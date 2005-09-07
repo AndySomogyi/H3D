@@ -1,0 +1,459 @@
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2004, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+//
+//
+//////////////////////////////////////////////////////////////////////////////
+#ifndef __MFIELD_H__
+#define __MFIELD_H__
+
+#include <string>
+#include <set>
+#include <vector>
+
+#include "TypedField.h"
+#include "Node.h"
+#include "X3DFieldConversion.h"
+
+using namespace std;
+
+namespace H3D {
+
+  /// \class MFieldBase
+  /// \brief The common base class for MField types and MFNode.
+  /// It defines the common interface between MFNode and MField <>.
+  /// It encapsulates a vector of values of a certain type with the Field
+  /// mechanisms.
+  /// \param Type The type the values in the vector.
+  /// \param VectorClass The actual vector type.
+  /// \param BaseField The Field base class to inherit from.
+  /// 
+  template< class Type, 
+            class VectorClass = vector< Type >, 
+            class BaseField  = ParsableMField > 
+  class MFieldBase: public TypedField< BaseField,
+                                       void,
+                                       AnyNumber< MFieldBase< Type, 
+                                                              VectorClass, 
+                                                              BaseField > > > {
+  public:
+    /// The type of the value member. 
+    typedef VectorClass vector_type;
+    /// The type of the Node, NodeClass, stored in the vector.
+    typedef typename VectorClass::value_type value_type;
+    /// Pointer to NodeClass.
+    typedef typename VectorClass::pointer pointer;
+    /// Const reference to NodeClass.
+    typedef typename VectorClass::const_reference const_reference;
+    /// An unsigned integral type.
+    typedef typename VectorClass::size_type size_type;
+    /// A signed integral type.
+    typedef typename VectorClass::difference_type difference_type;  
+    /// Const iterator used to iterate through a vector.
+    typedef typename VectorClass::const_iterator const_iterator;
+    /// Const iterator used to iterate backwards through a vector.
+    typedef typename VectorClass::const_reverse_iterator 
+    const_reverse_iterator;
+
+    /// Returns a const_iterator pointing to the beginning of the vector.
+    inline virtual const_iterator begin( int id = 0 ) { 
+      // check that we have the correct access type
+      this->checkAccessTypeGet( id );
+      this->upToDate();
+      return value.begin();
+    }
+    /// Returns a const_iterator pointing to the end of the vector.
+    inline virtual const_iterator end( int id = 0 ) { 
+      // check that we have the correct access type
+      this->checkAccessTypeGet( id );
+      this->upToDate();
+      return value.end(); 
+    }
+    /// Returns a const_reverse_iterator pointing to the beginning of the
+    /// reversed vector.
+    inline virtual const_reverse_iterator rbegin( int id = 0 ) { 
+      // check that we have the correct access type
+      this->checkAccessTypeGet( id );
+      this->upToDate();
+      return value.rbegin();
+    }
+    /// Returns a const_reverse_iterator pointing to the end of the reversed 
+    /// vector.
+    inline virtual const_reverse_iterator rend( int id = 0 ) { 
+      // check that we have the correct access type
+      this->checkAccessTypeGet( id );
+      this->upToDate();
+      return value.rend(); 
+    }
+
+    /// Returns the size of the vector.
+    inline virtual size_type size() { 
+      this->upToDate();
+      return value.size(); 
+    }
+
+    /// Returns the largest possible size of the vector.
+    inline virtual size_type max_size() {
+      this->upToDate();
+      return value.max_size();
+    }
+        
+    /// Number of elements for which memory has been allocated. capacity() 
+    /// is always greater than or equal to size().
+    inline virtual size_type capacity() { 
+      this->upToDate();
+      return value.capacity(); 
+    }
+        
+    /// A request for allocation of additional memory. If n is less than
+    /// or equal to capacity(), this call has no effect. 
+    /// Otherwise, it is a request for allocation of additional memory. 
+    /// If the request is successful, then capacity() is greater than or 
+    /// equal to n; otherwise, capacity() is unchanged. In either case, 
+    /// size() is unchanged.
+    /// 
+    inline virtual void reserve( size_t s ) { 
+      this->upToDate();
+      value.reserve( s ); 
+    }
+
+    /// Inserts or erases elements at the end such that the size becomes n.
+    inline virtual void resize( size_t n, Type t = Type(), int id = 0 ) { 
+      this->checkAccessTypeSet( id );
+      this->upToDate();
+      value.resize( n ); 
+      this->startEvent();
+    }
+
+    /// true if the vector's size is 0.
+    inline virtual bool empty() { 
+      this->upToDate();
+      return value.empty(); 
+    }
+    /// Returns the n'th element.
+    inline virtual const_reference operator[](size_type n ) {
+      // check that we have the correct access type
+      this->checkAccessTypeGet( 0 );
+      this->upToDate();
+      return value[n];
+    }
+
+    /// Returns the first element.
+    inline virtual const_reference front( int id = 0 ) { 
+      // check that we have the correct access type
+      this->checkAccessTypeGet( id );
+      this->upToDate();
+      return value.front(); 
+    }
+
+    /// Returns the last element.
+    inline virtual const_reference back( int id = 0 ) {
+      // check that we have the correct access type
+      this->checkAccessTypeGet( id );
+      this->upToDate();
+      return value.back(); 
+    }
+
+    /// Swaps the contents of two vectors.
+    inline virtual void swap( VectorClass &x, int id = 0 ) {
+      // check that we have the correct access type
+      this->checkAccessTypeSet( id );
+      this->checkAccessTypeGet( id );
+      this->upToDate();
+      value.swap( x );
+      this->startEvent();
+    }
+    /// Inserts a new element at the end.
+    inline virtual void push_back( const Type &x, int id = 0 ) {
+      // check that we have the correct access type
+      this->checkAccessTypeSet( id );
+      this->upToDate();    
+      value.push_back( x );
+      this->startEvent();
+    }
+
+    /// Removed the last element.
+    void pop_back( int id = 0 ) {
+      // check that we have the correct access type
+      this->checkAccessTypeSet( id );
+      this->upToDate();
+      value.pop_back();
+      this->startEvent();
+    }
+    /*        
+   /// Inserts x before pos.
+   const_iterator insert(const_iterator pos,
+   const Type &x) {
+   upToDate();
+   const_iterator i = value.insert( pos, x );
+   startEvent();
+   return i;
+   }
+        
+   /// Inserts the range [first, last) before pos.
+   template <class InputIterator>
+   void insert(const_iterator pos,
+   InputIterator first, InputIterator last ) {
+   upToDate();
+   value.insert( pos, first, last );
+   startEvent();
+   } 
+            
+   /// Inserts n copies of x before pos.
+   void insert(const_iterator pos, 
+   size_type n, const Type &x) {
+   upToDate();
+   value.insert( pos, n, x );
+   startEvent();
+   }
+    /// Erases the element at position pos.
+    inline virtual void erase( const_iterator pos ) { 
+      this->upToDate();
+      value.erase( pos );
+      this->startEvent();
+    }
+    
+    
+    /// Erases the range [first, last)
+    inline virtual void erase( const_iterator first, const_iterator last ) {
+      this->upToDate();
+      value.erase( first, last );
+      this->startEvent();
+    }
+    */
+    
+    /// Erases all of the elements.
+    inline virtual void clear( int id = 0 ) {
+      // check that we have the correct access type
+      this->checkAccessTypeSet( id );
+      this->upToDate();
+      value.clear();
+      this->startEvent();
+    }
+
+    /// Default constructor. Creates an empty MField.
+    MFieldBase() {};
+
+    /// Creates a MField with space reserved for n elements.
+    MFieldBase( size_type size ) : value( size ) {};
+
+    /// Returns a string name for this field type e.g. MFInt32
+    static string classTypeName() {
+      return typeid( MFieldBase< Type, VectorClass, BaseField > ).name();
+    }
+
+  protected:
+    /// The encapsulated vector.
+    VectorClass value;
+  };
+
+  /// \ingroup FieldTemplateModifiers   
+  /// Template class that adds the Field mechanism to a vector of values.
+  /// 
+  /// \param Type The type of the values in the vector.
+  ///     
+  template< class Type >
+  class MField: public MFieldBase< Type, 
+                                   vector< Type >, 
+                                   ParsableMField > {
+    typedef MFieldBase< Type, 
+                        vector< Type >, 
+                        ParsableMField > BaseMField;
+     
+  public:
+    /// Thrown if the index given to getValueByIndex() is outside the 
+    /// boundaries.
+    H3D_VALUE_EXCEPTION( typename BaseMField::size_type, InvalidIndex );
+
+    /// Default constructor. Creates an empty MField.
+    MField() {}
+
+    /// Creates an MField with space reserved for size nodes.
+    MField( typename BaseMField::size_type size ) : 
+      BaseMField( size ) {}
+        
+    /// Get the value of the MField.
+    inline virtual const vector< Type > &getValue( int id = 0 );
+
+    /// Get the value of an element of the MField.
+    /// \param i The index of the element.
+    inline virtual typename MField<Type>::const_reference 
+      getValueByIndex( typename BaseMField::size_type i, int id = 0 );
+
+    /// Set the value of the field.
+    /// \param The new value.
+    inline virtual void setValue( const vector< Type > &v, int id = 0  );
+
+    /// Change the value of one element in the MField.
+    /// \param i The index of the value to set.
+    /// \param t The new value.
+    inline virtual void setValue( typename BaseMField::size_type i,
+                                  const Type &t, int id = 0  );
+
+    /// Set the value of the field given a string. By default
+    /// we try to parse the values according to the X3D/XML 
+    /// specification.
+    inline virtual void setValueFromString( const string &s ) {
+      vector< Type > v;
+      X3D::X3DStringToVector< vector< Type > >( s, v ); 
+      setValue( v );
+    }
+
+    /// Add a new element to an MField from a string value.
+    inline virtual void addElementFromString( const string &s ) {
+      push_back(  X3D::X3DStringToValue< Type >( s )  );
+    }
+
+    /// Get the value of the field as a string. If the field contains
+    /// multiple values the separator string is used between the values.
+    inline virtual string getValueAsString( const string& separator = " " ) {
+      stringstream s;
+      const vector< Type > &v = getValue();
+      
+      if( v.size() == 0 )
+        return "";
+      unsigned int i;
+      for( i = 0; i < v.size() - 1; i++ )
+        s << v[i] << separator;
+      s << v[i];
+      return s.str();
+    }
+
+    /// Returns a string name for this field type e.g. MFInt32
+    virtual string getTypeName() {
+      return this->classTypeName();
+    }
+
+    /// Set the value of the field given a string. By default
+    /// we try to parse the values according to the X3D/XML 
+    /// specification.
+    virtual size_t getSize( ) {
+      const vector< Type > &v = getValue();
+      return v.size();
+    }
+
+    /// Get the value of the field as a string. If the field contains
+    /// multiple values the separator string is used between the values.
+    inline virtual string getElementAsString( size_t element ) {
+      stringstream s;
+      const vector< Type > &v = getValue();
+      
+      if( element >= v.size() )
+        throw InvalidIndex( element, "getElementAsString", H3D_FULL_LOCATION );
+      
+      s << v[element];
+      return s.str();
+    }
+
+
+  protected:
+    /// Make the field up to date given that an event has occured.
+    inline virtual void update();
+  };
+
+  template< class Type  >
+  void MField< Type >::update() {
+#ifdef DEBUG
+    cerr << "MField< " << typeid( Type ).name() 
+         << " >(" << this->name << ")::update()" << endl;
+#endif
+    if( this->owner )
+      this->value = 
+        static_cast< MField<Type>* >
+        (this->event.ptr)->getValue( this->owner->id );
+    else 
+      this->value = 
+        static_cast< MField<Type>* >(this->event.ptr)->getValue();
+  }
+
+  template< class Type  >
+  void MField< Type >::setValue( const vector< Type > &v, int id ) {
+#ifdef DEBUG
+    cerr << "MField< " << typeid( Type ).name() 
+         << " >(" << this->name << ")::setValue()" << endl;
+#endif
+    // check that we have the correct access type
+    this->checkAccessTypeSet( id );
+    this->value = v;
+    // reset the event pointer since we want to ignore any pending
+    // events when the field is set to a new value.
+    this->event.ptr = NULL;
+    // generate an event.
+    this->startEvent();
+  }
+
+  template< class Type >
+  const vector< Type > &MField<Type >::getValue( int id ) {
+#ifdef DEBUG
+    cerr << "MField< " << typeid( Type ).name() 
+         << " >(" << this->name << ")::getValue()" << endl;
+#endif
+    // check that we have the correct access type
+    this->checkAccessTypeGet( id );
+
+    // check that the field is up-to-date first
+    this->upToDate();
+    return this->value;
+  }
+
+  template< class Type  >
+  inline void MField<Type >::setValue( typename BaseMField::size_type i,
+                                       const Type &v, int id ) {
+#ifdef DEBUG
+    cerr << "MField< " << typeid( Type ).name() 
+         << " >(" << this->name << ")::setValue()" << endl;
+#endif
+    // check that we have the correct access type
+    this->checkAccessTypeSet( id );
+    this->value[i] = v; //.set( i, v );
+    // reset the event pointer since we want to ignore any pending
+    // events when the field is set to a new value.
+    this->event.ptr = NULL;
+    // generate an event.
+    this->startEvent();                                  
+  }
+    
+  template< class Type >
+  inline typename MField< Type >::const_reference MField< Type >::
+    getValueByIndex( typename BaseMField::size_type i, int id ) {
+#ifdef DEBUG
+    cerr << "MField(" << name << ")::getValue()" << endl;
+#endif
+    // check that we have the correct access type
+    this->checkAccessTypeGet( id );
+
+    // check that the field is up-to-date first
+    this->upToDate();
+    if( i < 0 || i >= this->value.size() ) {
+      stringstream s;
+      s << "Trying to access value outside the bounds of field "
+        << this->getFullName() << ". Field has size " << this->value.size()
+        << ". " << ends;
+      throw InvalidIndex( i, s.str(), H3D_FULL_LOCATION );
+    }
+    return this->value[i];    
+  }
+}
+
+#endif
+

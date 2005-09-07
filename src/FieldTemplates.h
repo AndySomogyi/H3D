@@ -1,0 +1,467 @@
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2004, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+//
+//
+//////////////////////////////////////////////////////////////////////////////
+#ifndef __FIELDTEMPLATES_H__
+#define __FIELDTEMPLATES_H__
+
+#include <string>
+#include <set>
+#include <vector>
+
+#include "SField.h"
+#include "MField.h"
+#include "TypedField.h"
+
+using namespace std;
+
+namespace H3D {
+
+  H3D_VALUE_EXCEPTION( string, InvalidNodeType );
+
+  // template specializations in order to get nicer type printouts.
+  template<>
+  inline string SField< H3DFloat >::classTypeName() { return "SFFloat"; }
+
+  template<>
+  inline string SField< H3DDouble >::classTypeName() { return "SFDouble"; }
+
+  template<>
+  inline string SField< H3DInt32 >::classTypeName() { return "SFInt32"; }
+
+  template<>
+  inline string SField< Vec2f >::classTypeName() { return "SFVec2f"; }
+
+  template<>
+  inline string SField< Vec3f >::classTypeName() { return "SFVec3f"; }
+
+  template<>
+  inline string SField< Vec4f >::classTypeName() { return "SFVec4f"; }
+
+  template<>
+  inline string SField< Vec2d >::classTypeName() { return "SFVec2d"; }
+
+  template<>
+  inline string SField< Vec3d >::classTypeName() { return "SFVec3d"; }
+
+  template<>
+  inline string SField< Vec4d >::classTypeName() { return "SFVec4d"; }
+
+  template<>
+  inline string SField< bool >::classTypeName() { return "SFBool"; }
+
+  template<>
+  inline string SField< string >::classTypeName() { return "SFString"; }
+
+  template<>
+  inline string SField< RGB >::classTypeName() { return "SFColor"; }
+
+  template<>
+  inline string SField< RGBA >::classTypeName() { return "SFColorRGBA"; }
+
+  template<>
+  inline string SField< Rotation >::classTypeName() { return "SFRotation"; }
+
+  template<>
+  inline string SField< Matrix3f >::classTypeName() { return "SFMatrix3f"; }
+
+  template<>
+  inline string SField< Matrix4f >::classTypeName() { return "SFMatrix4f"; }
+
+  template<>
+  inline string MFieldBase< H3DFloat >::classTypeName() { return "MFFloat"; }
+
+  template<>
+  inline string MFieldBase< H3DDouble >::classTypeName() { return "MFDouble"; }
+
+  template<>
+  inline string MFieldBase< H3DInt32 >::classTypeName() { return "MFInt32"; }
+
+  template<>
+  inline string MFieldBase< Vec2f >::classTypeName() { return "MFVec2f"; }
+
+  template<>
+  inline string MFieldBase< Vec3f >::classTypeName() { return "MFVec3f"; }
+
+  template<>
+  inline string MFieldBase< Vec4f >::classTypeName() { return "MFVec4f"; }
+
+  template<>
+  inline string MFieldBase< Vec2d >::classTypeName() { return "MFVec2d"; }
+
+  template<>
+  inline string MFieldBase< Vec3d >::classTypeName() { return "MFVec3d"; }
+
+  template<>
+  inline string MFieldBase< Vec4d >::classTypeName() { return "MFVec4d"; }
+
+  template<>
+  inline string MFieldBase< bool >::classTypeName() { return "MFBool"; }
+
+  template<>
+  inline string MFieldBase< string >::classTypeName() { return "MFString"; }
+
+  template<>
+  inline string MFieldBase< RGB >::classTypeName() { return "MFColor"; }
+
+  template<>
+  inline string MFieldBase< RGBA >::classTypeName() { return "MFColorRGBA"; }
+
+  template<>
+  inline string MFieldBase< Rotation >::classTypeName() 
+  { return "MFRotation"; }
+
+  template<>
+  inline string MFieldBase< Matrix3f >::classTypeName() 
+  { return "MFMatrix3f"; }
+
+  template<>
+  inline string MFieldBase< Matrix4f >::classTypeName() 
+  { return "MFMatrix4f"; }
+
+  /// \defgroup FieldTypes Basic Field types.
+  /// The basic Field types of H3D API.
+  /// \{
+    
+  /// The SFFloat field contains one single-precision floating point number.
+  class H3DAPI_API SFFloat: public SField< H3DFloat > {
+  public:
+    SFFloat() {}
+    SFFloat( const H3DFloat &_value ): SField< H3DFloat >( _value ){}
+  };
+
+  /// The SFDouble field contains one high-precision floating point number.
+  class H3DAPI_API SFDouble: public SField< H3DDouble > {
+  public:
+    SFDouble() {}
+    SFDouble( const H3DDouble &_value ): SField< H3DDouble >( _value ){}
+  };
+
+  /// The SFInt32 field contains one 32-bit integer.
+  class H3DAPI_API SFInt32: public SField< H3DInt32 > {
+  public:
+    SFInt32() {}
+    SFInt32( const H3DInt32 &_value ): SField< H3DInt32 >( _value ){}
+  };
+
+  /// The SFVec2f field contains a Vec2f.
+  class H3DAPI_API SFVec2f: public SField< Vec2f > {
+  public:
+    SFVec2f() {}
+    SFVec2f( const Vec2f &_value ): SField< Vec2f >( _value ){}
+  };
+
+  /// The SFVec3f field contains a Vec3f.
+  class H3DAPI_API SFVec3f: public SField< Vec3f > {
+  public:
+    SFVec3f() {}
+    SFVec3f( const Vec3f &_value ): SField< Vec3f >( _value ){}
+  };
+
+  /// The SFVec4f field contains a Vec4f.
+  class H3DAPI_API SFVec4f: public SField< Vec4f > {
+  public:
+    SFVec4f() {}
+    SFVec4f( const Vec4f &_value ): SField< Vec4f >( _value ){}
+  };
+
+  /// The SFVec2d field contains a Vec2d.
+  class H3DAPI_API SFVec2d: public SField< Vec2d > {
+  public:
+    SFVec2d() {}
+    SFVec2d( const Vec2d &_value ): SField< Vec2d >( _value ){}
+  };
+
+  /// The SFVec3d field contains a Vec3d.
+  class H3DAPI_API SFVec3d: public SField< Vec3d > {
+  public:
+    SFVec3d() {}
+    SFVec3d( const Vec3d &_value ): SField< Vec3d >( _value ){}
+  };
+
+  /// The SFVec4d field contains a Vec4d.
+  class H3DAPI_API SFVec4d: public SField< Vec4d > {
+  public:
+    SFVec4d() {}
+    SFVec4d( const Vec4d &_value ): SField< Vec4d >( _value ){}
+  };
+
+  /// The SFBool field contains a single boolean value.
+  class H3DAPI_API SFBool: public SField< bool > {
+  public:
+    SFBool() {}
+    SFBool( const bool &_value ): SField< bool >( _value ){}
+  };
+
+  /// The SFTime field contains a single time value.
+  class H3DAPI_API SFTime: public TypedField< SFDouble, void, 
+                                              AnyNumber< SFTime > > {
+  public:
+    SFTime() {}
+	SFTime( const H3DTime &_value ) { value = _value; }
+    virtual string getTypeName() { return classTypeName(); }
+    static string classTypeName() { return "SFTime"; }
+  };
+
+  /// The SFString field contains a string.
+  class H3DAPI_API SFString: public SField< string > {
+  public:
+    SFString() {}
+    SFString( const string &_value ): SField< string >( _value ){}
+    /// Get the value of the field as a string. If the field contains
+    /// multiple values the separator string is used between the values.
+    inline virtual string getValueAsString( const string& separator = " " ) {
+      stringstream s;
+      s << "\"" << getValue() << "\"";
+      return s.str();
+    }
+  };
+
+  /// The SFColor field contains one RGB (red-green-blue) colour triple.
+  class H3DAPI_API SFColor: public SField< RGB > {
+  public:
+    SFColor() {}
+    SFColor( const RGB &_value ): SField< RGB >( _value ){}
+  };
+  
+  /// The SFColorRGBA field contains one RGBA (red-green-blue-alpha) 
+  /// colour 4-tuple.
+  class H3DAPI_API SFColorRGBA: public SField< RGBA > {
+  public:
+    SFColorRGBA() {}
+    SFColorRGBA( const RGBA &_value ): SField< RGBA >( _value ){}
+    virtual string getTypeName() { return classTypeName(); }
+    static string classTypeName() { return "SFColorRGBA"; }
+  };
+
+  /// The SFRotation field contains one arbitrary Rotation.
+  class H3DAPI_API SFRotation: public SField< Rotation > {
+  public:
+    SFRotation() {}
+    SFRotation( const Rotation &_value ): SField< Rotation >( _value ){}
+  };
+
+  /// The SFMatrix3f field contains a Matrix3f.
+  class H3DAPI_API SFMatrix3f: public SField< Matrix3f > {
+  public:
+    SFMatrix3f() {}
+    SFMatrix3f( const Matrix3f &_value ): SField< Matrix3f >( _value ){}
+  };
+    
+  /// The SFMatrix4f field contains a Matrix4f.
+  class H3DAPI_API SFMatrix4f: public SField< Matrix4f > {
+  public:
+    SFMatrix4f() {}
+    SFMatrix4f( const Matrix4f &_value ): SField< Matrix4f >( _value ){}
+  };
+
+  /// The MFFloat field contains a vector of single-precision floating 
+  /// point numbers.
+  class H3DAPI_API MFFloat: public MField< H3DFloat > {
+  public:
+    MFFloat(){}
+    MFFloat( size_type size ): MField< H3DFloat >( size ){}
+  };
+
+  /// The MFDouble field contains a vector of high-precision floating 
+  /// point numbers.
+  class H3DAPI_API MFDouble: public MField< H3DDouble > {
+  public:
+    MFDouble(){}
+    MFDouble( size_type size ): MField< H3DDouble >( size ){}
+  };
+
+  /// The MFInt32 field contains a vector of 32-bit integers.
+  class H3DAPI_API MFInt32: public MField< H3DInt32 > {
+  public:
+    MFInt32(){}
+    MFInt32( size_type size ): MField< H3DInt32 >( size ){}
+  };
+
+  /// The MFVec2f field contains a vector of Vec2f.
+  class H3DAPI_API MFVec2f: public MField< Vec2f > {
+  public:
+    MFVec2f(){}
+    MFVec2f( size_type size ): MField< Vec2f >( size ){}
+  };
+
+  /// The MFVec3f field contains a vector of Vec3f.
+  class H3DAPI_API MFVec3f: public MField< Vec3f > {
+  public:
+    MFVec3f(){}
+    MFVec3f( size_type size ): MField< Vec3f >( size ){}
+  };
+
+  /// The MFVec4f field contains a vector of Vec4f.
+  class H3DAPI_API MFVec4f: public MField< Vec4f > {
+  public:
+    MFVec4f(){}
+    MFVec4f( size_type size ): MField< Vec4f >( size ){}
+  };
+
+  /// The MFVec2d field contains a vector of Vec2d.
+  class H3DAPI_API MFVec2d: public MField< Vec2d > {
+  public:
+    MFVec2d(){}
+    MFVec2d( size_type size ): MField< Vec2d >( size ){}
+  };
+
+  /// The MFVec3d field contains a vector of Vec3d.
+  class H3DAPI_API MFVec3d: public MField< Vec3d > {
+  public:
+    MFVec3d(){}
+    MFVec3d( size_type size ): MField< Vec3d >( size ){}
+  };
+
+  /// The MFVec4d field contains a vector of Vec4d.
+  class H3DAPI_API MFVec4d: public MField< Vec4d > {
+  public:
+    MFVec4d(){}
+    MFVec4d( size_type size ): MField< Vec4d >( size ){}
+  };
+
+  /// The MFBool field contains a vector of boolean values.
+  class H3DAPI_API MFBool: public MField< bool > {
+  public:
+    MFBool(){}
+    MFBool( size_type size ): MField< bool >( size ){}
+  };
+
+  /// The MFTime field contains a vector of time values.
+  class H3DAPI_API MFTime: public TypedField< MFDouble, 
+                                              void,
+                                              AnyNumber< MFTime > > {
+  public:
+    MFTime(){}
+    MFTime( size_type size ) {
+	  value.resize( size );	
+	}
+    virtual string getTypeName() { return classTypeName(); }
+    static string classTypeName() { return "MFTime"; }
+  };
+  
+  /// The MFString field conatins a vector of strings.
+  class H3DAPI_API MFString: public MField< string > {
+  public:
+    MFString(){}
+    MFString( size_type size ): MField< string >( size ){}
+    inline virtual string getValueAsString( const string& separator = " " ) {
+      stringstream s;
+      const vector< string > &v = getValue();
+      if( v.size() == 0 )
+        return "";
+      unsigned int i;
+      for( i = 0; i < v.size() - 1; i++ )
+        s << "\"" << v[i] << "\"" << separator;
+      s << "\"" << v[i] << "\"";
+      return s.str();
+    }
+  };
+
+  /// The MFColor field contains a vector of RGB (red-green-blue) 
+  /// colour triples.
+  class H3DAPI_API MFColor: public MField< RGB > {
+  public:
+    MFColor(){}
+    MFColor( size_type size ): MField< RGB >( size ){}
+  };
+
+  /// The MFColorRGBA field contains a vector of RGBA (red-green-blue-alpha) 
+  /// colour 4-tuples.
+  class H3DAPI_API MFColorRGBA: public MField< RGBA > {
+  public:
+    MFColorRGBA(){}
+    MFColorRGBA( size_type size ): MField< RGBA >( size ){}
+  };
+
+  /// The MFRotation field contains a vector of arbitrary Rotation objects.
+  class H3DAPI_API MFRotation: public MField< Rotation > {
+  public:
+    MFRotation(){}
+    MFRotation( size_type size ): MField< Rotation >( size ){}
+  };
+
+  /// The MFMatrix3f field contains a vector of Matrix3f instances.
+  class H3DAPI_API MFMatrix3f: public MField< Matrix3f > {
+  public:
+    MFMatrix3f(){}
+    MFMatrix3f( size_type size ): MField< Matrix3f >( size ){}
+  };
+
+  /// The MFMatrix4f field contains a vector of Matrix4f instances.
+  class H3DAPI_API MFMatrix4f: public MField< Matrix4f > {
+  public:
+    MFMatrix4f(){}
+    MFMatrix4f( size_type size ): MField< Matrix4f >( size ){}
+  };
+  /// \}
+
+  /// Template to make sure that the Node that is set in a SFNode is
+  /// of a specified Node type.
+  /// \param RefCountedTyoe The expected RefcountedClass type. 
+  /// \param BaseRefCountType The base field type.
+  /// \ingroup FieldTemplateModifiers
+  template< class RefCountedType, class BaseRefCountType >
+  class TypedRefCountField: public BaseRefCountType {
+  protected:
+    /// We check that the type of the Node is of the correct type.
+    void onAdd( typename BaseRefCountType::value_type n) {
+      if( !dynamic_cast< RefCountedType * >( n ) ) {
+        stringstream s;
+        s << "Expecting " << typeid( RefCountedType ).name() << ends;
+        throw InvalidNodeType( typeid( n ).name(),
+                               s.str(),
+                               H3D_FULL_LOCATION );
+  
+      } else {
+        BaseRefCountType::onAdd(  n );
+      }
+    }
+  public:
+    /// Get the value casted to the RefCountType.
+    virtual RefCountedType *getValue() {
+      return static_cast< RefCountedType * >( BaseRefCountType::getValue() );
+    }
+    
+  };
+
+  /// The AutoUpdate field is a template to force the BaseField to update 
+  /// itself as soon as an event is received. Normally the value of the 
+  /// field has to be requested in order for an update to take place.
+  /// \ingroup FieldTemplateModifiers
+  template< class BaseFieldType >
+  struct AutoUpdate: public BaseFieldType {
+    /// Receive an event from another field. We call the upToDate() 
+    /// function to update the field.
+    ///
+    virtual void propagateEvent( Field::Event e ) {
+      BaseFieldType::propagateEvent( e );
+      this->upToDate();
+    }
+  };
+}
+
+#endif
+

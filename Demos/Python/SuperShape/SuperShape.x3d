@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Group>
+<Viewpoint />
+   <Transform DEF="TX">
+     <Shape>
+       <Appearance>
+        <Material diffuseColor="0.7 1 0.7"/>
+       </Appearance>
+	   <SuperShape DEF="SS" resolution="20" 
+	   ss1_m="8" 
+	   ss1_n1="100" ss1_n2="100" ss1_n3="100"
+	   ss2_m="0" 
+	   ss2_n1="100" ss2_n2="100" ss2_n3="100"  /> 
+     </Shape>
+   </Transform>
+   <PythonScript DEF="PS" url="SuperShape.py" />
+   <ROUTE fromNode="PS" fromField="morph" toNode="SS" toField="ss1_m" />
+   <ROUTE fromNode="PS" fromField="pos" toNode="TX" toField="translation" />
+</Group>
