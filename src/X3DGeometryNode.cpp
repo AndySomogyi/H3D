@@ -124,10 +124,13 @@ void HLCALLBACK X3DGeometryNode::touchCallback( HLenum event,
                                                 HLcache *cache,
                                                 void *userdata ) {
   X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( userdata );
+  // make sure contactPoint and contactNormal vectors are set 
+  // before isTouched is set to avoid errors if routed to AutoUpdate
+  // fields.
+  X3DGeometryNode::motionCallback( event, object, thread, cache, userdata );
   vector< bool > v;
   v.push_back( true );
   geometry->isTouched->setValue( v, geometry->id );
-
 }
 
 void HLCALLBACK X3DGeometryNode::untouchCallback( HLenum event,
