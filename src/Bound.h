@@ -147,6 +147,30 @@ namespace H3D {
       size->setValue( s );
     }
 
+    template< class InputIterator >
+    void fitAround2DPoints( InputIterator begin,
+                            InputIterator end ) {
+      if( begin == end ) {
+        center->setValue( Vec3f( 0, 0, 0 ) );
+        size->setValue( Vec3f( 0, 0, 0 ) );
+        return;
+      }
+      InputIterator i = begin;
+      Vec2f min = *i;
+      Vec2f max = *i;
+      i++;
+      for( ; i != end; ++i ) {
+        if( (*i).x < min.x ) min.x = (*i).x;
+        if( (*i).y < min.y ) min.y = (*i).y;
+        if( (*i).x > max.x ) max.x = (*i).x;
+        if( (*i).y > max.y ) max.y = (*i).y;
+      }
+      Vec2f s = max - min;
+      Vec2f c = min + s / 2.0;
+      center->setValue( Vec3f( c.x, c.y, 0.f ) );
+      size->setValue( Vec3f( s.x, s.y, 0.f ) );
+    }
+
     /// Determines if a given point is inside the bound or not.
     virtual bool isInside( const Vec3f &p ){ 
       Vec3f half_size = size->getValue() / 2.0;
