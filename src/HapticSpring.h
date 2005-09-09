@@ -86,7 +86,9 @@ namespace H3D {
       //Vec3f local_force = ( position - local_pos ) * spring_constant;
       // transform force into global coordinate space before returning.
       //return EffectOutput( transform.getRotationPart() * local_force );
-      return force;
+      Vec3f f = force;
+      force = Vec3f( 0, 0, 0 );
+      return f;
     }
     
   protected:
