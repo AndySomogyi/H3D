@@ -54,6 +54,30 @@ DvState LinearMotion::evaluate( LMState state ) {
   DvState newState;
   newState.vel = state.vel;
   newState.force = state.force; // some function to establish force
+  // simple colission detection against the "box" to establish a new
+  // force.
+  float half_x = state.box.x/2;
+  float half_y = state.box.y/2;
+  float half_z = state.box.z/2;
+  if ( half_x > 0 ) {
+    if ( state.pos.x < -half_x )
+      newState.force.x += 10000*(fabs(state.pos.x)-half_x);
+    if ( state.pos.x > half_x )
+      newState.force.x += -10000*(fabs(state.pos.x)-half_x);
+  }
+  if ( half_y > 0 ) {
+    if ( state.pos.y < -half_y )
+      newState.force.y += 10000*(fabs(state.pos.y)-half_y);
+    if ( state.pos.y > half_y )
+      newState.force.y += -10000*(fabs(state.pos.y)-half_y);
+  }
+  if ( half_z > 0 ) {
+    if ( state.pos.z < -half_z )
+      newState.force.z += 10000*(fabs(state.pos.z)-half_z);
+    if ( state.pos.z > half_z )
+      newState.force.z += -10000*(fabs(state.pos.z)-half_z);
+  }
+
   newState.spin = state.spin;
   newState.torque = state.torque;
   return newState;
