@@ -51,6 +51,8 @@ namespace H3D {
   public:
     /// Constructor
     SpringEffect( Inst< SFVec3f     > _position = 0,
+                  Inst< SFVec3f     > _velocity = 0,
+                  Inst< SFVec3f     > _force = 0,
                   Inst< SFFloat     > _springConstant = 0,
                   Inst< SFFloat     > _startDistance = 0,
                   Inst< SFFloat     > _escapeDistance = 0,
@@ -69,6 +71,19 @@ namespace H3D {
     /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
     auto_ptr< SFVec3f > position;
 
+    /// The velocity of the spring.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
+    auto_ptr< SFVec3f > velocity;
+    
+    /// The force applied by the spring to the haptics device since the last
+    /// scenegraph update.
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
+    auto_ptr< SFVec3f > force;
+    
     /// The spring constant of the spring. 
     /// force = (position - device_position) * springConstant
     ///
@@ -105,6 +120,9 @@ namespace H3D {
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+    
+    /// Internal haptic spring instance
+    AutoRef< HapticSpring > haptic_spring;
   };
 }
 
