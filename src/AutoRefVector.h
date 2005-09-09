@@ -31,6 +31,7 @@
 
 #include "H3DApi.h"
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -216,6 +217,18 @@ namespace H3D {
     inline void clear() {
       unrefAll();
       vector<NodeClass*>::clear();
+    }
+
+    /// Erase the first element equal to a.
+    inline virtual void erase( NodeClass *a ) {
+      vector<NodeClass * >::iterator i = 
+        std::find( vector<NodeClass*>::begin(), 
+                   vector<NodeClass*>::end(), 
+                   a );
+      if( i != end() ) {
+        unref( *i );
+        vector<NodeClass*>::erase( i );
+      } 
     }
 
   protected:

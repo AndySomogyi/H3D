@@ -130,6 +130,12 @@ namespace H3D {
       this->value = v;
       this->startEvent();
     }
+
+    /// Erase the first element equal to a.
+    inline virtual void erase( RefClass *a, int id = 0 ) {
+      this->checkAccessTypeSet( id );
+      this->value.erase( a );
+    } 
     
     /// Returns a string name for this field type i.e. SFNode
     virtual string getTypeName() {

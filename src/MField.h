@@ -30,6 +30,7 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <algorithm>
 
 #include "TypedField.h"
 #include "Node.h"
@@ -200,48 +201,7 @@ namespace H3D {
       value.pop_back();
       this->startEvent();
     }
-    /*        
-   /// Inserts x before pos.
-   const_iterator insert(const_iterator pos,
-   const Type &x) {
-   upToDate();
-   const_iterator i = value.insert( pos, x );
-   startEvent();
-   return i;
-   }
-        
-   /// Inserts the range [first, last) before pos.
-   template <class InputIterator>
-   void insert(const_iterator pos,
-   InputIterator first, InputIterator last ) {
-   upToDate();
-   value.insert( pos, first, last );
-   startEvent();
-   } 
-            
-   /// Inserts n copies of x before pos.
-   void insert(const_iterator pos, 
-   size_type n, const Type &x) {
-   upToDate();
-   value.insert( pos, n, x );
-   startEvent();
-   }
-    /// Erases the element at position pos.
-    inline virtual void erase( const_iterator pos ) { 
-      this->upToDate();
-      value.erase( pos );
-      this->startEvent();
-    }
-    
-    
-    /// Erases the range [first, last)
-    inline virtual void erase( const_iterator first, const_iterator last ) {
-      this->upToDate();
-      value.erase( first, last );
-      this->startEvent();
-    }
-    */
-    
+
     /// Erases all of the elements.
     inline virtual void clear( int id = 0 ) {
       // check that we have the correct access type
@@ -281,6 +241,9 @@ namespace H3D {
                         ParsableMField > BaseMField;
      
   public:
+    /// iterator used to iterate through a vector.
+    typedef typename vector< Type >::iterator iterator;
+
     /// Thrown if the index given to getValueByIndex() is outside the 
     /// boundaries.
     H3D_VALUE_EXCEPTION( typename BaseMField::size_type, InvalidIndex );
@@ -338,6 +301,63 @@ namespace H3D {
       s << v[i];
       return s.str();
     }
+
+    /// Inserts x before pos.
+    iterator insert( iterator pos,
+                     const Type &x, 
+                     int id = 0 ) {
+      this->checkAccessTypeSet( id );
+      this->upToDate();
+      iterator i = this->value.insert( pos, x );
+      this->startEvent();
+      return i;
+    }
+        
+   /// Inserts the range [first, last) before pos.
+   template <class InputIterator>
+   void insert(iterator pos,
+               InputIterator first, 
+               InputIterator last,
+               int id = 0 ) {
+     this->checkAccessTypeSet( id );
+     this->upToDate();
+     this->value.insert( pos, first, last );
+     this->startEvent();
+   } 
+            
+    /// Inserts n copies of x before pos.
+    void insert(iterator pos, 
+                size_type n, const Type &x, int id = 0 ) {
+      this->checkAccessTypeSet( id );
+      this->upToDate();
+      this->value.insert( pos, n, x );
+      this->startEvent();
+    }
+    
+    /// Erases the element at position pos.
+    inline virtual void erase( iterator pos, int id = 0 ) { 
+      this->checkAccessTypeSet( id );
+      this->upToDate();
+      this->value.erase( pos );
+      this->startEvent();
+    }
+        
+    /// Erases the range [first, last)
+    inline virtual void erase( iterator first, iterator last, int id = 0 ) {
+      this->checkAccessTypeSet( id );
+      this->upToDate();
+      this->value.erase( first, last );
+      this->startEvent();
+    }
+    
+    
+    /// Erase the first element equal to a.
+    inline virtual void erase( const Type &a, int id = 0 ) {
+      iterator i = std::find( value.begin(), value.end(), a );
+      if( i != value.end() ) {
+        this->value.erase( i );
+      }
+    } 
 
     /// Returns a string name for this field type e.g. MFInt32
     virtual string getTypeName() {
