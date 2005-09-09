@@ -81,7 +81,7 @@ namespace H3D {
 
   /// Returns true if its argument is a PyNode.
   inline bool PyNode_Check( PyObject *o) {
-    return PyObject_TypeCheck(o,&PyNode_Type);
+    return PyObject_TypeCheck(o,&PyNode_Type ) || o == Py_None;
   }
 
   /// \class PyNode

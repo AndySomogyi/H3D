@@ -159,11 +159,13 @@ namespace H3D {
   
   /// Returns an Node * representation of the contents of o.
   Node * PyNode_AsNode( PyObject *o ) {
-    if( PyNode_Check( o ) ) {
+    if( o == Py_None ) {
+      return NULL;
+    } else if( PyNode_Check( o ) ) {
       PyNode *p = (PyNode *)(o);
       return p->nodePtr();
     } else {
-      throw Exception::H3DAPIException( "PyObject * is not a PyVec2f *", 
+      throw Exception::H3DAPIException( "PyObject * is not a PyNode *", 
                                         H3D_FULL_LOCATION );
     }
   }  
