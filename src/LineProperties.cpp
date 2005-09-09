@@ -72,8 +72,11 @@ LineProperties::LineProperties( Inst< DisplayList > _displayList,
 void LineProperties::render() {
   if( applied->getValue() ) {
     H3DFloat width = linewidthScaleFactor->getValue();
+    
     int line_type = linetype->getValue();
     
+    if( width <= 0 )
+      width = 1;
     glLineWidth( width );
    
     if( line_type != 1 ) { 
