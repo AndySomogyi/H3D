@@ -158,14 +158,13 @@ void DynamicShape::SFMotion::update() {
   state.mass = ds->mass->getValue();
   state.inertiaTensor = ds->inertia->getValue();
 
-  if ( state.mom.length() > 1e-4) {
     // only perform integration if the momentum is non-zero
     H3DFloat stepsize=0.01; // 1ms
     while ( dt > stepsize/2 ) {  
       LinearMotion::solve( state, stepsize );
       dt = dt - stepsize;
     }
-  }
+
   //cerr << "SFMotion::update() momentum = " << solve.mom << endl;
   ds->position->setValue( state.pos );
   ds->momentum->setValue( state.mom );
