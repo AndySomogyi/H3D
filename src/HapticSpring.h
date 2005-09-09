@@ -39,25 +39,60 @@ namespace H3D {
   class H3DAPI_API HapticSpring: public HapticForceEffect {
   public:
     /// Constructor
+    HapticSpring ( const H3D::ArithmeticTypes::Matrix4f & _transform,
+                   bool _interpolate ):
+      HapticForceEffect( _transform, _interpolate ),
+      position( Vec3f( 0, 0, 0 ) ),
+      velocity( Vec3f( 0, 0, 0 ) ),
+    spring_constant( 0 ) { }
+    
+    /// Constructor
     HapticSpring( const H3D::ArithmeticTypes::Matrix4f & _transform,
                   const Vec3f &_position,
+                  const Vec3f &_velocity,
                   H3DFloat _spring_constant,
                   bool _interpolate ):
       HapticForceEffect( _transform, _interpolate ),
       position( _position ),
+      velocity( _velocity ),
       spring_constant( _spring_constant ) {}
     
     /// The force of the EffectOutput will be the force of the force field. 
     EffectOutput virtual calculateForces( const EffectInput &input ) {
-      Vec3f local_pos = transform.inverse() * input.position;
+      //position = position + velocity*input.deltaT;
+      Vec3f f = ( position - input.position ) * spring_constant;
+      force += (double)((TimeStamp)input.deltaT) * f;
+      //cerr << "input.deltaT " << input.deltaT << endl;
+      return EffectOutput( f );
+    }
+
+    // set position
+    virtual void setPosition( const Vec3f &_position ) { 
+      position = _position;
+    }
+
+    // set velocity
+    virtual void setVelocity( const Vec3f &_velocity ) {
+      velocity = _velocity;
+    }
+
+    // set velocity
+    virtual void setSpringConstant( const H3DFloat &_sc ) { spring_constant = _sc; }
+    
+    // get and reset force
+    virtual Vec3f getAndResetForce() {
+      //Vec3f local_pos = transform.inverse() * input.position;
       // force in local coordinate space
-      Vec3f local_force = ( position - local_pos ) * spring_constant;
+      //Vec3f local_force = ( position - local_pos ) * spring_constant;
       // transform force into global coordinate space before returning.
-      return EffectOutput( transform.getRotationPart() * local_force );
+      //return EffectOutput( transform.getRotationPart() * local_force );
+      return force;
     }
     
   protected:
     Vec3f position;
+    Vec3f velocity;
+    Vec3f force;
     H3DFloat spring_constant;
   };
 }
