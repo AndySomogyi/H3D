@@ -30,6 +30,7 @@
 #define __DYNAMICSHAPE_H__
 
 #include "MatrixTransform.h"
+#include "PeriodicUpdate.h"
 
 namespace H3D {
 
@@ -47,9 +48,12 @@ namespace H3D {
     /// routes_in[0] time field
     ///
     class H3DAPI_API SFMotion: 
-      public AutoUpdate< TypedField< H3D::SFVec3f,
-                                     Types< SFTime > > > {
+      public  TypedField< H3D::SFVec3f, Types< SFTime > >  {
     public:
+      
+      SFMotion() {
+      }
+      
       H3DTime last_t;
     protected:
       /// Update the matrix from the fields in the Transform node.
@@ -92,7 +96,8 @@ namespace H3D {
                   Inst< SFVec3f          > _torque           = 0,
                   Inst< SFFloat          > _mass             = 0,
                   Inst< SFMatrix3f       > _inertia          = 0,
-                  Inst< SFMotion         > _motion           = 0 );
+                  Inst< SFMotion         > _motion           = 0,
+                  Inst< SFVec3f          > _box              = 0 );
 
 
     virtual H3DNodeDatabase *getDatabase() { return &database; }
@@ -160,6 +165,13 @@ namespace H3D {
     /// Dynamic update algorithm
     auto_ptr<    SFMotion    >  motion;
     
+    /// Specifies a box that bounds the dynamic object. The dynamic object
+    /// will "bounce" off the walls of the box. No box is simulated if
+    /// the size is 0, 0, 0.
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
+    auto_ptr<    SFVec3f    >  box;
+
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   };

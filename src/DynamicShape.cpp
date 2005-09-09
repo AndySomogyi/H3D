@@ -57,6 +57,7 @@ namespace DynamicShapeInternals {
   FIELDDB_ELEMENT( DynamicShape, mass,            INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, inertia,         INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, motion,          INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DynamicShape, box,             INPUT_OUTPUT );
 }
 
 
@@ -82,7 +83,8 @@ DynamicShape::DynamicShape(
                            Inst< SFVec3f            > _torque,
                            Inst< SFFloat            > _mass,
                            Inst< SFMatrix3f         > _inertia,
-                           Inst< SFMotion           > _motion ):
+                           Inst< SFMotion           > _motion,
+                           Inst< SFVec3f            > _box ):
   MatrixTransform( _addChildren, _removeChildren, _children,
                    _metadata, _bound,_bboxCenter, _bboxSize,
                    _transformedBound, _matrix, 
@@ -97,8 +99,8 @@ DynamicShape::DynamicShape(
   torque          ( _torque           ),
   mass            ( _mass             ),
   inertia         ( _inertia          ),
-  motion          ( _motion           ) {
-
+  motion          ( _motion           ),
+  box             ( _box              )   {
   type_name = "DynamicShape";
   database.initFields( this );
   //motion->last_t = 0;
@@ -121,12 +123,14 @@ DynamicShape::DynamicShape(
   orientation->route( matrix );
   position->route( matrix );
 
+  box->setValue( Vec3f( 0, 0, 0 ) );
+
   Scene::time->route( motion );
+  motion->route( Scene::eventSink );
 }
 
 
 void DynamicShape::SFMotion::update() {
-  //cerr << "SFMotion::update()" << endl;
   if ( routes_in.size() != 1 )
     return;
   
@@ -148,15 +152,19 @@ void DynamicShape::SFMotion::update() {
   state.orn = ds->orientation->getValue(); 
   state.angMom = ds->angularMomentum->getValue(); ;
   state.torque = ds->torque->getValue(); 
+  state.box = ds->box->getValue(); 
 
 
   state.mass = ds->mass->getValue();
   state.inertiaTensor = ds->inertia->getValue();
 
-  H3DFloat stepsize=0.01; // 1ms
-  while ( dt > stepsize/2 ) {  
-    LinearMotion::solve( state, stepsize );
-    dt = dt - stepsize;
+  if ( state.mom.length() > 1e-4) {
+    // only perform integration if the momentum is non-zero
+    H3DFloat stepsize=0.01; // 1ms
+    while ( dt > stepsize/2 ) {  
+      LinearMotion::solve( state, stepsize );
+      dt = dt - stepsize;
+    }
   }
   //cerr << "SFMotion::update() momentum = " << solve.mom << endl;
   ds->position->setValue( state.pos );
