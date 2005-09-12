@@ -284,10 +284,10 @@ void X3DComposedGeometryNode::stopTexGen(
       size_t texture_units = mt->texture->size();
       for( size_t i = 0; i < texture_units; i++ ) {
         glActiveTexture( GL_TEXTURE0_ARB + (unsigned int) i );
-        tex_coord_gen->startTexGen();
+        tex_coord_gen->stopTexGen();
       }
     } else {
-      tex_coord_gen->startTexGen();
+      tex_coord_gen->stopTexGen();
     }
   }
 }
