@@ -74,12 +74,15 @@ void Field::route( Field *f, int id ) {
 
   // only call routeFrom if the route is a new route and
   // not already in routes_out 
-  if( routes_out.insert( f ).second ) {
+  FieldSet::iterator i = std::find( routes_out.begin(), routes_out.end(), f );
+  if( i == routes_out.end() ) {
+    routes_out.push_back( f );
     try {
       f->routeFrom( this, id );
     } catch( ... ) {
       //route failed, unroute and throw
-      routes_out.erase( f );
+      i = std::find( routes_out.begin(), routes_out.end(), f );
+      routes_out.erase( i );
       throw;
     }
 	// experimental; placing routes automatically triggers an event...
@@ -157,8 +160,11 @@ void Field::routeNoEvent( Field *f, int id ) {
   checkAccessTypeRoute( f, id );
     
   // only call routeFrom if the route is a new route and
-  // not already in routes_out 
-  if( routes_out.insert( f ).second ) {
+  // not already in routes_out
+  FieldSet::iterator i = std::find( routes_out.begin(), routes_out.end(), f );
+  
+  if( i == routes_out.end() ) {
+    routes_out.push_back( f );
     f->routeFrom( this, id );
   }
 }
@@ -185,9 +191,10 @@ Field * Field::replaceRoute( Field *f, unsigned int i, int id ) {
 
   // only call routeFrom if the route is a new route and
   // not already in routes_out 
-  if( routes_out.insert( f ).second ) {
+  FieldSet::iterator f_i = std::find( routes_out.begin(), routes_out.end(), f );
+  if( f_i == routes_out.end() ) {
+    routes_out.push_back( f );
     Field *replaced_field = f->replaceRouteFrom( this, i, id );
-    routes_out.erase( replaced_field );
     // experimental; placing routes automatically triggers an event...
     touch();
     return replaced_field;
@@ -204,9 +211,10 @@ Field * Field::replaceRouteNoEvent( Field *f, unsigned int i, int id ) {
 
   // only call routeFrom if the route is a new route and
   // not already in routes_out 
-  if( routes_out.insert( f ).second ) {
+  FieldSet::iterator f_i = std::find( routes_out.begin(), routes_out.end(), f );
+  if( f_i == routes_out.end() ) {
+    routes_out.push_back( f );
     Field *replaced_field = f->replaceRouteFrom( this, i, id );
-    routes_out.erase( replaced_field );
     return replaced_field;
   }
   return NULL;
@@ -221,7 +229,10 @@ Field* Field::replaceRouteFrom( Field *f, unsigned int i, int id ) {
   
   checkFieldType( f, i );
   Field *old_value = routes_in[i];
-  old_value->routes_out.erase( this );
+  FieldSet::iterator f_i = std::find( old_value->routes_out.begin(), old_value->routes_out.end(), this );
+  if( f_i != old_value->routes_out.end() ) {
+    old_value->routes_out.erase( f_i );
+  }
   routes_in[i] = f;
   return old_value;
 }
@@ -230,7 +241,10 @@ void Field::unroute( Field *f ) {
 #ifdef DEBUG
   cerr << "Field(" << getFullName() << ")::unroute()" << endl;
 #endif
-  routes_out.erase( f );
+  FieldSet::iterator i = std::find( routes_out.begin(), routes_out.end(), f );
+  if( i != routes_out.end() ) {
+    routes_out.erase( i );
+  }
   f->unrouteFrom( this );
   // if we are unrouting from the node that sent us
   // an event, then we need to cancel that event.
@@ -259,13 +273,9 @@ void Field::touch() {
   Event e( this, event.time_stamp );
 
   event_lock = true;
-  // TODO: fix so that changes to the routes_out set does not affect this
-  // iteration. Temp fix with size
-  unsigned int size = routes_out.size();
-  
-  for( FieldSet::iterator i = routes_out.begin();
-       i != routes_out.end() && size == routes_out.size(); i++ ) {
-    (*i)->propagateEvent( e );
+  for( unsigned int i = 0; i < routes_out.size(); i++ ) {
+    Field *f = routes_out[i];
+    f->propagateEvent( e );
   }
   event_lock = false;
 }
@@ -281,12 +291,9 @@ void Field::startEvent() {
   Event e( this, event.time_stamp );
 
   event_lock = true;
-  // TODO: fix so that changes to the routes_out set does not affect this
-  // iteration. Temp fix with size
-  unsigned int size = routes_out.size();
-  for( FieldSet::iterator i = routes_out.begin();
-       i != routes_out.end() && size == routes_out.size(); i++ ) {
-    (*i)->propagateEvent( e );
+  for( unsigned int i = 0; i < routes_out.size(); i++ ) {
+    Field *f = routes_out[i];
+    f->propagateEvent( e );
   }
   event_lock = false;
 }
@@ -300,12 +307,9 @@ void Field::propagateEvent( Event e ) {
     event.ptr = e.ptr;
     event_lock = true;
     Event newe( this, event.time_stamp );
-    // TODO: fix so that changes to the routes_out set does not affect this
-    // iteration. Temp fix with size
-    unsigned int size = routes_out.size();
-    for( FieldSet::iterator i = routes_out.begin();
-         i != routes_out.end() && size == routes_out.size(); i++ ) {
-      (*i)->propagateEvent( newe );
+    for( unsigned int i = 0; i < routes_out.size(); i++ ) {
+      Field *f = routes_out[i];
+      f->propagateEvent( newe );
     }
     event_lock = false;
   }

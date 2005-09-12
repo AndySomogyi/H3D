@@ -178,7 +178,7 @@ namespace H3D {
       return access_type;
     }
 
-    typedef set< Field * > FieldSet;
+    typedef vector< Field * > FieldSet;
     typedef vector< Field * > FieldVector;
 
     /// Get the Fields that are routed to this Field.
