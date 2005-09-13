@@ -131,6 +131,15 @@ namespace H3D {
       this->startEvent();
     }
 
+
+    /// Swaps the contents of two vectors.
+    inline virtual void swap( vector< RefClass * > &v, int id = 0 ) {
+      this->checkAccessTypeSet( id );
+      this->checkAccessTypeGet( id );
+      this->value.swap( v );
+      this->startEvent();
+    }
+
     /// Erase the first element equal to a.
     inline virtual void erase( RefClass *a, int id = 0 ) {
       this->checkAccessTypeSet( id );
