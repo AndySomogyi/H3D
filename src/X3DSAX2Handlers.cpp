@@ -14,7 +14,7 @@
 #include "MFNode.h"
 #include "Group.h"
 #include "H3DDynamicFieldsObject.h"
-#include "X3DTypes.h"
+#include "X3DTypeFunctions.h"
 
 
 using namespace std;
@@ -118,7 +118,8 @@ void X3DSAX2Handlers::startElement(const XMLCh* const uri,
   if( !parent && node_stack.size() > 0 ) {
     // the previous node element could not be created so we skip all
     // children as well. 
-    if( toString( localname ).compare( "ROUTE" ) !=0 ) {
+    if( toString( localname ).compare( "ROUTE" ) !=0 ||
+        toString( localname ).compare( "ROUTE_NO_EVENT" ) !=0 ) {
       node_stack.push( NodeElement( NULL ) );
     }
   } else {
@@ -148,7 +149,8 @@ in fieldValue element.", "",
       node_stack.push( NodeElement( fv ) ); 
     } // end localname == "fieldValue"
 
-    else if( toString( localname ).compare( "ROUTE" ) == 0 ) {
+    else if( toString( localname ).compare( "ROUTE" ) == 0 || 
+             toString( localname ).compare( "ROUTE_NO_EVENT" ) == 0) {
       // The element is a ROUTE specification 
       int nr_attrs = attrs.getLength();
       const XMLCh *from_node_name  = NULL;
@@ -209,7 +211,10 @@ in fieldValue element.", "",
           if( to_node ) {
             Field *to_field = to_node->getField( toString( to_field_name ).c_str() );
             if( to_field ) {
-              from_field->route( to_field );
+              if( toString( localname ).compare( "ROUTE" ) == 0 )
+                from_field->route( to_field );
+              else
+                from_field->routeNoEvent( to_field );
             } else {
               cerr << "WARNING: Route error. Could not find field named \"" 
                    << to_field_name
@@ -241,14 +246,12 @@ in fieldValue element.", "",
       H3DDynamicFieldsObject *dyn_object = 
         dynamic_cast< H3DDynamicFieldsObject * >( parent );
       if( dyn_object ) {
-        // The element is a ROUTE specification 
         int nr_attrs = attrs.getLength();
         const XMLCh *field_name  = NULL;
         const XMLCh *field_type = NULL;
         const XMLCh *field_access_type    = NULL;
         const XMLCh *field_value    = NULL;
             
-        // get all the route specific attributes
         for( int i = 0; i < nr_attrs; i++ ) {
           const XMLCh *name = attrs.getQName( i );
           if( !field_name && toString( name ).compare( "name" ) == 0 ) {
@@ -535,7 +538,8 @@ void X3DSAX2Handlers::endElement (const XMLCh *const uri,
   }
   // skip special element X3D.
   if( toString( localname ).compare( "X3D" ) == 0 ||
-      toString( localname ).compare( "ROUTE" ) == 0 ) {
+      toString( localname ).compare( "ROUTE" ) == 0 || 
+      toString( localname ).compare( "ROUTE_NO_EVENT" ) == 0) {
     return;
   }
   
