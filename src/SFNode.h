@@ -64,6 +64,8 @@ namespace H3D {
     static string classTypeName() {
       return "SFNode";
     }
+    /// Returns the X3DType of the field.
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFNODE; }
   };
 
   /// Template to make sure that the Node that is set in a SFNode is

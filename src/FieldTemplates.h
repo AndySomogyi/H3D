@@ -150,6 +150,7 @@ namespace H3D {
   public:
     SFFloat() {}
     SFFloat( const H3DFloat &_value ): SField< H3DFloat >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFFLOAT; }
   };
 
   /// The SFDouble field contains one high-precision floating point number.
@@ -157,6 +158,7 @@ namespace H3D {
   public:
     SFDouble() {}
     SFDouble( const H3DDouble &_value ): SField< H3DDouble >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFDOUBLE; }
   };
 
   /// The SFInt32 field contains one 32-bit integer.
@@ -164,6 +166,7 @@ namespace H3D {
   public:
     SFInt32() {}
     SFInt32( const H3DInt32 &_value ): SField< H3DInt32 >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFINT32; }
   };
 
   /// The SFVec2f field contains a Vec2f.
@@ -171,6 +174,7 @@ namespace H3D {
   public:
     SFVec2f() {}
     SFVec2f( const Vec2f &_value ): SField< Vec2f >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFVEC2F; }
   };
 
   /// The SFVec3f field contains a Vec3f.
@@ -178,6 +182,7 @@ namespace H3D {
   public:
     SFVec3f() {}
     SFVec3f( const Vec3f &_value ): SField< Vec3f >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFVEC3F; }
   };
 
   /// The SFVec4f field contains a Vec4f.
@@ -185,6 +190,7 @@ namespace H3D {
   public:
     SFVec4f() {}
     SFVec4f( const Vec4f &_value ): SField< Vec4f >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFVEC4F; }
   };
 
   /// The SFVec2d field contains a Vec2d.
@@ -192,6 +198,7 @@ namespace H3D {
   public:
     SFVec2d() {}
     SFVec2d( const Vec2d &_value ): SField< Vec2d >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFVEC2D; }
   };
 
   /// The SFVec3d field contains a Vec3d.
@@ -199,6 +206,7 @@ namespace H3D {
   public:
     SFVec3d() {}
     SFVec3d( const Vec3d &_value ): SField< Vec3d >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFVEC3D; }
   };
 
   /// The SFVec4d field contains a Vec4d.
@@ -206,6 +214,7 @@ namespace H3D {
   public:
     SFVec4d() {}
     SFVec4d( const Vec4d &_value ): SField< Vec4d >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFVEC4D; }
   };
 
   /// The SFBool field contains a single boolean value.
@@ -213,6 +222,7 @@ namespace H3D {
   public:
     SFBool() {}
     SFBool( const bool &_value ): SField< bool >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFBOOL; }
   };
 
   /// The SFTime field contains a single time value.
@@ -223,6 +233,7 @@ namespace H3D {
 	SFTime( const H3DTime &_value ) { value = _value; }
     virtual string getTypeName() { return classTypeName(); }
     static string classTypeName() { return "SFTime"; }
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFTIME; }
   };
 
   /// The SFString field contains a string.
@@ -237,6 +248,7 @@ namespace H3D {
       s << "\"" << getValue() << "\"";
       return s.str();
     }
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFSTRING; }
   };
 
   /// The SFColor field contains one RGB (red-green-blue) colour triple.
@@ -244,6 +256,7 @@ namespace H3D {
   public:
     SFColor() {}
     SFColor( const RGB &_value ): SField< RGB >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFCOLOR; }
   };
   
   /// The SFColorRGBA field contains one RGBA (red-green-blue-alpha) 
@@ -254,6 +267,7 @@ namespace H3D {
     SFColorRGBA( const RGBA &_value ): SField< RGBA >( _value ){}
     virtual string getTypeName() { return classTypeName(); }
     static string classTypeName() { return "SFColorRGBA"; }
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFCOLORRGBA; }
   };
 
   /// The SFRotation field contains one arbitrary Rotation.
@@ -261,6 +275,7 @@ namespace H3D {
   public:
     SFRotation() {}
     SFRotation( const Rotation &_value ): SField< Rotation >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFROTATION; }
   };
 
   /// The SFMatrix3f field contains a Matrix3f.
@@ -268,6 +283,7 @@ namespace H3D {
   public:
     SFMatrix3f() {}
     SFMatrix3f( const Matrix3f &_value ): SField< Matrix3f >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFMATRIX3F; }
   };
     
   /// The SFMatrix4f field contains a Matrix4f.
@@ -275,6 +291,7 @@ namespace H3D {
   public:
     SFMatrix4f() {}
     SFMatrix4f( const Matrix4f &_value ): SField< Matrix4f >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFMATRIX4F; }
   };
 
   /// The MFFloat field contains a vector of single-precision floating 
@@ -283,6 +300,7 @@ namespace H3D {
   public:
     MFFloat(){}
     MFFloat( size_type size ): MField< H3DFloat >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFFLOAT; }
   };
 
   /// The MFDouble field contains a vector of high-precision floating 
@@ -291,6 +309,7 @@ namespace H3D {
   public:
     MFDouble(){}
     MFDouble( size_type size ): MField< H3DDouble >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFDOUBLE; }
   };
 
   /// The MFInt32 field contains a vector of 32-bit integers.
@@ -298,6 +317,7 @@ namespace H3D {
   public:
     MFInt32(){}
     MFInt32( size_type size ): MField< H3DInt32 >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFINT32; }
   };
 
   /// The MFVec2f field contains a vector of Vec2f.
@@ -305,6 +325,7 @@ namespace H3D {
   public:
     MFVec2f(){}
     MFVec2f( size_type size ): MField< Vec2f >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC2F; }
   };
 
   /// The MFVec3f field contains a vector of Vec3f.
@@ -312,6 +333,7 @@ namespace H3D {
   public:
     MFVec3f(){}
     MFVec3f( size_type size ): MField< Vec3f >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC3F; }
   };
 
   /// The MFVec4f field contains a vector of Vec4f.
@@ -319,6 +341,7 @@ namespace H3D {
   public:
     MFVec4f(){}
     MFVec4f( size_type size ): MField< Vec4f >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC4F; }
   };
 
   /// The MFVec2d field contains a vector of Vec2d.
@@ -326,6 +349,7 @@ namespace H3D {
   public:
     MFVec2d(){}
     MFVec2d( size_type size ): MField< Vec2d >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC2D; }
   };
 
   /// The MFVec3d field contains a vector of Vec3d.
@@ -333,6 +357,7 @@ namespace H3D {
   public:
     MFVec3d(){}
     MFVec3d( size_type size ): MField< Vec3d >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC3D; }
   };
 
   /// The MFVec4d field contains a vector of Vec4d.
@@ -340,6 +365,7 @@ namespace H3D {
   public:
     MFVec4d(){}
     MFVec4d( size_type size ): MField< Vec4d >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC4D; }
   };
 
   /// The MFBool field contains a vector of boolean values.
@@ -347,6 +373,7 @@ namespace H3D {
   public:
     MFBool(){}
     MFBool( size_type size ): MField< bool >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFBOOL; }
   };
 
   /// The MFTime field contains a vector of time values.
@@ -360,6 +387,7 @@ namespace H3D {
 	}
     virtual string getTypeName() { return classTypeName(); }
     static string classTypeName() { return "MFTime"; }
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFTIME; }
   };
   
   /// The MFString field conatins a vector of strings.
@@ -378,6 +406,7 @@ namespace H3D {
       s << "\"" << v[i] << "\"";
       return s.str();
     }
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFSTRING; }
   };
 
   /// The MFColor field contains a vector of RGB (red-green-blue) 
@@ -386,6 +415,7 @@ namespace H3D {
   public:
     MFColor(){}
     MFColor( size_type size ): MField< RGB >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFCOLOR; }
   };
 
   /// The MFColorRGBA field contains a vector of RGBA (red-green-blue-alpha) 
@@ -394,6 +424,7 @@ namespace H3D {
   public:
     MFColorRGBA(){}
     MFColorRGBA( size_type size ): MField< RGBA >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFCOLORRGBA; }
   };
 
   /// The MFRotation field contains a vector of arbitrary Rotation objects.
@@ -401,6 +432,7 @@ namespace H3D {
   public:
     MFRotation(){}
     MFRotation( size_type size ): MField< Rotation >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFROTATION; }
   };
 
   /// The MFMatrix3f field contains a vector of Matrix3f instances.
@@ -408,6 +440,7 @@ namespace H3D {
   public:
     MFMatrix3f(){}
     MFMatrix3f( size_type size ): MField< Matrix3f >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX3F; }
   };
 
   /// The MFMatrix4f field contains a vector of Matrix4f instances.
@@ -415,6 +448,7 @@ namespace H3D {
   public:
     MFMatrix4f(){}
     MFMatrix4f( size_type size ): MField< Matrix4f >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX4F; }
   };
   /// \}
 

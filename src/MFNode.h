@@ -69,6 +69,9 @@ namespace H3D {
     static string classTypeName() {
       return "MFNode";
     }
+
+    /// Returns the X3DType of the field.
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFNODE; }
   };
 
   template<>

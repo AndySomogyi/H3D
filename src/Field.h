@@ -34,6 +34,7 @@
 #include "H3DApi.h"
 #include "H3DTypes.h"
 #include "TimeStamp.h"
+#include "X3DTypes.h"
 
 using namespace std;
 
@@ -105,6 +106,9 @@ namespace H3D {
 
     /// Returns a string name for this field type.
     virtual string getTypeName() { return classTypeName(); }
+
+    /// Returns the X3DType of the field.
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::UNKNOWN_X3D_TYPE; }
 
     /// Returns a string name for this field type. Must have a static
     /// version in order to give relevant error messages in TypedField.
