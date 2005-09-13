@@ -99,6 +99,13 @@ namespace H3D {
     PyObject* pythonGetActiveStereoInfo( PyObject *self, PyObject *arg );
 
     PyObject* pythonGetActiveBackground( PyObject *self, PyObject *arg );
+
+    PyObject* pythonEraseElementFromMField( PyObject *self, PyObject *arg );
+
+    PyObject* pythonPushBackElementInMField( PyObject *self, PyObject *arg );
+
+    PyObject* pythonTouchField( PyObject *self, PyObject *arg );
+    
   }
 
     

@@ -34,7 +34,7 @@
 #include "NavigationInfo.h"
 #include "StereoInfo.h"
 #include "X3DBackgroundNode.h" 
-#include "X3DTypes.h"
+#include "X3DTypeFunctions.h"
 #include "PythonTypes.h"
 #include "MFNode.h"
 #include "X3D.h"
@@ -47,14 +47,334 @@ using namespace PythonInternals;
 namespace H3D {
   namespace PythonInternals {
 
+
+
+
     H3D_VALUE_EXCEPTION( string, UnableToCreatePythonField );
 
     PyObject *H3D_module = 0;
     PyObject *H3D_dict = 0;
     PyObject *H3DInterface_module = 0;
     PyObject *H3DInterface_dict = 0;
+
+    // Macro used by pythonCreateField to create a new PythonField depending
+    // on the field type.
+    #define CREATE_FIELD( check_func, value_func, from_func, \
+                       value_type, field_type, \
+                       field, value ) \
+f = new PythonField< field_type >( field );
+
+    // Macro used by pythonCreateField to create a new PythonField with 
+    // AutoUpdate depending on the field type.
+    #define CREATE_AUTOUPDATE_FIELD( check_func, value_func, from_func, \
+                       value_type, field_type, \
+                       field, value ) \
+f = new PythonField< AutoUpdate< field_type > >( field );
+
+
+    // Macro used by pythonGetFieldValue to get the value of a SField.
+#define GET_SFIELD( check_func, value_func, from_func, \
+                       value_type, field_type, \
+                       field, value ) \
+return from_func( static_cast< field_type * >( field )->getValue() ); 
+
+    // Macro used by pythonGetFieldValue to get the value of a MField.
+#define GET_MFIELD( check_func, value_func, from_func, \
+                       value_type, field_type, \
+                       field, value ) \
+  field_type *mfield = static_cast< field_type* >( field ); \
+  PyObject *list = PyList_New( (int)mfield->size() ); \
+  for( size_t i = 0; i < mfield->size(); i++ ) { \
+    PyObject *v = from_func( (*mfield)[i] ); \
+    PyList_SetItem( list, i, v ); \
+  } \
+  return list;
+
+    // Macro used by pythonPushBackElementInMField to push_back a value
+    // in a MField.
+#define MFIELD_PUSH_BACK( check_func, value_func, from_func, \
+                       value_type, field_type, \
+                       field, value ) \
+ if( ! value || ! check_func( value ) ) { \
+    PyErr_SetString( PyExc_ValueError,  \
+                     "Value to MFNode.erase must be a Node *" ); \
+    return 0; \
+ } \
+ static_cast< field_type *> \
+    (field_ptr)->push_back( (value_type)value_func( v ) ); 
+
+    // Macro used by pythonEraseElementFromMField to push_back a value
+    // in a MField.
+#define MFIELD_ERASE( check_func, value_func, from_func, \
+                       value_type, field_type, \
+                       field, value ) \
+ if( ! value || ! check_func( value ) ) { \
+    PyErr_SetString( PyExc_ValueError,  \
+                     "Value to MFNode.erase must be a Node *" ); \
+    return 0; \
+ } \
+ static_cast< field_type *> \
+    (field_ptr)->erase( (value_type)value_func( v ) ); 
+ 
+    // Macro used by pythonSetFieldValue to set the value of a SField.
+    #define SET_SFIELD( check_func, value_func, from_func, \
+                       value_type, field_type, \
+                       field, value ) \
+if( check_func( value ) ) {                                         \
+  static_cast<field_type*>(field)->setValue( (value_type) value_func( value ) ); \
+} else {                                                            \
+  PyErr_SetString( PyExc_ValueError,                                \
+                   "field_type value must be a Vec2f" );            \
+  return 0;                                                         \
+} 
+
+    // Macro used by pythonSetFieldValue to set the value of a SField.
+    #define SET_MFIELD( check_func, value_func, from_func, \
+                       value_type, field_type, \
+                       field, value ) \
+  if( ! value || ! PyList_Check( value ) ) {                     \
+    PyErr_SetString( PyExc_ValueError,                         \
+                     "field_type value must be a list" );      \
+    return 0;                                                  \
+  }                                                            \
+  int n = PyList_GET_SIZE( value );                            \
+  vector< value_type > fv;                                     \
+  fv.resize( n );                                              \
+  for ( int i=0; i < n; i++ ) {                                \
+    if ( check_func( PyList_GET_ITEM( value, i ) ) ) {         \
+              fv[i] = (value_type)value_func( PyList_GET_ITEM( value, i ) ); \
+    } else { \
+      PyErr_SetString( PyExc_ValueError, \
+                       "field_type value must be a list of value_type" ); \
+      return 0;                                                \
+    }                                                          \
+  }                                                          \
+  static_cast<field_type *>(field)->swap(fv);                  
+
+
+    // This macro is used in order to apply some macro where the values
+    // given to the macro depends on the X3DType of the field it is given.
+    // 
+    // field_ptr is a pointer to a field.
+    // x3d_type is the X3DType of that field.
+    // value is an optional argument that will be passed along to the macro
+    // macro is the macro to apply. The macro must take arguments as in
+    //
+    // #define MACRO( check_func, value_func, from_func, value_type,
+    //                field_type, field, value ) 
+    // where check_func is a function to check if a PyObject is of the current
+    // type. 
+    // value_func is a function to get the value from a PyObject.
+    // from_func is a function to crete a new PyObject from a value.
+    // value_type is the type of the value encapsulated in the field.
+    // field_type is the type of the field
+    // field is a pointer to the field
+    // value is an extra parameter that can be used to pass an extra argument.
+    // 
+    // The APPLY_SFIELD_MACRO will check what the type of the field is and
+    // call the macro with the appropriate parameters.
+    // success is a boolean variable that will be set to true on success
+    // and false otherwise.
+#define APPLY_SFIELD_MACRO( field_ptr, x3d_type, value, macro, success ) \
+   { \
+   success = true; \
+      switch( x3d_type ) { \
+      case X3DTypes::SFFLOAT: { \
+        macro( PyFunctions::H3DPyDouble_Check, PyFunctions::H3DPyDouble_AsDouble, \
+               PyFloat_FromDouble, H3DFloat, SFFloat, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFDOUBLE: { \
+        macro( PyFunctions::H3DPyDouble_Check, PyFunctions::H3DPyDouble_AsDouble, \
+               PyFloat_FromDouble, H3DDouble, SFDouble, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFTIME: { \
+        macro( PyFunctions::H3DPyDouble_Check, PyFunctions::H3DPyDouble_AsDouble, \
+               PyFloat_FromDouble, H3DTime, SFTime, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFINT32: { \
+        macro( PyInt_Check, PyInt_AsLong, PyInt_FromLong,  \
+               H3DInt32, SFInt32, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFVEC2F: { \
+        macro( PyVec2f_Check, PyVec2f_AsVec2f, PyVec2f_FromVec2f, \
+               Vec2f, SFVec2f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFVEC2D: { \
+        macro( PyVec2d_Check, PyVec2d_AsVec2d, PyVec2d_FromVec2d, \
+               Vec2d, SFVec2d, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFVEC3F: { \
+        macro( PyVec3f_Check, PyVec3f_AsVec3f, PyVec3f_FromVec3f, \
+               Vec3f, SFVec3f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFVEC3D: { \
+        macro( PyVec3d_Check, PyVec3d_AsVec3d, PyVec3d_FromVec3d, \
+               Vec3d, SFVec3d, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFVEC4F: { \
+        macro( PyVec4f_Check, PyVec4f_AsVec4f, PyVec4f_FromVec4f, \
+               Vec4f, SFVec4f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFVEC4D: { \
+        macro( PyVec4d_Check, PyVec4d_AsVec4d, PyVec4d_FromVec4d, \
+               Vec4d, SFVec4d, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFBOOL: { \
+        macro( PyInt_Check, PyInt_AsLong, PyInt_FromLong,  \
+               bool, SFBool, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFSTRING: { \
+        macro( PyString_Check, PyString_AsString, \
+               PyFunctions::H3DPyString_FromString, \
+               string, SFString, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFNODE: { \
+        macro( PyNode_Check, PyNode_AsNode, PyNode_FromNode,  \
+               Node *,SFNode, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFCOLOR: { \
+        macro( PyRGB_Check, PyRGB_AsRGB, PyRGB_FromRGB,  \
+               RGB, SFColor, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFCOLORRGBA: { \
+        macro( PyRGBA_Check, PyRGBA_AsRGBA, PyRGBA_FromRGBA, \
+               RGBA, SFColorRGBA, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFROTATION: { \
+        macro( PyRotation_Check, PyRotation_AsRotation, PyRotation_FromRotation, \
+               Rotation, SFRotation, field_ptr, v ); break; \
+      } \
+ /*       case X3DTypes::SFQUATERNION: { \
+                 macro( PyQuaternion_Check, PyQuaternion_AsQuaternion, SFQuaternion,  \
+                 field_ptr, v ); break; \
+                 } */ \
+      case X3DTypes::SFMATRIX3F: { \
+        macro( PyMatrix3f_Check, PyMatrix3f_AsMatrix3f, PyMatrix3f_FromMatrix3f, \
+               Matrix3f, SFMatrix3f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFMATRIX4F: { \
+        macro( PyMatrix4f_Check, PyMatrix4f_AsMatrix4f, PyMatrix4f_FromMatrix4f, \
+               Matrix4f, SFMatrix4f, field_ptr, v ); break; \
+      } \
+      default: success = false; \
+      } \
+  }
+
+    // This macro is used in order to apply some macro where the values
+    // given to the macro depends on the X3DType of the field it is given.
+    // 
+    // field_ptr is a pointer to a field.
+    // x3d_type is the X3DType of that field.
+    // value is an optional argument that will be passed along to the macro
+    // macro is the macro to apply. The macro must take arguments as in
+    //
+    // #define MACRO( check_func, value_func, from_func, value_type,
+    //                field_type, field, value ) 
+    // where check_func is a function to check if a PyObject is of the current
+    // type. 
+    // value_func is a function to get the value from a PyObject.
+    // from_func is a function to crete a new PyObject from a value.
+    // value_type is the type of the value encapsulated in the field.
+    // field_type is the type of the field
+    // field is a pointer to the field
+    // value is an extra parameter that can be used to pass an extra argument.
+    // 
+    // The APPLY_SFIELD_MACRO will check what the type of the field is and
+    // call the macro with the appropriate parameters.
+    // success is a boolean variable that will be set to true on success
+    // and false otherwise.
+#define APPLY_MFIELD_MACRO( field_ptr, x3d_type, value, macro, success  ) \
+  {\
+    success = true; \
+      switch( x3d_type ) { \
+      case X3DTypes::MFFLOAT: { \
+        macro( PyFunctions::H3DPyDouble_Check, PyFunctions::H3DPyDouble_AsDouble, \
+               PyFloat_FromDouble, H3DFloat, MFFloat, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFDOUBLE: { \
+        macro( PyFunctions::H3DPyDouble_Check, PyFunctions::H3DPyDouble_AsDouble, \
+               PyFloat_FromDouble, H3DDouble, MFDouble, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFTIME: { \
+        macro( PyFunctions::H3DPyDouble_Check, PyFunctions::H3DPyDouble_AsDouble, \
+               PyFloat_FromDouble, H3DTime, MFTime, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFINT32: { \
+        macro( PyInt_Check, PyInt_AsLong,  PyInt_FromLong, \
+               H3DInt32, MFInt32, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFVEC2F: { \
+        macro( PyVec2f_Check, PyVec2f_AsVec2f, PyVec2f_FromVec2f, \
+               Vec2f, MFVec2f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFVEC2D: { \
+        macro( PyVec2d_Check, PyVec2d_AsVec2d, PyVec2d_FromVec2d, \
+               Vec2d, MFVec2d, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFVEC3F: { \
+        macro( PyVec3f_Check, PyVec3f_AsVec3f, PyVec3f_FromVec3f, \
+               Vec3f, MFVec3f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFVEC3D: { \
+        macro( PyVec3d_Check, PyVec3d_AsVec3d, PyVec3d_FromVec3d, \
+               Vec3d, MFVec3d, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFVEC4F: { \
+        macro( PyVec4f_Check, PyVec4f_AsVec4f, PyVec4f_FromVec4f, \
+               Vec4f, MFVec4f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFVEC4D: { \
+        macro( PyVec4d_Check, PyVec4d_AsVec4d, PyVec4d_FromVec4d, \
+               Vec4d, MFVec4d, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFBOOL: { \
+        macro( PyInt_Check, PyInt_AsLong, PyInt_FromLong, bool,  \
+               MFBool, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFSTRING: { \
+        macro( PyString_Check, PyString_AsString, \
+               PyFunctions::H3DPyString_FromString, \
+               string, MFString, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFNODE: { \
+        macro( PyNode_Check, PyNode_AsNode, PyNode_FromNode,  \
+                    Node *, MFNode, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFCOLOR: { \
+        macro( PyRGB_Check, PyRGB_AsRGB, PyRGB_FromRGB, \
+               RGB, MFColor, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFCOLORRGBA: { \
+        macro( PyRGBA_Check, PyRGBA_AsRGBA, PyRGBA_FromRGBA, \
+               RGBA, MFColorRGBA, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFROTATION: { \
+        macro( PyRotation_Check, PyRotation_AsRotation, PyRotation_FromRotation, \
+               Rotation, MFRotation, field_ptr, v ); break; \
+      } \
+        /* \
+          case X3DTypes::MFQUATERNION: { \
+          macro( PyQuaternion_Check, PyQuaternion_AsQuaternion, Quaternion,  \
+          MFQuaternion, field_ptr, v ); break; \
+          }*/ \
+       \
+      case X3DTypes::MFMATRIX3F: { \
+        macro( PyMatrix3f_Check, PyMatrix3f_AsMatrix3f, PyMatrix3f_FromMatrix3f, \
+               Matrix3f, MFMatrix3f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFMATRIX4F: { \
+        macro( PyMatrix4f_Check, PyMatrix4f_AsMatrix4f, PyMatrix4f_FromMatrix4f, \
+               Matrix4f, MFMatrix4f, field_ptr, v ); break; \
+      } \
+      default: success = false; \
+    } \
+  }
+
+
     
     // Utility functions
+
+    // Insert all the X3DTypes in the given Python dictionary.
     void insertFieldTypes( PyObject *dict ) {
       for( int i = 0; i <= X3DTypes::UNKNOWN_X3D_TYPE; i++ ) {
         // insert each type from the enumerated list into Python
@@ -111,6 +431,9 @@ namespace H3D {
       { "getActiveNavigationInfo", pythonGetActiveNavigationInfo, 0 },
       { "getActiveStereoInfo", pythonGetActiveStereoInfo, 0 },
       { "getActiveBackground", pythonGetActiveBackground, 0 },
+      { "eraseElementFromMField", pythonEraseElementFromMField, 0 },
+      { "pushBackElementInMField", pythonPushBackElementInMField, 0 },
+      { "touchField", pythonTouchField, 0 },
       { NULL, NULL }      
     };
     
@@ -150,6 +473,10 @@ namespace H3D {
       PyDict_SetItem( PythonInternals::H3DInterface_dict, 
                       PyString_FromString( "time" ), 
                       time );
+      PyObject *event_sink = (PyObject*)fieldAsPythonObject( Scene::eventSink );
+      PyDict_SetItem( PythonInternals::H3DInterface_dict, 
+                      PyString_FromString( "eventSink" ), 
+                      event_sink );
       
     };
   
@@ -175,18 +502,6 @@ namespace H3D {
       return (void*)py_field;      
     }
 
-
-    double pyObjectToDouble( PyObject *v ) {
-      if ( v ) {
-        if ( PyFloat_Check( v ) )
-          return PyFloat_AS_DOUBLE( v );
-        if ( PyInt_Check( v ) )
-          return PyInt_AS_LONG( v );
-      }
-      // TODO: else throw error
-      return 0.f;
-    }
-
     // Methods for the H3D Module:
     
     PyObject *pythonCreateField( PyObject *self, PyObject *args ) {
@@ -208,147 +523,30 @@ namespace H3D {
         Field *f;
 
         if ( autoupdate ) {
-          switch( field_type ) {
-          case X3DTypes::SFFLOAT: 
-            f = new PythonField< AutoUpdate< SFFloat > >( field ); break;
-          case X3DTypes::MFFLOAT: 
-            f = new PythonField< AutoUpdate< MFFloat > >( field ); break;
-          case X3DTypes::SFDOUBLE:
-            f = new PythonField< AutoUpdate< SFDouble > >( field ); break;
-          case X3DTypes::MFDOUBLE:
-            f = new PythonField< AutoUpdate< MFDouble > >( field ); break;
-          case X3DTypes::SFTIME:  
-            f = new PythonField< AutoUpdate< SFTime > >( field ); break;
-          case X3DTypes::MFTIME:  
-            f = new PythonField< AutoUpdate< MFTime > >( field ); break;
-          case X3DTypes::SFINT32: 
-            f = new PythonField< AutoUpdate< SFInt32 > >( field ); break;
-          case X3DTypes::MFINT32: 
-            f = new PythonField< AutoUpdate< MFInt32 > >( field ); break;
-          case X3DTypes::SFVEC2F: 
-            f = new PythonField< AutoUpdate< SFVec2f > >( field ); break;
-          case X3DTypes::MFVEC2F: 
-            f = new PythonField< AutoUpdate< MFVec2f > >( field ); break;
-          case X3DTypes::SFVEC2D: 
-            f = new PythonField< AutoUpdate< SFVec2d > >( field ); break;
-          case X3DTypes::MFVEC2D: 
-            f = new PythonField< AutoUpdate< MFVec2d > >( field ); break;
-          case X3DTypes::SFVEC3F:
-            f = new PythonField< AutoUpdate< SFVec3f > >( field ); break;
-          case X3DTypes::MFVEC3F: 
-            f = new PythonField< AutoUpdate< MFVec3f > >( field ); break;
-          case X3DTypes::SFVEC3D: 
-            f = new PythonField< AutoUpdate< SFVec3f > >( field ); break;
-          case X3DTypes::MFVEC3D: 
-            f = new PythonField< AutoUpdate< MFVec3d > >( field ); break;
-          case X3DTypes::SFBOOL:  
-            f = new PythonField< AutoUpdate< SFBool > >( field ); break;
-          case X3DTypes::MFBOOL:  
-            f = new PythonField< AutoUpdate< MFBool > >( field ); break;
-          case X3DTypes::SFSTRING:
-            f = new PythonField< AutoUpdate< SFString > >( field ); break;
-          case X3DTypes::MFSTRING:
-            f = new PythonField< AutoUpdate< MFString > >( field ); break;
-          case X3DTypes::SFNODE:
-            f = new PythonField< AutoUpdate< SFNode > >( field ); break;
-          case X3DTypes::MFNODE:
-            f = new PythonField< AutoUpdate< MFNode > >( field ); break;
-          case X3DTypes::SFCOLOR:   
-            f = new PythonField< AutoUpdate< SFColor > >( field ); break;
-          case X3DTypes::MFCOLOR:   
-            f = new PythonField< AutoUpdate< MFColor > >( field ); break;
-          case X3DTypes::SFCOLORRGBA:    
-            f = new PythonField< AutoUpdate< SFColorRGBA > >( field ); break;
-          case X3DTypes::MFCOLORRGBA:    
-            f = new PythonField< AutoUpdate< MFColorRGBA > >( field ); break;
-          case X3DTypes::SFROTATION:
-            f = new PythonField< AutoUpdate< SFRotation > >( field ); break;
-          case X3DTypes::MFROTATION:
-            f = new PythonField< AutoUpdate< MFRotation > >( field ); break;
-          case X3DTypes::SFMATRIX3F:
-            f = new PythonField< AutoUpdate< SFMatrix3f > >( field ); break;
-          case X3DTypes::MFMATRIX3F:
-            f = new PythonField< AutoUpdate< MFMatrix3f > >( field ); break;
-          case X3DTypes::SFMATRIX4F:
-            f = new PythonField< AutoUpdate< SFMatrix4f > >( field ); break;
-          case X3DTypes::MFMATRIX4F:
-            f = new PythonField< AutoUpdate< MFMatrix4f > >( field ); break;
-          case X3DTypes::UNKNOWN_X3D_TYPE: 
-          default: f = 0; //THROW ERROR
-          };
-          
+          bool success;
+          APPLY_SFIELD_MACRO( field, field_type, 0, CREATE_AUTOUPDATE_FIELD, success );
+          if( !success )
+            APPLY_MFIELD_MACRO( field, field_type, 0, 
+                                CREATE_AUTOUPDATE_FIELD, success );
+          if( !success ) {
+            f = 0; /*
+            PyErr_SetString( PyExc_ValueError, 
+                             "Error: not a valid Field instance" );
+                             return 0;*/  
+          }
         } else {
-          switch( field_type ) {
-          case X3DTypes::SFFLOAT: 
-            f = new PythonField< SFFloat >( field ); break;
-          case X3DTypes::MFFLOAT: 
-            f = new PythonField< MFFloat >( field ); break;
-          case X3DTypes::SFDOUBLE:
-            f = new PythonField< SFDouble >( field ); break;
-          case X3DTypes::MFDOUBLE:
-            f = new PythonField< MFDouble >( field ); break;
-          case X3DTypes::SFTIME:  
-            f = new PythonField< SFTime >( field ); break;
-          case X3DTypes::MFTIME:  
-            f = new PythonField< MFTime >( field ); break;
-          case X3DTypes::SFINT32: 
-            f = new PythonField< SFInt32 >( field ); break;
-          case X3DTypes::MFINT32: 
-            f = new PythonField< MFInt32 >( field ); break;
-          case X3DTypes::SFVEC2F: 
-            f = new PythonField< SFVec2f >( field ); break;
-          case X3DTypes::MFVEC2F: 
-            f = new PythonField< MFVec2f >( field ); break;
-          case X3DTypes::SFVEC2D: 
-            f = new PythonField< SFVec2d >( field ); break;
-          case X3DTypes::MFVEC2D: 
-            f = new PythonField< MFVec2d >( field ); break;
-          case X3DTypes::SFVEC3F: 
-            f = new PythonField< SFVec3f >( field ); break;
-          case X3DTypes::MFVEC3F: 
-            f = new PythonField< MFVec3f >( field ); break;
-          case X3DTypes::SFVEC3D: 
-            f = new PythonField< SFVec3f >( field ); break;
-          case X3DTypes::MFVEC3D: 
-            f = new PythonField< MFVec3d >( field ); break;
-          case X3DTypes::SFBOOL:  
-            f = new PythonField< SFBool >( field ); break;
-          case X3DTypes::MFBOOL:  
-            f = new PythonField< MFBool >( field ); break;
-          case X3DTypes::SFSTRING:
-            f = new PythonField< SFString >( field ); break;
-          case X3DTypes::MFSTRING:
-            f = new PythonField< MFString >( field ); break;
-          case X3DTypes::SFNODE:
-            f = new PythonField< SFNode >( field ); break;
-          case X3DTypes::MFNODE:
-            f = new PythonField< MFNode >( field ); break;
-          case X3DTypes::SFCOLOR:   
-            f = new PythonField< SFColor >( field ); break;
-          case X3DTypes::MFCOLOR:   
-            f = new PythonField< MFColor >( field ); break;
-          case X3DTypes::SFCOLORRGBA:    
-            f = new PythonField< SFColorRGBA >( field ); break;
-          case X3DTypes::MFCOLORRGBA:    
-            f = new PythonField< MFColorRGBA >( field ); break;
-          case X3DTypes::SFROTATION:
-            f = new PythonField< SFRotation >( field ); break;
-          case X3DTypes::MFROTATION:
-            f = new PythonField< MFRotation >( field ); break;
-          case X3DTypes::SFMATRIX3F:
-            f = new PythonField< SFMatrix3f >( field ); break;
-          case X3DTypes::MFMATRIX3F:
-            f = new PythonField< MFMatrix3f >( field ); break;
-          case X3DTypes::SFMATRIX4F:
-            f = new PythonField< SFMatrix4f >( field ); break;
-          case X3DTypes::MFMATRIX4F:
-            f = new PythonField< MFMatrix4f >( field ); break;
-          case X3DTypes::UNKNOWN_X3D_TYPE: 
-          default: f = 0; //THROW ERROR
-          };
-          
+          bool success;
+          APPLY_SFIELD_MACRO( field, field_type, 0, CREATE_FIELD, success );
+          if( !success )
+            APPLY_MFIELD_MACRO( field, field_type, 0, 
+                                CREATE_FIELD, success );
+          if( !success ) {
+            f = 0 ; /*PyErr_SetString( PyExc_ValueError, 
+                             "Error: not a valid Field instance" );
+                             return 0; */ 
+          }
         }
-        
+          
         PyObject *pfield = PyCObject_FromVoidPtr( f, 0 );
         PyObject_SetAttrString( field, "__fieldptr__", pfield );
         // field now holds a reference to pfield so we can remove the extra reference
@@ -388,551 +586,41 @@ namespace H3D {
       Py_INCREF(Py_None);
       return Py_None;
     }
-    
+
+    namespace PyFunctions {
+      int H3DPyDouble_Check( PyObject *v ) {
+        return PyFloat_Check( v ) || PyInt_Check( v ) || PyLong_Check( v );
+      }
+
+      double H3DPyDouble_AsDouble( PyObject *v ) {
+        if( PyFloat_Check( v ) )
+          return PyFloat_AsDouble( v );
+        else if( PyInt_Check( v ) ) 
+          return (double)PyInt_AsLong( v );
+         else if( PyLong_Check( v ) ) 
+          return PyLong_AsDouble( v );
+        return 0.0;
+      }
+
+      PyObject *H3DPyString_FromString( const string &s ) {
+        return PyString_FromString( s.c_str() );
+      }
+
+    }
+
     
     PyObject *pythonSetFieldValueFromObject( Field *field_ptr, PyObject *v ) {
-      if ( field_ptr ) {
-        // Try to set the field value, depending on the type of the field
-        if ( field_ptr->getTypeName().compare( "SFFloat" ) == 0 ) {
-          static_cast<SFFloat*>(field_ptr)->setValue
-            ( (H3DFloat)PythonInternals::pyObjectToDouble( v ) );
-        } 
-        else if ( field_ptr->getTypeName().compare( "MFFloat" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFFloat value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< H3DFloat > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) 
-            fv[i] = (H3DFloat)PythonInternals::pyObjectToDouble( PyList_GET_ITEM( v, i ) );
-          static_cast<MFFloat*>(field_ptr)->swap(fv);         
-        } 
-        else if ( field_ptr->getTypeName().compare( "SFDouble" ) == 0 ) {
-          static_cast<SFDouble*>(field_ptr)->setValue( PyFloat_AsDouble( v ) );
-        } 
-        else if ( field_ptr->getTypeName().compare( "MFDouble" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFDouble value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< double > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) 
-            fv[i] = PythonInternals::pyObjectToDouble( PyList_GET_ITEM( v, i ) );
-          static_cast<MFDouble*>(field_ptr)->swap(fv);         
+      if( field_ptr ) { 
+        bool success;
+        APPLY_SFIELD_MACRO( field_ptr, field_ptr->getX3DType(), v, SET_SFIELD, success );
+        if( !success )
+          APPLY_MFIELD_MACRO( field_ptr, field_ptr->getX3DType(), v, SET_MFIELD, success );
+        if( !success ) {
+          PyErr_SetString( PyExc_ValueError, 
+                           "Error: not a valid Field instance" );
+          return 0;  
         }
-        else if ( field_ptr->getTypeName().compare( "SFTime" ) == 0 ) {
-          static_cast<SFTime*>(field_ptr)->setValue( PyFloat_AsDouble( v ) );
-        } 
-        else if ( field_ptr->getTypeName().compare( "MFTime" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFTime value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< H3DDouble > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) 
-            fv[i] = PythonInternals::pyObjectToDouble( PyList_GET_ITEM( v, i ) );
-          static_cast<MFTime*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFInt32" ) == 0 ) {
-          static_cast<SFInt32*>(field_ptr)->setValue( PyInt_AsLong( v ) );
-        } 
-        else if ( field_ptr->getTypeName().compare( "MFInt32" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFInt32 value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< int > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) 
-            fv[i] = (int)PythonInternals::pyObjectToDouble( PyList_GET_ITEM( v, i ) );
-          static_cast<MFInt32*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFVec2f" ) == 0 ) {
-          if ( PyVec2f_Check( v ) ) {
-            PyVec2f *value = (PyVec2f*)( v );
-            static_cast<SFVec2f*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFVec2f value must be a Vec2f" );
-            return 0;
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFVec2f" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFVec2f value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Vec2f > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyVec2f_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyVec2f *value = (PyVec2f*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFVec2f value must be a list of Vec2f" );
-              return 0;
-            }
-          }
-          static_cast<MFVec2f*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFVec2d" ) == 0 ) {
-          if ( PyVec2d_Check( v ) ) {
-            PyVec2d *value = (PyVec2d*)( v );
-            static_cast<SFVec2d*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFVec2d value must be a Vec2d" );
-            return 0;
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFVec2d" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFVec2d value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Vec2d > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyVec2d_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyVec2d *value = (PyVec2d*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFVec2d value must be a list of Vec2d" );
-              return 0;
-            }
-          }
-          static_cast<MFVec2d*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFVec3f" ) == 0 ) {
-          if ( PyVec3f_Check( v ) ) {
-            PyVec3f *value = (PyVec3f*)( v );
-            static_cast<SFVec3f*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFVec3f value must be a Vec3f" );
-            return 0;
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFVec3f" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFVec3f value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Vec3f > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyVec3f_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyVec3f *value = (PyVec3f*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFVec3f value must be a list of Vec3f" );
-              return 0;
-            }
-          }
-          static_cast<MFVec3f*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFVec3d" ) == 0 ) {
-          if ( PyVec3d_Check( v ) ) {
-            PyVec3d *value = (PyVec3d*)( v );
-            static_cast<SFVec3d*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFVec3d value must be a Vec3d" );
-            return 0;
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFVec3d" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFVec3d value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Vec3d > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyVec3d_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyVec3d *value = (PyVec3d*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFVec3d value must be a list of Vec3d" );
-              return 0;
-            }
-          }
-          static_cast<MFVec3d*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFVec4f" ) == 0 ) {
-          if ( PyVec4f_Check( v ) ) {
-            PyVec4f *value = (PyVec4f*)( v );
-            static_cast<SFVec4f*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFVec4f value must be a Vec4f" );
-            return 0;
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFVec4f" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFVec4f value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Vec4f > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyVec4f_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyVec4f *value = (PyVec4f*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFVec4f value must be a list of Vec4f" );
-              return 0;
-            }
-          }
-          static_cast<MFVec4f*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFVec4d" ) == 0 ) {
-          if ( PyVec4d_Check( v ) ) {
-            PyVec4d *value = (PyVec4d*)( v );
-            static_cast<SFVec4d*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFVec4d value must be a Vec4d" );
-            return 0;
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFVec4d" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFVec4d value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Vec4d > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyVec4d_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyVec4d *value = (PyVec4d*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFVec4d value must be a list of Vec4d" );
-              return 0;
-            }
-          }
-          static_cast<MFVec4d*>(field_ptr)->swap(fv);         
-        }        
-        else if ( field_ptr->getTypeName().compare( "SFBool" ) == 0 ) {
-          if( PyInt_Check( v ) ) {
-            bool value = PyInt_AsLong( v ) != 0;
-            static_cast<SFBool*>(field_ptr)->setValue( value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFBool value must be an integer representing a boolean" );
-            return 0;
-          }
-        } 
-        else if ( field_ptr->getTypeName().compare( "MFBool" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFBool value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< bool > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyInt_Check( PyList_GET_ITEM( v, i ) ) ) {
-              bool value = PyInt_AsLong( PyList_GET_ITEM( v, i ) ) != 0;
-              fv[i] = value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFBool value must be a list of integers representing boolean values" );
-              return 0;
-            }
-          }
-          static_cast<MFBool*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFString" ) == 0 ) {
-          if ( PyString_Check( v ) ) {
-            char *value = PyString_AsString( v );
-            static_cast<SFString*>(field_ptr)->setValue( value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFString value must be a string" );
-            return 0;
-          }
-        } 
-        else if ( field_ptr->getTypeName().compare( "MFString" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFString value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< string > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyString_Check( PyList_GET_ITEM( v, i ) ) ) {
-              char *value = PyString_AsString( PyList_GET_ITEM( v, i ) );
-              fv[i] = value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFString value must be a list of strings" );
-              return 0;
-              
-            }
-          }
-          static_cast<MFString*>(field_ptr)->swap(fv);         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFNode" ) == 0 ) {
-          if ( PyNode_Check( v ) ) {
-            PyNode *value = (PyNode*)( v );
-            static_cast<SFNode*>(field_ptr)->setValue( value->nodePtr() );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFNode value must be a Node type" );
-            return 0;            
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFNode" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFNode value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Node* > fv( n ); 
-          //fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyNode_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyNode *value = (PyNode*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = value->nodePtr();
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFNode value must be a list of Node types" );
-              return 0;            
-            }
-          }
- 
-          static_cast<MFNode*>(field_ptr)->setValue( fv );         
-        }
-        else if ( field_ptr->getTypeName().compare( "SFColor" ) == 0 ) {
-          if ( PyRGB_Check( v ) ) {
-            PyRGB *value = (PyRGB*)( v );
-            static_cast<SFColor*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFColor value must be a RGB" );
-            return 0;
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFColor" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFColor value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< RGB > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyRGB_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyRGB *value = (PyRGB*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFColor value must be a list of RGB" );
-              return 0;
-            }
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "SFColorRGBA" ) == 0 ) {
-          if ( PyRGBA_Check( v ) ) {
-            PyRGBA *value = (PyRGBA*)( v );
-            static_cast<SFColorRGBA*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFColorRGBA value must be a RGBA" );
-            return 0;
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFColorRGBA" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFColorRGBA value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< RGBA > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyRGBA_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyRGBA *value = (PyRGBA*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFColorRGBA value must be a list of RGBA" );
-              return 0;
-            }
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "SFRotation" ) == 0 ) {
-          if ( PyRotation_Check(v) ) {
-            PyRotation *value = (PyRotation*)( v );
-            static_cast<SFRotation*>(field_ptr)->setValue( *value );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFRotation value must be of Rotation type" );
-            return 0;            
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFRotation" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFRotation value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Rotation > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            if ( PyRotation_Check( PyList_GET_ITEM( v, i ) ) ) {
-              PyRotation *value = (PyRotation*)( PyList_GET_ITEM( v, i ) );
-              fv[i] = *value;
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFRotation value must be a list of Rotations" );
-              return 0;            
-            }
-          }
-          static_cast<MFRotation*>(field_ptr)->swap(fv);         
-        }
-        /* No SF/MFQuaternion yet
-           else if ( field_ptr->getTypeName().compare( "SFQuaternion" ) == 0 ) {
-           if ( PyQuaternion_Check(v) ) {
-           PyQuaternion *value = (PyQuaternion*)( v );
-           static_cast<SFQuaternion*>(field_ptr)->setValue( *value );
-           } else {
-           PyErr_SetString( PyExc_ValueError, 
-           "SFQuaternion value must be of Quaternion type" );
-           return 0;            
-           }
-           }
-           else if ( field_ptr->getTypeName().compare( "MFQuaternion" ) == 0 ) {
-           if( ! v || ! PyList_Check( v ) ) {
-           PyErr_SetString( PyExc_ValueError, 
-           "MFQuaternion value must be a list" );
-           return 0;
-           }
-           int n = PyList_GET_SIZE( v );
-           vector< Quaternion > fv; 
-           fv.resize( n );
-           for ( int i=0; i < n; i++ ) {
-           if ( PyQuaternion_Check( PyList_GET_ITEM( v, i ) ) ) {
-           PyQuaternion *value = (PyQuaternion*)( PyList_GET_ITEM( v, i ) );
-           fv[i] = *value;
-           } else {
-           PyErr_SetString( PyExc_ValueError, 
-           "MFQuaternion value must be a list of Quaternions" );
-           return 0;            
-           }
-           }
-           static_cast<MFQuaternion*>(field_ptr)->swap(fv);         
-           }
-        */
-        else if ( field_ptr->getTypeName().compare( "SFMatrix3f" ) == 0 ) {
-          if ( PyMatrix3f_Check(v) ) {
-            SFMatrix3f *f = static_cast<SFMatrix3f*>(field_ptr);
-            f->setValue( PyMatrix3f_AsMatrix3f( v ) );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFMatrix3f value must be of Matrix3f type" );
-            return 0;            
-          }
-        }
-        else if ( field_ptr->getTypeName().compare( "MFMatrix3f" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFMatrix3f value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Matrix3f > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            PyObject *o = PyList_GET_ITEM( v, i );
-            if ( PyMatrix3f_Check( o ) ) {
-              fv[i] = PyMatrix3f_AsMatrix3f( o );
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFMatrix3f value must be a list of Matrix3f" );
-              return 0;
-            }
-          }
-          static_cast<MFMatrix3f*>(field_ptr)->swap(fv); 
-        }
-        else if ( field_ptr->getTypeName().compare( "SFMatrix4f" ) == 0 ) {
-          if ( PyMatrix4f_Check(v) ) {
-            SFMatrix4f *f = static_cast<SFMatrix4f*>(field_ptr);
-            f->setValue( PyMatrix4f_AsMatrix4f( v ) );
-          } else {
-            PyErr_SetString( PyExc_ValueError, 
-                             "SFMatrix4f value must be of Matrix4f type" );
-            return 0;            
-          }
-
-        }
-        else if ( field_ptr->getTypeName().compare( "MFMatrix4f" ) == 0 ) {
-          if( ! v || ! PyList_Check( v ) ) {
-            PyErr_SetString( PyExc_ValueError, 
-                             "MFMatrix3f value must be a list" );
-            return 0;
-          }
-          int n = PyList_GET_SIZE( v );
-          vector< Matrix4f > fv; 
-          fv.resize( n );
-          for ( int i=0; i < n; i++ ) {
-            PyObject *o = PyList_GET_ITEM( v, i );
-            if ( PyMatrix4f_Check( o ) ) {
-              fv[i] = PyMatrix4f_AsMatrix4f( o );
-            } else {
-              PyErr_SetString( PyExc_ValueError, 
-                               "MFMatrix4f value must be a list of Matrix4f" );
-              return 0;
-            }
-          }
-          static_cast<MFMatrix4f*>(field_ptr)->swap(fv); 
-        }
-
-      } else {
-        PyErr_SetString( PyExc_ValueError, 
-                         "Error: not a valid Field instance in call to H3D.setFieldValue( self, value )" );
-        return 0;       
-      }     
-      
+      }
       Py_INCREF(Py_None);
       return Py_None; 
     }
@@ -960,7 +648,7 @@ call the base class __init__ function." );
       }
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
-  
+
       PyObject *v = PyTuple_GetItem( args, 1 );
       //const char *value = PyString_AsString( PyObject_Repr( v ) );
       //ParsableField *pf = static_cast< ParsableField* >(field_ptr);
@@ -988,259 +676,20 @@ call the base class __init__ function." );
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
       
-      //cerr << "  field type name = " << field_ptr->getTypeName() << endl;
-      
-      if ( field_ptr->getTypeName().compare( "SFFloat" ) == 0 ) {
-        return PyFloat_FromDouble( static_cast< SFFloat* >
-                                   ( field_ptr )->getValue() );        
-      } else if ( field_ptr->getTypeName().compare( "MFFloat" ) == 0 ) {
-        MFFloat *mfield = static_cast< MFFloat* >( field_ptr );
-        PyObject *list = PyList_New( (int)mfield->size() );
-        //cerr << "   MFFloat - size = " << mfield->size() << endl;
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          PyObject *v = PyFloat_FromDouble( (*mfield)[i] );
-          PyList_SetItem( list, i, v );
+      if( field_ptr ) { 
+        bool success;
+        APPLY_SFIELD_MACRO( field_ptr, field_ptr->getX3DType(), v, GET_SFIELD, success );
+        if( !success )
+          APPLY_MFIELD_MACRO( field_ptr, field_ptr->getX3DType(), v, GET_MFIELD, success );
+        if( !success ) {
+          PyErr_SetString( PyExc_ValueError, 
+                           "Error: not a valid Field instance" );
+          return 0;  
         }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFDouble" ) == 0 ) {
-        return PyFloat_FromDouble( static_cast< SFDouble* >
-                                   ( field_ptr )->getValue() );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFDouble" ) == 0 ) {
-        MFDouble *mfield = static_cast< MFDouble* >( field_ptr );
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          PyObject *v = PyFloat_FromDouble( (*mfield)[i] );
-          PyList_SetItem( list, i, v );
-        }
-        return list;
       }
-      else if ( field_ptr->getTypeName().compare( "SFTime" ) == 0 ) {
-        return PyFloat_FromDouble( static_cast< SFTime* >
-                                   ( field_ptr )->getValue() );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFTime" ) == 0 ) {
-        MFTime *mfield = static_cast< MFTime* >( field_ptr );
-        PyObject *list = PyList_New( (int) mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          PyObject *v = PyFloat_FromDouble( (*mfield)[i] );
-          PyList_SetItem( list, i, v );
-        }
-        return list;
-      }
-      else if ( field_ptr->getTypeName().compare( "SFInt32" ) == 0 ) {
-        return PyInt_FromLong( static_cast< SFInt32* >
-                               ( field_ptr )->getValue() );        
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFInt32" ) == 0 ) {
-        MFInt32 *mfield = static_cast< MFInt32* >( field_ptr );
-        PyObject *list = PyList_New( (int) mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          PyObject *v = PyInt_FromLong( (*mfield)[i] );
-          PyList_SetItem( list, i, v );
-        }
-        return list;
-      }
-      else if ( field_ptr->getTypeName().compare( "SFVec2f" ) == 0 ) {
-        Vec2f a = static_cast< SFVec2f* >( field_ptr )->getValue();
-        return PyVec2f_FromVec2f( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFVec2f" ) == 0 ) {
-        MFVec2f *mfield = static_cast< MFVec2f* >( field_ptr );
-        vector<Vec2f> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Vec2f a = v[i];
-          PyList_SetItem( list, i, PyVec2f_FromVec2f( a ) );
-        }
-        return list;
-
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFVec2d" ) == 0 ) {
-        Vec2d a = static_cast< SFVec2d* >( field_ptr )->getValue();
-        return PyVec2d_FromVec2d( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFVec2d" ) == 0 ) {
-        MFVec2d *mfield = static_cast< MFVec2d* >( field_ptr );
-        vector<Vec2d> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Vec2d a = v[i];
-          PyList_SetItem( list, i, PyVec2d_FromVec2d( a ) );
-        }
-        return list;        
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFVec3f" ) == 0 ) {
-        Vec3f a = static_cast< SFVec3f* >( field_ptr )->getValue();
-        return PyVec3f_FromVec3f( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFVec3f" ) == 0 ) {
-        MFVec3f *mfield = static_cast< MFVec3f* >( field_ptr );
-        vector<Vec3f> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Vec3f a = v[i];
-          PyList_SetItem( list, i, PyVec3f_FromVec3f( a ) );
-        }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFVec3d" ) == 0 ) {
-        Vec3d a = static_cast< SFVec3d* >( field_ptr )->getValue();
-        return PyVec3d_FromVec3d( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFVec3d" ) == 0 ) {
-        MFVec3d *mfield = static_cast< MFVec3d* >( field_ptr );
-        vector<Vec3d> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Vec3d a = v[i];
-          PyList_SetItem( list, i, PyVec3d_FromVec3d( a ) );
-        }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFVec4f" ) == 0 ) {
-        Vec4f a = static_cast< SFVec4f* >( field_ptr )->getValue();
-        return PyVec4f_FromVec4f( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFVec4f" ) == 0 ) {
-        MFVec4f *mfield = static_cast< MFVec4f* >( field_ptr );
-        vector<Vec4f> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Vec4f a = v[i];
-          PyList_SetItem( list, i, PyVec4f_FromVec4f( a ) );
-        }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFVec4d" ) == 0 ) {
-        Vec4d a = static_cast< SFVec4d* >( field_ptr )->getValue();
-        return PyVec4d_FromVec4d( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFVec4d" ) == 0 ) {
-        MFVec4d *mfield = static_cast< MFVec4d* >( field_ptr );
-        vector<Vec4d> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Vec4d a = v[i];
-          PyList_SetItem( list, i, PyVec4d_FromVec4d( a ) );
-        }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFBool" ) == 0 ) {
-        return PyInt_FromLong( static_cast< SFBool* >
-                               ( field_ptr )->getValue() );
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFBool" ) == 0 ) {
-        MFBool *mfield = static_cast< MFBool* >( field_ptr );
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          PyObject *v = PyInt_FromLong( (*mfield)[i] );
-          PyList_SetItem( list, i, v );
-        }
-        return list;
-      }
-      else if ( field_ptr->getTypeName().compare( "SFString" ) == 0 ) {
-        return PyString_FromString( static_cast< SFString* >
-                                    ( field_ptr )->getValue().c_str() );        
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFString" ) == 0 ) {
-        MFString *mfield = static_cast< MFString* >( field_ptr );
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          PyObject *v = PyString_FromString( (*mfield)[i].c_str() );
-          PyList_SetItem( list, i, v );
-        }
-        return list;
-      }
-      else if ( field_ptr->getTypeName().compare( "SFNode" ) == 0 ) {
-        Node* n = static_cast< SFNode* >( field_ptr )->getValue();
-        return PyNode_FromNode( n );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFNode" ) == 0 ) {
-        MFNode *mfield = static_cast< MFNode* >( field_ptr );
-        AutoRefVector<Node> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Node *n = v[i];
-          PyObject *o = PyNode_FromNode( n );
-          PyList_SetItem( list, i, o );
-        }
-        return list;
-      }
-      else if ( field_ptr->getTypeName().compare( "SFColor" ) == 0 ) {
-        RGB a = static_cast< SFColor* >( field_ptr )->getValue();
-        return PyRGB_FromRGB( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFColor" ) == 0 ) {
-        MFColor *mfield = static_cast< MFColor* >( field_ptr );
-        vector<RGB> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          RGB a = v[i];
-          PyList_SetItem( list, i, PyRGB_FromRGB( a ) );
-        }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFColorRGBA" ) == 0 ) {
-        RGBA a = static_cast< SFColorRGBA* >( field_ptr )->getValue();
-        return PyRGBA_FromRGBA( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFColorRGBA" ) == 0 ) {
-        MFColorRGBA *mfield = static_cast< MFColorRGBA* >( field_ptr );
-        vector<RGBA> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          RGBA a = v[i];
-          PyList_SetItem( list, i, PyRGBA_FromRGBA( a ) );
-        }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFRotation" ) == 0 ) {
-        Rotation a = static_cast< SFRotation* >( field_ptr )->getValue();
-        return PyRotation_FromRotation( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFRotation" ) == 0 ) {
-        MFRotation *mfield = static_cast< MFRotation* >( field_ptr );
-        vector<Rotation> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Rotation a = v[i];
-          PyList_SetItem( list, i, PyRotation_FromRotation( a ) );
-        }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFMatrix3f" ) == 0 ) {
-        Matrix3f a = static_cast< SFMatrix3f* >( field_ptr )->getValue();
-        return PyMatrix3f_FromMatrix3f( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFMatrix3f" ) == 0 ) {
-        MFMatrix3f *mfield = static_cast< MFMatrix3f* >( field_ptr );
-        vector<Matrix3f> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Matrix3f a = v[i];
-          PyList_SetItem( list, i, PyMatrix3f_FromMatrix3f( a ) );
-        }
-        return list;
-      } 
-      else if ( field_ptr->getTypeName().compare( "SFMatrix4f" ) == 0 ) {
-        Matrix4f a = static_cast< SFMatrix4f* >( field_ptr )->getValue();
-        return PyMatrix4f_FromMatrix4f( a );       
-      } 
-      else if ( field_ptr->getTypeName().compare( "MFMatrix4f" ) == 0 ) {
-        MFMatrix4f *mfield = static_cast< MFMatrix4f* >( field_ptr );
-        vector<Matrix4f> v = mfield->getValue();
-        PyObject *list = PyList_New( (int)mfield->size() );
-        for( size_t i = 0; i < mfield->size(); i++ ) {
-          Matrix4f a = v[i];
-          PyList_SetItem( list, i, PyMatrix4f_FromMatrix4f( a ) );
-        }
-        return list;
-      } 
-      
-      Py_INCREF( Py_None );
-      return Py_None;
+      PyErr_SetString( PyExc_ValueError, 
+                       "Error: Field NULL pointer" );
+      return 0;  
     }
 
 
@@ -1595,5 +1044,116 @@ call the base class __init__ function." );
       return PyNode_FromNode( X3DBackgroundNode::getActive() );
     }
 
+    PyObject* pythonEraseElementFromMField( PyObject *self, PyObject *args ) {
+      if( !args || ! PyTuple_Check( args ) || PyTuple_Size( args ) != 2  ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Invalid argument(s) to function H3D.setFieldValue( self, value )" );  
+        return 0;
+      }
+
+      PyObject *field = PyTuple_GetItem( args, 0 );
+      if( ! PyInstance_Check( field ) ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Invalid Field type given as argument to H3D.setFieldValue( self, value )" );
+        return 0;
+      }
+
+      PyObject *py_field_ptr = PyObject_GetAttrString( field, "__fieldptr__" );
+      if( !py_field_ptr ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Python object not a Field type. Make sure that if you \
+have defined an __init__ function in a specialized field class, you \
+call the base class __init__ function." );
+        return 0;
+      }
+      Field *field_ptr = static_cast< Field * >
+        ( PyCObject_AsVoidPtr( py_field_ptr ) );
+
+
+      if( field_ptr ) {
+        PyObject *v = PyTuple_GetItem( args, 1 );
+        bool success;
+        APPLY_MFIELD_MACRO( field_ptr, field_ptr->getX3DType(), 
+                            v, MFIELD_ERASE, success );
+        if( !success ) {
+          PyErr_SetString( PyExc_ValueError, 
+                           "Error: not a valid MField instance" );
+          return 0;  
+        }
+      }
+      Py_INCREF(Py_None);
+      return Py_None; 
+    }
+
+   PyObject* pythonPushBackElementInMField( PyObject *self, PyObject *args ) {
+      if( !args || ! PyTuple_Check( args ) || PyTuple_Size( args ) != 2  ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Invalid argument(s) to function H3D.setFieldValue( self, value )" );  
+        return 0;
+      }
+
+      PyObject *field = PyTuple_GetItem( args, 0 );
+      if( ! PyInstance_Check( field ) ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Invalid Field type given as argument to H3D.setFieldValue( self, value )" );
+        return 0;
+      }
+
+      PyObject *py_field_ptr = PyObject_GetAttrString( field, "__fieldptr__" );
+      if( !py_field_ptr ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Python object not a Field type. Make sure that if you \
+have defined an __init__ function in a specialized field class, you \
+call the base class __init__ function." );
+        return 0;
+      }
+      Field *field_ptr = static_cast< Field * >
+        ( PyCObject_AsVoidPtr( py_field_ptr ) );
+
+
+      if( field_ptr ) {
+        PyObject *v = PyTuple_GetItem( args, 1 );
+        if( field_ptr ) {
+          PyObject *v = PyTuple_GetItem( args, 1 );
+          bool success;
+          APPLY_MFIELD_MACRO( field_ptr, field_ptr->getX3DType(), 
+                              v, MFIELD_PUSH_BACK, success );
+          if( !success ) {
+            PyErr_SetString( PyExc_ValueError, 
+                             "Error: not a valid MField instance" );
+            return 0;  
+          }
+        }
+      }
+      Py_INCREF(Py_None);
+      return Py_None; 
+    }
+
+    PyObject *pythonTouchField( PyObject *self, PyObject *arg ) {
+      if(!arg || ! PyInstance_Check( arg ) ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Invalid argument(s) to function H3D.touchField( self )" );
+        return 0;
+      }
+      
+      PyObject *py_field_ptr = PyObject_GetAttrString( arg, "__fieldptr__" );
+      if( !py_field_ptr ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Python object not a Field type. Make sure that if you \
+have defined an __init__ function in a specialized field class, you \
+call the base class __init__ function." );
+        return 0;
+      }
+      
+      Field *field_ptr = static_cast< Field * >
+        ( PyCObject_AsVoidPtr( py_field_ptr ) );
+      if( field_ptr ) field_ptr->touch();
+
+      Py_INCREF(Py_None);
+      return Py_None; 
+    }
+
   }
+
+ 
 }
