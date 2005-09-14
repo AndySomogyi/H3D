@@ -83,10 +83,6 @@ int main(int argc, char* argv[]) {
   try {
     // TODO: move someplace where is is initialized once
     //		  XMLPlatformUtils::Initialize();
-#ifdef MACOSX
-    FreeImage_Initialise();
-    XMLPlatformUtils::Initialize();
-#endif
 
     AutoRef< KeySensor > ks( new KeySensor );
     AutoRef< MouseSensor > ms( new MouseSensor );

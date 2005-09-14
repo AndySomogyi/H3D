@@ -79,7 +79,7 @@ namespace HLHapticsDeviceInternal {
   HDCallbackCode HDCALLBACK forceEffectCallback( void *data ) {
     HLHapticsDevice *hd = static_cast< HLHapticsDevice * >( data );
   
-#ifdef MACOSX_STOP  
+#ifdef MACOSX_DISABLED
     // set thread priority
     if ( !init_realtime ) {
       struct thread_time_constraint_policy ttcpolicy;
