@@ -78,7 +78,8 @@ void Scene::idle() {
   frameRate->setValue( 1 / ( t - last_time ), id );
   last_time = t;
   time->setValue( t, id );
-  
+
+  //cerr << "fr = " << frameRate->getValue() << endl;
   DeviceInfo *di = DeviceInfo::getActive();
   if( di ) {
     vector< H3DHapticsDevice * > hds;

@@ -373,7 +373,24 @@ in fieldValue element.", "",
       }
     } else {
       // if we have a USE attribute use that Node.
+
+      /*
+      // Note: this could really could be replaced with 
+      //   const XMLCh *use_name = attrs.getValue( (XMLCh*)L"USE" );
+      // but there is a problem / configuration error on OS X that 
+      // causes getValue( onst XMLCh* ) to fail.
+      const XMLCh *use_name='\0';
+      int nr_attrs = attrs.getLength();
+      for( int i = 0; i < nr_attrs; i++ ) {
+        const XMLCh *name = attrs.getQName( i );
+        if( toString( name ).compare("USE") == 0 )
+          use_name =  attrs.getValue( i );
+      }
+      */  
+      // = attrs.getValue( (const char*)"USE" );
+
       const XMLCh *use_name = attrs.getValue( gUSE );
+
       if( use_name ) {
         new_node = DEF_map->getNode( toString( use_name ) );
         if( !new_node ) {

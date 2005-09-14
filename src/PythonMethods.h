@@ -32,6 +32,8 @@
 #include "Field.h"
 #include "X3DTypes.h"
 #include "X3DFieldConversion.h"
+#include "X3DTypeFunctions.h"
+
 
 #if defined(_MSC_VER)
 // undefine _DEBUG since we want to always link to the release version of

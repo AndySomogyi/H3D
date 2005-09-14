@@ -221,7 +221,7 @@ namespace H3D {
 
     /// Erase the first element equal to a.
     inline virtual void erase( NodeClass *a ) {
-      vector<NodeClass * >::iterator i = 
+      typename vector<NodeClass * >::iterator i = 
         std::find( vector<NodeClass*>::begin(), 
                    vector<NodeClass*>::end(), 
                    a );

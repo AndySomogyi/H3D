@@ -31,6 +31,12 @@
 #include "HLShape.h"
 #include "GL/glew.h"
 
+#ifdef MACOSX
+#include <mach/mach_init.h>
+#include <mach/thread_policy.h>
+#include <mach/thread_act.h>
+#endif
+
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
@@ -44,6 +50,10 @@ H3DNodeDatabase HLHapticsDevice::database(
 namespace HLHapticsDeviceInternal {
   FIELDDB_ELEMENT( HLHapticsDevice, deviceName, INPUT_OUTPUT );
   FIELDDB_ELEMENT( HLHapticsDevice, secondaryButton, OUTPUT_ONLY );
+
+#ifdef MACOSX
+  static int init_realtime=0;
+#endif
 
 #ifdef HAVE_OPENHAPTICS
   // Structure to return values from the HDDataCallback callback function.
@@ -64,12 +74,29 @@ namespace HLHapticsDeviceInternal {
     return HD_CALLBACK_DONE;
   } 
   
-
   // Callback function for rendering force effects on the 
   // HLHapticsDevice.  
   HDCallbackCode HDCALLBACK forceEffectCallback( void *data ) {
     HLHapticsDevice *hd = static_cast< HLHapticsDevice * >( data );
-    
+  
+#ifdef MACOSX_STOP  
+    // set thread priority
+    if ( !init_realtime ) {
+      struct thread_time_constraint_policy ttcpolicy;
+      int ret;
+      ttcpolicy.period=      30000; // HZ/160;
+      ttcpolicy.computation= 10000; // HZ/3300;
+      ttcpolicy.constraint=  20000; //HZ/2200;
+      ttcpolicy.preemptible=1;
+      if ((ret=thread_policy_set( mach_thread_self(),
+                                  THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&ttcpolicy,
+                                  THREAD_TIME_CONSTRAINT_POLICY_COUNT)) != KERN_SUCCESS) {
+        cerr << "set_realtime() failed" << endl;
+        return 0;
+      }
+      init_realtime = 1;
+    }
+#endif
 
     // get current values from HD API 
     HLdouble tmp[16];

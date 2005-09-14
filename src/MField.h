@@ -303,7 +303,7 @@ namespace H3D {
     }
 
     /// Inserts x before pos.
-    iterator insert( iterator pos,
+    inline iterator insert( iterator pos,
                      const Type &x, 
                      int id = 0 ) {
       this->checkAccessTypeSet( id );
@@ -326,8 +326,8 @@ namespace H3D {
    } 
             
     /// Inserts n copies of x before pos.
-    void insert(iterator pos, 
-                size_type n, const Type &x, int id = 0 ) {
+    inline void insert(iterator pos, 
+                       typename BaseMField::size_type n, const Type &x, int id = 0 ) {
       this->checkAccessTypeSet( id );
       this->upToDate();
       this->value.insert( pos, n, x );
@@ -353,8 +353,8 @@ namespace H3D {
     
     /// Erase the first element equal to a.
     inline virtual void erase( const Type &a, int id = 0 ) {
-      iterator i = std::find( value.begin(), value.end(), a );
-      if( i != value.end() ) {
+      iterator i = std::find( this->value.begin(), this->value.end(), a );
+      if( i != this->value.end() ) {
         this->value.erase( i );
       }
     } 

@@ -17,6 +17,12 @@
 #include "DEFNodes.h"
 #include "Viewpoint.h"
 
+#ifdef MACOSX
+#include "FreeImage.h"
+#include <xercesc/util/PlatformUtils.hpp>
+#endif
+
+
 using namespace std;
 using namespace H3D;
 
@@ -77,8 +83,10 @@ int main(int argc, char* argv[]) {
   try {
     // TODO: move someplace where is is initialized once
     //		  XMLPlatformUtils::Initialize();
-    //FreeImage_Initialise();
-    //XMLPlatformUtils::Initialize();
+#ifdef MACOSX
+    FreeImage_Initialise();
+    XMLPlatformUtils::Initialize();
+#endif
 
     AutoRef< KeySensor > ks( new KeySensor );
     AutoRef< MouseSensor > ms( new MouseSensor );

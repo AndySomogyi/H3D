@@ -25,7 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef __X3DTYPEFUNCTIONS_H__
-#define __X3DTYPEFuNCTIONS_H__
+#define __X3DTYPEFUNCTIONS_H__
 
 #include "X3DTypes.h"
 #include "FieldTemplates.h"
