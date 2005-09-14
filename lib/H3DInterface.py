@@ -19,12 +19,6 @@ class Field:
   def __init__( self, auto_update = 0 ):
     createField( self, auto_update )
 
-  def setValue( self, value ):
-    setFieldValue( self, value )
-
-  def getValue( self ):
-    return getFieldValue( self )
-  
   def route( self, dest ):
     return routeField( self, dest )
 
@@ -49,48 +43,95 @@ class Field:
   def getRoutesOut( self ):
     return getRoutesOut( self )
 
+class SField( Field ):
+  type = UNKNOWN_X3D_TYPE
+  def setValue( self, value ):
+    setFieldValue( self, value )
 
+  def getValue( self ):
+    return getFieldValue( self )
 
+class MField( Field ):
+  type = UNKNOWN_X3D_TYPE
+  def setValue( self, value ):
+    setFieldValue( self, value )
+
+  def getValue( self ):
+    return getFieldValue( self )
+
+  def push_back( self, v ):
+    pushBackElementInMField( self, v ) 
+
+  def pop_back( self ):
+    MFieldPopBack( self )
+
+  def empty( self ):
+    return MFieldEmpty( self )
+
+  def front( self ):
+    return MFieldFront( self )
+
+  def back( self ):
+    return MFieldBack( self )
+
+  def clear( self ):
+    MFieldClear( self )
+
+  def erase( self, v ):
+    eraseElementFromMField( self, v ) 
 
 
 # Install all built-in Field types:
-types = [ 
+sfield_types = [ 
   ( SFFLOAT,    "SFFloat" ),
-  ( MFFLOAT,    "MFFloat" ),
   ( SFDOUBLE,   "SFDouble" ),
-  ( MFDOUBLE,   "MFDouble" ),
   ( SFTIME,     "SFTime" ),
-  ( MFTIME,     "MFTime" ),
   ( SFINT32,    "SFInt32" ),
-  ( MFINT32,    "MFInt32" ),
   ( SFVEC2F,    "SFVec2f" ),
-  ( MFVEC2F,    "MFVec2f" ),
   ( SFVEC2D,    "SFVec2d" ),
-  ( MFVEC2D,    "MFVec2d" ),
   ( SFVEC3F,    "SFVec3f" ),
-  ( MFVEC3F,    "MFVec3f" ),
   ( SFVEC3D,    "SFVec3d" ),
-  ( MFVEC3D,    "MFVec3d" ),
+  ( SFVEC4F,    "SFVec4f" ),
+  ( SFVEC4D,    "SFVec4d" ),
   ( SFBOOL,     "SFBool"  ),
-  ( MFBOOL,     "MFBool"  ),
   ( SFSTRING,   "SFString" ),
-  ( MFSTRING,   "MFString" ),
   ( SFCOLOR,    "SFColor" ),
-  ( MFCOLOR,    "MFColor" ),
   ( SFCOLORRGBA,"SFColorRGBA" ),
-  ( MFCOLORRGBA,"MFColorRGBA" ),
   ( SFROTATION, "SFRotation" ),
-  ( MFROTATION, "MFRotation" ),
   ( SFMATRIX3F, "SFMatrix3f" ),
-  ( MFMATRIX3F, "MFMatrix3f" ),
   ( SFMATRIX4F, "SFMatrix4f" ),
-  ( MFMATRIX4F, "MFMatrix4f" ),
-  ( SFNODE    , "SFNode"     ),
-  ( MFNODE    , "MFNode"     ) ]
+  ( SFNODE    , "SFNode"     ) ]
 
-for t in types:
+mfield_types = [
+  ( MFFLOAT,    "MFFloat" ),
+  ( MFDOUBLE,   "MFDouble" ),
+  ( MFTIME,     "MFTime" ),
+  ( MFINT32,    "MFInt32" ),
+  ( MFVEC2F,    "MFVec2f" ),
+  ( MFVEC2D,    "MFVec2d" ),
+  ( MFVEC3F,    "MFVec3f" ),
+  ( MFVEC3D,    "MFVec3d" ),
+  ( MFVEC4F,    "MFVec4f" ),
+  ( MFVEC4D,    "MFVec4d" ),
+  ( MFBOOL,     "MFBool"  ),
+  ( MFSTRING,   "MFString" ),
+  ( MFCOLOR,    "MFColor" ),
+  ( MFCOLORRGBA,"MFColorRGBA" ),
+  ( MFROTATION, "MFRotation" ),
+  ( MFMATRIX3F, "MFMatrix3f" ),
+  ( MFMATRIX4F, "MFMatrix4f" ),
+  ( MFNODE    , "MFNode"     )
+]
+
+for t in sfield_types:
   exec """
-class %s( Field ):
+class %s( SField ):
+  type = %s
+""" % (t[1], t[0] )
+
+for t in mfield_types:
+  exec """
+class %s( MField ):
   type = %s
 """ % (t[1], t[0] )
 
