@@ -104,6 +104,16 @@ namespace H3D {
 
     PyObject* pythonPushBackElementInMField( PyObject *self, PyObject *arg );
 
+    PyObject* pythonMFieldClear( PyObject *self, PyObject *arg );
+
+    PyObject* pythonMFieldBack( PyObject *self, PyObject *arg );
+
+    PyObject* pythonMFieldFront( PyObject *self, PyObject *arg );
+
+    PyObject* pythonMFieldEmpty( PyObject *self, PyObject *arg );
+
+    PyObject* pythonMFieldPopBack( PyObject *self, PyObject *arg );
+
     PyObject* pythonTouchField( PyObject *self, PyObject *arg );
     
   }
