@@ -54,7 +54,7 @@ Rotation::Rotation( const Quaternion &q ) {
 	  if( q.w > 1 ) 
       angle = 0;
 	  else if ( q.w < -1 ) 
-      angle = Constants::pi;
+      angle = (H3DFloat) Constants::pi;
     else
       angle = 2 * H3DAcos( q.w );
   }
