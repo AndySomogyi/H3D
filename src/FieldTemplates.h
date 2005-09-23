@@ -223,6 +223,14 @@ namespace H3D {
     SFBool() {}
     SFBool( const bool &_value ): SField< bool >( _value ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFBOOL; }
+    
+    /// Get the value of the field as a string.
+    inline virtual string getValueAsString( const string& separator = " " ) {
+      if( getValue() )
+        return "true";
+      else
+        return "false";
+    }
   };
 
   /// The SFTime field contains a single time value.
@@ -241,13 +249,6 @@ namespace H3D {
   public:
     SFString() {}
     SFString( const string &_value ): SField< string >( _value ){}
-    /// Get the value of the field as a string. If the field contains
-    /// multiple values the separator string is used between the values.
-    inline virtual string getValueAsString( const string& separator = " " ) {
-      stringstream s;
-      s << "\"" << getValue() << "\"";
-      return s.str();
-    }
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFSTRING; }
   };
 
@@ -374,6 +375,25 @@ namespace H3D {
     MFBool(){}
     MFBool( size_type size ): MField< bool >( size ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFBOOL; }
+    /// Get the value of the field as a string. If the field contains
+    /// multiple values the separator string is used between the values.
+    inline virtual string getValueAsString( const string& separator = " " ) {
+      stringstream s;
+      const vector< bool > &v = getValue();
+      
+      if( v.size() == 0 )
+        return "";
+      unsigned int i;
+      for( i = 0; i < v.size() - 1; i++ ) {
+        if( v[i] ) s << "true";
+        else s << "false";
+        s << separator;
+        
+      }
+      if( v[i] ) s << "true";
+      else s << "false";
+      return s.str();
+    }
   };
 
   /// The MFTime field contains a vector of time values.

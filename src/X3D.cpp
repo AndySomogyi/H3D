@@ -106,3 +106,50 @@ AutoRef< Node > X3D::createX3DNodeFromStream( istream &is,
   return handler.getResultingNode();
 }
 
+void X3D::writeNodeAsX3D( ostream& os, 
+                          Node *node, 
+                          const string& container_field ) {
+  if( !node ) {
+    return;
+  }
+  H3DNodeDatabase *db = H3DNodeDatabase::lookupTypeId( typeid( *node ) );
+  string node_name = node->getTypeName();    
+
+  os << "<" << node_name << " containerField=\"" 
+     << container_field << "\" ";
+    
+  vector< pair< string, SFNode * > > sf_nodes;
+  vector< pair< string, MFNode * > > mf_nodes;
+
+  for( H3DNodeDatabase::FieldDBConstIterator i = db->fieldDBBegin();
+       i != db->fieldDBEnd(); i++ ) {
+    Field *f = node->getField( *i );
+    Field::AccessType access_type = f->getAccessType();
+    if( access_type != Field::INPUT_ONLY &&
+        access_type != Field::OUTPUT_ONLY ) {
+      if( MFNode *mf_node = dynamic_cast< MFNode * >( f ) ) {
+        mf_nodes.push_back( make_pair( f->getName(), mf_node ) );
+      } else if( SFNode *sf_node = dynamic_cast< SFNode * >( f ) ) {
+        sf_nodes.push_back( make_pair( f->getName(), sf_node ) );
+      } else if( ParsableField *p_field = 
+                 dynamic_cast< ParsableField * >( f ) ){
+        os << f->getName() << "=\'" << p_field->getValueAsString() << "\' ";
+      }
+    }
+  }
+
+  os << ">" << endl;
+
+  for( unsigned int i = 0; i < sf_nodes.size(); i++ ) {
+    X3D::writeNodeAsX3D( os, sf_nodes[i].second->getValue(), sf_nodes[i].first );
+  }
+
+  for( unsigned int i = 0; i < mf_nodes.size(); i++ ) {
+    for( MFNode::const_iterator n = mf_nodes[i].second->begin();
+         n != mf_nodes[i].second->end(); n++ ) {
+      X3D::writeNodeAsX3D( os, *n, mf_nodes[i].first );
+    }
+  }
+  
+  os << "</" << node_name << ">" << endl;
+}

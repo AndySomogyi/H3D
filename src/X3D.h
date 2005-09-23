@@ -82,6 +82,13 @@ namespace H3D {
                                                    DEFNodes *dn = NULL );
 
     SAX2XMLReader* getNewXMLParser();
+    
+    /// Write the scene graph part of the node given in X3D/XML format
+    /// to the given ostream.
+    H3DAPI_API void writeNodeAsX3D( ostream& os, 
+                                    Node *node,
+                                    const string& container_field = 
+                                    "children" );
 
   }
 };
