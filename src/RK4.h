@@ -62,8 +62,6 @@ namespace H3D {
 
     // constants:
     float mass;
-
-    Vec3f box;
   };
 
   // Performs fourth-order Runge Kutta integration for solving

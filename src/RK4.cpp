@@ -53,31 +53,7 @@ void LinearMotion::update( LMState &state ) {
 DvState LinearMotion::evaluate( LMState state ) {
   DvState newState;
   newState.vel = state.vel;
-  newState.force = state.force; // some function to establish force
-  // simple colission detection against the "box" to establish a new
-  // force.
-  float half_x = state.box.x/2;
-  float half_y = state.box.y/2;
-  float half_z = state.box.z/2;
-  if ( half_x > 0 ) {
-    if ( state.pos.x < -half_x )
-      newState.force.x += 10000*(fabs(state.pos.x)-half_x);
-    if ( state.pos.x > half_x )
-      newState.force.x += -10000*(fabs(state.pos.x)-half_x);
-  }
-  if ( half_y > 0 ) {
-    if ( state.pos.y < -half_y )
-      newState.force.y += 10000*(fabs(state.pos.y)-half_y);
-    if ( state.pos.y > half_y )
-      newState.force.y += -10000*(fabs(state.pos.y)-half_y);
-  }
-  if ( half_z > 0 ) {
-    if ( state.pos.z < -half_z )
-      newState.force.z += 10000*(fabs(state.pos.z)-half_z);
-    if ( state.pos.z > half_z )
-      newState.force.z += -10000*(fabs(state.pos.z)-half_z);
-  }
-
+  newState.force = state.force;   
   newState.spin = state.spin;
   newState.torque = state.torque;
   return newState;
@@ -103,8 +79,8 @@ DvState LinearMotion::evaluate( LMState state,
 void LinearMotion::solve( LMState &state, H3DFloat dt ) {
   // Sample four different DvStates from the current state:
   DvState a = evaluate( state );  // current state
-  DvState b = evaluate( state, 0.5*dt, a );
-  DvState c = evaluate( state, 0.5*dt, b );
+  DvState b = evaluate( state, 0.5f*dt, a );
+  DvState c = evaluate( state, 0.5f*dt, b );
   DvState d = evaluate( state, dt, c );
 		
   // update position and momentum from a weighted average of the

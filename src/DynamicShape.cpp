@@ -53,11 +53,11 @@ namespace DynamicShapeInternals {
   FIELDDB_ELEMENT( DynamicShape, force,           INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, angularVelocity, INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, angularMomentum, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DynamicShape, spin,            INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, torque,          INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, mass,            INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, inertia,         INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, motion,          INPUT_OUTPUT );
-  FIELDDB_ELEMENT( DynamicShape, box,             INPUT_OUTPUT );
 }
 
 
@@ -80,11 +80,11 @@ DynamicShape::DynamicShape(
                            Inst< SFVec3f            > _force,
                            Inst< SFVec3f            > _angularVelocity,
                            Inst< SFVec3f            > _angularMomentum,
+                           Inst< SFRotation         > _spin,
                            Inst< SFVec3f            > _torque,
                            Inst< SFFloat            > _mass,
                            Inst< SFMatrix3f         > _inertia,
-                           Inst< SFMotion           > _motion,
-                           Inst< SFVec3f            > _box ):
+                           Inst< SFMotion           > _motion ):
   MatrixTransform( _addChildren, _removeChildren, _children,
                    _metadata, _bound,_bboxCenter, _bboxSize,
                    _transformedBound, _matrix, 
@@ -96,17 +96,18 @@ DynamicShape::DynamicShape(
   force           ( _force            ),
   angularVelocity ( _angularVelocity  ),
   angularMomentum ( _angularMomentum  ),
+  spin            ( _spin             ),
   torque          ( _torque           ),
   mass            ( _mass             ),
   inertia         ( _inertia          ),
-  motion          ( _motion           ),
-  box             ( _box              )   {
+  motion          ( _motion           )   {
   type_name = "DynamicShape";
   database.initFields( this );
   //motion->last_t = 0;
 
   position->setValue( Vec3f( 0, 0, 0 ) );
   orientation->setValue( Rotation( 0, 0, 1, 0 ) );
+  spin->setValue( Rotation( 0, 0, 1, 0 ) );
 
   velocity->setValue( Vec3f( 0, 0, 0 ) );
   momentum->setValue( Vec3f( 0, 0, 0 ) );
@@ -122,8 +123,6 @@ DynamicShape::DynamicShape(
 
   orientation->route( matrix );
   position->route( matrix );
-
-  box->setValue( Vec3f( 0, 0, 0 ) );
 
   Scene::time->route( motion );
   motion->route( Scene::eventSink );
@@ -147,34 +146,43 @@ void DynamicShape::SFMotion::update() {
   LMState state;
   DynamicShape *ds = static_cast<DynamicShape*>(owner);
   state.pos = ds->position->getValue(); 
+  state.vel = ds->velocity->getValue();
   state.mom = ds->momentum->getValue(); ;
   state.force = ds->force->getValue(); 
   state.orn = ds->orientation->getValue(); 
-  state.angMom = ds->angularMomentum->getValue(); ;
+  state.spin = ds->spin->getValue();
+  state.angVel = ds->angularVelocity->getValue();
+  state.angMom = ds->angularMomentum->getValue();
   state.torque = ds->torque->getValue(); 
-  state.box = ds->box->getValue(); 
-
-
   state.mass = ds->mass->getValue();
   state.inertiaTensor = ds->inertia->getValue();
 
-    // only perform integration if the momentum is non-zero
-    H3DFloat stepsize=0.01; // 1ms
-    while ( dt > stepsize/2 ) {  
-      LinearMotion::solve( state, stepsize );
-      dt = dt - stepsize;
-    }
+  updateState( state, dt );
 
   //cerr << "SFMotion::update() momentum = " << solve.mom << endl;
   ds->position->setValue( state.pos );
   ds->momentum->setValue( state.mom );
-  ds->velocity->setValue( state.vel );
-
   ds->orientation->setValue( state.orn );
   ds->angularMomentum->setValue( state.angMom );
+
   ds->angularVelocity->setValue( state.angVel );
+  ds->velocity->setValue( state.vel );
+  ds->spin->setValue( state.spin );
 }
 
+
+void DynamicShape::SFMotion::updateState( LMState &state, H3DTime dt ) {
+  DynamicShape *ds = static_cast<DynamicShape*>(owner);
+
+  // only perform integration if the momentum is non-zero
+  // H3DFloat stepsize=0.01; // 1ms
+  //while ( dt > stepsize/2 ) {  
+  //  LinearMotion::solve( state, stepsize );
+  ////  dt = dt - stepsize;
+  // }
+  
+  LinearMotion::solve( state, dt );
+}
 
 void DynamicShape::SFMatrix4f::update() {
   Rotation r  = static_cast< SFRotation *>(routes_in[0])->getValue();

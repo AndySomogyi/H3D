@@ -31,6 +31,7 @@
 
 #include "MatrixTransform.h"
 #include "PeriodicUpdate.h"
+#include "RK4.h"
 
 namespace H3D {
 
@@ -58,6 +59,8 @@ namespace H3D {
     protected:
       /// Update the matrix from the fields in the Transform node.
       virtual void update();
+
+      virtual void updateState( LMState &state, H3DTime dt );
     };
 
     /// Specialize the SFMatrix4f to update the matrix from the
@@ -93,11 +96,11 @@ namespace H3D {
                   Inst< SFVec3f          > _force            = 0,
                   Inst< SFVec3f          > _angularVelocity  = 0,
                   Inst< SFVec3f          > _angularMomentum  = 0, 
+                  Inst< SFRotation       > _spin             = 0,
                   Inst< SFVec3f          > _torque           = 0,
                   Inst< SFFloat          > _mass             = 0,
                   Inst< SFMatrix3f       > _inertia          = 0,
-                  Inst< SFMotion         > _motion           = 0,
-                  Inst< SFVec3f          > _box              = 0 );
+                  Inst< SFMotion         > _motion           = 0 );
 
 
     virtual H3DNodeDatabase *getDatabase() { return &database; }
@@ -144,6 +147,12 @@ namespace H3D {
     /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
     auto_ptr<    SFVec3f    >  angularMomentum;
 
+    /// Specifies the spin of the dynamic
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
+    auto_ptr<    SFRotation    >  spin;
+
     /// Specifies the torque force currently acting on the dynamic
     ///
     /// <b>Access type:</b> inputOutput \n
@@ -165,13 +174,6 @@ namespace H3D {
     /// Dynamic update algorithm
     auto_ptr<    SFMotion    >  motion;
     
-    /// Specifies a box that bounds the dynamic object. The dynamic object
-    /// will "bounce" off the walls of the box. No box is simulated if
-    /// the size is 0, 0, 0.
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
-    auto_ptr<    SFVec3f    >  box;
-
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   };
