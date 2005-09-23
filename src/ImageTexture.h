@@ -68,8 +68,8 @@ namespace H3D {
     /// routes_in[0] is the url field.
     /// routes_in[1] is the imageLoader field.
     ///
-    class SFImage: public TypedField< X3DTexture2DNode::SFImage,
-                   Types< MFString, MFImageLoader > > {
+    class H3DAPI_API SFImage: public TypedField< X3DTexture2DNode::SFImage,
+                                                 Types< MFString, MFImageLoader > > {
 
       /// Updates the value from the url and imageLoader fields
       /// of the ImageTexture
