@@ -269,8 +269,6 @@ namespace TransformInternals {
   FIELDDB_ELEMENT( Transform, scale, INPUT_OUTPUT );
   FIELDDB_ELEMENT( Transform, scaleOrientation, INPUT_OUTPUT );
   FIELDDB_ELEMENT( Transform, translation, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( Transform, accumulatedForward, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( Transform, accumulatedInverse, INPUT_OUTPUT );
 }
 
 

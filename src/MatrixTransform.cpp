@@ -41,8 +41,8 @@ H3DNodeDatabase MatrixTransform::database(
 
 namespace MatrixTransformInternals {
   FIELDDB_ELEMENT( MatrixTransform, matrix, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( MatrixTransform, accumulatedForward, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( MatrixTransform, accumulatedInverse, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( MatrixTransform, accumulatedForward, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( MatrixTransform, accumulatedInverse, OUTPUT_ONLY );
 }
 
 
@@ -133,8 +133,8 @@ void MatrixTransform::traverseSG( TraverseInfo &ti ) {
                    matrix->getValue().inverse() );
 
   // set accumulated forward and inverse matrices
-  accumulatedForward->setValue( ti.getAccForwardMatrix() );
-  accumulatedInverse->setValue( ti.getAccInverseMatrix() );
+  accumulatedForward->setValue( ti.getAccForwardMatrix(), id );
+  accumulatedInverse->setValue( ti.getAccInverseMatrix(), id );
   X3DGroupingNode::traverseSG( ti );
   ti.popMatrices();
 }
