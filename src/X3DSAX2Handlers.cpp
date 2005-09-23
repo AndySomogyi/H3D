@@ -370,6 +370,7 @@ in fieldValue element.", "",
       }  else {
         cerr << "Warning: 'field' declaration in Node that is does not support"
              << " it " << getLocationString() << endl;
+        node_stack.push( NULL ); 
       }
     } else {
       // if we have a USE attribute use that Node.
@@ -566,7 +567,7 @@ void X3DSAX2Handlers::endElement (const XMLCh *const uri,
   Node *parent = NULL;
   if( node_stack.size() > 0 ) 
     parent = node_stack.top().getNode();
-  
+
   if( toString( localname ).compare( "field" ) == 0 ) {
     return;
   } else {
