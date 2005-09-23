@@ -40,6 +40,35 @@ using namespace std;
 
 namespace H3D {
 
+  class H3DAPI_API MFieldClass {
+  public:
+    /// Set the value of the field given a pointer to where the value
+    /// of the field is. 
+    /// \param data A pointer to the data.
+    /// \param nr_elements The number of values in the mfield.
+    /// \param size The size in bytes of the each value stored in the data.
+    /// \returns 0 if successful, -1 otherwise.
+    virtual int setValueFromVoidPtr( void *data, int nr_elements, 
+                                     int size, int id = 0 ) = 0;
+
+    /// Get the value of the data copied into a memory buffer.
+    /// \param data Buffer to copy the data into.
+    /// \param nr_elements This parameter will be set to the nr of values
+    /// in the mfield.
+    /// \param size The size of the buffer.
+    /// \returns If successful: The number of bytes that was copied into the 
+    /// Otherwise -1.
+    virtual int getValueAsVoidPtr( void *data, int &nr_elements,
+                                   int size, int id = 0 ) = 0;
+
+    /// Returns the size in bytes of the value type the mfield encapsulates.
+    virtual unsigned int valueTypeSize() = 0;
+
+    /// Returns the number of values that is stored in the mfield.
+    virtual unsigned int size() = 0; 
+  };
+
+
   /// \class MFieldBase
   /// \brief The common base class for MField types and MFNode.
   /// It defines the common interface between MFNode and MField <>.
@@ -56,15 +85,16 @@ namespace H3D {
                                        void,
                                        AnyNumber< MFieldBase< Type, 
                                                               VectorClass, 
-                                                              BaseField > > > {
+                                                              BaseField > > >,
+                    public MFieldClass {
   public:
     /// The type of the value member. 
     typedef VectorClass vector_type;
-    /// The type of the Node, NodeClass, stored in the vector.
+    /// The type of the values stored in the vector.
     typedef typename VectorClass::value_type value_type;
-    /// Pointer to NodeClass.
+    /// Pointer to Type.
     typedef typename VectorClass::pointer pointer;
-    /// Const reference to NodeClass.
+    /// Const reference to Type.
     typedef typename VectorClass::const_reference const_reference;
     /// An unsigned integral type.
     typedef typename VectorClass::size_type size_type;
@@ -184,6 +214,7 @@ namespace H3D {
       value.swap( x );
       this->startEvent();
     }
+
     /// Inserts a new element at the end.
     inline virtual void push_back( const Type &x, int id = 0 ) {
       // check that we have the correct access type
@@ -209,6 +240,60 @@ namespace H3D {
       this->upToDate();
       value.clear();
       this->startEvent();
+    }
+
+    /// Set the value of the field given a pointer to where the value
+    /// of the field is. 
+    /// \param data A pointer to the data.
+    /// \param nr_elements The number of values in the mfield.
+    /// \param size The size in bytes of the each value stored in the data.
+    /// \returns 0 if successful, -1 otherwise.
+    inline virtual int setValueFromVoidPtr( void *data, 
+                                            int nr_elements, 
+                                            int len, int id = 0 ) {
+      this->checkAccessTypeSet( id );
+          
+      if( len != sizeof( typename value_type ) * nr_elements )
+      return -1;
+      
+      vector< Type > new_data( nr_elements );
+      for( int i = 0; i < nr_elements; i++ ) {
+        new_data[i] = static_cast< typename value_type * >( data )[i];
+      }
+      this->value.swap( new_data );
+      this->startEvent();
+      return 0;
+    }
+
+    /// Get the value of the data copied into a memory buffer.
+    /// \param data Buffer to copy the data into.
+    /// \param nr_elements This parameter will be set to the nr of values
+    /// in the mfield.
+    /// \param size The size of the buffer.
+    /// \returns If successful: The number of bytes that was copied into the 
+    /// Otherwise -1.
+    inline virtual int getValueAsVoidPtr( void *data, int &nr_elements,
+                                          int len, int id = 0 ) {
+      int size = sizeof( typename value_type );
+      nr_elements = this->value.size();
+      if( len < size * nr_elements ) {
+        return -1;
+      }
+      
+      typename value_type *data_ptr = 
+        static_cast< typename value_type * >( data );
+
+      upToDate();
+
+      for( int i = 0; i < nr_elements; i++ ) {
+        data_ptr[i] = value[i];
+      }
+      return size * nr_elements;
+    } 
+
+    /// Returns the size in bytes of the value type the mfield encapsulates.
+    inline virtual unsigned int valueTypeSize() {
+      return sizeof( typename value_type );
     }
 
     /// Default constructor. Creates an empty MField.

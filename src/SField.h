@@ -36,7 +36,29 @@ namespace H3D {
   /// \defgroup FieldTemplateModifiers Field template modifiers.
   /// Template classes for modifying the behaviour of Field classes.
  
-  //
+  /// Base class for all fields created with the SField template.
+  class H3DAPI_API SFieldClass {
+  public:
+    /// Set the value of the field given a pointer to where the value
+    /// of the field is. 
+    /// \param data A pointer to the data.
+    /// \param size The size in bytes of the value stored in data.
+    /// \returns 0 if successful, -1 otherwise.
+    virtual int setValueFromVoidPtr( void *data, int size, int id = 0 ) = 0;
+
+    /// Get the value of the data copied into a memory buffer.
+    /// \param data Buffer to copy the data into.
+    /// \param size The size of the buffer.
+    /// \returns If successful: The number of bytes that was copied into the 
+    /// Otherwise -1.
+    ///
+    virtual int getValueAsVoidPtr( void *data, int size, int id = 0 ) = 0;
+
+    /// Returns the size in bytes of the value type the sfield encapsulates.
+    virtual unsigned int valueTypeSize() = 0;
+  };
+
+
   /// Template class that adds the Field mechanisms to an encapsulated value
   /// of specified type.
   /// 
@@ -45,7 +67,8 @@ namespace H3D {
   template< class Type > 
   class SField: public TypedField< ParsableField,
                                    void,
-                                   AnyNumber< SField< Type> > > {
+                                   AnyNumber< SField< Type> > >,
+                public SFieldClass {
   public:   
     /// The type of the value member. 
     typedef Type value_type;
@@ -56,6 +79,38 @@ namespace H3D {
     /// Constructor.
     SField( const Type &_value ) {
       value = _value;
+    }
+
+    /// Set the value of the field given a pointer to where the value
+    /// of the field is. 
+    /// \param data A pointer to the data.
+    /// \param size The size in bytes of the value stored in data.
+    /// \returns 0 if successful, -1 otherwise.
+    inline virtual int setValueFromVoidPtr( void *data, int len, int id = 0 ) {
+      if( len != sizeof( typename value_type ) )
+        return -1;
+      setValue( *( static_cast< Type * >( data ) ), id );
+      return 0;
+    }
+
+    /// Get the value of the data copied into a memory buffer.
+    /// \param data Buffer to copy the data into.
+    /// \param size The size of the buffer.
+    /// \returns If successful: The number of bytes that was copied into the 
+    /// Otherwise -1.
+    ///
+    inline virtual int getValueAsVoidPtr( void *data, int len, int id = 0 ) {
+      int size = sizeof( typename value_type );
+      if( len < size ) {
+        return -1;
+      }
+      *static_cast< Type * >( data ) = getValue( id );
+      return size;
+    } 
+
+    /// Returns the size in bytes of the value type the sfield encapsulates.
+    inline virtual unsigned int valueTypeSize() {
+      return sizeof( typename value_type );
     }
 
     /// Set the value of the field.
