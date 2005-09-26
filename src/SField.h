@@ -87,7 +87,7 @@ namespace H3D {
     /// \param size The size in bytes of the value stored in data.
     /// \returns 0 if successful, -1 otherwise.
     inline virtual int setValueFromVoidPtr( void *data, int len, int id = 0 ) {
-      if( len != sizeof( typename value_type ) )
+      if( len != sizeof( value_type ) )
         return -1;
       setValue( *( static_cast< Type * >( data ) ), id );
       return 0;
@@ -100,7 +100,7 @@ namespace H3D {
     /// Otherwise -1.
     ///
     inline virtual int getValueAsVoidPtr( void *data, int len, int id = 0 ) {
-      int size = sizeof( typename value_type );
+      int size = sizeof( value_type );
       if( len < size ) {
         return -1;
       }
@@ -110,7 +110,7 @@ namespace H3D {
 
     /// Returns the size in bytes of the value type the sfield encapsulates.
     inline virtual unsigned int valueTypeSize() {
-      return sizeof( typename value_type );
+      return sizeof( value_type );
     }
 
     /// Set the value of the field.

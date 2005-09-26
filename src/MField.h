@@ -138,7 +138,7 @@ namespace H3D {
     }
 
     /// Returns the size of the vector.
-    inline virtual size_type size() { 
+    inline virtual unsigned int size() { 
       this->upToDate();
       return value.size(); 
     }
@@ -253,12 +253,12 @@ namespace H3D {
                                             int len, int id = 0 ) {
       this->checkAccessTypeSet( id );
           
-      if( len != sizeof( typename value_type ) * nr_elements )
+      if( len != sizeof( value_type ) * nr_elements )
       return -1;
       
       vector< Type > new_data( nr_elements );
       for( int i = 0; i < nr_elements; i++ ) {
-        new_data[i] = static_cast< typename value_type * >( data )[i];
+        new_data[i] = static_cast< value_type * >( data )[i];
       }
       this->value.swap( new_data );
       this->startEvent();
@@ -274,16 +274,16 @@ namespace H3D {
     /// Otherwise -1.
     inline virtual int getValueAsVoidPtr( void *data, int &nr_elements,
                                           int len, int id = 0 ) {
-      int size = sizeof( typename value_type );
+      int size = sizeof( value_type );
       nr_elements = this->value.size();
       if( len < size * nr_elements ) {
         return -1;
       }
       
-      typename value_type *data_ptr = 
-        static_cast< typename value_type * >( data );
+      value_type *data_ptr = 
+        static_cast< value_type * >( data );
 
-      upToDate();
+      this->upToDate();
 
       for( int i = 0; i < nr_elements; i++ ) {
         data_ptr[i] = value[i];
@@ -293,7 +293,7 @@ namespace H3D {
 
     /// Returns the size in bytes of the value type the mfield encapsulates.
     inline virtual unsigned int valueTypeSize() {
-      return sizeof( typename value_type );
+      return sizeof( value_type );
     }
 
     /// Default constructor. Creates an empty MField.
