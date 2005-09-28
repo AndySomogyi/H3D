@@ -50,6 +50,7 @@ H3DNodeDatabase HLHapticsDevice::database(
 namespace HLHapticsDeviceInternal {
   FIELDDB_ELEMENT( HLHapticsDevice, deviceName, INPUT_OUTPUT );
   FIELDDB_ELEMENT( HLHapticsDevice, secondaryButton, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( HLHapticsDevice, deviceLog,  INPUT_OUTPUT );
 
 #ifdef MACOSX
   static int init_realtime=0;
@@ -127,6 +128,10 @@ namespace HLHapticsDeviceInternal {
     pos = hd->positionCalibration->rt_pos_calibration * pos;
     vel = hd->positionCalibration->rt_pos_calibration * vel;
     rot = hd->orientationCalibration->rt_orn_calibration * rot;
+
+    // Dump out values to log file
+    if ( hd->log )
+      hd->log->writeLog( pos, rot );
 
     TimeStamp dt = TimeStamp() - hd->last_effect_change;
     HapticForceEffect::EffectInput input( pos, vel, rot, dt );
@@ -274,16 +279,24 @@ void HLCALLBACK HLHapticsDevice::hlButtonCallback( HLenum event,
                                                    HLcache *cache,
                                                    void *data ) {
   HLHapticsDevice *hd = static_cast< HLHapticsDevice * >( data );
-  if( event == HL_EVENT_1BUTTONDOWN )
+  if( event == HL_EVENT_1BUTTONDOWN ) {
     hd->mainButton->setValue( true, hd->id );
-  else if( event == HL_EVENT_1BUTTONUP ) 
+    if ( hd->log )
+      hd->log->writeMessage( "Button 1 pressed" );
+  } else if( event == HL_EVENT_1BUTTONUP ) {
     hd->mainButton->setValue( false, hd->id );
-  else if( event ==  HL_EVENT_2BUTTONDOWN ) 
+    if ( hd->log )
+      hd->log->writeMessage( "Button 1 released" );
+  } else if( event ==  HL_EVENT_2BUTTONDOWN ) {
     hd->secondaryButton->setValue( true, hd->id );
-  else if( event == HL_EVENT_2BUTTONUP ) 
+    if ( hd->log )
+      hd->log->writeMessage( "Button 2 pressed" );
+  } else if( event == HL_EVENT_2BUTTONUP ) {
     hd->secondaryButton->setValue( false, hd->id );
+    if ( hd->log )
+      hd->log->writeMessage( "Button 2 released" );
+  }
 }
-
 void HLHapticsDevice::renderShapes( const HapticShapeVector &objects  ) {
   hlMakeCurrent( haptic_context );
 
@@ -403,6 +416,8 @@ void HLHapticsDevice::initDevice() {
 }
 
 void HLHapticsDevice::disableDevice() {
+  if ( log )
+	  log->closeLog();
   if( initialized->getValue() ) {
     H3DHapticsDevice::disableDevice();
     hlMakeCurrent( NULL );
@@ -424,8 +439,18 @@ void HLHapticsDevice::disableDevice() {
 
 void HLHapticsDevice::updateDeviceValues() {
 
-  // button values are set via event callback functions
+  // update real-time reference to DeviecLog
+	DeviceLog * dl = static_cast< DeviceLog* >( deviceLog->getValue() );
+	if ( !log && dl ) {
+		log = dl;
+		log->openLog( "log.dat" );
+	} else if ( log && log != dl ) {
+		log->closeLog();
+		log = dl;
+		log->openLog( "log.dat" );		
+	}
 
+  // button values are set via event callback functions
   hlMakeCurrent( haptic_context );  
 
   HLdouble rotation[4];

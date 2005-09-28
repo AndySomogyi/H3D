@@ -33,6 +33,7 @@
 #include <HL/hl.h>
 #endif
 #include "H3DHapticsDevice.h"
+#include "DeviceLog.h"
 
 #include "GL/glew.h"
 namespace H3D {
@@ -45,6 +46,7 @@ namespace H3D {
   /// \dotfile HLHapticsDevice.dot
   class H3DAPI_API HLHapticsDevice : public H3DHapticsDevice {
   public:
+    typedef TypedSFNode< DeviceLog > SFDeviceLog;
 
     H3D_VALUE_EXCEPTION( string, CouldNotInitHapticsDevice );
     
@@ -67,7 +69,8 @@ namespace H3D {
                      Inst< SFNode          > _stylus                 = 0,
                      Inst< SFBool          > _initialized            = 0,
                      Inst< SFString        > _deviceName             = 0,
-                     Inst< SFBool          > _secondaryButton        = 0 ):
+                     Inst< SFBool          > _secondaryButton        = 0,
+                     Inst< SFDeviceLog     > _deviceLog              = 0 ):
       H3DHapticsDevice( _devicePosition, _deviceOrientation, _trackerPosition,
                         _trackerOrientation, _positionCalibration, 
                         _orientationCalibration, _proxyPosition,
@@ -75,7 +78,8 @@ namespace H3D {
                         _mainButton, _force, _torque,
                         _inputDOF, _outputDOF, _hapticsRate, _stylus, _initialized ),
       deviceName( _deviceName ),
-      secondaryButton( _secondaryButton )
+      secondaryButton( _secondaryButton ),
+      deviceLog( _deviceLog )
       #ifdef HAVE_OPENHAPTICS
       ,
       last_effect_change( TimeStamp() ),
@@ -157,6 +161,15 @@ namespace H3D {
     /// \dotfile HLHapticsDevice_secondaryButton.dot
     auto_ptr< SFBool > secondaryButton;
 
+    /// Logging Node that can be used to log device position and
+    /// orientation information to a binary file.
+    ///
+    /// <b>Access type:</b> initializeOnly \n
+    /// <b>Default value:</b> NONE \n
+    /// 
+    /// \dotfile HLTrackedHapticsDevice_deviceName.dot
+    auto_ptr< SFDeviceLog > deviceLog;
+
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 #ifdef HAVE_OPENHAPTICS
@@ -189,6 +202,9 @@ namespace H3D {
     
     /// The time between the previous two calls to changeForceEffects.
     TimeStamp last_loop_time;
+
+    /// Realtime pointer to deviceLog
+    DeviceLog *log;
 
   protected:
     /// The device handle used in the HLAPI.
