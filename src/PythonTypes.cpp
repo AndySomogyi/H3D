@@ -31,6 +31,7 @@
 #include "PythonScript.h"
 #include "X3DTypes.h"
 #include "X3DFieldConversion.h"
+#include "H3DDynamicFieldsObject.h"
 
 #if defined(_MSC_VER)
 // undefine _DEBUG since we want to always link to the release version of
@@ -106,6 +107,7 @@ namespace H3D {
     { "__repr__", (PyCFunction) PyNode::repr, 0 },
     { "__str__", (PyCFunction) PyNode::repr, 0 },
     { "getFieldList", (PyCFunction) PyNode::getFieldList, 0 },
+    { "addField", (PyCFunction) PyNode::addField, 0 },
     {NULL, NULL}
   };
   
@@ -183,6 +185,62 @@ namespace H3D {
     }
   }
 
+  PyObject* PyNode::addField( PyObject *self, 
+                              PyObject *args, 
+                              PyObject *ffield_type, 
+                              PyObject *fpy_access_type ) {
+    Node *n = PyNode_AsNode( self );
+    
+    if( !PyTuple_Check( args ) || PyTuple_Size( args ) != 3 ) {
+      PyErr_SetString( PyExc_ValueError, 
+                       "Invalid argument(s) to function PyNode.addField( \
+self, name, field_type, access_type )" );
+      return NULL;
+    } 
+    
+    PyObject *name = PyTuple_GetItem( args, 0 );
+    PyObject *field_type = PyTuple_GetItem( args, 1 );
+    PyObject *py_access_type = PyTuple_GetItem( args, 2 );
+
+    if(! PyString_Check( name ) || ! PyInt_Check( field_type ) || 
+       ! PyString_Check( py_access_type ) ) {
+      PyErr_SetString( PyExc_ValueError, 
+                       "Invalid argument(s) to function PyNode.addField( \
+self, name, field_type, access_type )" );
+      return NULL;
+    }
+
+    H3DDynamicFieldsObject *dfo = dynamic_cast< H3DDynamicFieldsObject * >( n );
+    if( !dfo ) {
+      PyErr_SetString( PyExc_ValueError, 
+               "Trying to add field to Node that is not a H3DDynamicFieldsObject." );
+	  return NULL;
+    }
+	Field *f = X3DTypes::newFieldInstance( (X3DTypes::X3DType)PyInt_AsLong( field_type ) );
+
+    string access_type_string = PyString_AsString( py_access_type );
+    Field::AccessType access_type;
+
+    if( access_type_string == "initializeOnly" ) 
+      access_type= Field::INITIALIZE_ONLY;
+    else if( access_type_string == "outputOnly" )
+      access_type = Field::OUTPUT_ONLY;
+    else if( access_type_string == "inputOnly" )
+      access_type = Field::INPUT_ONLY;
+    else if( access_type_string == "inputOutput" )
+      access_type = Field::INPUT_OUTPUT;
+    else {
+       PyErr_SetString( PyExc_ValueError, 
+         "Invalid access type" );
+       return NULL;
+    }
+    
+    dfo->addField( PyString_AsString( name ),
+                   access_type,
+                   f );
+    Py_INCREF( Py_None );
+    return Py_None;
+  }
   
   void PyNode::installType( PyObject* H3D_module ) {
     // Install Node
