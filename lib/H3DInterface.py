@@ -7,8 +7,6 @@ from H3D import *
 #
 ###################################################################
 
-
-
 ###################################################################
 #
 # Field base class and SF* MF* class definitions
@@ -17,7 +15,8 @@ from H3D import *
 class Field:
   type = UNKNOWN_X3D_TYPE
   def __init__( self, auto_update = 0 ):
-    createField( self, auto_update )
+    module = self.__class__.__dict__["__module__"]
+    createField( self, auto_update, module + "." + self.__class__.__name__ )
 
   def route( self, dest ):
     return routeField( self, dest )
