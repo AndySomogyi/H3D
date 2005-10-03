@@ -61,7 +61,8 @@ namespace H3D {
     ///
     /// routes_in[0] is the radius field of the Sphere node.  
     ///
-    class SFBound: public X3DGeometryNode::SFBound {
+    class SFBound: public TypedField< X3DGeometryNode::SFBound,
+                                      SFFloat >{
       /// Update the bound from the radius field. 
       virtual void update() {
         H3DFloat d = 2 * static_cast< SFFloat * >( routes_in[0] )->getValue();
