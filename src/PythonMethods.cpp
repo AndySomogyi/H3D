@@ -558,14 +558,16 @@ if( check_func( value ) ) {                                         \
     // Methods for the H3D Module:
     
     PyObject *pythonCreateField( PyObject *self, PyObject *args ) {
-      if( !args || !PyTuple_Check( args ) || PyTuple_Size( args ) != 2  ) {
+      if( !args || !PyTuple_Check( args ) || PyTuple_Size( args ) != 3  ) {
         ostringstream err;
-        err << "Invalid argument(s) to function H3D.createField( Field, int auto_update )" << ends;
+        err << "Invalid argument(s) to function H3D.createField( Field, int auto_update, name )" << ends;
         PyErr_SetString( PyExc_ValueError, err.str().c_str() );
         return 0;
       }
       PyObject *field = PyTuple_GetItem( args, 0 );
       PyObject *autoupdateobj = PyTuple_GetItem( args, 1 );
+      PyObject *name = PyTuple_GetItem( args, 2 );
+
       bool autoupdate = PyInt_AsLong( autoupdateobj ) != 0;
       
       if( field && PyInstance_Check( field ) ) {
@@ -599,7 +601,9 @@ if( check_func( value ) ) {                                         \
                              return 0; */ 
           }
         }
-          
+
+        if( f ) f->setName( PyString_AsString( name ) );
+        
         PyObject *pfield = PyCObject_FromVoidPtr( f, 0 );
         PyObject_SetAttrString( field, "__fieldptr__", pfield );
         // field now holds a reference to pfield so we can remove the extra reference
