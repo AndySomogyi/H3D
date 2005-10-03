@@ -79,10 +79,11 @@ void H3DNodeDatabase::initFields( Node *n ) const {
     FieldDBElement *fdb = (*i).second;
     if ( fdb ) {
       Field *f = fdb->getField( n );
-      f->setName( fdb->getName() );
-      f->setOwner( n );
-      f->setAccessType( fdb->getAccessType() );
-    } else {
+      if( f ) { 
+        f->setName( fdb->getName() );
+        f->setOwner( n );
+        f->setAccessType( fdb->getAccessType() );
+      }
     }
   }
   if ( parent )

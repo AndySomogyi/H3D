@@ -104,7 +104,10 @@ namespace H3D {
     /// Given a Node get a pointer to the field in that node that
     /// is represented by this FieldDBElement.
     virtual Field *getField( Node *n ) const {
-      return ptr;
+      if( ptr && n == ptr->getOwner() )
+        return ptr;
+      else
+        return NULL;
     }
   protected:
     /// The pointer to the field.
@@ -342,7 +345,11 @@ namespace H3D {
     
     /// Returns the number of fields in the H3DNodeDatabase.
     inline size_t fieldDBSize() {
-		  return fields.size();
+      if( !parent ) {
+        return fields.size();
+      } else {
+        return fields.size() + parent->fieldDBSize();
+      }
 		}
     
 	};
