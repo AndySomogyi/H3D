@@ -132,7 +132,7 @@ void PythonScript::initialiseParser() {
 }
 
 void PythonScript::loadScript( const string &script ) {
-  module = PyModule_New( (char*)name.c_str() );
+  module = PyImport_AddModule( (char*)name.c_str() );
   module_dict = PyModule_GetDict( static_cast< PyObject * >( module ) );
   MFNode *x = references.get();
   PyObject *ref = (PyObject*)PythonInternals::fieldAsPythonObject( references.get() );
