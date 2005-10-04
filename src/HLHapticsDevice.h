@@ -79,14 +79,14 @@ namespace H3D {
                         _inputDOF, _outputDOF, _hapticsRate, _stylus, _initialized ),
       deviceName( _deviceName ),
       secondaryButton( _secondaryButton ),
-      deviceLog( _deviceLog ),
-      log( NULL ),
 #ifdef HAVE_OPENHAPTICS
+      log( NULL ),
       last_effect_change( TimeStamp() ),
       last_loop_time( (H3DFloat) 0.1 ), 
       device_handle( 0 ),
-      haptic_context( NULL )
+      haptic_context( NULL ),
 #endif
+      deviceLog( _deviceLog )
 {
 
       type_name = "HLHapticsDevice";
