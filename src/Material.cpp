@@ -110,6 +110,13 @@ void Material::render()  {
   material[2] *= intensity;
   glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, material );
   
+  // Specular 
+  RGB s = specularColor->getValue(); 
+  material[0] = s.r; 
+  material[1] = s.g; 
+  material[2] = s.b; 
+  glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, material );
+
   // Shininess
   glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, shininess->getValue()*128 );
   
