@@ -45,30 +45,35 @@ namespace H3D {
   public:
 
     /// Contructor.
-	DeviceLog( Inst< SFNode>  _metadata = 0 ) :
-	  X3DChildNode( _metadata ) {
-    log_file = 0;
-  };
+    DeviceLog( Inst< SFNode>  _metadata = 0,
+               Inst< SFString > _filename = 0 ) :
+      X3DChildNode( _metadata ),
+      filename( _filename ) {
+      log_file = 0;
+      filename->setValue( "log.dat" );
+    };
     
     /// Destructor.
-	virtual ~DeviceLog() {
-		closeLog();
-	};
-
-	virtual void openLog( const char* fname );
-
-	virtual void writeLog( Vec3f pos, Rotation rot );
-
-	virtual void writeMessage( char *msg );
-
-	virtual void closeLog();
-
-
-	virtual string defaultXMLContainerField() {
-		return "deviceLog";
-	}
-
-	/// The H3DNodeDatabase for this node.
+    virtual ~DeviceLog() {
+      closeLog();
+    };
+    
+    virtual void openLog( );
+    
+    virtual void writeLog( Vec3f pos, Rotation rot );
+    
+    virtual void writeMessage( char *msg );
+    
+    virtual void closeLog();
+    
+    
+    virtual string defaultXMLContainerField() {
+      return "deviceLog";
+    }
+    
+    auto_ptr< SFString > filename;
+    
+    /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   protected:
     FILE *log_file;

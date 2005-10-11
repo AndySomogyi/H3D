@@ -31,18 +31,19 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase DeviceLog::database( 
-                                           "DeviceLog", 
-                                           &(newInstance<DeviceLog>),
-                                           typeid( DeviceLog )                                           );
+                                    "DeviceLog", 
+                                    &(newInstance<DeviceLog>),
+                                    typeid( DeviceLog ),
+                                    &X3DChildNode::database );
 
 namespace DeviceLogInternal {
-  //FIELDDB_ELEMENT( DeviceLog, deviceName, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DeviceLog, filename, INPUT_OUTPUT );
 }
 
-void DeviceLog::openLog( const char* fname ) {
+void DeviceLog::openLog() {
 	if ( log_file )
 		closeLog();
-	log_file = fopen( fname, "w" );
+	log_file = fopen( filename->getValue().c_str(), "w" );
   start_time = TimeStamp::now();
 }
 
