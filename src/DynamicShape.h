@@ -77,6 +77,56 @@ namespace H3D {
       virtual void update();
     };
 
+    /// Calculates the velocity based on the mass and momentum. 
+    /// vel = mom / mass
+    ///
+    /// routes_in[0] is the mass
+    /// routes_in[1] is the momentum
+    class H3DAPI_API SFVelocity: public TypedField< SFVec3f, 
+                                                    Types< SFFloat, 
+                                                           SFVec3f > > {
+      virtual void update() {
+        H3DFloat mass = 
+          static_cast< SFFloat * >( routes_in[0] )->getValue();
+        const Vec3f &momentum = 
+          static_cast< SFVec3f * >( routes_in[1] )->getValue();
+        value = momentum / mass;
+      }
+    };
+
+    /// Calculates the spin.
+    ///
+    /// routes_in[0] is the angularVelocity
+    /// routes_in[1] is the orientation
+    class H3DAPI_API SFSpin: public TypedField< SFRotation, 
+                                                Types< SFVec3f, 
+                                                       SFRotation > > {
+      virtual void update() {
+        const Vec3f & ang_vel = 
+          static_cast< SFVec3f * >( routes_in[0] )->getValue();
+        const Rotation &orn = 
+          static_cast< SFRotation * >( routes_in[1] )->getValue();
+        value = 0.5 * Quaternion(ang_vel.x, ang_vel.y, ang_vel.z, 0) * (Quaternion)orn;
+      }
+    };
+
+    /// Calculates the angular velocity based on the inertia tensor and angular
+    /// momentum. 
+    ///
+    /// routes_in[0] is the inertiaTensor
+    /// routes_in[1] is the angularMomentum
+    class H3DAPI_API SFAngularVelocity: public TypedField< SFVec3f, 
+                                                           Types< SFMatrix3f,
+                                                                  SFVec3f > > {
+      virtual void update() {
+        const Matrix3f &inertia_tensor = 
+          static_cast< SFMatrix3f * >( routes_in[0] )->getValue();
+        const Vec3f &ang_momentum = 
+          static_cast< SFVec3f * >( routes_in[1] )->getValue();
+        value = inertia_tensor.inverse() * ang_momentum;
+      }
+    };
+
      /// Constructor.
     DynamicShape( Inst< MFChild    > _addChildren              = 0,
                   Inst< MFChild    > _removeChildren           = 0,
@@ -91,19 +141,16 @@ namespace H3D {
                   Inst< SFMatrix4f > _accumulatedInverse       = 0,
                   Inst< SFVec3f          > _position         = 0,
                   Inst< SFRotation       > _orientation      = 0,
-                  Inst< SFVec3f          > _velocity         = 0,
+                  Inst< SFVelocity       > _velocity         = 0,
                   Inst< SFVec3f          > _momentum         = 0,
                   Inst< SFVec3f          > _force            = 0,
-                  Inst< SFVec3f          > _angularVelocity  = 0,
+                  Inst< SFAngularVelocity > _angularVelocity  = 0,
                   Inst< SFVec3f          > _angularMomentum  = 0, 
-                  Inst< SFRotation       > _spin             = 0,
+                  Inst< SFSpin           > _spin             = 0,
                   Inst< SFVec3f          > _torque           = 0,
                   Inst< SFFloat          > _mass             = 0,
                   Inst< SFMatrix3f       > _inertia          = 0,
                   Inst< SFMotion         > _motion           = 0 );
-
-
-    virtual H3DNodeDatabase *getDatabase() { return &database; }
 
     /// Specifies the position of the shape
     ///

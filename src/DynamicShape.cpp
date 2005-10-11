@@ -48,12 +48,12 @@ namespace DynamicShapeInternals {
   FIELDDB_ELEMENT( DynamicShape, bboxSize,        INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, orientation,     INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, position,        INPUT_OUTPUT );
-  FIELDDB_ELEMENT( DynamicShape, velocity,        INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DynamicShape, velocity,        OUTPUT_ONLY  );
   FIELDDB_ELEMENT( DynamicShape, momentum,        INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, force,           INPUT_OUTPUT );
-  FIELDDB_ELEMENT( DynamicShape, angularVelocity, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DynamicShape, angularVelocity, OUTPUT_ONLY  );
   FIELDDB_ELEMENT( DynamicShape, angularMomentum, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( DynamicShape, spin,            INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DynamicShape, spin,            OUTPUT_ONLY  );
   FIELDDB_ELEMENT( DynamicShape, torque,          INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, mass,            INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, inertia,         INPUT_OUTPUT );
@@ -75,12 +75,12 @@ DynamicShape::DynamicShape(
                            Inst< SFMatrix4f         > _accumulatedInverse,
                            Inst< SFVec3f            > _position,
                            Inst< SFRotation         > _orientation,
-                           Inst< SFVec3f            > _velocity,
+                           Inst< SFVelocity         > _velocity,
                            Inst< SFVec3f            > _momentum,
                            Inst< SFVec3f            > _force,
-                           Inst< SFVec3f            > _angularVelocity,
+                           Inst< SFAngularVelocity  > _angularVelocity,
                            Inst< SFVec3f            > _angularMomentum,
-                           Inst< SFRotation         > _spin,
+                           Inst< SFSpin             > _spin,
                            Inst< SFVec3f            > _torque,
                            Inst< SFFloat            > _mass,
                            Inst< SFMatrix3f         > _inertia,
@@ -107,13 +107,9 @@ DynamicShape::DynamicShape(
 
   position->setValue( Vec3f( 0, 0, 0 ) );
   orientation->setValue( Rotation( 0, 0, 1, 0 ) );
-  spin->setValue( Rotation( 0, 0, 1, 0 ) );
-
-  velocity->setValue( Vec3f( 0, 0, 0 ) );
   momentum->setValue( Vec3f( 0, 0, 0 ) );
   force->setValue( Vec3f( 0, 0, 0 ) );
   angularMomentum->setValue( Vec3f( 0, 0, 0 ) );
-  angularVelocity->setValue( Vec3f( 0, 0, 0 ) );
   torque->setValue( Vec3f( 0, 0, 0 ) );
   
   mass->setValue( 1 );
@@ -123,6 +119,15 @@ DynamicShape::DynamicShape(
 
   orientation->route( matrix );
   position->route( matrix );
+
+  mass->route( velocity, id );
+  momentum->route( velocity, id );
+
+  angularVelocity->route( spin, id );
+  orientation->route( spin, id );
+
+  inertia->route( angularVelocity, id );
+  angularMomentum->route( angularVelocity, id );
 
   Scene::time->route( motion );
   motion->route( Scene::eventSink );
@@ -147,7 +152,7 @@ void DynamicShape::SFMotion::update() {
   DynamicShape *ds = static_cast<DynamicShape*>(owner);
   state.pos = ds->position->getValue(); 
   state.vel = ds->velocity->getValue();
-  state.mom = ds->momentum->getValue(); ;
+  state.mom = ds->momentum->getValue();
   state.force = ds->force->getValue(); 
   state.orn = ds->orientation->getValue(); 
   state.spin = ds->spin->getValue();
@@ -164,10 +169,6 @@ void DynamicShape::SFMotion::update() {
   ds->momentum->setValue( state.mom );
   ds->orientation->setValue( state.orn );
   ds->angularMomentum->setValue( state.angMom );
-
-  ds->angularVelocity->setValue( state.angVel );
-  ds->velocity->setValue( state.vel );
-  ds->spin->setValue( state.spin );
 }
 
 
