@@ -443,11 +443,11 @@ void HLHapticsDevice::updateDeviceValues() {
 	DeviceLog * dl = static_cast< DeviceLog* >( deviceLog->getValue() );
 	if ( !log && dl ) {
 		log = dl;
-		log->openLog( "log.dat" );
+		log->openLog();
 	} else if ( log && log != dl ) {
 		log->closeLog();
 		log = dl;
-		log->openLog( "log.dat" );		
+		log->openLog();		
 	}
 
   // button values are set via event callback functions
