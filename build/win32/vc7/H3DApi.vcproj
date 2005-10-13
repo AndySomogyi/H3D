@@ -35,7 +35,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="xerces-c_2d.lib FreeImage.lib glew32.lib hl.lib hd.lib hlu.lib hdu.lib siapp.lib spwmath.lib ftgl_dynamic_MTD.lib pthreadVC2.lib"
 				OutputFile="$(OutDir)/H3DApi.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(H3D_EXTERNAL_ROOT)\lib;  $(3DTOUCH_BASE)\lib; $(3DTOUCH_BASE)\utilities\lib;$(H3D_PYTHON_ROOT)\libs"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="TRUE"
@@ -128,6 +128,12 @@
 				RelativePath="..\..\..\src\Appearance.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\Arc2D.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\ArcClose2D.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\AudioClip.cpp">
 			</File>
 			<File
@@ -141,6 +147,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\Box.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Circle2D.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\ClipPlane.cpp">
@@ -179,10 +188,19 @@
 				RelativePath="..\..\..\src\DeviceInfo.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\DeviceLog.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\DirectionalLight.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\Disk2D.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\DynamicLibrary.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\DynamicShape.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Exception.cpp">
@@ -380,6 +398,12 @@
 				RelativePath="..\..\..\src\PointSet.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\Polyline2D.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Polypoint2D.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\PositionInterpolator.cpp">
 			</File>
 			<File
@@ -399,6 +423,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\RawImageLoader.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Rectangle2D.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\RK4.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Types\Rotation.cpp">
@@ -479,6 +509,9 @@
 				RelativePath="..\..\..\src\TimeStamp.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\ToggleGroup.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\Transform.cpp">
 			</File>
 			<File
@@ -492,6 +525,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\TriangleSet.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\TriangleSet2D.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\TriangleStripSet.cpp">
@@ -575,6 +611,15 @@
 				RelativePath="..\..\..\src\X3DNormalNode.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\X3DNurbsSurfaceGeometryNode.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\X3DParametricGeometryNode.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\X3DParametricGeometryNode.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\X3DProgrammableShaderObject.cpp">
 			</File>
 			<File
@@ -631,6 +676,12 @@
 				RelativePath="..\..\..\src\Appearance.h">
 			</File>
 			<File
+				RelativePath="..\..\..\src\Arc2D.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\ArcClose2D.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\AudioClip.h">
 			</File>
 			<File
@@ -653,6 +704,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\Child.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Circle2D.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\ClipPlane.h">
@@ -701,6 +755,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\DirectionalLight.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Disk2D.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\DynamicLibrary.h">
@@ -976,6 +1033,12 @@
 				RelativePath="..\..\..\src\PointSet.h">
 			</File>
 			<File
+				RelativePath="..\..\..\src\Polyline2D.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Polypoint2D.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\PositionInterpolator.h">
 			</File>
 			<File
@@ -998,6 +1061,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\RawImageLoader.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Rectangle2D.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\RefCountedClass.h">
@@ -1081,6 +1147,9 @@
 				RelativePath="..\..\..\src\TimeStamp.h">
 			</File>
 			<File
+				RelativePath="..\..\..\src\ToggleGroup.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\Transform.h">
 			</File>
 			<File
@@ -1094,6 +1163,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\TriangleSet.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\TriangleSet2D.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\TriangleStripSet.h">
@@ -1196,6 +1268,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\X3DNormalNode.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\X3DNurbsSurfaceGeometryNode.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\X3DProgrammableShaderObject.h">
