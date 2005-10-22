@@ -30,7 +30,6 @@
 #define __X3DPROGRAMMABLESHADEROBJECT_H__
 
 #include "H3DDynamicFieldsObject.h"
-#include "GL/glew.h"
 
 namespace H3D {
   /// \ingroup AbstractInterface
@@ -65,11 +64,9 @@ namespace H3D {
     /// Constructor. 
     X3DProgrammableShaderObject( H3DNodeDatabase *_database ):
       H3DDynamicFieldsObject( _database ) {}
- 
-    /// Set the value of a uniform variable in the current GLSL shader.
-    /// The name of the uniform variable is the same as the name of the field. 
-    virtual bool setUniformVariableValue( GLhandleARB program_handle,
-                                          Field *field );
+
+    /// Destructor.
+    virtual ~X3DProgrammableShaderObject();
   };
 }
 

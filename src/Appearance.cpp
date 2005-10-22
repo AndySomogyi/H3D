@@ -156,16 +156,21 @@ void Appearance::preRender() {
   X3DTextureTransformNode *tt = textureTransform->getValue();
   if ( tt ) tt->preRender();
 
- for( MFShaderNode::const_iterator i = shaders->begin();
+  for( MFShaderNode::const_iterator i = shaders->begin();
        i != shaders->end();
        i++ ) {
    X3DShaderNode *s = static_cast< X3DShaderNode * >( *i );
-   if ( s && s->isSupported() ) {
-     s->setSelected( true );
-     s->preRender();
-     break;
-   } else {
-     s->setSelected( false );
+   if ( s ) {
+     if( s->isSupported() ) {
+       s->setSelected( true );
+       s->preRender();
+       break;
+     } else {
+       cerr << "Warning: Shader node \"" << s->getName() 
+            << "\" does not support the \"" << s->language->getValue() 
+            << "\" language. Shader will be ignored." << endl;
+       s->setSelected( false );
+     }
    }
  }
 }
