@@ -31,6 +31,7 @@
 
 #include "H3DNodeDatabase.h"
 #include "AutoPtrVector.h"
+#include "Node.h"
 
 namespace H3D {
   /// \ingroup AbstractInterface
@@ -61,17 +62,29 @@ namespace H3D {
       Node *n = dynamic_cast< Node * >( this );
       if( n && !database->getField( n, name.c_str() ) ) {
         field->setOwner( n );
-	field->setName( name );
+        field->setName( name );
         database->addField( new DynamicFieldDBElement( database,
                                                        name.c_str(),
                                                        access,
                                                        field ) );
         dynamic_fields.push_back( field );
-                                                   
+        return true;
       }
       return false;
     }
     
+    typedef AutoPtrVector< Field >::const_iterator field_iterator;
+
+    /// Get an iterator to the first of the dynamic fields.
+    inline field_iterator firstField() {
+      return dynamic_fields.begin();
+    }
+
+    /// Get an iterator pointing to the end of the dynamic fields.
+    inline field_iterator endField() {
+      return dynamic_fields.end();
+    }
+
     /// Remove a field from the Node.
     /// \param name The name of the field to remove.
     /// \returns true on success false otherwise.
