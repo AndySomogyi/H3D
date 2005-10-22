@@ -68,7 +68,11 @@ namespace H3D {
   /// to camera space, as input texture coordinates</tr>
   /// <tr><td>"COORD"<td>use vertex coordinates</tr>
   /// <tr><td>"COORD-EYE"<td>use vertex coordinates transformed to 
-  /// camera space</tr>
+  /// <tr><td>"CAMERASPACEREFLECTIONVECTOR"<td>Use the reflection vector, 
+  /// transformed to camera space, as input texture coordinates.>/tr> 
+  /// <tr><td>"CAMERASPACENORMAL"<td>Use the vertex normal, transformed to
+  /// camera space, as input texture coordinates, resulting coordinates are
+  /// in -1 to 1 range.</tr>
   /// </table>
   /// 
   /// The parameter field gives input paramters that can be used by the
