@@ -106,7 +106,8 @@ namespace H3D {
     /// glPixelComponentType () functions to get the arguments to the
     /// glTexImage2D call.
     ///
-    virtual void glTexImage( Image *image, bool scale_to_power_of_two );
+    virtual void glTexImage( Image *image, GLenum texture_target, 
+                             bool scale_to_power_of_two );
       
     /// If true the texture will repeat itself when the s texture coordinate
     /// is outside the range [0,1]. If false the texture will be clamped if

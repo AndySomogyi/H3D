@@ -103,7 +103,6 @@ namespace H3D {
     /// bound in OpenGL. NULL us returned if no X3DTextureNode is bound. 
     static X3DTextureNode *getActiveTexture() { return active_texture; }
 
-  protected:
     /// Installs the image as a OpenGL texture. Uses the glTexImage function
     /// for the glTexImage call, so it has to be defined for subclasses
     /// that use this function. 
@@ -135,6 +134,21 @@ namespace H3D {
     ///
     virtual GLenum glPixelComponentType( Image *image );
 
+    /// Install the given image as a OpenGL texture with a call to 
+    /// a glTexImage function. Subclasses that use the renderImage () 
+    /// function must define this function. By default an 
+    /// glTexImageFunctionNotDefined exception is thrown.
+    /// if scale_to_power_of_two is true then the image data will be 
+    /// scaled to the closest higher power of two if dimensions are not a power
+    /// of two.
+    ///
+    virtual void glTexImage( Image *image,
+                             GLenum texture_target,
+                             bool scale_to_power_of_two ){
+      throw glTexImageFunctionNotDefined( "", H3D_FULL_LOCATION ); 
+    }
+
+  protected:
     // The glTexImage functions needs each line of image data to be 4 byte 
     // aligned. This function takes a pointer to image data and width,height
     // and bits per pixel for that data and returns a pointer to new image
@@ -145,19 +159,6 @@ namespace H3D {
                                       unsigned int height,
                                       unsigned int depth,
                                       unsigned int bits_per_pixel );
-
-    /// Install the given image as a OpenGL texture with a call to 
-    /// a glTexImage function. Subclasses that use the renderImage () 
-    /// function must define this function. By default an 
-    /// glTexImageFunctionNotDefined exception is thrown.
-    /// if scale_to_power_of_two is true then the image data will be 
-    /// scaled to the closest higher power of two if dimensions are not a power
-    /// of two.
-    ///
-    virtual void glTexImage( Image *image,
-                             bool scale_to_power_of_two ){
-      throw glTexImageFunctionNotDefined( "", H3D_FULL_LOCATION ); 
-    }
 
     /// Set the active texture. The active texture is the texture that is
     /// currently in bound in OpenGL, so as soon a call to glBindTexture is

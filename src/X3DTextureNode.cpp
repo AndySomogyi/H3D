@@ -285,7 +285,7 @@ GLuint X3DTextureNode::renderImage( Image *image,
 
     while( glGetError() != GL_NO_ERROR )
       ;
-    glTexImage( image, scale_to_power_of_two );
+    glTexImage( image, texture_target, scale_to_power_of_two );
 
     GLenum error = glGetError();
     if( error != GL_NO_ERROR ) {
@@ -354,3 +354,10 @@ void *X3DTextureNode::padTo4ByteAlignment( const void *data,
     }
   return new_data;
 }
+
+
+
+
+
+
+

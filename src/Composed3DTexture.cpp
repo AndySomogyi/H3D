@@ -63,7 +63,8 @@ Composed3DTexture::Composed3DTexture(
   texture->route( displayList );
 }
 
-void Composed3DTexture::glTexImage( Image *image, bool scale_to_power_of_two ) {
+void Composed3DTexture::glTexImage( Image *image, GLenum texture_target,
+                                    bool scale_to_power_of_two ) {
   unsigned int width  = 1;
   unsigned int height = 1;
   Image::PixelType pixel_type = Image::LUMINANCE;
@@ -110,7 +111,7 @@ void Composed3DTexture::glTexImage( Image *image, bool scale_to_power_of_two ) {
                  NULL ); 
     
   // allocate texture memory for the entire texture. 
-  glTexImage3D( GL_TEXTURE_3D, 
+  glTexImage3D( texture_target, 
                 0, // mipmap level
                 glInternalFormat( &pi ),
                 width,
@@ -172,7 +173,7 @@ void Composed3DTexture::glTexImage( Image *image, bool scale_to_power_of_two ) {
         }
 
         // transfer to texture memory as a subtexture
-        glTexSubImage3D( GL_TEXTURE_3D, 
+        glTexSubImage3D( texture_target, 
                       0, // mipmap level
                       0,// xoffset
                       0,// yoffset
@@ -222,7 +223,7 @@ void Composed3DTexture::render()     {
       while( glGetError() != GL_NO_ERROR )
         ;
       
-      glTexImage( NULL, scaleToPowerOfTwo->getValue() );
+      glTexImage( NULL, GL_TEXTURE_3D, scaleToPowerOfTwo->getValue() );
       
       GLenum error = glGetError();
       if( error != GL_NO_ERROR ) {

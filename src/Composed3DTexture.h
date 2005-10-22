@@ -74,7 +74,8 @@ namespace H3D {
 
     /// Ignores the image given, and uses the textures
     /// in the texture field to create a 3d texture instead.
-    void glTexImage( Image *i, bool scale_to_power_of_two );
+    void glTexImage( Image *i, GLenum texture_target, 
+                     bool scale_to_power_of_two );
     
     /// Renders the texture with OpenGL. 
     void render() ;

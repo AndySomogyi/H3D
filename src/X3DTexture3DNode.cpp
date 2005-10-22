@@ -85,7 +85,8 @@ X3DTexture3DNode::X3DTexture3DNode(
   interpolate->route( displayList );
 }
 
-void X3DTexture3DNode::glTexImage( Image *i, bool scale_to_power_of_two ) {
+void X3DTexture3DNode::glTexImage( Image *i, GLenum texture_target,
+                                   bool scale_to_power_of_two ) {
   // the image data to render
   void *image_data = i->getImageData();
   unsigned int width = i->width();
@@ -151,7 +152,7 @@ void X3DTexture3DNode::glTexImage( Image *i, bool scale_to_power_of_two ) {
       image_data = new_data;
     }
   }
-  glTexImage3D( GL_TEXTURE_3D, 
+  glTexImage3D( texture_target, 
                 0, // mipmap level
                 glInternalFormat( i ),
                 width,

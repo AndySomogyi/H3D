@@ -80,7 +80,8 @@ X3DTexture2DNode::X3DTexture2DNode(
   interpolate->route( displayList );
 }
 
-void X3DTexture2DNode::glTexImage( Image *i, bool scale_to_power_of_two ) {
+void X3DTexture2DNode::glTexImage( Image *i, GLenum texture_target,
+                                   bool scale_to_power_of_two ) {
   // the image data to render
   void *image_data = i->getImageData();
   // the width of the data of the image_data pointer
@@ -145,7 +146,7 @@ void X3DTexture2DNode::glTexImage( Image *i, bool scale_to_power_of_two ) {
   }
 
   // install the image as a 2d texture/
-  glTexImage2D( GL_TEXTURE_2D, 
+  glTexImage2D( texture_target, 
                 0, // mipmap level
                 glInternalFormat( i ),
                 width,
@@ -177,7 +178,7 @@ void X3DTexture2DNode::render()     {
   } else {
     if ( texture_id ) {
       // same texture as last loop, so we just bind it.
-      glBindTexture( GL_TEXTURE_2D, texture_id );
+      glBindTexture(  GL_TEXTURE_2D, texture_id );
       enableTexturing();
     }     
   }
