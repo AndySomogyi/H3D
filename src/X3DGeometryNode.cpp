@@ -100,7 +100,7 @@ void HLCALLBACK X3DGeometryNode::motionCallback( HLenum event,
     v[0] = m.getScaleRotationPart() * Vec3f( (H3DFloat)n[0],
                                              (H3DFloat)n[1],
                                              (H3DFloat)n[2] );
-    v[0].normalize();
+    v[0].normalizeSafe();
     geometry->contactNormal->setValue( v, geometry->id );
     
     Vec3f f;
