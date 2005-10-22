@@ -118,23 +118,6 @@ void TextureBackground::render() {
       front_texture->preRender();
       front_texture->displayList->callList();
       glBegin( GL_QUADS );
-      glNormal3f( 0, 0, -1 );
-      glTexCoord2f( 0, 0 );
-      glVertex3f( s, -s, s );
-      glTexCoord2f( 1, 0 );
-      glVertex3f( -s, -s, s );
-      glTexCoord2f( 1, 1 );
-      glVertex3f( -s, s, s );
-      glTexCoord2f( 0, 1 );
-      glVertex3f( s, s, s );
-      glEnd();
-      front_texture->postRender();
-    }
-  
-    if( back_texture ) {
-      back_texture->preRender();
-      back_texture->displayList->callList();
-      glBegin( GL_QUADS );
       glNormal3f( 0, 0, 1 );
       glTexCoord2f( 1, 1 );
       glVertex3f( s, s, -s );
@@ -144,6 +127,23 @@ void TextureBackground::render() {
       glVertex3f( -s, -s, -s );
       glTexCoord2f( 1, 0 );
       glVertex3f( s, -s, -s );
+      glEnd();
+      front_texture->postRender();
+    }
+  
+    if( back_texture ) {
+      back_texture->preRender();
+      back_texture->displayList->callList();
+      glBegin( GL_QUADS );
+      glNormal3f( 0, 0, -1 );
+      glTexCoord2f( 0, 0 );
+      glVertex3f( s, -s, s );
+      glTexCoord2f( 1, 0 );
+      glVertex3f( -s, -s, s );
+      glTexCoord2f( 1, 1 );
+      glVertex3f( -s, s, s );
+      glTexCoord2f( 0, 1 );
+      glVertex3f( s, s, s );
       glEnd();
       back_texture->postRender();
     }
@@ -206,7 +206,7 @@ void TextureBackground::render() {
       glNormal3f( 0, 1, 0 );
       glTexCoord2f( 1, 0 );
       glVertex3f( s, -s, s );
-      glTexCoord2f( 0, 1 );
+      glTexCoord2f( 1, 1 );
       glVertex3f( s, -s, -s );
       glTexCoord2f( 0, 1 );
       glVertex3f( -s, -s, -s );
