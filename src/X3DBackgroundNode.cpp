@@ -34,11 +34,6 @@
 
 using namespace H3D;
 
-template<>
-X3DBindableNode< X3DBackgroundNode >::StackType X3DBindableNode< X3DBackgroundNode >::stack = 
-X3DBindableNode< X3DBackgroundNode >::StackType();
-
-
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase X3DBackgroundNode::database( 
                            "X3DBackgroundNode", 

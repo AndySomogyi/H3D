@@ -33,10 +33,6 @@
 
 using namespace H3D;
 
-template<>
-X3DBindableNode< DeviceInfo >::StackType X3DBindableNode< DeviceInfo >::stack = X3DBindableNode< DeviceInfo >::StackType();
-
-
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase DeviceInfo::database( "DeviceInfo", 
                                       &(newInstance<DeviceInfo>), 

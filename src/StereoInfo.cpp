@@ -33,11 +33,6 @@
 
 using namespace H3D;
 
-template<>
-X3DBindableNode< StereoInfo >::StackType X3DBindableNode< StereoInfo >::stack = 
-X3DBindableNode< StereoInfo >::StackType();
-
-
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase StereoInfo::database( 
                                     "StereoInfo", 

@@ -34,6 +34,14 @@
 #include "X3DChildNode.h"
 #include "FieldTemplates.h"
 
+#ifdef _MSC_VER
+// disable warnings about not finding the definition of the static
+// stack member. It is included by instances of X3DBindableNode by
+// including the X3DBindableNode.cpp file in the .cpp file of the class
+// using it.
+#pragma warning( disable: 4661 )
+#endif
+
 namespace H3D {
 
   /// \ingroup AbstractNodes
@@ -111,7 +119,7 @@ namespace H3D {
   /// The results are undefined if a bindable node is bound and is the child
   /// of an LOD, Switch, or any node or prototype that disables its children. 
   template< class T >
-  class H3DAPI_API X3DBindableNode : public X3DChildNode {
+  class X3DBindableNode : public X3DChildNode {
   public:
     
     
@@ -218,8 +226,6 @@ namespace H3D {
     typedef deque< T* > StackType;
     /// The bindable stack.
     static StackType stack;
-    
-    static H3DNodeDatabase database;
   };
 }
 

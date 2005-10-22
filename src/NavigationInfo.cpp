@@ -33,11 +33,6 @@
 
 using namespace H3D;
 
-template<>
-X3DBindableNode< NavigationInfo >::StackType X3DBindableNode< NavigationInfo >::stack = 
-X3DBindableNode< NavigationInfo >::StackType();
-
-
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase NavigationInfo::database( 
                                     "NavigationInfo", 
