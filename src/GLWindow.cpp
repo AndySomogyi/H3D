@@ -132,7 +132,6 @@ GLWindow::GLWindow(
   time    ( _time ),
   last_render_child( NULL ),
   window_id( 0 ),
-  tex_id( 0),
   rebuild_stencil_mask( false ) {
   
   initGLUT();
