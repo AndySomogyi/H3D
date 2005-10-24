@@ -45,6 +45,7 @@
 #include "MatrixTransform.h"
 #include "NavigationInfo.h"
 #include "StereoInfo.h"
+#include "GeneratedCubeMapTexture.h"
 
 using namespace H3D;
 
@@ -131,6 +132,7 @@ GLWindow::GLWindow(
   time    ( _time ),
   last_render_child( NULL ),
   window_id( 0 ),
+  tex_id( 0),
   rebuild_stencil_mask( false ) {
   
   initGLUT();
@@ -419,22 +421,7 @@ void renderStyli() {
   // Render the stylus of each H3DHapticsDevice.
   DeviceInfo *di = DeviceInfo::getActive();
   if( di ) {
-    for( DeviceInfo::MFDevice::const_iterator i = di->device->begin();
-         i != di->device->end();
-         i++ ) {
-      H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
-      Node *stylus = hd->stylus->getValue();
-      if( stylus ) {
-        const Vec3f &pos = hd->weightedProxyPosition->getValue();
-        const Rotation &rot = hd->trackerOrientation->getValue();
-        glPushMatrix();
-        glTranslatef( pos.x, pos.y, pos.z );
-        glRotatef( rot.angle * 180 / Constants::pi, 
-                   rot.axis.x, rot.axis.y, rot.axis.z );
-        stylus->render();
-        glPopMatrix();
-      }
-    }
+    di->renderStyli();
   }
 }
 
@@ -470,6 +457,31 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
   else 
     glEnable(GL_LIGHT0);
 
+    AutoRef< Viewpoint > vp_ref;
+  // get the viewpoint. If the GLWindow viewpoint field is set use that
+  // otherwise use the stack top of the Viewpoint bindable stack.
+  Viewpoint *vp = static_cast< Viewpoint * >( viewpoint->getValue() );
+  if( !vp ) 
+    vp = Viewpoint::getActive();
+  if ( ! vp ) {
+    vp = new Viewpoint;
+    vp_ref.reset( vp );
+  }
+
+  Vec3f vp_position = vp->position->getValue();
+  Rotation vp_orientation = vp->orientation->getValue();
+  const Matrix4f &vp_inv_m = vp->accInverseMatrix->getValue();
+  Rotation vp_inv_rot = (Rotation)vp_inv_m.getRotationPart();
+  //const Matrix4f &vp_frw_m = vp->accForwardMatrix->getValue();
+  GLfloat vp_inv_transform[] = { 
+    vp_inv_m[0][0], vp_inv_m[1][0], vp_inv_m[2][0], 0,
+    vp_inv_m[0][1], vp_inv_m[1][1], vp_inv_m[2][1], 0,
+    vp_inv_m[0][2], vp_inv_m[1][2], vp_inv_m[2][2], 0,
+    vp_inv_m[0][3], vp_inv_m[1][3], vp_inv_m[2][3], 1 };
+
+
+  GeneratedCubeMapTexture::updateAllCubeMapTextures( child_to_render, vp );
+
   glViewport( 0, 0, width->getValue(), height->getValue() );
 
   if( rebuild_stencil_mask ) {
@@ -489,27 +501,6 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
     free( mask );
     rebuild_stencil_mask = false;
   }
-
-  AutoRef< Viewpoint > vp_ref;
-  // get the viewpoint. If the GLWindow viewpoint field is set use that
-  // otherwise use the stack top of the Viewpoint bindable stack.
-  Viewpoint *vp = static_cast< Viewpoint * >( viewpoint->getValue() );
-  if( !vp ) 
-    vp = Viewpoint::getActive();
-  if ( ! vp ) {
-    vp = new Viewpoint;
-    vp_ref.reset( vp );
-  }
-  
-  Vec3f vp_position = vp->position->getValue();
-  Rotation vp_orientation = vp->orientation->getValue();
-  const Matrix4f &vp_inv_m = vp->accInverseMatrix->getValue();
-  //const Matrix4f &vp_frw_m = vp->accForwardMatrix->getValue();
-  GLfloat vp_inv_transform[] = { 
-    vp_inv_m[0][0], vp_inv_m[1][0], vp_inv_m[2][0], 0,
-    vp_inv_m[0][1], vp_inv_m[1][1], vp_inv_m[2][1], 0,
-    vp_inv_m[0][2], vp_inv_m[1][2], vp_inv_m[2][2], 0,
-    vp_inv_m[0][3], vp_inv_m[1][3], vp_inv_m[2][3], 1 };
 
   H3DFloat fov_h, fov_v;
   H3DFloat lwidth = width->getValue();
@@ -620,18 +611,25 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    glTranslatef( half_interocular_distance, 0, 0 );
     glRotatef( -(180/Constants::pi)*vp_orientation.angle, 
                vp_orientation.axis.x, 
                vp_orientation.axis.y,
                vp_orientation.axis.z );
     // clear the buffers before rendering
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    glPushMatrix();
+    glRotatef( (180/Constants::pi)*vp_inv_rot.angle, 
+               vp_inv_rot.axis.x, vp_inv_rot.axis.y, vp_inv_rot.axis.z );
     if( background ) {
       glDepthMask( GL_FALSE );
       background->renderBackground();
       glDepthMask( GL_TRUE );
     }
-    glTranslatef( -vp_position.x + half_interocular_distance,
+    glPopMatrix();
+
+    glTranslatef( -vp_position.x,
                   -vp_position.y, 
                   -vp_position.z );
     glMultMatrixf( vp_inv_transform );
@@ -674,17 +672,22 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
+    glTranslatef( -half_interocular_distance, 0, 0 );
     glRotatef( -(180/Constants::pi)*vp_orientation.angle, 
                vp_orientation.axis.x, 
                vp_orientation.axis.y,
                vp_orientation.axis.z );
+    
+    glPushMatrix();
+    glRotatef( (180/Constants::pi)*vp_inv_rot.angle, 
+               vp_inv_rot.axis.x, vp_inv_rot.axis.y, vp_inv_rot.axis.z );
     if( background ) {
       glDepthMask( GL_FALSE );
       background->renderBackground();
       glDepthMask( GL_TRUE );
     }
-    glTranslatef( -vp_position.x - half_interocular_distance,
+    glPopMatrix();
+    glTranslatef( -vp_position.x,
                   -vp_position.y, 
                   -vp_position.z );
     glMultMatrixf( vp_inv_transform );
@@ -770,16 +773,22 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
     // clear the buffers before rendering
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+    glPushMatrix();
+    glRotatef( (180/Constants::pi)*vp_inv_rot.angle, 
+               vp_inv_rot.axis.x, vp_inv_rot.axis.y, vp_inv_rot.axis.z );
+
     if( background ) {
       glDepthMask( GL_FALSE );
       background->renderBackground();
       glDepthMask( GL_TRUE );
     } 
+    glPopMatrix();
 
     glTranslatef( -vp_position.x, -vp_position.y, -vp_position.z );
     glMultMatrixf( vp_inv_transform );
     
     renderStyli();
+
     if( dlo )  dlo->displayList->callList();
     else child_to_render->render();
     glutSwapBuffers();
