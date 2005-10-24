@@ -153,6 +153,9 @@ namespace H3D {
     /// the call to preRender().
     virtual void postRender();
 
+    virtual void traverseSG( TraverseInfo &ti ); 
+
+
     /// This function checks the transparency field to determine if the
     /// material requires that the geometry is rendered with transparency
     virtual bool isTransparent() {

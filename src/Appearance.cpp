@@ -207,3 +207,27 @@ void Appearance::postRender() {
 
   X3DAppearanceNode::postRender();     
 }
+
+void Appearance::traverseSG( TraverseInfo &ti ) {
+  X3DAppearanceNode::traverseSG( ti );     
+  
+  X3DMaterialNode *m = material->getValue();
+  if ( m ) m->traverseSG( ti );
+  X3DTextureNode *t = texture->getValue();
+  if ( t ) t->traverseSG( ti );
+  LineProperties *lp = lineProperties->getValue();
+  if ( lp ) lp->traverseSG( ti );
+  FillProperties *fp = fillProperties->getValue();
+  if ( fp ) fp->traverseSG( ti );
+  X3DTextureTransformNode *tt = textureTransform->getValue();
+  if ( tt ) tt->traverseSG( ti );
+  H3DSurfaceNode *s = surface->getValue();
+  if( s ) s->traverseSG( ti );
+  
+  for( MFShaderNode::const_iterator i = shaders->begin();
+       i != shaders->end();
+       i++ ) {
+   X3DShaderNode *s = static_cast< X3DShaderNode * >( *i );
+   if ( s ) s->traverseSG( ti );
+  }
+}
