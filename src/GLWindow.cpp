@@ -608,17 +608,16 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
       glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
     }
 
+    // clear the buffers before rendering
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef( half_interocular_distance, 0, 0 );
+    glPushMatrix();
     glRotatef( -(180/Constants::pi)*vp_orientation.angle, 
                vp_orientation.axis.x, 
                vp_orientation.axis.y,
                vp_orientation.axis.z );
-    // clear the buffers before rendering
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    glPushMatrix();
     glRotatef( (180/Constants::pi)*vp_inv_rot.angle, 
                vp_inv_rot.axis.x, vp_inv_rot.axis.y, vp_inv_rot.axis.z );
     if( background ) {
@@ -627,7 +626,12 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
       glDepthMask( GL_TRUE );
     }
     glPopMatrix();
-
+    glTranslatef( half_interocular_distance, 0, 0 );
+    glRotatef( -(180/Constants::pi)*vp_orientation.angle, 
+               vp_orientation.axis.x, 
+               vp_orientation.axis.y,
+               vp_orientation.axis.z );
+ 
     glTranslatef( -vp_position.x,
                   -vp_position.y, 
                   -vp_position.z );
@@ -671,13 +675,11 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef( -half_interocular_distance, 0, 0 );
+    glPushMatrix();
     glRotatef( -(180/Constants::pi)*vp_orientation.angle, 
                vp_orientation.axis.x, 
                vp_orientation.axis.y,
                vp_orientation.axis.z );
-    
-    glPushMatrix();
     glRotatef( (180/Constants::pi)*vp_inv_rot.angle, 
                vp_inv_rot.axis.x, vp_inv_rot.axis.y, vp_inv_rot.axis.z );
     if( background ) {
@@ -686,6 +688,14 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
       glDepthMask( GL_TRUE );
     }
     glPopMatrix();
+
+
+    glTranslatef( -half_interocular_distance, 0, 0 );
+    glRotatef( -(180/Constants::pi)*vp_orientation.angle, 
+               vp_orientation.axis.x, 
+               vp_orientation.axis.y,
+               vp_orientation.axis.z );
+      
     glTranslatef( -vp_position.x,
                   -vp_position.y, 
                   -vp_position.z );
