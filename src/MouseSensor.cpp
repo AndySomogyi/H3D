@@ -78,6 +78,10 @@ MouseSensor::MouseSensor( Inst< SFBool>  _enabled,
   instances.push_back( this );
 }
 
+MouseSensor::~MouseSensor() {
+  instances.remove( this );
+}
+
 void MouseSensor::addGLUTMouseButtonAction( int button, int state ) { 
   switch( button ) {
   case GLUT_LEFT_BUTTON:

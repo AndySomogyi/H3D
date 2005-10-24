@@ -55,8 +55,8 @@ namespace H3D {
                  Inst< SFVec2f > _motion       = 0
                  );
 
-
-    virtual H3DNodeDatabase *getDatabase() { return &database; }
+    /// Destructor.
+    virtual ~MouseSensor();
 
     /// Will be called when the mouse has moved. The x and y parameters 
     /// indicate the mouse location in window relative coordinates.
