@@ -30,7 +30,8 @@
 
 #include "DeviceInfo.h"
 #include "X3DBindableNode.cpp"
-
+#include <GL/glew.h>
+#include <GL/gl.h>
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
@@ -56,4 +57,20 @@ DeviceInfo::DeviceInfo(
   database.initFields( this );
 }
 
-
+void DeviceInfo::renderStyli() {
+  for( MFDevice::const_iterator i = device->begin();
+       i != device->end(); i++ ) {
+    H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
+    Node *stylus = hd->stylus->getValue();
+    if( stylus ) {
+      const Vec3f &pos = hd->weightedProxyPosition->getValue();
+      const Rotation &rot = hd->trackerOrientation->getValue();
+      glPushMatrix();
+      glTranslatef( pos.x, pos.y, pos.z );
+      glRotatef( (GLfloat)(rot.angle * 180 / Constants::pi), 
+                 rot.axis.x, rot.axis.y, rot.axis.z );
+      stylus->render();
+      glPopMatrix();
+    }
+  }
+}

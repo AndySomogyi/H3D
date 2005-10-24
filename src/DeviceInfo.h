@@ -50,6 +50,9 @@ namespace H3D {
                 Inst< SFBool    >  _isBound         = 0,
                 Inst< MFDevice  >  _device          = 0 );
 
+    /// Render the styli of all devices in the device field.
+    virtual void renderStyli();
+
     /// Contains the devices in this DeviceInfo instance.
     ///
     /// <b>Access type: </b> inputOutput \n
