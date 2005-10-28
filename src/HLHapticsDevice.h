@@ -204,7 +204,7 @@ namespace H3D {
     TimeStamp last_loop_time;
 
     /// Realtime pointer to deviceLog
-    DeviceLog *log;
+    AutoRef< DeviceLog > log;
 
   protected:
     /// The device handle used in the HLAPI.

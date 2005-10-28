@@ -130,7 +130,7 @@ namespace HLHapticsDeviceInternal {
     rot = hd->orientationCalibration->rt_orn_calibration * rot;
 
     // Dump out values to log file
-    if ( hd->log )
+    if ( hd->log.get() )
       hd->log->writeLog( pos, rot );
 
     TimeStamp dt = TimeStamp() - hd->last_effect_change;
@@ -281,19 +281,19 @@ void HLCALLBACK HLHapticsDevice::hlButtonCallback( HLenum event,
   HLHapticsDevice *hd = static_cast< HLHapticsDevice * >( data );
   if( event == HL_EVENT_1BUTTONDOWN ) {
     hd->mainButton->setValue( true, hd->id );
-    if ( hd->log )
+    if ( hd->log.get() )
       hd->log->writeMessage( "Button 1 pressed" );
   } else if( event == HL_EVENT_1BUTTONUP ) {
     hd->mainButton->setValue( false, hd->id );
-    if ( hd->log )
+    if ( hd->log.get() )
       hd->log->writeMessage( "Button 1 released" );
   } else if( event ==  HL_EVENT_2BUTTONDOWN ) {
     hd->secondaryButton->setValue( true, hd->id );
-    if ( hd->log )
+    if ( hd->log.get() )
       hd->log->writeMessage( "Button 2 pressed" );
   } else if( event == HL_EVENT_2BUTTONUP ) {
     hd->secondaryButton->setValue( false, hd->id );
-    if ( hd->log )
+    if ( hd->log.get() )
       hd->log->writeMessage( "Button 2 released" );
   }
 }
@@ -416,7 +416,7 @@ void HLHapticsDevice::initDevice() {
 }
 
 void HLHapticsDevice::disableDevice() {
-  if ( log )
+  if ( log.get() )
 	  log->closeLog();
   if( initialized->getValue() ) {
     H3DHapticsDevice::disableDevice();
@@ -441,13 +441,14 @@ void HLHapticsDevice::updateDeviceValues() {
 
   // update real-time reference to DeviecLog
 	DeviceLog * dl = static_cast< DeviceLog* >( deviceLog->getValue() );
-	if ( !log && dl ) {
-		log = dl;
+	if ( !log.get() && dl ) {
+		log.reset( dl );
 		log->openLog();
-	} else if ( log && log != dl ) {
+	} else if ( log.get() && log.get() != dl ) {
 		log->closeLog();
-		log = dl;
-		log->openLog();		
+		log.reset( dl );
+		if( log.get() )
+		  log->openLog();		
 	}
 
   // button values are set via event callback functions
