@@ -1932,22 +1932,46 @@ self, name, field_type, access_type )" );
   
   int PyRotation::init(PyRotation *self, PyObject *args, PyObject *kwds)  {
     int args_size =  PyTuple_Size( args );
+    Rotation *self_r = (Rotation *)self;
     if( args_size == 0 ) {
-      Rotation *self_r = (Rotation *)self;
       *self_r = Rotation();
     } else if( args_size == 1 ) {
       // from Quaternion, Rotation and Matrix3f
       PyObject *o = PyTuple_GetItem( args, 0 );
-      Rotation *self_m = (Rotation *)self;
       if( PyRotation_Check( o ) ) {
         Rotation r = PyRotation_AsRotation( o );
-        *self_m = r;
+        *self_r = r;
       } else if( PyQuaternion_Check( o ) ) {
         Quaternion q = PyQuaternion_AsQuaternion( o );
-        *self_m = q;
+        *self_r = q;
       } else if( PyMatrix3f_Check( o ) ) {
         Matrix3f m = PyMatrix3f_AsMatrix3f( o );
-        *self_m = (Rotation)m;
+        *self_r = (Rotation)m;
+      } else if( PyVec3f_Check( o ) ) {
+        Vec3f v = PyVec3f_AsVec3f( o );
+        *self_r = Rotation( v );
+      } else {
+        PyErr_SetString(PyExc_TypeError, 
+                        "invalid type given to Rotation constructor." );
+        return -1;
+      }
+    } else if( args_size == 2 ) {
+      PyObject *o0 = PyTuple_GetItem( args, 0 );
+      PyObject *o1 = PyTuple_GetItem( args, 1 );
+      if( PyVec3f_Check( o0 ) ) {
+        Vec3f v0 = PyVec3f_AsVec3f( o0 );
+        if( PyVec3f_Check( o1 ) ) {
+          Vec3f v1 = PyVec3f_AsVec3f( o1 );
+          *self_r = Rotation( v0, v1 );
+        } else if( PyFloat_Check( o1 ) ) {
+          *self_r = Rotation( v0, (H3DFloat) PyFloat_AsDouble( o1 ) );
+        } else if( PyInt_Check( o1 ) ) {
+          *self_r = Rotation( v0, (H3DFloat) PyInt_AsLong( o1 ) );
+        } else {
+          PyErr_SetString(PyExc_TypeError, 
+                          "invalid type given to Rotation constructor." );
+          return -1;
+        }
       } else {
         PyErr_SetString(PyExc_TypeError, 
                         "invalid type given to Rotation constructor." );
