@@ -84,6 +84,8 @@ SuperShape::SuperShape(
   //size =      2 2 2 (0,);
   //solid =     TRUE;
 
+  //bound->setValue( new BoxBound );
+
   ss1_m->setValue ( 4 );
   ss1_a->setValue ( 1 );
   ss1_b->setValue ( 1 );
@@ -143,6 +145,8 @@ void SuperShape::render() {
 
   float long_step =  2 * 3.14159f / resolution->getValue();
   float lat_step = 3.14159f / resolution->getValue();
+  Vec3f vmax = Vec3f( 0, 0, 0 );
+  Vec3f vmin = Vec3f( 0, 0, 0 );
   
   for(int lat_count = 0; lat_count < resolution->getValue(); lat_count++ )
     {
@@ -213,7 +217,7 @@ void SuperShape::render() {
         n += (p12-p11).crossProduct(p12-p22);
         n += (p12-p22).crossProduct(p12-p13);
         n += (p12-p13).crossProduct(p12-p02);
-        n.normalize(); glNormal3f( n.x, n.y, n.z );
+        n.normalizeSafe(); glNormal3f( n.x, n.y, n.z );
         //n = Vec3f( theta2, phi1, theta1 ); n.normalize(); glColor3f( n.x, n.y, n.z );
         glVertex3f( p12.x, p12.y, p12.z );
       
@@ -222,14 +226,38 @@ void SuperShape::render() {
         n += (p11-p21).crossProduct(p11-p12);
         n += (p11-p12).crossProduct(p11-p01);
       
-        n.normalize(); glNormal3f( n.x, n.y, n.z );
+        n.normalizeSafe(); glNormal3f( n.x, n.y, n.z );
         //n = Vec3f( theta1, phi1, theta2 ); n.normalize(); glColor3f( n.x, n.y, n.z );
         glVertex3f( p11.x, p11.y, p11.z );
       
-      
+        if ( p11.x > vmax.x ) vmax.x = p11.x;
+        if ( p11.y > vmax.y ) vmax.y = p11.y;
+        if ( p11.z > vmax.z ) vmax.z = p11.z;
+        if ( p12.x > vmax.x ) vmax.x = p12.x;
+        if ( p12.y > vmax.y ) vmax.y = p12.y;
+        if ( p12.z > vmax.z ) vmax.z = p12.z;
+
+        if ( p11.x < vmin.x ) vmin.x = p11.x;
+        if ( p11.y < vmin.y ) vmin.y = p11.y;
+        if ( p11.z < vmin.z ) vmin.z = p11.z;
+        if ( p12.x < vmin.x ) vmin.x = p12.x;
+        if ( p12.y < vmin.y ) vmin.y = p12.y;
+        if ( p12.z < vmin.z ) vmin.z = p12.z;
       }
     
       glEnd();
+
+      // update boxbound
+      BoxBound *bb = new BoxBound;
+      Vec3f half = Vec3f( (vmax.x+vmin.x)/2,
+                          (vmax.y+vmin.y)/2,
+                          (vmax.z+vmin.z)/2 );
+      bb->center->setValue( half );
+      Vec3f size = Vec3f( vmax.x-vmin.x, vmax.y-vmin.y, vmax.z-vmin.z );
+      bb->size->setValue( size );
+      //cerr << "bb center= " << half << endl;
+      //cerr << "bb size=   " << size << endl;
+      bound->setValue( bb );
     }
 }
 
