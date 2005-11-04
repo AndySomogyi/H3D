@@ -29,28 +29,18 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "AudioClip.h"
+#include "H3DSoundFileNode.h"
 
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase AudioClip::database( "AudioClip", 
                                      &(newInstance<AudioClip>),
-                                     typeid( AudioClip ) );
+                                     typeid( AudioClip ),
+                                     &X3DSoundSourceNode::database );
 
 namespace AudioClipInternals {
-  FIELDDB_ELEMENT( AudioClip, description, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, loop, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, metadata, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, pauseTime, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, pitch, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, resumeTime, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, startTime, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, stopTime, INPUT_OUTPUT );
   FIELDDB_ELEMENT( AudioClip, url, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, duration_changed, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, elapsedTime, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, isActive, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( AudioClip, isPaused, INPUT_OUTPUT );
 }
 
 
@@ -67,29 +57,120 @@ AudioClip::AudioClip(
                      Inst<  SFTime  >  _duration_changed,
                      Inst<  SFTime  >  _elapsedTime,
                      Inst<  SFBool  >  _isActive,
-                     Inst<  SFBool  >  _isPaused ) :
+                     Inst<  SFBool  >  _isPaused,
+                     Inst< TimeHandler > _time_handler ) :
   X3DSoundSourceNode( _metadata, _description, _loop,  
                       _pauseTime, _pitch, _resumeTime, 
                       _startTime, _stopTime, _duration_changed, 
-                      _elapsedTime, _isActive, _isPaused ),
-  url( _url ) {
-
-  cerr << "Warning: AudioClip unimplemented!" << endl; 
-
-  //description =       "";
-  //loop =              FALSE;
-  //metadata =          NULL  [X3DMetadataObject];
-  //pauseTime =         0     (-8,8);
-  //pitch =             1.0   (0,8);
-  //resumeTime =        0     (-8,8);
-  //startTime =         0     (-8,8);
-  //stopTime =          0     (-8,8);
-  //url =               []    [urn];
+                      _elapsedTime, _isActive, _isPaused, _time_handler ),
+  X3DUrlObject( _url ) {
 
   type_name = "AudioClip";
-
   database.initFields( this );
-  
+  url->route( sound_buffer );
 }
 
+void AudioClip::ALrender() {
 
+  if( !al_buffers[0] ) {
+    // Generate Buffers
+    alGenBuffers(NR_STREAM_BUFFERS, al_buffers );
+  }
+
+  if( sound_buffer->hasCausedEvent( url ) ) {
+    // url field has generated an event, so we have to unload the previous audio
+    // and replace it with the new
+    
+    for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
+         i != parent_sound_nodes.end(); i++ ) {
+      alSourceStop( (*i)->getALSourceId() );
+      alSourcei( (*i)->getALSourceId(), AL_BUFFER, 0 );
+    }
+    
+    for( MFString::const_iterator i = url->begin(); i != url->end(); ++i ) {
+      H3DSoundFileNode *sf = H3DSoundFileNode::getSupportedFileReader( *i );
+      if( sf ) {
+        sf->load( *i );
+      }
+      reader.reset( sf );
+    }
+
+    if( reader.get() ) { 
+	    if( reader->nrChannels() == 1 )
+        if( reader->bitsPerSample() == 16 )
+          al_format = AL_FORMAT_MONO16;
+        else if( reader->bitsPerSample() == 8 ) 
+          al_format = AL_FORMAT_MONO8;
+        else {
+          cerr << "Warning: Invalid sample width(" << reader->bitsPerSample()
+               << "Only 16 and 8 bit mono " 
+               << "audio clips supported. " << endl;
+          reader.reset( NULL );
+        }
+      else if( reader->nrChannels() == 2 ) {
+        if( reader->bitsPerSample() == 16 )
+          al_format = AL_FORMAT_STEREO16;
+        else if( reader->bitsPerSample() == 8 ) 
+          al_format = AL_FORMAT_STEREO8;
+        else {
+          cerr << "Warning: Invalid sample width(" << reader->bitsPerSample()
+               << "Only 16 and 8 bit stereo " 
+               << "audio clips supported. " << endl;
+          reader.reset( NULL );
+        }
+      } else {
+         cerr << "Warning: Invalid number of channels(" << reader->nrChannels()
+               << "Only 1 and 2 bit channels are supported" << endl;
+         reader.reset( NULL );
+      }
+    }
+
+    if( reader.get() ) {
+      duration_changed->setValue( reader->duration(), id );
+      initALBuffers( NR_STREAM_BUFFERS * STREAM_BUFFER_SIZE <= 
+                     reader->totalDataSize() );
+      for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
+           i != parent_sound_nodes.end(); i++ ) {
+        if( isActive->getValue() && !isPaused->getValue() )
+          alSourcePlay( (*i)->getALSourceId() );
+      }
+    } else {
+      cerr << "Warning: None of the urls in the node \"" << getName() 
+           << "\" with url [";
+      for( MFString::const_iterator i = url->begin(); 
+           i != url->end(); ++i ) {  
+        cerr << " \"" << *i << "\"";
+      }
+      cerr << "] could be loaded. No sound will be played "
+           << " from this AudioClip." << endl;
+    }
+  }
+  X3DSoundSourceNode::ALrender();
+
+    /*
+    // Load test.wav
+    alutLoadWAVFile("ding.wav",&format,&data,&size,&freq,&loop);
+    if ((error = alGetError()) != AL_NO_ERROR) {
+      alDeleteBuffers(1, &al_buffer);
+      cerr << "FDAFAS" << endl;
+      exit(-1);
+    }
+    // Copy test.wav data into AL Buffer 0
+    alBufferData(al_buffer,format,data,size,freq);
+    if ((error = alGetError()) != AL_NO_ERROR) {
+      cerr << "FDASF" << endl;
+      alDeleteBuffers(1, &al_buffer);
+      exit(-1);
+    }
+    // Unload test.wav
+    alutUnloadWAV(format,data,size,freq);
+    if ((error = alGetError()) != AL_NO_ERROR) {
+      cerr << "as" << endl;
+      alDeleteBuffers(1, &al_buffer);
+      exit(-1);
+    }
+
+    */
+  
+ 
+}

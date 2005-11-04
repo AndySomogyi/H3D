@@ -29,21 +29,9 @@
 #ifndef __AUDIOCLIP_H__
 #define __AUDIOCLIP_H__
 
-#include <iostream>
 #include "X3DSoundSourceNode.h"
-#include "FieldTemplates.h"
-#include "Exception.h"
+#include "X3DUrlObject.h"
 
-/// Standard Template Library namespace
-using namespace std;
-
-/// H3D namespace
-using namespace H3D;
-
-/// Exception handling namespace
-using namespace Exception;
-
-/// H3D API namespace
 namespace H3D {
 
   /// \ingroup Nodes
@@ -102,7 +90,9 @@ namespace H3D {
   ///
   ///    t = (now - startTime) modulo (duration / pitch)
   /// 
-  class H3DAPI_API AudioClip : public X3DSoundSourceNode {
+  class AudioClip : 
+    public X3DSoundSourceNode,
+    public X3DUrlObject {
   public:
     
     AudioClip( Inst< SFString>  _description      = 0,
@@ -117,12 +107,10 @@ namespace H3D {
                Inst<  SFTime  >  _duration_changed = 0,
                Inst<  SFTime  >  _elapsedTime      = 0,
                Inst<  SFBool  >  _isActive         = 0,
-               Inst<  SFBool  >  _isPaused         = 0 );
+               Inst<  SFBool  >  _isPaused         = 0,
+               Inst< TimeHandler > _time_handler   = 0 );
 
-    virtual void render()     { X3DSoundSourceNode::render();     };
-
-    // Fields
-    auto_ptr< MFString >  url;
+    virtual void ALrender();
 
     static H3DNodeDatabase database;
   };

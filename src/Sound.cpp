@@ -29,6 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Sound.h"
+#include "AudioClip.h"
 
 using namespace H3D;
 
@@ -36,7 +37,10 @@ using namespace H3D;
 H3DNodeDatabase Sound::database( 
                                 "Sound", 
                                 &(newInstance<Sound>), 
-                                typeid( Sound ) );
+                                typeid( Sound ),
+                                &X3DSoundNode::database );
+
+bool Sound::alut_initialized = false;
 
 namespace SoundInternals {
   FIELDDB_ELEMENT( Sound, direction, INPUT_OUTPUT );
@@ -44,27 +48,29 @@ namespace SoundInternals {
   FIELDDB_ELEMENT( Sound, location, INPUT_OUTPUT );
   FIELDDB_ELEMENT( Sound, maxBack, INPUT_OUTPUT );
   FIELDDB_ELEMENT( Sound, maxFront, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( Sound, metadata, INPUT_OUTPUT );
   FIELDDB_ELEMENT( Sound, minBack, INPUT_OUTPUT );
   FIELDDB_ELEMENT( Sound, minFront, INPUT_OUTPUT );
   FIELDDB_ELEMENT( Sound, priority, INPUT_OUTPUT );
   FIELDDB_ELEMENT( Sound, source, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( Sound, spatialize, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( Sound, spatialize, INITIALIZE_ONLY );
 }
 
+ALCdevice *Sound::al_device = NULL;
+ALCcontext *Sound::al_context = NULL;
 
 Sound::Sound( 
+             Inst< SFNode  > _metadata,
              Inst< SFVec3f > _direction,
              Inst< SFFloat > _intensity,
              Inst< SFVec3f > _location,
              Inst< SFFloat > _maxBack,
              Inst< SFFloat > _maxFront,
-             Inst< SFNode  > _metadata,
              Inst< SFFloat > _minBack,
              Inst< SFFloat > _minFront,
              Inst< SFFloat > _priority,
-             Inst< SFNode  > _source,
-             Inst< SFBool  > _spatialize ) :
+             Inst< SFSoundSourceNode  > _source,
+             Inst< SFBool  > _spatialize,
+             Inst< ALSoundSetup > _soundSetup ) :
   X3DSoundNode( _metadata ),
   direction ( _direction  ),
   intensity ( _intensity  ),
@@ -75,35 +81,85 @@ Sound::Sound(
   minFront  ( _minFront   ),
   priority  ( _priority   ),
   source    ( _source     ),
-  spatialize( _spatialize ) {
+  spatialize( _spatialize ),
+  soundSetup( _soundSetup ) {
 
-  cerr << "Warning: Sound unimplemented!" << endl; 
-
-  //direction =   0 0 1 (-8,8);
-  //intensity =   1     [0,1];
-  //location =    0 0 0 (-8,8);
-  //maxBack =     10    [0,8);
-  //maxFront =    10    [0,8);
-  //metadata =    NULL  [X3DMetadataObject];
-  //minBack =     1     [0,8);
-  //minFront =    1     [0,8);
-  //priority =    0     [0,1];
-  //source =      NULL  [X3DSoundSourceNode];
-  //spatialize =  TRUE;
-
-
+  database.initFields( this );
   type_name = "Sound";
-  direction->setName( "Sound.direction" );
-  intensity->setName( "Sound.intensity" );
-  location->setName( "Sound.location" );
-  maxBack->setName( "Sound.maxBack" );
-  maxFront->setName( "Sound.maxFront" );
-  minBack->setName( "Sound.minBack" );
-  minFront->setName( "Sound.minFront" );
-  priority->setName( "Sound.priority" );
-  source->setName( "Sound.source" );
-  spatialize->setName( "Sound.spatialize" );
 
+  soundSetup->setName( "soundSetup" );
+  soundSetup->setOwner( this );
+
+  direction->setValue( Vec3f( 0, 0, 1 ) );
+  intensity->setValue( 1 );
+  location->setValue( Vec3f( 0, 0, 0 ) );
+  maxBack->setValue( 10 );
+  maxFront->setValue( 10 );
+  minBack->setValue( 1 );
+  minFront->setValue( 1 );
+  priority->setValue( 0 );
+  spatialize->setValue( true );
+
+  direction->route( soundSetup );
+  location->route( soundSetup );
+
+  if( !al_device )
+    al_device = alcOpenDevice(NULL);
+  if( !al_device ) {
+    cerr << "Warning: Could not find audio device for use with Sound node."
+         << endl;
+  }
+  if( !al_context )
+	  al_context = alcCreateContext( al_device, NULL);
+  
+	if( !al_context ) {
+    cerr << "Warning: Could not create OpenAL context for use with Sound node."
+         << endl;
+	}
+  alcMakeContextCurrent(al_context);
+  if( !al_source ) {
+    alGenSources( 1, &al_source );
+    }
+  alSourcef( al_source, AL_GAIN, 0 );
 }
 
 
+void Sound::traverseSG( TraverseInfo &ti ) {
+  X3DSoundSourceNode *sound_source = source->getValue();
+  if( sound_source ) {
+    sound_source->traverseSG( ti );
+  }
+}
+
+void Sound::ALSoundSetup::update() {
+  Sound *sound_node = static_cast< Sound * >( getOwner() );
+
+  if( !sound_node->al_context || !sound_node->al_device ) return;
+  
+  alDistanceModel( AL_LINEAR_DISTANCE_CLAMPED );
+  const Vec3f &pos = sound_node->location->getValue(); 
+  alSource3f( sound_node->al_source, AL_POSITION, pos.x, pos.y, pos.z );
+  alSourcef( sound_node->al_source, AL_GAIN, sound_node->intensity->getValue() );
+  alSourcef( sound_node->al_source, AL_REFERENCE_DISTANCE, 
+             sound_node->minFront->getValue() );
+  alSourcef( sound_node->al_source, AL_MAX_DISTANCE, 
+             sound_node->maxFront->getValue() );
+}
+
+void Sound::SFSoundSourceNode::onAdd( Node *n ) {
+  TypedSFNode< X3DSoundSourceNode >::onAdd( n );
+  X3DSoundSourceNode *sound_source = static_cast< X3DSoundSourceNode * >( n );
+  X3DSoundNode *sound_node = static_cast< X3DSoundNode * >( getOwner() );
+  if( sound_source ) {
+    sound_source->registerSoundNode( sound_node );
+  }
+}
+
+void Sound::SFSoundSourceNode::onRemove( Node *n ) {
+  X3DSoundSourceNode *sound_source = static_cast< X3DSoundSourceNode * >( n );
+  X3DSoundNode *sound_node = static_cast< X3DSoundNode * >( getOwner() );
+  if( sound_source ) {
+    sound_source->unregisterSoundNode( sound_node );
+  }
+  TypedSFNode< X3DSoundSourceNode >::onRemove( n );
+}

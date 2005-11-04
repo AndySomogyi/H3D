@@ -34,7 +34,8 @@ using namespace H3D;
 
 X3DSoundNode::X3DSoundNode( 
                            Inst< SFNode>  _metadata ) :
-  X3DChildNode( _metadata ) {
+  X3DChildNode( _metadata ),
+  al_source( 0 ) {
   type_name = "X3DSoundNode";
 }
 
