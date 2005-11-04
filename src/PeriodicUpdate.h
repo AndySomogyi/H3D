@@ -120,13 +120,15 @@ namespace H3D {
       period = _period;
     }
 
-  protected:
     /// upToDate is specialized to record the time of the call to the 
     /// function in the last_up_to_date member.
     virtual void upToDate() {
       BaseFieldType::upToDate();
       last_up_to_date = TimeStamp();
     }
+
+  protected:
+    
     /// The tye of the period.
     PeriodType period_type;
     /// The period of automatic updates/
