@@ -158,6 +158,19 @@ namespace H3D {
     /// from the start are met. 
     virtual void initialize();
 
+    /// This function will be called when the node is paused.
+    virtual void onPause() {}
+
+    /// This function will be called when the node is resumed after
+    /// it has been in paused state.
+    virtual void onResume() {}
+
+    /// This function will be called when the time node is started.
+    virtual void onStart() {}
+
+    /// This function will be called when the time node is stopped.
+    virtual void onStop() {}
+
     /// If loop is TRUE at the end of a cycle, execution continues into
     /// the next cycle, otherwise it stops.
     ///

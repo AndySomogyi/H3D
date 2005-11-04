@@ -118,15 +118,16 @@ void X3DTimeDependentNode::TimeHandler::activate( H3DTime time ) {
                                         time_node->id ); //??
     }
     time_node->isPaused->setValue( true, time_node->id );
+    time_node->onPause();
   } else {
     // not getting paused
     time_node->elapsedTime->setValue( time - start_time, time_node->id );
+    time_node->onStart();
   }
   time_node->isActive->setValue( true, time_node->id );
 }
 
 void X3DTimeDependentNode::TimeHandler::deactivate( H3DTime time ) {
-  cerr << "Deactivating" << endl;
   X3DTimeDependentNode *time_node = 
     static_cast< X3DTimeDependentNode * >( getOwner() );
   H3DTime stop_time = time_node->stopTime->getValue();
@@ -135,6 +136,7 @@ void X3DTimeDependentNode::TimeHandler::deactivate( H3DTime time ) {
                                     stop_time - value,
                                     time_node->id ); //??
   time_node->isActive->setValue( false, time_node->id );
+  time_node->onStop();
 }
 
 void X3DTimeDependentNode::TimeHandler::update() {
@@ -160,6 +162,7 @@ void X3DTimeDependentNode::TimeHandler::update() {
                                             pause_time - last_time, 
                                             time_node->id ); //??
           time_node->isPaused->setValue( true, time_node->id );
+          time_node->onPause();
         } else {
           time_node->elapsedTime->setValue( elapsed_time + 
                                             time - last_time,
@@ -171,6 +174,7 @@ void X3DTimeDependentNode::TimeHandler::update() {
       if( time >= resume_time && resume_time > pause_time ) {
         time_node->isPaused->setValue( false, time_node->id );
         time_node->resumeTime->setValue( time );
+        time_node->onResume();
       }
     }
   } else {
