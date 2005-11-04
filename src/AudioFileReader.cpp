@@ -51,11 +51,6 @@ unsigned int AudioFileReader::read( char *buffer, unsigned int size ) {
   afGetVirtualSampleFormat( file, AF_DEFAULT_TRACK, 
                             &sample_format, &sample_width );
   unsigned int sample_size = nrChannels() * (sample_width /8 ); 
-  
-  //if( sample_format == AF_SAMPFMT_TWOSCOMP ) {
-  //cerr << "Yoment" << endl;
-  //}
-  
   unsigned int nr_samples = size / sample_size;
   int samples_read = afReadFrames( file, AF_DEFAULT_TRACK, buffer, 
                                    nr_samples );
@@ -68,15 +63,26 @@ unsigned int AudioFileReader::load( const string &_url ) {
    if( file ) {
      int fileformat = afGetFileFormat( file, NULL );
      if( fileformat == AF_FILE_UNKNOWN  ) {
-       cerr << "unsupported file" << endl;
        afCloseFile( file );
+       return 0;
      } else {
-       cerr << afSetVirtualByteOrder( file, AF_DEFAULT_TRACK, 
-                                      AF_BYTEORDER_LITTLEENDIAN );
-       // afSetVirtualSampleFormat( file, AF_DEFAULT_TRACK, AF_SAMPFMT_UNSIGNED, 16 );
+       afSetVirtualByteOrder( file, AF_DEFAULT_TRACK, 
+                              AF_BYTEORDER_LITTLEENDIAN );
+       int sample_format, sample_width;
+       afGetVirtualSampleFormat( file, AF_DEFAULT_TRACK, 
+                                 &sample_format, &sample_width );
+       // OpenAL only supports 8 bit unsigned and 16 bit signed data
+       // so force it to be compatible.
+       if( sample_width == 8 ) {
+         afSetVirtualSampleFormat( file, AF_DEFAULT_TRACK, 
+                                   AF_SAMPFMT_UNSIGNED, 8 );
+       } else {
+         afSetVirtualSampleFormat( file, AF_DEFAULT_TRACK, 
+                                   AF_SAMPFMT_TWOSCOMP, 16 );
+       }
      }
    } else {
-     cerr << "Could not find file" << endl;
+     return 0;
    }
    return totalDataSize();
 }

@@ -39,17 +39,25 @@ namespace H3D {
   /// \brief This abstract node type is used to derive node types that
   /// can stream PCM sound data from a file.
   ///
-  /// 
+  /// It also upholds a database over all subclasses that registers
+  /// itself. The getSupportedFileReader function can then be used to
+  /// get an instance of a H3DSoundFileNode that supports a certain
+  /// file type.
   class H3DSoundFileNode : public H3DSoundStreamNode {
   public:
+    /// 
     typedef H3DSoundFileNode*( *CreateNodeFunc)(); 
+
+    /// Function ptr type for  
     typedef bool ( *SupportsFileFunc)( const string &url ); 
     
     template< class N >
     static H3DSoundFileNode *newSoundFileNode() { return new N; };
 
+    /// Class used to register a class to the registered file readers.
     struct FileReaderRegistration{
     public:
+      /// Constructor.
       FileReaderRegistration( const string &_name,
                               CreateNodeFunc _create, 
                               SupportsFileFunc _supports ):
@@ -57,7 +65,8 @@ namespace H3D {
       create_func( _create ),
       supports_func( _supports ) {
         if( !H3DSoundFileNode::initialized ) {
-          H3DSoundFileNode::registered_file_readers = new list< FileReaderRegistration >;
+          H3DSoundFileNode::registered_file_readers = 
+            new list< FileReaderRegistration >;
           initialized = true;
         }
         H3DSoundFileNode::registerFileReader( *this );
@@ -72,19 +81,31 @@ namespace H3D {
     /// generate PCM data.
     virtual unsigned int load( const string &_url ) = 0;
     
+    /// Given an url to a file, it returns an instance of a H3DSoundFileNode
+    /// class that can handle that file type. If no such class is registered
+    /// NULL is returns.
     static H3DSoundFileNode *getSupportedFileReader( const string &url );
 
+    /// Register a file reader that can then be returned by 
+    /// getSupportedFileReader().
+    /// \param name The name of the class
+    /// \param create A function for creating an instance of that class.
+    /// \param supports A function to determine if the class supports a
+    /// given file type.
     static void registerFileReader( const string &name,
                                     CreateNodeFunc create, 
                                     SupportsFileFunc supports ) {
       registerFileReader( FileReaderRegistration( name, create, supports ) );
     }
 
+    /// Register a file reader that can then be returned by 
+    /// getSupportedFileReader().
     static void registerFileReader( const FileReaderRegistration &fr ) {
       registered_file_readers->push_back( fr );
       cerr << "Registring: " << fr.name << endl;
     }
 
+  protected:
     static list< FileReaderRegistration > *registered_file_readers;
     static bool initialized;
   };

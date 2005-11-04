@@ -36,29 +36,41 @@ namespace H3D {
 
   /// \ingroup Nodes
   /// \class OggFileReader
-  ///
-  /// 
+  /// \brief OggFileReader uses the libVorbis (http://www.vorbis.com)
+  /// decoder library to support
+  /// Ogg Vorbis files.
   class OggFileReader : public H3DSoundFileNode {
   public:
 
-    /// Load a sound file from the given url that will be used to
-    /// generate PCM data.
+    /// Constructor.
     OggFileReader() {}
 
+    /// Destructor.
+    ~OggFileReader() {
+      ov_clear( &ogg_file );
+    }
+
+    /// Load a sound file from the given url that will be used to
+    /// generate PCM data.
     unsigned int load( const string &_url );
-      
+          
+    /// The duration in seconds for the the PCM data.
     virtual H3DTime duration() {
       return ov_time_total( &ogg_file, -1 );
     }
     
+    /// Reset the stream to the beginning of the sound stream.
     virtual void reset() {
       ov_raw_seek( &ogg_file, 0 );
     }
     
+    /// Returns the total size of the PCM data of the current stream.
     virtual unsigned int totalDataSize() {
       return ov_raw_total( &ogg_file, -1 );
     }
       
+    /// Returns the number of channels per second for the current PCM 
+    /// data stream.
     virtual unsigned int nrChannels() {
       return vorbis_info->channels;
     }
@@ -68,14 +80,26 @@ namespace H3D {
       return 16;
     }
 
+    /// Read PCM data from the stream into the buffer.
+    /// \param buffer A buffer to write data into.
+    /// \param size The number of bytes of data to read.
+    /// \returns The number of bytes written to the buffer.
     virtual unsigned int read( char *buffer, unsigned int size );
     
+    /// Returns the number of samples per second for the current PCM 
+    /// data stream.
     virtual unsigned int samplesPerSecond() {
       return vorbis_info->rate;
     }
     
+    /// Returns true if the node supports the filetype of the file
+    /// specified by url.
     static bool supportsFileType( const string &url );
+
+    /// The H3DNodeDatabase for this node
     static H3DNodeDatabase database;
+
+    /// Register this node to the H3DSoundFileNodes available.
     static FileReaderRegistration reader_registration;
 
   protected:

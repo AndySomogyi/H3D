@@ -49,34 +49,30 @@ H3DSoundFileNode::FileReaderRegistration OggFileReader::reader_registration(
 unsigned int OggFileReader::read( char *buffer, unsigned int size ) {
       
   int section;
-  int bytes_read = 0;
+  unsigned int bytes_read = 0;
   
   while( bytes_read < size ) {
     int res = ov_read(&ogg_file, buffer + bytes_read, 
                       size - bytes_read, 0, 2, 1, & section);
     if( res <= 0 ) break;
-    
-    else 
-      bytes_read += res;
-    //  cerr << oggString( res );
+    else  bytes_read += res;
   }
   return bytes_read;
 }
 
 unsigned int OggFileReader::load( const string &_url ) {
   url = _url;
-  //        ov_clear( &ogg_file );
   FILE *f = fopen( url.c_str(), "rb" );
   if( f ) {
     if( ov_open( f, &ogg_file, NULL, 0 ) < 0 ) {
-      cerr << "Invalid ogg file" << endl;
       fclose( f );
+      return 0;
     } else {
       vorbis_info = ov_info(&ogg_file, -1);
       vorbis_comment = ov_comment(&ogg_file, -1);
     }
   } else {
-    cerr << "Could not find file" << endl;
+    return 0;
   }
   return totalDataSize();
 }

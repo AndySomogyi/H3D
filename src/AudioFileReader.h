@@ -36,31 +36,47 @@ namespace H3D {
 
   /// \ingroup Nodes
   /// \class AudioFileReader
-  ///
-  /// 
+  /// \brief AudioFileReader uses the Audio File Library
+  /// ( http://www.68k.org/~michael/audiofile/ ) to read sound data. It 
+  /// supports AIFF/AIFF-C, WAVE, NeXT/Sun .snd/.au, Berkeley/IRCAM/CARL
+  /// Sound File, Audio Visual Research, Amiga IFF/8SVX, and NIST SPHERE. 
+  /// Supported compression formats are currently G.711 mu-law and A-law and
+  /// IMA and MS ADPCM.
   class AudioFileReader : public H3DSoundFileNode {
   public:
 
-    /// Load a sound file from the given url that will be used to
-    /// generate PCM data.
+    /// Constructor.
     AudioFileReader() {}
 
+    /// Destructor.
+    ~AudioFileReader() {
+      afCloseFile( file );
+    }
+
+    /// Load a sound file from the given url that will be used to
+    /// generate PCM data.
     unsigned int load( const string &_url );
     
+    /// Reset the stream to the beginning of the sound stream.
     virtual void reset() {
       afSeekFrame( file, AF_DEFAULT_TRACK, 0 );
     }
       
+    /// Returns the total size of the PCM data of the current stream.
     virtual unsigned int totalDataSize() {
       return afGetTrackBytes( file, AF_DEFAULT_TRACK );
     }
     
+    /// Returns the number of channels per second for the current PCM 
+    /// data stream.
     virtual unsigned int nrChannels() {
       return afGetChannels( file, AF_DEFAULT_TRACK );
     }
     
+    /// Returns the number of samples per second for the current PCM 
+    /// data stream.
     virtual unsigned int samplesPerSecond() {
-      return afGetRate( file, AF_DEFAULT_TRACK );
+      return (unsigned int) afGetRate( file, AF_DEFAULT_TRACK );
     }
     
     /// Returns the number of bits for a sample.
@@ -71,16 +87,26 @@ namespace H3D {
       return sample_width;
     }
 
+    /// The duration in seconds for the the PCM data.
     virtual H3DTime duration() {
       return afGetFrameCount(file, AF_DEFAULT_TRACK) /
         afGetRate(file, AF_DEFAULT_TRACK);
     }
 
+    /// Read PCM data from the stream into the buffer.
+    /// \param buffer A buffer to write data into.
+    /// \param size The number of bytes of data to read.
+    /// \returns The number of bytes written to the buffer.
     virtual unsigned int read( char *buffer, unsigned int size );
 
+    /// Returns true if the node supports the filetype of the file
+    /// specified by url.
     static bool supportsFileType( const string &url );
     
+    /// The H3DNodeDatabase for this node
     static H3DNodeDatabase database;
+
+    /// Register this node to the H3DSoundFileNodes available.
     static FileReaderRegistration reader_registration;
 
   protected:
