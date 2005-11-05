@@ -32,14 +32,15 @@
 #include "X3DTimeDependentNode.h"
 #include "X3DSoundNode.h"
 #include "PeriodicUpdate.h"
+#include "H3DSoundStreamNode.h"
 #include <list>
 #include <fstream>
-#include "al.h"
-#include "alc.h"
-#include "alut.h"
-#include "H3DSoundStreamNode.h"
-#include <vorbis/vorbisfile.h>
-#include <audiofile.h>
+
+#ifdef HAVE_OPENAL
+#include <al.h>
+#include <alc.h>
+#include <alut.h>
+#endif 
 
 #define NR_STREAM_BUFFERS 3
 #define STREAM_BUFFER_SIZE (4096*8)
@@ -51,20 +52,23 @@ namespace H3D {
   /// \brief This abstract node type is used to derive node types that can emit
   /// audio data. 
   ///
-  /// 
-  class X3DSoundSourceNode : public X3DTimeDependentNode {
+  /// \par Internal routes:
+  /// \dotfile X3DSoundSourceNode.dot
+  class H3DAPI_API X3DSoundSourceNode : public X3DTimeDependentNode {
   public:
-    
-    class TimeHandler: public X3DTimeDependentNode::TimeHandler {
+    /// TimeHandler is extended to stream audio data to OpenAL buffers
+    /// if the sound source is a streaming source.
+    class H3DAPI_API TimeHandler: public X3DTimeDependentNode::TimeHandler {
     public:
-      TimeHandler() : was_playing( false ) {}
+      /// Constructor.
+      TimeHandler() {}
     protected:
       virtual void update();
-
-      bool was_playing;
     };
 
-    class ALSoundBuffer: 
+    /// Field that calls ALrender() when a field routed to it
+    /// has generated an event.
+    class H3DAPI_API ALSoundBuffer: 
       public PeriodicUpdate< Field > {
     protected:
       virtual void update() {
@@ -116,8 +120,12 @@ namespace H3D {
                         Inst< SFBool   > _isPaused         = 0,
                         Inst< TimeHandler > _timeHandler   = 0 );
 
+    /// Reads new data into the OpenAL from the reader and attaches them
+    /// to the sound sources that use this sound source. The stream param 
+    /// indicates if it should init a stream source or a static source.
     virtual void initALBuffers( bool stream );
 
+    /// Perform the OpenAL calls to render the sound.
     virtual void ALrender();
 
     /// Returns the default xml containerField attribute value.
@@ -126,54 +134,74 @@ namespace H3D {
       return "source";
     }
 
-    virtual void traverseSG( TraverseInfo &ti ) {
-      X3DTimeDependentNode::traverseSG( ti );
-      traversing = true;
-    }
+    /// Register this sound node with the X3DSoundSourceNode. All 
+    /// X3DSoundSourceNodes that want to play this sound source must
+    /// register with this function.
+    virtual void registerSoundNode( X3DSoundNode *n );
 
-    virtual void registerSoundNode( X3DSoundNode *n ) {
-      sound_buffer->upToDate();
-      if( !sound_as_stream ) {
-        alSourcei( n->getALSourceId(), AL_BUFFER, al_buffers[0] );
-        if( loop->getValue() )
-          alSourcei( n->getALSourceId(), AL_LOOPING, AL_TRUE );
-        else
-          alSourcei( n->getALSourceId(), AL_LOOPING, AL_FALSE );
-      } else {
-        alSourceQueueBuffers( n->getALSourceId(), NR_STREAM_BUFFERS, 
-                             al_buffers );  
-      }
-      alSourcef( n->getALSourceId(), AL_PITCH, 
-                 pitch->getValue() );
-      if( isActive->getValue() && !isPaused->getValue() )
-        alSourcePlay( n->getALSourceId() );
-      parent_sound_nodes.push_front( n );
-    }
+    /// Unregister this sound node with the X3DSoundSourceNode.   
+    virtual void unregisterSoundNode( X3DSoundNode *n );
 
-    virtual void unregisterSoundNode( X3DSoundNode *n ) {
-      parent_sound_nodes.remove( n );
-    }
-
+    /// On pause, pause the sound.
     virtual void onPause();
+
+    /// On resume, resume paused sound.
     virtual void onResume();
+
+    /// On start, initialize AL buffers and start playing.
     virtual void onStart();
+
+    /// On stop, stop playing the sound.
     virtual void onStop();
 
+    /// The description field specifies a textual description of the audio
+    /// source. 
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> "" \n
+    ///
+    /// \dotfile X3DSoundSourceNode_description.dot 
     auto_ptr< SFString > description;
+
+    /// The pitch field specifies a multiplier for the rate at which sampled
+    /// sound is played. Values for the pitch field shall be greater than
+    /// zero.
+    /// 
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> 1.0 \n
+    ///
+    /// \dotfile X3DSoundSourceNode_pitch.dot 
     auto_ptr< SFFloat  > pitch;
+
+    /// The duration field is the length of time in seconds for one cycle 
+    /// of the audio for a pitch set to 1.0.
+    /// 
+    /// <b>Access type:</b> outputOnly
+    ///
+    /// \dotfile X3DSoundSourceNode_duration_changed.dot 
     auto_ptr< SFTime   > duration_changed;
 
-    auto_ptr< ALSoundBuffer > sound_buffer;
-
+     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   protected:
+    /// The X3DSoundNodes that use this node as sound source.
     list< X3DSoundNode * > parent_sound_nodes;
+
+#ifdef HAVE_OPENAL
+    /// OpenAL buffer ids used for playing sound.
     ALuint al_buffers[NR_STREAM_BUFFERS];
+
+    /// The OpenAL format of the current sound source.
     ALenum al_format;
-    bool traversing;
+#endif
+
+    /// The H3DSoundStreamNode used to read sound data.
     AutoRef< H3DSoundStreamNode > reader;
+
+    /// Indicates if the current sounds source is being streamed or not.
     bool sound_as_stream;
-  };
+
+    auto_ptr< ALSoundBuffer > sound_buffer;
+ };
 }
 
 #endif

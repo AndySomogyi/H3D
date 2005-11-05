@@ -43,7 +43,7 @@ namespace H3D {
   /// itself. The getSupportedFileReader function can then be used to
   /// get an instance of a H3DSoundFileNode that supports a certain
   /// file type.
-  class H3DSoundFileNode : public H3DSoundStreamNode {
+  class H3DAPI_API H3DSoundFileNode : public H3DSoundStreamNode {
   public:
     /// 
     typedef H3DSoundFileNode*( *CreateNodeFunc)(); 
@@ -55,7 +55,7 @@ namespace H3D {
     static H3DSoundFileNode *newSoundFileNode() { return new N; };
 
     /// Class used to register a class to the registered file readers.
-    struct FileReaderRegistration{
+    struct H3DAPI_API FileReaderRegistration{
     public:
       /// Constructor.
       FileReaderRegistration( const string &_name,
@@ -102,7 +102,6 @@ namespace H3D {
     /// getSupportedFileReader().
     static void registerFileReader( const FileReaderRegistration &fr ) {
       registered_file_readers->push_back( fr );
-      cerr << "Registring: " << fr.name << endl;
     }
 
   protected:

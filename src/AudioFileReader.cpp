@@ -30,6 +30,8 @@
 
 #include "AudioFileReader.h"
 
+#ifdef HAVE_LIBAUDIOFILE
+
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
@@ -66,8 +68,9 @@ unsigned int AudioFileReader::load( const string &_url ) {
        afCloseFile( file );
        return 0;
      } else {
-       afSetVirtualByteOrder( file, AF_DEFAULT_TRACK, 
-                              AF_BYTEORDER_LITTLEENDIAN );
+       if( isLittleEndian() )
+         afSetVirtualByteOrder( file, AF_DEFAULT_TRACK, 
+                                AF_BYTEORDER_LITTLEENDIAN );
        int sample_format, sample_width;
        afGetVirtualSampleFormat( file, AF_DEFAULT_TRACK, 
                                  &sample_format, &sample_width );
@@ -98,3 +101,5 @@ bool AudioFileReader::supportsFileType( const string &url ) {
     return false;
   }
 }
+
+#endif

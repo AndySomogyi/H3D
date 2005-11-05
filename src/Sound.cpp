@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Sound.h"
-#include "AudioClip.h"
 
 using namespace H3D;
 
@@ -39,8 +38,6 @@ H3DNodeDatabase Sound::database(
                                 &(newInstance<Sound>), 
                                 typeid( Sound ),
                                 &X3DSoundNode::database );
-
-bool Sound::alut_initialized = false;
 
 namespace SoundInternals {
   FIELDDB_ELEMENT( Sound, direction, INPUT_OUTPUT );
@@ -55,8 +52,11 @@ namespace SoundInternals {
   FIELDDB_ELEMENT( Sound, spatialize, INITIALIZE_ONLY );
 }
 
+#ifdef HAVE_OPENAL
+bool Sound::alut_initialized = false;
 ALCdevice *Sound::al_device = NULL;
 ALCcontext *Sound::al_context = NULL;
+#endif
 
 Sound::Sound( 
              Inst< SFNode  > _metadata,
@@ -82,7 +82,8 @@ Sound::Sound(
   priority  ( _priority   ),
   source    ( _source     ),
   spatialize( _spatialize ),
-  soundSetup( _soundSetup ) {
+  soundSetup( _soundSetup ),
+  accForwardMatrix( new SFMatrix4f ) {
 
   database.initFields( this );
   type_name = "Sound";
@@ -100,9 +101,16 @@ Sound::Sound(
   priority->setValue( 0 );
   spatialize->setValue( true );
 
+  
   direction->route( soundSetup );
   location->route( soundSetup );
-
+  maxBack->route( soundSetup );
+  minBack->route( soundSetup );
+  maxFront->route( soundSetup );
+  minFront->route( soundSetup );
+  accForwardMatrix->route( soundSetup );
+  
+#ifdef HAVE_OPENAL
   if( !al_device )
     al_device = alcOpenDevice(NULL);
   if( !al_device ) {
@@ -121,6 +129,10 @@ Sound::Sound(
     alGenSources( 1, &al_source );
     }
   alSourcef( al_source, AL_GAIN, 0 );
+#else
+  cerr << "Warning: H3D API compiled without OpenAL. Sound nodes"
+       << " will be unusable." << endl;
+#endif
 }
 
 
@@ -129,21 +141,118 @@ void Sound::traverseSG( TraverseInfo &ti ) {
   if( sound_source ) {
     sound_source->traverseSG( ti );
   }
+  accForwardMatrix->setValue( ti.getAccForwardMatrix() );
 }
 
-void Sound::ALSoundSetup::update() {
-  Sound *sound_node = static_cast< Sound * >( getOwner() );
+void Sound::ALrender() {
+#ifdef HAVE_OPENAL
+  if( !al_context || !al_device ) return;
 
-  if( !sound_node->al_context || !sound_node->al_device ) return;
+  Vec3f listener_pos = Vec3f( 0, 0, 0 );
+
+  // set up listener properties.
+  Viewpoint *vp = Viewpoint::getActive();
+  if( vp ) {
+    const Matrix4f &vp_to_global =  vp->accForwardMatrix->getValue();
+    const Matrix3f &vp_to_global_rot = vp_to_global.getRotationPart();
+    listener_pos = vp_to_global * vp->position->getValue(); 
+    Vec3f listener_up  = vp_to_global * vp->orientation->getValue() * 
+      Vec3f( 0, 1, 0 ); 
+    Vec3f listener_lookat  = vp_to_global * vp->orientation->getValue()
+      * Vec3f( 0, 0, -1 ); 
+    alListener3f( AL_POSITION, 
+                  listener_pos.x, listener_pos.y, listener_pos.z ); 
+    ALfloat listener_orn[] = 
+      { listener_lookat.x, listener_lookat.y, listener_lookat.z,
+        listener_up.x, listener_up.y, listener_up.z };
+    alListenerfv( AL_ORIENTATION, listener_orn );
+  }
+
+  // convert all directions and positions to global space
+
+  const Matrix4f &local_to_global = accForwardMatrix->getValue();
+  Vec3f sound_pos = local_to_global * location->getValue();
+
+  Vec3f dir = 
+    local_to_global.getRotationPart() *
+    direction->getValue();
+  dir.normalizeSafe();
   
-  alDistanceModel( AL_LINEAR_DISTANCE_CLAMPED );
-  const Vec3f &pos = sound_node->location->getValue(); 
-  alSource3f( sound_node->al_source, AL_POSITION, pos.x, pos.y, pos.z );
-  alSourcef( sound_node->al_source, AL_GAIN, sound_node->intensity->getValue() );
-  alSourcef( sound_node->al_source, AL_REFERENCE_DISTANCE, 
-             sound_node->minFront->getValue() );
-  alSourcef( sound_node->al_source, AL_MAX_DISTANCE, 
-             sound_node->maxFront->getValue() );
+  Vec3f to_listener = listener_pos - sound_pos;
+  // the distance between listener and sound source
+  H3DFloat distance = to_listener.length();
+
+  to_listener.normalizeSafe();
+
+  // the angle in the ellipse from between the direction vector and
+  // the vector from sound source an listener
+  H3DFloat theta = (H3DFloat)( Constants::pi - H3DAcos( dir * to_listener ) );
+
+  // clamp values within allowed border
+  H3DFloat min_back = minBack->getValue();
+  H3DFloat min_front = minFront->getValue();
+  H3DFloat max_back = maxBack->getValue();
+  H3DFloat max_front = maxFront->getValue();
+
+  if( max_back < 0 ) max_back = 0;
+  if( max_front < 0 ) max_front = 0;
+  
+  if( min_back < 0 ) min_back = 0;
+  else if( min_back > max_back ) min_back = max_back;
+  if( min_front < 0 ) min_front = 0;
+  else if( min_front > max_front ) min_front = max_front;
+
+  // calculate the distance from the sound location and the max ellipse
+  // in the direction of the listener using the ellipse equation.
+  H3DFloat max_r = 0;
+  H3DFloat a = ( max_front + max_back ) / 2; 
+  H3DFloat c = ( max_front - max_back ) / 2;  
+  if( a > Constants::f_epsilon ) {
+    H3DFloat e = c / a;
+    if( e < 1.0f && e > -1.0f  ) {
+      max_r = ( a * ( 1 - e*e ) ) / (1 + e * H3DCos( theta ) );
+    }
+  }
+
+  // calculate the distance from the sound location and the min ellipse
+  // in the direction of the listener using the ellipse equation.
+  H3DFloat min_r = 0;
+  a = ( min_front + min_back ) / 2; 
+  c = ( min_front - min_back ) / 2;  
+  if( a > Constants::f_epsilon ) {
+    H3DFloat e = c / a;
+    if( e < 1.0f && e > -1.0f  ) {
+      min_r = ( a * ( 1 - e*e ) ) / (1 + e * H3DCos( theta ) );
+    }
+  }
+  
+  ALfloat gain = intensity->getValue();
+  if( distance > max_r ) gain = 0;
+  else if( distance > min_r ) {
+    H3DFloat diff = max_r - min_r;
+    if( diff > Constants::f_epsilon ) {
+      // attenuation according to X3D spec
+      H3DFloat attenuation_db = -20 * ( distance - min_r ) / diff;
+      // convert to OpenAL attenuation which is linear and not
+      // db based.
+      H3DFloat attenuation = H3DPow( 10.f, attenuation_db / 20 );
+      gain = gain * attenuation;
+      // gain = gain * ( max_r - distance ) / ( max_r - min_r );
+    }
+  }
+
+  alDistanceModel( AL_NONE );
+  if( spatialize->getValue() ) {
+    alSource3f( al_source, AL_POSITION, 
+                sound_pos.x, sound_pos.y, sound_pos.z );
+  } else {
+    // spacialize is FALSE, so put the sound in the same position
+    // as the listener to avoid spatialize effects.
+    alSource3f( al_source, AL_POSITION, 
+                listener_pos.x, listener_pos.y, listener_pos.z );
+  }
+  alSourcef( al_source, AL_GAIN, gain );
+#endif
 }
 
 void Sound::SFSoundSourceNode::onAdd( Node *n ) {

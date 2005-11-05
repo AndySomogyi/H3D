@@ -39,7 +39,7 @@ namespace H3D {
   /// can stream PCM sound data.
   ///
   /// 
-  class H3DSoundStreamNode : public Node {
+  class H3DAPI_API H3DSoundStreamNode : public Node {
   public:
     
     /// Reset the stream to the beginning of the sound stream.

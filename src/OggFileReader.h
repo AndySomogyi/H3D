@@ -26,10 +26,13 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
+
 #ifndef __OGGFILEREADER_H__
 #define __OGGFILEREADER_H__
 
 #include "H3DSoundFileNode.h"
+
+#ifdef HAVE_LIBVORBIS
 #include <vorbis/vorbisfile.h>
 
 namespace H3D {
@@ -39,7 +42,7 @@ namespace H3D {
   /// \brief OggFileReader uses the libVorbis (http://www.vorbis.com)
   /// decoder library to support
   /// Ogg Vorbis files.
-  class OggFileReader : public H3DSoundFileNode {
+  class H3DAPI_API OggFileReader : public H3DSoundFileNode {
   public:
 
     /// Constructor.
@@ -110,4 +113,5 @@ namespace H3D {
   };
 }
 
+#endif
 #endif

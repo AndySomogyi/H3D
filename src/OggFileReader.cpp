@@ -30,6 +30,8 @@
 
 #include "OggFileReader.h"
 
+#ifdef HAVE_LIBVORBIS
+
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
@@ -53,7 +55,7 @@ unsigned int OggFileReader::read( char *buffer, unsigned int size ) {
   
   while( bytes_read < size ) {
     int res = ov_read(&ogg_file, buffer + bytes_read, 
-                      size - bytes_read, 0, 2, 1, & section);
+                      size - bytes_read, !isLittleEndian(), 2, 1, & section);
     if( res <= 0 ) break;
     else  bytes_read += res;
   }
@@ -92,3 +94,5 @@ bool OggFileReader::supportsFileType( const string &url ) {
     return false;
   }
 }
+
+#endif

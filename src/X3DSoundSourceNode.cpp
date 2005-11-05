@@ -29,8 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "X3DSoundSourceNode.h"
-#include "OggFileReader.h"
-#include "AudioFileReader.h"
 
 using namespace H3D;
 
@@ -66,11 +64,12 @@ X3DSoundSourceNode::X3DSoundSourceNode( Inst< SFNode  >  _metadata,
   description     ( _description      ),
   pitch           ( _pitch            ),
   duration_changed( _duration_changed ),
-  sound_buffer( new ALSoundBuffer ),
-  traversing( false ) {
+  sound_buffer( new ALSoundBuffer ) {
   type_name = "X3DSoundSourceNode";
   database.initFields( this );
+#ifdef HAVE_OPENAL
   al_buffers[0] = 0;
+#endif
   sound_buffer->setName( "soundBuffer" );
   sound_buffer->setOwner( this );
 
@@ -84,6 +83,7 @@ X3DSoundSourceNode::X3DSoundSourceNode( Inst< SFNode  >  _metadata,
 
 
 void X3DSoundSourceNode::initALBuffers( bool stream ) {
+#ifdef HAVE_OPENAL
   if( !stream ) {
     sound_as_stream = false;
     char *buffer = new char[ reader->totalDataSize() ];
@@ -120,31 +120,36 @@ void X3DSoundSourceNode::initALBuffers( bool stream ) {
                             al_buffers );  
     }
   }
+#endif
 }
 
 void X3DSoundSourceNode::onStart() {
-  cerr << "Start" << endl;
   X3DTimeDependentNode::onStart();
+#ifdef HAVE_OPENAL
   sound_buffer->upToDate();
-  if( reader.get() ) reader->reset();
-  initALBuffers( sound_as_stream );
+  if( reader.get() ) {
+    reader->reset();
+    initALBuffers( sound_as_stream );
 
-  for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
-       i != parent_sound_nodes.end(); i++ ) {
-    alSourcei( (*i)->getALSourceId(), AL_BUFFER, 0 );
-	  if( !sound_as_stream ) {
-      alSourcei( (*i)->getALSourceId(), AL_BUFFER, al_buffers[0] );
-    } else {
-      alSourceQueueBuffers( (*i)->getALSourceId(), NR_STREAM_BUFFERS, 
-                            al_buffers );  
+    for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
+         i != parent_sound_nodes.end(); i++ ) {
+      alSourcei( (*i)->getALSourceId(), AL_BUFFER, 0 );
+      if( !sound_as_stream ) {
+        alSourcei( (*i)->getALSourceId(), AL_BUFFER, al_buffers[0] );
+      } else {
+        alSourceQueueBuffers( (*i)->getALSourceId(), NR_STREAM_BUFFERS, 
+                              al_buffers );  
+      }
+      alSourcePlay( (*i)->getALSourceId() );  
     }
-    alSourcePlay( (*i)->getALSourceId() );  
   }
+#endif
 }
 
 void X3DSoundSourceNode::onStop() {
-  cerr << "Stop" << endl;
   X3DTimeDependentNode::onStop();
+  
+#ifdef HAVE_OPENAL
   for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
        i != parent_sound_nodes.end(); i++ ) {
     alSourceStop( (*i)->getALSourceId() );  
@@ -152,24 +157,27 @@ void X3DSoundSourceNode::onStop() {
   }
 
   if( reader.get() ) reader->reset();
+#endif
 }
 
 void X3DSoundSourceNode::onPause() {
-  cerr << "Pause" << endl;
   X3DTimeDependentNode::onPause();
+#ifdef HAVE_OPENAL
   for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
        i != parent_sound_nodes.end(); i++ ) {
     alSourcePause( (*i)->getALSourceId() );  
   }
+#endif
 }
 
 void X3DSoundSourceNode::onResume() {
-  cerr << "Resume" << endl;
   X3DTimeDependentNode::onResume();
+#ifdef HAVE_OPENAL
   for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
        i != parent_sound_nodes.end(); i++ ) {
     alSourcePlay( (*i)->getALSourceId() );  
   }
+#endif
 }
 
 
@@ -179,6 +187,7 @@ void X3DSoundSourceNode::TimeHandler::update() {
     static_cast< X3DSoundSourceNode * >( getOwner() );
   X3DTimeDependentNode::TimeHandler::update();
 
+#ifdef HAVE_OPENAL
   if( sound_source->isActive->getValue() &&
       !sound_source->isPaused->getValue() ) { 
     if( !sound_source->sound_as_stream ) {
@@ -266,10 +275,11 @@ void X3DSoundSourceNode::TimeHandler::update() {
       }
     }
   }
-  sound_source->traversing = false;
+  #endif
 }
 
 void X3DSoundSourceNode::ALrender() {
+#ifdef HAVE_OPENAL
   if( !al_buffers[0] ) {
     // Generate Buffers
     alGenBuffers(NR_STREAM_BUFFERS, al_buffers );
@@ -286,4 +296,38 @@ void X3DSoundSourceNode::ALrender() {
     alSourcef( (*i)->getALSourceId(), AL_PITCH, 
                pitch->getValue() );
   }
+#endif
+}
+
+
+    /// Register this sound node with the X3DSoundSourceNode. All 
+    /// X3DSoundSourceNodes that want to play this sound source must
+    /// register with this function.
+void X3DSoundSourceNode::registerSoundNode( X3DSoundNode *n ) {
+#ifdef HAVE_OPENAL
+  sound_buffer->upToDate();
+  if( !sound_as_stream ) {
+    alSourcei( n->getALSourceId(), AL_BUFFER, al_buffers[0] );
+    if( loop->getValue() )
+      alSourcei( n->getALSourceId(), AL_LOOPING, AL_TRUE );
+    else
+      alSourcei( n->getALSourceId(), AL_LOOPING, AL_FALSE );
+  } else {
+    alSourceQueueBuffers( n->getALSourceId(), NR_STREAM_BUFFERS, 
+                          al_buffers );  
+  }
+  alSourcef( n->getALSourceId(), AL_PITCH, 
+             pitch->getValue() );
+  if( isActive->getValue() && !isPaused->getValue() )
+    alSourcePlay( n->getALSourceId() );
+#endif
+  parent_sound_nodes.push_front( n );
+}
+
+/// Unregister this sound node with the X3DSoundSourceNode.   
+void X3DSoundSourceNode::unregisterSoundNode( X3DSoundNode *n ) {
+#ifdef HAVE_OPENAL
+  alSourcei( n->getALSourceId(), AL_BUFFER, 0 );
+#endif
+  parent_sound_nodes.remove( n );
 }

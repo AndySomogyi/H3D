@@ -68,10 +68,15 @@ AudioClip::AudioClip(
   type_name = "AudioClip";
   database.initFields( this );
   url->route( sound_buffer );
+
+#ifndef HAVE_OPENAL
+  cerr << "Warning: H3D API compiled without OpenAL. AudioClip nodes"
+       << " will be unusable." << endl;
+#endif
 }
 
 void AudioClip::ALrender() {
-
+#ifdef HAVE_OPENAL
   if( !al_buffers[0] ) {
     // Generate Buffers
     alGenBuffers(NR_STREAM_BUFFERS, al_buffers );
@@ -135,6 +140,7 @@ void AudioClip::ALrender() {
           alSourcePlay( (*i)->getALSourceId() );
       }
     } else {
+      duration_changed->setValue( -1, id );
       cerr << "Warning: None of the urls in the node \"" << getName() 
            << "\" with url [";
       for( MFString::const_iterator i = url->begin(); 
@@ -172,5 +178,5 @@ void AudioClip::ALrender() {
 
     */
   
- 
+#endif
 }

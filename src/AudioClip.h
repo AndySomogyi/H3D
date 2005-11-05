@@ -22,7 +22,7 @@
 //
 //
 /// \file AudioClip.h
-/// \brief UNIMPLEMENTED: Header file for AudioClip, X3D scene-graph node
+/// \brief Header file for AudioClip, X3D scene-graph node
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -35,9 +35,8 @@
 namespace H3D {
 
   /// \ingroup Nodes
-  /// \ingroup Unimplemented
   /// \class AudioClip
-  /// \brief UNIMPLEMENTED: An AudioClip node specifies audio data that can 
+  /// \brief An AudioClip node specifies audio data that can 
   /// be referenced by Sound nodes. 
   ///
   /// The description field specifies a textual description of the audio
@@ -45,12 +44,7 @@ namespace H3D {
   /// may choose to do so in addition to playing the sound. 
   ///
   /// The url field specifies the URL from which the sound is
-  /// loaded. Browsers shall support at least the wavefile format in
-  /// uncompressed PCM format (see [WAV]). It is recommended that browsers
-  /// also support the MIDI file type 1 sound format (see 2.[MIDI]) and the
-  /// MP3 compressed format (see 2.[I11172-1]). MIDI files are presumed to
-  /// use the General MIDI patch set. 9.2.1 URLs contains details on the url
-  /// field. 
+  /// loaded. 
   ///
   /// The loop, pauseTime, resumeTime, startTime, and stopTime inputOutput
   /// fields and the elapsedTime, isActive, and isPaused outputOnly fields,
@@ -65,11 +59,7 @@ namespace H3D {
   /// and no pitch_changed field is generated. If pitch is set to 2.0, the
   /// sound shall be played one octave higher than normal and played twice
   /// as fast. For a sampled sound, the pitch field alters the sampling rate
-  /// at which the sound is played. The proper implementation of pitch
-  /// control for MIDI (or other note sequence sound clips) is to multiply
-  /// the tempo of the playback by the pitch value and adjust the MIDI
-  /// Coarse Tune and Fine Tune controls to achieve the proper pitch
-  /// change. 
+  /// at which the sound is played. 
   ///
   /// A duration_changed event is sent whenever there is a new value for the
   /// "normal" duration of the clip. Typically, this will only occur when
@@ -90,11 +80,14 @@ namespace H3D {
   ///
   ///    t = (now - startTime) modulo (duration / pitch)
   /// 
-  class AudioClip : 
+  ///
+  /// \par Internal routes:
+  /// \dotfile AudioClip.dot
+  class H3DAPI_API AudioClip : 
     public X3DSoundSourceNode,
     public X3DUrlObject {
   public:
-    
+    /// Constructor.
     AudioClip( Inst< SFString>  _description      = 0,
                Inst< SFBool  >  _loop             = 0,
                Inst< SFNode  >  _metadata         = 0,
@@ -110,8 +103,10 @@ namespace H3D {
                Inst<  SFBool  >  _isPaused         = 0,
                Inst< TimeHandler > _time_handler   = 0 );
 
+    /// Perform the OpenAL calls to render the audio clip.
     virtual void ALrender();
 
+    /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   };
 }

@@ -30,8 +30,9 @@
 #define __X3DSOUNDNODE_H__
 
 #include "X3DChildNode.h"
-#include "al.h"
-
+#ifdef HAVE_OPENAL
+#include <al.h>
+#endif
 namespace H3D {
 
   /// \ingroup AbstractNodes
@@ -39,18 +40,19 @@ namespace H3D {
   /// \brief This abstract node type is the base for all Sound nodes.
   ///
   /// 
-  class X3DSoundNode : public X3DChildNode {
+  class H3DAPI_API X3DSoundNode : public X3DChildNode {
   public:
     
     /// Constructor.
     X3DSoundNode( Inst< SFNode>  _metadata = 0 );
-
+#ifdef HAVE_OPENAL
     /// Get the OpenAL source id that is used for playing this source.
     inline ALuint getALSourceId() { return al_source; }
 
   protected:
     // the handle of the OpenAL source that is used for this node.
     ALuint al_source;
+#endif
   };
 }
 

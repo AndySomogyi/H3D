@@ -30,6 +30,8 @@
 #define __AUDIOFILEREADER_H__
 
 #include "H3DSoundFileNode.h"
+
+#ifdef HAVE_LIBAUDIOFILE
 #include <audiofile.h>
 
 namespace H3D {
@@ -42,7 +44,7 @@ namespace H3D {
   /// Sound File, Audio Visual Research, Amiga IFF/8SVX, and NIST SPHERE. 
   /// Supported compression formats are currently G.711 mu-law and A-law and
   /// IMA and MS ADPCM.
-  class AudioFileReader : public H3DSoundFileNode {
+  class H3DAPI_API AudioFileReader : public H3DSoundFileNode {
   public:
 
     /// Constructor.
@@ -115,4 +117,5 @@ namespace H3D {
   };
 }
 
+#endif
 #endif
