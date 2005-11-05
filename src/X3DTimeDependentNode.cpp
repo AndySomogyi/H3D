@@ -130,11 +130,6 @@ void X3DTimeDependentNode::TimeHandler::activate( H3DTime time ) {
 void X3DTimeDependentNode::TimeHandler::deactivate( H3DTime time ) {
   X3DTimeDependentNode *time_node = 
     static_cast< X3DTimeDependentNode * >( getOwner() );
-  H3DTime stop_time = time_node->stopTime->getValue();
-  H3DTime elapsed_time = time_node->elapsedTime->getValue();
-  time_node->elapsedTime->setValue( elapsed_time + 
-                                    stop_time - value,
-                                    time_node->id ); //??
   time_node->isActive->setValue( false, time_node->id );
   time_node->onStop();
 }
