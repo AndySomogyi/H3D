@@ -36,11 +36,12 @@
 #include <iostream>
 
 using namespace std;
+#include "Threads.h"
+#include <errno.h>
+
 #ifdef HAVE_OPENHAPTICS
 #include <HD/hd.h>
 #endif
-#include "Threads.h"
-#include <errno.h>
 
 using namespace H3D;
 using namespace std;

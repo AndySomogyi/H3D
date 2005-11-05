@@ -29,12 +29,11 @@
 #ifndef __HLHAPTICSDEVICE_H__
 #define __HLHAPTICSDEVICE_H__
 
+#include "H3DHapticsDevice.h"
+#include "DeviceLog.h"
 #ifdef HAVE_OPENHAPTICS
 #include <HL/hl.h>
 #endif
-#include "H3DHapticsDevice.h"
-#include "DeviceLog.h"
-
 #include "GL/glew.h"
 namespace H3D {
   /// \ingroup Nodes

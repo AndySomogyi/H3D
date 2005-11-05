@@ -33,6 +33,47 @@
 #ifndef __H3DApi_H__
 #define __H3DApi_H__
 
+/// Undef if you do not have OpenHaptics(www.sensable.com) installed. 
+/// Haptics will then be disabled.
+#define HAVE_OPENHAPTICS
+
+/// Undef if you do not have OpenAL(www.openal.org) installed. Sounds will
+/// then be disabled.
+#define HAVE_OPENAL
+
+/// Undef if you do not have libvorbis(www.vorbis.com) installed. Ogg Vorbis
+/// sound files will then not be supported.
+#define HAVE_LIBVORBIS
+
+///Undef if you do not have libaudiofile(www.68k.org/~michael/audiofile)
+/// installed. Most sound files will then not be supported.
+#define HAVE_LIBAUDIOFILE
+
+/// Undef if you do not have the NVIDIA CG Toolkit
+/// (developer.nvidia.com/object/cg_toolkit.html) installed. 
+/// CG shader nodes will then not be supported.
+#define HAVE_CG
+
+/// Undef if you do not have FTGL(homepages.paradise.net.nz/henryj/code)
+/// installed. Text nodes will then not be supported.
+#define HAVE_FTGL
+
+/// Undef if you do not have FreeType(www.freetype.org)
+/// installed. Text nodes will then not be supported.
+#define HAVE_FREETYPE
+
+/// Undef if you do not have 3dxware(www.3dconnexion.com) installed.
+/// SpaceWareSensor node will then not be supported.
+#define HAVE_3DCONNEXION
+
+/// Undef if you do not have Python(www.python.org) installed.
+/// PythonScript node will then not be supported.
+#define HAVE_PYTHON
+
+/// Undef if you do not have FreeImage(freeimage.sourceforge.net) installed.
+/// ImageTexture nodes will not be able to read image files.
+#define HAVE_FREEIMAGE
+
 // The following ifdef block is the standard way of creating macros
 // which make exporting from a DLL simpler. All files within this DLL
 // are compiled with the H3DAPI_EXPORTS symbol defined on the command
@@ -67,5 +108,25 @@
 #define H3DAPI_API 
 #define HAVE_SYS_TIME_H
 #endif
+
+
+namespace H3D {
+  /// Function for determining if the machine we are running on is uses
+  /// little endian byte order or not.
+  inline bool isLittleEndian() {
+    union probe{ 
+      unsigned int num;
+      unsigned char bytes[sizeof(unsigned int)];
+    };
+    //initialize first member of p with unsigned 1
+    probe p = { 1U };
+    // in a big endian architecture, p.bytes[0] equals 0  
+    bool little_endian = (p.bytes[0] == 1U); 
+    return little_endian;
+  }
+}
+
 #endif
+
+
 

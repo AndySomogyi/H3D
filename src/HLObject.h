@@ -29,11 +29,11 @@
 #ifndef __HLOBJECT_H__
 #define __HLOBJECT_H__
 
+#include "H3DApi.h"
+
 #ifdef HAVE_OPENHAPTICS
 #include <HL/hl.h>
 #endif
-#include "H3DApi.h"
-
 
 namespace H3D {
 
