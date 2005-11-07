@@ -69,7 +69,7 @@ extern "C" {
 #endif
   void __attribute__((constructor)) initAPI( void ) {
     XERCES_CPP_NAMESPACE_USE
-#ifdef FREEIMAGE
+#ifdef HAVE_FREEIMAGE
     FreeImage_Initialise();
 #endif
 #ifdef LINUX
