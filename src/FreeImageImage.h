@@ -31,8 +31,10 @@
 
 #include "H3DApi.h"
 #include "Image.h"
-#include "FreeImage.h"
 #include "Exception.h"
+
+#ifdef HAVE_FREEIMAGE
+#include <FreeImage.h>
 
 namespace H3D {
   /// Thrown when the FIBITMAP * we encapsulate has a color type we 
@@ -120,6 +122,7 @@ namespace H3D {
     
 }
 
+#endif // HAVE_FREEIMAGE
 #endif
 
 

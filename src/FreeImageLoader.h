@@ -31,8 +31,11 @@
 #ifndef __FREEIMAGELOADER_H__
 #define __FREEIMAGELOADER_H__
 
-#include "FreeImageImage.h"
 #include "H3DImageLoaderNode.h"
+
+#ifdef HAVE_FREEIMAGE
+
+#include "FreeImageImage.h"
 
 namespace H3D {
   /// \ingroup Nodes
@@ -69,8 +72,16 @@ namespace H3D {
     /// TODO: Implement 
     ////virtual Image *loadImage( const istream &is ) = 0;
     
+    /// Returns true if the node supports the filetype of the file
+    /// specified by url.
+    static bool supportsFileType( const string &url );
+
     static H3DNodeDatabase database;    
+
+    /// Register this node to the H3DSoundFileNodes available.
+    static FileReaderRegistration reader_registration;
   };
 }
 
+#endif // HAVE_FREEIMAGE
 #endif

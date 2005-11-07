@@ -26,6 +26,7 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
+
 #include "PythonScript.h"
 #include "X3DTypes.h"
 #include "X3DFieldConversion.h"
@@ -35,6 +36,8 @@
 #include "X3DSAX2Handlers.h"
 #include "MFNode.h"
 #include "PythonMethods.h"
+
+#ifdef HAVE_PYTHON
 
 #include <string>
 #include <algorithm>
@@ -198,3 +201,4 @@ void PythonScript::initialize() {
   }   
 }
 
+#endif // HAVE_PYTHON

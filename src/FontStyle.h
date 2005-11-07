@@ -32,6 +32,10 @@
 
 #include "X3DFontStyleNode.h"
 
+#if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
+#include <FTGLTextureFont.h>
+#endif
+
 namespace H3D {
 
   /// \ingroup Nodes
@@ -164,7 +168,7 @@ namespace H3D {
                Inst< SFString > _style       = 0,
                Inst< SFBool   > _topToBottom = 0,
                Inst< SFString > _renderType  = 0 );
-
+#if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
     /// Build Character instances for all characters that will be allowed
     /// for use by this font node. For Windows wglUseFontOutlines will 
     /// be used to generate polygon versions of the characters of the font.
@@ -240,6 +244,7 @@ namespace H3D {
     /// Get the bounding box dimensions of the 3d-representation of
     /// the character.
     virtual Vec3f charDimensions( unsigned char c ) {
+      
       H3DFloat default_size = font->Ascender() - font->Descender();
       H3DFloat scale_factor = size->getValue() / default_size;
       char t[2];  t[0]=c; t[1]='\0';
@@ -258,6 +263,7 @@ namespace H3D {
     /// Gets the justification of the text in the minor alignment direction.
     virtual Justification getMinorJustification();
 
+#endif
     /// The family field contains a case-sensitive MFString value that 
     /// specifies a sequence of font family names in preference order. 
     /// See the 
@@ -358,9 +364,11 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   protected:
+#if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
     /// FTGL container class for all glyphs in the current font, used to
     /// measure bounding  boxes, render, advance, etc.
     FTFont* font;   
+#endif
   };
 }
 

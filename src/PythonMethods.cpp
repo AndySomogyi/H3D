@@ -41,6 +41,9 @@
 #include "Scene.h"
 #include <sstream>
 #include <cctype>
+
+#ifdef HAVE_PYTHON
+
 using namespace H3D;
 using namespace PythonInternals;
 
@@ -1432,3 +1435,5 @@ call the base class __init__ function." );
 
  
 }
+
+#endif // HAVE_PYTHON

@@ -32,6 +32,8 @@
 #include "Exception.h"
 #include "H3DScriptNode.h"
 
+#ifdef HAVE_PYTHON
+
 namespace H3D {
   
   /// \ingroup Nodes 
@@ -91,4 +93,5 @@ namespace H3D {
   };
 }
 
+#endif // HAVE_PYTHON
 #endif

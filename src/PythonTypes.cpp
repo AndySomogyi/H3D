@@ -33,6 +33,8 @@
 #include "X3DFieldConversion.h"
 #include "H3DDynamicFieldsObject.h"
 
+#ifdef HAVE_PYTHON
+
 #if defined(_MSC_VER)
 // undefine _DEBUG since we want to always link to the release version of
 // python and pyconfig.h automatically links debug version if _DEBUG is
@@ -2465,3 +2467,5 @@ self, name, field_type, access_type )" );
     return 0;
   }
 }
+
+#endif // HAVE_PYTHON

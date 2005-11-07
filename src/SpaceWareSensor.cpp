@@ -37,11 +37,13 @@
 #define OS_WIN32
 #endif
 
+#ifdef HAVE_3DXWARE
 extern "C" {
 #include <si.h>
 #include <siapp.h>
   extern  SpwRetVal SpwErrorVal;
 }
+#endif
 
 #include <process.h>
 
@@ -82,7 +84,8 @@ namespace SpaceWareSensorInternal {
   H3D_API_EXCEPTION( CouldNotInitSpaceWare );
   H3D_API_EXCEPTION( CreateWindowError );
   H3D_API_EXCEPTION( WindowGetMessageError );
-  
+
+#ifdef HAVE_3DXWARE
 #ifdef WIN32
   // Help function for getting a string of the current
   // error returned from GetLastError.
@@ -259,7 +262,8 @@ namespace SpaceWareSensorInternal {
     }
     return 1;
   }
-#endif
+#endif // WIN32
+#endif // HAVE_3DXWARE
 }
 
 SpaceWareSensor::SpaceWareSensor( 
@@ -346,26 +350,35 @@ SpaceWareSensor::SpaceWareSensor(
   rotationScale->route( instantRotation, id  );
   instantRotation->route( accumulatedRotation, id  );
 
-#ifndef WIN32
+#ifndef HAVE_3DXWARE
+#ifdef WIN32
+  cerr << "Warning: H3D API compiled without 3Dxware. SpaceWareSensor node "
+       << "will be unusable." << endl;
+#else
   cerr << "Warning: SpaceWareSensor only supported on Windows platform." 
        << endl;
+#endif
 #endif
 }
 
 SpaceWareSensor::~SpaceWareSensor() {
+#ifdef HAVE_3DXWARE
 #ifdef WIN32
   CloseHandle( thread_handle );
+#endif
 #endif
 }
 
 void SpaceWareSensor::initialize() {
   X3DSensorNode::initialize();
+#ifdef HAVE_3DXWARE
 #ifdef WIN32
   thread_handle =
     (HANDLE) _beginthreadex( NULL, 0,
                              SpaceWareSensorInternal::spaceWareThread,
                              this,
                              0, 0 );
+#endif
 #endif
   
 }

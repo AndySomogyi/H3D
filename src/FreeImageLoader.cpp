@@ -31,9 +31,24 @@
 
 #include "FreeImageLoader.h"
 
+#ifdef HAVE_FREEIMAGE
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase FreeImageLoader::database( "FreeImageLoader", 
                                            &(newInstance<FreeImageLoader>), 
                                            typeid( FreeImageLoader ) );
+
+H3DImageLoaderNode::FileReaderRegistration 
+FreeImageLoader::reader_registration(
+                            "FreeImageLoader",
+                            &(newImageLoaderNode< FreeImageLoader >),
+                            &FreeImageLoader::supportsFileType 
+                            );
+
+bool FreeImageLoader::supportsFileType( const string &url ) {
+  FREE_IMAGE_FORMAT format = FreeImage_GetFileType( url.c_str() );
+  return format != FIF_UNKNOWN;
+}
+
+#endif // HAVE_FREEIMAGE

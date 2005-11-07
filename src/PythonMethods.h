@@ -34,7 +34,7 @@
 #include "X3DFieldConversion.h"
 #include "X3DTypeFunctions.h"
 
-
+#ifdef HAVE_PYTHON
 #if defined(_MSC_VER)
 // undefine _DEBUG since we want to always link to the release version of
 // python and pyconfig.h automatically links debug version if _DEBUG is
@@ -216,4 +216,5 @@ namespace H3D {
   };
 }
 
+#endif // HAVE_PYTHON
 #endif

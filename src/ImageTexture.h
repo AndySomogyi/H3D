@@ -30,7 +30,6 @@
 #define __IMAGETEXTURE_H__
 
 #include "X3DTexture2DNode.h"
-#include "FreeImageImage.h"
 #include "H3DImageLoaderNode.h"
 #include "X3DUrlObject.h"
 

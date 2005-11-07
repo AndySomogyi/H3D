@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "ImageTexture.h"
-#include "FreeImageLoader.h"
 
 using namespace H3D;
 
@@ -60,8 +59,6 @@ ImageTexture::ImageTexture(
   X3DUrlObject( _url ),
   imageLoader( _imageLoader ) {
 
-  imageLoader->push_back( new FreeImageLoader );
-
   type_name = "ImageTexture";
   database.initFields( this );
 
@@ -72,25 +69,37 @@ ImageTexture::ImageTexture(
 void ImageTexture::SFImage::update() {
   MFImageLoader *image_loaders = static_cast< MFImageLoader * >( routes_in[1] );
   MFString *urls = static_cast< MFString * >( routes_in[0] );
-  for( MFString::const_iterator i = urls->begin(); i != urls->end(); ++i ) {
-    for( MFImageLoader::const_iterator il = image_loaders->begin();
-         il != image_loaders->end();
-         il++ ) {
-      Image *image = static_cast< H3DImageLoaderNode * >(*il)->loadImage( *i );
-      if( image ) {
-        value = image;
-        return;
-      }
 
+  if( image_loaders->size() ) { 
+    for( MFString::const_iterator i = urls->begin(); i != urls->end(); ++i ) {
+      for( MFImageLoader::const_iterator il = image_loaders->begin();
+           il != image_loaders->end();
+           il++ ) {
+        Image *image = 
+          static_cast< H3DImageLoaderNode * >(*il)->loadImage( *i );
+        if( image ) {
+          value = image;
+          return;
+        }
+      }
     }
   }
+
+  for( MFString::const_iterator i = urls->begin(); i != urls->end(); ++i ) {
+    H3DImageLoaderNode *il = H3DImageLoaderNode::getSupportedFileReader( *i );
+    if( il ) {
+      value = il->loadImage( *i );
+      return;
+    }
+  }
+
   cerr << "Warning: None of the urls in ImageTexture with url [";
   for( MFString::const_iterator i = urls->begin(); i != urls->end(); ++i ) {  
     cerr << " \"" << *i << "\"";
   }
-  cerr << "] could be loaded. Either they don't exist or none of the "
-       << "specified ImageLoaders is able to load them (in " 
-       << getOwner()->getName() << ")" << endl;
+  cerr << "] could be loaded. Either they don't exist or the file format "
+       << "is not supported by any H3DImageLoaderNode that is available "
+       << "(in " << getOwner()->getName() << ")" << endl;
 
   value = NULL;
 }

@@ -33,6 +33,7 @@
 #include <AGL/agl.h>
 #endif
 
+#if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
 #include <FTGLTextureFont.h>
 #include <FTGLPolygonFont.h>
 #include <FTGLOutlineFont.h>
@@ -46,10 +47,11 @@
 #include <fontconfig/fontconfig.h>
 #include <string.h>
 #endif
+#endif
 
 using namespace H3D;
 
-
+#if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
 namespace FontStyleInternals {
 #if defined(__APPLE__) && defined(__MACH__)
 FT_Error  xFT_GetFile_From_Mac_Name( const char* fontName,
@@ -354,7 +356,7 @@ string FC_GetFontByName( const char *font_name ) {
 
 }
 
-
+#endif
 
 #define DEFAULT_SERIF_FONT "Times New Roman"
 #define DEFAULT_SANS_FONT "Helvetica"
@@ -401,8 +403,11 @@ FontStyle::FontStyle(
   spacing    ( _spacing     ),
   style      ( _style       ),
   topToBottom( _topToBottom ),
-  renderType ( _renderType  ),
-  font( NULL ) {
+  renderType ( _renderType  )
+#if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
+  ,font( NULL )
+#endif
+ {
 
   type_name = "FontStyle";
   
@@ -418,8 +423,14 @@ FontStyle::FontStyle(
   style->setValue( "PLAIN" );
   topToBottom->setValue( true );
   renderType->setValue( "TEXTURE" );
+
+#if !( defined( HAVE_FREETYPE ) && defined( HAVE_FTGL ) )
+  cerr << "Warning: H3D API compiled withour FTGL or FreeType. FontStyle"
+       << " nodes will be unusable." << endl;
+#endif
 }
 
+#if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
 void FontStyle::buildFonts() {
 
   if( fonts_built )
@@ -553,3 +564,5 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
     throw InvalidFontStyleJustify( s, serr.str(), H3D_FULL_LOCATION ); 
   }
 }
+
+#endif

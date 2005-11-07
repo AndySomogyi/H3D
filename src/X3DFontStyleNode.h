@@ -31,7 +31,6 @@
 
 #include "X3DNode.h"
 #include "GL/glew.h"
-#include <FTGLTextureFont.h>
 
 namespace H3D {
 
@@ -63,7 +62,7 @@ namespace H3D {
     /// for use by this font node. Characters are to be put into the 
     /// characters vector using its own value as an index. Also buildFonts
     /// has to be set to true when defining this function.
-    virtual void buildFonts() = 0;
+    virtual void buildFonts() {}
 
     /// Returns true if buildFonts has been called, false otherwise.
     inline bool fontsBuilt() {
@@ -104,19 +103,19 @@ namespace H3D {
     }
 
     /// Render the given character with this font.
-    virtual void renderChar( unsigned char c ) = 0;
+    virtual void renderChar( unsigned char c ) {}
 
     /// Get the dimensions in metres of the character given when 
     /// rendered with this font.
-    virtual Vec3f charDimensions( unsigned char c ) = 0;
+    virtual Vec3f charDimensions( unsigned char c ) { return Vec3f(); }
 
     /// Returns how many metres in the the positive y-direction from the
     /// origin the characters of this font use. 
-    virtual H3DFloat ascender() = 0;
+    virtual H3DFloat ascender() { return 0; }
 
     /// Returns how many metres in the the negative y-direction from the
     /// origin the characters of this font use. 
-    virtual H3DFloat descender() = 0;
+    virtual H3DFloat descender() { return 0; }
 
     /// Given a text string and an alignment of the text the function
     /// returns the dimensions of the bounding box of the 3d representation

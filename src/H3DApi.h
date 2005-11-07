@@ -64,7 +64,9 @@
 
 /// Undef if you do not have 3dxware(www.3dconnexion.com) installed.
 /// SpaceWareSensor node will then not be supported.
-#define HAVE_3DCONNEXION
+#ifdef WIN32
+#define HAVE_3DXWARE
+#endif
 
 /// Undef if you do not have Python(www.python.org) installed.
 /// PythonScript node will then not be supported.

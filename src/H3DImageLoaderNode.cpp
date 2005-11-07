@@ -21,25 +21,26 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file H3DSoundFileNode.cpp
-/// \brief CPP file for H3DSoundFileNode
+/// \file H3DImageLoaderNode.cpp
+/// \brief CPP file for H3DImageLoaderNode
 ///
 //
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "H3DSoundFileNode.h"
+#include "H3DImageLoaderNode.h"
 
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
-list< H3DSoundFileNode::FileReaderRegistration > 
-*H3DSoundFileNode::registered_file_readers; 
+list< H3DImageLoaderNode::FileReaderRegistration > 
+*H3DImageLoaderNode::registered_file_readers; 
 
-bool H3DSoundFileNode::initialized = false; 
+bool H3DImageLoaderNode::initialized = false; 
 
-H3DSoundFileNode *H3DSoundFileNode::getSupportedFileReader( const string &url ) {
-  if( initialized ) { 
+H3DImageLoaderNode *H3DImageLoaderNode::getSupportedFileReader( 
+   const string &url ) {
+  if( initialized ) {
     for( list< FileReaderRegistration >::iterator i = 
            registered_file_readers->begin();
          i != registered_file_readers->end(); i++ ) {

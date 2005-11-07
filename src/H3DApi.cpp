@@ -25,7 +25,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "H3DApi.h"
-#include "FreeImage.h"
+#ifdef HAVE_FREEIMAGE
+#include <FreeImage.h>
+#endif
 #include <xercesc/util/PlatformUtils.hpp>
 #include "Exception.h"
 #ifdef LINUX
@@ -42,7 +44,9 @@ BOOL APIENTRY DllMain( HANDLE hModule,
   XERCES_CPP_NAMESPACE_USE
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH: {
+#ifdef HAVE_FREEIMAGE
       FreeImage_Initialise();
+#endif
       XMLPlatformUtils::Initialize();
       break;
     }
@@ -51,7 +55,9 @@ BOOL APIENTRY DllMain( HANDLE hModule,
     case DLL_THREAD_DETACH:
       break;
     case DLL_PROCESS_DETACH:
+#ifdef HAVE_FREEIMAGE
       FreeImage_DeInitialise();
+#endif
       XMLPlatformUtils::Terminate();
       break;
     }
@@ -63,7 +69,9 @@ extern "C" {
 #endif
   void __attribute__((constructor)) initAPI( void ) {
     XERCES_CPP_NAMESPACE_USE
+#ifdef FREEIMAGE
     FreeImage_Initialise();
+#endif
 #ifdef LINUX
     FcInit();
 #endif 
@@ -71,7 +79,9 @@ extern "C" {
   }
   void __attribute__((destructor)) finiAPI( void ) {
     XERCES_CPP_NAMESPACE_USE
+#ifdef HAVE_FREEIMAGE
     FreeImage_DeInitialise();
+#endif
     XMLPlatformUtils::Terminate();
   }
 #ifdef __cplusplus

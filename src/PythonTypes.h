@@ -29,12 +29,15 @@
 #ifndef __PYTHONTYPES_H__
 #define __PYTHONTYPES_H__
 
+
 #include "Exception.h"
 #include "X3DTypes.h"
 #include "X3DFieldConversion.h"
 #include "Node.h"
 #include "H3DApi.h"
 #include "PyTypeWrapper.h"
+
+#ifdef HAVE_PYTHON
 
 #if defined(_MSC_VER)
 // undefine _DEBUG since we want to always link to the release version of
@@ -703,4 +706,4 @@ namespace H3D {
 }
   
 #endif
-
+#endif
