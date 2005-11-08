@@ -137,14 +137,11 @@ void PythonScript::initialiseParser() {
 void PythonScript::loadScript( const string &script ) {
   module = PyImport_AddModule( (char*)name.c_str() );
   module_dict = PyModule_GetDict( static_cast< PyObject * >( module ) );
-  MFNode *x = references.get();
   PyObject *ref = (PyObject*)PythonInternals::fieldAsPythonObject( references.get() );
   PyDict_SetItem( (PyObject *)module_dict, 
                   PyString_FromString( "references" ), 
                   ref );
 
-  PyObject *main = PyImport_AddModule( "__main__" );
-  PyObject *main_dict = PyModule_GetDict( main );
   if (PyDict_GetItemString( static_cast< PyObject * >(module_dict), "__builtins__") == NULL) {
     if (PyDict_SetItemString( static_cast< PyObject * >(module_dict), "__builtins__",
                              PyEval_GetBuiltins()) != 0)

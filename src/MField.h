@@ -48,8 +48,8 @@ namespace H3D {
     /// \param nr_elements The number of values in the mfield.
     /// \param size The size in bytes of the each value stored in the data.
     /// \returns 0 if successful, -1 otherwise.
-    virtual int setValueFromVoidPtr( void *data, int nr_elements, 
-                                     int size, int id = 0 ) = 0;
+    virtual int setValueFromVoidPtr( void *data, unsigned int nr_elements, 
+                                     unsigned int size, int id = 0 ) = 0;
 
     /// Get the value of the data copied into a memory buffer.
     /// \param data Buffer to copy the data into.
@@ -58,8 +58,8 @@ namespace H3D {
     /// \param size The size of the buffer.
     /// \returns If successful: The number of bytes that was copied into the 
     /// Otherwise -1.
-    virtual int getValueAsVoidPtr( void *data, int &nr_elements,
-                                   int size, int id = 0 ) = 0;
+    virtual int getValueAsVoidPtr( void *data, unsigned int &nr_elements,
+                                   unsigned int size, int id = 0 ) = 0;
 
     /// Returns the size in bytes of the value type the mfield encapsulates.
     virtual unsigned int valueTypeSize() = 0;
@@ -249,15 +249,15 @@ namespace H3D {
     /// \param size The size in bytes of the each value stored in the data.
     /// \returns 0 if successful, -1 otherwise.
     inline virtual int setValueFromVoidPtr( void *data, 
-                                            int nr_elements, 
-                                            int len, int id = 0 ) {
+                                            unsigned int nr_elements, 
+                                            unsigned int len, int id = 0 ) {
       this->checkAccessTypeSet( id );
           
       if( len != sizeof( value_type ) * nr_elements )
       return -1;
       
       vector< Type > new_data( nr_elements );
-      for( int i = 0; i < nr_elements; i++ ) {
+      for( unsigned int i = 0; i < nr_elements; i++ ) {
         new_data[i] = static_cast< value_type * >( data )[i];
       }
       this->value.swap( new_data );
@@ -272,9 +272,11 @@ namespace H3D {
     /// \param size The size of the buffer.
     /// \returns If successful: The number of bytes that was copied into the 
     /// Otherwise -1.
-    inline virtual int getValueAsVoidPtr( void *data, int &nr_elements,
-                                          int len, int id = 0 ) {
-      int size = sizeof( value_type );
+    inline virtual int getValueAsVoidPtr( void *data, 
+					  unsigned int &nr_elements,
+                                          unsigned int len, 
+					  int id = 0 ) {
+      unsigned int size = sizeof( value_type );
       nr_elements = this->value.size();
       if( len < size * nr_elements ) {
         return -1;
@@ -285,7 +287,7 @@ namespace H3D {
 
       this->upToDate();
 
-      for( int i = 0; i < nr_elements; i++ ) {
+      for( unsigned int i = 0; i < nr_elements; i++ ) {
         data_ptr[i] = value[i];
       }
       return size * nr_elements;

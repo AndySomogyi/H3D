@@ -44,7 +44,8 @@ namespace H3D {
     /// \param data A pointer to the data.
     /// \param size The size in bytes of the value stored in data.
     /// \returns 0 if successful, -1 otherwise.
-    virtual int setValueFromVoidPtr( void *data, int size, int id = 0 ) = 0;
+    virtual int setValueFromVoidPtr( void *data, unsigned int size, 
+				     int id = 0 ) = 0;
 
     /// Get the value of the data copied into a memory buffer.
     /// \param data Buffer to copy the data into.
@@ -52,7 +53,8 @@ namespace H3D {
     /// \returns If successful: The number of bytes that was copied into the 
     /// Otherwise -1.
     ///
-    virtual int getValueAsVoidPtr( void *data, int size, int id = 0 ) = 0;
+    virtual int getValueAsVoidPtr( void *data, unsigned int size, 
+				   int id = 0 ) = 0;
 
     /// Returns the size in bytes of the value type the sfield encapsulates.
     virtual unsigned int valueTypeSize() = 0;
@@ -86,7 +88,8 @@ namespace H3D {
     /// \param data A pointer to the data.
     /// \param size The size in bytes of the value stored in data.
     /// \returns 0 if successful, -1 otherwise.
-    inline virtual int setValueFromVoidPtr( void *data, int len, int id = 0 ) {
+    inline virtual int setValueFromVoidPtr( void *data, unsigned int len, 
+					    int id = 0 ) {
       if( len != sizeof( value_type ) )
         return -1;
       setValue( *( static_cast< Type * >( data ) ), id );
@@ -99,8 +102,9 @@ namespace H3D {
     /// \returns If successful: The number of bytes that was copied into the 
     /// Otherwise -1.
     ///
-    inline virtual int getValueAsVoidPtr( void *data, int len, int id = 0 ) {
-      int size = sizeof( value_type );
+    inline virtual int getValueAsVoidPtr( void *data, unsigned int len, 
+					  int id = 0 ) {
+      unsigned int size = sizeof( value_type );
       if( len < size ) {
         return -1;
       }

@@ -94,7 +94,7 @@ void ComposedCubeMapTexture::render() {
     
     if( back_tex && front_tex && left_tex && 
         right_tex && top_tex && bottom_tex ) {
-      H3DInt32 dim;
+      unsigned int dim;
       bool textures_ok = true;
       Image *i = back_tex->image->getValue();
       if( i ) 

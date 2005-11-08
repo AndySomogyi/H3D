@@ -173,7 +173,7 @@ void DynamicShape::SFMotion::update() {
 
 
 void DynamicShape::SFMotion::updateState( LMState &state, H3DTime dt ) {
-  DynamicShape *ds = static_cast<DynamicShape*>(owner);
+  //DynamicShape *ds = static_cast<DynamicShape*>(owner);
 
   // only perform integration if the momentum is non-zero
   // H3DFloat stepsize=0.01; // 1ms
