@@ -70,8 +70,8 @@ unsigned int OggFileReader::load( const string &_url ) {
       fclose( f );
       return 0;
     } else {
-      vorbis_info = ov_info(&ogg_file, -1);
-      vorbis_comment = ov_comment(&ogg_file, -1);
+      info = ov_info(&ogg_file, -1);
+      comment = ov_comment(&ogg_file, -1);
     }
   } else {
     return 0;

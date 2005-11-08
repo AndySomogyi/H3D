@@ -33,12 +33,6 @@
 #include "X3DSoundNode.h"
 #include "X3DSoundSourceNode.h"
 
-#ifdef HAVE_OPENAL
-#include <al.h>
-#include <alc.h>
-#include <alut.h>
-#endif 
-
 namespace H3D {
 
   /// \ingroup Nodes

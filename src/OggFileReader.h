@@ -75,7 +75,7 @@ namespace H3D {
     /// Returns the number of channels per second for the current PCM 
     /// data stream.
     virtual unsigned int nrChannels() {
-      return vorbis_info->channels;
+      return info->channels;
     }
     
     /// Returns the number of bits for a sample.
@@ -92,7 +92,7 @@ namespace H3D {
     /// Returns the number of samples per second for the current PCM 
     /// data stream.
     virtual unsigned int samplesPerSecond() {
-      return vorbis_info->rate;
+      return info->rate;
     }
     
     /// Returns true if the node supports the filetype of the file
@@ -107,8 +107,8 @@ namespace H3D {
 
   protected:
     OggVorbis_File ogg_file;
-    vorbis_info* vorbis_info;
-    vorbis_comment *vorbis_comment;
+    vorbis_info* info;
+    vorbis_comment *comment;
     string url;
   };
 }

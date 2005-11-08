@@ -37,9 +37,16 @@
 #include <fstream>
 
 #ifdef HAVE_OPENAL
+#ifdef WIN32
 #include <al.h>
 #include <alc.h>
-#include <alut.h>
+#elif defined( MACOSX )
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+#else
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
 #endif 
 
 #define NR_STREAM_BUFFERS 3
