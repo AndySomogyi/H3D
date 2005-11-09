@@ -160,6 +160,6 @@ void Box::traverseSG( TraverseInfo &ti ) {
     ti.addHapticShapeToAll( new HLFeedbackShape( this,
                                                  ti.getCurrentSurface(),
                                                  ti.getAccForwardMatrix(),
-												 8 ) );
+                                                 24 ) );
   }
 }
