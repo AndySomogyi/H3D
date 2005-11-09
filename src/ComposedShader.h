@@ -36,21 +36,23 @@
 
 namespace H3D {
 
+  /// \ingroup Nodes
   /// \class ComposedShader
   /// \brief The ComposedShader node defines a shader where the individual 
   /// source files are not individually programmable. All access to the
   /// shading capabilities is defined through a single interface that 
   /// applies to all parts.
   ///
-  /// EXAMPLE  OpenGL Shading Language (GLSL)
+  /// In H3D API this is the shader node to use if you want to use the
+  /// GLSL shading language. If you want to use CG, use either the 
+  /// ProgramShader or PackagedShader nodes.
   ///
   /// The isValid field adds an additional semantic indicating whether 
   /// the current shader parts can be linked together to form a complete
   /// valid shader program.
   /// 
   /// The activate field forces the shader to activate the contained 
-  /// objects. The conditions under which a activate may be required
-  /// are described in I.5 Event model.
+  /// objects. 
   class H3DAPI_API ComposedShader : 
     public X3DShaderNode, 
     public X3DProgrammableShaderObject {

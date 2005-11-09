@@ -36,6 +36,7 @@
 
 namespace H3D {
 
+  /// \ingroup Nodes
   /// \class ProgramShader
   /// \brief he ProgramShader node defines a shader that can consist 
   /// of one or more individually programmable, self contained pieces. 
@@ -43,6 +44,10 @@ namespace H3D {
   /// self-contained source that does not rely on any other source file
   /// and can manage one part of the programmable pipeline (e.g., vertex or
   /// fragment processing). 
+  /// 
+  /// This node can be used with the CG shading language in H3D API. You 
+  /// can also use the PackagedShader node with CG. If you want to use GLSL
+  /// you will have to use the ComposedShader node.
   ///
   /// The programs field consists of zero or more ShaderProgram node 
   /// instances. In general, only two ShaderProgram instances will be needed:

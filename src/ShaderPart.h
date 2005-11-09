@@ -31,10 +31,11 @@
 
 #include "X3DNode.h"
 #include "X3DUrlObject.h"
-#include "GL/glew.h"
+#include <GL/glew.h>
 
 namespace H3D {
 
+  /// \ingroup Nodes
   /// \class ShaderPart
   /// \brief The ShaderPart node defines the source for a single object to
   /// be used by a ComposedShader node. The source is not required to be

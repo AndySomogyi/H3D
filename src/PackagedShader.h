@@ -41,7 +41,19 @@
 
 namespace H3D {
 
+  /// \ingroup Nodes
   /// \class PackagedShader
+  /// \briefA PackagedShader node describes a single file that may contain a 
+  /// number of shaders and combined effects.
+  ///
+  /// The shader source is read from the URL specified by the url field. 
+  ///
+  /// The language field may be used to optionally determine the language type.
+  /// Only the CG language strings are supported by H3D API. If you want to
+  /// use GLSL use the ComposedShader node.
+  ///
+  /// The main function of the CG vertex shader must be named "vert_main" and
+  /// the main function of the fragment shader must be named "frag_main".
   class H3DAPI_API PackagedShader : 
     public X3DShaderNode, 
     public X3DUrlObject,

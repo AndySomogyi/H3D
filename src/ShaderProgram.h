@@ -42,6 +42,7 @@
 
 namespace H3D {
 
+  /// \ingroup Nodes
   /// \class ShaderProgram
   /// \brief The ShaderProgram node provides the source and interface to a 
   /// self contained program that occupies one part of the rendering process: 
