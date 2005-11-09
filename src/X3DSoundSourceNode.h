@@ -207,6 +207,8 @@ namespace H3D {
     /// Indicates if the current sounds source is being streamed or not.
     bool sound_as_stream;
 
+    /// Field that calls ALrender() when a field routed to it
+    /// has generated an event.
     auto_ptr< ALSoundBuffer > sound_buffer;
  };
 }

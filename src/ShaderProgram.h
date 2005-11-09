@@ -53,6 +53,9 @@ namespace H3D {
   /// Shader source files shall be plain text encoded as specified for MIME 
   /// type text/plain and interpreted according to the containing node's 
   /// language definition.
+  ///
+  /// \par Internal routes:
+  /// \dotfile ShaderProgram.dot
   class H3DAPI_API ShaderProgram : 
     public X3DNode, 
     public X3DUrlObject,
@@ -107,7 +110,7 @@ namespace H3D {
     /// as a vertex shader, fragment shader, or other future-defined shader 
     /// type. Valid values are "VERTEX" and "FRAGMENT".
     /// 
-    /// <b>Access type:</b> outputOnly \n
+    /// <b>Access type:</b> initializeOnly \n
     /// \dotfile ShaderProgram_type.dot
     auto_ptr< SFString > type;
 

@@ -54,6 +54,9 @@ namespace H3D {
   ///
   /// The main function of the CG vertex shader must be named "vert_main" and
   /// the main function of the fragment shader must be named "frag_main".
+  ///
+  /// \par Internal routes:
+  /// \dotfile PackagedShader.dot
   class H3DAPI_API PackagedShader : 
     public X3DShaderNode, 
     public X3DUrlObject,

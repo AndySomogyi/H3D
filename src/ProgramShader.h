@@ -56,6 +56,9 @@ namespace H3D {
   ///
   /// The isValid field may add an additional semantic to indicate whether
   /// all parts are available.  
+  ///
+  /// \par Internal routes:
+  /// \dotfile ProgramShader.dot
   class H3DAPI_API ProgramShader : 
     public X3DShaderNode {
   public:

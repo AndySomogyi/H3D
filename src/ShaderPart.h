@@ -48,6 +48,9 @@ namespace H3D {
   /// When the url field contains no values ([]), this object instance is 
   /// ignored. Shader source files shall be plain text encoded as specified
   /// for MIME type text/plain and interpreted according to the type field.
+  ///
+  /// \par Internal routes:
+  /// \dotfile ShaderPart.dot
   class H3DAPI_API ShaderPart : 
     public X3DNode, 
     public X3DUrlObject {
@@ -83,7 +86,7 @@ namespace H3D {
     /// as a vertex shader, fragment shader, or other future-defined shader 
     /// type. Valid values are "VERTEX" and "FRAGMENT".
     /// 
-    /// <b>Access type:</b> outputOnly \n
+    /// <b>Access type:</b> initializeOnly \n
     /// \dotfile ShaderPart_type.dot
     auto_ptr< SFString > type;
 

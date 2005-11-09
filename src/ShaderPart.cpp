@@ -47,7 +47,7 @@ namespace ShaderPartInternals {
 ShaderPart::ShaderPart( Inst< SFNode         > _metadata,
                         Inst< MFString       > _url ,
                         Inst< SFString       > _type,
-						Inst< SFShaderString > _shader_string ):
+                        Inst< SFShaderString > _shader_string ):
   X3DNode( _metadata ),
   X3DUrlObject( _url ),
   shaderString( _shader_string ),
@@ -55,6 +55,10 @@ ShaderPart::ShaderPart( Inst< SFNode         > _metadata,
   shader_handle( 0 ) {
   type_name = "ShaderPart";
   database.initFields( this );
+
+  shaderString->setOwner( this );
+  shaderString->setName( "shaderString" );
+
   
   type->setValue( "VERTEX", id );
   url->route( shaderString );

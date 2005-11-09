@@ -66,6 +66,8 @@ ShaderProgram::ShaderProgram( Inst< SFNode      > _metadata,
   database.initFields( this );
   displayList->setOwner( this );
   type->setValue( "VERTEX", id );
+
+  url->route( displayList );
 #ifdef HAVE_CG
   setCGProfile( "CG" );
 #endif

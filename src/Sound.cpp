@@ -91,6 +91,9 @@ Sound::Sound(
   soundSetup->setName( "soundSetup" );
   soundSetup->setOwner( this );
 
+  accForwardMatrix->setName( "accForwardMatrix" );
+  accForwardMatrix->setOwner( this );
+
   direction->setValue( Vec3f( 0, 0, 1 ) );
   intensity->setValue( 1 );
   location->setValue( Vec3f( 0, 0, 0 ) );
@@ -102,6 +105,7 @@ Sound::Sound(
   spatialize->setValue( true );
 
   
+  intensity->route( soundSetup );
   direction->route( soundSetup );
   location->route( soundSetup );
   maxBack->route( soundSetup );

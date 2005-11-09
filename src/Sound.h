@@ -281,6 +281,8 @@ namespace H3D {
     static ALCdevice *al_device;
     static ALCcontext *al_context;
 #endif
+    /// Field that calls ALrender() when a field routed to it
+    /// has generated an event.
     auto_ptr< ALSoundSetup > soundSetup;
 
     /// The matrix from local space to global space.
