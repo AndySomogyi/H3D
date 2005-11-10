@@ -225,7 +225,7 @@ BOOL GetFontFile(LPCTSTR lpszFontName,
 	while (GetNextNameValue(HKEY_LOCAL_MACHINE, strFont, szName, szData) == 
          ERROR_SUCCESS)
 	{
-		if (strnicmp(lpszFontName, szName, strlen(lpszFontName)) == 0)
+		if (_strnicmp(lpszFontName, szName, strlen(lpszFontName)) == 0)
 		{
 			strDisplayName = szName;
 			strFontFile = szData;

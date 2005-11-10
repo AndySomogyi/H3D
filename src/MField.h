@@ -348,7 +348,24 @@ namespace H3D {
     /// Get the value of an element of the MField.
     /// \param i The index of the element.
     inline virtual typename MField<Type>::const_reference 
-      getValueByIndex( typename BaseMField::size_type i, int id = 0 );
+    getValueByIndex( typename BaseMField::size_type i, int id = 0 ) {
+#ifdef DEBUG
+      cerr << "MField(" << name << ")::getValue()" << endl;
+#endif
+      // check that we have the correct access type
+      this->checkAccessTypeGet( id );
+      
+      // check that the field is up-to-date first
+      this->upToDate();
+      if( i < 0 || i >= this->value.size() ) {
+        stringstream s;
+        s << "Trying to access value outside the bounds of field "
+          << this->getFullName() << ". Field has size " << this->value.size()
+          << ". " << ends;
+        throw InvalidIndex( i, s.str(), H3D_FULL_LOCATION );
+      }
+      return this->value[i];    
+    }
 
     /// Set the value of the field.
     /// \param The new value.
@@ -358,7 +375,20 @@ namespace H3D {
     /// \param i The index of the value to set.
     /// \param t The new value.
     inline virtual void setValue( typename BaseMField::size_type i,
-                                  const Type &t, int id = 0  );
+                                  const Type &v, int id = 0  ) {
+#ifdef DEBUG
+      cerr << "MField< " << typeid( Type ).name() 
+           << " >(" << this->name << ")::setValue()" << endl;
+#endif
+      // check that we have the correct access type
+      this->checkAccessTypeSet( id );
+      this->value[i] = v; //.set( i, v );
+      // reset the event pointer since we want to ignore any pending
+      // events when the field is set to a new value.
+      this->event.ptr = NULL;
+      // generate an event.
+      this->startEvent();                                  
+    }
 
     /// Set the value of the field given a string. By default
     /// we try to parse the values according to the X3D/XML 
@@ -522,44 +552,7 @@ namespace H3D {
     this->upToDate();
     return this->value;
   }
-
-  template< class Type  >
-  inline void MField<Type >::setValue( typename BaseMField::size_type i,
-                                       const Type &v, int id ) {
-#ifdef DEBUG
-    cerr << "MField< " << typeid( Type ).name() 
-         << " >(" << this->name << ")::setValue()" << endl;
-#endif
-    // check that we have the correct access type
-    this->checkAccessTypeSet( id );
-    this->value[i] = v; //.set( i, v );
-    // reset the event pointer since we want to ignore any pending
-    // events when the field is set to a new value.
-    this->event.ptr = NULL;
-    // generate an event.
-    this->startEvent();                                  
-  }
     
-  template< class Type >
-  inline typename MField< Type >::const_reference MField< Type >::
-    getValueByIndex( typename BaseMField::size_type i, int id ) {
-#ifdef DEBUG
-    cerr << "MField(" << name << ")::getValue()" << endl;
-#endif
-    // check that we have the correct access type
-    this->checkAccessTypeGet( id );
-
-    // check that the field is up-to-date first
-    this->upToDate();
-    if( i < 0 || i >= this->value.size() ) {
-      stringstream s;
-      s << "Trying to access value outside the bounds of field "
-        << this->getFullName() << ". Field has size " << this->value.size()
-        << ". " << ends;
-      throw InvalidIndex( i, s.str(), H3D_FULL_LOCATION );
-    }
-    return this->value[i];    
-  }
 }
 
 #endif
