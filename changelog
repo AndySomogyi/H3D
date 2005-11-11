@@ -1,3 +1,58 @@
+Changes for version 1.3:
+
+New nodes:
+Arc2D
+ArcClose2D
+AudioClip
+Circle2D
+ComposedCubeMapTexture
+ComposedShader
+Disk2D
+DynamicShape
+FloatVertexAttribute
+GeneratedCubeMapTexture
+Matrix3fVertexAttribute
+Matrix4fVertexAttribute
+PackagedShader
+Polyline2D
+Polypoint2D
+ProgramShader
+ShaderPart
+ShaderProgram
+Sound
+TriangleSet2D
+	
+- Added erase and insert methods to MFields.
+
+- None object is now used in Python to represent a NULL node pointer.
+
+- Added lots of new member functions for MFields in Python, such as erase
+push_back, empty etc.
+
+- Several fixes to give better error messages in Python.
+
+- Fixed a bug in the Material node where the specular color was never 
+specified.
+	
+- Fixed a bug where texture coordinate generation was not turned off in 
+X3DComposedGeometryNode.
+
+- Added ROUTE_NO_EVENT keyword to X3D.
+
+- Fixed a bug in Background and TextureBackground where the front and back 
+textures were mixed up. Also there was a problem with one of the texture 
+coordinates for the top texture.
+
+- Added CAMERASPACEREFLECTIONVECTOR and CAMERASPACENORMAL texture
+coordinate generation modes to TextureCoordinateGenerator.
+
+- Fixed a bug with background rendering in stereo.
+
+- Fixes to compile with Visual Studio 2005.
+
+- Lots of other smaller bugfixes. See svn changelog at www.h3d.org:8080
+for details.
+
 Changes for version 1.2:
 
 New nodes:
