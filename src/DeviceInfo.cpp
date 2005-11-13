@@ -31,7 +31,7 @@
 #include "DeviceInfo.h"
 #include "X3DBindableNode.cpp"
 #include <GL/glew.h>
-#include <GL/gl.h>
+
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
