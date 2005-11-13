@@ -28,10 +28,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "ShaderFunctions.h"
 #include "ComposedShader.h"
 #include "X3DTexture2DNode.h"
 #include "X3DTexture3DNode.h"
-#include "ShaderFunctions.h"
 
 using namespace H3D;
 
