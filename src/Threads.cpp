@@ -43,6 +43,14 @@ using namespace std;
 #include <HD/hd.h>
 #endif
 
+#ifdef MACOSX
+#include <mach/mach_init.h>
+#include <mach/thread_policy.h>
+#include <mach/thread_act.h>
+#endif
+
+
+
 using namespace H3D;
 using namespace std;
 
@@ -106,6 +114,23 @@ void ConditionLock::broadcast() {
 
 void *Thread::thread_func( void * _data ) {
   Thread *thread = static_cast< Thread * >( _data );
+
+#ifdef MACOSX
+  // set thread priority
+  cerr << "SETTING REALTIME ON MAC" << endl;
+  struct thread_time_constraint_policy ttcpolicy;
+  int ret;
+  ttcpolicy.period=      100000;
+  ttcpolicy.computation=  10000;
+  ttcpolicy.constraint=  100000;
+  ttcpolicy.preemptible=  1;
+  if ((ret=thread_policy_set( mach_thread_self(),
+                              THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&ttcpolicy,
+                              THREAD_TIME_CONSTRAINT_POLICY_COUNT)) != KERN_SUCCESS) {
+    cerr << "set_realtime() failed" << endl;
+    return 0;
+  }
+#endif
   
 #ifdef WIN32
   HANDLE hTimer = NULL;
@@ -274,6 +299,7 @@ HapticThreadBase::HapticThreadBase() {
   sg_lock.lock();
   threads.push_back( this );
   sg_lock.unlock();
+
 }
 
 HapticThreadBase::~HapticThreadBase() {
