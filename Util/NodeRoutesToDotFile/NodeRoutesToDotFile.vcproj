@@ -23,7 +23,7 @@
 				InlineFunctionExpansion="2"
 				ImproveFloatingPointConsistency="TRUE"
 				OptimizeForProcessor="0"
-				AdditionalIncludeDirectories="&quot;..\..\External\Xerces-C-2.5.0\src&quot;;..\..\H3DNodeDatabase;..\..\H3DApi"
+				AdditionalIncludeDirectories="$(H3D_EXTERNAL_ROOT)\include\pthread;$(H3D_EXTERNAL_ROOT)\include;&quot;$(H3D_ROOT)\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;."
 				PreprocessorDefinitions="NDEBUG,_CONSOLE,WIN32,_WINDOWS,PLATFORM_WIN32"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -44,7 +44,7 @@
 				AdditionalDependencies="xerces-c_2.lib H3DAPI.lib"
 				OutputFile="$(OutDir)/NodeRoutesToDotFile.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\..\lib\vc7&quot;"
+				AdditionalLibraryDirectories="$(H3D_EXTERNAL_ROOT)\lib;&quot;$(H3D_ROOT)\build\win32\vc7\debug&quot;;"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="1"/>
 			<Tool
@@ -83,7 +83,7 @@
 				Optimization="0"
 				ImproveFloatingPointConsistency="TRUE"
 				OptimizeForProcessor="0"
-				AdditionalIncludeDirectories="&quot;..\..\External\Xerces-C-2.5.0\src&quot;;$(3DTOUCH_BASE)\include;.;..\..\src"
+				AdditionalIncludeDirectories="$(H3D_EXTERNAL_ROOT)\include\pthread;$(H3D_EXTERNAL_ROOT)\include;&quot;$(H3D_ROOT)\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;."
 				PreprocessorDefinitions="H3D_DOT_NODE_ROUTES;_DEBUG;_CONSOLE;WIN32;_WINDOWS;PLATFORM_WIN32;"
 				RuntimeLibrary="3"
 				DisableLanguageExtensions="FALSE"
@@ -103,7 +103,7 @@
 				AdditionalDependencies="xerces-c_2D.lib H3DAPI.lib FreeImage.lib"
 				OutputFile="$(OutDir)/NodeRoutesToDotFile.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\lib\vc7&quot;"
+				AdditionalLibraryDirectories="$(H3D_EXTERNAL_ROOT)\lib;&quot;$(H3D_ROOT)\build\win32\vc7\debug&quot;;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="1"/>

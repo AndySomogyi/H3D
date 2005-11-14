@@ -1,5 +1,6 @@
 
 #include "H3DNodeDatabase.h"
+#include "Scene.h"
 #include "Exception.h"
 #include "Node.h"
 #include <set>
@@ -24,7 +25,7 @@ void writeRoute( ostream &os, Field *src, Field *dest ) {
 
 void writeNode( string out_dir, Node *n ) {
   if( !n ) {
-    cerr << "No such node exists in the node database" << endl;
+ 
     return;
   }
   set< Field * > visited;
@@ -53,6 +54,12 @@ void writeNode( string out_dir, Node *n ) {
   while( !to_visit.empty() ) {
     Field *f = *(to_visit.begin());
     visited.insert( f );
+	if( f == Scene::eventSink ) {
+	  writeFieldDef( os, f );
+	  to_visit.erase( f );
+	  continue;
+	}
+
     const Field::FieldSet &routes_out = f->getRoutesOut();
     
     string out_file_field = 
@@ -77,7 +84,7 @@ void writeNode( string out_dir, Node *n ) {
       writeRoute( os, f, *out );
       
       if( visited.find( *out ) == visited.end() &&
-          to_visit.find( *out ) == to_visit.end()) {
+          to_visit.find( *out ) == to_visit.end() ) {
         to_visit.insert( *out );
       }
     }
@@ -87,7 +94,7 @@ void writeNode( string out_dir, Node *n ) {
       writeFieldDef( os_field, *in );
       writeRoute( os_field,*in, f );
       if( visited.find( *in ) == visited.end() &&
-          to_visit.find( *out ) == to_visit.end()) {
+          to_visit.find( *in ) == to_visit.end()) {
         to_visit.insert( *in );
       }
     }
@@ -104,6 +111,9 @@ void writeNode( string out_dir, Node *n ) {
 #include "X3DTextureTransform2DNode.h"
 #include "X3DShapeNode.h"
 #include "X3DBackgroundNode.h"
+#include "H3DHapticsDevice.h"
+#include "X3DTexture3DNode.h"
+
 
 int main(int argc, char* argv[]) {
 
@@ -116,10 +126,10 @@ int main(int argc, char* argv[]) {
 
   writeNode( out_dir, new X3DComposedGeometryNode );
   writeNode( out_dir, new H3DHapticsDevice );
+
   writeNode( out_dir, new X3DTexture2DNode );
   writeNode( out_dir, new X3DTexture3DNode );
   writeNode( out_dir, new X3DTextureTransform2DNode );
-  writeNode( out_dir, new X3DTextureTransform3DNode );
   writeNode( out_dir, new X3DShapeNode );
   writeNode( out_dir, new X3DBackgroundNode );
 
@@ -130,7 +140,11 @@ int main(int argc, char* argv[]) {
          i++ ) {
       string node_name = (*i).first;
       Node *n = H3DNodeDatabase::createNode( node_name.c_str()  );
+	  if( !n ) {
+		  cerr << node_name << ": No such node exists in the node database" << endl;
+	  } else {
       writeNode( out_dir, n );
+	  }
     }
   cerr << "DONE!" << endl;
   }
