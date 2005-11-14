@@ -51,7 +51,6 @@ namespace H3D {
   public:
     /// Constructor
     SpringEffect( Inst< SFVec3f     > _position = 0,
-                  Inst< SFVec3f     > _velocity = 0,
                   Inst< SFVec3f     > _force = 0,
                   Inst< SFFloat     > _springConstant = 0,
                   Inst< SFFloat     > _startDistance = 0,
@@ -71,12 +70,6 @@ namespace H3D {
     /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
     auto_ptr< SFVec3f > position;
 
-    /// The velocity of the spring.
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
-    auto_ptr< SFVec3f > velocity;
-    
     /// The force applied by the spring to the haptics device since the last
     /// scenegraph update.
     ///

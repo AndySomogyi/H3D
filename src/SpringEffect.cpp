@@ -40,7 +40,6 @@ H3DNodeDatabase SpringEffect::database(
 
 namespace SpringEffectInternals {
   FIELDDB_ELEMENT( SpringEffect, position, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( SpringEffect, velocity, INPUT_OUTPUT );
   FIELDDB_ELEMENT( SpringEffect, force, INPUT_OUTPUT );
   FIELDDB_ELEMENT( SpringEffect, springConstant, INPUT_OUTPUT );
   FIELDDB_ELEMENT( SpringEffect, startDistance, INPUT_OUTPUT );
@@ -51,7 +50,6 @@ namespace SpringEffectInternals {
 
 /// Constructor
 SpringEffect::SpringEffect( Inst< SFVec3f     > _position,
-                            Inst< SFVec3f     > _velocity,
                             Inst< SFVec3f     > _force,
                             Inst< SFFloat     > _springConstant,
                             Inst< SFFloat     > _startDistance,
@@ -61,7 +59,6 @@ SpringEffect::SpringEffect( Inst< SFVec3f     > _position,
                             Inst< SFNode      >  _metadata ) :
   H3DForceEffect( _metadata ),
   position( _position ),
-  velocity( _velocity ),
   force( _force ),
   springConstant( _springConstant ),
   startDistance( _startDistance ),
@@ -75,7 +72,6 @@ SpringEffect::SpringEffect( Inst< SFVec3f     > _position,
   database.initFields( this );
   
   position->setValue( Vec3f( 0,0,0 ) );
-  velocity->setValue( Vec3f( 0,0,0 ) );
   force->setValue( Vec3f( 0,0,0 ) );
   springConstant->setValue( 100 );
   startDistance->setValue( 0.01f );
@@ -94,11 +90,7 @@ void SpringEffect::traverseSG( TraverseInfo &ti ) {
   if( counter < 5 ) {
     counter++;
   } else {
-    Vec3f f = haptic_spring->getAndResetForce();
-    force->setValue( f );
-    
     if( ti.hapticsEnabled()  ) {
-    
       int device_index = deviceIndex->getValue();
       H3DHapticsDevice *hd = ti.getHapticsDevice( device_index );
       // the tracker position in local coordinates.
@@ -106,22 +98,22 @@ void SpringEffect::traverseSG( TraverseInfo &ti ) {
         ti.getAccInverseMatrix() * 
         hd->trackerPosition->getValue();
       const Vec3f &spring_pos = position->getValue();
-      const Vec3f &spring_vel = velocity->getValue();
       H3DFloat distance = ( pos - spring_pos ).length();
       if( active->getValue() ) {
         if( distance >= escapeDistance->getValue() ) {
           active->setValue( false, id );
+          force->setValue( Vec3f( 0, 0, 0 ) );
         } else {
           haptic_spring->setPosition( spring_pos );
-          haptic_spring->setVelocity( spring_vel );
           haptic_spring->setSpringConstant( springConstant->getValue() );
           ti.addForceEffect( device_index, haptic_spring.get() );
+          Vec3f f = haptic_spring->getLatestForce();
+          force->setValue( f );
         }
       } else {
         if( distance <= startDistance->getValue() ) {
           active->setValue( true, id );
           haptic_spring->setPosition( spring_pos );
-          haptic_spring->setVelocity( spring_vel );
           haptic_spring->setSpringConstant( springConstant->getValue() );
           ti.addForceEffect( device_index, haptic_spring.get() );
         }

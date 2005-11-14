@@ -30,6 +30,7 @@
 #define __HAPTICSPRING_H__
 
 #include "HapticForceEffect.h" 
+#include "Threads.h"
 
 namespace H3D {
 
@@ -43,51 +44,53 @@ namespace H3D {
                    bool _interpolate ):
       HapticForceEffect( _transform, _interpolate ),
       position( Vec3f( 0, 0, 0 ) ),
-      velocity( Vec3f( 0, 0, 0 ) ),
-    spring_constant( 0 ) { }
+      spring_constant( 0 ) { }
     
     /// Constructor
     HapticSpring( const H3D::ArithmeticTypes::Matrix4f & _transform,
                   const Vec3f &_position,
-                  const Vec3f &_velocity,
                   H3DFloat _spring_constant,
                   bool _interpolate ):
       HapticForceEffect( _transform, _interpolate ),
       position( _position ),
-      velocity( _velocity ),
       spring_constant( _spring_constant ) {}
     
     /// The force of the EffectOutput will be the force of the force field. 
     EffectOutput virtual calculateForces( const EffectInput &input ) {
-      //position = position + velocity*input.deltaT;
-      Vec3f f = ( position - input.position ) * spring_constant;
-      force += (double)((TimeStamp)input.deltaT) * f;
-      //cerr << "input.deltaT " << input.deltaT << endl;
-      return EffectOutput( f );
+      lock.lock();
+      Vec3f local_pos = transform.inverse() * input.position;
+      Vec3f local_force = ( position - local_pos ) * spring_constant;
+      force = local_force;
+      lock.unlock();
+      return EffectOutput( transform.getRotationPart() * local_force );
     }
 
     // set position
     virtual void setPosition( const Vec3f &_position ) { 
+      lock.lock();
       position = _position;
+      lock.unlock();
     }
 
     // set velocity
     virtual void setVelocity( const Vec3f &_velocity ) {
+      lock.lock();
       velocity = _velocity;
+      lock.unlock();
     }
 
     // set velocity
-    virtual void setSpringConstant( const H3DFloat &_sc ) { spring_constant = _sc; }
+    virtual void setSpringConstant( const H3DFloat &_sc ) { 
+      lock.lock();
+      spring_constant = _sc;
+      lock.unlock();
+    }
     
     // get and reset force
-    virtual Vec3f getAndResetForce() {
-      //Vec3f local_pos = transform.inverse() * input.position;
-      // force in local coordinate space
-      //Vec3f local_force = ( position - local_pos ) * spring_constant;
-      // transform force into global coordinate space before returning.
-      //return EffectOutput( transform.getRotationPart() * local_force );
+    virtual Vec3f getLatestForce() {
+      lock.lock();
       Vec3f f = force;
-      force = Vec3f( 0, 0, 0 );
+      lock.unlock();
       return f;
     }
     
@@ -96,6 +99,7 @@ namespace H3D {
     Vec3f velocity;
     Vec3f force;
     H3DFloat spring_constant;
+    MutexLock lock;
   };
 }
 
