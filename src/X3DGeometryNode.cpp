@@ -142,6 +142,9 @@ void HLCALLBACK X3DGeometryNode::untouchCallback( HLenum event,
   vector< bool > v;
   v.push_back( false );
   geometry->isTouched->setValue( v, geometry->id );
+  vector< Vec3f > fv;
+  fv.push_back( Vec3f( 0, 0, 0 ) );
+  geometry->force->setValue( fv, geometry->id );
 }
 
 HLuint X3DGeometryNode::getHLShapeId( HLHapticsDevice *hd,
