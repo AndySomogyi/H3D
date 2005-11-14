@@ -1804,6 +1804,485 @@ self, name, field_type, access_type )" );
      Matrix4f m = PyMatrix4f_AsMatrix4f( myself );
      return PyMatrix3f_FromMatrix3f( m.getRotationPart() );
    }
+
+
+  ///////////////////////////////////////////////////////////////////
+  /// MATRIX3D
+  /// 
+  static PyMethodDef PyMatrix3d_methods[] = {
+    { "__repr__", (PyCFunction) PyMatrix3d::repr, 0 },
+    { "__str__", (PyCFunction) PyMatrix3d::repr, 0 },
+    { "setToIdentity", (PyCFunction)PyMatrix3d::setToIdentity, 0 },
+    { "inverse", (PyCFunction)PyMatrix3d::inverse, 0 },
+    { "getRow", (PyCFunction)PyMatrix3d::getRow, 0 },
+    { "getColumn", (PyCFunction)PyMatrix3d::getColumn, 0 },
+    {NULL, NULL}
+  };
+  
+  static PyMemberDef PyMatrix3d_members[] = {
+    {NULL}  /* Sentinel */
+  };
+  
+  
+  static PyNumberMethods PyMatrix3d_as_number = {
+    (binaryfunc)  PyMatrix3d::add,   /* nb_add */
+    (binaryfunc)  PyMatrix3d::sub,   /* nb_subtract */
+    (binaryfunc)  PyMatrix3d::mul,       /* nb_multiply */
+    (binaryfunc)    PyMatrix3d::div,   /* nb_divide */
+    (binaryfunc)    0,   /* nb_remainder */
+    (binaryfunc)    0,          /* nb_divmod */
+    (ternaryfunc)   0,          /* nb_power */
+    (unaryfunc)     0,          /* nb_negative */
+    (unaryfunc)     0,          /* tp_positive */
+    (unaryfunc)     0,          /* tp_absolute */
+    (inquiry)       0,          /* tp_nonzero */
+    (unaryfunc)     0,          /* nb_invert */
+    (binaryfunc)    0,          /* nb_lshift */
+    (binaryfunc)    0,          /* nb_rshift */
+    (binaryfunc)    0,          /* nb_and */
+    (binaryfunc)    0,          /* nb_xor */
+    (binaryfunc)    0,          /* nb_or */
+    (coercion)      0,          /* nb_coerce */
+    (unaryfunc)     0,          /* nb_int */
+    (unaryfunc)     0,          /* nb_long */
+    (unaryfunc)     0,          /* nb_float */
+    (unaryfunc)     0,          /* nb_oct */
+    (unaryfunc)   0,                  /* nb_hex */
+      
+    /* Added in release 2.0 */
+    /* These require the Py_TPFLAGS_HAVE_INPLACEOPS flag */
+    0,                      /* nb_inplace_add */
+    0,                      /* nb_inplace_subtract */
+    0,                      /* nb_inplace_multiply */
+    0,                      /* nb_inplace_divide */
+    0,                      /* nb_inplace_remainder */
+    (ternaryfunc)0,         /* nb_inplace_power */
+    0,                      /* nb_inplace_lshift */
+    0,                      /* nb_inplace_rshift */
+    0,                      /* nb_inplace_and */
+    0,                      /* nb_inplace_xor */
+    0,                      /* nb_inplace_or */
+      
+    /* Added in release 2.2 */
+    /* These require the Py_TPFLAGS_HAVE_CLASS flag */
+    (binaryfunc)    PyMatrix3d::div,  /* nb_floor_divide */
+    (binaryfunc)    PyMatrix3d::div,  /* nb_true_divide */
+    0,                      /* nb_inplace_floor_divide */
+    0,                      /* nb_inplace_true_divide */
+  };    
+  PyTypeObject PyMatrix3d_Type = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "H3D.Matrix3d",
+    sizeof(PyMatrix3d),
+    0,                         /*tp_itemsize*/
+    (destructor)PyMatrix3d::dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    (cmpfunc) PyMatrix3d::compare,                         /*tp_compare*/
+    (reprfunc) PyMatrix3d::repr,                         /*tp_repr*/
+    &PyMatrix3d_as_number,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | 
+    Py_TPFLAGS_BASETYPE |
+    Py_TPFLAGS_CHECKTYPES,     /*tp_flags*/
+    "Matrix3d Object",         /* tp_doc */
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    PyMatrix3d_methods,        /* tp_methods */
+    PyMatrix3d_members,        /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)PyMatrix3d::init,   /* tp_init */
+    PyType_GenericAlloc,       /* tp_alloc */
+    (newfunc) PyType_GenericAlloc,            /* tp_new */
+  };
+  
+  /// Returns an Matrix3d representation of the contents of o.
+  Matrix3d PyMatrix3d_AsMatrix3d( PyObject *o ) {
+    if( PyMatrix3d_Check( o ) ) {
+      return *(Matrix3d *)(PyMatrix3d *)(o);
+    } else {
+      throw Exception::H3DAPIException( "PyObject * is not a PyMatrix3d *", 
+                                        H3D_FULL_LOCATION );
+    }
+  }  
+
+  /// Creates a new PyMatrix3d object based on the value of v.
+  PyObject *PyMatrix3d_FromMatrix3d( const Matrix3d &v) {
+    PyObject *o = PyType_GenericAlloc( &PyMatrix3d_Type, 1 );
+    Matrix3d *part = (Matrix3d *)(PyMatrix3d *)( o );
+    *part = v;
+    return o;
+  }
+  
+  int PyMatrix3d::init(PyMatrix3d *self, PyObject *args, PyObject *kwds)  {
+    int args_size =  PyTuple_Size( args );
+    if( args_size == 0 ) {
+      // no arguments, identify matrix
+      self->setToIdentity( (PyObject *) self, args );
+    } else if( args_size == 1 ) {
+      // from Quaternion, Rotation and Matrix3d
+      PyObject *o = PyTuple_GetItem( args, 0 );
+      Matrix3d *self_m = (Matrix3d *)self;
+      if( PyRotation_Check( o ) ) {
+        Rotation r = PyRotation_AsRotation( o );
+        *self_m = r;
+      } else if( PyQuaternion_Check( o ) ) {
+        Quaternion q = PyQuaternion_AsQuaternion( o );
+        *self_m = q;
+      } else if( PyMatrix3d_Check( o ) ) {
+        Matrix3d m = PyMatrix3d_AsMatrix3d( o );
+        *self_m = m;
+      } else {
+        PyErr_SetString(PyExc_TypeError, 
+                        "invalid type given to Matrix3d constructor." );
+        return -1;
+      }
+    } else {
+      // full matrix specification.
+      if (! PyArg_ParseTuple(args, 
+                             "ddddddddd", 
+                             &(*self)[0][0],
+                             &(*self)[0][1],
+                             &(*self)[0][2],
+                             &(*self)[1][0],
+                             &(*self)[1][1],
+                             &(*self)[1][2],
+                             &(*self)[2][0],
+                             &(*self)[2][1],
+                             &(*self)[2][2] ) )
+        return -1; 
+    }
+    // success
+    return 0;
+  }
+  
+  PyObject* PyMatrix3d::mul( PyObject *a, PyObject *b ) {
+    if( PyMatrix3d_Check( a ) ) {
+      Matrix3d ma = PyMatrix3d_AsMatrix3d( a );
+      if( PyMatrix3d_Check( b ) ) {
+        Matrix3d mb = PyMatrix3d_AsMatrix3d( b );
+        return PyMatrix3d_FromMatrix3d( ma * mb );
+      } else if( PyVec3d_Check( b ) ) {
+        Vec3d vb = PyVec3d_AsVec3d( b );
+        return PyVec3d_FromVec3d( ma * vb );
+      }
+    }
+
+    return PyNumberTypeWrapper< Matrix3d, 
+      &PyMatrix3d_Type,
+      PyMatrix3d_Name,
+      PyMatrix3d_Check,
+      PyMatrix3d_AsMatrix3d, 
+      PyMatrix3d_FromMatrix3d >::mul( a, b );
+  }
+
+  PyObject* PyMatrix3d::setToIdentity( PyObject *myself, PyObject *args ) {
+    PyMatrix3d *v = (PyMatrix3d*)myself;
+    Matrix3d *m = (Matrix3d*)v;
+    m->setToIdentity();
+    Py_INCREF( myself );
+    return myself;
+  }
+  
+  PyObject* PyMatrix3d::inverse( PyObject *myself, PyObject *args ) {
+    Matrix3d m = PyMatrix3d_AsMatrix3d( myself );
+    return PyMatrix3d_FromMatrix3d( m.inverse() );
+  }
+
+  PyObject* PyMatrix3d::getRow( PyObject *myself, PyObject *args ) {
+    if( args && PyInt_Check( args ) ) {
+      int row = PyInt_AsLong( args );
+      Matrix3d m = PyMatrix3d_AsMatrix3d( myself );
+      return PyVec3d_FromVec3d( m.getRow( row ) );
+    } 
+    PyErr_SetString(PyExc_TypeError, 
+                    "int type required as argument to getRow" );
+    return NULL;
+  }
+
+  PyObject* PyMatrix3d::getColumn( PyObject *myself, PyObject *args ) {
+    if( args && PyInt_Check( args ) ) {
+      int col = PyInt_AsLong( args );
+      Matrix3d m = PyMatrix3d_AsMatrix3d( myself );
+      return PyVec3d_FromVec3d( m.getColumn( col ) );
+    } 
+    PyErr_SetString(PyExc_TypeError, 
+                    "int type required as argument to getColumn" );
+    return NULL;
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  /// MATRIX4D
+  /// 
+  static PyMethodDef PyMatrix4d_methods[] = {
+    { "__repr__", (PyCFunction) PyMatrix4d::repr, 0 },
+    { "__str__", (PyCFunction) PyMatrix4d::repr, 0 },
+    { "setToIdentity", (PyCFunction)PyMatrix4d::setToIdentity, 0 },
+    { "transformInverse", (PyCFunction)PyMatrix4d::transformInverse, 0 },
+    { "inverse", (PyCFunction)PyMatrix4d::inverse, 0 },
+    { "getRow", (PyCFunction)PyMatrix4d::getRow, 0 },
+    { "getColumn", (PyCFunction)PyMatrix4d::getColumn, 0 },
+    { "getScaleRotationPart", (PyCFunction)PyMatrix4d::getScaleRotationPart, 0 },
+    { "getRotationPart", (PyCFunction)PyMatrix4d::getRotationPart, 0 },
+    {NULL, NULL}
+  };
+  
+  static PyMemberDef PyMatrix4d_members[] = {
+    {NULL}  /* Sentinel */
+  };
+  
+  
+  static PyNumberMethods PyMatrix4d_as_number = {
+    (binaryfunc)  PyMatrix4d::add,   /* nb_add */
+    (binaryfunc)  PyMatrix4d::sub,   /* nb_subtract */
+    (binaryfunc)  PyMatrix4d::mul,       /* nb_multiply */
+    (binaryfunc)    PyMatrix4d::div,   /* nb_divide */
+    (binaryfunc)    0,   /* nb_remainder */
+    (binaryfunc)    0,          /* nb_divmod */
+    (ternaryfunc)   0,          /* nb_power */
+    (unaryfunc)     0,          /* nb_negative */
+    (unaryfunc)     0,          /* tp_positive */
+    (unaryfunc)     0,          /* tp_absolute */
+    (inquiry)       0,          /* tp_nonzero */
+    (unaryfunc)     0,          /* nb_invert */
+    (binaryfunc)    0,          /* nb_lshift */
+    (binaryfunc)    0,          /* nb_rshift */
+    (binaryfunc)    0,          /* nb_and */
+    (binaryfunc)    0,          /* nb_xor */
+    (binaryfunc)    0,          /* nb_or */
+    (coercion)      0,          /* nb_coerce */
+    (unaryfunc)     0,          /* nb_int */
+    (unaryfunc)     0,          /* nb_long */
+    (unaryfunc)     0,          /* nb_float */
+    (unaryfunc)     0,          /* nb_oct */
+    (unaryfunc)   0,                  /* nb_hex */
+      
+    /* Added in release 2.0 */
+    /* These require the Py_TPFLAGS_HAVE_INPLACEOPS flag */
+    0,                      /* nb_inplace_add */
+    0,                      /* nb_inplace_subtract */
+    0,                      /* nb_inplace_multiply */
+    0,                      /* nb_inplace_divide */
+    0,                      /* nb_inplace_remainder */
+    (ternaryfunc)0,         /* nb_inplace_power */
+    0,                      /* nb_inplace_lshift */
+    0,                      /* nb_inplace_rshift */
+    0,                      /* nb_inplace_and */
+    0,                      /* nb_inplace_xor */
+    0,                      /* nb_inplace_or */
+      
+    /* Added in release 2.2 */
+    /* These require the Py_TPFLAGS_HAVE_CLASS flag */
+    (binaryfunc)    PyMatrix4d::div,  /* nb_floor_divide */
+    (binaryfunc)    PyMatrix4d::div,  /* nb_true_divide */
+    0,                      /* nb_inplace_floor_divide */
+    0,                      /* nb_inplace_true_divide */
+  };    
+  PyTypeObject PyMatrix4d_Type = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "H3D.Matrix4d",
+    sizeof(PyMatrix4d),
+    0,                         /*tp_itemsize*/
+    (destructor)PyMatrix4d::dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    (cmpfunc) PyMatrix4d::compare,                         /*tp_compare*/
+    (reprfunc) PyMatrix4d::repr,                         /*tp_repr*/
+    &PyMatrix4d_as_number,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | 
+    Py_TPFLAGS_BASETYPE |
+    Py_TPFLAGS_CHECKTYPES,     /*tp_flags*/
+    "Matrix4d Object",         /* tp_doc */
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    PyMatrix4d_methods,        /* tp_methods */
+    PyMatrix4d_members,        /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)PyMatrix4d::init,   /* tp_init */
+    PyType_GenericAlloc,       /* tp_alloc */
+    (newfunc) PyType_GenericAlloc,            /* tp_new */
+  };
+  
+  /// Returns an Matrix4d representation of the contents of o.
+  Matrix4d PyMatrix4d_AsMatrix4d( PyObject *o ) {
+    if( PyMatrix4d_Check( o ) ) {
+      return *(Matrix4d *)(PyMatrix4d *)(o);
+    } else {
+      throw Exception::H3DAPIException( "PyObject * is not a PyMatrix4d *", 
+                                        H3D_FULL_LOCATION );
+    }
+  }  
+
+  /// Creates a new PyMatrix4d object based on the value of v.
+  PyObject *PyMatrix4d_FromMatrix4d( const Matrix4d &v) {
+    PyObject *o = PyType_GenericAlloc( &PyMatrix4d_Type, 1 );
+    Matrix4d *part = (Matrix4d *)(PyMatrix4d *)( o );
+    *part = v;
+    return o;
+  }
+  
+  int PyMatrix4d::init(PyMatrix4d *self, PyObject *args, PyObject *kwds)  {
+    int args_size =  PyTuple_Size( args );
+    if( args_size == 0 ) {
+      // no arguments, identify matrix
+      self->setToIdentity( (PyObject *) self, args );
+    } else if( args_size == 1 ) {
+      // from Quaternion, Rotation and Matrix4d
+      PyObject *o = PyTuple_GetItem( args, 0 );
+      Matrix4d *self_m = (Matrix4d *)self;
+      if( PyRotation_Check( o ) ) {
+        Rotation r = PyRotation_AsRotation( o );
+        *self_m = r;
+      } else if( PyQuaternion_Check( o ) ) {
+        Quaternion q = PyQuaternion_AsQuaternion( o );
+        *self_m = q;
+      } else if( PyMatrix4d_Check( o ) ) {
+        Matrix4d m = PyMatrix4d_AsMatrix4d( o );
+        *self_m = m;
+      } else {
+        PyErr_SetString(PyExc_TypeError, 
+                        "invalid type given to Matrix4d constructor." );
+        return -1;
+      }
+    } else {
+      // full matrix specification.
+      if (! PyArg_ParseTuple(args, 
+                             "dddddddddddddddd", 
+                             &(*self)[0][0],
+                             &(*self)[0][1],
+                             &(*self)[0][2],
+                             &(*self)[0][3],
+                             &(*self)[1][0],
+                             &(*self)[1][1],
+                             &(*self)[1][2],
+                             &(*self)[1][3],
+                             &(*self)[2][0],
+                             &(*self)[2][1],
+                             &(*self)[2][2],
+                             &(*self)[2][3],
+                             &(*self)[3][0],
+                             &(*self)[3][1],
+                             &(*self)[3][2],
+                             &(*self)[3][3] ) )
+        return -1; 
+    }
+    // success
+    return 0;
+  }
+  
+  
+  PyObject* PyMatrix4d::mul( PyObject *a, PyObject *b ) {
+    if( PyMatrix4d_Check( a ) ) {
+      Matrix4d ma = PyMatrix4d_AsMatrix4d( a );
+      if( PyMatrix4d_Check( b ) ) {
+        Matrix4d mb = PyMatrix4d_AsMatrix4d( b );
+        return PyMatrix4d_FromMatrix4d( ma * mb );
+      } else if( PyVec4d_Check( b ) ) {
+        Vec4d vb = PyVec4d_AsVec4d( b );
+        return PyVec4d_FromVec4d( ma * vb );
+      } else if( PyVec3d_Check( b ) ) {
+        Vec3d vb = PyVec3d_AsVec3d( b );
+        return PyVec3d_FromVec3d( ma * vb );
+      }
+    }
+
+    return PyNumberTypeWrapper< Matrix4d, 
+      &PyMatrix4d_Type,
+      PyMatrix4d_Name,
+      PyMatrix4d_Check,
+      PyMatrix4d_AsMatrix4d, 
+      PyMatrix4d_FromMatrix4d >::mul( a, b );
+  }
+
+  PyObject* PyMatrix4d::setToIdentity( PyObject *myself, PyObject *args ) {
+    PyMatrix4d *v = (PyMatrix4d*)myself;
+    Matrix4d *m = (Matrix4d*)v;
+    m->setToIdentity();
+    Py_INCREF( myself );
+    return myself;
+  }
+  
+  PyObject* PyMatrix4d::transformInverse( PyObject *myself, PyObject *args ) {
+    Matrix4d m = PyMatrix4d_AsMatrix4d( myself );
+    return PyMatrix4d_FromMatrix4d( m.transformInverse() );
+  }
+
+  PyObject* PyMatrix4d::inverse( PyObject *myself, PyObject *args ) {
+    Matrix4d m = PyMatrix4d_AsMatrix4d( myself );
+    return PyMatrix4d_FromMatrix4d( m.inverse() );
+  }
+
+  PyObject* PyMatrix4d::getRow( PyObject *myself, PyObject *args ) {
+    if( args && PyInt_Check( args ) ) {
+      int row = PyInt_AsLong( args );
+      Matrix4d m = PyMatrix4d_AsMatrix4d( myself );
+      return PyVec4d_FromVec4d( m.getRow( row ) );
+    } 
+    PyErr_SetString(PyExc_TypeError, 
+                    "int type required as argument to getRow" );
+    return NULL;
+  }
+
+  PyObject* PyMatrix4d::getColumn( PyObject *myself, PyObject *args ) {
+    if( args && PyInt_Check( args ) ) {
+      int col = PyInt_AsLong( args );
+      Matrix4d m = PyMatrix4d_AsMatrix4d( myself );
+      return PyVec4d_FromVec4d( m.getColumn( col ) );
+    } 
+    PyErr_SetString(PyExc_TypeError, 
+                    "int type required as argument to getColumn" );
+    return NULL;
+  }
+
+   PyObject* PyMatrix4d::getScaleRotationPart( PyObject *myself, 
+                                               PyObject *args ) {
+     Matrix4d m = PyMatrix4d_AsMatrix4d( myself );
+     return PyMatrix3d_FromMatrix3d( m.getScaleRotationPart() );
+   }
+
+   PyObject* PyMatrix4d::getRotationPart( PyObject *myself, 
+                                          PyObject *args ) {
+     Matrix4d m = PyMatrix4d_AsMatrix4d( myself );
+     return PyMatrix3d_FromMatrix3d( m.getRotationPart() );
+   }
+
   
   ///////////////////////////////////////////////////////////////////
   /// ROTATION

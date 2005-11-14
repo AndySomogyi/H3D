@@ -85,10 +85,19 @@ namespace H3D {
   inline string SField< Rotation >::classTypeName() { return "SFRotation"; }
 
   template<>
+  inline string SField< Quaternion >::classTypeName() { return "SFQuaternion";}
+
+  template<>
   inline string SField< Matrix3f >::classTypeName() { return "SFMatrix3f"; }
 
   template<>
   inline string SField< Matrix4f >::classTypeName() { return "SFMatrix4f"; }
+
+  template<>
+  inline string SField< Matrix3d >::classTypeName() { return "SFMatrix3d"; }
+
+  template<>
+  inline string SField< Matrix4d >::classTypeName() { return "SFMatrix4d"; }
 
   template<>
   inline string MFieldBase< H3DFloat >::classTypeName() { return "MFFloat"; }
@@ -134,12 +143,24 @@ namespace H3D {
   { return "MFRotation"; }
 
   template<>
+  inline string MFieldBase< Quaternion >::classTypeName() 
+  { return "MFQuaternion"; }
+
+  template<>
   inline string MFieldBase< Matrix3f >::classTypeName() 
   { return "MFMatrix3f"; }
 
   template<>
   inline string MFieldBase< Matrix4f >::classTypeName() 
   { return "MFMatrix4f"; }
+
+  template<>
+  inline string MFieldBase< Matrix3d >::classTypeName() 
+  { return "MFMatrix3d"; }
+
+  template<>
+  inline string MFieldBase< Matrix4d >::classTypeName() 
+  { return "MFMatrix4d"; }
 
   /// \defgroup FieldTypes Basic Field types.
   /// The basic Field types of H3D API.
@@ -279,6 +300,14 @@ namespace H3D {
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFROTATION; }
   };
 
+  /// The SFQuaternion field contains a Quaternion.
+  class H3DAPI_API SFQuaternion: public SField< Quaternion > {
+  public:
+    SFQuaternion() {}
+    SFQuaternion( const Quaternion &_value ): SField< Quaternion >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFQUATERNION; }
+  };
+
   /// The SFMatrix3f field contains a Matrix3f.
   class H3DAPI_API SFMatrix3f: public SField< Matrix3f > {
   public:
@@ -293,6 +322,22 @@ namespace H3D {
     SFMatrix4f() {}
     SFMatrix4f( const Matrix4f &_value ): SField< Matrix4f >( _value ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFMATRIX4F; }
+  };
+
+  /// The SFMatrix3d field contains a Matrix3d.
+  class H3DAPI_API SFMatrix3d: public SField< Matrix3d > {
+  public:
+    SFMatrix3d() {}
+    SFMatrix3d( const Matrix3d &_value ): SField< Matrix3d >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFMATRIX3D; }
+  };
+    
+  /// The SFMatrix4d field contains a Matrix4d.
+  class H3DAPI_API SFMatrix4d: public SField< Matrix4d > {
+  public:
+    SFMatrix4d() {}
+    SFMatrix4d( const Matrix4d &_value ): SField< Matrix4d >( _value ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFMATRIX4D; }
   };
 
   /// The MFFloat field contains a vector of single-precision floating 
@@ -455,6 +500,14 @@ namespace H3D {
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFROTATION; }
   };
 
+  /// The MFQuaternion field contains a vector of arbitrary Quaternion objects.
+  class H3DAPI_API MFQuaternion: public MField< Quaternion > {
+  public:
+    MFQuaternion(){}
+    MFQuaternion( size_type size ): MField< Quaternion >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFQUATERNION; }
+  };
+
   /// The MFMatrix3f field contains a vector of Matrix3f instances.
   class H3DAPI_API MFMatrix3f: public MField< Matrix3f > {
   public:
@@ -470,6 +523,23 @@ namespace H3D {
     MFMatrix4f( size_type size ): MField< Matrix4f >( size ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX4F; }
   };
+
+  /// The MFMatrix3d field contains a vector of Matrix3d instances.
+  class H3DAPI_API MFMatrix3d: public MField< Matrix3d > {
+  public:
+    MFMatrix3d(){}
+    MFMatrix3d( size_type size ): MField< Matrix3d >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX3D; }
+  };
+
+  /// The MFMatrix4d field contains a vector of Matrix4d instances.
+  class H3DAPI_API MFMatrix4d: public MField< Matrix4d > {
+  public:
+    MFMatrix4d(){}
+    MFMatrix4d( size_type size ): MField< Matrix4d >( size ){}
+    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX4D; }
+  };
+
   /// \}
 
   /// Template to make sure that the Node that is set in a SFNode is

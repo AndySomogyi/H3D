@@ -294,10 +294,10 @@ if( check_func( value ) ) {                                         \
         macro( PyRotation_Check, PyRotation_AsRotation, PyRotation_FromRotation, \
                Rotation, SFRotation, field_ptr, v ); break; \
       } \
- /*       case X3DTypes::SFQUATERNION: { \
-                 macro( PyQuaternion_Check, PyQuaternion_AsQuaternion, SFQuaternion,  \
-                 field_ptr, v ); break; \
-                 } */ \
+      case X3DTypes::SFQUATERNION: { \
+        macro( PyQuaternion_Check, PyQuaternion_AsQuaternion, PyQuaternion_FromQuaternion, \
+               Quaternion, SFQuaternion, field_ptr, v ); break; \
+      } \
       case X3DTypes::SFMATRIX3F: { \
         macro( PyMatrix3f_Check, PyMatrix3f_AsMatrix3f, PyMatrix3f_FromMatrix3f, \
                Matrix3f, SFMatrix3f, field_ptr, v ); break; \
@@ -305,6 +305,14 @@ if( check_func( value ) ) {                                         \
       case X3DTypes::SFMATRIX4F: { \
         macro( PyMatrix4f_Check, PyMatrix4f_AsMatrix4f, PyMatrix4f_FromMatrix4f, \
                Matrix4f, SFMatrix4f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFMATRIX3D: { \
+        macro( PyMatrix3d_Check, PyMatrix3d_AsMatrix3d, PyMatrix3d_FromMatrix3d, \
+               Matrix3d, SFMatrix3d, field_ptr, v ); break; \
+      } \
+      case X3DTypes::SFMATRIX4D: { \
+        macro( PyMatrix4d_Check, PyMatrix4d_AsMatrix4d, PyMatrix4d_FromMatrix4d, \
+               Matrix4d, SFMatrix4d, field_ptr, v ); break; \
       } \
       default: success = false; \
       } \
@@ -402,12 +410,10 @@ if( check_func( value ) ) {                                         \
         macro( PyRotation_Check, PyRotation_AsRotation, PyRotation_FromRotation, \
                Rotation, MFRotation, field_ptr, v ); break; \
       } \
-        /* \
-          case X3DTypes::MFQUATERNION: { \
-          macro( PyQuaternion_Check, PyQuaternion_AsQuaternion, Quaternion,  \
-          MFQuaternion, field_ptr, v ); break; \
-          }*/ \
-       \
+      case X3DTypes::MFQUATERNION: { \
+        macro( PyQuaternion_Check, PyQuaternion_AsQuaternion, PyQuaternion_FromQuaternion, \
+               Quaternion, MFQuaternion, field_ptr, v ); break; \
+      } \
       case X3DTypes::MFMATRIX3F: { \
         macro( PyMatrix3f_Check, PyMatrix3f_AsMatrix3f, PyMatrix3f_FromMatrix3f, \
                Matrix3f, MFMatrix3f, field_ptr, v ); break; \
@@ -415,6 +421,14 @@ if( check_func( value ) ) {                                         \
       case X3DTypes::MFMATRIX4F: { \
         macro( PyMatrix4f_Check, PyMatrix4f_AsMatrix4f, PyMatrix4f_FromMatrix4f, \
                Matrix4f, MFMatrix4f, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFMATRIX3D: { \
+        macro( PyMatrix3d_Check, PyMatrix3d_AsMatrix3d, PyMatrix3d_FromMatrix3d, \
+               Matrix3d, MFMatrix3d, field_ptr, v ); break; \
+      } \
+      case X3DTypes::MFMATRIX4D: { \
+        macro( PyMatrix4d_Check, PyMatrix4d_AsMatrix4d, PyMatrix4d_FromMatrix4d, \
+               Matrix4d, MFMatrix4d, field_ptr, v ); break; \
       } \
       default: success = false; \
     } \

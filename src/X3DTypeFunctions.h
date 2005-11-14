@@ -68,10 +68,16 @@ namespace H3D {
       case MFCOLORRGBA: return "MFColorRGBA";
       case  SFROTATION: return "SFRotation";
       case  MFROTATION: return "MFRotation";
+      case  SFQUATERNION: return "SFQuaternion";
+      case  MFQUATERNION: return "MFQuaternion";
       case  SFMATRIX3F: return "SFMatrix3f";
       case  MFMATRIX3F: return "MFMatrix3f";
       case  SFMATRIX4F: return "SFMatrix4f";
       case  MFMATRIX4F: return "MFMatrix4f";
+      case  SFMATRIX3D: return "SFMatrix3d";
+      case  MFMATRIX3D: return "MFMatrix3d";
+      case  SFMATRIX4D: return "SFMatrix4d";
+      case  MFMATRIX4D: return "MFMatrix4d";
       case UNKNOWN_X3D_TYPE: 
       default:return "UNKNOWN_X3D_TYPE";
       };
@@ -110,10 +116,16 @@ namespace H3D {
       else if( strcmp( t, "MFColorRGBA" ) == 0 ) return MFCOLORRGBA;
       else if( strcmp( t, "SFRotation" ) == 0 ) return SFROTATION;
       else if( strcmp( t, "MFRotation" ) == 0 ) return MFROTATION;
+      else if( strcmp( t, "SFQuaternion" ) == 0 ) return SFQUATERNION;
+      else if( strcmp( t, "MFQuaternion" ) == 0 ) return MFQUATERNION;
       else if( strcmp( t, "SFMatrix3f" ) == 0 ) return SFMATRIX3F;
       else if( strcmp( t, "MFMatrix3f" ) == 0 ) return MFMATRIX3F;
       else if( strcmp( t, "SFMatrix4f" ) == 0 ) return SFMATRIX4F;
       else if( strcmp( t, "MFMatrix4f" ) == 0 ) return MFMATRIX4F;
+      else if( strcmp( t, "SFMatrix3d" ) == 0 ) return SFMATRIX3D;
+      else if( strcmp( t, "MFMatrix3d" ) == 0 ) return MFMATRIX3D;
+      else if( strcmp( t, "SFMatrix4d" ) == 0 ) return SFMATRIX4D;
+      else if( strcmp( t, "MFMatrix4d" ) == 0 ) return MFMATRIX4D;
       else return UNKNOWN_X3D_TYPE;
     };
 
@@ -183,6 +195,10 @@ namespace H3D {
         return new SFRotation;
       case X3DTypes::MFROTATION:
         return new MFRotation;
+      case X3DTypes::SFQUATERNION:
+        return new SFQuaternion;
+      case X3DTypes::MFQUATERNION:
+        return new MFQuaternion;
       case X3DTypes::SFMATRIX3F:
         return new SFMatrix3f;
       case X3DTypes::MFMATRIX3F:
@@ -191,6 +207,14 @@ namespace H3D {
         return new SFMatrix4f;
       case X3DTypes::MFMATRIX4F:
         return new MFMatrix4f;
+      case X3DTypes::SFMATRIX3D:
+        return new SFMatrix3d;
+      case X3DTypes::MFMATRIX3D:
+        return new MFMatrix3d;
+      case X3DTypes::SFMATRIX4D:
+        return new SFMatrix4d;
+      case X3DTypes::MFMATRIX4D:
+        return new MFMatrix4d;
       case X3DTypes::UNKNOWN_X3D_TYPE: 
       default: return NULL;
       }

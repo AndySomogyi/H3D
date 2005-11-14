@@ -524,7 +524,7 @@ namespace H3D {
 
   extern H3DAPI_API PyTypeObject PyMatrix3f_Type;
 
-  /// Returns which is the name the PyVec3f is to be installed
+  /// Returns which is the name the PyMatrix3f is to be installed
   /// as in Python.
   inline string PyMatrix3f_Name() { return "Matrix3f"; }   
 
@@ -534,7 +534,7 @@ namespace H3D {
   /// Returns an Matrix3f representation of the contents of o.
   Matrix3f PyMatrix3f_AsMatrix3f( PyObject *o );
 
-  /// Returns true if its argument is a PyVec3f.
+  /// Returns true if its argument is a PyMatrix3f.
   inline bool PyMatrix3f_Check( PyObject *o) {
     return PyObject_TypeCheck(o,&PyMatrix3f_Type);
   }
@@ -573,7 +573,7 @@ namespace H3D {
 
   extern H3DAPI_API PyTypeObject PyMatrix4f_Type;
 
-  /// Returns which is the name the PyVec3f is to be installed
+  /// Returns which is the name the PyMatrix4f is to be installed
   /// as in Python.
   inline string PyMatrix4f_Name() { return "Matrix4f"; }   
 
@@ -583,7 +583,7 @@ namespace H3D {
   /// Returns an Matrix4f representation of the contents of o.
   Matrix4f PyMatrix4f_AsMatrix4f( PyObject *o );
 
-  /// Returns true if its argument is a PyVec3f.
+  /// Returns true if its argument is a PyMatrix4f.
   inline bool PyMatrix4f_Check( PyObject *o) {
     return PyObject_TypeCheck(o,&PyMatrix4f_Type);
   }
@@ -630,6 +630,122 @@ namespace H3D {
     static PyObject* getScaleRotationPart( PyObject *self, PyObject *args );
 
     /// Returns the rotation part of the Matrix4f.
+    static PyObject* getRotationPart( PyObject *self, PyObject *args );
+  };
+
+
+  //////////////////////////////////////////////////////
+  // Python C declarations for PyMatrix3d type
+  //////////////////////////////////////////////////////
+
+  extern H3DAPI_API PyTypeObject PyMatrix3d_Type;
+
+  /// Returns which is the name the PyMatrix3d is to be installed
+  /// as in Python.
+  inline string PyMatrix3d_Name() { return "Matrix3d"; }   
+
+  /// Creates a new PyMatrix3d object based on the value of v.
+  PyObject *PyMatrix3d_FromMatrix3d( const Matrix3d &v);
+
+  /// Returns an Matrix3d representation of the contents of o.
+  Matrix3d PyMatrix3d_AsMatrix3d( PyObject *o );
+
+  /// Returns true if its argument is a PyMatrix3d.
+  inline bool PyMatrix3d_Check( PyObject *o) {
+    return PyObject_TypeCheck(o,&PyMatrix3f_Type);
+  }
+  /// \class PyMatrix3d
+  /// \brief Python C Type wrapper around Matrix3d
+  struct PyMatrix3d : public PyNumberTypeWrapper< Matrix3d, 
+                      &PyMatrix3d_Type,
+                      PyMatrix3d_Name,
+                      PyMatrix3d_Check,
+                      PyMatrix3d_AsMatrix3d, 
+                      PyMatrix3d_FromMatrix3d > {
+    
+    /// Python type initialisation: will set the Matrix3d value from a
+    /// python string argument list
+    static int init(PyMatrix3d *self, PyObject *args, PyObject *kwds);
+    
+    /// Multiplies two Matrix3d objects
+    static PyObject* mul( PyObject *rota, PyObject *rotb );
+    
+    /// Set to the identity matrix.
+    static PyObject* setToIdentity( PyObject *self, PyObject *args );
+
+    /// Returns the inverse of the matrix.
+    static PyObject* inverse( PyObject *self, PyObject *args );
+
+    /// Get a row of the matrix.
+    static PyObject* getRow( PyObject *self, PyObject *args );
+
+    /// Get a column of the matrix.
+    static PyObject* getColumn( PyObject *self, PyObject *args );
+  };
+    
+  //////////////////////////////////////////////////////
+  // Python C declarations for PyMatrix4d type
+  //////////////////////////////////////////////////////
+
+  extern H3DAPI_API PyTypeObject PyMatrix4d_Type;
+
+  /// Returns which is the name the PyMatrix4d is to be installed
+  /// as in Python.
+  inline string PyMatrix4d_Name() { return "Matrix4d"; }   
+
+  /// Creates a new PyMatrix4d object based on the value of v.
+  PyObject *PyMatrix4d_FromMatrix4d( const Matrix4d &v);
+
+  /// Returns an Matrix4d representation of the contents of o.
+  Matrix4d PyMatrix4d_AsMatrix4d( PyObject *o );
+
+  /// Returns true if its argument is a PyMatrix4d.
+  inline bool PyMatrix4d_Check( PyObject *o) {
+    return PyObject_TypeCheck(o,&PyMatrix4d_Type);
+  }
+  /// \class PyMatrix4d
+  /// \brief Python C Type wrapper around Matrix4d
+  struct PyMatrix4d : public PyNumberTypeWrapper< Matrix4d, 
+                      &PyMatrix4d_Type,
+                      PyMatrix4d_Name,
+                      PyMatrix4d_Check,
+                      PyMatrix4d_AsMatrix4d, 
+                      PyMatrix4d_FromMatrix4d > {
+    
+    
+    /// Python type initialisation: will set the Matrix4d value from a
+    /// python string argument list
+    static int init(PyMatrix4d *self, PyObject *args, PyObject *kwds);
+    
+    /// Multiplies two Matrix4d objects
+    static PyObject* mul( PyObject *rota, PyObject *rotb );
+    
+    /// Set to the identity matrix.
+    static PyObject* setToIdentity( PyObject *self, PyObject *args );
+
+    /// Returns the inverse of the matrix assuming that it is on 
+    /// the form
+    ///
+    ///  [ m00 m01 m02 m03
+    ///    m10 m11 m12 m13
+    ///    m20 m21 m22 m23
+    ///    0   0   0   1   ]
+    ///
+    static PyObject* transformInverse( PyObject *self, PyObject *args );
+
+    /// Returns the inverse of the matrix.
+    static PyObject* inverse( PyObject *self, PyObject *args );
+
+    /// Get a row of the matrix.
+    static PyObject* getRow( PyObject *self, PyObject *args );
+
+    /// Get a column of the matrix.
+    static PyObject* getColumn( PyObject *self, PyObject *args );
+
+    /// Returns the scale and rotation part of the Matrix4d.
+    static PyObject* getScaleRotationPart( PyObject *self, PyObject *args );
+
+    /// Returns the rotation part of the Matrix4d.
     static PyObject* getRotationPart( PyObject *self, PyObject *args );
   };
     

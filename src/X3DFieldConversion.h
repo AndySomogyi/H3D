@@ -351,6 +351,32 @@ namespace H3D {
         rot.angle = getValue<H3DFloat>( t1, rest );
         return rot;
       }
+
+      /// Template specialization to handle the type 'Quaternion'.
+      /// \param s The string to convert.
+      /// \param rest Return value pointing at the first character in the
+      /// string not used in the conversion.
+      ///
+      template<>
+      inline Quaternion getValue<Quaternion>( const char *s, 
+                                              const char *&rest ) {
+        Quaternion q;
+        const char *t1, *t2;
+        q.v.x = getValue<H3DFloat>( s, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Quaternion" );
+        }
+        q.v.y = getValue<H3DFloat>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Quaternion" );
+        }
+        q.v.z = getValue<H3DFloat>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Quaternion" );
+        }
+        q.w = getValue<H3DFloat>( t1, rest );
+        return q;
+      }
       
       /// Template specialization to handle the type 'Matrix4f'.
       /// \param s The string to convert.
@@ -475,6 +501,131 @@ namespace H3D {
         return m;
       }
 
+      /// Template specialization to handle the type 'Matrix4d'.
+      /// \param s The string to convert.
+      /// \param rest Return value pointing at the first character in the 
+      /// string not used in the conversion.
+      ///
+      template<>
+      inline Matrix4d getValue<Matrix4d>( const char *s, const char *&rest ) {
+        Matrix4d m;
+        const char *t1, *t2;
+        m[0][0] = getValue<H3DDouble>( s, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[0][1] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[0][2] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[0][3] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+
+        m[1][0] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[1][1] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[1][2] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[1][3] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        } 
+  
+        m[2][0] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[2][1] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[2][2] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[2][3] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        } 
+
+        m[3][0] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[3][1] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[3][2] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix4d" );
+        }
+        m[3][3] = getValue<H3DDouble>( t1, rest );
+
+        return m;
+      }
+
+      /// Template specialization to handle the type 'Matrix3f'.
+      /// \param s The string to convert.
+      /// \param rest Return value pointing at the first character in the 
+      /// string not used in the conversion.
+      ///
+      template<>
+      inline Matrix3d getValue<Matrix3d>( const char *s, const char *&rest ) {
+        Matrix3d m;
+        const char *t1, *t2;
+        m[0][0] = getValue<H3DDouble>( s, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix3d" );
+        }
+        m[0][1] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix3d" );
+        }
+        m[0][2] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix3d" );
+        }
+        m[1][0] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix3d" );
+        }
+        m[1][1] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix3d" );
+        }
+        m[1][2] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix3d" );
+        }
+        m[2][0] = getValue<H3DDouble>( t2, t1 );
+        if( !isspace(t1[0]) ) {
+          throw X3DFieldConversionError( "Matrix3d" );
+        }
+        m[2][1] = getValue<H3DDouble>( t1, t2 );
+        if( !isspace(t2[0]) ) {
+          throw X3DFieldConversionError( "Matrix3d" );
+        }
+        m[2][2] = getValue<H3DDouble>( t2, rest );
+
+        return m;
+      }
+
+
+
       /// Template specialization to handle the type 'Vec4f'.
       /// \param s The string to convert.
       /// \param rest Return value pointing at the first character in the 
@@ -509,19 +660,19 @@ namespace H3D {
       inline Vec4d getValue<Vec4d>( const char *s, const char *&rest ) {
         Vec4d v;
         const char *t1, *t2;
-        v.x = getValue<H3DFloat>( s, t1 );
+        v.x = getValue<H3DDouble>( s, t1 );
         if( !isspace(t1[0]) ) {
           throw X3DFieldConversionError( "Vec4d" );
         }
-        v.y = getValue<H3DFloat>( t1, t2 );
+        v.y = getValue<H3DDouble>( t1, t2 );
         if( !isspace(t2[0]) ) {
           throw X3DFieldConversionError( "Vec4d" );
         }
-        v.z = getValue<H3DFloat>( t2, t1 );
+        v.z = getValue<H3DDouble>( t2, t1 );
         if( !isspace(t1[0]) ) {
           throw X3DFieldConversionError( "Vec4d" );
         }
-        v.w = getValue<H3DFloat>( t1, rest );
+        v.w = getValue<H3DDouble>( t1, rest );
         return v;
       }
 

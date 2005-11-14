@@ -97,8 +97,11 @@ sfield_types = [
   ( SFCOLOR,    "SFColor" ),
   ( SFCOLORRGBA,"SFColorRGBA" ),
   ( SFROTATION, "SFRotation" ),
+  ( SFQUATERNION, "SFQuaternion" ),
   ( SFMATRIX3F, "SFMatrix3f" ),
   ( SFMATRIX4F, "SFMatrix4f" ),
+  ( SFMATRIX3D, "SFMatrix3d" ),
+  ( SFMATRIX4D, "SFMatrix4d" ),
   ( SFNODE    , "SFNode"     ) ]
 
 mfield_types = [
@@ -117,8 +120,11 @@ mfield_types = [
   ( MFCOLOR,    "MFColor" ),
   ( MFCOLORRGBA,"MFColorRGBA" ),
   ( MFROTATION, "MFRotation" ),
+  ( MFQUATERNION, "MFQuaternion" ),
   ( MFMATRIX3F, "MFMatrix3f" ),
   ( MFMATRIX4F, "MFMatrix4f" ),
+  ( MFMATRIX3D, "MFMatrix3d" ),
+  ( MFMATRIX4D, "MFMatrix4d" ),
   ( MFNODE    , "MFNode"     )
 ]
 
