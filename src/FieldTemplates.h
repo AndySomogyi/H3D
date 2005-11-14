@@ -345,7 +345,7 @@ namespace H3D {
   class H3DAPI_API MFFloat: public MField< H3DFloat > {
   public:
     MFFloat(){}
-    MFFloat( size_type size ): MField< H3DFloat >( size ){}
+    MFFloat( size_type sz ): MField< H3DFloat >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFFLOAT; }
   };
 
@@ -354,7 +354,7 @@ namespace H3D {
   class H3DAPI_API MFDouble: public MField< H3DDouble > {
   public:
     MFDouble(){}
-    MFDouble( size_type size ): MField< H3DDouble >( size ){}
+    MFDouble( size_type sz ): MField< H3DDouble >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFDOUBLE; }
   };
 
@@ -362,7 +362,7 @@ namespace H3D {
   class H3DAPI_API MFInt32: public MField< H3DInt32 > {
   public:
     MFInt32(){}
-    MFInt32( size_type size ): MField< H3DInt32 >( size ){}
+    MFInt32( size_type sz ): MField< H3DInt32 >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFINT32; }
   };
 
@@ -370,7 +370,7 @@ namespace H3D {
   class H3DAPI_API MFVec2f: public MField< Vec2f > {
   public:
     MFVec2f(){}
-    MFVec2f( size_type size ): MField< Vec2f >( size ){}
+    MFVec2f( size_type sz ): MField< Vec2f >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC2F; }
   };
 
@@ -378,7 +378,7 @@ namespace H3D {
   class H3DAPI_API MFVec3f: public MField< Vec3f > {
   public:
     MFVec3f(){}
-    MFVec3f( size_type size ): MField< Vec3f >( size ){}
+    MFVec3f( size_type sz ): MField< Vec3f >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC3F; }
   };
 
@@ -386,7 +386,7 @@ namespace H3D {
   class H3DAPI_API MFVec4f: public MField< Vec4f > {
   public:
     MFVec4f(){}
-    MFVec4f( size_type size ): MField< Vec4f >( size ){}
+    MFVec4f( size_type sz ): MField< Vec4f >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC4F; }
   };
 
@@ -394,7 +394,7 @@ namespace H3D {
   class H3DAPI_API MFVec2d: public MField< Vec2d > {
   public:
     MFVec2d(){}
-    MFVec2d( size_type size ): MField< Vec2d >( size ){}
+    MFVec2d( size_type sz ): MField< Vec2d >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC2D; }
   };
 
@@ -402,7 +402,7 @@ namespace H3D {
   class H3DAPI_API MFVec3d: public MField< Vec3d > {
   public:
     MFVec3d(){}
-    MFVec3d( size_type size ): MField< Vec3d >( size ){}
+    MFVec3d( size_type sz ): MField< Vec3d >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC3D; }
   };
 
@@ -410,7 +410,7 @@ namespace H3D {
   class H3DAPI_API MFVec4d: public MField< Vec4d > {
   public:
     MFVec4d(){}
-    MFVec4d( size_type size ): MField< Vec4d >( size ){}
+    MFVec4d( size_type sz ): MField< Vec4d >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFVEC4D; }
   };
 
@@ -418,7 +418,7 @@ namespace H3D {
   class H3DAPI_API MFBool: public MField< bool > {
   public:
     MFBool(){}
-    MFBool( size_type size ): MField< bool >( size ){}
+    MFBool( size_type sz ): MField< bool >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFBOOL; }
     /// Get the value of the field as a string. If the field contains
     /// multiple values the separator string is used between the values.
@@ -447,8 +447,8 @@ namespace H3D {
                                               AnyNumber< MFTime > > {
   public:
     MFTime(){}
-    MFTime( size_type size ) {
-	  value.resize( size );	
+    MFTime( size_type sz ) {
+	  value.resize( sz );	
 	}
     virtual string getTypeName() { return classTypeName(); }
     static string classTypeName() { return "MFTime"; }
@@ -459,7 +459,7 @@ namespace H3D {
   class H3DAPI_API MFString: public MField< string > {
   public:
     MFString(){}
-    MFString( size_type size ): MField< string >( size ){}
+    MFString( size_type sz ): MField< string >( sz ){}
     inline virtual string getValueAsString( const string& separator = " " ) {
       stringstream s;
       const vector< string > &v = getValue();
@@ -479,7 +479,7 @@ namespace H3D {
   class H3DAPI_API MFColor: public MField< RGB > {
   public:
     MFColor(){}
-    MFColor( size_type size ): MField< RGB >( size ){}
+    MFColor( size_type sz ): MField< RGB >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFCOLOR; }
   };
 
@@ -488,7 +488,7 @@ namespace H3D {
   class H3DAPI_API MFColorRGBA: public MField< RGBA > {
   public:
     MFColorRGBA(){}
-    MFColorRGBA( size_type size ): MField< RGBA >( size ){}
+    MFColorRGBA( size_type sz ): MField< RGBA >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFCOLORRGBA; }
   };
 
@@ -496,7 +496,7 @@ namespace H3D {
   class H3DAPI_API MFRotation: public MField< Rotation > {
   public:
     MFRotation(){}
-    MFRotation( size_type size ): MField< Rotation >( size ){}
+    MFRotation( size_type sz ): MField< Rotation >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFROTATION; }
   };
 
@@ -504,7 +504,7 @@ namespace H3D {
   class H3DAPI_API MFQuaternion: public MField< Quaternion > {
   public:
     MFQuaternion(){}
-    MFQuaternion( size_type size ): MField< Quaternion >( size ){}
+    MFQuaternion( size_type sz ): MField< Quaternion >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFQUATERNION; }
   };
 
@@ -512,7 +512,7 @@ namespace H3D {
   class H3DAPI_API MFMatrix3f: public MField< Matrix3f > {
   public:
     MFMatrix3f(){}
-    MFMatrix3f( size_type size ): MField< Matrix3f >( size ){}
+    MFMatrix3f( size_type sz ): MField< Matrix3f >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX3F; }
   };
 
@@ -520,7 +520,7 @@ namespace H3D {
   class H3DAPI_API MFMatrix4f: public MField< Matrix4f > {
   public:
     MFMatrix4f(){}
-    MFMatrix4f( size_type size ): MField< Matrix4f >( size ){}
+    MFMatrix4f( size_type sz ): MField< Matrix4f >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX4F; }
   };
 
@@ -528,7 +528,7 @@ namespace H3D {
   class H3DAPI_API MFMatrix3d: public MField< Matrix3d > {
   public:
     MFMatrix3d(){}
-    MFMatrix3d( size_type size ): MField< Matrix3d >( size ){}
+    MFMatrix3d( size_type sz ): MField< Matrix3d >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX3D; }
   };
 
@@ -536,7 +536,7 @@ namespace H3D {
   class H3DAPI_API MFMatrix4d: public MField< Matrix4d > {
   public:
     MFMatrix4d(){}
-    MFMatrix4d( size_type size ): MField< Matrix4d >( size ){}
+    MFMatrix4d( size_type sz ): MField< Matrix4d >( sz ){}
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFMATRIX4D; }
   };
 

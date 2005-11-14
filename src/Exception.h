@@ -238,7 +238,7 @@ namespace H3D {
     _filename, _linenumber) {}                                              \
   protected:                                                                \
     string className() const { return #name; }                         \
-};
+}
 
   /// Macro for easy creation of a H3D::Exception::H3DAPIException subclass.
   /// \param name the name of the class to define
@@ -254,7 +254,7 @@ namespace H3D {
                 _filename, _linenumber) {}                                  \
   protected:                                                                \
     string className() const { return #name; }                         \
-};
+}
 
 }
 

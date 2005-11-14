@@ -65,10 +65,10 @@ namespace H3D {
     }
 
     /// Creates an RefCountMField with space reserved for size nodes.
-      RefCountMField( typename FieldInternals::MFNodeAutoRefVector< RefClass >::size_type size ) : 
+      RefCountMField( typename FieldInternals::MFNodeAutoRefVector< RefClass >::size_type sz ) : 
       MFieldBase< RefClass *, 
                   FieldInternals::MFNodeAutoRefVector< RefClass >,
-                  Field >( size ){
+                  Field >( sz ){
       this->value.owner = this;
     }
     
@@ -136,6 +136,7 @@ namespace H3D {
     inline virtual void swap( vector< RefClass * > &v, int id = 0 ) {
       this->checkAccessTypeSet( id );
       this->checkAccessTypeGet( id );
+      this->upToDate();
       this->value.swap( v );
       this->startEvent();
     }
@@ -143,6 +144,7 @@ namespace H3D {
     /// Erase the first element equal to a.
     inline virtual void erase( RefClass *a, int id = 0 ) {
       this->checkAccessTypeSet( id );
+      this->upToDate();
       this->value.erase( a );
     } 
     

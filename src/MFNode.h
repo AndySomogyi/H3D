@@ -48,8 +48,8 @@ namespace H3D {
     MFNode() {}
     
     /// Creates an MFNode with space reserved for size nodes.
-    MFNode( size_type size ) : 
-      RefCountMField< Node >( size ) {} 
+    MFNode( size_type sz ) : 
+      RefCountMField< Node >( sz ) {} 
     
     /// Get the value of the MField.
     inline virtual const NodeVector &getValue( int id = 0 ) {

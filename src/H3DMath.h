@@ -36,7 +36,7 @@ namespace H3D {
   namespace Constants {
     /// Pi.
     static const double pi = 3.1415926535897932384626433832795;
-  };
+  }
 
   /// Determines if the given integer is a power of two or not.
   inline bool isPowerOfTwo( unsigned int i ) {

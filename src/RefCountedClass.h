@@ -139,6 +139,6 @@ namespace H3D {
     bool manual_initialize;
   };
     
-};
+}
 
 #endif

@@ -39,6 +39,9 @@ namespace H3D {
   /// Base class for all fields created with the SField template.
   class H3DAPI_API SFieldClass {
   public:
+    // Virtual destructor.
+    virtual ~SFieldClass() {};
+
     /// Set the value of the field given a pointer to where the value
     /// of the field is. 
     /// \param data A pointer to the data.

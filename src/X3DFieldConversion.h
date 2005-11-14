@@ -808,10 +808,10 @@ namespace H3D {
           s = Convert::skipWhitespacesAndComma( t1 );
         }
       } catch( const ConversionError & ) {
-        stringstream s;
-        s << typeid( typename VectorType::value_type ).name() 
-          << " vector" << ends;
-        throw ConversionError( s.str() );
+        stringstream ss;
+        ss << typeid( typename VectorType::value_type ).name() 
+           << " vector" << ends;
+        throw ConversionError( ss.str() );
       }
     }
 
@@ -842,9 +842,9 @@ namespace H3D {
             s = Convert::skipWhitespacesAndComma( t1 );
           }
       } catch( const ConversionError & ) {
-        stringstream s;
-        s << " string vector" << ends;
-        throw ConversionError( s.str() );
+        stringstream ss;
+        ss << " string vector" << ends;
+        throw ConversionError( ss.str() );
       }
     }
   

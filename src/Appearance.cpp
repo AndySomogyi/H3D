@@ -227,7 +227,7 @@ void Appearance::traverseSG( TraverseInfo &ti ) {
   for( MFShaderNode::const_iterator i = shaders->begin();
        i != shaders->end();
        i++ ) {
-   X3DShaderNode *s = static_cast< X3DShaderNode * >( *i );
-   if ( s ) s->traverseSG( ti );
+   X3DShaderNode *sn = static_cast< X3DShaderNode * >( *i );
+   if ( sn ) sn->traverseSG( ti );
   }
 }

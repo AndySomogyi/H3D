@@ -42,6 +42,9 @@ namespace H3D {
 
   class H3DAPI_API MFieldClass {
   public:
+    // Virtual destructor.
+    virtual ~MFieldClass() {};
+
     /// Set the value of the field given a pointer to where the value
     /// of the field is. 
     /// \param data A pointer to the data.
@@ -211,7 +214,7 @@ namespace H3D {
       this->checkAccessTypeSet( id );
       this->checkAccessTypeGet( id );
       this->upToDate();
-      value.swap( x );
+      this->value.swap( x );
       this->startEvent();
     }
 
@@ -220,7 +223,7 @@ namespace H3D {
       // check that we have the correct access type
       this->checkAccessTypeSet( id );
       this->upToDate();    
-      value.push_back( x );
+      this->value.push_back( x );
       this->startEvent();
     }
 
@@ -273,12 +276,12 @@ namespace H3D {
     /// \returns If successful: The number of bytes that was copied into the 
     /// Otherwise -1.
     inline virtual int getValueAsVoidPtr( void *data, 
-					  unsigned int &nr_elements,
+                                          unsigned int &nr_elements,
                                           unsigned int len, 
-					  int id = 0 ) {
-      unsigned int size = sizeof( value_type );
+                                          int id = 0 ) {
+      unsigned int sz = sizeof( value_type );
       nr_elements = this->value.size();
-      if( len < size * nr_elements ) {
+      if( len < sz * nr_elements ) {
         return -1;
       }
       
@@ -290,7 +293,7 @@ namespace H3D {
       for( unsigned int i = 0; i < nr_elements; i++ ) {
         data_ptr[i] = value[i];
       }
-      return size * nr_elements;
+      return sz * nr_elements;
     } 
 
     /// Returns the size in bytes of the value type the mfield encapsulates.
@@ -302,7 +305,7 @@ namespace H3D {
     MFieldBase() {};
 
     /// Creates a MField with space reserved for n elements.
-    MFieldBase( size_type size ) : value( size ) {};
+    MFieldBase( size_type sz ) : value( sz ) {};
 
     /// Returns a string name for this field type e.g. MFInt32
     static string classTypeName() {
@@ -339,8 +342,8 @@ namespace H3D {
     MField() {}
 
     /// Creates an MField with space reserved for size nodes.
-    MField( typename BaseMField::size_type size ) : 
-      BaseMField( size ) {}
+    MField( typename BaseMField::size_type sz ) : 
+      BaseMField( sz ) {}
         
     /// Get the value of the MField.
     inline virtual const vector< Type > &getValue( int id = 0 );
