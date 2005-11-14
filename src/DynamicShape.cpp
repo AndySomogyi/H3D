@@ -58,6 +58,9 @@ namespace DynamicShapeInternals {
   FIELDDB_ELEMENT( DynamicShape, mass,            INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, inertia,         INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicShape, motion,          INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DynamicShape, accumulatedInverse, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DynamicShape, accumulatedForward, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( DynamicShape, matrix,          INPUT_OUTPUT );
 }
 
 

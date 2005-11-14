@@ -94,11 +94,11 @@ namespace H3D {
       }
     };
 
-    /// Calculates the spin.
+    /// Calculates the spin (time derivative of the orientation)
     ///
     /// routes_in[0] is the angularVelocity
     /// routes_in[1] is the orientation
-    class H3DAPI_API SFSpin: public TypedField< SFRotation, 
+    class H3DAPI_API SFSpin: public TypedField< SFQuaternion, 
                                                 Types< SFVec3f, 
                                                        SFRotation > > {
       virtual void update() {
@@ -198,7 +198,7 @@ namespace H3D {
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
-    auto_ptr<    SFRotation    >  spin;
+    auto_ptr<    SFSpin    >  spin;
 
     /// Specifies the torque force currently acting on the dynamic
     ///
