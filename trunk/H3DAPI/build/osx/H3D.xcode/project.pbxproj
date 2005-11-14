@@ -114,6 +114,15 @@
 		};
 		08FB77ACFE841707C02AAC07 = {
 			children = (
+				4DF7479808D8407F00E4EE0D,
+				4DF7479A08D8407F00E4EE0D,
+				4DF7479C08D8407F00E4EE0D,
+				4DF7479E08D8407F00E4EE0D,
+				4DF747A008D8407F00E4EE0D,
+				4DF747A208D8407F00E4EE0D,
+				4DF747A408D8407F00E4EE0D,
+				4DF747A608D8407F00E4EE0D,
+				4DF747A808D8407F00E4EE0D,
 				4D0AFE9708A797D400A71D46,
 				4D0AFE9908A797D400A71D46,
 				4D0AFE9E08A797D400A71D46,
@@ -3124,6 +3133,16 @@
 		};
 		4D0AFE9508A7975100A71D46 = {
 			children = (
+				4DF7479908D8407F00E4EE0D,
+				4DF7479B08D8407F00E4EE0D,
+				4DF7479D08D8407F00E4EE0D,
+				4DF7479F08D8407F00E4EE0D,
+				4DF747A108D8407F00E4EE0D,
+				4DF747A308D8407F00E4EE0D,
+				4DF747A508D8407F00E4EE0D,
+				4DF747A708D8407F00E4EE0D,
+				4DF747A908D8407F00E4EE0D,
+				4DF7475308D82D7500E4EE0D,
 				4D0AFE9808A797D400A71D46,
 				4D0AFE9A08A797D400A71D46,
 				4D0AFE9B08A797D400A71D46,
@@ -6609,6 +6628,7 @@
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
+				4DF7479208D833DF00E4EE0D,
 			);
 			isa = PBXNativeTarget;
 			name = H3DLoad;
@@ -6656,6 +6676,309 @@
 		};
 		4D7B1DD008A8BF65008FFC05 = {
 			fileRef = 4D0A01FA08A79C4300A71D46;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF7475308D82D7500E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = X3DTypeFunctions.h;
+			path = ../../src/X3DTypeFunctions.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF7475408D82D7500E4EE0D = {
+			fileRef = 4DF7475308D82D7500E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF7479108D833DF00E4EE0D = {
+			containerPortal = 0867D690FE84028FC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 8D07F2BC0486CC7A007CD1D0;
+			remoteInfo = H3D;
+		};
+		4DF7479208D833DF00E4EE0D = {
+			isa = PBXTargetDependency;
+			target = 8D07F2BC0486CC7A007CD1D0;
+			targetProxy = 4DF7479108D833DF00E4EE0D;
+		};
+		4DF7479808D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Arc2D.cpp;
+			path = ../../src/Arc2D.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF7479908D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Arc2D.h;
+			path = ../../src/Arc2D.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF7479A08D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ArcClose2D.cpp;
+			path = ../../src/ArcClose2D.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF7479B08D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ArcClose2D.h;
+			path = ../../src/ArcClose2D.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF7479C08D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Circle2D.cpp;
+			path = ../../src/Circle2D.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF7479D08D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Circle2D.h;
+			path = ../../src/Circle2D.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF7479E08D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Disk2D.cpp;
+			path = ../../src/Disk2D.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF7479F08D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Disk2D.h;
+			path = ../../src/Disk2D.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A008D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Polyline2D.cpp;
+			path = ../../src/Polyline2D.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A108D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Polyline2D.h;
+			path = ../../src/Polyline2D.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A208D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Polypoint2D.cpp;
+			path = ../../src/Polypoint2D.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A308D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Polypoint2D.h;
+			path = ../../src/Polypoint2D.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A408D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Rectangle2D.cpp;
+			path = ../../src/Rectangle2D.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A508D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Rectangle2D.h;
+			path = ../../src/Rectangle2D.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A608D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ToggleGroup.cpp;
+			path = ../../src/ToggleGroup.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A708D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ToggleGroup.h;
+			path = ../../src/ToggleGroup.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A808D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = TriangleSet2D.cpp;
+			path = ../../src/TriangleSet2D.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747A908D8407F00E4EE0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = TriangleSet2D.h;
+			path = ../../src/TriangleSet2D.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4DF747AA08D8407F00E4EE0D = {
+			fileRef = 4DF7479808D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747AB08D8407F00E4EE0D = {
+			fileRef = 4DF7479908D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747AC08D8407F00E4EE0D = {
+			fileRef = 4DF7479A08D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747AD08D8407F00E4EE0D = {
+			fileRef = 4DF7479B08D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747AE08D8407F00E4EE0D = {
+			fileRef = 4DF7479C08D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747AF08D8407F00E4EE0D = {
+			fileRef = 4DF7479D08D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B008D8407F00E4EE0D = {
+			fileRef = 4DF7479E08D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B108D8407F00E4EE0D = {
+			fileRef = 4DF7479F08D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B208D8407F00E4EE0D = {
+			fileRef = 4DF747A008D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B308D8407F00E4EE0D = {
+			fileRef = 4DF747A108D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B408D8407F00E4EE0D = {
+			fileRef = 4DF747A208D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B508D8407F00E4EE0D = {
+			fileRef = 4DF747A308D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B608D8407F00E4EE0D = {
+			fileRef = 4DF747A408D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B708D8407F00E4EE0D = {
+			fileRef = 4DF747A508D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B808D8407F00E4EE0D = {
+			fileRef = 4DF747A608D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747B908D8407F00E4EE0D = {
+			fileRef = 4DF747A708D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747BA08D8407F00E4EE0D = {
+			fileRef = 4DF747A808D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747BB08D8407F00E4EE0D = {
+			fileRef = 4DF747A908D8407F00E4EE0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4DF747C008D84A6400E4EE0D = {
+			fileRef = 4D0AFF9108A797D500A71D46;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -6727,6 +7050,7 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
 				HEADER_SEARCH_PATHS = "../../../External/xerces-c-src_2_6_0/src ../../../External/FTGL/include ../../../External/freetype-2.1.9/include";
 				INFOPLIST_FILE = Info.plist;
+				INIT_ROUTINE = "";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				LIBRARY_SEARCH_PATHS = "../../../External/glew/lib ../../../External/FreeImage/Dist ../../../External/freetype-2.1.9/objs ../../../External/FTGL/mac/build /Users/mark/H3D/External/glew/lib /Users/mark/H3D/External/FTGL/mac/build /Users/mark/H3D/External/freetype-2.1.9/objs /Users/mark/H3D/External/FreeImage/Dist";
 				LIBRARY_STYLE = DYNAMIC;
@@ -6968,6 +7292,16 @@
 				4D0A01C308A797D600A71D46,
 				4D0A01C508A797D600A71D46,
 				4D7B1D7808A7BF6C008FFC05,
+				4DF7475408D82D7500E4EE0D,
+				4DF747AB08D8407F00E4EE0D,
+				4DF747AD08D8407F00E4EE0D,
+				4DF747AF08D8407F00E4EE0D,
+				4DF747B108D8407F00E4EE0D,
+				4DF747B308D8407F00E4EE0D,
+				4DF747B508D8407F00E4EE0D,
+				4DF747B708D8407F00E4EE0D,
+				4DF747B908D8407F00E4EE0D,
+				4DF747BB08D8407F00E4EE0D,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7154,6 +7488,16 @@
 				4D0A01BF08A797D600A71D46,
 				4D0A01C208A797D600A71D46,
 				4D0A01C408A797D600A71D46,
+				4DF747AA08D8407F00E4EE0D,
+				4DF747AC08D8407F00E4EE0D,
+				4DF747AE08D8407F00E4EE0D,
+				4DF747B008D8407F00E4EE0D,
+				4DF747B208D8407F00E4EE0D,
+				4DF747B408D8407F00E4EE0D,
+				4DF747B608D8407F00E4EE0D,
+				4DF747B808D8407F00E4EE0D,
+				4DF747BA08D8407F00E4EE0D,
+				4DF747C008D84A6400E4EE0D,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
