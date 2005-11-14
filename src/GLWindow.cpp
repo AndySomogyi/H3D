@@ -181,13 +181,13 @@ void GLWindow::shareRenderingContext( GLWindow *w ) {
 
 void GLWindow::initialize() {
   if ( !initialized ) {
-    unsigned int mode = GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH;
+    unsigned int mode = GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL;
     
     RenderMode::Mode stereo_mode = renderMode->getRenderMode();
     
     if( stereo_mode == RenderMode::VERTICAL_INTERLACED ||
         stereo_mode == RenderMode::VERTICAL_INTERLACED_GREEN_SHIFT ) {
-      mode |= GLUT_STENCIL;
+      //mode |= GLUT_STENCIL;
     } else  if( stereo_mode == RenderMode::QUAD_BUFFERED_STEREO ) {
       mode |= GLUT_STEREO;
     }
@@ -398,7 +398,7 @@ bool GLWindow::calculateFarAndNearPlane( H3DFloat &clip_far,
     if( d < min_d ) min_d = d;
     if( d > max_d ) max_d = d;
 
-     // add an epsilon value to make sure nothing is clipped away
+    // add an epsilon value to make sure nothing is clipped away
     // unintentially.
     clip_near = min_d - 1e-4;
     clip_far = max_d + 1e-4;
@@ -597,7 +597,8 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
     
     glDrawBuffer(GL_BACK_LEFT);
     
-    if( stereo_mode == RenderMode::RED_BLUE_STEREO )
+    if( stereo_mode == RenderMode::RED_BLUE_STEREO ||
+        stereo_mode == RenderMode::RED_CYAN_STEREO )
       // render only the red component
       glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
     else if( stereo_mode == RenderMode::VERTICAL_INTERLACED ||
@@ -657,15 +658,21 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
                bottom, top, 
                clip_near, clip_far );
     
-	if( stereo_mode == RenderMode::QUAD_BUFFERED_STEREO ) {
+    if( stereo_mode == RenderMode::QUAD_BUFFERED_STEREO ) {
       glDrawBuffer(GL_BACK_RIGHT);
-	  // clear the buffers before rendering
-	  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	} else if( stereo_mode == RenderMode::RED_BLUE_STEREO ) {
-      glClear(GL_DEPTH_BUFFER_BIT);
+      // clear the buffers before rendering
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    } else if( stereo_mode == RenderMode::RED_BLUE_STEREO ) {
+      glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+      glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
       glEnable(GL_BLEND);
       glBlendFunc(GL_ONE, GL_ONE);
-      glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
+    } else if( stereo_mode == RenderMode::RED_CYAN_STEREO ) {
+      glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_ONE, GL_ONE);
     } else if( stereo_mode == RenderMode::VERTICAL_INTERLACED ||
                stereo_mode == RenderMode::VERTICAL_INTERLACED_GREEN_SHIFT ) {
       glEnable(GL_STENCIL_TEST);
@@ -705,7 +712,8 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
     if( dlo )  dlo->displayList->callList();
     else child_to_render->render();
 
-    if( stereo_mode == RenderMode::RED_BLUE_STEREO )
+    if( stereo_mode == RenderMode::RED_BLUE_STEREO ||
+        stereo_mode == RenderMode::RED_CYAN_STEREO )
       glDisable( GL_BLEND );
     else if( stereo_mode == RenderMode::VERTICAL_INTERLACED ) 
       glDisable( GL_STENCIL_TEST );
@@ -841,13 +849,15 @@ GLWindow::RenderMode::Mode GLWindow::RenderMode::getRenderMode() {
     return VERTICAL_INTERLACED;
   else if( value == "RED_BLUE_STEREO" )
     return RED_BLUE_STEREO;
+  else if( value == "RED_CYAN_STEREO" )
+    return RED_CYAN_STEREO;
   else if( value == "VERTICAL_INTERLACED_GREEN_SHIFT" )
     return VERTICAL_INTERLACED_GREEN_SHIFT;  
   else {
     stringstream s;
     s << "Must be one of MONO, QUAD_BUFFERED_STEREO, "
-      << "VERTICAL_INTERLACED, VERTICAL_INTERLACED_GREEN_SHIFT "
-      << "or RED_BLUE_STEREO. " << ends;
+      << "VERTICAL_INTERLACED, VERTICAL_INTERLACED_GREEN_SHIFT, "
+      << "RED_CYAN_STEREO or RED_BLUE_STEREO. " << ends;
     throw InvalidRenderMode( value, 
                              s.str(),
                              H3D_FULL_LOCATION );

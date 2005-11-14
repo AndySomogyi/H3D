@@ -65,7 +65,10 @@ namespace H3D {
         VERTICAL_INTERLACED_GREEN_SHIFT,  
         /// Stereo mode where the left eye is rendered in red and the right 
         /// eye in blue. 
-        RED_BLUE_STEREO
+        RED_BLUE_STEREO,
+        /// Stereo mode where the left eye is rendered in red and the right 
+        /// eye in cyan. 
+        RED_CYAN_STEREO
       } Mode;
 
       /// Returns true if the current render mode is a stereo mode.
