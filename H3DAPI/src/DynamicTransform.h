@@ -21,13 +21,13 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file Dynamicshape.h
-/// \brief Header file for Dynamicshape, X3D scene-graph node
+/// \file DynamicTransform.h
+/// \brief Header file for DynamicTransform.
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-#ifndef __DYNAMICSHAPE_H__
-#define __DYNAMICSHAPE_H__
+#ifndef __DYNAMICTRANSFORM_H__
+#define __DYNAMICTRANSFORM_H__
 
 #include "MatrixTransform.h"
 #include "PeriodicUpdate.h"
@@ -36,12 +36,12 @@
 namespace H3D {
 
   /// \ingroup Groups
-  /// \class Dynamicshape
-  /// \brief The Dynamicshape node is a Shape container that has basic
+  /// \class DynamicTransform
+  /// \brief The DynamicTransform node is a Shape container that has basic
   /// properties for defining rigid body motion. This includes
   /// a position, orientation, mass, etc.
   ///
-  class H3DAPI_API DynamicShape : public MatrixTransform {
+  class H3DAPI_API DynamicTransform : public MatrixTransform {
   public:
 
     /// Time dependant field to perform the RK4 integration for determining
@@ -73,7 +73,7 @@ namespace H3D {
                          Types< SFRotation, SFVec3f > >{
     protected:
  
-      /// Update the matrix from the fields in the Dynamicshape node.
+      /// Update the matrix from the fields in the DynamicTransform node.
       virtual void update();
     };
 
@@ -128,7 +128,7 @@ namespace H3D {
     };
 
      /// Constructor.
-    DynamicShape( Inst< MFChild    > _addChildren              = 0,
+    DynamicTransform( Inst< MFChild    > _addChildren              = 0,
                   Inst< MFChild    > _removeChildren           = 0,
                   Inst< MFChild    > _children                 = 0,
                   Inst< SFNode     > _metadata                 = 0,
@@ -149,7 +149,7 @@ namespace H3D {
                   Inst< SFSpin           > _spin             = 0,
                   Inst< SFVec3f          > _torque           = 0,
                   Inst< SFFloat          > _mass             = 0,
-                  Inst< SFMatrix3f       > _inertia          = 0,
+                  Inst< SFMatrix3f       > _inertiaTensor    = 0,
                   Inst< SFMotion         > _motion           = 0 );
 
     /// Specifies the position of the shape
@@ -216,7 +216,7 @@ namespace H3D {
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> Matrix3f( 1, 0, 0, 0, 1, 0, 0, 0, 1 ) \n
-    auto_ptr<    SFMatrix3f  >  inertia;
+    auto_ptr<    SFMatrix3f  >  inertiaTensor;
 
     /// Dynamic update algorithm
     auto_ptr<    SFMotion    >  motion;
