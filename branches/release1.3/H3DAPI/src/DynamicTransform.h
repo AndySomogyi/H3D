@@ -52,7 +52,7 @@ namespace H3D {
       public  TypedField< H3D::SFVec3f, Types< SFTime > >  {
     public:
       
-      SFMotion() {
+      SFMotion(): last_t( 0 ) {
       }
       
       H3DTime last_t;
