@@ -166,8 +166,7 @@ namespace H3D {
 
     /// Specifies the velocity in m/s
     ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
+    /// <b>Access type:</b> outputOnly \n
     auto_ptr<    SFVec3f    >  velocity;
     
     /// Specifies the momentum
@@ -184,8 +183,7 @@ namespace H3D {
 
     /// Specifies the angular velocity of the dynamic
     ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
+    /// <b>Access type:</b> outputOnly \n
     auto_ptr<    SFVec3f    >  angularVelocity;
 
     /// Specifies the angular momentum of the dynamic
@@ -196,8 +194,7 @@ namespace H3D {
 
     /// Specifies the spin of the dynamic
     ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> Vec3f( 0, 0, 0 ) \n
+    /// <b>Access type:</b> outputOnly \n
     auto_ptr<    SFSpin    >  spin;
 
     /// Specifies the torque force currently acting on the dynamic
