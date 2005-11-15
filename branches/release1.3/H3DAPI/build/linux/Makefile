@@ -38,10 +38,19 @@ INCLUDES   = -I$(H3D_HOME)/src
 CXXFLAGS   = -g $(INCLUDES)
 LDFLAGS    = 
 
+# CG
+CXXLIBS   += -lCg -lCgGL
+
+# libaudiofile
+CXXLIBS   += -laudiofile
+
+# Ogg vorbis
+CXXLIBS   += -lvorbisfile
+
 # FreeImage
 CXXLIBS   += -L$(FREEIMAGE_LIBS) -lfreeimage
 INCLUDES  += -I$(FREEIMAGE_INCLUDE)
-
+ 
 # FreeType
 CXXLIBS   += -L$(FREETYPE_LIBS) -lfreetype
 INCLUDES  += -I$(FREETYPE_INCLUDE)
@@ -58,7 +67,7 @@ CXXLIBS   += -L$(XERCESC_LIBS) -lxerces-c
 INCLUDES  += -I$(XERCESC_INCLUDE)
 
 # OpenHaptics
-#CXXLIBS   += -lHL -lHLU -lHDU -lHD -lrt
+CXXLIBS   += -lHL -lHLU -lHDU -lHD -lrt
 
 # Python
 CXXLIBS   += -L$(PYTHON_LIBS) -lpython2.4 -lutil
