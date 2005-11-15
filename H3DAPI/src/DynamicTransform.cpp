@@ -106,7 +106,6 @@ DynamicTransform::DynamicTransform(
   motion          ( _motion           )   {
   type_name = "DynamicTransform";
   database.initFields( this );
-  //motion->last_t = 0;
 
   position->setValue( Vec3f( 0, 0, 0 ) );
   orientation->setValue( Rotation( 0, 0, 1, 0 ) );
@@ -143,11 +142,10 @@ void DynamicTransform::SFMotion::update() {
   
   H3DTime  t  = static_cast< SFTime *>(routes_in[0])->getValue();
 
-  //cerr << "DynamicTransform::SFMotion::update() v = " << v << endl;
-
+  if( last_t == 0 ) last_t = t;
   H3DTime dt = t - last_t;
   last_t = t;
-  if ( dt > 0.2 ) return; // ignore large dt's
+  if ( dt > 0.2 || dt <= 0 ) return; // ignore large dt's
 
   // iteratively perform the RK4 integration at 1ms intervals until
   // we have exceeded the current dt.
@@ -173,7 +171,7 @@ void DynamicTransform::SFMotion::update() {
   ds->angularMomentum->setValue( state.angMom );
 }
 
-
+ 
 void DynamicTransform::SFMotion::updateState( LMState &state, H3DTime dt ) {
   //DynamicTransform *ds = static_cast<DynamicTransform*>(owner);
 
