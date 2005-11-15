@@ -209,7 +209,7 @@
 				RelativePath="..\..\..\src\DynamicLibrary.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\DynamicShape.cpp">
+				RelativePath="..\..\..\src\DynamicTransform.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Exception.cpp">
@@ -820,7 +820,7 @@
 				RelativePath="..\..\..\src\DynamicLibrary.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\DynamicShape.h">
+				RelativePath="..\..\..\src\DynamicTransform.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Exception.h">
