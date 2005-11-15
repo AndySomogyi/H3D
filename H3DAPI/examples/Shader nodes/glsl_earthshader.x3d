@@ -1,0 +1,65 @@
+<Group>
+<DeviceInfo>
+     <HLHapticsDevice DEF="HDEV" positionCalibration="2e-3 0 0 0 0 2e-3 0 0 0 0 2e-3 0 0 0 0 1" >
+	<Group containerField="stylus">
+	<Shape>
+	  <Appearance>
+	     <Material/>
+	  </Appearance>
+	<Sphere radius="0.0025"/>
+	</Shape>
+	<Transform translation="0 0 0.08" rotation="1 0 0 1.570796" >
+	<Shape>
+	  <Appearance>
+	     <Material/>
+	  </Appearance>
+	<Cylinder radius="0.005" height="0.1"/>
+	</Shape>
+	</Transform>
+	</Group>
+     </HLHapticsDevice>
+  </DeviceInfo>
+
+<Transform DEF="TRAN" translation="-0.1 0.0 0" >
+<Shape>
+<Appearance>
+<Material diffuseColor="0 0 1"/> 
+<FrictionalSurface stiffness ="1"/>
+</Appearance> 
+<Box DEF="BOX" size="0.08 0.08 0.08" />
+</Shape> 
+</Transform>
+
+<Transform DEF="TRAN" translation="-0.1 0.0 0" >
+<Shape>
+<Appearance>
+<Material diffuseColor="0 0 1"/> 
+<MagneticSurface stiffness ="1" />
+</Appearance> 
+<Box DEF="BOX" solid="FALSE" size="0.08 0.08 0.08" />
+</Shape> 
+</Transform>
+<fShape>
+    <Appearance>
+	<Material />
+    <ComposedShader DEF="SHADER" language="GLSL" >
+    <field name="EarthDay" type="SFNode" accessType="inputOutput">
+<ImageTexture DEF="EARTH_DAY" url="shaders\textures\day.jpg" />
+    </field>
+    <field name="EarthNight" type="SFNode" accessType="inputOutput">
+        <ImageTexture DEF="EARTH_NIGHT" url="shaders\textures\night.jpg" />
+    </field>
+    <field name="EarthCloudGloss" type="SFNode" accessType="inputOutput">
+        <ImageTexture DEF="EARTH_CLOUDS" url="shaders\textures\clouds.jpg" />
+    </field>
+    <field name="LightPosition" type="SFVec3f" value="0.45 0 -0.45" accessType="inputOutput" />
+<ShaderPart type="FRAGMENT" url="Shaders\glsl_Earth.frag" />
+<ShaderPart type="VERTEX" url="Shaders\glsl_Earth.vert" />
+    </ComposedShader>
+    </Appearance>
+    <Sphere radius="0.1" />
+</fShape>
+<ROUTE fromNode="HDEV" fromField="trackerPosition" toNode="SHADER"
+toField="LightPosition" />
+</Group>
+
