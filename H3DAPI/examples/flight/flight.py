@@ -206,7 +206,6 @@ class Terrain:
     intx = int( posx )
     inty = int( posy )
     if intx < 0 or inty < 0 or intx>=sz-1 or inty>=sz-1:
-      print "OUT OF BOUNDS"
       return self.max
 
     diffx = posx - float( intx )
@@ -300,7 +299,6 @@ class ProxyNavigator( AutoUpdate( SFVec3f ) ):
   def update( self, event ):
     global podvel, podangvel, podalt, origin, podOrigin
     pos = event.getValue()
-    print "pod pos", pos
     try:
       diff = origin - pos
     except:
@@ -312,7 +310,6 @@ class ProxyNavigator( AutoUpdate( SFVec3f ) ):
     podvel = diff.z
     if podvel < 0:
       podvel = 0
-    #print "diff", diff
     podalt = -diff.y + 0.25
 
     # H3D requires a return value if the Field type is an SF or MF container
