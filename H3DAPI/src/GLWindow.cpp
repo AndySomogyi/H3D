@@ -617,6 +617,11 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
       glEnable(GL_STENCIL_TEST);
       glStencilFunc(GL_EQUAL,1,1);
       glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+    } else if( stereo_mode == RenderMode::HORIZONTAL_SPLIT ) {
+      glViewport( 0, height->getValue() / 2, 
+                  width->getValue(), height->getValue() / 2 );
+    } else if( stereo_mode == RenderMode::VERTICAL_SPLIT ) {
+      glViewport( 0, 0, width->getValue() / 2, height->getValue() );
     }
 
     // clear the buffers before rendering
@@ -689,6 +694,12 @@ void GLWindow::render( X3DChildNode *child_to_render ) {
       glEnable(GL_STENCIL_TEST);
       glStencilFunc(GL_NOTEQUAL,1,1);
       glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+    } if( stereo_mode == RenderMode::HORIZONTAL_SPLIT ) {
+      glViewport( 0, 0, 
+                  width->getValue(), height->getValue() / 2 );
+    } else if( stereo_mode == RenderMode::VERTICAL_SPLIT ) {
+      glViewport( width->getValue() / 2, 0, 
+                  width->getValue() / 2, height->getValue() );
     }
 
     glMatrixMode(GL_MODELVIEW);
@@ -858,6 +869,10 @@ GLWindow::RenderMode::Mode GLWindow::RenderMode::getRenderMode() {
     return MONO;
   else if( value == "QUAD_BUFFERED_STEREO" )
     return QUAD_BUFFERED_STEREO;
+  else if( value == "VERTICAL_SPLIT" )
+    return VERTICAL_SPLIT;
+  else if( value == "HORIZONTAL_SPLIT" )
+    return HORIZONTAL_SPLIT;
   else if( value == "VERTICAL_INTERLACED" )
     return VERTICAL_INTERLACED;
   else if( value == "HORIZONTAL_INTERLACED" )
@@ -872,6 +887,7 @@ GLWindow::RenderMode::Mode GLWindow::RenderMode::getRenderMode() {
     stringstream s;
     s << "Must be one of MONO, QUAD_BUFFERED_STEREO, HORIZONTAL_INTERLACED"
       << "VERTICAL_INTERLACED, VERTICAL_INTERLACED_GREEN_SHIFT, "
+      << "VERTICAL_SPLIT, HORIZONTAL_SPLIT, "
       << "RED_CYAN_STEREO or RED_BLUE_STEREO. " << ends;
     throw InvalidRenderMode( value, 
                              s.str(),
