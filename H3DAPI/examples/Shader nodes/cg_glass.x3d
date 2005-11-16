@@ -7,8 +7,7 @@
      bottomUrl="../textures/d_arch_00000.png"
      topUrl   ="../textures/t_arch_00000.png"  />
   
-  <!--Viewpoint position="0 0 -0.6" orientation="0 1 0 3.14159" /-->
-  <!--Navigator--> 
+  <Viewpoint position="0 0 0.6" />
     <DynamicTransform angularMomentum="-0.40 0.22 0.5">
     <FitToBoxTransform boxCenter="0 0 0" boxSize="0.25 0.25 0.25"
                        uniformScalingOnly="true" active="true">
@@ -45,15 +44,12 @@
           </ProgramShader>
           
         </Appearance>
-        <!--TexGenGeometry -->
           <SuperShape DEF="SS" resolution="128" 
                       ss1_m="1" ss1_a="1.1" ss1_b="1.88"
                       ss1_n1="3.41" ss1_n2="-0.24" ss1_n3="19.07"
                       ss2_m="4" ss2_a="1" ss2_b="1"
                       ss2_n1="110" ss2_n2="100" ss2_n3="70"  /> 
           
-          <!--TextureCoordinateGenerator mode="CAMERASPACEREFLECTIONVECTOR" />
-        </TexGenGeometry -->
       </Shape>
     </FitToBoxTransform>
     </DynamicTransform>

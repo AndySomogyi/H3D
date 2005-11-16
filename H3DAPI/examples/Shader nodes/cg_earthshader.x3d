@@ -28,13 +28,13 @@
       <ProgramShader DEF="SHADER" language="CG" >
         <ShaderProgram DEF="FRAGMENT_SHADER" type="FRAGMENT" url="Shaders/cg_Earth.frag" >
           <field name="EarthDay" type="SFNode" accessType="inputOutput">
-            <ImageTexture DEF="EARTH_DAY" url="Shaders/textures/day.jpg" />
+            <ImageTexture DEF="EARTH_DAY" url="../textures/Day.jpg" />
           </field>
           <field name="EarthNight" type="SFNode" accessType="inputOutput">
-            <ImageTexture DEF="EARTH_NIGHT" url="Shaders/textures/night.jpg" />
+            <ImageTexture DEF="EARTH_NIGHT" url="../textures/Night.jpg" />
           </field>
           <field name="EarthCloudGloss" type="SFNode" accessType="inputOutput">
-            <ImageTexture DEF="EARTH_CLOUDS" url="Shaders/textures/clouds.jpg" />
+            <ImageTexture DEF="EARTH_CLOUDS" url="../textures/Clouds.jpg" />
           </field>
         </ShaderProgram>
         <ShaderProgram DEF="VERTEX_SHADER" type="VERTEX" url="Shaders/cg_Earth.vert" >
