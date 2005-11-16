@@ -13,7 +13,7 @@ varying vec3 MCPosition;
 
 //Create uniform variables so dots can be spaced and scaled by user
 uniform vec3 Spacing;
-uniform float DotSize;
+uniform float DotSize, Transparency;
 
 //Create colors as uniform variables so they can be easily changed
 uniform vec3 ModelColor, PolkaDotColor;
@@ -40,6 +40,6 @@ void main(void)
    finalcolor        = vec3(mix(ModelColor, PolkaDotColor, insidesphere));
 
    // Output final color and factor in lighting
-   gl_FragColor      = clamp(vec4(finalcolor * LightIntensity, 1.0), 0.0, 1.0);
+   gl_FragColor      = clamp(vec4(finalcolor * LightIntensity, 1.0-Transparency), 0.0, 1.0);
 }
 
