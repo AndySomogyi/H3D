@@ -1,0 +1,143 @@
+<Group>
+	<Background			
+		 backUrl	="../textures/b_arch_00000.png"
+	   frontUrl ="../textures/f_arch_00000.png"
+	   leftUrl	="../textures/l_arch_00000.png"
+	   rightUrl ="../textures/r_arch_00000.png"
+	   bottomUrl="../textures/d_arch_00000.png"
+	   topUrl		="../textures/t_arch_00000.png"	 />
+  
+  <Viewpoint position="0 0 0.6" />
+  <DynamicTransform angularMomentum="0.2 0.45 0">
+
+
+    <!-- CubeMap -->
+    <FitToBoxTransform boxCenter="0 0 0" boxSize="0.25 0.25 0.25"
+	                     uniformScalingOnly="true" active="true">
+      <Shape>
+	      <Appearance>
+			    <Material DEF="CUBEMAP" transparency="1"/>
+          
+			    <ComposedCubeMapTexture>
+			      <ImageTexture url="../textures/b_arch_00000rot.png" 
+                          containerField="back"/>
+			      <ImageTexture url="../textures/f_arch_00000rot.png" 
+                          containerField="front"/>
+			      <ImageTexture url="../textures/l_arch_00000rot.png" 
+                          containerField="left"/>
+			      <ImageTexture url="../textures/r_arch_00000rot.png" 
+                          containerField="right"/>
+			      <ImageTexture url="../textures/t_arch_00000.png" 
+                          containerField="top"/>
+			      <ImageTexture url="../textures/d_arch_00000.png" 
+                          containerField="bottom"/>
+			    </ComposedCubeMapTexture>
+		      
+	      </Appearance>
+	      <TexGenGeometry>
+	        <SuperShape DEF="SS" resolution="128" 
+					            ss1_m="1" ss1_a="1.1" ss1_b="1.88"
+					            ss1_n1="3.41" ss1_n2="-0.24" ss1_n3="19.07"
+					            ss2_m="4" ss2_a="1" ss2_b="1"
+					            ss2_n1="150" ss2_n2="120" ss2_n3="90"	/> 
+				  
+	        <TextureCoordinateGenerator mode="CAMERASPACEREFLECTIONVECTOR" />
+        </TexGenGeometry>
+      </Shape>
+    </FitToBoxTransform>
+
+
+    <!-- GLASS -->
+    <FitToBoxTransform boxCenter="0 0 0" boxSize="0.25 0.25 0.25"
+                       uniformScalingOnly="true" active="true">
+      <Shape>
+        <Appearance>
+			    <Material DEF="GLASS" transparency="1"/>
+          <ProgramShader language="CG" >
+            <ShaderProgram DEF="GLASSSHADER" 
+                           type="FRAGMENT" 
+                           url="Shaders/cg_Refraction.frag" >
+              <field name="EnvMap" type="SFNode" accessType="inputOutput">
+                <ComposedCubeMapTexture>
+                  <ImageTexture url="../textures/b_arch_00000rot.png" 
+                                containerField="back"/>
+                  <ImageTexture url="../textures/f_arch_00000rot.png" 
+                                containerField="front"/>
+                  <ImageTexture url="../textures/l_arch_00000rot.png" 
+                                containerField="left"/>
+                  <ImageTexture url="../textures/r_arch_00000rot.png" 
+                                containerField="right"/>
+                  <ImageTexture url="../textures/t_arch_00000.png" 
+                                containerField="top"/>
+                  <ImageTexture url="../textures/d_arch_00000.png" 
+                                containerField="bottom"/>
+                </ComposedCubeMapTexture>
+              </field>
+              <field value="1" name="Transparency" type="SFFloat"
+                     accessType="inputOutput"/>
+              <field value="1" name="enableRefraction" type="SFFloat"
+                     accessType="inputOutput"/>
+              <field value="1" name="enableFresnel" 
+                     type="SFFloat" accessType="inputOutput"/>
+            </ShaderProgram>
+            <ShaderProgram DEF="VERTEX_SHADER" type="VERTEX"
+                           url="Shaders/cg_Refraction.vert" />
+          </ProgramShader>
+          
+        </Appearance>
+        <!--TexGenGeometry -->
+	        <SuperShape USE="SS"/> 
+				  
+          
+          <!--TextureCoordinateGenerator mode="CAMERASPACEREFLECTIONVECTOR" />
+        </TexGenGeometry -->
+      </Shape>
+    </FitToBoxTransform>
+
+
+    <FitToBoxTransform boxCenter="0 0 0" boxSize="0.25 0.25 0.25"
+                       uniformScalingOnly="true" active="true">
+      <Shape>
+        <Appearance>
+			    <Material DEF="POLKA" transparency="1"/>
+          
+          <ComposedShader DEF="POLKASHADER" language="GLSL" >
+            <field name="LightPosition" type="SFVec3f" value="0 0 0.45"
+                   accessType="inputOutput" /> 
+            <field name="Spacing" type="SFVec3f" value="0.2 0.2 0.2"
+                   accessType="inputOutput" /> 
+            <field name="DotSize" type="SFFloat" value="0.1"
+                   accessType="inputOutput" /> 
+            <field name="ModelColor" type="SFColor" value="1 0 0"
+                   accessType="inputOutput" /> 
+            <field name="PolkaDotColor" type="SFColor" value="1 1 1"
+                   accessType="inputOutput" /> 
+            <field name="Transparency" type="SFFloat" value="1"
+                   accessType="inputOutput" /> 
+            <ShaderPart type="FRAGMENT" url="Shaders/glsl_Polkadot3D.frag" />
+            <ShaderPart type="VERTEX" url="Shaders/glsl_Polkadot3D.vert" />
+          </ComposedShader>
+
+ 
+        </Appearance>
+	        <SuperShape USE="SS"/> 
+      </Shape>
+    </FitToBoxTransform>
+    
+
+
+  </DynamicTransform>
+  <PythonScript url="multi.py">
+    <Material USE="CUBEMAP" containerField="references" />
+    <Material USE="GLASS" containerField="references" />
+    <Material USE="POLKA" containerField="references" />
+  </PythonScript>
+
+
+  <ROUTE fromNode="GLASS" fromField="transparency"
+      toNode="GLASSSHADER" toField="Transparency" />
+
+  <ROUTE fromNode="POLKA" fromField="transparency"
+      toNode="POLKASHADER" toField="Transparency" />
+
+</Group>
