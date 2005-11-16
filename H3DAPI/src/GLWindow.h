@@ -55,6 +55,9 @@ namespace H3D {
         /// Quad buffered stereo rendering. Needs a quad buffered
         /// enabled graphics card
         QUAD_BUFFERED_STEREO, 
+        /// Stereo mode where every second horizontal line is rendered for the 
+        /// left eye and every other line for the right eye.
+        HORIZONTAL_INTERLACED,  
         /// Stereo mode where every second vertical line is rendered for the 
         /// left eye and every other line for the right eye.
         VERTICAL_INTERLACED,  
