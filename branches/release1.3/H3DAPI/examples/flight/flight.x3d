@@ -130,42 +130,23 @@
   </Transform>
 </Transform>
 
-
-<!--Transform translation="0 0.5 0">
-<Shape>
-   <Appearance>
-        <GeneratedCubeMapTexture update="ALWAYS" />
-   </Appearance>
-   <TexGenGeometry >
-     <Sphere radius="0.25" /> 
-     <TextureCoordinateGenerator mode="CAMERASPACEREFLECTIONVECTOR" />
-   </TexGenGeometry >
- </Shape>
-</Transform-->
-
-
-
+<!-- 'POD' Spaceship -->
 <Transform DEF="POD" translation="0 0.25 0">
 <Transform scale="0.01 0.01 0.01" >
 <Shape>
    <Appearance>
      <Material emissiveColor="0.5 0.5 0.5" diffuseColor="0.81 0.81 0.81" />
-        <!--GeneratedCubeMapTexture update="ALWAYS" /-->
    </Appearance>
-   <!--TexGenGeometry -->
      <SuperShape DEF="SS" resolution="64" 
                  ss1_m="2" 
                  ss1_n1="0.7" ss1_n2="0.3" ss1_n3="0.2"
                  ss2_m="3" 
                  ss2_n1="100" ss2_n2="100" ss2_n3="100"  /> 
-     <!--TextureCoordinateGenerator mode="CAMERASPACEREFLECTIONVECTOR" />
-   </TexGenGeometry -->
  </Shape>
 </Transform>
 </Transform>
 
 
-<!--SpringEffect startDistance="1" escapeDistance="2" DEF="SPRING" /-->
 
   <!-- KeySensor node for handling user keyboard input -->
   <KeySensor DEF="KS" />
@@ -188,8 +169,5 @@
          toNode="POD" toField="translation" />
   <ROUTE fromNode="PS" fromField="podOrientation" 
          toNode="POD" toField="rotation" />
-  <ROUTE fromNode="PS" fromField="podOrigin" 
-         toNode="SPRING" toField="position" />
-
 
 </Group>
