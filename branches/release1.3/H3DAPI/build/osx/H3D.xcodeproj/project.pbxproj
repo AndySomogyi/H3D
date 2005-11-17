@@ -386,6 +386,9 @@
 		4D4C503D090E24E400AD15B0 /* X3DParametricGeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C5039090E24E400AD15B0 /* X3DParametricGeometryNode.cpp */; };
 		4D4C503E090E24E400AD15B0 /* GeneratedCubeMapTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C503A090E24E400AD15B0 /* GeneratedCubeMapTexture.cpp */; };
 		4D4C503F090E24E400AD15B0 /* ComposedCubeMapTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C503B090E24E400AD15B0 /* ComposedCubeMapTexture.cpp */; };
+		4D5AEA4A092B88B700427A11 /* TexGenGeometry.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D5AEA47092B88B700427A11 /* TexGenGeometry.h */; };
+		4D5AEA4B092B88B700427A11 /* H3DFunctionNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D5AEA48092B88B700427A11 /* H3DFunctionNode.h */; };
+		4D5AEA79092C895800427A11 /* TexGenGeometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AEA49092B88B700427A11 /* TexGenGeometry.cpp */; };
 		4D5AEE2D092A0FCD007DE64E /* Xerces.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D5AEE2B092A0FCD007DE64E /* Xerces.framework */; };
 		4D5AEE2E092A0FCD007DE64E /* Xerces.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D5AEE2B092A0FCD007DE64E /* Xerces.framework */; };
 		4D5DCBAE091B9B3F007BCF50 /* OggFileReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D5DCBA7091B9B3F007BCF50 /* OggFileReader.h */; };
@@ -427,7 +430,6 @@
 		4D7B1DAA08A8AE5E008FFC05 /* libGLEW.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D7B1D8C08A8AC4D008FFC05 /* libGLEW.a */; };
 		4D7B1DAB08A8AE5E008FFC05 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0A01FB08A79C4300A71D46 /* OpenGL.framework */; };
 		4D7B1DD008A8BF65008FFC05 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0A01FA08A79C4300A71D46 /* GLUT.framework */; };
-		4D818E4C092A80180055532C /* TexGenGeometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D818E4B092A80180055532C /* TexGenGeometry.cpp */; };
 		4DEC79E0092A216C00CB721D /* DynamicTransform.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEC79D9092A216C00CB721D /* DynamicTransform.h */; };
 		4DEC79E1092A216C00CB721D /* X3DNurbsSurfaceGeometryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEC79DA092A216C00CB721D /* X3DNurbsSurfaceGeometryNode.h */; };
 		4DEC79E2092A216C00CB721D /* X3DParametricGeometryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEC79DB092A216C00CB721D /* X3DParametricGeometryNode.h */; };
@@ -901,6 +903,9 @@
 		4D4C5039090E24E400AD15B0 /* X3DParametricGeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = X3DParametricGeometryNode.cpp; path = ../../src/X3DParametricGeometryNode.cpp; sourceTree = SOURCE_ROOT; };
 		4D4C503A090E24E400AD15B0 /* GeneratedCubeMapTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = GeneratedCubeMapTexture.cpp; path = ../../src/GeneratedCubeMapTexture.cpp; sourceTree = SOURCE_ROOT; };
 		4D4C503B090E24E400AD15B0 /* ComposedCubeMapTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ComposedCubeMapTexture.cpp; path = ../../src/ComposedCubeMapTexture.cpp; sourceTree = SOURCE_ROOT; };
+		4D5AEA47092B88B700427A11 /* TexGenGeometry.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TexGenGeometry.h; path = ../../src/TexGenGeometry.h; sourceTree = SOURCE_ROOT; };
+		4D5AEA48092B88B700427A11 /* H3DFunctionNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = H3DFunctionNode.h; path = ../../src/H3DFunctionNode.h; sourceTree = SOURCE_ROOT; };
+		4D5AEA49092B88B700427A11 /* TexGenGeometry.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TexGenGeometry.cpp; path = ../../src/TexGenGeometry.cpp; sourceTree = SOURCE_ROOT; };
 		4D5AEE2B092A0FCD007DE64E /* Xerces.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Xerces.framework; path = /Library/Frameworks/Xerces.framework; sourceTree = "<absolute>"; };
 		4D5DCBA7091B9B3F007BCF50 /* OggFileReader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OggFileReader.h; path = ../../src/OggFileReader.h; sourceTree = SOURCE_ROOT; };
 		4D5DCBA8091B9B3F007BCF50 /* H3DSoundFileNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = H3DSoundFileNode.cpp; path = ../../src/H3DSoundFileNode.cpp; sourceTree = SOURCE_ROOT; };
@@ -935,8 +940,6 @@
 		4D7B1D9008A8ACA6008FFC05 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = /usr/local/lib/libfreetype.a; sourceTree = SOURCE_ROOT; };
 		4D7B1D9208A8ACCB008FFC05 /* libfreeimage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreeimage.a; path = /usr/lib/libfreeimage.a; sourceTree = SOURCE_ROOT; };
 		4D7B1D9808A8AD7C008FFC05 /* H3DLoad */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = H3DLoad; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D818E4A092A80180055532C /* TexGenGeometry.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TexGenGeometry.h; path = ../../../../../../projects/VolumeViewer/src/TexGenGeometry.h; sourceTree = SOURCE_ROOT; };
-		4D818E4B092A80180055532C /* TexGenGeometry.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TexGenGeometry.cpp; path = ../../../../../../projects/VolumeViewer/src/TexGenGeometry.cpp; sourceTree = SOURCE_ROOT; };
 		4DEC79D9092A216C00CB721D /* DynamicTransform.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DynamicTransform.h; path = ../../src/DynamicTransform.h; sourceTree = SOURCE_ROOT; };
 		4DEC79DA092A216C00CB721D /* X3DNurbsSurfaceGeometryNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = X3DNurbsSurfaceGeometryNode.h; path = ../../src/X3DNurbsSurfaceGeometryNode.h; sourceTree = SOURCE_ROOT; };
 		4DEC79DB092A216C00CB721D /* X3DParametricGeometryNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = X3DParametricGeometryNode.h; path = ../../src/X3DParametricGeometryNode.h; sourceTree = SOURCE_ROOT; };
@@ -1045,8 +1048,6 @@
 		0867D691FE84028FC02AAC07 /* H3D */ = {
 			isa = PBXGroup;
 			children = (
-				4D818E4A092A80180055532C /* TexGenGeometry.h */,
-				4D818E4B092A80180055532C /* TexGenGeometry.cpp */,
 				4D0AFE9508A7975100A71D46 /* Headers */,
 				08FB77ACFE841707C02AAC07 /* Source */,
 				089C1665FE841158C02AAC07 /* Resources */,
@@ -1094,6 +1095,7 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				4D5AEA49092B88B700427A11 /* TexGenGeometry.cpp */,
 				4DEC7A0B092A21E400CB721D /* DynamicTransform.cpp */,
 				4DEC7A05092A21D400CB721D /* Matrix4VertexAttribute.cpp */,
 				4DEC7A06092A21D400CB721D /* Matrix3VertexAttribute.cpp */,
@@ -1289,6 +1291,8 @@
 		4D0AFE9508A7975100A71D46 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				4D5AEA47092B88B700427A11 /* TexGenGeometry.h */,
+				4D5AEA48092B88B700427A11 /* H3DFunctionNode.h */,
 				4DEC79E7092A219600CB721D /* Vec4f.h */,
 				4DEC79E8092A219600CB721D /* Vec4d.h */,
 				4DEC79E9092A219600CB721D /* Vec3f.h */,
@@ -1814,6 +1818,8 @@
 				4DEC7A02092A219600CB721D /* H3DTypeOperators.h in Headers */,
 				4DEC7A03092A219600CB721D /* H3DTemplateOperators.h in Headers */,
 				4DEC7A04092A219600CB721D /* H3DBasicTypes.h in Headers */,
+				4D5AEA4A092B88B700427A11 /* TexGenGeometry.h in Headers */,
+				4D5AEA4B092B88B700427A11 /* H3DFunctionNode.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1987,7 +1993,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D7B1D9B08A8AD8E008FFC05 /* H3DLoad.cpp in Sources */,
-				4D818E4C092A80180055532C /* TexGenGeometry.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2187,6 +2192,7 @@
 				4DEC7A09092A21D400CB721D /* Matrix3VertexAttribute.cpp in Sources */,
 				4DEC7A0A092A21D400CB721D /* FloatVertexAttribute.cpp in Sources */,
 				4DEC7A0C092A21E400CB721D /* DynamicTransform.cpp in Sources */,
+				4D5AEA79092C895800427A11 /* TexGenGeometry.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
