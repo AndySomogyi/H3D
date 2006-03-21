@@ -1,0 +1,27 @@
+<!-- This example requires a haptics device -->
+<Group>
+  <IMPORT inlineDEF='H3D_EXPORTS' exportedDEF='HDEV' AS='HDEV' />
+  <Shape>
+    <Appearance>
+      <Material />
+      <ComposedShader DEF="SHADER" language="GLSL" >
+        <field name="EarthDay" type="SFNode" accessType="inputOutput">
+          <ImageTexture DEF="EARTH_DAY" url="../textures/Day.jpg" />
+        </field>
+        <field name="EarthNight" type="SFNode" accessType="inputOutput">
+          <ImageTexture DEF="EARTH_NIGHT" url="../textures/Night.jpg" />
+        </field>
+        <field name="EarthCloudGloss" type="SFNode" accessType="inputOutput">
+          <ImageTexture DEF="EARTH_CLOUDS" url="../textures/Clouds.jpg" />
+        </field>
+        <field name="LightPosition" type="SFVec3f" value="0.45 0 -0.45" accessType="inputOutput" />
+        <ShaderPart type="FRAGMENT" url="Shaders/glsl_Earth.frag" />
+        <ShaderPart type="VERTEX" url="Shaders/glsl_Earth.vert" />
+      </ComposedShader>
+    </Appearance>
+    <Sphere radius="0.1" />
+  </Shape>
+  <ROUTE fromNode="HDEV" fromField="trackerPosition" toNode="SHADER"
+         toField="LightPosition" />
+</Group>
+
