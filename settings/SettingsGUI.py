@@ -1,9 +1,7 @@
 #!/usr/local/bin/pythonw2.4
 
 import os
-import _winreg
 import wx
-import win32gui, win32con
 import ConfigParser
 import string
 
