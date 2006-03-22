@@ -147,6 +147,9 @@ void PythonScript::loadScript( const string &script ) {
       Console(3) << "Warning: PyEval_GetBuiltins() could not be installed in module dictionary!" << endl;
   }  
   
+#ifdef WIN32
+  // have to read the script into a buffer instead of using FILE *
+  // since it is unsafe to use FILE * sent over DLL boundaries.
   ifstream is( script.c_str() );
   if( is.good() ) {
     int length;
@@ -174,7 +177,21 @@ void PythonScript::loadScript( const string &script ) {
       PyErr_Print();
     }
     delete buffer;
-  } else {
+  }
+#else
+  FILE *f = fopen( script.c_str(), "r" );
+  if ( f ) {
+    PyErr_Clear();
+    PyObject *r = PyRun_File( f, script.c_str(), Py_file_input,
+                              static_cast< PyObject * >(module_dict), 
+                              static_cast< PyObject * >(module_dict) );
+    if ( r == NULL )
+      PyErr_Print();
+  }
+  
+#endif
+
+  else {
     Console(4) << "Could not open \""<< script << endl;
   }
 }
