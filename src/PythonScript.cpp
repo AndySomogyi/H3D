@@ -93,7 +93,7 @@ namespace PythonScriptInternals {
 
 
 Field *PythonScript::lookupField( const string &name ) {
-	if( module_dict ) {
+    if( module_dict ) {
     PyObject *fname = 
       PyDict_GetItemString( static_cast< PyObject * >( module_dict ), 
                             name.c_str() );
@@ -101,13 +101,13 @@ Field *PythonScript::lookupField( const string &name ) {
       // it was a variable in the python script, so extract the C++ type
       // pointer and return it
       PyObject *fieldptr = PyObject_GetAttrString( fname, "__fieldptr__" );
-	  if ( fieldptr && PyCObject_Check( fieldptr ) ) {
+      if ( fieldptr && PyCObject_Check( fieldptr ) ) {
         Field *f = static_cast< Field* >( PyCObject_AsVoidPtr( fieldptr ) );
-		Py_DECREF( fieldptr );
-		return f;
-	  }
+        Py_DECREF( fieldptr );
+        return f;
+      }
     } 
-	}
+    }
   return NULL;
 }
 
@@ -139,7 +139,7 @@ void PythonScript::initialiseParser() {
 }
 
 void PythonScript::loadScript( const string &script ) {
-  PyObject *ref = (PyObject*)PythonInternals::fieldAsPythonObject( references.get() );
+  PyObject *ref = (PyObject*)PythonInternals::fieldAsPythonObject( references.get(), false );
   PyDict_SetItem( (PyObject *)module_dict, 
                   PyString_FromString( "references" ), 
                   ref );
