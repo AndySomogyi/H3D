@@ -101,8 +101,11 @@ Field *PythonScript::lookupField( const string &name ) {
       // it was a variable in the python script, so extract the C++ type
       // pointer and return it
       PyObject *fieldptr = PyObject_GetAttrString( fname, "__fieldptr__" );
-      if ( fieldptr && PyCObject_Check( fieldptr ) )
-        return static_cast< Field* >( PyCObject_AsVoidPtr( fieldptr ) );
+	  if ( fieldptr && PyCObject_Check( fieldptr ) ) {
+        Field *f = static_cast< Field* >( PyCObject_AsVoidPtr( fieldptr ) );
+		Py_DECREF( fieldptr );
+		return f;
+	  }
     } 
 	}
   return NULL;

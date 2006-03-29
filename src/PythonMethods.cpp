@@ -728,6 +728,7 @@ call the base class __init__ function." );
       }
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
+      Py_DECREF( py_field_ptr );
 
       PyObject *v = PyTuple_GetItem( args, 1 );
       //const char *value = PyString_AsString( PyObject_Repr( v ) );
@@ -756,7 +757,9 @@ call the base class __init__ function." );
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
       
-      if( field_ptr ) { 
+      Py_DECREF( py_field_ptr );
+
+	  if( field_ptr ) { 
         bool success;
         APPLY_SFIELD_MACRO( field_ptr, field_ptr->getX3DType(), v, GET_SFIELD, success );
         if( !success )
@@ -814,7 +817,10 @@ call the base class __init__ function." );
       Field *to_field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_to_field_ptr ) );
       
-      if( from_field_ptr == 0 ) {
+      Py_DECREF( py_to_field_ptr );
+      Py_DECREF( py_from_field_ptr );
+
+	  if( from_field_ptr == 0 ) {
         ostringstream err;
         err << "Source not a Field class in H3D.unrouteField( fromField, toField )";
         PyErr_SetString( PyExc_ValueError, err.str().c_str() );
@@ -862,6 +868,8 @@ call the base class __init__ function." );
       }
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
+
+      Py_DECREF( py_field_ptr );
       
       return PyInt_FromLong( (int)field_ptr );
       //Py_INCREF(Py_None);
@@ -910,7 +918,8 @@ call the base class __init__ function." );
         ( PyCObject_AsVoidPtr( py_from_field_ptr ) );
       Field *to_field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_to_field_ptr ) );
-      
+
+
       if( from_field_ptr == 0 ) {
         ostringstream err;
         err << "Source not a Field class in H3D.routeField( fromField, toField )";
@@ -935,6 +944,8 @@ call the base class __init__ function." );
         return NULL;
       }
       
+	  Py_DECREF( py_to_field_ptr );
+	  Py_DECREF( py_from_field_ptr );
       Py_INCREF(Py_None);
       return Py_None; 
     }
@@ -1016,16 +1027,18 @@ have defined an __init__ function in a specialized field class, you \
 call the base class __init__ function." );
         return 0;
       }
-      
+
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
       Field::FieldVector routes_in =  field_ptr->getRoutesIn();
       PyObject *retval = PyTuple_New( routes_in.size() );
 
       for( unsigned int i = 0; i < routes_in.size() ; i++ ) {
-        PyTuple_SetItem( retval, i, 
-           (PyObject *)PythonInternals::fieldAsPythonObject( routes_in[i] ) );
+        PyObject *t = (PyObject *)PythonInternals::fieldAsPythonObject( routes_in[i] );
+  	    PyTuple_SetItem( retval, i, t );
       }
+      
+      Py_DECREF( py_field_ptr );
       return retval;
     }
 
@@ -1059,9 +1072,11 @@ call the base class __init__ function." );
       Field::FieldSet::iterator fi = routes_out.begin();
       unsigned int i = 0;
       for( ; fi != routes_out.end(); i++,fi++ ) {
-        PyTuple_SetItem( retval, i, 
-            (PyObject *) PythonInternals::fieldAsPythonObject( *fi ) );
+	    PyObject *t = (PyObject *) PythonInternals::fieldAsPythonObject( *fi );
+        PyTuple_SetItem( retval, i, t );
       }
+
+      Py_DECREF( py_field_ptr );
       return retval;
     }
 
@@ -1208,6 +1223,7 @@ call the base class __init__ function." );
           return 0;  
         }
       }
+      Py_DECREF( py_field_ptr );
       Py_INCREF(Py_None);
       return Py_None; 
     }
@@ -1251,6 +1267,7 @@ call the base class __init__ function." );
           return 0;  
         }
       }
+      Py_DECREF( py_field_ptr );
       Py_INCREF(Py_None);
       return Py_None; 
     }
@@ -1277,6 +1294,7 @@ call the base class __init__ function." );
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
       if( field_ptr ) field_ptr->touch();
 
+      Py_DECREF( py_field_ptr );
       Py_INCREF(Py_None);
       return Py_None; 
     }
@@ -1301,6 +1319,7 @@ call the base class __init__ function." );
       
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
+      Py_DECREF( py_field_ptr );
       
       if( field_ptr ) { 
         bool success;
@@ -1339,6 +1358,7 @@ call the base class __init__ function." );
       
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
+      Py_DECREF( py_field_ptr );
       
       if( field_ptr ) { 
         bool success;
@@ -1377,6 +1397,7 @@ call the base class __init__ function." );
       
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
+      Py_DECREF( py_field_ptr );
       
       if( field_ptr ) { 
         bool success;
@@ -1413,6 +1434,7 @@ call the base class __init__ function." );
       
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
+      Py_DECREF( py_field_ptr );
       
       if( field_ptr ) { 
         bool success;
@@ -1449,6 +1471,7 @@ call the base class __init__ function." );
       
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
+      Py_DECREF( py_field_ptr );
       
       if( field_ptr ) { 
         bool success;
