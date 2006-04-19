@@ -119,6 +119,11 @@ template<> bool IntersectSegmentShape(const Point3& p, const Point3& q, const Sp
 template<typename SHAPE> class BoundingShapesTree
 {
 public:
+
+  virtual void render( int depth, const IndexedTriangleGeometry& mesh ) {
+    if( root ) root->render( depth, mesh );
+  }
+  
 	class Node
 	{
 	public:
@@ -141,6 +146,27 @@ public:
 			if (right) delete right;
 		}
 
+    virtual void render( int depth, const IndexedTriangleGeometry& mesh ) {
+      if( !IsLeaf() ) {
+        if( depth == 0 ) {
+          shape.render();
+        } else {
+          if( left ) left->render( depth - 1, mesh );
+          if( right ) right->render( depth - 1, mesh );
+        }
+      } else {
+        glDisable( GL_LIGHTING );
+        glColor3f( 0, 0, 1 );
+        Triangle t = mesh.FetchTriangle(data);
+        glBegin( GL_LINE_STRIP );
+        glVertex3f( t.a.x, t.a.y, t.a.z );
+        glVertex3f( t.b.x, t.b.y, t.b.z );
+        glVertex3f( t.c.x, t.c.y, t.c.z );
+        glVertex3f( t.a.x, t.a.y, t.a.z );
+        glEnd();
+        glEnable( GL_LIGHTING );
+      }
+    }
 		
 	public:
 		bool IsLeaf() const
@@ -171,6 +197,7 @@ public:
 	typename BoundingShapesTree<SHAPE>::Node* node;
 	std::vector<unsigned int> triangles;
 };
+
 template<typename SHAPE> void Build(BoundingShapesTree<SHAPE>& tree, const IndexedTriangleGeometry& mesh)
 {
 	std::stack< Subtree<SHAPE> > stack;
@@ -201,7 +228,7 @@ template<typename SHAPE> void Build(BoundingShapesTree<SHAPE>& tree, const Index
 	//	build bounding shape
 		node->shape = BoundingShape<SHAPE>( &temp[0],(unsigned int)temp.size() );
 		
-		if (triangle.size() == 1)
+		if (triangle.size() == 1 )
 		{
 		//	build a leaf
 			node->data = triangle[0];
@@ -209,16 +236,20 @@ template<typename SHAPE> void Build(BoundingShapesTree<SHAPE>& tree, const Index
 		}
 		
 		
-	//	DIVIDE SUBSET AND RECURSE
-	//	longest axis
+    //	DIVIDE SUBSET AND RECURSE
+    //	longest axis
 		Vector3 axis = LongestAxis(node->shape);
 
-	//	middle point of current set
+    //	middle point of current set
 		Point3 mid(0,0,0);
-		for(unsigned int i=0 ; i<triangle.size() ; i++) mid = mid + Representative( temp[i] );
-		mid = (1.0f/triangles.size()) * mid;	//divide by N
-		
-	//	build subsets based on axis/middle point
+    float test = 0;
+    for(unsigned int i=0 ; i<triangle.size() ; i++) {
+       mid = mid + Representative( temp[i] );
+       test = test + temp[i].a.x;
+    }
+		mid = (1.0f/triangle.size()) * mid;	//divide by N
+    
+    //	build subsets based on axis/middle point
 		std::vector<unsigned int> left;
 		std::vector<unsigned int> right;
 		for(unsigned int i=0 ; i<triangle.size() ; i++)
@@ -229,8 +260,7 @@ template<typename SHAPE> void Build(BoundingShapesTree<SHAPE>& tree, const Index
 				right.push_back(triangle[i]);
 		}
 		
-		
-	//	sanity check... sometimes current subset cannot be divided by longest axis: change axis or just half
+    //	sanity check... sometimes current subset cannot be divided by longest axis: change axis or just half
 		if ( (left.size() == 0) || (right.size() == 0) )
 		{
 			left.clear();
@@ -281,7 +311,7 @@ public:
 		barycentric = Vector3(0,0,0);
 	}
 };
-template<typename SHAPE> bool Intersect(const Point3& p, const Point3& q, const typename BoundingShapesTree<SHAPE>::Node* node, const IndexedTriangleGeometry& mesh, IntersectionQueryResult& result)
+template<typename SHAPE> bool Intersect(const Point3& p, const Point3& q, typename BoundingShapesTree<SHAPE>::Node* node, const IndexedTriangleGeometry& mesh, IntersectionQueryResult& result)
 {
 	if ( node->IsLeaf() )
 	{
@@ -307,6 +337,7 @@ template<typename SHAPE> bool Intersect(const Point3& p, const Point3& q, const 
 		if ( IntersectSegmentShape(p,q,node->shape) )
 		{
 			bool overlap = false;
+      node->shape.collided = true;
 			
 			if (node->left) overlap |= Intersect<SHAPE>(p,q,node->left,mesh,result);
 			if (node->right) overlap |= Intersect<SHAPE>(p,q,node->right,mesh,result);
@@ -316,7 +347,15 @@ template<typename SHAPE> bool Intersect(const Point3& p, const Point3& q, const 
 		else return false;
 	}
 }
- 
+
+template<typename SHAPE> 
+void Clear( typename BoundingShapesTree<SHAPE>::Node* node) {
+  node->shape.collided = false;
+  if( !node->IsLeaf() ) {
+    Clear<SHAPE>(node->left);
+    Clear<SHAPE>(node->right);
+  }
+}
  
  
 #endif//___H3DGLUE_COLLISION_DETECTION___

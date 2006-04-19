@@ -6,6 +6,7 @@
 #include "Math.hpp"
 #include <vector>		//vector 
 #include <float.h>	//FLT_MAX, FLT_EPSILON
+#include "H3DTypes.h"
  
  
  
@@ -13,13 +14,14 @@
 template<typename C, typename T> bool Contains(const C& container, const T& item)
 {
 	for (C::const_iterator it = container.begin() ; it != container.end() ; it++)
-	{
-		if (*it == item) return true;
-	}
+    {
+      if (*it == item) return true;
+    }
 	return false;
 }
  
- 
+
+
  
 //---CLASS
 //	Desc:	Axis Aligned Box
@@ -29,17 +31,52 @@ class Box
 public:
 	Vector3 min;
 	Vector3 max;
+  bool collided;
+  virtual void render( ) {
+    glDisable( GL_LIGHTING );
+    if( collided )
+      glColor3f( 1, 0, 0 );
+    else
+      glColor3f( 1, 1, 0 );
+    glBegin( GL_LINE_STRIP );
+    glVertex3f( min.x, min.y, min.z );
+    glVertex3f( min.x, max.y, min.z );
+    glVertex3f( max.x, max.y, min.z );
+    glVertex3f( max.x, min.y, min.z );
+    glVertex3f( min.x, min.y, min.z );
+    glEnd();
+
+    glBegin( GL_LINE_STRIP );
+    glVertex3f( min.x, min.y, max.z );
+    glVertex3f( min.x, max.y, max.z );
+    glVertex3f( max.x, max.y, max.z );
+    glVertex3f( max.x, min.y, max.z );
+    glVertex3f( min.x, min.y, max.z );
+    glEnd();
+
+    glBegin( GL_LINES );
+    glVertex3f( min.x, min.y, max.z );
+    glVertex3f( min.x, min.y, min.z );
+    glVertex3f( max.x, min.y, max.z );
+    glVertex3f( max.x, min.y, min.z );
+    glVertex3f( min.x, max.y, max.z );
+    glVertex3f( min.x, max.y, min.z );
+    glVertex3f( max.x, max.y, max.z );
+    glVertex3f( max.x, max.y, min.z );
+    glEnd();
+    glEnable( GL_LIGHTING );
+  }
 };
  
 inline Vector3 LongestAxis(const Box& box)
 {
-   Vector3 dims(box.max.x-box.min.x,
-                box.max.y-box.min.y,
-                box.max.z-box.min.z);
+  Vector3 dims(box.max.x-box.min.x,
+               box.max.y-box.min.y,
+               box.max.z-box.min.z);
 
-   if (dims.x >= dims.y && dims.x >= dims.z) return Vector3(1,0,0);
-   if (dims.y >= dims.x && dims.y >= dims.z) return Vector3(0,1,0);
-   else													return Vector3(0,0,1);
+  if (dims.x >= dims.y && dims.x >= dims.z) return Vector3(1,0,0);
+  if (dims.y >= dims.x && dims.y >= dims.z) return Vector3(0,1,0);
+  else													return Vector3(0,0,1);
 }
 Box BoundingBox(const Point3* pt,const unsigned int n)
 {
@@ -48,15 +85,15 @@ Box BoundingBox(const Point3* pt,const unsigned int n)
 	box.max = pt[0];
 
 	for(unsigned int i=1 ; i<n ; i++)
-	{
-		if (pt[i].x < box.min.x) box.min.x = pt[i].x;
-		if (pt[i].y < box.min.y) box.min.y = pt[i].y;
-		if (pt[i].z < box.min.z) box.min.z = pt[i].z;
+    {
+      if (pt[i].x < box.min.x) box.min.x = pt[i].x;
+      if (pt[i].y < box.min.y) box.min.y = pt[i].y;
+      if (pt[i].z < box.min.z) box.min.z = pt[i].z;
 		
-		if (pt[i].x > box.max.x) box.max.x = pt[i].x;
-		if (pt[i].y > box.max.y) box.max.y = pt[i].y;
-		if (pt[i].z > box.max.z) box.max.z = pt[i].z;
-	}
+      if (pt[i].x > box.max.x) box.max.x = pt[i].x;
+      if (pt[i].y > box.max.y) box.max.y = pt[i].y;
+      if (pt[i].z > box.max.z) box.max.z = pt[i].z;
+    }
 	return box;
 }
  
@@ -67,10 +104,29 @@ class Sphere
 public:
 	Vector3 c;
 	float r;
-	
+  bool collided;
+  GLUquadricObj* gl_quadric;
 public:
-	Sphere(){}
-	Sphere(const Vector3& c_,float r_):c(c_),r(r_){}
+	Sphere(): gl_quadric( NULL ), collided( false ) {}
+	Sphere(const Vector3& c_,float r_):c(c_),r(r_), 
+                                     gl_quadric( NULL ), collided( false ) {}
+  
+  virtual void render( ) {
+    if( !gl_quadric ) gl_quadric = gluNewQuadric();
+    glDisable( GL_LIGHTING );
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
+    glTranslatef( c.x, c.y, c.z );
+    if( collided )
+      glColor3f( 1, 0, 0 );
+    else
+      glColor3f( 1, 1, 0 );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    gluSphere( gl_quadric, r, 10, 10 );
+    glPopMatrix();
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    glEnable( GL_LIGHTING );
+  }
 };
  
 Sphere QuickBoundingSphere(const Point3* pt,const unsigned int n)
@@ -79,12 +135,12 @@ Sphere QuickBoundingSphere(const Point3* pt,const unsigned int n)
 	Point3 c = 0.5 * (box.min + box.max);
 	float r = 0;
 	
-//	find largest square distance
+  //	find largest square distance
 	for(unsigned int i=0 ; i<n ; i++)
-	{
-		float d = Dot(pt[i]-c,pt[i]-c);
-		if (d > r) r = d;
-	}
+    {
+      float d = Dot(pt[i]-c,pt[i]-c);
+      if (d > r) r = d;
+    }
 	
 	return Sphere(c, sqrt(r) );
 } 
@@ -94,7 +150,9 @@ Sphere QuickBoundingSphere(const Point3* pt,const unsigned int n)
 class IndexedTriangle
 {
 public:
-	unsigned int a,b,c;
+  IndexedTriangle() {}
+  IndexedTriangle( int _a, int _b, int _c ): a( _a ), b( _b ), c( _c ) {}
+	int a,b,c;
 };
 class Triangle
 {
@@ -125,6 +183,17 @@ public:
 	{
 		SetSize(vertexCount,triangleCount);
 	}
+  IndexedTriangleGeometry( const vector< H3D::Vec3f > &coords, const vector< int > &index ) {
+    vertex.resize( coords.size() );
+    triangle.resize( index.size() / 3 );
+    for( unsigned int i = 0; i < coords.size(); i++ ) {
+      vertex[i] = Vector3( coords[i].x, coords[i].y, coords[i].z ); 
+    }
+
+    for( unsigned int i = 0; i < index.size(); i+=3 ) {
+      triangle[i/3] = IndexedTriangle( index[i], index[i+1], index[i+2] ); 
+    }
+  } 
 	
 public:
 	void SetSize(unsigned int vertexCount, unsigned int triangleCount)
@@ -157,27 +226,30 @@ public:
 	{
 		return ::FetchTriangle(triangle[i], NormalPointer() );
 	}
-	unsigned int AdjacentTriangle(unsigned int i, unsigned int edge) const
+	
+  unsigned int AdjacentTriangle(unsigned int i, unsigned int edge) const
 	{
 		return (&adjacency[i].a)[edge];
 	}
 	
 public:
-	unsigned int* IndexPointer() const
+	int* IndexPointer() const
 	{
-		return const_cast<unsigned int*>(&triangle[0].a);
+		return const_cast<int*>(&triangle[0].a);
 	}
-	Point3* VertexPointer() const
+	
+  Point3* VertexPointer() const
 	{
 		return const_cast<Vector3*>(&vertex[0]);
 	}
-	Vector3* NormalPointer() const
+	
+  Vector3* NormalPointer() const
 	{
 		return const_cast<Vector3*>(&normal[0]);
 	}
-	unsigned int* AdjacencyPointer() const
+	int* AdjacencyPointer() const
 	{
-		return const_cast<unsigned int*>(&adjacency[0].a);
+		return const_cast<int*>(&adjacency[0].a);
 	}
 };
  
@@ -235,19 +307,19 @@ Vector3 OutOfPlaneBarycentricCoordinates(const Point3& p, const Point3& a,const 
 	float lastDist = FLT_MAX;
 	
 	for(unsigned int i=0 ; i<maxIterations ; i++)
-	{
-		float dist = Dot( Normalize(Cross(p1-p0,p2-p0)) , p-p0);
+    {
+      float dist = Dot( Normalize(Cross(p1-p0,p2-p0)) , p-p0);
 		
-		if (Abs(dist) < threshold) break;
-		if (Abs(dist)>Abs(lastDist)) break;
+      if (Abs(dist) < threshold) break;
+      if (Abs(dist)>Abs(lastDist)) break;
 		
-		h+= dist;
-		p0 = a + h * na;
-		p1 = b + h * nb;
-		p2 = c + h * nc;
+      h+= dist;
+      p0 = a + h * na;
+      p1 = b + h * nb;
+      p2 = c + h * nc;
 		
-		lastDist = dist;
-	}
+      lastDist = dist;
+    }
 	
 	return BarycentricCoords(p,p0,p1,p2);
 }
@@ -279,46 +351,46 @@ bool EdgesCoincide(const Point3& Ai, const Point3& Bi, const Point3& Aj, const P
 }
 void ComputeTriangleAdjacency(const Point3* vertex, unsigned int vertexCount, const unsigned int* index,const unsigned int indexCount, unsigned int* const adjacency)
 {
-//	init to no adj
+  //	init to no adj
 	for(unsigned int i=0 ; i<indexCount ; i++) adjacency[i] = H3DGLUE_INVALID_INDEX;
 
-//	for each triangle couple (i,j)...
+  //	for each triangle couple (i,j)...
 	for(unsigned int i=0 ; i<indexCount/3 ; i++) for(unsigned int j=i+1 ; j<indexCount/3 ; j++)
-	{
-	//	...and for each edge couple (e,f) between the two triangles
-		for(unsigned int e=0 ; e<3 ; e++) for(unsigned int f=0 ; f<3 ; f++)
-		{
-		//	fetch edge's vertices
-			const Point3& Ai = vertex[ index[i*3+ e     ] ];
-			const Point3& Bi = vertex[ index[i*3+(e+1)%3] ];
+    {
+      //	...and for each edge couple (e,f) between the two triangles
+      for(unsigned int e=0 ; e<3 ; e++) for(unsigned int f=0 ; f<3 ; f++)
+        {
+          //	fetch edge's vertices
+          const Point3& Ai = vertex[ index[i*3+ e     ] ];
+          const Point3& Bi = vertex[ index[i*3+(e+1)%3] ];
 
-			const Point3& Aj = vertex[ index[j*3+ f     ] ];
-			const Point3& Bj = vertex[ index[j*3+(f+1)%3] ];
+          const Point3& Aj = vertex[ index[j*3+ f     ] ];
+          const Point3& Bj = vertex[ index[j*3+(f+1)%3] ];
 
-		//	if edges coincide in space...
-			if ( EdgesCoincide(Ai,Bi,Aj,Bj) == true)
-			{
-			//	record adjacency
-				adjacency[i*3+e] = j;	
-				adjacency[j*3+f] = i;
-			}
-		}
-	}
+          //	if edges coincide in space...
+          if ( EdgesCoincide(Ai,Bi,Aj,Bj) == true)
+            {
+              //	record adjacency
+              adjacency[i*3+e] = j;	
+              adjacency[j*3+f] = i;
+            }
+        }
+    }
 }
 void ComputeTriangleNormals(const Point3* vertex, unsigned int vertexCount, const unsigned int* index,const unsigned int indexCount, Vector3* const normal)
 {
-//	init
+  //	init
 	for(unsigned int i=0 ; i<vertexCount ; i++) normal[i] = Vector3(0,0,0);
 
-//	for each triangle
+  //	for each triangle
 	for(unsigned int i=0 ; i<indexCount/3 ; i++)
-	{
-		Vector3 n = TriangleNormal(vertex[index[i*3+0]],vertex[index[i*3+1]],vertex[index[i*3+2]]);
+    {
+      Vector3 n = TriangleNormal(vertex[index[i*3+0]],vertex[index[i*3+1]],vertex[index[i*3+2]]);
 		
-		normal[index[i*3+0]] += AngleOfTriangle(vertex[index[i*3+0]],vertex[index[i*3+1]],vertex[index[i*3+2]]) * n;
-		normal[index[i*3+1]] += AngleOfTriangle(vertex[index[i*3+1]],vertex[index[i*3+2]],vertex[index[i*3+0]]) * n;
-		normal[index[i*3+2]] += AngleOfTriangle(vertex[index[i*3+2]],vertex[index[i*3+0]],vertex[index[i*3+1]]) * n;
-	}
+      normal[index[i*3+0]] += AngleOfTriangle(vertex[index[i*3+0]],vertex[index[i*3+1]],vertex[index[i*3+2]]) * n;
+      normal[index[i*3+1]] += AngleOfTriangle(vertex[index[i*3+1]],vertex[index[i*3+2]],vertex[index[i*3+0]]) * n;
+      normal[index[i*3+2]] += AngleOfTriangle(vertex[index[i*3+2]],vertex[index[i*3+0]],vertex[index[i*3+1]]) * n;
+    }
 	
 	for(unsigned int i=0 ; i<vertexCount ; i++) normal[i] = Normalize(normal[i]);
 }
@@ -326,33 +398,33 @@ unsigned int FindMaxVertexDegree(const unsigned int* index,const unsigned int in
 {
 	std::vector< std::vector<unsigned int> > neighbours(vertexCount);
 	
-//	for each triangle...
+  //	for each triangle...
 	for(unsigned int i=0 ; i<indexCount/3 ; i++)
-	{
-		unsigned int a = index[i*3+0];
-		unsigned int b = index[i*3+1];
-		unsigned int c = index[i*3+2];
+    {
+      unsigned int a = index[i*3+0];
+      unsigned int b = index[i*3+1];
+      unsigned int c = index[i*3+2];
 
-	//	put b,c in a
-		if (!Contains(neighbours[a],b)) neighbours[a].push_back(b);
-		if (!Contains(neighbours[a],c)) neighbours[a].push_back(c);
+      //	put b,c in a
+      if (!Contains(neighbours[a],b)) neighbours[a].push_back(b);
+      if (!Contains(neighbours[a],c)) neighbours[a].push_back(c);
 
-	//	put a,c in b
-		if (!Contains(neighbours[b],a)) neighbours[b].push_back(a);
-		if (!Contains(neighbours[b],c)) neighbours[b].push_back(c);
+      //	put a,c in b
+      if (!Contains(neighbours[b],a)) neighbours[b].push_back(a);
+      if (!Contains(neighbours[b],c)) neighbours[b].push_back(c);
 
-	//	put a,b in c
-		if (!Contains(neighbours[c],a)) neighbours[c].push_back(a);
-		if (!Contains(neighbours[c],b)) neighbours[c].push_back(b);
-	}
+      //	put a,b in c
+      if (!Contains(neighbours[c],a)) neighbours[c].push_back(a);
+      if (!Contains(neighbours[c],b)) neighbours[c].push_back(b);
+    }
 	
-//	find max...
+  //	find max...
 	unsigned int maxDegree = (unsigned int) neighbours[0].size();
 	for(unsigned int i=1 ; i<vertexCount ; i++)
-	{
-		unsigned int degree = (unsigned int) neighbours[i].size();
-		if (degree > maxDegree) maxDegree = degree;
-	}
+    {
+      unsigned int degree = (unsigned int) neighbours[i].size();
+      if (degree > maxDegree) maxDegree = degree;
+    }
 	return maxDegree;
 }
  

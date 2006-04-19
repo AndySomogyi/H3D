@@ -35,6 +35,8 @@
 #include "X3DColorNode.h"
 #include "CoordBoundField.h"
 #include "MFInt32.h"
+#include "SFInt32.h"
+#include "GLUE/CollisionDetection.hpp"
 
 namespace H3D {
 
@@ -157,6 +159,8 @@ namespace H3D {
                         Inst< MFInt32          > _set_index       = 0,
                         Inst< MFInt32          > _index           = 0 );
 
+    virtual void initialize();
+
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
@@ -188,8 +192,14 @@ namespace H3D {
     /// \dotfile IndexedTriangleSet_index.dot 
     auto_ptr< MFInt32 >  index;
 
+    auto_ptr< SFInt32 > depth;
+
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
+    IndexedTriangleGeometry *haptik_geometry;
+    BoundingShapesTree< Box > tree;
+    IntersectionQueryResult intersection;
   };
 }
 
