@@ -147,6 +147,183 @@ Sphere QuickBoundingSphere(const Point3* pt,const unsigned int n)
  
  
  
+class OrientedBox
+{
+public:
+	Point3 center;
+	Vector3 axis[3];
+	Vector3 halfsize;
+	
+public:
+	Vector3 AxisX() const {return axis[0];}
+	Vector3 AxisY() const {return axis[1];}
+	Vector3 AxisZ() const {return axis[2];}
+	Matrix3x3& Rotation() const
+	{
+		return *(Matrix3x3*)axis;
+	}
+};
+ 
+ 
+Matrix3x3 CovarianceMatrix(const Point3* pt, unsigned int numPts)
+{
+	Point3 c = pt[0];
+	for(unsigned int i=1 ; i<numPts ; i++) c+= pt[i];
+	c /= float(numPts);
+	
+	float e00 = 0, e01 = 0, e02 = 0,
+						e11 = 0, e12 = 0,
+									e22 = 0;
+	for (unsigned int i = 0; i < numPts; i++)
+	{
+		Point3 p = pt[i] - c;
+		
+		e00 += p.x * p.x;
+		e11 += p.y * p.y;
+		e22 += p.z * p.z;
+		e01 += p.x * p.y;
+		e02 += p.x * p.z;
+		e12 += p.y * p.z;
+	}
+	
+	Matrix3x3 cov;
+	cov.e[0][0] = e00 / numPts;
+	cov.e[1][1] = e11 / numPts;
+	cov.e[2][2] = e22 / numPts;
+	cov.e[0][1] = cov.e[1][0] = e01 / numPts;
+	cov.e[0][2] = cov.e[2][0] = e02 / numPts;
+	cov.e[1][2] = cov.e[2][1] = e12 / numPts;
+	
+	return cov;
+}
+
+
+void SymmetricSchurDecomposition(const Matrix3x3 &A, unsigned int p, unsigned int q, float &c, float &s)
+{
+	if (Abs(A.e[p][q]) > 0.0001f)
+	{
+		float r = (A.e[q][q] - A.e[p][p]) / (2.0f * A.e[p][q]);
+		float t = (r >= 0.0f ? 1.0f / (r + SquareRoot(1.0f + r*r)) : -1.0f / (-r + SquareRoot(1.0f + r*r)) );
+		
+		c = 1.0f / SquareRoot(1.0f + t*t);
+		s = t * c;
+	}
+	else
+	{
+		c = 1.0f;
+		s = 0.0f;
+	}
+}
+void EigenValuesAndEigenVectorsJacobi(const Matrix3x3& A, Vector3& eigValues, Matrix3x3& eigVectors, const unsigned int maxIterations = 50)
+{
+//!NOTE: on return rows (not cols) of eigVectors contains eigenvalues
+
+	Matrix3x3 a = A;
+	Matrix3x3 v = Identity3x3();
+	
+	unsigned int i, j, n, p, q;
+	float prevoff, c, s;
+	Matrix3x3 J, b, t;
+
+// Repeat for some maximum number of iterations
+	for (n = 0; n < maxIterations; n++)
+	{
+		p = 0; q = 1;
+		for (i = 0; i < 3; i++) for (j = 0; j < 3; j++)
+		{
+			if (i == j) continue;
+			if (Abs(a.e[i][j]) > Abs(a.e[p][q])) {p = i; q = j;}
+		}
+
+		SymmetricSchurDecomposition(a, p, q, c, s);
+		for (i = 0; i < 3; i++)
+		{
+			J.e[i][0] = J.e[i][1] = J.e[i][2] = 0.0f;
+			J.e[i][i] = 1.0f;
+		}
+		J.e[p][p] =  c; J.e[p][q] = s;
+		J.e[q][p] = -s; J.e[q][q] = c;
+
+	// cumulate rotations
+		v = v * J;
+
+	// diagonalize
+		a = (Transpose(J) * a) * J;
+
+	//	eval norm
+		float off = 0.0f;
+		for (i = 0; i < 3; i++) for (j = 0; j < 3; j++)
+		{
+			if (i == j) continue;
+			off += a.e[i][j] * a.e[i][j];
+		}
+		
+	// stop condition
+		if (n > 2 && off >= prevoff) break;
+		prevoff = off;
+	}
+	
+	eigValues = Vector3(a.e[0][0],a.e[1][1],a.e[2][2]);
+	eigVectors = Transpose(v);
+}
+ 
+ 
+inline OrientedBox BoundingOrientedBox(const Point3* point, unsigned int count)
+{
+	Matrix3x3 covariance = CovarianceMatrix(point,count);
+	
+	Vector3 eigValues;
+	Matrix3x3 eigVectors;
+	EigenValuesAndEigenVectorsJacobi(covariance,eigValues,eigVectors);
+	
+	
+//	guess an oriented reference frame
+	unsigned int lengthOrder[3];
+	ComputeSortingArray(&eigValues.x,3,lengthOrder);
+	Vector3 principal(eigVectors.e[lengthOrder[0]][0],eigVectors.e[lengthOrder[0]][1],eigVectors.e[lengthOrder[0]][2]);
+	Vector3 secondary(eigVectors.e[lengthOrder[1]][0],eigVectors.e[lengthOrder[1]][1],eigVectors.e[lengthOrder[1]][2]);
+	Matrix3x3 frame( Normalize(principal),Normalize(secondary), Cross(principal,secondary));
+	
+	
+//	build box in the new frame
+	Matrix3x3 inverse = Transpose(frame);
+	Point3 min = point[0]*inverse;
+	Point3 max = point[0]*inverse;
+	for(unsigned int i=1 ; i<count ; i++)
+	{
+		Point3 pt = point[i]*inverse;
+		
+		if (pt.x < min.x) min.x = pt.x;
+		if (pt.y < min.y) min.y = pt.y;
+		if (pt.z < min.z) min.z = pt.z;
+		
+		if (pt.x > max.x) max.x = pt.x;
+		if (pt.y > max.y) max.y = pt.y;
+		if (pt.z > max.z) max.z = pt.z;
+	}
+	
+	
+//	fill oriented box
+	OrientedBox obox;
+	obox.axis[0] = Vector3(frame.e[0][0],frame.e[0][1],frame.e[0][2]);
+	obox.axis[1] = Vector3(frame.e[1][0],frame.e[1][1],frame.e[1][2]);
+	obox.axis[2] = Vector3(frame.e[2][0],frame.e[2][1],frame.e[2][2]);
+	obox.center = 0.5f*(min+max) * frame;
+	obox.halfsize = 0.5f*(max-min);
+	
+	return obox;
+}
+ 
+ 
+inline Vector3 LongestAxis(const OrientedBox& obox)
+{
+	unsigned int max = IndexOfMax(&obox.halfsize.x,3);
+	return obox.axis[max];
+}
+ 
+ 
+ 
+ 
 class IndexedTriangle
 {
 public:

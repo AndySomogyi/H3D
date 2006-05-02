@@ -72,6 +72,13 @@ bool IntersectSegmentBox(const Point3& p, const Point3& q, const Point3& min, co
 
 	return true;
 }
+bool IntersectSegmentOrientedBox(const Point3& p, const Point3& q, const OrientedBox& obox)
+{
+	Point3 rp = obox.Rotation() * (p-obox.center);
+	Point3 rq = obox.Rotation() * (q-obox.center);
+	
+	return IntersectSegmentBox(rp,rq,-obox.halfsize,+obox.halfsize);
+}
  
  
  
@@ -87,6 +94,10 @@ template<> Box BoundingShape(const Triangle* item, unsigned int itemCount)
 template<> Sphere BoundingShape(const Triangle* item, unsigned int itemCount)
 {
 	return QuickBoundingSphere( &item[0].a , itemCount*3 );
+}
+template<> OrientedBox BoundingShape(const Triangle* item, unsigned int itemCount)
+{
+	return BoundingOrientedBox( &item[0].a , itemCount*3 );
 }
 template<typename SHAPE> Point3 Representative(const SHAPE& shape)
 {
@@ -111,6 +122,10 @@ template<> bool IntersectSegmentShape(const Point3& p, const Point3& q, const Bo
 template<> bool IntersectSegmentShape(const Point3& p, const Point3& q, const Sphere& sphere)
 {
 	return IntersectSegmentSphere(p,q,sphere.c,sphere.r);
+} 
+template<> bool IntersectSegmentShape(const Point3& p, const Point3& q, const OrientedBox& box)
+{
+	return IntersectSegmentOrientedBox(p,q,box);
 } 
  
  
