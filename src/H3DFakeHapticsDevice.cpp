@@ -88,12 +88,12 @@ H3DFakeHapticsDevice::~H3DFakeHapticsDevice() {
   disableDevice();
 }
 
-Vec3f H3DFakeHapticsDevice::getPosition() {
+Vec3d H3DFakeHapticsDevice::getPosition() {
   // devicePosition is thread safe so we can use getValue()
   return set_devicePosition->getValue();
 }
 
-Vec3f H3DFakeHapticsDevice::getVelocity() {
+Vec3d H3DFakeHapticsDevice::getVelocity() {
   return Vec3f();
 }
 

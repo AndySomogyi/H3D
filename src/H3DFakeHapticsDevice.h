@@ -100,17 +100,17 @@ namespace H3D {
 
   protected:
     /// Get the position of the haptics device.
-    virtual Vec3f getPosition();
+    virtual Vec3d getPosition();
     /// Get the velocity of the haptics device.
-    virtual Vec3f getVelocity();
+    virtual Vec3d getVelocity();
     /// Get the orientation of the haptics device.
     virtual Rotation getOrientation();
     /// Get the button status of the haptics device.
     virtual bool getButtonStatus();
     /// Forces are ignored.
-    virtual void sendForce( const Vec3f &f ) {}
+    virtual void sendForce( const Vec3d &f ) {}
     /// Torques are ignored.
-    virtual void sendTorque( const Vec3f &f ) {};
+    virtual void sendTorque( const Vec3d &f ) {};
   };
 }
 

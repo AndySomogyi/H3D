@@ -112,30 +112,30 @@ namespace HLHapticsDeviceInternal {
     HLdouble tmp[16];
     hdGetDoublev( HD_CURRENT_TRANSFORM, tmp );
     // Workaround for a mysterious problem with Linux / GCC
-    H3DFloat m0, m1, m2, m4,m5, m6, m8, m9, m10;
-    m0  = (H3DFloat) tmp[0];
-    m1  = (H3DFloat) tmp[1];
-    m2  = (H3DFloat) tmp[2];
+    H3DDouble m0, m1, m2, m4,m5, m6, m8, m9, m10;
+    m0  =  tmp[0];
+    m1  =  tmp[1];
+    m2  =  tmp[2];
     
-    m4  = (H3DFloat) tmp[4];
-    m5  = (H3DFloat) tmp[5];
-    m6  = (H3DFloat) tmp[6];
+    m4  =  tmp[4];
+    m5  =  tmp[5];
+    m6  =  tmp[6];
     
-    m8  = (H3DFloat) tmp[8];
-    m9  = (H3DFloat) tmp[9];
-    m10 = (H3DFloat) tmp[10];
+    m8  =  tmp[8];
+    m9  =  tmp[9];
+    m10 =  tmp[10];
     
-    Rotation rot( Matrix3f( m0, m4, m8,
+    Rotation rot( Matrix3d( m0, m4, m8,
 			    m1, m5, m9,
 			    m2, m6, m10 ) );
-    Vec3f pos( (H3DFloat) tmp[12], (H3DFloat) tmp[13], (H3DFloat) tmp[14] );
+    Vec3d pos( tmp[12],  tmp[13], tmp[14] );
     hdGetDoublev( HD_CURRENT_VELOCITY, tmp );
-    Vec3f vel( (H3DFloat) tmp[0], (H3DFloat) tmp[1], (H3DFloat) tmp[2] );
+    Vec3d vel( tmp[0], tmp[1], tmp[2] );
 
     // Dump out values to log file
     // BAF2 format uses uncalibrated position / orientation data.
     if ( hd->log.get() )
-      hd->log->writeLog( pos, rot );
+      hd->log->writeLog( (Vec3f)pos, rot );
 
     // apply the calibration matrices to get the values to
     // in the H3D API coordinate space.

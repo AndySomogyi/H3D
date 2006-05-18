@@ -30,7 +30,6 @@
 
 #include "TexGenGeometry.h"
 #include "HLShape.h"
-#include "HapticShape.h"
 
 using namespace H3D;
 

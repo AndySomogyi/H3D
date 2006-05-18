@@ -31,6 +31,7 @@
 
 #include "H3DApi.h"
 #include "Node.h"
+#include <HAPISurfaceObject.h>
 
 namespace H3D {
 
@@ -40,7 +41,7 @@ namespace H3D {
   ///
   /// It can define e.g. stiffnesses and friction.
   ///
-  class H3DAPI_API H3DSurfaceNode: public Node {
+  class H3DAPI_API H3DSurfaceNode: public Node, public HAPISurfaceObject {
   public:
 
     /// Constructor.

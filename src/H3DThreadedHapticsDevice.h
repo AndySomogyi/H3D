@@ -90,7 +90,7 @@ namespace H3D {
     /// HLHapticDevice can do this.
     /// \param objects The haptic shapes to render.
     ///
-    virtual void renderShapes( const HapticShapeVector &shapes ) {};
+    virtual void renderShapes( const HapticShapeVector &shapes );
 
     /// Perform haptic rendering for the given HapticForceEffect instances. 
     /// HapticForceEffect objects that are to be be rendered haptically must
@@ -108,6 +108,12 @@ namespace H3D {
       return current_force_effects;
     }
 
+    /// Returns the haptic shapes to render in the realtime loop.
+    /// Should not be called from the scenegraph loop.
+    inline HapticShapeVector &getCurrentHapticShapes() {
+      return current_shapes;
+    }
+
     /// Returns the force effects that was rendered during last scene graph loop.
     /// Should not be called from the scenegraph loop.
     inline HapticEffectVector &getLastForceEffects() {
@@ -122,11 +128,11 @@ namespace H3D {
   protected:
     /// Get the position of the haptics device. Only to be called in the 
     /// haptics loop.
-    virtual Vec3f getPosition() = 0;
+    virtual Vec3d getPosition() = 0;
 
     /// Get the velocity of the haptics device. Only to be called in the 
     /// haptics loop.
-    virtual Vec3f getVelocity() = 0;
+    virtual Vec3d getVelocity() = 0;
 
     /// Get the orientation of the haptics device. Only to be called in the 
     /// haptics loop.
@@ -138,11 +144,11 @@ namespace H3D {
 
     /// Send the force to render on the haptics device. Only to be called in the 
     /// haptics loop.
-    virtual void sendForce( const Vec3f &f ) = 0;
+    virtual void sendForce( const Vec3d &f ) = 0;
 
     /// Send the torque to render on the haptics device. Only to be called in the 
     /// haptics loop.
-    virtual void sendTorque( const Vec3f &f ) = 0;
+    virtual void sendTorque( const Vec3d &f ) = 0;
 
     // the force effects that are currently rendered in the realtime loop.
     // Should not be changed directly from the scenegraph loop but instead
@@ -173,6 +179,13 @@ namespace H3D {
     /// Callcack function to transfer the force effect vector to the 
     /// haptics loop.
     static PeriodicThread::CallbackCode changeForceEffects( void *_data ); 
+
+    /// Callcack function to transfer the shapes vector for the 
+    /// haptics loop.
+    static PeriodicThread::CallbackCode changeHapticShapes( void *_data ); 
+
+    // rt_value
+    Vec3d proxy_position;
   };
 }
 

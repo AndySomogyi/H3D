@@ -12,10 +12,12 @@
 #include "HLFeedbackShape.h"
 #include "GL/glew.h"
 #include "X3DChildNode.h"
+#include "X3DGeometryNode.h"
 
 using namespace H3D;
 
 void HLFeedbackShape::hlRender( HLHapticsDevice *hd ) {
+  X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( userdata );
 #ifdef HAVE_OPENHAPTICS
   HLSurface *s = dynamic_cast< HLSurface * >( surface );
   if( s ) {

@@ -31,8 +31,8 @@
 
 #include "H3DApi.h"
 #include "FieldTemplates.h"
-#include "HapticShape.h"
-#include "HapticForceEffect.h"
+#include <HAPIHapticShape.h>
+#include <HapticForceEffect.h>
 #include "SFNode.h"
 #include "Threads.h"
 #include "SFRotation.h"
@@ -79,11 +79,11 @@ namespace H3D {
 
       /// The value of the PosCalibration field to be accessed from 
       /// the realtime loop.
-      Matrix4f rt_pos_calibration;
+      Matrix4d rt_pos_calibration;
       
       /// The inverse of the part of rt_pos_calibration that involves
       /// rotation.
-      Matrix3f rt_inv_pos_rotation;
+      Matrix3d rt_inv_pos_rotation;
     };
 
     /// Saves the value of the field in a variable that can be accessed

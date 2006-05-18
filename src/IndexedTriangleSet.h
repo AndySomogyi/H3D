@@ -35,6 +35,8 @@
 #include "X3DColorNode.h"
 #include "CoordBoundField.h"
 #include "MFInt32.h"
+#include "SFInt32.h"
+#include <CollisionObjects.h>
 
 namespace H3D {
 
@@ -190,6 +192,9 @@ namespace H3D {
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
+    Bounds::BinaryBoundTree *tree;
+    auto_ptr< SFInt32 > depth;
   };
 }
 
