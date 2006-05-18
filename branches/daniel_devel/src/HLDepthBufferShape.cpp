@@ -17,6 +17,7 @@ using namespace H3D;
 
 void HLDepthBufferShape::hlRender( HLHapticsDevice *hd ) {
 #ifdef HAVE_OPENHAPTICS
+  X3DGeometryNode *geometry = static_cast< X3DGeometryNode *>( userdata );
   HLSurface *s = dynamic_cast< HLSurface * >( surface );
   if( s ) {
     hlMatrixMode( HL_VIEWTOUCH );

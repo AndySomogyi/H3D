@@ -31,6 +31,9 @@
 #include "IndexedTriangleSet.h"
 #include "HLFeedbackShape.h"
 #include "Normal.h"
+#include "FeedbackBufferGeometry.h"
+#include "H3DHapticsDevice.h"
+#include "HapticTriangleTree.h"
 
 using namespace H3D;
 
@@ -44,6 +47,7 @@ H3DNodeDatabase IndexedTriangleSet::database(
 namespace IndexedTriangleSetInternals {
   FIELDDB_ELEMENT( IndexedTriangleSet, set_index, INPUT_ONLY );
   FIELDDB_ELEMENT( IndexedTriangleSet, index, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( IndexedTriangleSet, depth, INPUT_OUTPUT );
 }
 
 
@@ -69,7 +73,9 @@ IndexedTriangleSet::IndexedTriangleSet(
                            _solid, _attrib ),
   autoNormal( _autoNormal ),   
   set_index( _set_index ),
-  index( _index ) {
+  index( _index ),
+  tree( NULL ),
+  depth( new SFInt32 ) {
 
   type_name = "IndexedTriangleSet";
   database.initFields( this );
@@ -86,11 +92,23 @@ IndexedTriangleSet::IndexedTriangleSet(
   ccw->route( autoNormal );
 
   coord->route( bound );
+
+  depth->setValue( 0 );
+  depth->route( displayList );
 }
+Vec3f from, to;
 
 
 
 void IndexedTriangleSet::render() {
+  if( tree ) tree->render( depth->getValue() );
+  glDisable( GL_LIGHTING );
+  glColor3f( 0, 0, 1 );
+  glBegin( GL_LINES );
+  glVertex3f( from.x ,from.y, from.z );
+  glVertex3f( to.x, to.y, to.z );
+  glEnd();
+  glEnable( GL_LIGHTING );
   X3DCoordinateNode *coordinate_node = coord->getValue();
   X3DTextureCoordinateNode *tex_coord_node = texCoord->getValue();
   TextureCoordinateGenerator *tex_coord_gen = 
@@ -250,12 +268,40 @@ void IndexedTriangleSet::render() {
   } 
 }
 
+
 void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
+  if( !tree ) {
+    TimeStamp start;
+    
+    vector< Bounds::Triangle > triangles;
+    FeedbackBufferGeometry *haptik_geometry = 
+      new FeedbackBufferGeometry( this, ti.getCurrentSurface(), 
+                                  ti.getAccForwardMatrix() );
+    //haptik_geometry = new IndexedTriangleGeometry( coord_node->point->getValue(),
+    //                                             index->getValue() );
+
+    TimeStamp before_build;
+    tree = new Bounds::AABBTree( haptik_geometry->triangles );
+    TimeStamp after_build;
+    
+    //cerr << "new: " << before_build - start << endl;
+    cerr << "build: " << after_build - before_build << endl;
+  } 
+
+  //H3DHapticsDevice *hd = ti.getHapticsDevice( 0 );
+  
+  //from = ti.getAccInverseMatrix() * hd->trackerPosition->getValue();
+  //to = from + ti.getAccInverseMatrix().getScaleRotationPart() * (Matrix3f)hd->trackerOrientation->getValue() * Vec3f( 0, 0, -0.1 ); 
+  tree->clearCollidedFlag();
+  // Bounds::IntersectionInfo info;
+  //tree->lineIntersect( from, to, info );
+  depth->touch();
+  
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix(),
-                                                 index->size() ) );
+    ti.addHapticShapeToAll( new HapticTriangleTree( tree,
+                                                    this,
+                                                    ti.getCurrentSurface(),
+                                                    ti.getAccForwardMatrix() ) );
   }
 }
 

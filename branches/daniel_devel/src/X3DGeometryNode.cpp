@@ -30,7 +30,7 @@
 
 #include "X3DGeometryNode.h"
 #include "HLShape.h"
-#include "HapticShape.h"
+#include <HAPIHapticShape.h>
 #include "DeviceInfo.h"
 
 using namespace H3D;
@@ -88,7 +88,7 @@ void HLCALLBACK X3DGeometryNode::motionCallback( HLenum event,
                      n );
 
   if( HLShape::getHLShape( object ) ) {
-    const Matrix4f &m = dynamic_cast< HapticShape * >
+    const Matrix4f &m = dynamic_cast< HAPIHapticShape * >
       (HLShape::getHLShape( object ))->transform.inverse();
 
     if( device_index > (int)geometry->contactPoint->size() -1 )

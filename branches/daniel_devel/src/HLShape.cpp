@@ -29,7 +29,7 @@
 
 #include "HLShape.h"
 #include "X3DGeometryNode.h"
-#include "HapticShape.h"
+#include <HAPIHapticShape.h>
 
 using namespace H3D;
 
@@ -41,14 +41,16 @@ HLShape::HLShapeMap HLShape::hl_shape_map;
 
 /// Get the HLAPI shape id that is used to render this shape.
 HLuint HLShape::getShapeId( HLHapticsDevice *hd ) { 
-  HapticShape *haptic_shape =  dynamic_cast< HapticShape * >( this );
+  HAPIHapticShape *haptic_shape =  dynamic_cast< HAPIHapticShape * >( this );
+  
   if( !haptic_shape ) {
     Exception::H3DAPIException( "HLShape object is not a HapticShape",
                                 H3D_FULL_LOCATION );
   }
+  X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( haptic_shape->userdata );
   HLuint shape_id = 
-    haptic_shape->geometry->getHLShapeId( hd,
-                       HLShape::getFreeShapeIdIndex( haptic_shape->geometry,
+    geometry->getHLShapeId( hd,
+                       HLShape::getFreeShapeIdIndex( geometry,
                                                      hd ) );
   hl_shape_map.insert( make_pair( shape_id, this ) );
   shape_ids.push_back( shape_id );

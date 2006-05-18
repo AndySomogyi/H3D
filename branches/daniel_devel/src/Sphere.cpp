@@ -30,6 +30,7 @@
 
 #include "Sphere.h"
 #include "HapticSphere.h"
+#include "H3DSurfaceNode.h"
 
 using namespace H3D;
 
@@ -94,7 +95,7 @@ void Sphere::traverseSG( TraverseInfo &ti ) {
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
     ti.addHapticShapeToAll( new HapticSphere( radius->getValue(),
                                               solid->getValue(),
-                                              this,
+                                              (void * )this,
                                               ti.getCurrentSurface(),
                                               ti.getAccForwardMatrix() ) );
   }

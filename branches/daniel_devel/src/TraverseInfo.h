@@ -29,10 +29,10 @@
 #ifndef __TRAVERSEINFO_H__
 #define __TRAVERSEINFO_H__
 
-#include "H3DTypes.h"
-#include "HapticForceEffect.h"
-#include "HapticShape.h"
-#include "AutoRefVector.h"
+#include <H3DTypes.h>
+#include <HapticForceEffect.h>
+#include <HAPIHapticShape.h>
+#include <AutoRefVector.h>
 #include <sstream>
 #include <stack>
 
@@ -40,11 +40,11 @@ using namespace std;
 
 namespace H3D {
   // forward declarations
-  class HapticShape;
+  class HAPIHapticShape;
   class H3DSurfaceNode;
   class H3DHapticsDevice;
 
-  typedef AutoRefVector< HapticShape > HapticShapeVector;
+  typedef AutoRefVector< HAPIHapticShape > HapticShapeVector;
   typedef AutoRefVector< HapticForceEffect > HapticEffectVector;
 
   /// TraverseInfo is a structure that is passed along when traversing the 
@@ -93,14 +93,14 @@ namespace H3D {
     /// shape on.
     /// \param shape The HapticShape to render.
     ///
-    void addHapticShape( int device_index, HapticShape *shape );
+    void addHapticShape( int device_index, HAPIHapticShape *shape );
 
     /// Adds a HapticShape to be rendered by a H3DHapticsDevice.
     /// Shapes will only be added if hapticsEnabled() is true. 
     /// \param hd The H3DHapticsDevice to render the shape on.
     /// \param shape The HapticShape to render.
     ///
-    inline void addHapticShape( H3DHapticsDevice *hd, HapticShape *shape ) {
+    inline void addHapticShape( H3DHapticsDevice *hd, HAPIHapticShape *shape ) {
       int device_index = getHapticsDeviceIndex( hd );
       addHapticShape( device_index, shape );
     }
@@ -109,7 +109,7 @@ namespace H3D {
     /// Shapes will only be added if hapticsEnabled() is true. 
     /// \param shape The HapticShape to render.
     ///
-    void addHapticShapeToAll( HapticShape *shape );
+    void addHapticShapeToAll( HAPIHapticShape *shape );
 
     /// Get the HapticShapes that has been added for the H3DHapticsDevice
     /// with the given device_index.
