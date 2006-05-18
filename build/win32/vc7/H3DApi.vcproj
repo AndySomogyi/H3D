@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\src;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS;"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -33,9 +33,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="HAPI.lib"
 				OutputFile="$(OutDir)/H3DApi.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\HAPI\build\win32\vc7\Debug;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
@@ -71,7 +72,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\src;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
@@ -83,9 +84,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="HAPI.lib"
 				OutputFile="$(OutDir)/H3DApi.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\HAPI\build\win32\vc7\Release;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
@@ -145,6 +147,15 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\BooleanFilter.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\BooleanSequencer.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\BooleanToggle.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\BooleanTrigger.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Box.cpp">
@@ -222,10 +233,13 @@
 				RelativePath="..\..\..\src\ElevationGrid.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\Exception.cpp">
+				RelativePath="..\..\..\src\Extrusion.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\FakeHapticsDevice.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\FeedbackBufferGeometry.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Field.cpp">
@@ -303,12 +317,6 @@
 				RelativePath="..\..\..\src\H3DWindowNode.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\HapticCylinder.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\HapticSphere.cpp">
-			</File>
-			<File
 				RelativePath="..\..\..\src\HLDepthBufferShape.cpp">
 			</File>
 			<File
@@ -354,6 +362,12 @@
 				RelativePath="..\..\..\src\Inline.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\IntegerSequencer.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\IntegerTrigger.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\IStreamInputSource.cpp">
 			</File>
 			<File
@@ -361,6 +375,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\KeySensor.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\lex.yy.cc">
 			</File>
 			<File
 				RelativePath="..\..\..\src\LibCurlResolver.cpp">
@@ -384,19 +401,7 @@
 				RelativePath="..\..\..\src\Material.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Matrix3d.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix3f.cpp">
-			</File>
-			<File
 				RelativePath="..\..\..\src\Matrix3VertexAttribute.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix4d.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix4f.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Matrix4VertexAttribute.cpp">
@@ -501,9 +506,6 @@
 				RelativePath="..\..\..\src\PythonTypes.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Quaternion.cpp">
-			</File>
-			<File
 				RelativePath="..\..\..\src\RawImageLoader.cpp">
 			</File>
 			<File
@@ -514,9 +516,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\RK4.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Rotation.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\ScalarInterpolator.cpp">
@@ -544,6 +543,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\Sound.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\SpaceballSensor.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\SpaceWareHapticsDevice.cpp">
@@ -600,13 +602,10 @@
 				RelativePath="..\..\..\src\TextureTransform3D.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\Threads.cpp">
-			</File>
-			<File
 				RelativePath="..\..\..\src\TimeSensor.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\TimeStamp.cpp">
+				RelativePath="..\..\..\src\TimeTrigger.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\ToggleGroup.cpp">
@@ -636,16 +635,16 @@
 				RelativePath="..\..\..\src\URNResolver.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Vec2f.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec3f.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec4f.cpp">
-			</File>
-			<File
 				RelativePath="..\..\..\src\Viewpoint.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\vrml.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\VrmlDriver.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\VrmlParser.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\WorldInfo.cpp">
@@ -738,6 +737,9 @@
 				RelativePath="..\..\..\src\X3DSensorNode.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\X3DSequencerNode.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\X3DShaderNode.cpp">
 			</File>
 			<File
@@ -769,6 +771,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\X3DTimeDependentNode.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\X3DTriggerNode.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\X3DUrlObject.cpp">
@@ -1533,24 +1538,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\TypedFieldTypesTmpl.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec2d.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec2f.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec3d.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec3f.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec4d.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec4f.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Viewpoint.h">
