@@ -144,14 +144,14 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
 
     
     // make sure the proxy is above any constraints
-    for( vector< Bounds::PlaneConstraint >::iterator i = constraints.begin();
+    /*for( vector< Bounds::PlaneConstraint >::iterator i = constraints.begin();
          i != constraints.end(); i++ ) {
       H3DDouble d = (*i).normal * (proxy_pos - (*i).point );
       if( d < 0 && d > -proxy_radius ) {
         //cerr << (*i).normal << " " << d << endl;
         proxy_pos = proxy_pos + (*i).normal * (-d+1e-7);
       }
-    }
+      }*/
 
     vector< PlaneConstraint > intersected_constraints;
     vector< PlaneConstraint > closest_constraints;
@@ -169,7 +169,6 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
           has_intersection = true;
           closest_constraints.push_back( *i );
         } else {
-
           Vec3d v = intersection.point - proxy_pos;
           H3DDouble distance = v * v; 
       
@@ -204,20 +203,34 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
             intersected_constraints.push_back( *i );
           }
         }
-      } 
+      } else {
+        intersected_constraints.push_back( *i );
+      }
     } 
-
+    
     unsigned int nr_constraints = closest_constraints.size();
 
-    Vec3d new_proxy_pos;
+    Vec3d new_proxy_pos, new_force;
+
+    HAPISurfaceObject::ContactInfo contact;
+
+    contact.contact_point_global = closest_intersection.point;
+    contact.probe_position_global = pos;
 
     if( nr_constraints == 0 ) {
       new_proxy_pos = proxy_pos + (pos-proxy_pos)*0.05;
     } else if( nr_constraints == 1 ) {
-      Vec3d v = closest_constraints[0].point - pos;
-      H3DDouble d = closest_constraints[0].normal * v;
-      Vec3d p = pos + closest_constraints[0].normal * d;
-      new_proxy_pos = p;
+      contact.y_axis = closest_constraints[0].normal;
+      Vec3d a( contact.y_axis.z, contact.y_axis.x, contact.y_axis.y );
+      contact.x_axis = contact.y_axis % a;
+      contact.z_axis = contact.x_axis % contact.y_axis;
+      assert( closest_constraints[0].haptic_shape );
+      closest_constraints[0].haptic_shape->surface->onContact( contact );
+      new_proxy_pos = 
+        closest_intersection.point + 
+        contact.proxy_movement_local.x * contact.x_axis + 
+        contact.proxy_movement_local.y * contact.z_axis;
+      new_force = contact.force_global;
     } else if( nr_constraints == 2 ) {
       const PlaneConstraint &p0 = closest_constraints[0];
       const PlaneConstraint &p1 = closest_constraints[1];
@@ -227,25 +240,73 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
                   p0.normal.z, p1.normal.z, line_dir.z, p0.point.z,
                   0, 0, 0, 1 );
       Matrix4d m_inv = m.inverse();
+
       Vec3d local_pos = m_inv * pos;
+
+      Vec3d projected_pos = local_pos.x * p0.normal + local_pos.y * p1.normal;
+      projected_pos.normalizeSafe();
+      H3DDouble weight = 
+        H3DAcos( -projected_pos * p1.normal ) / 
+        H3DAcos( p0.normal * p1.normal ); 
+
       if( local_pos.x > Constants::f_epsilon ) {
         //cerr << p0.normal << endl;
-        Vec3d v = p1.point - pos;
-        H3DDouble d = p1.normal * v;
-        Vec3d p = pos + p1.normal * d;
-        new_proxy_pos = p;
+        contact.y_axis = p1.normal;
+        Vec3d a( contact.y_axis.z, contact.y_axis.x, contact.y_axis.y );
+        contact.x_axis = contact.y_axis % a;
+        contact.z_axis = contact.x_axis % contact.y_axis;
+        assert( p1.haptic_shape );
+        p1.haptic_shape->surface->onContact( contact );
+        new_proxy_pos = 
+          closest_intersection.point + 
+          contact.proxy_movement_local.x * contact.x_axis + 
+          contact.proxy_movement_local.y * contact.z_axis;
+        new_force = contact.force_global;
       } else if( local_pos.y > Constants::f_epsilon ) {
-        //cerr << p1.normal << endl;
-        Vec3d v = p0.point - pos;
-        H3DDouble d = p0.normal * v;
-        Vec3d p = pos + p0.normal * d;
-        new_proxy_pos = p;
-        } else {
-        //cerr << "3";
-        Vec3d v = pos - closest_intersection.point;
-        H3DDouble d = line_dir * v;
-        Vec3d p = closest_intersection.point + d * line_dir;
-        new_proxy_pos = p;
+        contact.y_axis = p0.normal;
+        Vec3d a( contact.y_axis.z, contact.y_axis.x, contact.y_axis.y );
+        contact.x_axis = contact.y_axis % a;
+        contact.z_axis = contact.x_axis % contact.y_axis;
+        assert( p0.haptic_shape );
+        p0.haptic_shape->surface->onContact( contact );
+        new_proxy_pos = 
+          closest_intersection.point + 
+          contact.proxy_movement_local.x * contact.x_axis + 
+          contact.proxy_movement_local.y * contact.z_axis;
+        new_force = contact.force_global;
+      } else {
+        /*contact.y_axis = closest_intersection.point - pos;
+        H3DDouble l = contact.y_axis * contact.y_axis;
+        if( l > Constants::f_epsilon ) 
+          contact.y_axis /= H3DSqrt(l);
+        else
+        contact.y_axis = Vec3d( 0, 1, 0 );*/
+
+        contact.y_axis = p0.normal * weight + p1.normal * (1 - weight );
+
+        Vec3d a( contact.y_axis.z, contact.y_axis.x, contact.y_axis.y );
+        contact.x_axis = contact.y_axis % a;
+        contact.z_axis = contact.x_axis % contact.y_axis;
+
+        assert( p0.haptic_shape );
+        p0.haptic_shape->surface->onContact( contact );
+        H3DDouble p0_proxy_movement = 
+          (contact.proxy_movement_local.x * contact.x_axis + 
+           contact.proxy_movement_local.y * contact.z_axis ) * line_dir;
+        Vec3d p0_force = contact.force_global;
+
+        assert( p1.haptic_shape );
+        p1.haptic_shape->surface->onContact( contact );
+        H3DDouble p1_proxy_movement = 
+          ( contact.proxy_movement_local.x * contact.x_axis + 
+            contact.proxy_movement_local.y * contact.z_axis ) * line_dir;
+        Vec3d p1_force = contact.force_global;
+
+        new_proxy_pos = 
+          closest_intersection.point + 
+          H3DMin( p0_proxy_movement, p1_proxy_movement ) * line_dir;
+
+        new_force = p0_force * weight + p1_force * ( 1 - weight );
       }
     }
     
@@ -285,21 +346,7 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
     }
 
     hd->proxy_position = new_proxy_pos;
-    Vec3d n = closest_intersection.normal;
-    if( closest_constraints.size() > 1 ) {
-      n = closest_intersection.point - pos;
-      n.normalizeSafe();
-    }
-
-    /*    HAPISurfaceObject::SurfaceInput s_input;
-    s_input.contact_point_global = closest_intersection.point;
-    s_input.contact_normal_global = n;
-    s_input.probe_position_global = pos;
-    */
-    H3DDouble penetration = (pos - closest_intersection.point) * n;
-    //cerr << n << endl;
-    output.force = output.force - n * penetration * 200;
-    //cerr << output.force << endl;
+    output.force = new_force;
     
     output.force = 
       hd->positionCalibration->rt_inv_pos_rotation * output.force;
