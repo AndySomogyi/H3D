@@ -30,6 +30,7 @@
 #define __SMOOTHSURFACE_H__
 
 #include "H3DSurfaceNode.h"
+#include <HAPISurfaceObject.h>
 #include "HLSurface.h"
 #include "SFFloat.h"
 
@@ -50,6 +51,8 @@ namespace H3D {
   
     /// Renders the surface using hlMaterialf calls
     virtual void hlRender( HLHapticsDevice *hd );
+
+    virtual void onContact( ContactInfo &contact );
 
     /// The stiffness of the surface. Should be a value between 0 and 1
     /// where 1 is the maximum stiffness the haptics device can handle.

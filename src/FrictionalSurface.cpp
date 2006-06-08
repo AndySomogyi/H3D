@@ -62,10 +62,49 @@ FrictionalSurface::FrictionalSurface( Inst< SFFloat >  _stiffness,
                                       Inst< SFFloat >  _dynamicFriction ):
   SmoothSurface( _stiffness, _damping ),
   staticFriction( _staticFriction ),
-  dynamicFriction( _dynamicFriction ) {
+  dynamicFriction( _dynamicFriction ),
+  in_static_contact( true ) {
   type_name = "FrictionalSurface";
   database.initFields( this );
   
   staticFriction->setValue( 0.1f );
   dynamicFriction->setValue( 0.4f );
+}
+
+void FrictionalSurface::onContact( ContactInfo &contact ) {
+  Vec3d local_probe = contact.localProbePosition();
+  Vec3d force = local_probe * -stiffness->getValue();
+  Vec2d force_t( force.x, force.z );
+
+  if( in_static_contact ) {
+   
+    if( force_t.length() <= staticFriction->getValue() *  force.y ) {
+      contact.setLocalForce( force );
+      contact.proxy_movement_local = Vec2d( 0, 0 );
+    } else {
+      in_static_contact = false;
+    }
+  } 
+
+  if( !in_static_contact ) {
+    H3DDouble b = 1;
+    H3DDouble dt = 1e-3;
+    H3DDouble velocity = 
+      ( force_t.length() - dynamicFriction->getValue() * force.y ) / b;
+
+    contact.setLocalForce( force );
+    if( velocity < Constants::f_epsilon ) {
+      in_static_contact = true;
+      velocity = 0;
+      contact.proxy_movement_local = Vec2d( 0, 0 ); 
+    } else {
+      H3DDouble max_movement = velocity * 1e-3;
+      Vec2d proxy_movement = Vec2d( local_probe.x, local_probe.z );
+      H3DDouble l = proxy_movement.length();
+      if( l > max_movement ) {
+        proxy_movement *= max_movement / l; 
+      }
+      contact.proxy_movement_local = proxy_movement;
+    }
+  }
 }
