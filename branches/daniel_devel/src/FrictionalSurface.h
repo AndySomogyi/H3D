@@ -49,6 +49,8 @@ namespace H3D {
     /// Renders the surface using hlMaterialf calls
     virtual void hlRender( HLHapticsDevice *hd );
 
+    virtual void onContact( ContactInfo &contact );
+
     /// The friction that is experienced upon initial movement when resting on 
     /// the surface.
     ///
@@ -67,6 +69,9 @@ namespace H3D {
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+    
+  protected:
+    bool in_static_contact;
   };
 }
 

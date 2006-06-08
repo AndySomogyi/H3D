@@ -69,3 +69,11 @@ SmoothSurface::SmoothSurface( Inst< SFFloat >  _stiffness,
   stiffness->setValue( 0.5 );
   damping->setValue( 0 );
 }
+
+
+void SmoothSurface::onContact( ContactInfo &contact ) {
+  Vec3d local_probe = contact.localProbePosition();
+  // TODO: fix realtime field access
+  contact.setLocalForce( Vec3d( 0, -local_probe.y * stiffness->getValue(), 0 ) );
+  contact.proxy_movement_local = Vec2d( local_probe.x, local_probe.z );
+}
