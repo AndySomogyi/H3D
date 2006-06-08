@@ -160,20 +160,44 @@ inline void onTwoPlaneContact( const PlaneConstraint &p0,
   }
 }
 
-inline void onThreeOrMorePlaneContact(  const PlaneConstraint &p0,
-                                        const PlaneConstraint &p1,
-                                        const PlaneConstraint &p2,
+
+inline void onThreeOrMorePlaneContact(  vector< PlaneConstraint > &constraints,
                                         HAPISurfaceObject::ContactInfo &contact ) {
+  vector< PlaneConstraint >::iterator i = constraints.begin();
+  PlaneConstraint &p0 = (*i++);
+  PlaneConstraint &p1 = (*i++);
+  PlaneConstraint &p2 = (*i++);
+
   Vec3d contact_global = contact.globalContactPoint();
 
-  Matrix4d m( p0.normal.x, p1.normal.x, p2.normal.x, contact_global.x, 
-              p0.normal.y, p1.normal.y, p2.normal.y, contact_global.y, 
-              p0.normal.z, p1.normal.z, p2.normal.z, contact_global.z,
-              0, 0, 0, 1 );
+  while( i != constraints.end() ) {
+    Matrix4d m( p0.normal.x, p1.normal.x, p2.normal.x, contact_global.x, 
+                p0.normal.y, p1.normal.y, p2.normal.y, contact_global.y, 
+                p0.normal.z, p1.normal.z, p2.normal.z, contact_global.z,
+                0, 0, 0, 1 );
+    Matrix4d m_inv = m.inverse();
+    Vec3d local_pos = m_inv * contact.globalProbePosition();
+    
+    if( local_pos.x > Constants::f_epsilon ) {
+      std::swap( p0, *i++ ); 
+    } else if( local_pos.y > Constants::f_epsilon ) {
+      std::swap( p1, *i++ ); 
+    } else if( local_pos.z > Constants::f_epsilon ) {
+      std::swap( p2, *i++ );
+    } else {
+      break;
+    }
+  }
 
-  Matrix4d m_inv = m.inverse();
-  
-  Vec3d local_pos = m_inv * contact.globalProbePosition();
+
+    Matrix4d m( p0.normal.x, p1.normal.x, p2.normal.x, contact_global.x, 
+                p0.normal.y, p1.normal.y, p2.normal.y, contact_global.y, 
+                p0.normal.z, p1.normal.z, p2.normal.z, contact_global.z,
+                0, 0, 0, 1 );
+
+    Matrix4d m_inv = m.inverse();
+    
+    Vec3d local_pos = m_inv * contact.globalProbePosition();
   
   if( local_pos.x > Constants::f_epsilon ) {
     onTwoPlaneContact( p1, p2, contact );
@@ -376,9 +400,7 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
         onTwoPlaneContact( closest_constraints[0],
                            closest_constraints[1], contact );
       } if( nr_constraints >= 3 ) {
-        onThreeOrMorePlaneContact( closest_constraints[0],
-                                   closest_constraints[1],
-                                   closest_constraints[2],
+        onThreeOrMorePlaneContact( closest_constraints,
                                    contact );
       } 
 
