@@ -35,6 +35,8 @@
 #include "Viewpoint.h"
 #include "NavigationInfo.h"
 #include "StereoInfo.h"
+#include "Fog.h"
+#include "GlobalSettings.h"
 #include "X3DSAX2Handlers.h"
 #include "X3DBackgroundNode.h" 
 #include "X3DTypeFunctions.h"
@@ -505,6 +507,8 @@ if( check_func( value ) ) {                                         \
 #endif
 			, { "getActiveViewpoint", pythonGetActiveViewpoint, 0 },
       { "getActiveNavigationInfo", pythonGetActiveNavigationInfo, 0 },
+      { "getActiveFog", pythonGetActiveFog, 0 },
+      { "getActiveGlobalSettings", pythonGetActiveGlobalSettings, 0 },
       { "getActiveStereoInfo", pythonGetActiveStereoInfo, 0 },
       { "getActiveBackground", pythonGetActiveBackground, 0 },
       { "eraseElementFromMField", pythonEraseElementFromMField, 0 },
@@ -1292,6 +1296,34 @@ call the base class __init__ function." );
       }
 
       return PyNode_FromNode( Viewpoint::getActive() );
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    PyObject* pythonGetActiveFog( PyObject *self, PyObject *arg ) {
+     if( arg ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.getActiveFog()."
+            << "Function does not take any arguments.";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+
+      return PyNode_FromNode( Fog::getActive() );
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    PyObject* pythonGetActiveGlobalSettings( PyObject *self, PyObject *arg ) {
+     if( arg ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.getActiveGlobalSettings()."
+            << "Function does not take any arguments.";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+
+      return PyNode_FromNode( GlobalSettings::getActive() );
     }
 
     /////////////////////////////////////////////////////////////////////////
