@@ -27,6 +27,7 @@ hdev = None
 di = getActiveDeviceInfo()
 if( di and len( di.device.getValue() ) > 0 ):
   hdev=di.device.getValue()[0]
+  hdev.stylus.setValue( None )
 
 # TimerCallback used for delayed events.
 timer_callback = H3DUtils.TimerCallback()
