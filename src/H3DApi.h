@@ -88,7 +88,7 @@
 /// Undef if you do not have DirectShow available. Needed for the 
 /// DirectShowDecoder node.
 #ifdef WIN32
-#define HAVE_DSHOW
+//#define HAVE_DSHOW
 #endif
 
 /// Undef if you do not have the DHD-API from ForceDimension. Needed
