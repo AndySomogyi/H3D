@@ -261,19 +261,6 @@ class SpaceTennisGame:
 
       #to see if ball has passed players racket
       if pos.z > 0.29:
-        if self.levelIndex == 0:
-          self.levelIndex += 1
-          self.dn["LIFE1_TOGGLE"].graphicsOn.setValue( False )
-        elif self.levelIndex == 1:
-          self.dn["LIFE2_TOGGLE"].graphicsOn.setValue( False )
-          self.levelIndex += 1
-        elif self.levelIndex == 2:  
-          self.dn["LIFE3_TOGGLE"].graphicsOn.setValue( False )
-          self.levelIndex += 1
-        elif self.levelIndex == 3:  
-          self.levelIndex += 1
-        if self.levelIndex == 3:
-          self.levelIndex += 1
         self.restart()
                   
       #to see if ball has passed opponents racket
@@ -362,7 +349,7 @@ class SpaceTennisGame:
 
     self.updateScore( 0 )
     
-    if self.levelIndex < self.amountLevels:
+    if self.levelIndex < self.amountLevels - 1:
       if self.levelIndex == 0 :
         self.levelIndex += 1
         self.dn["LIFE1_TOGGLE"].graphicsOn.setValue( False )
