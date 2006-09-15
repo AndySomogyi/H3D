@@ -30,7 +30,6 @@
 #define __HAPIDEVICE_H__
 
 #include "H3DHapticsDevice.h"
-#include "ThreadSafeFields.h"
 #include <HAPIHapticsDevice.h>
 
 namespace H3D {
@@ -54,8 +53,8 @@ namespace H3D {
 
     /// Constructor.
     HAPIDevice( 
-          Inst< ThreadSafeSField< SFVec3f > > _devicePosition = 0,
-          Inst< ThreadSafeSField< SFRotation > > _deviceOrientation      = 0,
+          Inst< SFVec3f > _devicePosition = 0,
+          Inst< SFRotation > _deviceOrientation      = 0,
           Inst< TrackerPosition > _trackerPosition        = 0,
           Inst< TrackerOrientation > _trackerOrientation  = 0,
           Inst< PosCalibration  > _positionCalibration    = 0,
@@ -63,14 +62,15 @@ namespace H3D {
           Inst< SFVec3f         > _proxyPosition          = 0,
           Inst< WeightedProxy   > _weightedProxyPosition  = 0,     
           Inst< SFFloat         > _proxyWeighting         = 0,
-          Inst< ThreadSafeSField< SFBool > > _main_button = 0,
-          Inst< ThreadSafeSField< SFVec3f > > _force      = 0,
-          Inst< ThreadSafeSField< SFVec3f > > _torque     = 0,
+          Inst< SFBool          > _main_button = 0,
+          Inst< SFVec3f         > _force      = 0,
+          Inst< SFVec3f         > _torque     = 0,
           Inst< SFInt32         > _inputDOF               = 0,
           Inst< SFInt32         > _outputDOF              = 0,
           Inst< SFInt32         > _hapticsRate            = 0,
           Inst< SFNode          > _stylus                 = 0,
-          Inst< SFBool          > _initialized            = 0 );
+          Inst< SFBool          > _initialized            = 0,
+          Inst< SFFloat         > _proxyRadius            = 0 );
 
     /// Destructor. Stops haptics rendering and remove callback functions.
     virtual ~HAPIDevice() {
@@ -126,6 +126,8 @@ namespace H3D {
     /// and possible vice versa.
     virtual void updateDeviceValues();
 
+    auto_ptr< SFFloat > proxyRadius;
+
   protected:
     /*
     /// Get the position of the haptics device. Only to be called in the 
@@ -174,9 +176,6 @@ namespace H3D {
     
     /// The time between the previous two calls to changeForceEffects.
     TimeStamp last_loop_time;
-
-    /// Callback function to render force effects.
-    static PeriodicThread::CallbackCode forceEffectCallback( void *data );
 
     /// Callcack function to transfer the force effect vector to the 
     /// haptics loop.

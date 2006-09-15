@@ -28,7 +28,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "HAPIDevice.h"
-#include <HaptikDevice.h>
+#include <PhantomHapticsDevice.h>
 
 using namespace H3D;
 
@@ -38,9 +38,7 @@ H3DNodeDatabase HAPIDevice::database( "HAPIDevice",
                                       &H3DHapticsDevice::database ); 
 
 namespace HAPIDeviceInternals {
-
-
-
+  FIELDDB_ELEMENT( HAPIDevice, proxyRadius, INPUT_OUTPUT );
 }
 
 
@@ -74,23 +72,10 @@ PeriodicThread::CallbackCode HAPIDevice::changeHapticShapes( void *_data ) {
     return PeriodicThread::CALLBACK_DONE;
   }
 
-
-// Callback function for rendering force effects on the 
-// HLHapticsDevice.  
-PeriodicThread::CallbackCode HAPIDevice::forceEffectCallback( void *data ) {
-  HAPIDevice *hd = 
-    static_cast< HAPIDevice * >( data );
-  hd->hapi_device->setPositionCalibration( hd->positionCalibration->rt_pos_calibration );
-  hd->hapi_device->setOrientationCalibration( hd->orientationCalibration->rt_orn_calibration );
-  hd->hapi_device->renderHapticsOneStep();
-  hd->nr_haptics_loops++;
-  return PeriodicThread::CALLBACK_CONTINUE;
-} 
-
 /// Constructor.
 HAPIDevice::HAPIDevice( 
-               Inst< ThreadSafeSField< SFVec3f > > _devicePosition,
-               Inst< ThreadSafeSField< SFRotation >  > _deviceOrientation,
+               Inst< SFVec3f > _devicePosition,
+               Inst< SFRotation > _deviceOrientation,
                Inst< TrackerPosition > _trackerPosition        ,
                Inst< TrackerOrientation > _trackerOrientation  ,
                Inst< PosCalibration  > _positionCalibration    ,
@@ -98,48 +83,44 @@ HAPIDevice::HAPIDevice(
                Inst< SFVec3f         > _proxyPosition          ,
                Inst< WeightedProxy   > _weightedProxyPosition  ,     
                Inst< SFFloat         > _proxyWeighting         ,
-               Inst< ThreadSafeSField< SFBool > > _mainButton  ,
-               Inst< ThreadSafeSField< SFVec3f > > _force      ,
-               Inst< ThreadSafeSField< SFVec3f > > _torque     ,
+               Inst< SFBool          > _mainButton  ,
+               Inst< SFVec3f         > _force      ,
+               Inst< SFVec3f         > _torque     ,
                Inst< SFInt32         > _inputDOF               ,
                Inst< SFInt32         > _outputDOF              ,
                Inst< SFInt32         > _hapticsRate            ,
                Inst< SFNode          > _stylus                 ,
-               Inst< SFBool          > _initialized             ):
+               Inst< SFBool          > _initialized,
+               Inst< SFFloat         > _proxyRadius ):
   H3DHapticsDevice( _devicePosition, _deviceOrientation, _trackerPosition,
                     _trackerOrientation, _positionCalibration, 
                     _orientationCalibration, _proxyPosition,
                     _weightedProxyPosition, _proxyWeighting, _mainButton,
                     _force, _torque, _inputDOF, _outputDOF, _hapticsRate,
                     _stylus, _initialized ),
+  proxyRadius( _proxyRadius ),
   nr_haptics_loops( 0 ),
-  hapi_device( new HaptikDevice ) {
+  hapi_device( new PhantomHapticsDevice ) {
 
   type_name = "HAPIDevice";  
   database.initFields( this );
 
+  proxyRadius->setValue( 0.01 );
   // trackerPosition->route( proxyPosition, id );
 }
 
 
 void HAPIDevice::initDevice() {
   if( !initialized->getValue() ) {
-#ifdef WIN32
-    #ifdef PROFILING
-    thread = NULL;
-    #else
-    thread = new HapticThread(  THREAD_PRIORITY_ABOVE_NORMAL, 1000 );
-    #endif
-#else
-    thread = new HapticThread( 0, 1000 );
-#endif
-#ifndef PROFILING
-    thread->asynchronousCallback( HAPIDevice::forceEffectCallback,
-                                  this );
-#endif
     if( hapi_device.get() ) {
       hapi_device->initDevice();
       hapi_device->enableDevice();
+      // TODO TEMP:
+      hapi_device->setPositionCalibration( positionCalibration->getValue( ) );
+      RuspiniRenderer *rr = 
+        dynamic_cast< RuspiniRenderer * >(hapi_device->getHapticsRenderer());
+      rr->setProxyRadius( proxyRadius->getValue() );
+      
     }
     H3DHapticsDevice::initDevice();
   }
@@ -151,45 +132,19 @@ void HAPIDevice::disableDevice() {
   thread = NULL;
   if( hapi_device.get() ) {
     hapi_device->disableDevice();
-    //hapi_device->releaseDevice();
+    hapi_device->releaseDevice();
   }
   H3DHapticsDevice::disableDevice();
 }
 
 void HAPIDevice::renderEffects( 
                          const HapticEffectVector &effects ) {
-  if( thread ) {
-    // make a copy of the effects vector since it is swapped in
-    // the callback.
-    HapticEffectVector effects_copy( effects );
-    typedef void *pp;
-    void * param[] = { this, &effects_copy };
-    // change the current_force_effects vector to render the new effects.
-    //thread->synchronousCallback( HAPIDevice::changeForceEffects,
-    //param );
-  }
+  hapi_device->setEffects( effects );
 }
 
 void HAPIDevice::renderShapes( 
                          const HapticShapeVector &shapes ) {
-#ifndef PROFILING
-  if( thread ) {
-#endif
-    // make a copy of the effects vector since it is swapped in
-    // the callback.
-    HapticShapeVector shapes_copy( shapes );
-    typedef void *pp;
-    void * param[] = { this, &shapes_copy };
-    // change the current_force_effects vector to render the new effects.
-#ifdef PROFILING
-     HAPIDevice::changeHapticShapes( param );
-     HAPIDevice::forceEffectCallback( this );
-#else
-     hapi_device->swapShapes( shapes_copy );
-     //thread->synchronousCallback( HAPIDevice::changeHapticShapes,
-     //param );
-  }
-#endif
+                           hapi_device->setShapes( shapes );
 }
 
 void HAPIDevice::updateDeviceValues() {
@@ -203,6 +158,8 @@ void HAPIDevice::updateDeviceValues() {
   if( hapi_device.get() ) {
     devicePosition->setValue( (Vec3f)hapi_device->getPosition(), id);
     deviceOrientation->setValue( hapi_device->getOrientation(), id);
+    cerr << deviceOrientation->getValue() << endl;
+    cerr << trackerOrientation->getValue() << endl;
     RuspiniRenderer *ruspini = dynamic_cast< RuspiniRenderer * >( hapi_device->getHapticsRenderer() );
     if( ruspini ) {
       proxyPosition->setValue( (Vec3f)ruspini->getProxyPosition(), id );
