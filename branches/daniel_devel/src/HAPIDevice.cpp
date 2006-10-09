@@ -27,8 +27,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "HAPIDevice.h"
+#include <HAPIDevice.h>
 #include <PhantomHapticsDevice.h>
+#include <X3DGeometryNode.h>
+#include <DeviceInfo.h>
 
 using namespace H3D;
 
@@ -116,10 +118,10 @@ void HAPIDevice::initDevice() {
       hapi_device->initDevice();
       hapi_device->enableDevice();
       // TODO TEMP:
-      hapi_device->setPositionCalibration( positionCalibration->getValue( ) );
+      //hapi_device->setPositionCalibration( positionCalibration->getValue( ) );
       RuspiniRenderer *rr = 
         dynamic_cast< RuspiniRenderer * >(hapi_device->getHapticsRenderer());
-      rr->setProxyRadius( proxyRadius->getValue() );
+      rr->setProxyRadius( proxyRadius->getValue() * 1e3 );
       
     }
     H3DHapticsDevice::initDevice();
@@ -144,7 +146,7 @@ void HAPIDevice::renderEffects(
 
 void HAPIDevice::renderShapes( 
                          const HapticShapeVector &shapes ) {
-                           hapi_device->setShapes( shapes );
+  hapi_device->setShapes( shapes );
 }
 
 void HAPIDevice::updateDeviceValues() {
@@ -156,17 +158,103 @@ void HAPIDevice::updateDeviceValues() {
   nr_haptics_loops = 0;
   hapticsRate->setValue( hr, id );
   if( hapi_device.get() ) {
-    devicePosition->setValue( (Vec3f)hapi_device->getPosition(), id);
-    deviceOrientation->setValue( hapi_device->getOrientation(), id);
-    cerr << deviceOrientation->getValue() << endl;
-    cerr << trackerOrientation->getValue() << endl;
+    HAPIHapticsDevice::DeviceValues dv = hapi_device->getRawDeviceValues();
+    // convert to metres
+    devicePosition->setValue( (Vec3f)dv.position * 1e-3, id);
+    deviceOrientation->setValue( dv.orientation, id);
+    force->setValue( (Vec3f)dv.force, id);
+    torque->setValue( (Vec3f)dv.torque, id);
+    hapi_device->setPositionCalibration( positionCalibration->rt_pos_calibration );
+    hapi_device->setOrientationCalibration( orientationCalibration->rt_orn_calibration );
+    //cerr << deviceOrientation->getValue() << endl;
+    //cerr << trackerOrientation->getValue() << endl;
     RuspiniRenderer *ruspini = dynamic_cast< RuspiniRenderer * >( hapi_device->getHapticsRenderer() );
     if( ruspini ) {
-      proxyPosition->setValue( (Vec3f)ruspini->getProxyPosition(), id );
+      proxyPosition->setValue( (Vec3f)(ruspini->getProxyPosition() * 1e-3), id );
+
+      // find the index of the haptics device
+      DeviceInfo *di = DeviceInfo::getActive();
+      int device_index = -1;
+      if( di ) {
+        const NodeVector &devices = di->device->getValue();
+        for( unsigned int i = 0; i < devices.size(); i++ ) {
+          if( (Node *)devices[i] == this )
+            device_index = i;
+        }
+      }
+      assert( device_index != -1 );
+
+      RuspiniRenderer::Contacts contacts = ruspini->getContacts();
+      for( RuspiniRenderer::Contacts::iterator i = contacts.begin();
+           i != contacts.end(); i++ ) {
+        X3DGeometryNode *geom = static_cast< X3DGeometryNode * >((*i).first->userdata );
+      
+        // make sure all fields have the right size
+        if( device_index > (int)geom->force->size() -1 )
+          geom->force->resize( device_index + 1, Vec3f( 0, 0, 0 ), geom->id );
+        if( device_index > (int)geom->contactPoint->size() -1 )
+          geom->contactPoint->resize( device_index + 1, Vec3f( 0, 0, 0 ), geom->id );
+        if( device_index > (int)geom->contactNormal->size() -1 )
+          geom->contactNormal->resize( device_index + 1, Vec3f( 1, 0, 0 ), geom->id );
+        if( device_index > (int)geom->isTouched->size() -1 )
+          geom->isTouched->resize( device_index + 1, false, geom->id );
+        
+        HAPISurfaceObject::ContactInfo ci = (*i).second;
+
+        // TODO: shpould be able to do it in a faster/better way.
+        Matrix4d global_to_local = (*i).first->transform.inverse();
+        Matrix3d global_vec_to_local = global_to_local.getRotationPart();
+
+        Vec3f cp( global_to_local * (ci.globalSurfaceContactPoint() *1e-3) );
+
+        if( geom->contactPoint->getValueByIndex( device_index ) != cp ) 
+          geom->contactPoint->setValue( device_index, cp, geom->id ); 
+
+        Vec3f n( global_vec_to_local * ci.y_axis );
+
+        if( geom->contactNormal->getValueByIndex( device_index ) != n ) 
+          geom->contactNormal->setValue( device_index, n, geom->id ); 
+        
+        Vec3f f( global_vec_to_local * ci.force_global );
+
+        if( geom->force->getValueByIndex( device_index ) != f ) 
+          geom->force->setValue(device_index, f, geom->id ); 
+
+        bool contact_last_time = 
+          geom->isTouched->getValueByIndex( device_index );
+        if( !contact_last_time ) 
+          geom->isTouched->setValue( device_index, true, geom->id );
+      }
+
+      for( RuspiniRenderer::Contacts::iterator j = last_contacts.begin();
+           j != last_contacts.end(); j++ ) {
+        bool still_in_contact = false;
+        for( RuspiniRenderer::Contacts::iterator i = contacts.begin();
+             i != contacts.end(); i++ ) {
+          cerr << (*i).first->userdata << " " << (*j).first->userdata << endl;
+          if( (*i).first->userdata == (*j).first->userdata ) {
+            still_in_contact = true;
+            break;
+          }
+        }
+        if( !still_in_contact ) {
+          X3DGeometryNode *geom = 
+            static_cast< X3DGeometryNode * >((*j).first->userdata );
+          geom->isTouched->setValue( device_index, false, geom->id );
+        }
+           }
+      // TODO: untouch
+    
+      last_contacts.swap( contacts );
     } else {
       proxyPosition->setValue( trackerPosition->getValue(), id );
     }
-
+    /*
+    cerr << "F: " << devicePosition->getValue() * 1e3<< endl;
+    cerr << "F: " << trackerPosition->getValue() * 1e3<< endl;
+    cerr << "T: " << proxyPosition->getValue() * 1e3 << endl;
+    cerr << "W: " << weightedProxyPosition->getValue()* 1e3<< endl;
+    */
   }
 
   //cerr << hr << endl;
