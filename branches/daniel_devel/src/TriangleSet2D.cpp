@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "TriangleSet2D.h"
-#include "HLFeedbackShape.h"
 #include "MultiTexture.h"
 
 using namespace H3D;
@@ -73,13 +72,6 @@ TriangleSet2D::TriangleSet2D( Inst< SFNode      > _metadata,
 void TriangleSet2D::render() {
   // render the points
   const vector< Vec2f > &v = vertices->getValue();
-
-  if( solid->getValue() ) {
-    glCullFace( GL_BACK );
-    glEnable( GL_CULL_FACE );
-  } else {
-    glDisable( GL_CULL_FACE );
-  }
 
   BoxBound *bb = dynamic_cast< BoxBound * >( bound->getValue() );
   MultiTexture *mt = 
@@ -133,11 +125,19 @@ void TriangleSet2D::render() {
   }
 }
 
+#ifdef USE_HAPTICS
 void TriangleSet2D::traverseSG( TraverseInfo &ti ) {
+  // use backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
+
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( 
                                                  ti.getCurrentSurface(),
                                                  ti.getAccForwardMatrix(),
                                                  vertices->size() ) );
+#endif
   }
 }
+#endif

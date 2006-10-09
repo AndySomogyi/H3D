@@ -45,7 +45,10 @@ FeedbackBufferGeometry::FeedbackBufferGeometry( X3DGeometryNode *_geometry,
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
   glLoadIdentity();
+  //glScaled( 1000, 1000, 1000 ); 
+  //glScaled( 1e-3, 1e-3, 1e-3 ); 
   
+
   const Matrix4f &m = _transform;
   GLdouble vt[] = { m[0][0], m[1][0], m[2][0], 0,
                     m[0][1], m[1][1], m[2][1], 0,
@@ -72,7 +75,7 @@ FeedbackBufferGeometry::FeedbackBufferGeometry( X3DGeometryNode *_geometry,
     const Vec3f &half_size = bound->size->getValue() / 2;
     Vec3f llf = center - half_size;
     Vec3f urn = center + half_size;
-    glOrtho( llf.x, urn.x, llf.y, urn.y, -urn.z, -llf.z );
+    glOrtho( llf.x - 0.01, urn.x + 0.01, llf.y -0.01, urn.y + 0.01, -urn.z-0.01, -llf.z+0.01 );
     //glOrtho( -0.5, 0.5, -0.5, 0.5, 0, 10 );
   }
   
@@ -85,7 +88,7 @@ glDisable(GL_LIGHTING);
   
   GLdouble pm[16];
   glGetDoublev( GL_PROJECTION_MATRIX, pm );
-  Matrix4f proj(  pm[0], pm[4], pm[8], pm[12],
+  Matrix4d proj(  pm[0], pm[4], pm[8], pm[12],
                   pm[1], pm[5], pm[9], pm[13],
                   pm[2], pm[6], pm[10], pm[14],
                   pm[3], pm[7], pm[11], pm[15] );
@@ -125,15 +128,15 @@ glDisable(GL_LIGHTING);
       if( nr_vertices != 3 ) { 
         cerr << "Too Many vertices: " << nr_vertices << endl;
       }
-      //cerr << "Polygon: " << nr_vertices << endl;
+      cerr << "Polygon: " << nr_vertices << endl;
       i+= parseVertex( buffer, i, p );
       gluUnProject( p.x, p.y, p.z, mv, pm, vp, &v0.x, &v0.y, &v0.z );
       i+= parseVertex( buffer, i, p );
       gluUnProject( p.x, p.y, p.z, mv, pm, vp, &v1.x, &v1.y, &v1.z );
       i+= parseVertex( buffer, i, p );
       gluUnProject( p.x, p.y, p.z, mv, pm, vp, &v2.x, &v2.y, &v2.z );
-      triangles.push_back( Bounds::Triangle( (Vec3f)v0, (Vec3f)v1, (Vec3f)v2 )) ;
-      //cerr << v0 << " " << v1 << " " << v2 << endl;
+      triangles.push_back( Bounds::Triangle( v0 *1e3, v1*1e3, v2*1e3 )) ;
+      cerr << v0 << " " << v1 << " " << v2 << endl;
       break;
     }
     case( GL_BITMAP_TOKEN ): cerr << "Bitmap: "; break;

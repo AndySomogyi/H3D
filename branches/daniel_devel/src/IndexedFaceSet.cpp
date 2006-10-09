@@ -30,8 +30,8 @@
 
 #include "IndexedFaceSet.h"
 #include "Normal.h"
-#include "HLFeedbackShape.h"
 #include "TextureCoordinateGenerator.h"
+
 
 using namespace H3D;
 
@@ -149,19 +149,10 @@ void IndexedFaceSet::render() {
   const vector< int > &normal_index    = normalIndex->getValue();
   const vector< int > &tex_coord_index = texCoordIndex->getValue();
 
-  glShadeModel( GL_SMOOTH ); 
   //  glEnable( GL_AUTO_NORMAL );
 
   // we need coordinates to render 
   if( coords ) {
-    // enable backface culling if solid is true
-    if( solid->getValue() ) {
-      glEnable( GL_CULL_FACE );
-      glCullFace( GL_BACK );
-    } else {
-      glDisable( GL_CULL_FACE );
-    }
-    
     // no X3DTextureCoordinateNode, so we generate texture coordinates
     // based on the bounding box according to the X3D specification.
     if( !tex_coords_per_vertex )
@@ -230,7 +221,7 @@ void IndexedFaceSet::render() {
       }
       
       // render all vertices for this face.
-      for(; coord_index[i] != -1 && i < coord_index.size(); i++ ) {
+      for(;  i < coord_index.size() && coord_index[i] != -1; i++ ) {
         // Set up texture coordinates.
         if( tex_coords_per_vertex ) {
           int tci;
@@ -530,12 +521,19 @@ X3DNormalNode *IndexedFaceSet::AutoNormal::generateNormalsPerFace(
   return normal;
 }
 
+#ifdef USE_HAPTICS
 void IndexedFaceSet::traverseSG( TraverseInfo &ti ) {
+  // use backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
+
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix(),
-                                                 coordIndex->size() ) );
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( ti.getCurrentSurface(),
+                                                  ti.getAccForwardMatrix(),
+                                                  coordIndex->size() ) );
+#endif
   }
 }
+#endif
 

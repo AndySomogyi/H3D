@@ -90,11 +90,6 @@ void Cone::render() {
   bool is_solid = solid->getValue();
   int nr_faces = 120;
   
-  if( is_solid )
-    glEnable( GL_CULL_FACE );
-  else 
-    glDisable( GL_CULL_FACE );
-  
   // render side
   if ( side->getValue() ) {
     glBegin( GL_QUAD_STRIP );
@@ -127,11 +122,22 @@ void Cone::render() {
     }
     glEnd();
   }
-  
-  if( is_solid )
-    glDisable( GL_CULL_FACE );
 }
 
 
-
+#ifdef USE_HAPTICS
+void Cone::traverseSG( TraverseInfo &ti ) {
+  if( solid->getValue() ) {
+    useBackFaceCulling( true );
+  } else {
+    useBackFaceCulling( false );
+  }
+  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll(  getOpenGLHapticShape( ti.getCurrentSurface(),
+                                                   ti.getAccForwardMatrix()));
+#endif
+  }
+}
+#endif
 

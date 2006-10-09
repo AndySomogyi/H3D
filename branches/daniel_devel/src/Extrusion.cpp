@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Extrusion.h"
-#include "HLFeedbackShape.h"
 
 using namespace H3D;
 
@@ -105,22 +104,24 @@ Extrusion::Extrusion(
   ccw->route( displayList, id );
   convex->route( displayList, id );
   creaseAngle->route( displayList, id );
-	crossSection->route( displayList, id );
+	//crossSection->route( displayList, id );
   endCap->route( displayList, id );
   solid->route( displayList, id );
-  spine->route( displayList, id );
-	vertexVector->route( displayList, id );
+  //spine->route( displayList, id );
 
 	crossSection->route( vertexVector );
 	orientation->route( vertexVector );
 	scale->route( vertexVector );
 	spine->route( vertexVector );
 
+	vertexVector->route( displayList, id );
+
 	vertexVector->route( bound );
 }
 
 	
 void Extrusion::VertexVectors::update() {
+	value.clear();
 	const vector< Vec2f > &cross_section = 
 		static_cast< MFVec2f * >( routes_in[0] )->getValue();
 	const vector< Rotation > &orientationVectors = 
@@ -440,15 +441,6 @@ void Extrusion::render() {
 			else 
 				glFrontFace( GL_CW );
 		}
-
-		glShadeModel( GL_SMOOTH ); 
-
-		// enable backface culling if solid is true
-		if( solid->getValue() ) {
-			glEnable( GL_CULL_FACE );
-			glCullFace( GL_BACK );
-		} else
-			glDisable( GL_CULL_FACE );
 
 		// check if the spine is closed
 		if( coinc( spineVectors.front(), spineVectors.back() ) )
@@ -1341,11 +1333,19 @@ void Extrusion::SFBound::update() {
 	value = bb;
 }
 
+#ifdef USE_HAPTICS
 void Extrusion::traverseSG( TraverseInfo &ti ) {
+  // enable backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
+
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( 
                                                  ti.getCurrentSurface(),
                                                  ti.getAccForwardMatrix(),
                                                  ( vertexVector->size() ) * 4 ) );
+#endif
   }
 }
+#endif

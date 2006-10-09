@@ -8,11 +8,14 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "H3DApi.h"
+#ifdef USE_HAPTICS
 #include "HLSurface.h"
 #include "HLFeedbackShape.h"
 #include "GL/glew.h"
 #include "X3DChildNode.h"
 #include "X3DGeometryNode.h"
+#include "HLHapticsDevice.h"
 
 using namespace H3D;
 
@@ -20,21 +23,29 @@ void HLFeedbackShape::hlRender( HLHapticsDevice *hd ) {
   X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( userdata );
 #ifdef HAVE_OPENHAPTICS
   HLSurface *s = dynamic_cast< HLSurface * >( surface );
-  if( s ) {
-    hlMatrixMode( HL_VIEWTOUCH );
-    hlPushMatrix();
+  if( s && closeEnoughToBound( hd->proxyPosition->getValue(), 
+                               hd->getPreviousProxyPosition(), 
+                               (Matrix4f) transform.inverse(), 
+                               geometry ) ) {
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
 #if HL_VERSION_MAJOR_NUMBER >= 2
     hlPushAttrib( HL_MATERIAL_BIT | HL_TOUCH_BIT );
 #endif
-    const Matrix4f &m = transform;
-    HLfloat vt[] = { m[0][0], m[1][0], m[2][0], 0,
+    const Matrix4d &m = transform;
+    GLfloat vt[] = { m[0][0], m[1][0], m[2][0], 0,
                      m[0][1], m[1][1], m[2][1], 0,
                      m[0][2], m[1][2], m[2][2], 0,
                      m[0][3], m[1][3], m[2][3], 1 };
-    hlLoadMatrixf( vt );
+    glLoadMatrixf( vt );
     s->hlRender( hd );
-    hlTouchableFace( HL_FRONT_AND_BACK );
-    Matrix3f m3 = m.getScaleRotationPart();
+    hlTouchableFace( touchable_face );
+    if( use_haptic_camera )
+      hlEnable( HL_HAPTIC_CAMERA_VIEW );
+    else
+      hlDisable( HL_HAPTIC_CAMERA_VIEW );
+
+    Matrix3d m3 = m.getScaleRotationPart();
     GLint front_face;
 
     bool negative_scaling = 
@@ -54,17 +65,21 @@ void HLFeedbackShape::hlRender( HLHapticsDevice *hd ) {
     } else {
       hlHinti(  HL_SHAPE_FEEDBACK_BUFFER_VERTICES, 65536 );
     }
+
+    bool previous_allow = geometry->allowingCulling();
+    geometry->allowCulling( false );
     hlBeginShape( HL_SHAPE_FEEDBACK_BUFFER, getShapeId( hd ) );
-    geometry->displayList->callList( false );
+    geometry->hlRender( hd, (Matrix4f)transform );
     hlEndShape();
+    geometry->allowCulling( previous_allow );
     
     glFrontFace( front_face );
 #if HL_VERSION_MAJOR_NUMBER >= 2
     hlPopAttrib();
 #endif
-    hlPopMatrix();
+    glPopMatrix();
   }
 #endif
 }
-
+#endif
 

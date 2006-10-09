@@ -63,10 +63,10 @@ namespace H3D {
              float n1, float n2, float n3 ) {
       float t2 = m*phi/4.0f;
       float t3 = cosf(t2);
-      float t6 = fabsf(t3/a);
+      float t6 = H3DAbs(t3/a);
       float t7 = powf(t6,n2);
       float t8 = sinf(t2);
-      float t11 = fabsf(t8/b);
+      float t11 = H3DAbs(t8/b);
       float t12 = powf(t11,n3);
       float t14 = powf(t7+t12,-1/n1);
       return t14;
@@ -114,10 +114,12 @@ namespace H3D {
         /(4.f*n1*powf(powf(cosf((m*phi)/4.f)/a, n2) 
                      + powf(sinf((m*phi)/4.f)/b, n3), (1 + n1)/n1));
     }
-  
+
+#ifdef USE_HAPTICS
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
+#endif
     
     // Fields
     auto_ptr< SFFloat  > ss1_m;

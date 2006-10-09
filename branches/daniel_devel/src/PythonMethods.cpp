@@ -29,16 +29,23 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "PythonMethods.h"
+#ifdef USE_HAPTICS
 #include "DeviceInfo.h"
+#endif
 #include "Viewpoint.h"
 #include "NavigationInfo.h"
 #include "StereoInfo.h"
+#include "Fog.h"
+#include "GlobalSettings.h"
+#include "X3DSAX2Handlers.h"
 #include "X3DBackgroundNode.h" 
 #include "X3DTypeFunctions.h"
 #include "PythonTypes.h"
 #include "MFNode.h"
 #include "X3D.h"
+#include "VrmlParser.h"
 #include "Scene.h"
+#include "ResourceResolver.h"
 #include <sstream>
 #include <cctype>
 
@@ -199,7 +206,7 @@ if( check_func( value ) ) {                                         \
       return 0;                                                \
     }                                                          \
   }                                                          \
-  static_cast<field_type *>(field)->swap(fv);                  
+  static_cast<field_type *>(field)->setValue(fv);                  
 
 
     // This macro is used in order to apply some macro where the values
@@ -487,12 +494,21 @@ if( check_func( value ) ) {                                         \
       { "createX3DFromString", pythonCreateX3DFromString, 0 },
       { "createX3DNodeFromURL", pythonCreateX3DNodeFromURL, 0 },
       { "createX3DNodeFromString", pythonCreateX3DNodeFromString, 0 },
+      { "createVRMLFromURL", pythonCreateVRMLFromURL, 0 },
+      { "createVRMLFromString", pythonCreateVRMLFromString, 0 },
+      { "createVRMLNodeFromURL", pythonCreateVRMLNodeFromURL, 0 },
+      { "createVRMLNodeFromString", pythonCreateVRMLNodeFromString, 0 },
       { "getRoutesIn", pythonGetRoutesIn, 0 },
       { "getRoutesOut", pythonGetRoutesOut, 0 },
-      { "getCurrentScenes", pythonGetCurrentScenes, 0 },
-      { "getActiveDeviceInfo", pythonGetActiveDeviceInfo, 0 },
-      { "getActiveViewpoint", pythonGetActiveViewpoint, 0 },
+      { "getCurrentScenes", pythonGetCurrentScenes, 0 }
+#ifdef USE_HAPTICS
+			,
+      { "getActiveDeviceInfo", pythonGetActiveDeviceInfo, 0 }
+#endif
+			, { "getActiveViewpoint", pythonGetActiveViewpoint, 0 },
       { "getActiveNavigationInfo", pythonGetActiveNavigationInfo, 0 },
+      { "getActiveFog", pythonGetActiveFog, 0 },
+      { "getActiveGlobalSettings", pythonGetActiveGlobalSettings, 0 },
       { "getActiveStereoInfo", pythonGetActiveStereoInfo, 0 },
       { "getActiveBackground", pythonGetActiveBackground, 0 },
       { "eraseElementFromMField", pythonEraseElementFromMField, 0 },
@@ -504,6 +520,7 @@ if( check_func( value ) ) {                                         \
       { "MFieldEmpty", pythonMFieldEmpty, 0 },
       { "MFieldPopBack", pythonMFieldPopBack, 0 },
       { "touchField", pythonTouchField, 0 },
+      { "resolveURLAsFile", pythonResolveURLAsFile, 0 },
       { NULL, NULL }      
     };
     
@@ -660,6 +677,19 @@ if( check_func( value ) ) {                                         \
             return NULL;
           }
         } else PyErr_Clear();
+
+        PyObject *opttypeinfo = 
+          PyObject_GetAttrString( field, "__opt_type_info__" );
+        if( opttypeinfo ) {
+          if( PyTuple_Check( opttypeinfo ) ) {
+            dynamic_cast< PythonFieldBase* >(f)->python_opttypeinfo = 
+              opttypeinfo;
+          } else {
+            PyErr_SetString( PyExc_ValueError, 
+                             "Symbol '__opt_type_info__' must be a tuple!" );
+            return NULL;
+          }
+        } else PyErr_Clear();
         
         //initField( (PyInstanceObject*) field );
         Py_INCREF( Py_None );
@@ -775,7 +805,7 @@ call the base class __init__ function." );
         if( !success )
           APPLY_MFIELD_MACRO( field_ptr, field_ptr->getX3DType(), v, GET_MFIELD, success );
         if( !success ) {
-          PyErr_SetString( PyExc_ValueError, 
+           PyErr_SetString( PyExc_ValueError, 
                            "Error: not a valid Field instance" );
           return 0;  
         }
@@ -970,8 +1000,16 @@ call the base class __init__ function." );
       }
       char *filename = PyString_AsString( arg );
       X3D::DEFNodes dm;
-      Node *n = X3D::createX3DFromURL( filename, &dm );
-      return PythonInternals::createX3DHelp( n, &dm );
+      try{
+        Node *n = X3D::createX3DFromURL( filename, &dm );
+        return PythonInternals::createX3DHelp( n, &dm );
+      }
+      catch(H3D::X3D::XMLParseError &e){
+        ostringstream err;
+        err << "Error creating X3D from URL: " << e.message;
+        PyErr_SetString( PyExc_RuntimeError, err.str().c_str() );
+        return 0;
+      }
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -985,8 +1023,16 @@ call the base class __init__ function." );
       }
       char *s = PyString_AsString( arg );
       X3D::DEFNodes dm;
-      Node *n = X3D::createX3DFromString( s, &dm );
-      return PythonInternals::createX3DHelp( n, &dm );
+      try{
+        Node *n = X3D::createX3DFromString( s, &dm );
+        return PythonInternals::createX3DHelp( n, &dm );
+      }
+      catch(H3D::X3D::XMLParseError &e){
+        ostringstream err;
+        err << "Error creating X3D from string: " << e.message;
+        PyErr_SetString( PyExc_RuntimeError, err.str().c_str() );
+        return 0;
+      }
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -1000,8 +1046,16 @@ call the base class __init__ function." );
       }
       char *filename = PyString_AsString( arg );
       X3D::DEFNodes dm;
-      AutoRef< Node > n = X3D::createX3DNodeFromURL( filename, &dm );
-      return PythonInternals::createX3DHelp( n.get(), &dm );
+      try{
+        AutoRef< Node > n = X3D::createX3DNodeFromURL( filename, &dm );
+        return PythonInternals::createX3DHelp( n.get(), &dm );
+      }
+      catch(H3D::X3D::XMLParseError &e){
+        ostringstream err;
+        err << "Error creating X3D Node from URL: " << e.message;
+        PyErr_SetString( PyExc_RuntimeError, err.str().c_str() );
+        return 0;
+      }
     }
 
     PyObject* pythonCreateX3DNodeFromString( PyObject *self, PyObject *arg ) {
@@ -1013,8 +1067,102 @@ call the base class __init__ function." );
       }
       char *s = PyString_AsString( arg );
       X3D::DEFNodes dm;
-      AutoRef< Node > n = X3D::createX3DNodeFromString( s, &dm );
-      return PythonInternals::createX3DHelp( n.get(), &dm );
+      try{
+        AutoRef< Node > n = X3D::createX3DNodeFromString( s, &dm );
+        return PythonInternals::createX3DHelp( n.get(), &dm );
+      }
+      catch(H3D::X3D::XMLParseError &e){
+        ostringstream err;
+        err << "Error creating X3D Node from string: " << e.message;
+        PyErr_SetString( PyExc_RuntimeError, err.str().c_str() );
+        return 0;
+      }
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    PyObject* pythonCreateVRMLFromURL( PyObject *self, PyObject *arg ) {
+      if( !arg || !PyString_Check( arg ) ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.createX3DFromURL( filename )";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+      char *filename = PyString_AsString( arg );
+      X3D::DEFNodes dm;
+      try {
+        Node *n = X3D::createX3DFromURL( filename, &dm );
+        return PythonInternals::createX3DHelp( n, &dm );
+      } catch(H3D::X3D::XMLParseError &e){
+        ostringstream err;
+        err << "Error creating X3D Node from string: " << e.message;
+        PyErr_SetString( PyExc_RuntimeError, err.str().c_str() );
+        return 0;
+      }
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    PyObject* pythonCreateVRMLFromString( PyObject *self, PyObject *arg ) {
+      if( !arg || !PyString_Check( arg ) ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.createVRMLFromString( s )";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+      char *s = PyString_AsString( arg );
+      X3D::DEFNodes dm;
+      try {
+        Node *n = X3D::createVRMLFromString( s, &dm );
+        return PythonInternals::createX3DHelp( n, &dm );
+      } catch(H3D::X3D::XMLParseError &e){
+        ostringstream err;
+        err << "Error creating X3D Node from string: " << e.message;
+        PyErr_SetString( PyExc_RuntimeError, err.str().c_str() );
+        return 0;
+      }
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    PyObject* pythonCreateVRMLNodeFromURL( PyObject *self, PyObject *arg ) {
+      if( !arg || !PyString_Check( arg ) ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.createVRMLFromURL( filename )";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+      char *filename = PyString_AsString( arg );
+      X3D::DEFNodes dm;
+      try {
+        AutoRef< Node > n = X3D::createVRMLNodeFromURL( filename, &dm );
+        return PythonInternals::createX3DHelp( n.get(), &dm );
+      } catch(H3D::X3D::XMLParseError &e){
+        ostringstream err;
+        err << "Error creating X3D Node from string: " << e.message;
+        PyErr_SetString( PyExc_RuntimeError, err.str().c_str() );
+        return 0;
+      }
+    }
+
+    PyObject* pythonCreateVRMLNodeFromString( PyObject *self, PyObject *arg ) {
+      if( !arg || !PyString_Check( arg ) ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.createVRMLFromString( s )";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+      char *s = PyString_AsString( arg );
+      X3D::DEFNodes dm;
+      try {
+        AutoRef< Node > n = X3D::createVRMLNodeFromString( s, &dm );
+        return PythonInternals::createX3DHelp( n.get(), &dm );
+      } catch(H3D::X3D::XMLParseError &e){
+        ostringstream err;
+        err << "Error creating X3D Node from string: " << e.message;
+        PyErr_SetString( PyExc_RuntimeError, err.str().c_str() );
+        return 0;
+      }
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -1122,7 +1270,7 @@ call the base class __init__ function." );
     }
 
     /////////////////////////////////////////////////////////////////////////
-
+#ifdef USE_HAPTICS
     PyObject* pythonGetActiveDeviceInfo( PyObject *self, PyObject *arg ) {
       if( arg ) {
         ostringstream err;
@@ -1134,6 +1282,7 @@ call the base class __init__ function." );
 
       return PyNode_FromNode( DeviceInfo::getActive() );
     }
+#endif
     
     /////////////////////////////////////////////////////////////////////////
 
@@ -1147,6 +1296,34 @@ call the base class __init__ function." );
       }
 
       return PyNode_FromNode( Viewpoint::getActive() );
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    PyObject* pythonGetActiveFog( PyObject *self, PyObject *arg ) {
+     if( arg ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.getActiveFog()."
+            << "Function does not take any arguments.";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+
+      return PyNode_FromNode( Fog::getActive() );
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    PyObject* pythonGetActiveGlobalSettings( PyObject *self, PyObject *arg ) {
+     if( arg ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.getActiveGlobalSettings()."
+            << "Function does not take any arguments.";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+
+      return PyNode_FromNode( GlobalSettings::getActive() );
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -1495,6 +1672,20 @@ call the base class __init__ function." );
       return 0;  
     }
 
+
+    PyObject *pythonResolveURLAsFile( PyObject *self, PyObject *args ) {
+
+      if( !args || !PyString_Check( args ) ) {
+        ostringstream err;
+        err << "Invalid argument(s) to function H3D.resolveURLAsFile( url )";
+        PyErr_SetString( PyExc_ValueError, err.str().c_str() );
+        return 0;
+      }
+
+      char *url = PyString_AsString( args );
+      string resolved_url = ResourceResolver::resolveURLAsFile( url );
+      return PyString_FromString( resolved_url.c_str() );
+    }
 
   }
 

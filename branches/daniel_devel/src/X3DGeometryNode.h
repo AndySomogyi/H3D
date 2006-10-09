@@ -35,6 +35,8 @@
 #include "MFBool.h"
 #include "MFVec3f.h"
 #include "AutoPtrVector.h"
+#include "H3DOptionNode.h"
+#include "MFNode.h"
 #ifdef HAVE_OPENHAPTICS
 #include <HL/hl.h>
 #endif
@@ -53,6 +55,25 @@ namespace H3D {
     public H3DBoundedObject,
     public H3DDisplayListObject {
   public:
+    typedef TypedMFNode< H3DOptionNode > MFOptionsNode;
+
+    /// This is just a dummy class to get around a bug in Visual C++ 7.1
+    /// If the X3DGeometry::DisplayList inherits directly from 
+    /// H3DDisplayListObject::Display list the application will crash
+    /// if trying to call H3DDisplayListObject::DisplayList::callList
+    /// By using an intermediate class the bug dissappears.
+    class H3DAPI_API BugWorkaroundDisplayList: 
+      public H3DDisplayListObject::DisplayList {
+    };
+
+    /// Display list is extended in order to set front sidedness of 
+    /// triangles outside the display list. 
+    class H3DAPI_API DisplayList: public BugWorkaroundDisplayList {
+    public:
+      /// Perform front face code outside the display list.
+      virtual void callList( bool build_list = true );
+    };
+
     /// Constructor.
     X3DGeometryNode( Inst< SFNode      >  _metadata = 0,
                      Inst< SFBound     > _bound = 0,
@@ -61,9 +82,78 @@ namespace H3D {
                      Inst< MFVec3f     > _force = 0,
                      Inst< MFVec3f     > _contactPoint = 0,
                      Inst< MFVec3f     > _contactNormal = 0);
+
+    /// This function will be called when rendering the geometry as a 
+    /// feedback shape or depth buffer shape for OpenHaptics and can be used 
+    /// to have other OpenGL calls for the OpenHaptics rendering than
+    /// for graphics rendering. By default it is the same is in the graphics
+    /// rendering.
+    virtual void hlRender( HLHapticsDevice *hd, Matrix4f &transform ) {
+      displayList->callList( false );
+    }
+
+    /// This function should be used by the render() function to disable
+    /// or enable face culling. DO NOT USE glEnable/glDisable to do
+    /// this, since it will cause problems with OpenHaptics.
+    inline void useCulling( bool enabled ) {
+      use_culling = enabled;
+    }
+
+    /// Returns if face culling is in use or not.
+    inline bool usingCulling() {
+      return use_culling;
+    }
+
+    /// Control if face culling is allowed or not. Used when rendering
+    /// HLFeedbackBuffer or HLDepthBuffer shapes in order not to have 
+    /// back face culling on when rendering shapes with OpenHaptics.
+    inline void allowCulling( bool allow ) {
+      allow_culling = allow;
+    } 
+
+    /// Enabling/disabling back face culling. Same as doing  
+    /// useCulling( enabled ); setCullFace( GL_BACK );
+    inline void useBackFaceCulling( bool enabled ) {
+      useCulling( enabled );
+      setCullFace( GL_BACK );
+    }
+
+    /// Returns true if back face culling is allowed, false otherwise.
+    inline bool allowingCulling() {
+      return allow_culling;
+    }
+
+    /// Set which side of a polygon to cull. Valid values are GL_FRONT
+    /// or GL_BACK
+    inline void setCullFace( GLenum face ) {
+      cull_face = face;
+    }
+
+    /// Get which face will be culled if culling is enabled.
+    inline GLenum getCullFace() {
+      return cull_face;
+    }
+
+    /// Get the first option node of the type of the pointer given as argument
+    /// from the renderOptions fieeld
+    /// The option argument will contain the node afterwards, or NULL if no
+    /// option of that type exists.
+    template< class OptionNodeType >
+    void getOptionNode( OptionNodeType * &option ) {
+       for( MFOptionsNode::const_iterator i = options->begin();
+           i != options->end(); i++ ) {
+        OptionNodeType *options = dynamic_cast< OptionNodeType * >( *i );
+        if( options ) {
+          option = options;
+          return;
+        }
+       }
+      option = NULL;
+    }
+
  #ifdef HAVE_OPENHAPTICS   
     /// Destructor. Deletes the hl_shape_id.
-    ~X3DGeometryNode();
+    virtual ~X3DGeometryNode();
  
     /// Get a shape id to be used for rendering of this geometry with HLAPI for
     /// the given haptics device.
@@ -72,6 +162,14 @@ namespace H3D {
     /// get is determined by the index argument.
     HLuint getHLShapeId( HLHapticsDevice *hd,
                          unsigned int index );
+
+    /// Returns a either a HLFeedbackShape or a HLDepthBufferShape with
+    /// the X3DGeometryNode. Which type depents on possible 
+    /// OpenHapticsOptions nodes in the options field and
+    /// the default settings in OpenHapticsSettings bindable node.
+    HAPIHapticShape *getOpenGLHapticShape( H3DSurfaceNode *_surface,
+                                           const Matrix4f &_transform,
+                                           HLint _nr_vertices = -1 );
 #endif
     /// Returns the default xml containerField attribute value.
     /// For this node it is "geometry".
@@ -111,10 +209,16 @@ namespace H3D {
     /// <b>Access type:</b> outputOnly
     auto_ptr< MFVec3f >  contactNormal;
 
+    /// Contains nodes with options for haptics and graphics rendering.
+    ///
+    /// <b>Access type:</b> inputOnly
+    auto_ptr< MFOptionsNode > options;
+
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
   protected:
+
   #ifdef HAVE_OPENHAPTICS
     /// HL event callback function for when the geometry is touched.
     static void HLCALLBACK touchCallback( HLenum event,
@@ -151,7 +255,11 @@ namespace H3D {
     };
     
     AutoPtrVector< CallbackData > callback_data; 
-  #endif
+
+#endif
+    bool use_culling, allow_culling;
+    GLenum cull_face;
+    friend class HAPIDevice;
   };
 }
 

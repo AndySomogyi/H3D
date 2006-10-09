@@ -21,19 +21,42 @@
 //    www.sensegraphics.com for more information.
 //
 //
-//
+/// \file X3DNurbsControlCurveNode.h
+/// \brief Header file for X3DNurbsControlCurveNode, X3D scene-graph node
+///
 //
 //////////////////////////////////////////////////////////////////////////////
-#ifndef __CHILD_H__
-#define __CHILD_H__
+#ifndef __X3DNURBSCONTROLCURVENODE_H__
+#define __X3DNURBSCONTROLCURVENODE_H__
 
-#include "Node.h"
+#include "X3DNode.h"
+#include "MFVec2d.h"
 
 namespace H3D {
-  class H3DAPI_API Child : public Node {
 
+  /// \ingroup AbstractNodes
+  /// \class X3DNurbsControlCurveNode
+  /// \brief This abstract node type is the base type for all node types that
+	/// provide control curve information in 2D space. 
+  class H3DAPI_API X3DNurbsControlCurveNode : 
+    public X3DNode {
+  public:
+    /// Constructor.
+    X3DNurbsControlCurveNode( Inst< SFNode      > _metadata			= 0,
+                              Inst< MFVec2d     > _controlPoint = 0);
+
+		/// The control points are defined in 2D coordinate space and interpreted 
+		/// according to the descendent node type as well as the user of this 
+		/// node instance.
+		///
+    /// <b>Access type:</b> inputOutput \n
+    /// 
+    /// \dotfile X3DNurbsSurfaceGeometryNode_controlPoint.dot 
+    auto_ptr< MFVec2d >  controlPoint;
+
+		/// The H3DNodeDatabase for this node.
+    static H3DNodeDatabase database;
   };
 }
 
 #endif
-

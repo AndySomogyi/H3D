@@ -137,9 +137,10 @@ namespace H3D {
     /// having it outside the display list is that you cannot call the render()
     /// function to render the geometry correctly, but MUST use the callList()
     /// function in DisplayList.
-    class H3DAPI_API DisplayList: public H3DDisplayListObject::DisplayList {
+    class H3DAPI_API DisplayList: public X3DGeometryNode::DisplayList {
+    public: 
       /// Perform front face code outside the display list.
-      virtual void callList( bool build_list );
+      virtual void callList( bool build_list = true );
     };
 
     /// Start texture coordinate generation. Texture coordinates will be
@@ -167,7 +168,7 @@ namespace H3D {
     /// Disable the arrays that were enabled in renderTexCoordArray().
     virtual void disableTexCoordArray( X3DTextureCoordinateNode *tc );
 
-    /// Contructor.
+    /// Constructor.
     X3DComposedGeometryNode( Inst< SFNode           > _metadata        = 0,
                              Inst< SFBound          > _bound           = 0,
                              Inst< DisplayList      > _displayList     = 0,

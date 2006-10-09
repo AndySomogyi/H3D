@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "SuperShape.h"
-#include "HLFeedbackShape.h"
 
 using namespace H3D;
 
@@ -139,8 +138,7 @@ SuperShape::SuperShape(
 
 void SuperShape::render() {
   X3DGeometryNode::render();
-  glShadeModel( GL_SMOOTH ); 
-  glEnable( GL_CULL_FACE );
+
   //glEnable( GL_COLOR_MATERIAL );
 
   float long_step =  2 * 3.14159f / resolution->getValue();
@@ -259,10 +257,15 @@ void SuperShape::render() {
     }
 }
 
+#ifdef USE_HAPTICS
 void SuperShape::traverseSG( TraverseInfo &ti ) {
+  useBackFaceCulling( true );
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( 
                                                  ti.getCurrentSurface(),
                                                  ti.getAccForwardMatrix() ) );
+#endif
   }
 }
+#endif

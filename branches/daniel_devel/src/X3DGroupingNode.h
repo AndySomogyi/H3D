@@ -83,7 +83,9 @@ namespace H3D {
     private:
       friend class X3DGroupingNode;
     };
+#ifdef __BORLANDC__
     friend class MFChild;
+#endif
     
     /// SFBound is specialized to update from the SFBound fields 
     /// routed to it. The resulting Bound object is the union of 
@@ -139,8 +141,10 @@ namespace H3D {
     /// Render the children.
     virtual void render();
 
+#ifdef USE_HAPTICS
     /// Traverse the scenegraph. traverseSG() is called in all children nodes.
     virtual void traverseSG( TraverseInfo &ti );
+#endif
   
     /// if true a route will be set up between the bound field of the
     /// nodes in children and the bound field of the grouping node. 

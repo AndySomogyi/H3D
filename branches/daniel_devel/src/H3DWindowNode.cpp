@@ -34,7 +34,12 @@
 #include "TimeStamp.h"
 #include "Bound.h"
 #include "H3DBoundedObject.h"
+#include "GlobalSettings.h"
+#include "DefaultAppearance.h"
+#include "X3DShapeNode.h"
+#ifdef USE_HAPTICS
 #include "DeviceInfo.h"
+#endif
 #include "H3DDisplayListObject.h"
 #include "Exception.h"
 #include "X3DBackgroundNode.h"
@@ -43,6 +48,7 @@
 #include "StereoInfo.h"
 #include "GeneratedCubeMapTexture.h"
 #include "Fog.h"
+#include "X3DShapeNode.h"
 
 #include <GL/glew.h>
 
@@ -58,6 +64,7 @@ using namespace H3D;
 H3DNodeDatabase H3DWindowNode::database( "H3DWindowNode", 
                                          NULL, 
                                          typeid( H3DWindowNode ) );
+
 
 namespace H3DWindowNodeInternals {
   FIELDDB_ELEMENT( H3DWindowNode, width, INPUT_OUTPUT );
@@ -206,6 +213,7 @@ bool H3DWindowNode::calculateFarAndNearPlane( H3DFloat &clip_far,
   
   if( include_styli ) {
     // get the Bounds of the styli of the H3DHapticsDevices.
+#ifdef USE_HAPTICS
     DeviceInfo *di = DeviceInfo::getActive();
     if( di ) {
       for( DeviceInfo::MFDevice::const_iterator i = di->device->begin();
@@ -240,6 +248,7 @@ bool H3DWindowNode::calculateFarAndNearPlane( H3DFloat &clip_far,
         }
       }
     }
+#endif
   }
     
   // add the child node bound.
@@ -365,11 +374,13 @@ bool H3DWindowNode::calculateFarAndNearPlane( H3DFloat &clip_far,
 }
 
 void renderStyli() {
-  // Render the stylus of each H3DHapticsDevice.
+#ifdef USE_HAPTICS
+	// Render the stylus of each H3DHapticsDevice.
   DeviceInfo *di = DeviceInfo::getActive();
   if( di ) {
     di->renderStyli();
   }
+#endif
 }
 
 void H3DWindowNode::render( X3DChildNode *child_to_render ) {
@@ -404,6 +415,32 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
   GLfloat no_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
   glLightModelfv( GL_LIGHT_MODEL_AMBIENT, no_ambient);
   
+  X3DShapeNode::disable_lighting_if_no_app = true;
+
+  DefaultAppearance *def_app = NULL;
+  GlobalSettings *default_settings = GlobalSettings::getActive();
+  if( default_settings ) {
+    default_settings->getOptionNode( def_app );
+  }
+
+  
+  if( def_app ) {
+    Appearance *app = def_app->defaultAppearance->getValue();
+    if( app ) {
+      app->displayList->callList();
+      if( app->material->getValue() ) {
+        X3DShapeNode::disable_lighting_if_no_app = false;
+      }
+
+      RenderProperties *rp = app->renderProperties->getValue();
+      if( rp ) {
+        X3DAppearanceNode::setDefaultUsingMultiPassTransparency( 
+          rp->multiPassTransparency->getValue() );
+      } else {
+        X3DAppearanceNode::setDefaultUsingMultiPassTransparency( true );
+      }
+    }
+  }
 
   // enable headlight
   NavigationInfo *nav_info = NavigationInfo::getActive();
@@ -615,10 +652,28 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
                   -vp_position.z );
     glMultMatrixf( vp_inv_transform );
     
-    renderStyli();
     // render the scene
-    if( dlo )  dlo->displayList->callList();
-    else child_to_render->render();
+    if( multi_pass_transparency ) {
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::SOLID; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+      
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::TRANSPARENT_BACK; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+      
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::TRANSPARENT_FRONT; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+    } else {
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::ALL; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+    }
 
     // RIGHT EYE
     glMatrixMode(GL_PROJECTION);
@@ -692,9 +747,28 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
                   -vp_position.z );
     glMultMatrixf( vp_inv_transform );
 
-    renderStyli();    
-    if( dlo )  dlo->displayList->callList();
-    else child_to_render->render();
+    // render the scene
+    if( multi_pass_transparency ) {
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::SOLID; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+      
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::TRANSPARENT_BACK; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+      
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::TRANSPARENT_FRONT; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+    } else {
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::ALL; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+    }
 
     if( stereo_mode == RenderMode::RED_BLUE_STEREO ||
         stereo_mode == RenderMode::RED_CYAN_STEREO )
@@ -789,10 +863,28 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     glTranslatef( -vp_position.x, -vp_position.y, -vp_position.z );
     glMultMatrixf( vp_inv_transform );
     
-    renderStyli();
+    if( multi_pass_transparency ) {
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::SOLID; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+      
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::TRANSPARENT_BACK; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+      
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::TRANSPARENT_FRONT; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+    } else {
+      X3DShapeNode::geometry_render_mode = X3DShapeNode::ALL; 
+      renderStyli();
+      if( dlo )  dlo->displayList->callList();
+      else child_to_render->render();
+    }
 
-    if( dlo )  dlo->displayList->callList();
-    else child_to_render->render();
     swapBuffers();
   }
   glPopAttrib();

@@ -86,6 +86,7 @@ SpringEffect::SpringEffect( Inst< SFVec3f     > _position,
 // which can cause the spring to be added even though it should not.
 int counter = 0;
 
+#ifdef USE_HAPTICS
 void SpringEffect::traverseSG( TraverseInfo &ti ) {
   if( counter < 5 ) {
     counter++;
@@ -106,6 +107,7 @@ void SpringEffect::traverseSG( TraverseInfo &ti ) {
         } else {
           haptic_spring->setPosition( spring_pos );
           haptic_spring->setSpringConstant( springConstant->getValue() );
+          haptic_spring->transform = ti.getAccForwardMatrix();
           ti.addForceEffect( device_index, haptic_spring.get() );
           Vec3f f = haptic_spring->getLatestForce();
           force->setValue( f );
@@ -115,9 +117,11 @@ void SpringEffect::traverseSG( TraverseInfo &ti ) {
           active->setValue( true, id );
           haptic_spring->setPosition( spring_pos );
           haptic_spring->setSpringConstant( springConstant->getValue() );
+          haptic_spring->transform = ti.getAccForwardMatrix();
           ti.addForceEffect( device_index, haptic_spring.get() );
         }
       }
     }
   }
 }
+#endif

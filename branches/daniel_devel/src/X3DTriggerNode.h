@@ -33,7 +33,7 @@
 
 namespace H3D {
 
-  /// \ingroup X3DNodes
+  /// \ingroup AbstractNodes
   /// \class X3DTriggerNode
   /// \brief This abstract node type is the base node type from which all 
 	/// Triggers are derived.

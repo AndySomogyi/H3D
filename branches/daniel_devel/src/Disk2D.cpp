@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Disk2D.h"
-#include "HLFeedbackShape.h"
 
 using namespace H3D;
 
@@ -84,13 +83,6 @@ void Disk2D::render() {
   H3DFloat nr_segments = 40;
 
   angle_increment = (H3DFloat) Constants::pi*2 / nr_segments;
-
-  if( solid->getValue() ) {
-    glCullFace( GL_BACK );
-    glEnable( GL_CULL_FACE );
-  } else {
-    glDisable( GL_CULL_FACE );
-  }
 
   if( inner_radius == 0 ) {
     // draw a filled circle
@@ -175,10 +167,18 @@ void Disk2D::render() {
   }
 }
 
+#ifdef USE_HAPTICS
 void Disk2D::traverseSG( TraverseInfo &ti ) {
+  if( solid->getValue() ) {
+    useBackFaceCulling( true );
+  } else {
+    useBackFaceCulling( false );
+  }
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix() ) );
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( ti.getCurrentSurface(),
+                                                  ti.getAccForwardMatrix() ) );
+#endif
   }
 }
+#endif

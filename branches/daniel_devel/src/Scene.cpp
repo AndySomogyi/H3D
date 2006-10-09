@@ -30,7 +30,9 @@
 
 #include "Scene.h"
 #include "TimeStamp.h"
+#ifdef USE_HAPTICS
 #include "DeviceInfo.h"
+#endif
 #include <GL/glew.h>
 #ifdef MACOSX
 #include <GLUT/glut.h>
@@ -39,6 +41,7 @@
 #endif
 #include "PeriodicUpdate.h"
 #include "GLUTWindow.h"
+#include "X3DShapeNode.h"
 
 using namespace H3D;
 
@@ -84,6 +87,7 @@ void Scene::idle() {
   last_time = t;
   time->setValue( t, id );
 
+#ifdef USE_HAPTICS
   DeviceInfo *di = DeviceInfo::getActive();
   if( di ) {
     vector< H3DHapticsDevice * > hds;
@@ -104,6 +108,19 @@ void Scene::idle() {
     X3DChildNode *c = static_cast< X3DChildNode * >( sceneRoot->getValue() );
     if( c )
       c->traverseSG( *ti );
+
+    /// traverse the stylus of all haptics devices
+    DeviceInfo *di = DeviceInfo::getActive();
+    if( di ) {
+      for( DeviceInfo::MFDevice::const_iterator i = di->device->begin();
+           i != di->device->end(); i++ ) {
+        H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
+        Node *stylus = hd->stylus->getValue();
+        if( stylus ) {
+          stylus->traverseSG( *ti );
+        }
+      }
+    }
       
     // render the HapticShapes and HapticForceEffets in the TraverseInfo 
     // instance on the H3DHapticsDevices.
@@ -140,12 +157,15 @@ void Scene::idle() {
       delete last_traverseinfo;
     last_traverseinfo = ti;
   }
+#endif
   
   // call window's render function
   for( MFWindow::const_iterator w = window->begin(); 
        w != window->end(); w++ ) {
-    static_cast< H3DWindowNode * >(*w)->
-      render( static_cast< X3DChildNode * >( sceneRoot->getValue() ) );
+    H3DWindowNode *window = static_cast< H3DWindowNode * >(*w);
+    window->setMultiPassTransparency( 
+                       last_traverseinfo->getMultiPassTransparency() );
+    window->render( static_cast< X3DChildNode * >( sceneRoot->getValue() ) );
   }
 
   // update the eventSink
@@ -165,8 +185,12 @@ Scene::Scene( Inst< SFChildNode >  _sceneRoot,
   sceneRoot( _sceneRoot ),
   window   ( _window    ),
   frameRate( _frameRate ),
-  active( true ),
-  last_traverseinfo( NULL ) {
+  active( true )
+#ifdef USE_HAPTICS
+	,
+  last_traverseinfo( NULL )
+#endif
+	{
   
   scenes.insert( this );
   
@@ -181,8 +205,10 @@ Scene::Scene( Inst< SFChildNode >  _sceneRoot,
 Scene::~Scene() {
   scenes.erase( this );
 
+#ifdef USE_HAPTICS
   if( last_traverseinfo )
     delete last_traverseinfo;
+#endif
 }
 
 void Scene::mainLoop() {

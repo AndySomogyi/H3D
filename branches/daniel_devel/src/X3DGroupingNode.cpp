@@ -90,8 +90,10 @@ void X3DGroupingNode::render()     {
     H3DDisplayListObject *c = dynamic_cast< H3DDisplayListObject* >( *i );
     if ( c ) {
       c->displayList->callList();
-    } else 
-      (*i)->render();
+    } else {
+      //if(*i)
+        (*i)->render();
+    }
   }
 
   for( MFNode::const_iterator i = children->begin();
@@ -104,6 +106,7 @@ void X3DGroupingNode::render()     {
 
 };
 
+#ifdef USE_HAPTICS
 void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
   for( MFNode::const_iterator i = children->begin();
        i != children->end(); i++ ) {
@@ -116,17 +119,19 @@ void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
   // traversal changes the children field while iterating.
   const NodeVector &c = children->getValue();
   for( unsigned int i = 0; i < c.size(); i++ ) {
-    c[i]->traverseSG( ti );
+    if( c[i] )
+      c[i]->traverseSG( ti );
   }
 
-  for( MFNode::const_iterator i = children->begin();
-       i != children->end(); i++ ) {
+  for( MFNode::const_reverse_iterator i = children->rbegin();
+       i != children->rend(); i++ ) {
     H3DRenderStateObject *l = dynamic_cast< H3DRenderStateObject* >( *i );
     if ( l ) {
       l->disableHapticsState( ti );
     }
   }
 }
+#endif
 
 void X3DGroupingNode::SFBound::update() {
   value = Bound::SFBoundUnion( routes_in.begin(),

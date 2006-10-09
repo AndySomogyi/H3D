@@ -32,6 +32,7 @@
 #include "Viewpoint.h"
 #include "MFNode.h"
 #include "SFInt32.h"
+#include "DefaultAppearance.h"
 
 namespace H3D {
 
@@ -213,17 +214,30 @@ namespace H3D {
     /// instances share rendering context by default.
     void shareRenderingContext( H3DWindowNode *w );
 
-#if WIN32
+#ifdef WIN32
     HGLRC getRenderingContext() {
       return rendering_context;
     }
 #endif
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
   protected:
-#if WIN32
+#ifdef WIN32
     HGLRC rendering_context;
 #endif
+    /// If multi pass transparency is set to true the scene will be rendered
+    /// three times graphically, once for all solid objects, once for the back
+    /// side of transparent objects and once for the front face of 
+    /// transparent objects. This is in order to avoid artifacts for 
+    /// transparent objects when rendered int the wrong order. 
+    inline void setMultiPassTransparency( bool b ) {
+      multi_pass_transparency = b;
+    }
+
+    friend class Scene; 
+
+    bool multi_pass_transparency;
     X3DChildNode *last_render_child;
     static bool GLEW_init;
     int window_id;

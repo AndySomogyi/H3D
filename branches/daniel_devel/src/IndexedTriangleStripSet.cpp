@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "IndexedTriangleStripSet.h"
-#include "HLFeedbackShape.h"
 #include "Normal.h"
 
 using namespace H3D;
@@ -103,17 +102,7 @@ void IndexedTriangleStripSet::render() {
   bool tex_coords_per_vertex = tex_coord_node && !tex_coord_gen;
   const vector< int > &indices  = index->getValue();
  
-  glShadeModel( GL_SMOOTH ); 
-
   if( coordinate_node ) {
-    // enable backface culling if solid is true
-    if( solid->getValue() ) {
-      glEnable( GL_CULL_FACE );
-      glCullFace( GL_BACK );
-    } else {
-      glDisable( GL_CULL_FACE );
-    }
-    
     // no X3DTextureCoordinateNode, so we generate texture coordinates
     // based on the bounding box according to the X3D specification.
     if( !tex_coords_per_vertex ) {
@@ -312,14 +301,22 @@ void IndexedTriangleStripSet::render() {
   } 
 }
 
+#ifdef USE_HAPTICS
 void IndexedTriangleStripSet::traverseSG( TraverseInfo &ti ) {
+  // use backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
+
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( 
                                                  ti.getCurrentSurface(),
                                                  ti.getAccForwardMatrix(),
                                                  index->size() ) );
+#endif
   }
 }
+#endif
 
 
 void IndexedTriangleStripSet::AutoNormal::update() {

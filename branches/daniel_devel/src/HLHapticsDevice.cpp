@@ -26,13 +26,14 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-
+#include "H3DApi.h"
+#ifdef USE_HAPTICS
 #include "HLHapticsDevice.h"
 #include "HLShape.h"
 #include "GL/glew.h"
 
 #ifdef HAVE_OPENHAPTICS
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 #pragma comment( lib, "hd.lib" )
 #pragma comment( lib, "hl.lib" )
 #pragma comment( lib, "hdu.lib" )
@@ -374,12 +375,16 @@ void HLHapticsDevice::initDevice() {
                                      this,
                                      HD_MIN_SCHEDULER_PRIORITY );
     hd_handles.push_back( handle );
-    
-    HLThread *hl_thread = HLThread::getInstance();
-
+    H3DHapticsDevice::initDevice();
+  }
+}
+void HLHapticsDevice::initHLLayer() {
+  if( initialized->getValue() ) {
     // Create a haptic context for the device. The haptic context maintains 
     // the state that persists between frame intervals and is used for
     // haptic rendering.
+
+    HLThread *hl_thread = HLThread::getInstance();
 
     haptic_context = hlCreateContext( device_handle );
     hlMakeCurrent( haptic_context );  
@@ -387,6 +392,7 @@ void HLHapticsDevice::initDevice() {
     hl_thread->setActive( true );
 
     hlEnable(HL_HAPTIC_CAMERA_VIEW);
+    hlEnable(HL_ADAPTIVE_VIEWPORT );
      
     HLint tmp_int;
     hdGetIntegerv( HD_INPUT_DOF, &tmp_int );
@@ -416,7 +422,6 @@ void HLHapticsDevice::initDevice() {
                         HLHapticsDevice::hlButtonCallback,
                         this );
 
-    H3DHapticsDevice::initDevice();
   }
 }
 
@@ -443,6 +448,7 @@ void HLHapticsDevice::disableDevice() {
 }
 
 void HLHapticsDevice::updateDeviceValues() {
+	H3DHapticsDevice::updateDeviceValues();
 
   // update real-time reference to DeviecLog
 	DeviceLog * dl = static_cast< DeviceLog* >( deviceLog->getValue() );
@@ -561,4 +567,4 @@ void HLHapticsDevice::postRender() {
   }   
   #endif   
 }
-
+#endif

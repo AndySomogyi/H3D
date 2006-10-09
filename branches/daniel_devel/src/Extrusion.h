@@ -139,13 +139,18 @@ namespace H3D {
                                 MFVec3f > > {
       virtual void update();
 		};
+#ifdef __BORLANDC__
+    friend class VertexVectors;
+#endif
 
     /// Render the Extrusion with OpenGL.
     virtual void render();
 
+#ifdef USE_HAPTICS
 		/// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
+#endif
 
     /// Constructor.
     Extrusion( Inst< SFNode           > _metadata        = 0,

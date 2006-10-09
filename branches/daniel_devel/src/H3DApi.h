@@ -37,6 +37,10 @@
 /// Haptics will then be disabled.
 #define HAVE_OPENHAPTICS
 
+/// Undef if you do not want to use haptics at all.
+/// HAVE_OPENHAPTICS must also be undef.
+#define USE_HAPTICS
+
 /// Undef if you do not have OpenAL(www.openal.org) installed. Sounds will
 /// then be disabled.
 #define HAVE_OPENAL
@@ -81,6 +85,21 @@
 /// supported. Only local filenames can be used. 
 #define HAVE_LIBCURL
 
+/// Undef if you do not have DirectShow available. Needed for the 
+/// DirectShowDecoder node.
+#ifdef WIN32
+#define HAVE_DSHOW
+#endif
+
+/// Undef if you do not have the DHD-API from ForceDimension. Needed
+/// for the DHDHapticsDevice, e.g. support for Omega and Delta haptics
+/// devices
+#define HAVE_DHDAPI
+
+/// Undef if you do not have Haptik(www.haptiklibrary.org). Needed
+/// for the HaptikHapticsDevice
+//#define HAVE_HAPTIK
+
 // The following ifdef block is the standard way of creating macros
 // which make exporting from a DLL simpler. All files within this DLL
 // are compiled with the H3DAPI_EXPORTS symbol defined on the command
@@ -89,19 +108,26 @@
 // this file see H3DAPI_API functions as being imported from a DLL,
 // whereas this DLL sees symbols defined with this macro as being
 // exported.
-#ifdef WIN32
+#if defined(WIN32) || defined(__WIN32__)
 #include <windows.h>
 #ifdef H3DAPI_EXPORTS
 #define H3DAPI_API __declspec(dllexport)
 #else
 #define H3DAPI_API __declspec(dllimport)
 #endif
-#ifdef _MSC_VER
-// disable dll-interface warnings for stl-exports 
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+// disable dll-interface warnings for stl-exports
 #pragma warning( disable: 4251 )
 #endif
 
 
+#endif
+
+// Borland uses strnicmp.
+#ifdef __BORLANDC__
+#define _strnicmp strnicmp
+#define __timeb64 timeb
+#define _ftime64 ftime
 #endif
 
 #if defined(__APPLE__) && defined(__MACH__)

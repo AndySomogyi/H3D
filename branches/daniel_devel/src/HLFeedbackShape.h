@@ -28,15 +28,20 @@ namespace H3D {
   public:
     #ifndef HAVE_OPENHAPTICS
     typedef int HLint;
+    typedef enum { HL_FRONT, HL_BACK, HL_FRONT_AND_BACK } HLenum;
     #endif
 
     /// Constructor.
     HLFeedbackShape( X3DGeometryNode *_geometry,
                      HAPISurfaceObject *_surface,
                      const Matrix4f &_transform,
-                     HLint _nr_vertices = -1 ):
+                     HLint _nr_vertices = -1,
+                     HLenum _touchable_face = HL_FRONT_AND_BACK,
+                     bool _use_haptic_camera = true ):
       HAPIHapticShape( _geometry, _surface, _transform ),
-      nr_vertices( _nr_vertices ) {}
+      nr_vertices( _nr_vertices ),
+      touchable_face( _touchable_face ),
+      use_haptic_camera( _use_haptic_camera ) {}
     
     /// This function performs all the HLAPI calls that are needed to render
     /// the shape. Uses HL_SHAPE_FEEDBACK_BUFFER to render the object.     
@@ -45,6 +50,12 @@ namespace H3D {
     /// A upper bound on the number of triangles that will be rendered.
     /// Negative values will use the system default value.
     HLint nr_vertices;
+    
+    /// Which sides of the faces are touchable.
+    HLenum touchable_face;
+    
+    /// Enable HL_HAPTIC_CAMERA_VIEW or not
+    bool use_haptic_camera;
   };
 }
 

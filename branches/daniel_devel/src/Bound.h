@@ -47,10 +47,9 @@ namespace H3D {
     virtual bool isInside( const Vec3f &p ) = 0;
 
     /// Checks a line segment for intersection with the bound. If line
-    /// intersects, true is returned and the to parameter is set to the 
-    /// intersection point. If no intersection, false is returned.
+    /// intersects, true is returned.
     virtual bool lineSegmentIntersect( const Vec3f& from,
-                                       Vec3f &to ) = 0;
+                                       const Vec3f &to ) = 0;
 
     /// Returns a Bound that is the union between all the bounds specified
     /// by the iterators. Iterator is a iterator to a Bound.
@@ -64,6 +63,7 @@ namespace H3D {
     template< class Iterator >
     static inline Bound *SFBoundUnion( Iterator begin, Iterator end );
 
+    virtual Vec3f closestPoint( const Vec3f &p ) = 0;
   };
 
   /// An InfiniteBound is a Bound that encompasses everything. So every point
@@ -76,11 +76,14 @@ namespace H3D {
       return true;
     }
 
-    /// Returns true always. The 'to' param is set to 'from'. 
+    /// Returns true always. 
     virtual bool lineSegmentIntersect( const Vec3f& from,
-                                       Vec3f &to ) {
-      to = from;
+                                       const Vec3f &to ) {
       return true;
+    }
+    
+    virtual Vec3f closestPoint( const Vec3f &p ) {
+      return p;
     }
   };  
 
@@ -96,8 +99,12 @@ namespace H3D {
 
     /// Returns false always. 
     virtual bool lineSegmentIntersect( const Vec3f& from,
-                                       Vec3f &to ) {
+                                       const Vec3f &to ) {
       return false;
+    }
+
+    virtual Vec3f closestPoint( const Vec3f &p ) {
+      return p;
     }
   };  
 
@@ -185,11 +192,60 @@ namespace H3D {
                p.z >= ( c.z - half_size.z ) );
     }
 
-    /// Not implemented.
+    /// Checks a line segment for intersection with the bound. If line
+    /// intersects, true is returned.
     virtual bool lineSegmentIntersect( const Vec3f& from,
-                                       Vec3f &to ) {
-      throw Exception::H3DAPIException("BoxBound::lineSegmentIntersect not implemented" );     
+                                       const Vec3f &to ) {
+      // algorithm from "Realtime Collision Detection" book
+      Vec3f e = size->getValue() / 2.0; 
+      const Vec3f c = center->getValue();       
+      // line center
+      Vec3f m = (from + to ) * 0.5f;
+      // halflength vector
+      Vec3f d = to - m;
+      // translate to origin
+      m = m -c; 
+      
+      H3DFloat adx = H3DAbs( d.x );
+      if( H3DAbs( m.x ) > e.x + adx ) return false;
+      H3DFloat ady = H3DAbs( d.y );
+      if( H3DAbs( m.y ) > e.y + ady ) return false;
+      H3DFloat adz = H3DAbs( d.z );
+      if( H3DAbs( m.z ) > e.z + adz ) return false;
+
+      adx += Constants::f_epsilon;
+      ady += Constants::f_epsilon;
+      adz += Constants::f_epsilon;
+
+      if( H3DAbs( m.y * d.z - m.z * d.y ) > e.y * adz + e.z * ady ) 
+        return false;
+      if( H3DAbs( m.z * d.x - m.x * d.z ) > e.x * adz + e.z * adx ) 
+        return false;
+      if( H3DAbs( m.x * d.y - m.y * d.x ) > e.x * ady + e.y * adx ) 
+        return false;
+
+      return true;
     }
+
+    virtual Vec3f closestPoint( const Vec3f &p ) {
+      const Vec3f &c = center->getValue();
+      const Vec3f &half_s = size->getValue() / 2;
+      
+      Vec3f min = c - half_s;
+      Vec3f max = c + half_s;
+
+      Vec3f result;
+      // for each coordinate axis, if the point coordinate value
+      // is outside box, clamp it to the box, e;se keep it as it is
+      for( int i = 0; i < 3; i++ ) {
+        H3DFloat v = p[i];
+        if( v < min[i] ) v = min[i];
+        if( v > max[i] ) v = max[i];
+        result[i] = v;
+      }
+      return result;
+    }
+
     /// The center point of the bounding box.
     auto_ptr< SFVec3f > center;
     /// The size of the bounding box.
