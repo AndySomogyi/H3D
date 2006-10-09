@@ -189,6 +189,8 @@ namespace H3D {
     Vec3d proxy_position;
 
     auto_ptr< HAPIHapticsDevice > hapi_device;
+
+    RuspiniRenderer::Contacts last_contacts;
   };
 }
 
