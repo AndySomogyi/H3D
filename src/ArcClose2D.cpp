@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "ArcClose2D.h"
-#include "HLFeedbackShape.h"
 
 using namespace H3D;
 
@@ -118,13 +117,6 @@ void ArcClose2D::render() {
 
   angle_increment = (H3DFloat) Constants::pi*2 / nr_segments;
 
-  if( solid->getValue() ) {
-    glCullFace( GL_BACK );
-    glEnable( GL_CULL_FACE );
-  } else {
-    glDisable( GL_CULL_FACE );
-  }
-
   glBegin( GL_TRIANGLE_FAN );
   glNormal3f( 0.f, 0.f, 1.f );
   glTexCoord2f( start_point_tc.x, start_point_tc.y );
@@ -150,11 +142,19 @@ void ArcClose2D::render() {
   glEnd ();
 }
 
+#ifdef USE_HAPTICS
 void ArcClose2D::traverseSG( TraverseInfo &ti ) {
+  if( solid->getValue() ) {
+    useBackFaceCulling( true );
+  } else {
+    useBackFaceCulling( false );
+  }
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
-                                                 ti.getCurrentSurface(),
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape(ti.getCurrentSurface(),
                                                  ti.getAccForwardMatrix(),
                                                  41 ) );
+#endif
   }
 }
+#endif

@@ -31,11 +31,12 @@
 
 #include "H3DThreadedHapticsDevice.h"
 #include "MFString.h"
+#ifdef HAVE_HAPTIK
 #include <RSLib/Haptik.hpp>
-
+#endif 
 namespace H3D {
 
-  /// \ingroup Nodes
+  /// \ingroup H3DNodes
   /// \class HaptikHapticsDevice
   /// \brief The HaptikHapticsDevice uses the Haptik library
   /// (www.haptiklibrary.org) to access haptics devices.
@@ -70,7 +71,7 @@ namespace H3D {
   /// 
   /// \par Internal routes:
   /// \dotfile HaptikHapticsDevice.dot
-  class HaptikHapticsDevice: public H3DThreadedHapticsDevice {
+  class H3DAPI_API HaptikHapticsDevice: public H3DThreadedHapticsDevice {
   public:
 
     /// The SelectDevice field changes the haptics device to use depending
@@ -78,7 +79,8 @@ namespace H3D {
     ///
     /// routes_in[0] is the set_selectedDevice field
     /// routes_in[1] is the preferredDeviceType field.
-    class SelectDevice: public TypedField< PeriodicUpdate< SFInt32 >,
+    class H3DAPI_API SelectDevice: 
+      public TypedField< PeriodicUpdate< SFInt32 >,
     Types< SFInt32, SFString > > {
       virtual void update();
     };
@@ -116,8 +118,14 @@ namespace H3D {
         delete thread;
         thread = NULL;
       }
-      if( haptik_device )
-        haptik_device->Release();
+      
+#ifdef HAVE_HAPTIK
+      if( haptik_device ) {
+        RSLib::IHaptikDeviceInterface t = haptik_device;
+        haptik_device = NULL;
+        t->Release();
+      }
+#endif
     }
 
     /// Does all the initialization needed for the device before starting to
@@ -218,13 +226,15 @@ namespace H3D {
     virtual void sendTorque( const Vec3d &f );
 
     /// Change the used Haptik device to the one with the given id.
-    virtual void changeHaptikDevice( UINT32 new_id );
+    virtual void changeHaptikDevice( unsigned int new_id );
 
+#ifdef HAVE_HAPTIK
     RSLib::Haptik haptik;
     /// The device currently in use.
     RSLib::IHaptikDeviceInterface haptik_device;
     Vec3f last_force;
     Vec3f last_torque;
+#endif
   };
 }
 

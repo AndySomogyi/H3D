@@ -144,19 +144,35 @@ class %s( MField ):
 """ % (t[1], t[0] )
 
 
-def TypedField( base_class, type_info = None ):
+typed_field_classes = {}
+
+def TypedField( base_class, type_info = None, opt_type_info = None ):
   class TypedBase( base_class ):
     pass
+  global typed_field_classes
+  if( typed_field_classes.has_key( (base_class, type_info, opt_type_info) ) ):
+    return typed_field_classes[(base_class, type_info, opt_type_info)]
+
   if type_info == None:
     TypedBase.__type_info__ = ()
   elif type( type_info ) != type(()):
     TypedBase.__type_info__ = ( type_info, )
   else:
     TypedBase.__type_info__ = type_info
+
+  if opt_type_info == None:
+    TypedBase.__opt_type_info__ = ()
+  elif type( opt_type_info ) != type(()):
+    TypedBase.__opt_type_info__ = ( opt_type_info, )
+  else:
+    TypedBase.__opt_type_info__ = opt_type_info
+
+  typed_field_classes[(base_class, type_info, opt_type_info)] = TypedBase
   return TypedBase
 
 
 auto_update_classes = {}
+
 
 # AutoUpdate "template" as in C++
 def AutoUpdate( base_class ):

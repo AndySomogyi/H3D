@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Rectangle2D.h"
-#include "HLFeedbackShape.h"
 
 using namespace H3D;
 
@@ -73,12 +72,6 @@ Rectangle2D::Rectangle2D( Inst< SFNode      > _metadata,
 }
 
 void Rectangle2D::render() {
-  if( solid->getValue() ) {
-    glCullFace( GL_BACK );
-    glEnable( GL_CULL_FACE );
-  } else {
-    glDisable( GL_CULL_FACE );
-  }
   H3DFloat half_x = size->getValue().x / 2;
   H3DFloat half_y = size->getValue().y / 2;
   
@@ -98,11 +91,19 @@ void Rectangle2D::render() {
   glEnd();
 }
 
+#ifdef USE_HAPTICS
 void Rectangle2D::traverseSG( TraverseInfo &ti ) {
+  // use backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
+
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( 
                                                  ti.getCurrentSurface(),
                                                  ti.getAccForwardMatrix(),
                                                  4 ) );
+#endif
   }
 }
+#endif

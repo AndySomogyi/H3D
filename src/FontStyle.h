@@ -37,7 +37,7 @@
 #include "SFFloat.h"
 
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 #pragma comment( lib, "ftgl_dynamic_MTD.lib" )
 #endif
 #include <FTGLTextureFont.h>
@@ -374,7 +374,7 @@ namespace H3D {
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
     /// FTGL container class for all glyphs in the current font, used to
     /// measure bounding  boxes, render, advance, etc.
-    FTFont* font;   
+    FTFont *font;   
 #endif
   };
 }

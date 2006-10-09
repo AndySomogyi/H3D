@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Box.h"
-#include "HLFeedbackShape.h"
 
 using namespace H3D;
 
@@ -68,12 +67,6 @@ Box::Box(
 }
 
 void Box::render() {
-  if( solid->getValue() ) {
-    glCullFace( GL_BACK );
-    glEnable( GL_CULL_FACE );
-  } else {
-    glDisable( GL_CULL_FACE );
-  }
   H3DFloat x = size->getValue().x / 2;
   H3DFloat y = size->getValue().y / 2;
   H3DFloat z = size->getValue().z / 2;
@@ -155,11 +148,19 @@ void Box::render() {
   glEnd();
 }
 
+#ifdef USE_HAPTICS
 void Box::traverseSG( TraverseInfo &ti ) {
+  if( solid->getValue() ) {
+    useBackFaceCulling( true );
+  } else {
+    useBackFaceCulling( false );
+  }
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix(),
-                                                 24 ) );
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( ti.getCurrentSurface(),
+                                                  ti.getAccForwardMatrix(),
+                                                  24 ) );
+#endif
   }
 }
+#endif

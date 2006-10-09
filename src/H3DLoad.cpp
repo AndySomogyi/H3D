@@ -15,10 +15,17 @@
 #include "Scene.h"
 #include "KeySensor.h"
 #include "MouseSensor.h"
+#ifndef MACOSX
+#include "SpaceWareSensor.h"
+#endif
 #include "DEFNodes.h"
 #include "Viewpoint.h"
+#ifdef USE_HAPTICS
 #include "DeviceInfo.h"
+#endif
 #include "INIFile.h"
+#include "ResourceResolver.h"
+#include "PythonScript.h"
 
 #ifdef MACOSX
 #include "FreeImage.h"
@@ -29,10 +36,11 @@
 using namespace std;
 using namespace H3D;
 
-class KeyRotation: public TypedField< SFRotation, 
-              Types< SFInt32,
-              SFBool,
-              SFVec2f > > {
+class KeyRotation : public TypedField< SFRotation, 
+                                       Types< SFInt32,
+                                              SFBool,
+                                              SFVec2f,
+                                              SFRotation> > {
   virtual void update() {
     bool button_pressed = static_cast< SFBool * >(routes_in[1])->getValue();
     Vec2f motion = static_cast< SFVec2f * >(routes_in[2])->getValue();
@@ -42,21 +50,27 @@ class KeyRotation: public TypedField< SFRotation,
       Vec2f perp = Vec2f( -motion.y, motion.x );
       perp.normalize();
       value = Rotation( perp.x, perp.y, 0, motion.length() * 0.01f ) * value;
-    } else {
-      if( event.ptr == routes_in[0] ) {
-        int key = static_cast< SFInt32 * >(routes_in[0])->getValue();
-        if( key == KeySensor::UP ) {
-          value = Rotation( 1,0,0,-0.1f ) * value;
-        }
-        if( key == KeySensor::DOWN ) {
-          value = Rotation( 1,0,0,0.1f ) * value;
-        }
-        if( key == KeySensor::LEFT ) {
-          value = Rotation( 0,1,0,-0.1f ) * value;
-        }
-        if( key == KeySensor::RIGHT ) {
-          value = Rotation( 0,1,0,0.1f ) * value;
-        }
+    }
+    
+    else if( event.ptr == routes_in[0] ) {
+      int key = static_cast< SFInt32 * >(routes_in[0])->getValue();
+      if( key == KeySensor::UP ) {
+        value = Rotation( 1,0,0,-0.1f ) * value;
+      }
+      if( key == KeySensor::DOWN ) {
+        value = Rotation( 1,0,0,0.1f ) * value;
+      }
+      if( key == KeySensor::LEFT ) {
+        value = Rotation( 0,1,0,-0.1f ) * value;
+      }
+      if( key == KeySensor::RIGHT ) {
+        value = Rotation( 0,1,0,0.1f ) * value;
+      }
+    }
+    else if( routes_in.size() > 3 ) {
+      if( event.ptr == routes_in[3] ) {
+        Rotation r = static_cast< SFRotation * >(routes_in[3])->getValue();
+        value = r * value;
       }
     }
   }
@@ -88,6 +102,30 @@ class QuitAPIField: public AutoUpdate< SFString > {
     PATH + ini_file.get( GROUP, VAR ) :                 \
     DEFAULT ) )
 
+string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
+                            const string &ENV,
+                            const string &DISPLAY_PATH,
+                            const string &COMMON_PATH,
+                            const string &GROUP,
+                            const string &VAR ) {
+  char *env = getenv(ENV.c_str());
+  if( env ) return env;
+  
+  if( ini_file.hasOption(GROUP,VAR) ) { 
+    string option = ini_file.get( GROUP, VAR );
+    
+    ifstream inp( (DISPLAY_PATH + option).c_str() );
+    inp.close();
+    if(!inp.fail()) return DISPLAY_PATH + option;
+
+    inp.clear();
+    inp.open( (COMMON_PATH + option).c_str() );
+    inp.close();
+    if(!inp.fail()) return COMMON_PATH + option;
+  }
+  return "";
+}
+
 #define GET_INT(GROUP,VAR,DEFAULT)  \
 ( ini_file.hasOption(GROUP,VAR) ? \
   atoi(ini_file.get( GROUP, VAR ).c_str()) :    \
@@ -100,7 +138,7 @@ class QuitAPIField: public AutoUpdate< SFString > {
 
 
 int main(int argc, char* argv[]) {
-  
+  PythonScript::setargv( argc, argv );
   
   // Settings and command line arguments ---
   
@@ -122,6 +160,8 @@ int main(int argc, char* argv[]) {
   help_message += "    --stylus=<file>     Use <file> as stylus model\n";
   help_message += "    --viewpoint=<file>  Use <file> as viewpoint\n";
   help_message += "    --rendermode=<mode> Use render mode <mode>\n";
+  help_message += " -s --spacemouse        Use 3DConnexion space mouse to\n";
+  help_message += "                        navigate scene.\n";
   help_message += "\n";
   help_message += " -h --help              This help message\n";
   help_message += "\n";
@@ -140,7 +180,7 @@ int main(int argc, char* argv[]) {
 
   ostream *console_ostream = 0;
   string ostream_str = GET4("H3D_CONSOLE_OSTREAM",
-                            "console","ostream","cerr");
+                            "console","ostream",(string)"cerr");
   if ( ostream_str == "cerr" )
     console_ostream = &cerr;
   else if( ostream_str == "cout" )
@@ -156,36 +196,46 @@ int main(int argc, char* argv[]) {
   
   // Graphics, devices, models and such
   
+  string settings_path = 
+    GET_ENV_INI_DEFAULT( "H3D_DISPLAY",
+                         h3d_root + "/settings/display/",
+                         "display","type",
+                         h3d_root + "/settings/common/" );
+  
+  string common_path =  h3d_root + "/settings/common/";
+
   string deviceinfo_file =
-    GET_ENV_INI_DEFAULT( "H3D_DEFAULT_DEVICEINFO",
-                         h3d_root + "/settings/common/deviceinfo/",
-                         "haptics device","deviceinfo",
-                         h3d_root + "/settings/current/deviceinfo.x3d" );
+    GET_ENV_INI_DEFAULT_FILE( ini_file, "H3D_DEFAULT_DEVICEINFO",
+                              settings_path + "/device/",
+                              common_path + "/device/",
+                              "haptics device","device" );
   
   string stylus_file =
-    GET_ENV_INI_DEFAULT( "H3D_STYLUS",
-                         h3d_root + "/settings/common/stylus/",
-                         "haptics device","stylus",
-                         h3d_root + "/settings/current/stylus.x3d" );
+    GET_ENV_INI_DEFAULT_FILE( ini_file, "H3D_STYLUS",
+                              common_path + "/stylus/",
+                              common_path + "/stylus/",
+                              "haptics device","stylus" );
   
   string viewpoint_file =
-    GET_ENV_INI_DEFAULT( "H3D_DEFAULT_VIEWPOINT",
-                         h3d_root + "/settings/common/viewpoint/",
-                         "graphical", "viewpoint",
-                         h3d_root + "/settings/current/viewpoint.x3d" );
+    GET_ENV_INI_DEFAULT_FILE( ini_file, "H3D_DEFAULT_VIEWPOINT",
+                              settings_path + "/viewpoint/",
+                              common_path + "/viewpoint/",
+                              "graphical", "viewpoint" );
 
   string render_mode = GET4( "H3D_RENDERMODE",
                              "graphical", "rendermode",
-                             "MONO" );
+                             (string)"MONO" );
   
   int width = GET_INT("graphical", "width", 640 );
   int height = GET_INT("graphical", "height", 480 );
   
   bool fullscreen    = GET_BOOL("graphical", "fullscreen", false);
   if( char *buffer = getenv("H3D_FULLSCREEN") ) {
-    if (strcmp( buffer, "TRUE" ) == 0 )
-      fullscreen = true;
-    else if(strcmp( buffer, "FALSE" ) != 0 )
+    if (strcmp( buffer, "TRUE" ) == 0 ){
+      fullscreen = true; }
+    else if (strcmp( buffer, "FALSE" ) == 0 ){
+      fullscreen = false; }
+    else
       Console(4) << "Invalid valid value \"" << buffer 
                  << "\" on environment "
                  << "variable H3D_FULLSCREEN. Must be TRUE or FALSE. "
@@ -194,14 +244,17 @@ int main(int argc, char* argv[]) {
   
   bool mirrored      = GET_BOOL("graphical", "mirrored", false);
   if( char *buffer = getenv("H3D_MIRRORED") ) {
-    if (strcmp( buffer, "TRUE" ) == 0 )
-      mirrored = true;
-    else if(strcmp( buffer, "FALSE" ) != 0 )
+    if (strcmp( buffer, "TRUE" ) == 0 ){
+      mirrored = true; }
+    else if (strcmp( buffer, "FALSE" ) == 0 ){
+      mirrored = false; }
+    else
       Console(4) << "Invalid valid value \"" << buffer 
                  << "\" on environment "
                  << "variable H3D_MIRRORED. Must be TRUE or FALSE. "<< endl;
   }
   
+  bool use_space_mouse = false;
 
   // Command line arguments ---
   
@@ -257,7 +310,9 @@ int main(int argc, char* argv[]) {
       else if( !strncmp(argv[i]+2,"rendermode=",
                         strlen("rendermode=")) ){
         render_mode = strstr(argv[i],"=")+1; }
-      
+
+       else if( !strcmp(argv[i]+2,"spacemouse") ){
+        use_space_mouse = true; }
       else {
         Console(4) << "Unknown argument "
                    << "'" << argv[i] << "'" << endl; }
@@ -281,6 +336,10 @@ int main(int argc, char* argv[]) {
       fullscreen = false;
       break;
       
+    case 's':
+      use_space_mouse = true;
+      break;
+
     default:
       Console(4) << "Unknown argument "
                  << "'" << argv[i] << "'" << endl;
@@ -298,6 +357,10 @@ int main(int argc, char* argv[]) {
   try {
     AutoRef< KeySensor > ks( new KeySensor );
     AutoRef< MouseSensor > ms( new MouseSensor );
+#ifndef MACOSX
+    AutoRef< SpaceWareSensor > ss;
+    if( use_space_mouse ) ss.reset( new SpaceWareSensor );
+#endif
     X3D::DEFNodes dn;
     KeyRotation *kr = new KeyRotation;
     QuitAPIField *quit_api = new QuitAPIField;
@@ -315,7 +378,8 @@ int main(int argc, char* argv[]) {
                    << e << endl;
       }
     }
-    
+
+#ifdef USE_HAPTICS
     DeviceInfo *di = DeviceInfo::getActive();
     if( di && stylus_file.size() ) {
       AutoRef< Node > default_stylus;
@@ -334,6 +398,7 @@ int main(int argc, char* argv[]) {
           d->stylus->setValue( default_stylus );
       }
     }
+#endif
     
     for( vector<string>::iterator file = xml_files.begin() ;
          file != xml_files.end() ; file++ ){
@@ -354,10 +419,17 @@ int main(int argc, char* argv[]) {
     ks->actionKeyPress->route( kr );
     ms->leftButton->route( kr );
     ms->motion->route( kr );
+#ifndef MACOSX
+    if( use_space_mouse )
+      ss->instantRotation->route( kr );
+#endif
     kr->route( t->rotation );
-		  
-    AutoRef< Group > g( new Group );     
-    
+
+    AutoRef< Group > g( new Group );
+#ifndef MACOSX
+    if( use_space_mouse )
+      g->children->push_back(ss.get());
+#endif    
     // create a Viewpoint if it does not exist.
     if( !Viewpoint::getActive() && viewpoint_file.size() ) {
       try {

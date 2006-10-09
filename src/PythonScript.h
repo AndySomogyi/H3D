@@ -62,10 +62,12 @@ namespace H3D {
     /// specified string field name, used when creating nodes via
     /// the H3DNodeDatabase service.
     virtual Field *lookupField( const string &name );
-    
+
+#ifdef USE_HAPTICS
     /// Traverse the scenegraph. Used in PythonScript to call a function
     /// in python once per scene graph loop.
     virtual void traverseSG( TraverseInfo &ti );
+#endif
     
     virtual void initialiseParser();
 
@@ -76,6 +78,8 @@ namespace H3D {
     }
     
     virtual void loadScript( const string &script );
+
+    static void setargv( int _argc, char *_argv[] );
 
     /// Initialize is called once upon the first reference of the 
     /// RefCountedClass.
@@ -91,7 +95,9 @@ namespace H3D {
   private:
     void * module;
     void * module_dict;
-  };
+    static int argc;
+    static char** argv;
+ };
 }
 
 #endif // HAVE_PYTHON

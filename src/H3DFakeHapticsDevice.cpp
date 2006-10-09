@@ -90,7 +90,7 @@ H3DFakeHapticsDevice::~H3DFakeHapticsDevice() {
 
 Vec3d H3DFakeHapticsDevice::getPosition() {
   // devicePosition is thread safe so we can use getValue()
-  return set_devicePosition->getValue();
+  return devicePosition->getValue( id );
 }
 
 Vec3d H3DFakeHapticsDevice::getVelocity() {
@@ -99,12 +99,12 @@ Vec3d H3DFakeHapticsDevice::getVelocity() {
 
 Rotation H3DFakeHapticsDevice::getOrientation() {
   // deviceOrientation is thread safe so we can use getValue()
-  return set_deviceOrientation->getValue();
+  return deviceOrientation->getValue();
 }
 
 bool H3DFakeHapticsDevice::getButtonStatus() {
   // mainButton is thread safe so we can use getValue()
-  return set_mainButton->getValue();
+  return mainButton->getValue();
 }
 
 

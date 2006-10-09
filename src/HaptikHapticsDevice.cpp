@@ -82,8 +82,11 @@ HaptikHapticsDevice::HaptikHapticsDevice(
   manufacturer( _manufacturer ),
   selectedDevice( _selectedDevice ),
   set_selectedDevice( _set_selectedDevice ),
-  preferredDeviceType( _preferredDeviceType ),
-  haptik_device( NULL ) {
+  preferredDeviceType( _preferredDeviceType )
+#ifdef HAVE_HAPTIK
+  , haptik_device( NULL )
+#endif
+  {
 
   type_name = "HaptikHapticsDevice";  
   database.initFields( this );
@@ -91,17 +94,24 @@ HaptikHapticsDevice::HaptikHapticsDevice(
   set_selectedDevice->setValue( -1 );
   preferredDeviceType->setValue( "DEFAULT_DEVICE" );
 
+#ifdef HAVE_HAPTIK
   for(UINT32 i = 0 ; i<haptik.numberOfDevices ; i++) {
     deviceName->push_back( haptik.device[i].name, id );
     modelName->push_back( haptik.device[i].model, id );
     manufacturer->push_back( haptik.device[i].manufacturer, id );
   }
+#else
+  Console(4) << "Cannot use HaptikHapticsDevice since H3D API is compiled"
+             << "without support for it. Define HAVE_HAPTIK in H3DApi.h to "
+             << " support it." << endl;
+#endif
   set_selectedDevice->routeNoEvent( selectedDevice, id );
   preferredDeviceType->route( selectedDevice, id );
 }
 
 
 void HaptikHapticsDevice::initDevice() {
+#ifdef HAVE_HAPTIK
   if( !initialized->getValue() ) {
     selectedDevice->upToDate();
     if (haptik.numberOfDevices == 0) {
@@ -118,13 +128,16 @@ void HaptikHapticsDevice::initDevice() {
     haptik_device->Init();
     haptik_device->Start();
   }
+#endif
   H3DThreadedHapticsDevice::initDevice();
 }
 
 void HaptikHapticsDevice::disableDevice() {
+#ifdef HAVE_HAPTIK
   if( haptik_device ) {
     haptik_device->Stop();
   }
+#endif
   H3DThreadedHapticsDevice::disableDevice();
 }
 
@@ -132,40 +145,44 @@ void HaptikHapticsDevice::disableDevice() {
 /// Get the position of the haptics device. Only to be called in the 
 /// haptics loop.
 Vec3d HaptikHapticsDevice::getPosition() {
+#ifdef HAVE_HAPTIK
   if( haptik_device ) {
     RSLib::HaptikData data;
     haptik_device->Read( data );
     return Vec3d( data.position.x, data.position.y, data.position.z );
-  } else {
-    return Vec3d( 0, 0, 0 );
   }
+#endif
+  return Vec3d( 0, 0, 0 );
 }
 
 /// Get the velocity of the haptics device. Only to be called in the 
 /// haptics loop.
 Vec3d HaptikHapticsDevice::getVelocity() {
+#ifdef HAVE_HAPTIK
   if( haptik_device ) {
     RSLib::HaptikData data;
     haptik_device->Read( data );
     return Vec3d( data.velocity.x, data.velocity.y, data.velocity.z );
-  } else {
-    return Vec3d( 0, 0, 0 );
-  }
+  } 
+#endif
+  return Vec3d( 0, 0, 0 );
 }
 
 bool HaptikHapticsDevice::getButtonStatus() {
+#ifdef HAVE_HAPTIK
   if( haptik_device ) {
     RSLib::HaptikData data;
     haptik_device->Read( data );
     return (bool)data.Button( 0 );
-  } else {
-    return false;
   }
+#endif
+  return false;
 }
 
 /// Get the orientation of the haptics device. Only to be called in the 
 /// haptics loop.
 Rotation HaptikHapticsDevice::getOrientation() {
+#ifdef HAVE_HAPTIK
   if( haptik_device ) {
     RSLib::HaptikData data;
     haptik_device->Read( data );
@@ -176,15 +193,15 @@ Rotation HaptikHapticsDevice::getOrientation() {
                 r0.y, r1.y, r2.y,
                 r0.z, r1.z, r2.z );
     return Rotation( m );
-  } else {
-    return Rotation( 1, 0, 0, 0 );
   }
-
+#endif
+  return Rotation( 1, 0, 0, 0 );
 }
 
 /// Send the force to render on the haptics device. Only to be called in the 
 /// haptics loop.
 void HaptikHapticsDevice::sendForce( const Vec3d &f ) {
+#ifdef HAVE_HAPTIK
   if( haptik_device ) {
     RSLib::HaptikData data;
     data.forceFeedback.x = f.x;
@@ -193,14 +210,16 @@ void HaptikHapticsDevice::sendForce( const Vec3d &f ) {
     data.torqueFeedback.x = last_torque.x;
     data.torqueFeedback.y = last_torque.y;
     data.torqueFeedback.z = last_torque.z;
-    last_force = (Vec3f)f;
+    last_force = f;
     haptik_device->Write( data );
   }
+#endif
 }
 
 /// Send the torque to render on the haptics device. Only to be called in the 
 /// haptics loop.
 void HaptikHapticsDevice::sendTorque( const Vec3d &f ) {
+#ifdef HAVE_HAPTIK
   if( haptik_device ) {
     RSLib::HaptikData data;
     haptik_device->Read( data );
@@ -213,9 +232,11 @@ void HaptikHapticsDevice::sendTorque( const Vec3d &f ) {
     last_torque = (Vec3f)f;
     haptik_device->Write( data );
   }
+#endif
 }
 
 void HaptikHapticsDevice::SelectDevice::update() {
+#ifdef HAVE_HAPTIK
   H3DInt32 index = static_cast< SFInt32 * >( routes_in[0] )->getValue();
   const string &preferred_device = 
     static_cast< SFString * >( routes_in[1] )->getValue();
@@ -268,9 +289,13 @@ void HaptikHapticsDevice::SelectDevice::update() {
   } else {
     value = -1;
   }
+#else
+  value = -1;
+#endif
 }
 
-void HaptikHapticsDevice::changeHaptikDevice( UINT32 device_id ) {
+void HaptikHapticsDevice::changeHaptikDevice( unsigned int device_id ) {
+#ifdef HAVE_HAPTIK
   if( haptik_device ) {
     RSLib::HaptikDeviceInfo info;
     haptik_device->GetInfo( info );
@@ -302,4 +327,5 @@ void HaptikHapticsDevice::changeHaptikDevice( UINT32 device_id ) {
     haptik_device = 
       (RSLib::IHaptikDeviceInterface) haptik.GetDeviceInterface( device_id );
   }
+#endif
 }

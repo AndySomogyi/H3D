@@ -36,7 +36,7 @@
 #define OS_WIN32
 
 #ifdef HAVE_3DXWARE
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 #pragma comment( lib, "siapp.lib" )
 #pragma comment( lib, "spwmath.lib" )
 #endif
@@ -155,7 +155,7 @@ namespace SpaceWareSensorInternal {
       // 3DxWare device handle.
       SiHdl hdl;   
       
-      sint32_t err = SiInitialize();
+      SpwRetVal err = SiInitialize();
       if ( err != SPW_NO_ERROR ) {
         char * s = SpwErrorString( err );
         if( s )
@@ -523,6 +523,7 @@ SpaceWareSensor::SpaceWareSensor(
 #endif
 }
 
+#ifdef USE_HAPTICS
 void SpaceWareSensor::traverseSG( TraverseInfo &ti ) {
   using namespace SpaceWareSensorInternal;
   // TODO: lock
@@ -572,3 +573,4 @@ void SpaceWareSensor::traverseSG( TraverseInfo &ti ) {
     }
   }
 }
+#endif

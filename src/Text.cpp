@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Text.h"
-#include "HLFeedbackShape.h"
 #include "FontStyle.h"
 
 using namespace H3D;
@@ -312,14 +311,6 @@ void Text::render() {
     static_cast< X3DFontStyleNode * >( fontStyle->getValue() );
  
   if( font ) {
-    // enable backface culling if solid is true
-    if( solid->getValue() ) {
-      glEnable( GL_CULL_FACE );
-      glCullFace( GL_BACK );
-    } else {
-      glDisable( GL_CULL_FACE );
-    }
-    
     // we will make changes to the transformation matrices so we save
     // the current matrices.
     glPushMatrix();
@@ -395,13 +386,21 @@ void Text::DisplayList::callList( bool build_list ) {
   X3DGeometryNode::DisplayList::callList( build_list );
 }
 
+#ifdef USE_HAPTICS
 void Text::traverseSG( TraverseInfo &ti ) {
+  // use backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
+
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape( 
                                                  ti.getCurrentSurface(),
                                                  ti.getAccForwardMatrix() ) );
+#endif
   }
 }
+#endif
 
 
 void Text::SFBound::update() {

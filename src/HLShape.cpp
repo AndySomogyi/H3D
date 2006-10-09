@@ -26,10 +26,14 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-
+#include "H3DApi.h"
+#ifdef USE_HAPTICS
 #include "HLShape.h"
 #include "X3DGeometryNode.h"
+
 #include <HAPIHapticShape.h>
+#include "GlobalSettings.h"
+#include "OpenHapticsOptions.h"
 
 using namespace H3D;
 
@@ -66,6 +70,84 @@ HLShape::~HLShape() {
       hl_shape_map.erase( hl );
     }
   }
+}
+
+
+#endif
+
+bool HLShape::closeEnoughToBound( const Vec3f &pos, 
+                                  const Vec3f &previous_pos,
+                                  const Matrix4f &m, 
+                                  X3DGeometryNode *geometry ) {
+  Bound *b = geometry->bound->getValue();
+  if( b ) {
+    H3DFloat max_distance = 0.01f;
+    H3DFloat look_ahead_factor = 3;
+    OpenHapticsOptions *options = NULL;
+
+    geometry->getOptionNode( options );
+    
+    if( !options ) {
+      GlobalSettings *default_settings = GlobalSettings::getActive();
+      if( default_settings ) {
+        default_settings->getOptionNode( options );
+      }
+    }
+    
+    if( options ) {
+      max_distance = options->maxDistance->getValue();
+      look_ahead_factor = options->lookAheadFactor->getValue();
+    }
+
+    if( max_distance < 0 ) return true;
+
+    Vec3f local_pos = m * pos;
+
+    if( b->isInside( local_pos ) ) return true;
+
+    BoxBound *bb = dynamic_cast< BoxBound * >( b );
+
+    Matrix3f m3 =  m.getScaleRotationPart();
+    Vec3f scale ( ( m3 * Vec3f(1,0,0) ).length(),
+                  ( m3 * Vec3f(0,1,0) ).length(),
+                  ( m3 * Vec3f(0,0,1) ).length() );
+
+    // check if the point is close enough to the point.
+    Vec3f f = (b->closestPoint( local_pos ) - local_pos);
+    
+    if( H3DAbs( f.x ) > Constants::f_epsilon ) f.x /= scale.x;
+    else f.x = 0;
+    if( H3DAbs( f.y ) > Constants::f_epsilon ) f.y /= scale.y;
+    else f.y = 0;
+    if( H3DAbs( f.z) > Constants::f_epsilon ) f.z /= scale.z;
+    else f.z = 0;
+      
+    H3DFloat l = f.length();
+    
+    if( l < max_distance ) return true;
+
+    // look ahead to include geometries in the direction the proxy is moving
+    if( bb && look_ahead_factor != 0 ) {
+      // expand the bounding box in order for the line segment 
+      // intersection test to be with a line with the radius of 
+      // max_distance
+      BoxBound expanded_box_bound;
+      expanded_box_bound.center->setValue( bb->center->getValue() );
+      H3DFloat double_max_dist = max_distance * 2;
+      expanded_box_bound.size->setValue( bb->size->getValue() + 
+                                         scale *  double_max_dist );
+      Vec3f previous_local_pos = m * previous_pos;
+      Vec3f end_pos = local_pos + 
+        ( local_pos - previous_local_pos ) * look_ahead_factor;
+
+      return expanded_box_bound.lineSegmentIntersect( local_pos, end_pos );
+      
+    } else {
+      return false;
+    }
+  }
+  cerr << "NO BOUND" << endl;
+  return true;
 }
 
 #endif

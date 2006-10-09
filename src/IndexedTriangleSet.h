@@ -36,7 +36,7 @@
 #include "CoordBoundField.h"
 #include "MFInt32.h"
 #include "SFInt32.h"
-#include <CollisionObjects.h>
+#include <HapticTriangleTree.h>
 
 namespace H3D {
 
@@ -142,7 +142,7 @@ namespace H3D {
 
     };
 
-    /// Contructor.
+    /// Constructor.
     IndexedTriangleSet( Inst< SFNode           > _metadata        = 0,
                         Inst< SFBound          > _bound           = 0,
                         Inst< DisplayList      > _displayList     = 0,
@@ -159,9 +159,11 @@ namespace H3D {
                         Inst< MFInt32          > _set_index       = 0,
                         Inst< MFInt32          > _index           = 0 );
 
+#ifdef USE_HAPTICS
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
+#endif
 
     /// Renders the IndexedTriangleSet with OpenGL.
     virtual void render();
@@ -193,6 +195,7 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
+    HapticTriangleTree *htree;
     Bounds::BinaryBoundTree *tree;
     auto_ptr< SFInt32 > depth;
   };

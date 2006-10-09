@@ -44,6 +44,10 @@ using namespace std;
 #define FIELDDB_ELEMENT( base, field, access ) \
 FieldDBInsert field( access( &base::database, #field, &base::field ) );
 
+/// Additional macro to support VRML names that are different from C++
+#define FIELDDB_ELEMENT_EX( base, field, access, fieldst )           \
+FieldDBInsert fieldst( access( &base::database, #fieldst, &base::field ) );
+
 namespace H3D {
     
   class Node;
@@ -261,6 +265,9 @@ namespace H3D {
       /// The database which fields this iterator iterates through.
       H3DNodeDatabase * ndb;
     };
+#ifdef __BORLANDC__
+    friend class FieldDBConstIterator;
+#endif
 
 
     /// Constructor.

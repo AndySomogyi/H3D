@@ -29,9 +29,16 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "X3DGeometryNode.h"
+#include "GlobalSettings.h"
+
+#ifdef USE_HAPTICS
+#include "OpenHapticsOptions.h"
 #include "HLShape.h"
 #include <HAPIHapticShape.h>
 #include "DeviceInfo.h"
+#include "HLDepthBufferShape.h"
+#include "HLFeedbackShape.h"
+#endif
 
 using namespace H3D;
 
@@ -44,6 +51,7 @@ namespace X3DGeometryNodeInternals {
   FIELDDB_ELEMENT( X3DGeometryNode, force, OUTPUT_ONLY );
   FIELDDB_ELEMENT( X3DGeometryNode, contactPoint, OUTPUT_ONLY );
   FIELDDB_ELEMENT( X3DGeometryNode, contactNormal, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( X3DGeometryNode, options, INPUT_OUTPUT );
 }
 
 X3DGeometryNode::X3DGeometryNode( 
@@ -60,7 +68,11 @@ X3DGeometryNode::X3DGeometryNode(
   isTouched( _isTouched ),
   force( _force ),
   contactPoint( _contactPoint ),
-  contactNormal( _contactNormal ) {
+  contactNormal( _contactNormal ),
+  options( new MFOptionsNode ),
+  use_culling( false ),
+  allow_culling( true ),
+  cull_face( GL_BACK ) {
 
   type_name = "X3DGeometryNode";
   
@@ -88,7 +100,7 @@ void HLCALLBACK X3DGeometryNode::motionCallback( HLenum event,
                      n );
 
   if( HLShape::getHLShape( object ) ) {
-    const Matrix4f &m = dynamic_cast< HAPIHapticShape * >
+    const Matrix4d &m = dynamic_cast< HAPIHapticShape * >
       (HLShape::getHLShape( object ))->transform.inverse();
 
     if( device_index > (int)geometry->contactPoint->size() -1 )
@@ -98,24 +110,24 @@ void HLCALLBACK X3DGeometryNode::motionCallback( HLenum event,
     if( device_index > (int)geometry->force->size() -1 )
       geometry->force->resize( device_index + 1, Vec3f( 0, 0, 0 ), geometry->id );
 
-    Vec3f cp = m * Vec3f( (H3DFloat)p[0],
+    Vec3f cp = (Vec3f) (m * Vec3f( (H3DFloat)p[0],
                          (H3DFloat)p[1],
-                         (H3DFloat)p[2] );
+                         (H3DFloat)p[2] ));
 
     geometry->contactPoint->setValue( device_index, cp, geometry->id );
 
-    Vec3f cn = m.getScaleRotationPart() * Vec3f( (H3DFloat)n[0],
+    Vec3f cn = (Vec3f) (m.getScaleRotationPart() * Vec3f( (H3DFloat)n[0],
                                                  (H3DFloat)n[1],
-                                                 (H3DFloat)n[2] );
+                                                 (H3DFloat)n[2] ));
     cn.normalizeSafe();
     geometry->contactNormal->setValue( device_index, cn, geometry->id );
     
     Vec3f f;
     HLdouble hlforce[3];
     hlGetShapeDoublev( object, HL_REACTION_FORCE, hlforce );
-    f =  m.getScaleRotationPart() * Vec3f( (H3DFloat)hlforce[0],
+    f =  ( Vec3f) (m.getScaleRotationPart() * Vec3f( (H3DFloat)hlforce[0],
                                            (H3DFloat)hlforce[1],
-                                           (H3DFloat)hlforce[2] );
+                                           (H3DFloat)hlforce[2] ));
     geometry->force->setValue( device_index, f, geometry->id );
   }
 
@@ -235,4 +247,107 @@ X3DGeometryNode::~X3DGeometryNode() {
                            &untouchCallback );
   }
 }
+
+HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_surface,
+                                                    const Matrix4f &_transform,
+                                                    HLint _nr_vertices ) {
+  int type = -1;
+  bool adaptive_viewport = true;
+  bool camera_view = true;
+  HLenum touchable_face;
+  
+  if( usingCulling() ) {
+      if( getCullFace() == GL_FRONT ) touchable_face = HL_BACK;
+      else touchable_face = HL_FRONT;
+  } else {
+      touchable_face = HL_FRONT_AND_BACK;
+  }
+
+  OpenHapticsOptions *openhaptics_options = NULL;
+
+  getOptionNode( openhaptics_options );
+
+  if( !openhaptics_options ) {
+    GlobalSettings *default_settings = GlobalSettings::getActive();
+    if( default_settings ) {
+      default_settings->getOptionNode( openhaptics_options );
+    }
+  }
+
+  if( openhaptics_options ) {
+    const string &shape = openhaptics_options->GLShape->getValue();
+    if( shape == "FEEDBACK_BUFFER" ) {
+      type = 0;
+    } else if( shape == "DEPTH_BUFFER" ) {
+      type = 1;
+    } else {
+      Console(4) << "Warning: Invalid OpenHaptics GLShape type: "
+                 << shape 
+                 << ". Must be \"FEEDBACK_BUFFER\" or \"DEPTH_BUFFER\" "
+                 << "(in \"" << getName() << "\")" << endl;
+    }
+    
+    const string &face = openhaptics_options->touchableFace->getValue();
+    if( face == "FRONT" ) touchable_face = HL_FRONT;
+    else if( face == "BACK" ) touchable_face = HL_BACK;
+    else if( face == "FRONT_AND_BACK" ) touchable_face = HL_FRONT_AND_BACK;
+    else if( face == "AS_GRAPHICS" ) {
+// default values are the same as graphics
+    } else {
+      Console(4) << "Warning: Invalid default OpenHaptics touchable face: "
+                 << face 
+                 << ". Must be \"FRONT\", \"BACK\" or \"FRONT_AND_BACK\" "
+                 << "(in active OpenHapticsSettings node\")" << endl;
+    }
+
+    adaptive_viewport = openhaptics_options->useAdaptiveViewport->getValue();
+    camera_view = openhaptics_options->useHapticCameraView->getValue();
+  }
+
+  if( type == 1 ) {
+    return new HLDepthBufferShape( this,
+                                   _surface,
+                                   _transform,
+                                   touchable_face,
+                                   camera_view,
+                                   adaptive_viewport );
+  } else {
+    return new HLFeedbackShape( this,
+                                _surface,
+                                _transform,
+                                _nr_vertices,
+                                touchable_face,
+                                camera_view );
+  }
+}
+
 #endif
+
+void X3DGeometryNode::DisplayList::callList( bool build_list ) {
+    
+  X3DGeometryNode *geom = 
+    static_cast< X3DGeometryNode * >( owner );
+    
+  GLboolean culling_enabled;
+  glGetBooleanv( GL_CULL_FACE, &culling_enabled );
+
+  GLint cull_face;
+  glGetIntegerv( GL_CULL_FACE_MODE, &cull_face );
+
+  if( geom->usingCulling() && geom->allowingCulling() ) {
+    glEnable( GL_CULL_FACE );
+  } else {
+    glDisable( GL_CULL_FACE );
+  }
+
+  glCullFace( geom->getCullFace() );
+
+  BugWorkaroundDisplayList::callList( build_list );
+
+  // restore previous values for culling
+  if( culling_enabled ) glEnable( GL_CULL_FACE );
+  else glDisable( GL_CULL_FACE );
+  
+  glCullFace( cull_face );
+
+}

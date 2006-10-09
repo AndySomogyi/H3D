@@ -73,8 +73,9 @@ void Switch::render() {
     dynamic_cast< H3DDisplayListObject * >(child_node);
   if( dlo )
     dlo->displayList->callList();
-  else 
-    child_node->render();
+  else {
+    if( child_node ) child_node->render();
+  }
 }
 
 void Switch::SFBound::update() {
@@ -84,9 +85,11 @@ void Switch::SFBound::update() {
     value = static_cast< SFBound * >( routes_in[choice+1] )->getValue();
 }
 
+#ifdef USE_HAPTICS
 void Switch::traverseSG( TraverseInfo &ti ) {
   int choice = whichChoice->getValue();
   if( choice < 0 || (size_t)choice > children->size() - 1 ) return;
   X3DChildNode *child_node = children->getValueByIndex( choice );
   if( child_node ) child_node->traverseSG( ti );
 }
+#endif

@@ -123,6 +123,22 @@ namespace H3D {
 
     };
 
+    /// This is just a dummy class to get around a bug in Visual C++ 7.1
+    /// If the X3DGeometry::DisplayList inherits directly from 
+    /// H3DDisplayListObject::Display list the application will crash
+    /// if trying to call H3DDisplayListObject::DisplayList::callList
+    /// By using an intermediate class the bug dissappears.
+    class H3DAPI_API BugWorkaroundDisplayList: 
+      public H3DDisplayListObject::DisplayList {
+    };
+
+    /// Display list is extended in 
+    class H3DAPI_API DisplayList: public BugWorkaroundDisplayList {
+    public: 
+      /// Perform front face code outside the display list.
+      virtual void callList( bool build_list = true );
+    };
+
 
     /// Constructor.
     X3DShapeNode( Inst< SFAppearanceNode > _appearance     = 0,
@@ -131,10 +147,13 @@ namespace H3D {
                   Inst< SFNode           > _metadata       = 0,
                   Inst< SFBound          > _bound          = 0,
                   Inst< SFVec3f          > _bboxCenter     = 0,
-                  Inst< SFVec3f          > _bboxSize       = 0
+                  Inst< SFVec3f          > _bboxSize       = 0,
+                  Inst< DisplayList      > _displayList    = 0
                   );
 
-    
+     ~X3DShapeNode() {
+      cerr << "FDA" << endl;
+    }
     /// Sets up the bound field using the bboxCenter and bboxSize fields.
     /// If bboxSize is (-1, -1, -1) the bound will be the bound of the
     /// geometry field. Otherwise it will be a BoxBound with center
@@ -160,8 +179,25 @@ namespace H3D {
     /// Render the shape using OpenGL.
     virtual void render();
 
+#ifdef USE_HAPTICS
     /// Traverse the scenegraph. Calls traverseSG on appeance and geometry.
     virtual void traverseSG( TraverseInfo &ti );
+#endif
+
+    typedef enum {
+      /// render only transparent objects
+      TRANSPARENT_ONLY,
+      /// render only the front face of transparent objects
+      TRANSPARENT_FRONT,
+      /// render only the back face of transparent objects
+      TRANSPARENT_BACK,
+      /// render only noon-transparent objects
+      SOLID,
+      /// render all objects
+      ALL
+    } GeometryRenderMode;
+
+    static GeometryRenderMode geometry_render_mode;
 
     /// The field containing the X3DAppearance node to be used when
     /// rendering the shape.
@@ -192,6 +228,12 @@ namespace H3D {
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
+    /// Set to true if lighting should be disabled when no Appearance
+    /// or Material node has been specified as per X3D spec. Will be set
+    /// to false in e.g. H3DWindowNode if a default Material node has 
+    /// been specified in a DefaultAppearance option node.
+    static bool disable_lighting_if_no_app;
   };
 }
 

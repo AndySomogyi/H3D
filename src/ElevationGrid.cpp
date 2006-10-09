@@ -307,16 +307,6 @@ void ElevationGrid::render() {
     unsigned int quad_index = 0;
     unsigned int vertex_index = 0;
 
-    glShadeModel( GL_SMOOTH ); 
-
-    // enable backface culling if solid is true
-    if( solid->getValue() ) {
-      glEnable( GL_CULL_FACE );
-      glCullFace( GL_BACK );
-    } else {
-      glDisable( GL_CULL_FACE );
-    }
-
     if ( color_node ) {
       glEnable( GL_COLOR_MATERIAL );
     } 
@@ -914,3 +904,20 @@ void ElevationGrid::SFBound::update() {
   bb->center->setValue( size / 2 );
   value = bb;
 }
+
+#ifdef USE_HAPTICS
+void ElevationGrid::traverseSG( TraverseInfo &ti ) {
+  if( solid->getValue() ) {
+    useBackFaceCulling( true );
+  } else {
+    useBackFaceCulling( false );
+  }
+  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
+#ifdef HAVE_OPENHAPTICS
+    ti.addHapticShapeToAll( getOpenGLHapticShape(
+                                                 ti.getCurrentSurface(),
+                                                 ti.getAccForwardMatrix() ) );
+#endif
+  }
+}
+#endif

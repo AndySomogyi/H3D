@@ -90,13 +90,23 @@ namespace H3D {
 
     PyObject* pythonCreateX3DNodeFromString( PyObject *self, PyObject *arg );
 
+    PyObject* pythonCreateVRMLFromURL( PyObject *self, PyObject *arg );
+
+    PyObject* pythonCreateVRMLFromString( PyObject *self, PyObject *arg );
+
+    PyObject* pythonCreateVRMLNodeFromURL( PyObject *self, PyObject *arg );
+
+    PyObject* pythonCreateVRMLNodeFromString( PyObject *self, PyObject *arg );
+
     PyObject* pythonGetRoutesIn( PyObject *self, PyObject *arg );
 
     PyObject* pythonGetRoutesOut( PyObject *self, PyObject *arg );
 
     PyObject* pythonGetCurrentScenes( PyObject *self, PyObject *arg );
 
+#ifdef USE_HAPTICS
     PyObject* pythonGetActiveDeviceInfo( PyObject *self, PyObject *arg );
+#endif
 
     PyObject* pythonGetActiveViewpoint( PyObject *self, PyObject *arg );
 
@@ -105,6 +115,10 @@ namespace H3D {
     PyObject* pythonGetActiveStereoInfo( PyObject *self, PyObject *arg );
 
     PyObject* pythonGetActiveBackground( PyObject *self, PyObject *arg );
+
+    PyObject* pythonGetActiveFog( PyObject *self, PyObject *arg );
+
+    PyObject* pythonGetActiveGlobalSettings( PyObject *self, PyObject *arg );
 
     PyObject* pythonEraseElementFromMField( PyObject *self, PyObject *arg );
 
@@ -121,6 +135,8 @@ namespace H3D {
     PyObject* pythonMFieldPopBack( PyObject *self, PyObject *arg );
 
     PyObject* pythonTouchField( PyObject *self, PyObject *arg );
+
+    PyObject* pythonResolveURLAsFile( PyObject *self, PyObject *arg );
     
   }
 
@@ -135,11 +151,13 @@ namespace H3D {
     PythonFieldBase( void *_python_field ) :
       python_field( _python_field ),
       python_update( 0 ),
-      python_typeinfo( 0 ) {}
+      python_typeinfo( 0 ),
+      python_opttypeinfo( 0 ){}
     
     void *python_field;
     void *python_update;
     void *python_typeinfo;
+    void *python_opttypeinfo;
   };
   
   template< class F >
@@ -185,19 +203,40 @@ namespace H3D {
     /// type list.
     /// \throws PythonInvalidFieldType
     void checkFieldType( Field *f, int index ) {
-      if( python_typeinfo == 0 ) {
+      if( python_typeinfo == 0 && python_opttypeinfo == 0 ) {
         F::checkFieldType( f, index );
         return;
       }
-      
-      int arg_size = 
-        PyTuple_Size( static_cast< PyObject * >(python_typeinfo) );
+      int arg_size = -1;      
+      if( python_typeinfo )
+        arg_size = PyTuple_Size( static_cast< PyObject * >(python_typeinfo) );
+
       if ( index >= arg_size ) {
-        ostringstream err;
-        err << "Too many inputs, expected " << arg_size+1;
-        throw H3D::PythonInvalidFieldType( err.str(), "", 
-                                           H3D_FULL_LOCATION );
+        int opt_arg_size = -1;
+        if( python_opttypeinfo )
+          opt_arg_size = PyTuple_Size( static_cast< PyObject * >(python_opttypeinfo) );
+        if( opt_arg_size > 0 ) {
+          PyObject *type_info = 
+            PyTuple_GetItem( static_cast< PyObject * >(python_opttypeinfo),
+                             0 );
+          PyObject *type_id = PyObject_GetAttrString( type_info, "type" );
+          int type_int = PyInt_AsLong( type_id );
+          if ( f->getTypeName().compare( 
+           X3DTypes::typeToString( (X3DTypes::X3DType)type_int ) ) != 0 ) {
+            ostringstream err;
+            err << "Bad input, expected " 
+                << X3DTypes::typeToString( (X3DTypes::X3DType)type_int )  
+                << " got " << f->getTypeName() << " for route" << index;
+            throw H3D::PythonInvalidFieldType( err.str(), "", 
+                                               H3D_FULL_LOCATION );
       }
+        } else {
+          ostringstream err;
+          err << "Too many inputs, expected " << arg_size+1;
+          throw H3D::PythonInvalidFieldType( err.str(), "", 
+                                             H3D_FULL_LOCATION );
+        }
+      } else {
       PyObject *type_info = 
         PyTuple_GetItem( static_cast< PyObject * >(python_typeinfo),
                          index );
@@ -209,9 +248,10 @@ namespace H3D {
         ostringstream err;
         err << "Bad input, expected " 
             << X3DTypes::typeToString( (X3DTypes::X3DType)type_int )  
-            << " got " << f->getTypeName();
+            << " got " << f->getTypeName() << " for route" << index;
         throw H3D::PythonInvalidFieldType( err.str(), "", 
                                            H3D_FULL_LOCATION );
+      }
       }
     }
   };

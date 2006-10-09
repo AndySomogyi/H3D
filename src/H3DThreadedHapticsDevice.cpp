@@ -31,6 +31,12 @@
 
 using namespace H3D;
 
+//#define NEW
+const H3DDouble dotproduct_epsilon = 1e-7;
+const H3DDouble length_sqr_point_epsilon = 1e-10;
+const H3DDouble length_sqr_normal_epsilon = 1e-3;
+const H3DDouble plane_width_epsilon = 1e-8;
+
 H3DNodeDatabase H3DThreadedHapticsDevice::database( "H3DThreadedHapticsDevice", 
                                                     NULL,
                                                     typeid( H3DThreadedHapticsDevice ),
@@ -48,6 +54,7 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::changeForceEffects( void 
     void * * data = static_cast< void * * >( _data );
     H3DThreadedHapticsDevice *hd = 
       static_cast< H3DThreadedHapticsDevice * >( data[0] );
+#ifdef USE_HAPTICS
     HapticEffectVector* effects  = 
       static_cast< HapticEffectVector * >( data[1] );
     hd->getLastForceEffects().swap( hd->getCurrentForceEffects() );
@@ -55,6 +62,7 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::changeForceEffects( void 
     TimeStamp now = TimeStamp();
     hd->last_loop_time = now - hd->last_effect_change;
     hd->last_effect_change = now;
+#endif
     return PeriodicThread::CALLBACK_DONE;
   }
 
@@ -75,7 +83,9 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::changeHapticShapes( void 
 
 inline void onOnePlaneContact( const PlaneConstraint &c, 
                                HAPISurfaceObject::ContactInfo &contact ) {
+  //cerr << "1";
   contact.y_axis = c.normal;
+  // cerr << "1: " << contact.y_axis << endl;
   Vec3d a( contact.y_axis.z, contact.y_axis.x, contact.y_axis.y );
   contact.x_axis = contact.y_axis % a;
   contact.z_axis = contact.x_axis % contact.y_axis;
@@ -86,7 +96,44 @@ inline void onOnePlaneContact( const PlaneConstraint &c,
 inline void onTwoPlaneContact( const PlaneConstraint &p0,
                                const PlaneConstraint &p1,
                                HAPISurfaceObject::ContactInfo &contact ) {
+
+  if( 1 - p0.normal * p1.normal < dotproduct_epsilon ) {
+    onOnePlaneContact( p0, contact );
+    return;
+  }
   Vec3d contact_global = contact.globalContactPoint();
+
+  // find the finger vector in terms of the basis formed
+  // by the two surface normals.
+  Vec3d n0 = p0.normal;
+  Vec3d n1 = p1.normal;
+  H3DDouble ab = n0 * n1;
+  H3DDouble d = 1 - ab * ab;
+  //cerr << "d = " << d << endl;
+  /*
+  if( d < dotproduct_epsilon ) {
+		onOnePlaneContact( p0, contact );
+    cerr<<"@"<< endl;
+    return;
+  } else {
+		d = 1 / d;
+    
+		H3DDouble h0 = ( p0.point - contact_global ) * p0.normal;
+		H3DDouble h1 = ( p1.point - contact_global ) * p1.normal;
+		H3DDouble x = ( h0 - ab * h1 ) * d;
+		Vec3d off = x * p0.normal + ( h1 - ab*x ) * p1.normal;
+		H3DDouble offl = off.length();
+		if( offl > 1e-5 ) {
+		  // get rid of the lower plane.
+		  if( h1 < h0 ) {
+        onOnePlaneContact( p0, contact );
+        return;
+		  } else {
+        onOnePlaneContact( p1, contact );
+        return;
+		  }
+		} 
+    }*/
 
   Vec3d line_dir = p0.normal % p1.normal;
   line_dir.normalizeSafe();
@@ -103,17 +150,21 @@ inline void onTwoPlaneContact( const PlaneConstraint &p0,
   } else if( local_pos.y > Constants::f_epsilon ) {
     onOnePlaneContact( p0, contact );
   } else {
+    //cerr << "2";
     H3DDouble sum = local_pos.x + local_pos.y;
     
-    H3DDouble fdaf = line_dir.length();
-
     H3DDouble weight = 0;
     if( sum < 0 )
       weight = local_pos.x / sum;
-    
+    else {
+      cerr << "FDAFDASFSDAFSDAFSDAFDASF" << endl;
+    }
     contact.y_axis = p0.normal * weight + p1.normal * (1 - weight );
+    contact.y_axis = p0.normal * local_pos.x + p1.normal * local_pos.y;
     contact.y_axis.normalizeSafe();
     
+    //cerr << "2: " << contact.y_axis << endl;
+
     Vec3d a( contact.y_axis.z, contact.y_axis.x, contact.y_axis.y );
     contact.x_axis = contact.y_axis % a;
     contact.z_axis = contact.x_axis % contact.y_axis;
@@ -127,6 +178,9 @@ inline void onTwoPlaneContact( const PlaneConstraint &p0,
                  contact.x_axis.z,  contact.y_axis.z,  contact.z_axis.z ).inverse();
     Vec3d fff = mm * line_dir;
 
+    Vec2d pm_0;
+    Vec2d pm_1;
+
     assert( p0.haptic_shape );
     p0.haptic_shape->surface->onContact( contact );
     H3DDouble p0_proxy_movement = 
@@ -134,6 +188,8 @@ inline void onTwoPlaneContact( const PlaneConstraint &p0,
              0, 
              contact.proxy_movement_local.y ) *
       line_dir_local;
+
+    pm_0 = contact.proxy_movement_local;
 
     Vec3d p0_force = contact.force_global;
     
@@ -145,6 +201,7 @@ inline void onTwoPlaneContact( const PlaneConstraint &p0,
              contact.proxy_movement_local.y ) *
       line_dir_local;
 
+     pm_1 = contact.proxy_movement_local;
     Vec3d p1_force = contact.force_global;
     
     Vec3d proxy_movement = 
@@ -154,7 +211,8 @@ inline void onTwoPlaneContact( const PlaneConstraint &p0,
       cerr << p0_proxy_movement << endl;
     contact.proxy_movement_local = Vec2d( proxy_movement.x, proxy_movement.z ); 
       
-    
+    //contact.proxy_movement_local = pm_0 * weight + pm_1 * ( 1 - weight );
+    //contact.proxy_movement_local = Vec2f( 0, 0 );
     //cerr << p0_proxy_movement.x << endl;
     contact.force_global = p0_force * weight + p1_force * ( 1 - weight );
   }
@@ -167,6 +225,18 @@ inline void onThreeOrMorePlaneContact(  vector< PlaneConstraint > &constraints,
   PlaneConstraint &p0 = (*i++);
   PlaneConstraint &p1 = (*i++);
   PlaneConstraint &p2 = (*i++);
+#ifdef NEW
+  if( 1 - p0.normal * p1.normal < dotproduct_epsilon ||
+      1 - p0.normal * p2.normal < dotproduct_epsilon ) {
+    onTwoPlaneContact( p1, p2, contact );
+    return;
+  }
+
+  if( 1 - p1.normal * p2.normal < dotproduct_epsilon ) {
+    onTwoPlaneContact( p0, p2, contact );
+    return;
+  }
+#endif
 
   Vec3d contact_global = contact.globalContactPoint();
 
@@ -206,6 +276,7 @@ inline void onThreeOrMorePlaneContact(  vector< PlaneConstraint > &constraints,
   } else if( local_pos.z > Constants::f_epsilon ) {
     onTwoPlaneContact( p0, p1, contact );
   } else {
+    //cerr << "3";
     H3DDouble sum = local_pos.x + local_pos.y + local_pos.z;
     
     Vec3d weight;
@@ -217,6 +288,12 @@ inline void onThreeOrMorePlaneContact(  vector< PlaneConstraint > &constraints,
       p1.normal * weight.y + 
       p2.normal * weight.z;
     
+    //cerr << "31: " << contact.y_axis << endl;
+    Vec3d bb = contact.globalContactPoint() - contact.globalProbePosition();
+    bb.normalizeSafe();
+    contact.y_axis= bb;
+    //cerr << "32: " << bb << endl;
+
     Vec3d a( contact.y_axis.z, contact.y_axis.x, contact.y_axis.y );
     contact.x_axis = contact.y_axis % a;
     contact.z_axis = contact.x_axis % contact.y_axis;
@@ -237,7 +314,7 @@ inline void onThreeOrMorePlaneContact(  vector< PlaneConstraint > &constraints,
     p2.haptic_shape->surface->onContact( contact );
     Vec3d p2_force = contact.force_global;
     
-    contact.proxy_movement_local = Vec2d( 0, 0 ); 
+    //contact.proxy_movement_local = Vec2d( 0, 0 ); 
     
     contact.force_global = 
       p0_force * weight.x + 
@@ -272,6 +349,7 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
     HapticForceEffect::EffectInput input( pos, vel, rot, dt );
     HapticForceEffect::EffectOutput output;
 
+#ifdef USE_HAPTICS
     // calculate the forces generated by the force effects from the
     // last loop that are to be interpolated. 
     HapticEffectVector & last_effects = hd->getLastForceEffects(); 
@@ -281,12 +359,14 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
       if( (*i)->isInterpolated() )
         output = output + (*i)->calculateForces( input );
     }
+#endif
 
     double weighting = dt / hd->last_loop_time;
     if( weighting > 1 ) weighting = 1;
     // the previous force effects are to be decreased as time goes by.
     output = output * ( 1 - weighting );
 
+#ifdef USE_HAPTICS
     // calculate the forces generated by the active force effects
     HapticEffectVector & current_effects = hd->getCurrentForceEffects(); 
     for( HapticEffectVector::const_iterator i = current_effects.begin();
@@ -297,6 +377,7 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
       else
         output = output + (*i)->calculateForces( input );
     }
+#endif
     
     bool has_intersection = false;
     H3DDouble d2;
@@ -313,29 +394,166 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
       (*i)->getConstraints( hd->proxy_position, 0.1, constraints );
     }
 
+           cerr << current_shapes.size() << " " << constraints.size() << endl;
+
+   //      cerr << "S: " << current_shapes.size() << endl;
+
     Vec3d proxy_pos = hd->proxy_position;
     H3DDouble proxy_radius = 0.01;
 
-    
+    bool done = false;
+    //cerr << "#####" << endl;
+    while( !done ) {
+      done = true;
     // make sure the proxy is above any constraints
-    /*for( vector< Bounds::PlaneConstraint >::iterator i = constraints.begin();
+    for( vector< Bounds::PlaneConstraint >::iterator i = constraints.begin();
          i != constraints.end(); i++ ) {
       H3DDouble d = (*i).normal * (proxy_pos - (*i).point );
+      //cerr << d << endl;
       if( d < 0 && d > -proxy_radius ) {
         //cerr << (*i).normal << " " << d << endl;
-        proxy_pos = proxy_pos + (*i).normal * (-d+1e-7);
+        proxy_pos = proxy_pos + (*i).normal * (-d+1e-15);
+          done = false;
       }
-      }*/
+    }
+      
+    }
 
     vector< PlaneConstraint > intersected_constraints;
     vector< PlaneConstraint > closest_constraints;
 
+#ifdef NEW
+
+    Vec3d from = proxy_pos;
+    Vec3d to = pos;
+H3DDouble epsilon = plane_width_epsilon;
+int nr = constraints.size();
+    for( vector< Bounds::PlaneConstraint >::iterator i = constraints.begin();
+         i != constraints.end(); i++ ) {
+      Bounds::IntersectionInfo intersection;
+      Vec3d n = (*i).normal;
+      H3DFloat d = (*i).point * n;
+      H3DFloat fn = from * n - d;
+      H3DFloat tn = to * n - d;
+      if( fn > -epsilon ) {
+        // normal case, finger is in the surface
+        if( tn < epsilon ) {
+          short mask;
+          if( fn < epsilon )  mask  = 0x10;
+          else                mask  = 0x20;
+          if( tn > -epsilon ) mask |= 0x01;
+          else                mask |= 0x02;
+          
+          // if( off * off < 5e-8 ) {
+          {
+            H3DDouble k;
+            switch( mask ) {
+            case 0x11:
+              // both from and to are on the plane.
+              to -= tn * n;
+              closest_constraints.push_back( *i );
+              break;
+            case 0x12:
+              // from is on the plane, to is below.
+              //closest_constraints.push_back( *i );
+              to = from - fn * n;
+              /*intersected_constraints.insert( intersected_constraints.end(),
+                                              closest_constraints.begin(),
+                                              closest_constraints.end() );
+                                              closest_constraints.clear();*/
+              closest_constraints.push_back( *i );
+              break;
+            case 0x21:
+              // to is on the plane, from is above.
+              to -= tn * n;
+              closest_constraints.push_back( *i );
+              break;
+            case 0x22:
+              // from is above the plane, to is below.
+              k = fn / ( fn - tn );
+              to = k * to + (1-k) * from;
+              intersected_constraints.insert( intersected_constraints.end(),
+                                              closest_constraints.begin(),
+                                              closest_constraints.end() );
+              closest_constraints.clear();
+              closest_constraints.push_back( *i );
+              break;
+            }
+          }
+        }
+      }
+    }
+         if( closest_constraints.size() == 1 ) {
+       cerr << "1" << endl;
+          Vec3d from = proxy_pos;
+    Vec3d to = pos;
+H3DDouble epsilon = plane_width_epsilon;
+int nr = constraints.size();
+    for( vector< Bounds::PlaneConstraint >::iterator i = constraints.begin();
+         i != constraints.end(); i++ ) {
+      Bounds::IntersectionInfo intersection;
+      Vec3d n = (*i).normal;
+      H3DFloat d = (*i).point * n;
+      H3DFloat fn = from * n - d;
+      H3DFloat tn = to * n - d;
+      if( fn > -epsilon ) {
+        // normal case, finger is in the surface
+        if( tn < epsilon ) {
+          short mask;
+          if( fn < epsilon )  mask  = 0x10;
+          else                mask  = 0x20;
+          if( tn > -epsilon ) mask |= 0x01;
+          else                mask |= 0x02;
+          
+          // if( off * off < 5e-8 ) {
+          {
+            H3DDouble k;
+            switch( mask ) {
+            case 0x11:
+              // both from and to are on the plane.
+              to -= tn * n;
+              closest_constraints.push_back( *i );
+              break;
+            case 0x12:
+              // from is on the plane, to is below.
+              //closest_constraints.push_back( *i );
+              to = from - fn * n;
+              /*intersected_constraints.insert( intersected_constraints.end(),
+                                              closest_constraints.begin(),
+                                              closest_constraints.end() );
+                                              closest_constraints.clear();*/
+              closest_constraints.push_back( *i );
+              break;
+            case 0x21:
+              // to is on the plane, from is above.
+              to -= tn * n;
+              closest_constraints.push_back( *i );
+              break;
+            case 0x22:
+              // from is above the plane, to is below.
+              k = fn / ( fn - tn );
+              to = k * to + (1-k) * from;
+              intersected_constraints.insert( intersected_constraints.end(),
+                                              closest_constraints.begin(),
+                                              closest_constraints.end() );
+              closest_constraints.clear();
+              closest_constraints.push_back( *i );
+              break;
+            }
+          }
+        }
+      }
+    }
+         }
+    closest_intersection.point = to;
+#else
+   // cerr << "#######" << endl;
     for( vector< Bounds::PlaneConstraint >::iterator i = constraints.begin();
          i != constraints.end(); i++ ) {
       Bounds::IntersectionInfo intersection;
       Vec3d vv =pos -  proxy_pos;
       vv.normalizeSafe();
-      if( (*i).lineIntersect( proxy_pos-vv*1e-7, pos+vv*1e-7, intersection ) ) {
+      if( (*i).lineIntersect( proxy_pos, pos, intersection ) ) {
         if( !has_intersection ) {
           closest_intersection = intersection;
           Vec3d v = intersection.point - proxy_pos;
@@ -347,13 +565,13 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
           H3DDouble distance = v * v; 
       
           if( (closest_intersection.point - intersection.point).lengthSqr()
-              < 1e-14 ) {
+              < length_sqr_point_epsilon ) {
             bool unique_constraint = true;
             for( vector< Bounds::PlaneConstraint >::iterator j = 
                    closest_constraints.begin();
                  j != closest_constraints.end(); j++ ) {
-              if( H3DAbs( intersection.normal * (*j).normal - 1 ) < 
-                  1e-6 ) {
+              if( ( intersection.normal - (*j).normal ).lengthSqr() < 
+                  length_sqr_normal_epsilon ) {
                 unique_constraint = false;
               }
             }
@@ -381,7 +599,67 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
         intersected_constraints.push_back( *i );
       }
     } 
-    
+
+         
+         if( closest_constraints.size() == 1 ) {
+
+           closest_constraints.clear();
+           intersected_constraints.clear();
+           has_intersection = false;
+            for( vector< Bounds::PlaneConstraint >::iterator i = constraints.begin();
+         i != constraints.end(); i++ ) {
+      Bounds::IntersectionInfo intersection;
+      Vec3d vv =pos -  proxy_pos;
+      vv.normalizeSafe();
+      if( (*i).lineIntersect( proxy_pos, pos, intersection ) ) {
+        if( !has_intersection ) {
+          closest_intersection = intersection;
+          Vec3d v = intersection.point - proxy_pos;
+          d2 = v * v;
+          has_intersection = true;
+          closest_constraints.push_back( *i );
+        } else {
+          Vec3d v = intersection.point - proxy_pos;
+          H3DDouble distance = v * v; 
+      
+          if( (closest_intersection.point - intersection.point).lengthSqr()
+              < length_sqr_point_epsilon ) {
+            bool unique_constraint = true;
+            for( vector< Bounds::PlaneConstraint >::iterator j = 
+                   closest_constraints.begin();
+                 j != closest_constraints.end(); j++ ) {
+              if( ( intersection.normal - (*j).normal ).lengthSqr() < 
+                  length_sqr_normal_epsilon ) {//if( H3DAbs( intersection.normal * (*j).normal - 1 ) < 
+                  //1e-9 ) {
+                unique_constraint = false;
+              }
+            }
+
+            // only add the constraint to the closest_constraints vector
+            // if it is an unique constraint.
+            if( unique_constraint ) {
+              closest_constraints.push_back( *i );
+            } else {
+              intersected_constraints.push_back( *i );
+            }
+          } else if( distance < d2 ) {
+            closest_intersection = intersection;
+            d2 = distance;
+            intersected_constraints.insert( intersected_constraints.end(),
+                                            closest_constraints.begin(),
+                                            closest_constraints.end() );
+            closest_constraints.clear();
+            closest_constraints.push_back( *i );
+          } else {
+            intersected_constraints.push_back( *i );
+          }
+        }
+      } else {
+        intersected_constraints.push_back( *i );
+      }
+    } 
+         }
+#endif
     unsigned int nr_constraints = closest_constraints.size();
 
     Vec3d new_proxy_pos, new_force;
@@ -390,6 +668,10 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
 
     contact.contact_point_global = closest_intersection.point;
     contact.probe_position_global = pos;
+
+    //if( nr_constraints == 0 ) cerr << "0";
+    //if( nr_constraints == 1 || nr_constraints == 3 )
+      cerr << nr_constraints;
 
     if( nr_constraints == 0 ) {
       new_proxy_pos = proxy_pos + (pos-proxy_pos)*0.05;
@@ -404,13 +686,78 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
                                    contact );
       } 
 
+      
       new_proxy_pos = 
         closest_intersection.point + 
         contact.proxy_movement_local.x * contact.x_axis + 
         contact.proxy_movement_local.y * contact.z_axis;
       new_force = contact.force_global;
     }
-    
+   
+#ifdef NEW
+    from = proxy_pos;
+    to = new_proxy_pos;
+    for( vector< Bounds::PlaneConstraint >::iterator i = 
+           constraints.begin();
+         i != constraints.end(); i++ ) {
+      Bounds::IntersectionInfo intersection;
+      Vec3d n = (*i).normal;
+      H3DFloat d = (*i).point * n;
+      H3DFloat fn = from * n - d;
+      H3DFloat tn = to * n - d;
+      if( fn > -epsilon ) {
+        // normal case, finger is in the surface
+        if( tn < epsilon ) {
+          short mask;
+          if( fn < epsilon )  mask  = 0x10;
+          else                mask  = 0x20;
+          if( tn > -epsilon ) mask |= 0x01;
+          else                mask |= 0x02;
+          
+          // if( off * off < 5e-8 ) {
+          {
+            H3DDouble k;
+            switch( mask ) {
+            case 0x11:
+              // both from and to are on the plane.
+              //to -= tn * n;
+              //closest_constraints.push_back( *i );
+              break;
+            case 0x12:
+              // from is on the plane, to is below.
+              //closest_constraints.push_back( *i );
+              to = from - fn * n;
+              /*intersected_constraints.insert( intersected_constraints.end(),
+                                              closest_constraints.begin(),
+                                              closest_constraints.end() );
+                                              closest_constraints.clear();*/
+              //closest_constraints.push_back( *i );
+              break;
+            case 0x21:
+              // to is on the plane, from is above.
+              to -= tn * n;
+              //closest_constraints.push_back( *i );
+              break;
+            case 0x22:
+              // from is above the plane, to is below.
+              k = fn / ( fn - tn );
+              to = k * to + (1-k) * from;
+              //intersected_constraints.insert( intersected_constraints.end(),
+              //                                closest_constraints.begin(),
+              //                                closest_constraints.end() );
+              //closest_constraints.clear();
+              //closest_constraints.push_back( *i );
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    new_proxy_pos = to;
+
+
+#else
     has_intersection = false;
     Vec3d closest_point;
     for( vector< Bounds::PlaneConstraint >::iterator i = 
@@ -421,8 +768,8 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
       
       Vec3d vv = new_proxy_pos - proxy_pos;
       vv.normalizeSafe();
-      if( (*i).lineIntersect( proxy_pos-vv*1e-7, 
-                              new_proxy_pos+vv*1e-7, intersection ) ) {
+      if( (*i).lineIntersect( closest_intersection.point, 
+                              new_proxy_pos, intersection ) ) {
         if( !has_intersection ) {
           closest_point = intersection.point;
           Vec3d v = intersection.point - proxy_pos;
@@ -445,7 +792,7 @@ PeriodicThread::CallbackCode H3DThreadedHapticsDevice::forceEffectCallback( void
       new_proxy_pos = closest_point;
       //cerr << new_proxy_pos << " " << pos << endl;
     }
-
+#endif
     hd->proxy_position = new_proxy_pos;
     output.force = new_force;
     
@@ -500,22 +847,30 @@ H3DThreadedHapticsDevice::H3DThreadedHapticsDevice(
 void H3DThreadedHapticsDevice::initDevice() {
   if( !initialized->getValue() ) {
 #ifdef WIN32
-    thread = new HapticThread(  THREAD_PRIORITY_TIME_CRITICAL, 1000 );
+    #ifdef PROFILING
+    thread = NULL;
+    #else
+    thread = new HapticThread(  THREAD_PRIORITY_ABOVE_NORMAL, 1000 );
+    #endif
 #else
     thread = new HapticThread( 0, 1000 );
 #endif
+#ifndef PROFILING
     thread->asynchronousCallback( H3DThreadedHapticsDevice::forceEffectCallback,
                                   this );
+#endif
     H3DHapticsDevice::initDevice();
   }
 }
 
 void H3DThreadedHapticsDevice::disableDevice() {
-  delete thread;
+  if( thread )
+    delete thread;
   thread = NULL;
   H3DHapticsDevice::disableDevice();
 }
 
+#ifdef USE_HAPTICS
 void H3DThreadedHapticsDevice::renderEffects( 
                          const HapticEffectVector &effects ) {
   if( thread ) {
@@ -529,19 +884,27 @@ void H3DThreadedHapticsDevice::renderEffects(
                                  param );
   }
 }
+#endif
 
 void H3DThreadedHapticsDevice::renderShapes( 
                          const HapticShapeVector &shapes ) {
+#ifndef PROFILING
   if( thread ) {
+#endif
     // make a copy of the effects vector since it is swapped in
     // the callback.
     HapticShapeVector shapes_copy( shapes );
     typedef void *pp;
     void * param[] = { this, &shapes_copy };
     // change the current_force_effects vector to render the new effects.
-    thread->synchronousCallback( H3DThreadedHapticsDevice::changeHapticShapes,
-                                 param );
+#ifdef PROFILING
+     H3DThreadedHapticsDevice::changeHapticShapes( param );
+     H3DThreadedHapticsDevice::forceEffectCallback( this );
+#else
+     thread->synchronousCallback( H3DThreadedHapticsDevice::changeHapticShapes,
+                                  param );
   }
+#endif
 }
 
 void H3DThreadedHapticsDevice::updateDeviceValues() {
@@ -552,6 +915,7 @@ void H3DThreadedHapticsDevice::updateDeviceValues() {
   H3DInt32 hr = (H3DInt32)( nr_haptics_loops / dt );
   nr_haptics_loops = 0;
   hapticsRate->setValue( hr, id );
+  //cerr << hr << endl;
   // TODO: lock
   proxyPosition->setValue( (Vec3f)proxy_position, id );
 }

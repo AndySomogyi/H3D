@@ -29,8 +29,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Sphere.h"
+#ifdef USE_HAPTICS
 #include "HapticSphere.h"
 #include "H3DSurfaceNode.h"
+#endif
 
 using namespace H3D;
 
@@ -70,15 +72,6 @@ Sphere::Sphere(
 
 
 void Sphere::render() {
-  // Render both sides of the sphere if solid is false, inside is not rendered
-  // if solid is true.
-  ///
-  if( solid->getValue() ) {
-    glCullFace( GL_BACK );
-    glEnable( GL_CULL_FACE );
-  } else {
-    glDisable( GL_CULL_FACE );
-  }
   if( !gl_quadric ) {
     gl_quadric = gluNewQuadric();
     gluQuadricTexture( gl_quadric, GL_TRUE );
@@ -91,7 +84,12 @@ void Sphere::render() {
   glPopMatrix();
 } 
 
+#ifdef USE_HAPTICS
 void Sphere::traverseSG( TraverseInfo &ti ) {
+  // use backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
+
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
     ti.addHapticShapeToAll( new HapticSphere( radius->getValue(),
                                               solid->getValue(),
@@ -100,3 +98,4 @@ void Sphere::traverseSG( TraverseInfo &ti ) {
                                               ti.getAccForwardMatrix() ) );
   }
 }
+#endif

@@ -29,7 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "TriangleStripSet.h"
-#include "HLFeedbackShape.h"
 #include "Normal.h"
 
 using namespace H3D;
@@ -98,16 +97,7 @@ void TriangleStripSet::render() {
   bool tex_coords_per_vertex = tex_coord_node && !tex_coord_gen;
   const vector< int > &strip_count  = stripCount->getValue();
  
-  glShadeModel( GL_SMOOTH ); 
-
   if( coordinate_node ) {
-    // enable backface culling if solid is true
-    if( solid->getValue() ) {
-      glEnable( GL_CULL_FACE );
-      glCullFace( GL_BACK );
-    } else {
-      glDisable( GL_CULL_FACE );
-    }
     
     // no X3DTextureCoordinateNode, so we generate texture coordinates
     // based on the bounding box according to the X3D specification.
@@ -334,17 +324,25 @@ void TriangleStripSet::render() {
   } 
 }
 
+#ifdef USE_HAPTICS
 void TriangleStripSet::traverseSG( TraverseInfo &ti ) {
+  // use backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
+  
   X3DCoordinateNode *coord_node = coord->getValue();
   if( ti.hapticsEnabled() && ti.getCurrentSurface() && coord_node ) {
-    HLFeedbackShape *fs = 
-      new HLFeedbackShape( this,
+#ifdef HAVE_OPENHAPTICS
+    HAPIHapticShape *fs = 
+      getOpenGLHapticShape( 
                            ti.getCurrentSurface(),
                            ti.getAccForwardMatrix(),
                            coord_node->nrAvailableCoords());
     ti.addHapticShapeToAll( fs );
+#endif
   }
 }
+#endif
 
 
 void TriangleStripSet::AutoNormal::update() {

@@ -80,6 +80,9 @@ using namespace H3D;
 using namespace X3D;
 
 
+int PythonScript::argc;
+char** PythonScript::argv;
+
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase PythonScript::database( 
                                        "PythonScript", 
@@ -89,6 +92,11 @@ H3DNodeDatabase PythonScript::database(
 
 namespace PythonScriptInternals {
   FIELDDB_ELEMENT( PythonScript, references, INITIALIZE_ONLY );
+}
+
+void PythonScript::setargv( int _argc, char *_argv[] ) {
+  argc = _argc;
+  argv = _argv;
 }
 
 
@@ -124,6 +132,8 @@ PythonScript::PythonScript( Inst< MFString > _url,
   // Py_Initialize really should be done in the DLL loader function:
   if ( !Py_IsInitialized() ) {
     Py_Initialize();  
+    if( argv )
+      PySys_SetArgv(argc,argv);
   }
   initialiseParser();
 }
@@ -200,6 +210,7 @@ void PythonScript::loadScript( const string &script ) {
 }
 
 
+#ifdef USE_HAPTICS
 /// Traverse the scenegraph. Used in PythonScript to call a function
 /// in python once per scene graph loop.
 void PythonScript::traverseSG( TraverseInfo &ti ) {
@@ -217,6 +228,7 @@ void PythonScript::traverseSG( TraverseInfo &ti ) {
     Py_DECREF( args );
   } 
 }
+#endif
 
 void PythonScript::initialize() {
   H3DScriptNode::initialize();
