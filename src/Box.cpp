@@ -155,12 +155,7 @@ void Box::traverseSG( TraverseInfo &ti ) {
   } else {
     useBackFaceCulling( false );
   }
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll( getOpenGLHapticShape( ti.getCurrentSurface(),
-                                                  ti.getAccForwardMatrix(),
-                                                  24 ) );
-#endif
-  }
+  X3DGeometryNode::traverseSG( ti );
+  
 }
 #endif

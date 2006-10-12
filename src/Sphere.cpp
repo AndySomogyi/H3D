@@ -91,7 +91,7 @@ void Sphere::traverseSG( TraverseInfo &ti ) {
   else useBackFaceCulling( false );
 
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HapticSphere( radius->getValue(),
+    ti.addHapticShapeToAll( new HAPI::HapticSphere( radius->getValue(),
                                               solid->getValue(),
                                               (void * )this,
                                               ti.getCurrentSurface(),

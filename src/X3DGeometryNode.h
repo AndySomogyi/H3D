@@ -41,6 +41,9 @@
 #include <HL/hl.h>
 #endif
 
+#include <HapticTriangleSet.h>
+#include <HLShape.h>
+
 namespace H3D {
 
   class HLHapticsDevice;
@@ -66,12 +69,40 @@ namespace H3D {
       public H3DDisplayListObject::DisplayList {
     };
 
+    /// TODO: comment
+    class H3DAPI_API TriangleSet: public HAPI::HapticTriangleSet,
+                                  public HLShape {
+    public:
+      /// Constructor.
+      TriangleSet( const vector< HAPI::Bounds::Triangle > &_triangles,
+                   void *_userdata,
+                   HAPI::HAPISurfaceObject *_surface,
+                   const Matrix4d & _transform ):
+        HapticTriangleSet( _triangles,_userdata, _surface, _transform ){ }
+
+      template< class Iterator >
+      TriangleSet( Iterator begin,
+                   Iterator end,
+                   void *_userdata,
+                   HAPI::HAPISurfaceObject *_surface,
+                   const Matrix4d & _transform ):
+        HapticTriangleSet( begin, end, _userdata, _surface, _transform ) {}
+
+      virtual void hlRender( HLHapticsDevice *hd );
+    };
+
     /// Display list is extended in order to set front sidedness of 
     /// triangles outside the display list. 
     class H3DAPI_API DisplayList: public BugWorkaroundDisplayList {
     public:
       /// Perform front face code outside the display list.
       virtual void callList( bool build_list = true );
+    };
+
+    /// The HAPIBoundTree constructs a 
+    class H3DAPI_API SFBoundTree: 
+      public RefCountSField< HAPI::Bounds::BinaryBoundTree > {
+      virtual void update();
     };
 
     /// Constructor.
@@ -81,7 +112,10 @@ namespace H3D {
                      Inst< MFBool      > _isTouched = 0,
                      Inst< MFVec3f     > _force = 0,
                      Inst< MFVec3f     > _contactPoint = 0,
-                     Inst< MFVec3f     > _contactNormal = 0);
+                     Inst< MFVec3f     > _contactNormal = 0,
+                     Inst< SFBoundTree > _boundTree = 0 );
+
+    virtual void traverseSG( TraverseInfo &ti );
 
     /// This function will be called when rendering the geometry as a 
     /// feedback shape or depth buffer shape for OpenHaptics and can be used 
@@ -167,9 +201,9 @@ namespace H3D {
     /// the X3DGeometryNode. Which type depents on possible 
     /// OpenHapticsOptions nodes in the options field and
     /// the default settings in OpenHapticsSettings bindable node.
-    HAPIHapticShape *getOpenGLHapticShape( H3DSurfaceNode *_surface,
-                                           const Matrix4f &_transform,
-                                           HLint _nr_vertices = -1 );
+    HAPI::HAPIHapticShape *getOpenGLHapticShape( H3DSurfaceNode *_surface,
+                                                 const Matrix4f &_transform,
+                                                 HLint _nr_vertices = -1 );
 #endif
     /// Returns the default xml containerField attribute value.
     /// For this node it is "geometry".
@@ -208,6 +242,8 @@ namespace H3D {
     ///
     /// <b>Access type:</b> outputOnly
     auto_ptr< MFVec3f >  contactNormal;
+
+    auto_ptr< SFBoundTree > boundTree;
 
     /// Contains nodes with options for haptics and graphics rendering.
     ///

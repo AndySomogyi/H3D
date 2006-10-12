@@ -212,7 +212,7 @@ namespace H3D {
     }
 
     /// Get the thread that is used to run this haptics device.
-    inline PeriodicThreadBase *getThread() { return thread; }
+    inline HAPI::PeriodicThreadBase *getThread() { return thread; }
 
     /// Reset the device.
     virtual void resetDevice() {}
@@ -399,7 +399,7 @@ namespace H3D {
     Vec3f previuos_proxy_pos;
 
     /// The thread that this haptics device loop is run in.
-    PeriodicThreadBase *thread;
+    HAPI::PeriodicThreadBase *thread;
   };
 }
 

@@ -33,11 +33,10 @@
 using namespace H3D;
 
 FeedbackBufferGeometry::FeedbackBufferGeometry( X3DGeometryNode *_geometry,
-                                                H3DSurfaceNode *_surface,
                                                 const Matrix4f &_transform,
                                                 int _nr_vertices  ):
   nr_vertices( _nr_vertices ) {
-  if( nr_vertices == -1 ) nr_vertices = 300000;
+  if( nr_vertices == -1 ) nr_vertices = 3000000;
   GLfloat *buffer = new GLfloat[ nr_vertices ];
   glFeedbackBuffer( nr_vertices, GL_3D, buffer );
   
@@ -128,15 +127,15 @@ glDisable(GL_LIGHTING);
       if( nr_vertices != 3 ) { 
         cerr << "Too Many vertices: " << nr_vertices << endl;
       }
-      cerr << "Polygon: " << nr_vertices << endl;
+      //cerr << "Polygon: " << nr_vertices << endl;
       i+= parseVertex( buffer, i, p );
       gluUnProject( p.x, p.y, p.z, mv, pm, vp, &v0.x, &v0.y, &v0.z );
       i+= parseVertex( buffer, i, p );
       gluUnProject( p.x, p.y, p.z, mv, pm, vp, &v1.x, &v1.y, &v1.z );
       i+= parseVertex( buffer, i, p );
       gluUnProject( p.x, p.y, p.z, mv, pm, vp, &v2.x, &v2.y, &v2.z );
-      triangles.push_back( Bounds::Triangle( v0 *1e3, v1*1e3, v2*1e3 )) ;
-      cerr << v0 << " " << v1 << " " << v2 << endl;
+      triangles.push_back( HAPI::Bounds::Triangle( v0 *1e3, v1*1e3, v2*1e3 )) ;
+      //cerr << v0 << " " << v1 << " " << v2 << endl;
       break;
     }
     case( GL_BITMAP_TOKEN ): cerr << "Bitmap: "; break;
@@ -151,6 +150,7 @@ glDisable(GL_LIGHTING);
   glPopMatrix();
   glMatrixMode( GL_MODELVIEW );
   glPopMatrix();
+  delete buffer;
 }
     
 int FeedbackBufferGeometry::parseVertex( GLfloat *buffer, int index, Vec3f &p ) {

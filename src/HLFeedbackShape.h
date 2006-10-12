@@ -24,7 +24,7 @@ namespace H3D {
   /// haptics rendering of a geometry, since when the render() function
   /// is implemented to perform the graphical rendering. The shape is
   /// implemented as a HL_SHAPE_FEEDBACK_BUFFER shape in HLAPI.
-  class H3DAPI_API HLFeedbackShape: public HAPIHapticShape, public HLShape  {
+  class H3DAPI_API HLFeedbackShape: public HAPI::HAPIHapticShape, public HLShape  {
   public:
     #ifndef HAVE_OPENHAPTICS
     typedef int HLint;
@@ -33,12 +33,12 @@ namespace H3D {
 
     /// Constructor.
     HLFeedbackShape( X3DGeometryNode *_geometry,
-                     HAPISurfaceObject *_surface,
+                     HAPI::HAPISurfaceObject *_surface,
                      const Matrix4f &_transform,
                      HLint _nr_vertices = -1,
                      HLenum _touchable_face = HL_FRONT_AND_BACK,
                      bool _use_haptic_camera = true ):
-      HAPIHapticShape( _geometry, _surface, _transform ),
+      HAPI::HAPIHapticShape( _geometry, _surface, _transform ),
       nr_vertices( _nr_vertices ),
       touchable_face( _touchable_face ),
       use_haptic_camera( _use_haptic_camera ) {}

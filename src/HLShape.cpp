@@ -45,7 +45,7 @@ HLShape::HLShapeMap HLShape::hl_shape_map;
 
 /// Get the HLAPI shape id that is used to render this shape.
 HLuint HLShape::getShapeId( HLHapticsDevice *hd ) { 
-  HAPIHapticShape *haptic_shape =  dynamic_cast< HAPIHapticShape * >( this );
+  HAPI::HAPIHapticShape *haptic_shape =  dynamic_cast< HAPI::HAPIHapticShape * >( this );
   
   if( !haptic_shape ) {
     Exception::H3DAPIException( "HLShape object is not a HapticShape",

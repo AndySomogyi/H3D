@@ -34,7 +34,7 @@
 #include <string>
 using namespace std;
 #include "URNResolver.h"
-#include "AutoPtrVector.h"
+#include <AutoPtrVector.h>
 
 
 namespace H3D {
@@ -85,7 +85,7 @@ namespace H3D {
 
   protected:
     static auto_ptr< URNResolver > urn_resolver;
-    static AutoPtrVector< ResourceResolver > resolvers;
+    static H3DUtil::AutoPtrVector< ResourceResolver > resolvers;
     static string baseURL;
   };
 }

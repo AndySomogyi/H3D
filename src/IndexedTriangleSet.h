@@ -195,9 +195,7 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
-    HapticTriangleTree *htree;
-    Bounds::BinaryBoundTree *tree;
-    auto_ptr< SFInt32 > depth;
+     auto_ptr< SFInt32 > depth;
   };
 }
 

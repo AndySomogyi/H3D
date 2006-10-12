@@ -142,6 +142,21 @@
 #define HAVE_SYS_TIME_H
 #endif
 
+namespace H3D {
+  /// Function for determining if the machine we are running on is uses
+  /// little endian byte order or not.
+  inline bool isLittleEndian() {
+    union probe{ 
+      unsigned int num;
+      unsigned char bytes[sizeof(unsigned int)];
+    };
+    //initialize first member of p with unsigned 1
+    probe p = { 1U };
+    // in a big endian architecture, p.bytes[0] equals 0  
+    bool little_endian = (p.bytes[0] == 1U); 
+    return little_endian;
+  }
+}
 
 #endif
 

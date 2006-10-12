@@ -33,11 +33,11 @@ void HLFeedbackShape::hlRender( HLHapticsDevice *hd ) {
     hlPushAttrib( HL_MATERIAL_BIT | HL_TOUCH_BIT );
 #endif
     const Matrix4d &m = transform;
-    GLfloat vt[] = { m[0][0], m[1][0], m[2][0], 0,
+    GLdouble vt[] = { m[0][0], m[1][0], m[2][0], 0,
                      m[0][1], m[1][1], m[2][1], 0,
                      m[0][2], m[1][2], m[2][2], 0,
                      m[0][3], m[1][3], m[2][3], 1 };
-    glLoadMatrixf( vt );
+    glLoadMatrixd( vt );
     s->hlRender( hd );
     hlTouchableFace( touchable_face );
     if( use_haptic_camera )

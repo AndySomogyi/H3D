@@ -121,7 +121,7 @@ namespace H3D {
     static H3DNodeDatabase database;
     
     /// Internal haptic spring instance
-    AutoRef< HapticSpring > haptic_spring;
+    AutoRef< HAPI::HapticSpring > haptic_spring;
   };
 }
 
