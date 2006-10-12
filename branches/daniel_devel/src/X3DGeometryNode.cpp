@@ -38,6 +38,10 @@
 #include "DeviceInfo.h"
 #include "HLDepthBufferShape.h"
 #include "HLFeedbackShape.h"
+#include "FeedbackBufferGeometry.h"
+#include <HapticTriangleSet.h>
+#include <HLSurface.h>
+#include <HLHapticsDevice.h>
 #endif
 
 using namespace H3D;
@@ -61,7 +65,8 @@ X3DGeometryNode::X3DGeometryNode(
                                  Inst< MFBool > _isTouched,
                                  Inst< MFVec3f > _force,
                                  Inst< MFVec3f > _contactPoint,
-                                 Inst< MFVec3f > _contactNormal) :
+                                 Inst< MFVec3f > _contactNormal,
+                                 Inst< SFBoundTree > _boundTree ) :
   X3DChildNode( _metadata ),
   H3DBoundedObject( _bound ),
   H3DDisplayListObject( _displayList ),
@@ -69,6 +74,7 @@ X3DGeometryNode::X3DGeometryNode(
   force( _force ),
   contactPoint( _contactPoint ),
   contactNormal( _contactNormal ),
+  boundTree( _boundTree ),
   options( new MFOptionsNode ),
   use_culling( false ),
   allow_culling( true ),
@@ -78,7 +84,11 @@ X3DGeometryNode::X3DGeometryNode(
   
   displayList->setOwner( this );
   bound->setOwner( this );
+  boundTree->setName( "boundTree" );
+  boundTree->setOwner( this );
   database.initFields( this );
+
+  displayList->route( boundTree );
 }
 
 
@@ -100,7 +110,7 @@ void HLCALLBACK X3DGeometryNode::motionCallback( HLenum event,
                      n );
 
   if( HLShape::getHLShape( object ) ) {
-    const Matrix4d &m = dynamic_cast< HAPIHapticShape * >
+    const Matrix4d &m = dynamic_cast< HAPI::HAPIHapticShape * >
       (HLShape::getHLShape( object ))->transform.inverse();
 
     if( device_index > (int)geometry->contactPoint->size() -1 )
@@ -248,7 +258,7 @@ X3DGeometryNode::~X3DGeometryNode() {
   }
 }
 
-HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_surface,
+HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_surface,
                                                     const Matrix4f &_transform,
                                                     HLint _nr_vertices ) {
   int type = -1;
@@ -350,4 +360,189 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
   
   glCullFace( cull_face );
 
+}
+
+
+/// The HAPIBoundTree constructs a 
+void X3DGeometryNode::SFBoundTree::update() { 
+  X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( getOwner() );
+  FeedbackBufferGeometry fbg( geometry, Matrix4f() );
+  value = new HAPI::Bounds::AABBTree( fbg.triangles );
+}
+
+void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
+  X3DChildNode::traverseSG( ti );
+  
+  const vector< H3DHapticsDevice * > &devices = ti.getHapticsDevices();
+
+  for( unsigned int i = 0; i < devices.size(); i++ ) {
+
+    H3DHapticsDevice *hd = devices[i];
+  
+    //displayList->breakCache();
+
+    vector< HAPI::Bounds::Triangle > tris;
+    tris.reserve( 200 );
+    Vec3f scale = ti.getAccInverseMatrix().getScalePart();
+    boundTree->getValue()->getTrianglesWithinRadius( ti.getAccInverseMatrix() * hd->proxyPosition->getValue() * 1e3,
+                                                     15 * H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
+                                                     tris );
+    
+    //if( tris.size() > 0 )
+    //cerr << tris.size() << endl;
+    
+    if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
+      int ii = tris.size();
+      cerr << ii << endl;
+      TriangleSet * tri_set = new TriangleSet( tris ,
+                                               this,
+                                               ti.getCurrentSurface(),
+                                               Matrix4f( 1e3, 0, 0, 0,
+                                                         0, 1e3, 0, 0,
+                                                         0, 0, 1e3, 0,
+                                                         0, 0, 0, 1 ) *(ti.getAccForwardMatrix() *
+                                               Matrix4f( 1e-3, 0, 0, 0,
+                                                         0, 1e-3, 0, 0,
+                                                         0, 0, 1e-3, 0,
+                                                         0, 0, 0, 1 )));
+      ti.addHapticShape( i, tri_set );
+      
+    }
+  }
+}
+
+
+void X3DGeometryNode::TriangleSet::hlRender( HLHapticsDevice *hd ) {
+  X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( userdata );
+  int type = -1;
+  bool adaptive_viewport = true;
+  bool camera_view = true;
+  HLenum touchable_face;
+  
+  if( geometry->usingCulling() ) {
+    if( geometry->getCullFace() == GL_FRONT ) touchable_face = HL_BACK;
+    else touchable_face = HL_FRONT;
+  } else {
+    touchable_face = HL_FRONT_AND_BACK;
+  }
+
+  OpenHapticsOptions *openhaptics_options = NULL;
+
+  geometry->getOptionNode( openhaptics_options );
+
+  if( !openhaptics_options ) {
+    GlobalSettings *default_settings = GlobalSettings::getActive();
+    if( default_settings ) {
+      default_settings->getOptionNode( openhaptics_options );
+    }
+  }
+
+  if( openhaptics_options ) {
+    const string &shape = openhaptics_options->GLShape->getValue();
+    if( shape == "FEEDBACK_BUFFER" ) {
+      type = 0;
+    } else if( shape == "DEPTH_BUFFER" ) {
+      type = 1;
+    } else {
+      Console(4) << "Warning: Invalid OpenHaptics GLShape type: "
+                 << shape 
+                 << ". Must be \"FEEDBACK_BUFFER\" or \"DEPTH_BUFFER\" "
+                 << "(in \"" << getName() << "\")" << endl;
+    }
+    
+    const string &face = openhaptics_options->touchableFace->getValue();
+    if( face == "FRONT" ) touchable_face = HL_FRONT;
+    else if( face == "BACK" ) touchable_face = HL_BACK;
+    else if( face == "FRONT_AND_BACK" ) touchable_face = HL_FRONT_AND_BACK;
+    else if( face == "AS_GRAPHICS" ) {
+// default values are the same as graphics
+    } else {
+      Console(4) << "Warning: Invalid default OpenHaptics touchable face: "
+                 << face 
+                 << ". Must be \"FRONT\", \"BACK\" or \"FRONT_AND_BACK\" "
+                 << "(in active OpenHapticsSettings node\")" << endl;
+    }
+
+    adaptive_viewport = openhaptics_options->useAdaptiveViewport->getValue();
+    camera_view = openhaptics_options->useHapticCameraView->getValue();
+  }
+
+#ifdef HAVE_OPENHAPTICS
+  HLSurface *s = dynamic_cast< HLSurface * >( surface );
+  if( s /*&& closeEnoughToBound( hd->proxyPosition->getValue(), 
+                               hd->getPreviousProxyPosition(), 
+                               (Matrix4f) transform.inverse(), 
+                               geometry ) */) {
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
+#if HL_VERSION_MAJOR_NUMBER >= 2
+    hlPushAttrib( HL_MATERIAL_BIT | HL_TOUCH_BIT );
+#endif
+    const Matrix4d &m = transform;
+    GLdouble vt[] = { m[0][0], m[1][0], m[2][0], 0,
+                     m[0][1], m[1][1], m[2][1], 0,
+                     m[0][2], m[1][2], m[2][2], 0,
+                     m[0][3], m[1][3], m[2][3], 1 };
+    glLoadIdentity();
+    glScaled( 1e-3, 1e-3, 1e-3 );
+    glMultMatrixd( vt );
+    s->hlRender( hd );
+    hlTouchableFace( touchable_face );
+    if( camera_view )
+      hlEnable( HL_HAPTIC_CAMERA_VIEW );
+    else
+      hlDisable( HL_HAPTIC_CAMERA_VIEW );
+
+    if( adaptive_viewport )
+      hlEnable( HL_ADAPTIVE_VIEWPORT );
+    else
+      hlDisable( HL_ADAPTIVE_VIEWPORT );
+
+    Matrix3d m3 = m.getScaleRotationPart();
+    GLint front_face;
+
+    bool negative_scaling = 
+      ( ( m3.getRow( 0 ) % m3.getRow( 1 ) ) * m3.getRow(2) ) < 0;
+    glGetIntegerv( GL_FRONT_FACE, &front_face );
+    // if front_face == GL_CW then the GLWindow we render to is mirrored.
+    // front_face has to be flipped each time a negative scaling is applied
+    // in order for normals to be correct. 
+    if( front_face == GL_CW ) {
+      if( !negative_scaling )
+        glFrontFace( GL_CCW );
+    } else if( negative_scaling )
+      glFrontFace( GL_CW );
+
+    hlHinti( HL_SHAPE_FEEDBACK_BUFFER_VERTICES, triangles.size() * 3 );
+
+    bool previous_allow = geometry->allowingCulling();
+    geometry->allowCulling( false );
+
+    if( type == 1 ) hlBeginShape( HL_SHAPE_DEPTH_BUFFER, getShapeId( hd ) );
+    else hlBeginShape( HL_SHAPE_FEEDBACK_BUFFER, getShapeId( hd ) );
+    
+    glMatrixMode( GL_MODELVIEW );
+    //glScalef( 1e-3f, 1e-3f, 1e-3f );
+    glBegin( GL_TRIANGLES );
+    for( unsigned int i = 0; i < triangles.size(); i++ ) {
+      HAPI::Bounds::Triangle &t = triangles[i];
+      glVertex3d( t.a.x, t.a.y, t.a.z );
+      glVertex3d( t.b.x, t.b.y, t.b.z );
+      glVertex3d( t.c.x, t.c.y, t.c.z );
+    }
+    glEnd();
+    //geometry->hlRender( hd, (Matrix4f)transform );
+
+    hlEndShape();
+
+    geometry->allowCulling( previous_allow );
+    
+    glFrontFace( front_face );
+#if HL_VERSION_MAJOR_NUMBER >= 2
+    hlPopAttrib();
+#endif
+glPopMatrix();
+
+  }
+#endif
 }

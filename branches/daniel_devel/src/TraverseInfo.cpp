@@ -35,7 +35,7 @@
 
 using namespace H3D;
 
-void TraverseInfo::addHapticShapeToAll( HAPIHapticShape *shape ) {
+void TraverseInfo::addHapticShapeToAll( HAPI::HAPIHapticShape *shape ) {
   shape->ref();
   if( hapticsEnabled() ) {
     for( vector< HapticShapeVector >::iterator i = haptic_shapes.begin();
@@ -47,7 +47,7 @@ void TraverseInfo::addHapticShapeToAll( HAPIHapticShape *shape ) {
   shape->unref();
 }
 
-void TraverseInfo::addForceEffectToAll( HapticForceEffect *effect ) {
+void TraverseInfo::addForceEffectToAll( HAPI::HapticForceEffect *effect ) {
   effect->ref();
   if( hapticsEnabled() ) {
     for( vector< HapticEffectVector >::iterator i = 
@@ -61,7 +61,7 @@ void TraverseInfo::addForceEffectToAll( HapticForceEffect *effect ) {
 }
 
 void TraverseInfo::addForceEffect( int device_index, 
-                                   HapticForceEffect *effect ) {
+                                   HAPI::HapticForceEffect *effect ) {
   if( device_index < 0 || device_index >= (int)haptics_devices.size() ) {
     stringstream s;
     s << "TraverseInfo only has " << (unsigned int) haptics_devices.size() 
@@ -79,7 +79,7 @@ void TraverseInfo::addForceEffect( int device_index,
 }
 
 void TraverseInfo::addHapticShape( int device_index, 
-                                   HAPIHapticShape *shape ) {
+                                   HAPI::HAPIHapticShape *shape ) {
   if( device_index < 0 || device_index >= (int)haptics_devices.size() ) {
     stringstream s;
     s << "TraverseInfo only has " << (unsigned int) haptics_devices.size() 

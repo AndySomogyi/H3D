@@ -80,8 +80,6 @@ IndexedTriangleSet::IndexedTriangleSet(
   autoNormal( _autoNormal ),   
   set_index( _set_index ),
   index( _index ),
-  tree( NULL ),
-  htree( NULL ),
   depth( new SFInt32 ) {
 
   type_name = "IndexedTriangleSet";
@@ -105,11 +103,11 @@ IndexedTriangleSet::IndexedTriangleSet(
 }
 
 void IndexedTriangleSet::render() {
-  if( tree ) {
+//  if( tree ) {
     //tree->render( depth->getValue() );
-  }
+ // }
 
-  if( htree ) {
+  /*if( htree ) {
     vector< PlaneConstraint > cs;
     DeviceInfo *di = DeviceInfo::getActive();
     if( di ) {
@@ -154,7 +152,7 @@ void IndexedTriangleSet::render() {
       glEnable( GL_LIGHTING );
       glPopMatrix();
     }
-  }
+    }*/
  /* glDisable( GL_LIGHTING );
   glColor3f( 0, 0, 1 );
   glBegin( GL_LINES );
@@ -314,24 +312,8 @@ void IndexedTriangleSet::render() {
 
 #ifdef USE_HAPTICS
 void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
-  if( !tree ) {
-    TimeStamp start;
-    
-    vector< Bounds::Triangle > triangles;
-    FeedbackBufferGeometry *haptik_geometry = 
-      new FeedbackBufferGeometry( this, ti.getCurrentSurface(), 
-                                  ti.getAccForwardMatrix() );
-    //haptik_geometry = new IndexedTriangleGeometry( coord_node->point->getValue(),
-    //                                             index->getValue() );
 
-    TimeStamp before_build;
-    tree = new Bounds::AABBTree( haptik_geometry->triangles );
-    TimeStamp after_build;
-    
-     //cerr << "new: " << before_build - start << endl;
-    cerr << "build: " << after_build - before_build << endl;
-  } 
-
+#if 0
   H3DHapticsDevice *hd = ti.getHapticsDevice( 0 );
   
   //from = ti.getAccInverseMatrix() * hd->trackerPosition->getValue();
@@ -339,17 +321,18 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
   //tree->clearCollidedFlag();
   // Bounds::IntersectionInfo info;
   //tree->lineIntersect( from, to, info );
-  depth->touch();
-  
+
+  //displayList->breakCache();
   Bounds::Triangle triangle( Vec3f( 0.1, -0.1, 0 ),
                     Vec3f( -0.1, -0.1, 0 ),
                     Vec3f( -0.1, 0.1, 0 ) );
   vector< Bounds::Triangle > tris;
   tris.reserve( 200 );
   Vec3f scale = ti.getAccInverseMatrix().getScalePart();
-  tree->getTrianglesWithinRadius( ti.getAccInverseMatrix() * hd->proxyPosition->getValue() * 1e3,
+  boundTree->getValue()->getTrianglesWithinRadius( ti.getAccInverseMatrix() * hd->proxyPosition->getValue() * 1e3,
                                   15 * H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
                                   tris );
+
   //if( tris.size() > 0 )
   //cerr << tris.size() << endl;
 
@@ -359,9 +342,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 
   cerr << "*******************************" << endl;
 */
-  // use backface culling if solid is true
-  if( solid->getValue() ) useBackFaceCulling( true );
-  else useBackFaceCulling( false );
+
 
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
        int ii = tris.size();
@@ -380,6 +361,11 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
     ti.addHapticShapeToAll( htree );
 
   }
+#endif
+  X3DComposedGeometryNode::traverseSG( ti );
+  // use backface culling if solid is true
+  if( solid->getValue() ) useBackFaceCulling( true );
+  else useBackFaceCulling( false );
 }
 #endif
 

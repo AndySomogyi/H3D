@@ -23,7 +23,7 @@ namespace H3D {
   /// haptics rendering of a geometry, since when the render() function
   /// is implemented to perform the graphical rendering. The shape is
   /// implemented as a HL_SHAPE_DEPTH_BUFFER shape in HLAPI.
-  class H3DAPI_API HLDepthBufferShape: public HAPIHapticShape, public HLShape  {
+  class H3DAPI_API HLDepthBufferShape: public HAPI::HAPIHapticShape, public HLShape  {
   public:
     /// Constructor.
     HLDepthBufferShape( X3DGeometryNode *_geometry,

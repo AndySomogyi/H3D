@@ -40,12 +40,12 @@ using namespace std;
 
 namespace H3D {
   // forward declarations
-  class HAPIHapticShape;
+  class HAPI::HAPIHapticShape;
   class H3DSurfaceNode;
   class H3DHapticsDevice;
 
-  typedef AutoRefVector< HAPIHapticShape > HapticShapeVector;
-  typedef AutoRefVector< HapticForceEffect > HapticEffectVector;
+  typedef AutoRefVector< HAPI::HAPIHapticShape > HapticShapeVector;
+  typedef AutoRefVector< HAPI::HapticForceEffect > HapticEffectVector;
 
   /// TraverseInfo is a structure that is passed along when traversing the 
   /// scene graph. It contains information needed during the traversing, 
@@ -94,14 +94,14 @@ namespace H3D {
     /// shape on.
     /// \param shape The HapticShape to render.
     ///
-    void addHapticShape( int device_index, HAPIHapticShape *shape );
+    void addHapticShape( int device_index, HAPI::HAPIHapticShape *shape );
 
     /// Adds a HapticShape to be rendered by a H3DHapticsDevice.
     /// Shapes will only be added if hapticsEnabled() is true. 
     /// \param hd The H3DHapticsDevice to render the shape on.
     /// \param shape The HapticShape to render.
     ///
-    inline void addHapticShape( H3DHapticsDevice *hd, HAPIHapticShape *shape ) {
+    inline void addHapticShape( H3DHapticsDevice *hd, HAPI::HAPIHapticShape *shape ) {
       int device_index = getHapticsDeviceIndex( hd );
       addHapticShape( device_index, shape );
     }
@@ -110,7 +110,7 @@ namespace H3D {
     /// Shapes will only be added if hapticsEnabled() is true. 
     /// \param shape The HapticShape to render.
     ///
-    void addHapticShapeToAll( HAPIHapticShape *shape );
+    void addHapticShapeToAll( HAPI::HAPIHapticShape *shape );
 
     /// Get the HapticShapes that has been added for the H3DHapticsDevice
     /// with the given device_index.
@@ -141,7 +141,7 @@ namespace H3D {
     /// shape on.
     /// \param effect The HapticForceEffect to render.
     ///
-    void addForceEffect( int device_index, HapticForceEffect *effect );
+    void addForceEffect( int device_index, HAPI::HapticForceEffect *effect );
 
     /// Adds a HapticForceEffect to be rendered by a H3DHapticsDevice.
     /// Shapes will only be added if hapticsEnabled() is true. 
@@ -149,7 +149,7 @@ namespace H3D {
     /// \param effect The HapticForceEffect to render.
     ///
     inline void addForceEffect( H3DHapticsDevice *hd, 
-                                HapticForceEffect *effect ) {
+                                HAPI::HapticForceEffect *effect ) {
       int device_index = getHapticsDeviceIndex( hd );
       addForceEffect( device_index, effect );
     }
@@ -158,7 +158,7 @@ namespace H3D {
     /// Effects will only be added if hapticsEnabled() is true. 
     /// \param effect The HapticForceEffect to render.
     ///
-    void addForceEffectToAll( HapticForceEffect *effect );
+                                void addForceEffectToAll( HAPI::HapticForceEffect *effect );
 		
     /// Get the HapticForceEffects that has been added for the H3DHapticsDevice
     /// with the given device_index.

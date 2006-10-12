@@ -75,7 +75,7 @@ void SmoothSurface::onContact( ContactInfo &contact ) {
   Vec3d local_probe = contact.localProbePosition();
   // TODO: fix realtime field access
   //contact.setLocalForce( Vec3d( 0, -local_probe.y/1000 * stiffness->getValue(), 0 ) );
-  contact.setLocalForce( -local_probe/1000 * stiffness->getValue() );
+  contact.setLocalForce( -local_probe/1000 * stiffness->getValue() * 700 );
   contact.proxy_movement_local = Vec2d( local_probe.x, local_probe.z );
 }
 

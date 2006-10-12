@@ -45,7 +45,7 @@ namespace HAPIDeviceInternals {
 
 
 // Callback function for changing force effect that are to be rendered.
-PeriodicThread::CallbackCode HAPIDevice::changeForceEffects( void *_data ) {
+HAPI::PeriodicThread::CallbackCode HAPIDevice::changeForceEffects( void *_data ) {
     void * * data = static_cast< void * * >( _data );
     HAPIDevice *hd = 
       static_cast< HAPIDevice * >( data[0] );
@@ -56,11 +56,11 @@ PeriodicThread::CallbackCode HAPIDevice::changeForceEffects( void *_data ) {
     TimeStamp now = TimeStamp();
     hd->last_loop_time = now - hd->last_effect_change;
     hd->last_effect_change = now;
-    return PeriodicThread::CALLBACK_DONE;
+    return HAPI::PeriodicThread::CALLBACK_DONE;
   }
 
 
-PeriodicThread::CallbackCode HAPIDevice::changeHapticShapes( void *_data ) {
+HAPI::PeriodicThread::CallbackCode HAPIDevice::changeHapticShapes( void *_data ) {
     void * * data = static_cast< void * * >( _data );
     HAPIDevice *hd = 
       static_cast< HAPIDevice * >( data[0] );
@@ -71,7 +71,7 @@ PeriodicThread::CallbackCode HAPIDevice::changeHapticShapes( void *_data ) {
     //TimeStamp now = TimeStamp();
     //hd->last_loop_time = now - hd->last_effect_change;
     //hd->last_effect_change = now;
-    return PeriodicThread::CALLBACK_DONE;
+    return HAPI::PeriodicThread::CALLBACK_DONE;
   }
 
 /// Constructor.
@@ -102,7 +102,7 @@ HAPIDevice::HAPIDevice(
                     _stylus, _initialized ),
   proxyRadius( _proxyRadius ),
   nr_haptics_loops( 0 ),
-  hapi_device( new PhantomHapticsDevice ) {
+  hapi_device( new HAPI::PhantomHapticsDevice("p2") ) {
 
   type_name = "HAPIDevice";  
   database.initFields( this );
@@ -119,8 +119,8 @@ void HAPIDevice::initDevice() {
       hapi_device->enableDevice();
       // TODO TEMP:
       //hapi_device->setPositionCalibration( positionCalibration->getValue( ) );
-      RuspiniRenderer *rr = 
-        dynamic_cast< RuspiniRenderer * >(hapi_device->getHapticsRenderer());
+      HAPI::RuspiniRenderer *rr = 
+        dynamic_cast< HAPI::RuspiniRenderer * >(hapi_device->getHapticsRenderer());
       rr->setProxyRadius( proxyRadius->getValue() * 1e3 );
       
     }
@@ -158,7 +158,7 @@ void HAPIDevice::updateDeviceValues() {
   nr_haptics_loops = 0;
   hapticsRate->setValue( hr, id );
   if( hapi_device.get() ) {
-    HAPIHapticsDevice::DeviceValues dv = hapi_device->getRawDeviceValues();
+    HAPI::HAPIHapticsDevice::DeviceValues dv = hapi_device->getRawDeviceValues();
     // convert to metres
     devicePosition->setValue( (Vec3f)dv.position * 1e-3, id);
     deviceOrientation->setValue( dv.orientation, id);
@@ -168,7 +168,7 @@ void HAPIDevice::updateDeviceValues() {
     hapi_device->setOrientationCalibration( orientationCalibration->rt_orn_calibration );
     //cerr << deviceOrientation->getValue() << endl;
     //cerr << trackerOrientation->getValue() << endl;
-    RuspiniRenderer *ruspini = dynamic_cast< RuspiniRenderer * >( hapi_device->getHapticsRenderer() );
+    HAPI::RuspiniRenderer *ruspini = dynamic_cast< HAPI::RuspiniRenderer * >( hapi_device->getHapticsRenderer() );
     if( ruspini ) {
       proxyPosition->setValue( (Vec3f)(ruspini->getProxyPosition() * 1e-3), id );
 
@@ -184,8 +184,8 @@ void HAPIDevice::updateDeviceValues() {
       }
       assert( device_index != -1 );
 
-      RuspiniRenderer::Contacts contacts = ruspini->getContacts();
-      for( RuspiniRenderer::Contacts::iterator i = contacts.begin();
+      HAPI::RuspiniRenderer::Contacts contacts = ruspini->getContacts();
+      for( HAPI::RuspiniRenderer::Contacts::iterator i = contacts.begin();
            i != contacts.end(); i++ ) {
         X3DGeometryNode *geom = static_cast< X3DGeometryNode * >((*i).first->userdata );
       
@@ -199,7 +199,7 @@ void HAPIDevice::updateDeviceValues() {
         if( device_index > (int)geom->isTouched->size() -1 )
           geom->isTouched->resize( device_index + 1, false, geom->id );
         
-        HAPISurfaceObject::ContactInfo ci = (*i).second;
+        HAPI::HAPISurfaceObject::ContactInfo ci = (*i).second;
 
         // TODO: shpould be able to do it in a faster/better way.
         Matrix4d global_to_local = (*i).first->transform.inverse();
@@ -226,10 +226,10 @@ void HAPIDevice::updateDeviceValues() {
           geom->isTouched->setValue( device_index, true, geom->id );
       }
 
-      for( RuspiniRenderer::Contacts::iterator j = last_contacts.begin();
+      for( HAPI::RuspiniRenderer::Contacts::iterator j = last_contacts.begin();
            j != last_contacts.end(); j++ ) {
         bool still_in_contact = false;
-        for( RuspiniRenderer::Contacts::iterator i = contacts.begin();
+        for( HAPI::RuspiniRenderer::Contacts::iterator i = contacts.begin();
              i != contacts.end(); i++ ) {
           cerr << (*i).first->userdata << " " << (*j).first->userdata << endl;
           if( (*i).first->userdata == (*j).first->userdata ) {

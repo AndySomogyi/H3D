@@ -122,5 +122,6 @@ void FitToBoxTransform::SFMatrix4f::update() {
       value = Matrix4f();
     }
   }
+  cerr << value << endl;
 }
 

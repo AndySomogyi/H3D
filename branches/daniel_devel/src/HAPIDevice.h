@@ -179,18 +179,18 @@ namespace H3D {
 
     /// Callcack function to transfer the force effect vector to the 
     /// haptics loop.
-    static PeriodicThread::CallbackCode changeForceEffects( void *_data ); 
+    static HAPI::PeriodicThread::CallbackCode changeForceEffects( void *_data ); 
 
     /// Callcack function to transfer the shapes vector for the 
     /// haptics loop.
-    static PeriodicThread::CallbackCode changeHapticShapes( void *_data ); 
+    static HAPI::PeriodicThread::CallbackCode changeHapticShapes( void *_data ); 
 
     // rt_value
     Vec3d proxy_position;
 
-    auto_ptr< HAPIHapticsDevice > hapi_device;
+    auto_ptr< HAPI::HAPIHapticsDevice > hapi_device;
 
-    RuspiniRenderer::Contacts last_contacts;
+    HAPI::RuspiniRenderer::Contacts last_contacts;
   };
 }
 

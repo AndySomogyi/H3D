@@ -30,6 +30,7 @@
 #include "ResourceResolver.h"
 
 using namespace H3D;
+using namespace H3DUtil;
 
 auto_ptr< URNResolver > ResourceResolver::urn_resolver( NULL );
 AutoPtrVector< ResourceResolver > ResourceResolver::resolvers; 

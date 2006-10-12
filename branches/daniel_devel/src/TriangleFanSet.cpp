@@ -298,7 +298,7 @@ void TriangleFanSet::traverseSG( TraverseInfo &ti ) {
   X3DCoordinateNode *coord_node = coord->getValue();
   if( ti.hapticsEnabled() && ti.getCurrentSurface() && coord_node ) {
 #ifdef HAVE_OPENHAPTICS
-    HAPIHapticShape *fs = 
+    HAPI::HAPIHapticShape *fs = 
       getOpenGLHapticShape( 
                            ti.getCurrentSurface(),
                            ti.getAccForwardMatrix(),

@@ -521,19 +521,12 @@ X3DNormalNode *IndexedFaceSet::AutoNormal::generateNormalsPerFace(
   return normal;
 }
 
-#ifdef USE_HAPTICS
 void IndexedFaceSet::traverseSG( TraverseInfo &ti ) {
   // use backface culling if solid is true
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
 
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll( getOpenGLHapticShape( ti.getCurrentSurface(),
-                                                  ti.getAccForwardMatrix(),
-                                                  coordIndex->size() ) );
-#endif
-  }
+  X3DGeometryNode::traverseSG( ti );
 }
-#endif
+
 

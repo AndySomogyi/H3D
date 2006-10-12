@@ -37,7 +37,7 @@ using namespace H3D;
 
 void HLCustomObject::hlRender( HLHapticsDevice *hd ) {
 #ifdef HAVE_OPENHAPTICS
-  HAPIHapticShape *hs = dynamic_cast< HAPIHapticShape * >( this );
+  HAPI::HAPIHapticShape *hs = dynamic_cast< HAPI::HAPIHapticShape * >( this );
   if( hs && !closeEnoughToBound( hd->proxyPosition->getValue(), 
                                  hd->getPreviousProxyPosition(),
                                  (Matrix4f)hs->transform.inverse(), 
