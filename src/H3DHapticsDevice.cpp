@@ -178,22 +178,14 @@ void H3DHapticsDevice::updateDeviceValues() {
     hapi_device->setOrientationCalibration( orientationCalibration->rt_orn_calibration );
     //cerr << deviceOrientation->getValue() << endl;
     //cerr << trackerOrientation->getValue() << endl;
-    HAPI::RuspiniRenderer *ruspini = dynamic_cast< HAPI::RuspiniRenderer * >( hapi_device->getHapticsRenderer() );
-    if( ruspini ) {
-      proxyPosition->setValue( (Vec3f)(ruspini->getProxyPosition() * 1e-3), id );
+    HAPI::HAPIProxyBasedRenderer *proxy_renderer = 
+      dynamic_cast< HAPI::HAPIProxyBasedRenderer * >
+      ( hapi_device->getHapticsRenderer() );
+    if( proxy_renderer ) {
+      proxyPosition->setValue( (Vec3f)(proxy_renderer->getProxyPosition() * 1e-3), 
+                               id );
     } else {
-      HAPI::OpenHapticsRenderer *oh = 
-         dynamic_cast< HAPI::OpenHapticsRenderer * >( hapi_device->getHapticsRenderer() );
-      if( oh ) {
-        proxyPosition->setValue( (Vec3f)(oh->getProxyPosition() ), id );
-      }
-      else {
-        HAPI::GodObjectRenderer *go = dynamic_cast< HAPI::GodObjectRenderer * >( hapi_device->getHapticsRenderer() );
-      if( go ) {
-        proxyPosition->setValue( (Vec3f)(go->getProxyPosition() * 1e-3 ), id );
-      } else 
-        proxyPosition->setValue( trackerPosition->getValue(), id );
-      }
+      proxyPosition->setValue( trackerPosition->getValue(), id );
     }
 
     HAPI::HAPIHapticsRenderer *renderer = hapi_device->getHapticsRenderer();
