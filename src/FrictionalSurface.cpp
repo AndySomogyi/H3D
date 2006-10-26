@@ -45,9 +45,9 @@ namespace FritionalSurfaceInternals {
   FIELDDB_ELEMENT( FrictionalSurface, dynamicFriction, INPUT_OUTPUT );
 }
   
-void FrictionalSurface::hlRender( HLHapticsDevice *hd ) {
+void FrictionalSurface::hlRender() {
 #ifdef HAVE_OPENHAPTICS
-  SmoothSurface::hlRender( hd );
+  SmoothSurface::hlRender();
   hlMaterialf(HL_FRONT_AND_BACK, 
               HL_DYNAMIC_FRICTION, 
               dynamicFriction->getValue() );

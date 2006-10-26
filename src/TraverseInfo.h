@@ -35,6 +35,7 @@
 #include <AutoRefVector.h>
 #include <sstream>
 #include <stack>
+#include <map>
 
 using namespace std;
 
@@ -43,6 +44,7 @@ namespace H3D {
   class HAPI::HAPIHapticShape;
   class H3DSurfaceNode;
   class H3DHapticsDevice;
+  class X3DGeometryNode;
 
   typedef AutoRefVector< HAPI::HAPIHapticShape > HapticShapeVector;
   typedef AutoRefVector< HAPI::HapticForceEffect > HapticEffectVector;
@@ -292,6 +294,9 @@ namespace H3D {
     vector< HapticEffectVector > haptic_effects;
     bool haptics_enabled;
     bool multi_pass_transparency;
+
+    typedef std::map< X3DGeometryNode *, int > GeometryCountMap;
+    GeometryCountMap geometry_count;
   };
 
 };

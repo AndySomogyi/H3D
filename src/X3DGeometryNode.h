@@ -37,16 +37,10 @@
 #include "AutoPtrVector.h"
 #include "H3DOptionNode.h"
 #include "MFNode.h"
-#ifdef HAVE_OPENHAPTICS
-#include <HL/hl.h>
-#endif
 
 #include <HapticTriangleSet.h>
-#include <HLShape.h>
 
 namespace H3D {
-
-  class HLHapticsDevice;
 
   /// \ingroup AbstractNodes
   /// \class X3DGeometryNode
@@ -67,28 +61,6 @@ namespace H3D {
     /// By using an intermediate class the bug dissappears.
     class H3DAPI_API BugWorkaroundDisplayList: 
       public H3DDisplayListObject::DisplayList {
-    };
-
-    /// TODO: comment
-    class H3DAPI_API TriangleSet: public HAPI::HapticTriangleSet,
-                                  public HLShape {
-    public:
-      /// Constructor.
-      TriangleSet( const vector< HAPI::Bounds::Triangle > &_triangles,
-                   void *_userdata,
-                   HAPI::HAPISurfaceObject *_surface,
-                   const Matrix4d & _transform ):
-        HapticTriangleSet( _triangles,_userdata, _surface, _transform ){ }
-
-      template< class Iterator >
-      TriangleSet( Iterator begin,
-                   Iterator end,
-                   void *_userdata,
-                   HAPI::HAPISurfaceObject *_surface,
-                   const Matrix4d & _transform ):
-        HapticTriangleSet( begin, end, _userdata, _surface, _transform ) {}
-
-      virtual void hlRender( HLHapticsDevice *hd );
     };
 
     /// Display list is extended in order to set front sidedness of 
@@ -122,7 +94,7 @@ namespace H3D {
     /// to have other OpenGL calls for the OpenHaptics rendering than
     /// for graphics rendering. By default it is the same is in the graphics
     /// rendering.
-    virtual void hlRender( HLHapticsDevice *hd, Matrix4f &transform ) {
+    virtual void hlRender( H3DHapticsDevice *hd, Matrix4f &transform ) {
       displayList->callList( false );
     }
 
@@ -194,8 +166,7 @@ namespace H3D {
     /// Since the geometry can appear in several places in the scene graph
     /// it can contain several shape ids (one for each place). Which one to
     /// get is determined by the index argument.
-    HLuint getHLShapeId( HLHapticsDevice *hd,
-                         unsigned int index );
+    int getHapticShapeId( unsigned int index );
 
     /// Returns a either a HLFeedbackShape or a HLDepthBufferShape with
     /// the X3DGeometryNode. Which type depents on possible 
@@ -203,7 +174,7 @@ namespace H3D {
     /// the default settings in OpenHapticsSettings bindable node.
     HAPI::HAPIHapticShape *getOpenGLHapticShape( H3DSurfaceNode *_surface,
                                                  const Matrix4f &_transform,
-                                                 HLint _nr_vertices = -1 );
+                                                 int _nr_vertices = -1 );
 #endif
     /// Returns the default xml containerField attribute value.
     /// For this node it is "geometry".
@@ -255,47 +226,12 @@ namespace H3D {
 
   protected:
 
-  #ifdef HAVE_OPENHAPTICS
-    /// HL event callback function for when the geometry is touched.
-    static void HLCALLBACK touchCallback( HLenum event,
-                                          HLuint object,
-                                          HLenum thread,
-                                          HLcache *cache,
-                                          void *userdata );
+    /// identifiers for the shapes geometry.
+    vector< int > haptic_shape_ids;
 
-    /// HL event callback function for when the geometry is not touched
-    /// any longer. 
-    static void HLCALLBACK untouchCallback( HLenum event,
-                                            HLuint object,
-                                            HLenum thread,
-                                            HLcache *cache,
-                                            void *userdata );
-
-    /// HL event callback function for when the proxy moves while in
-    /// contact with the geometry.
-    static void HLCALLBACK motionCallback( HLenum event,
-                                           HLuint object,
-                                           HLenum thread,
-                                           HLcache *cache,
-                                           void *userdata );
-
-    typedef map< HLHapticsDevice *, vector< HLuint > > ShapeIdMap;
-
-    /// HL identifiers for the geometry.
-    ShapeIdMap hl_shape_ids;
-
-    struct CallbackData {
-      CallbackData( X3DGeometryNode *g, int i ): geometry( g ), device_index( i ) {}
-      X3DGeometryNode *geometry;
-      int device_index;
-    };
-    
-    AutoPtrVector< CallbackData > callback_data; 
-
-#endif
     bool use_culling, allow_culling;
     GLenum cull_face;
-    friend class HAPIDevice;
+    friend class H3DHapticsDevice;
   };
 }
 

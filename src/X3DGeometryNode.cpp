@@ -33,15 +33,12 @@
 
 #ifdef USE_HAPTICS
 #include "OpenHapticsOptions.h"
-#include "HLShape.h"
 #include <HAPIHapticShape.h>
 #include "DeviceInfo.h"
-#include "HLDepthBufferShape.h"
-#include "HLFeedbackShape.h"
 #include "FeedbackBufferGeometry.h"
 #include <HapticTriangleSet.h>
-#include <HLSurface.h>
-#include <HLHapticsDevice.h>
+#include "HLDepthBufferShape.h"
+#include "HLFeedbackShape.h"
 #endif
 
 using namespace H3D;
@@ -92,149 +89,18 @@ X3DGeometryNode::X3DGeometryNode(
 }
 
 
-#ifdef HAVE_OPENHAPTICS
-void HLCALLBACK X3DGeometryNode::motionCallback( HLenum event,
-                                                 HLuint object,
-                                                 HLenum thread,
-                                                 HLcache *cache,
-                                                 void *userdata ) {
-  CallbackData *cb_data = static_cast< CallbackData * >( userdata ); 
-  int device_index = cb_data->device_index;
-  X3DGeometryNode *geometry = cb_data->geometry;
-  HLdouble n[3], p[3];
-  hlCacheGetDoublev( cache, 
-                     HL_PROXY_POSITION,
-                     p );
-  hlCacheGetDoublev( cache, 
-                     HL_PROXY_TOUCH_NORMAL,
-                     n );
+int X3DGeometryNode::getHapticShapeId( unsigned int index ) {
 
-  if( HLShape::getHLShape( object ) ) {
-    const Matrix4d &m = dynamic_cast< HAPI::HAPIHapticShape * >
-      (HLShape::getHLShape( object ))->transform.inverse();
-
-    if( device_index > (int)geometry->contactPoint->size() -1 )
-      geometry->contactPoint->resize( device_index + 1, Vec3f( 0, 0, 0 ), geometry->id );
-    if( device_index > (int)geometry->contactNormal->size() -1 )
-      geometry->contactNormal->resize( device_index + 1, Vec3f( 1, 0, 0 ), geometry->id );
-    if( device_index > (int)geometry->force->size() -1 )
-      geometry->force->resize( device_index + 1, Vec3f( 0, 0, 0 ), geometry->id );
-
-    Vec3f cp = (Vec3f) (m * Vec3f( (H3DFloat)p[0],
-                         (H3DFloat)p[1],
-                         (H3DFloat)p[2] ));
-
-    geometry->contactPoint->setValue( device_index, cp, geometry->id );
-
-    Vec3f cn = (Vec3f) (m.getScaleRotationPart() * Vec3f( (H3DFloat)n[0],
-                                                 (H3DFloat)n[1],
-                                                 (H3DFloat)n[2] ));
-    cn.normalizeSafe();
-    geometry->contactNormal->setValue( device_index, cn, geometry->id );
-    
-    Vec3f f;
-    HLdouble hlforce[3];
-    hlGetShapeDoublev( object, HL_REACTION_FORCE, hlforce );
-    f =  ( Vec3f) (m.getScaleRotationPart() * Vec3f( (H3DFloat)hlforce[0],
-                                           (H3DFloat)hlforce[1],
-                                           (H3DFloat)hlforce[2] ));
-    geometry->force->setValue( device_index, f, geometry->id );
-  }
-
-}
-
-void HLCALLBACK X3DGeometryNode::touchCallback( HLenum event,
-                                                HLuint object,
-                                                HLenum thread,
-                                                HLcache *cache,
-                                                void *userdata ) {
-  CallbackData *cb_data = static_cast< CallbackData * >( userdata ); 
-  int device_index = cb_data->device_index;
-  X3DGeometryNode *geometry = cb_data->geometry;
-  // make sure contactPoint and contactNormal vectors are set 
-  // before isTouched is set to avoid errors if routed to AutoUpdate
-  // fields.
-  X3DGeometryNode::motionCallback( event, object, thread, cache, userdata );
-
-  if( device_index > (int)geometry->isTouched->size() -1 )
-    geometry->isTouched->resize( device_index + 1, false, geometry->id );
-  
-  geometry->isTouched->setValue( device_index, 
-                                 true,  
-                                 geometry->id );  
-}
-
-void HLCALLBACK X3DGeometryNode::untouchCallback( HLenum event,
-                                                  HLuint object,
-                                                  HLenum thread,
-                                                  HLcache *cache,
-                                                  void *userdata ) {
-  CallbackData *cb_data = static_cast< CallbackData * >( userdata ); 
-  int device_index = cb_data->device_index;
-  X3DGeometryNode *geometry = cb_data->geometry;
-  if( device_index != -1 ) {
-    if( device_index > (int)geometry->isTouched->size() -1 )
-      geometry->isTouched->resize( device_index + 1, false, geometry->id );
-    if( device_index > (int)geometry->force->size() -1 )
-      geometry->force->resize( device_index + 1, Vec3f( 0, 0, 0 ), geometry->id );
-    geometry->isTouched->setValue( device_index, 
-                                   false,  
-                                   geometry->id );  
-    geometry->force->setValue( device_index, 
-                               Vec3f( 0, 0, 0 ), 
-                               geometry->id );
-  }
-}
-
-HLuint X3DGeometryNode::getHLShapeId( HLHapticsDevice *hd,
-                                      unsigned int index ) {
-  ShapeIdMap::iterator i = hl_shape_ids.find( hd );
-  if( i == hl_shape_ids.end() ) {
-    i =  hl_shape_ids.insert( i, std::make_pair( hd, vector< HDuint >() ) );
-  }
-  vector< HLuint > &shape_ids = (*i).second;  
-  if( index >= shape_ids.size() ) {
-    for( size_t i = shape_ids.size();
-         i <= index;
-         i++ ) {
-      // find the index of the haptics device
-      DeviceInfo *di = DeviceInfo::getActive();
-      int device_index = -1;
-      if( di ) {
-        const NodeVector &devices = di->device->getValue();
-        for( unsigned int i = 0; i < devices.size(); i++ ) {
-          if( (Node *)devices[i] == (Node *)hd )
-            device_index = i;
-        }
-      }
-      assert( device_index != -1 );
-
-      CallbackData *cb_data = new CallbackData( this, device_index );
-      callback_data.push_back( cb_data );
-      hlEventd(  HL_EVENT_MOTION_LINEAR_TOLERANCE, 0 );
-      HLuint hl_shape_id = hlGenShapes(1);
-      shape_ids.push_back( hl_shape_id );
-      hlAddEventCallback( HL_EVENT_MOTION, 
-                          hl_shape_id,
-                          HL_CLIENT_THREAD,
-                          &motionCallback,
-                          cb_data );
-      hlAddEventCallback( HL_EVENT_TOUCH, 
-                          hl_shape_id,
-                          HL_CLIENT_THREAD,
-                          &touchCallback,
-                          cb_data );
-      hlAddEventCallback( HL_EVENT_UNTOUCH, 
-                          hl_shape_id,
-                          HL_CLIENT_THREAD,
-                          &untouchCallback,
-                          cb_data );
+  if( index >= haptic_shape_ids.size() ) {
+    for( size_t i = haptic_shape_ids.size(); i <= index; i++ ) {
+      int shape_id = HAPI::HAPIHapticShape::genShapeId();
+      haptic_shape_ids.push_back( shape_id );
     }
   }
-  return shape_ids[index];
+  return haptic_shape_ids[ index ];
 }
 
-X3DGeometryNode::~X3DGeometryNode() {
+X3DGeometryNode::~X3DGeometryNode() {/*
   for( ShapeIdMap::iterator entry = hl_shape_ids.begin();
        entry != hl_shape_ids.end();
        entry++ )
@@ -255,7 +121,7 @@ X3DGeometryNode::~X3DGeometryNode() {
                            hl_shape_id,
                            HL_CLIENT_THREAD,
                            &untouchCallback );
-  }
+  }*/
 }
 
 HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_surface,
@@ -331,8 +197,6 @@ HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_s
   }
 }
 
-#endif
-
 void X3DGeometryNode::DisplayList::callList( bool build_list ) {
     
   X3DGeometryNode *geom = 
@@ -390,11 +254,12 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
     
     //if( tris.size() > 0 )
     //cerr << tris.size() << endl;
-    
-    if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-      int ii = tris.size();
-      cerr << ii << endl;
-      TriangleSet * tri_set = new TriangleSet( tris ,
+
+    int ii = tris.size();    
+    if( ti.hapticsEnabled() && ti.getCurrentSurface() && ii > 0 ) {
+
+      //cerr << ii;// << endl;
+      HAPI::HapticTriangleSet * tri_set = new HAPI::HapticTriangleSet( tris ,
                                                this,
                                                ti.getCurrentSurface(),
                                                Matrix4f( 1e3, 0, 0, 0,
@@ -405,14 +270,52 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
                                                          0, 1e-3, 0, 0,
                                                          0, 0, 1e-3, 0,
                                                          0, 0, 0, 1 )));
-      ti.addHapticShape( i, tri_set );
       
+      // if we have an OpenHapticsOptions node, then set the OpenHaptics options in
+      /// the HapticTriangleSet we just created.
+      OpenHapticsOptions *openhaptics_options = NULL;
+      getOptionNode( openhaptics_options );
+      if( !openhaptics_options ) {
+        GlobalSettings *default_settings = GlobalSettings::getActive();
+        if( default_settings ) {
+          default_settings->getOptionNode( openhaptics_options );
+        }
+      }
+
+      if( openhaptics_options ) {
+        HAPI::OpenHapticsRenderer::OpenHapticsOptions::ShapeType type;
+        bool adaptive_viewport;
+        bool camera_view;
+
+        const string &shape = openhaptics_options->GLShape->getValue();
+        if( shape == "FEEDBACK_BUFFER" ) {
+          type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER;
+        } else if( shape == "DEPTH_BUFFER" ) {
+          type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::DEPTH_BUFFER;
+        } else {
+          Console(4) << "Warning: Invalid OpenHaptics GLShape type: "
+                     << shape 
+                     << ". Must be \"FEEDBACK_BUFFER\" or \"DEPTH_BUFFER\" "
+                     << "(in \"" << getName() << "\")" << endl;
+        }
+        
+        adaptive_viewport = openhaptics_options->useAdaptiveViewport->getValue();
+        camera_view = openhaptics_options->useHapticCameraView->getValue();
+        tri_set->addRenderOption( 
+                new HAPI::OpenHapticsRenderer::OpenHapticsOptions( type,
+                                                                   adaptive_viewport,
+                                                                   camera_view ) );
+      }
+      
+      ti.addHapticShape( i, tri_set );
     }
   }
 }
 
+#if 0
+void X3DGeometryNode::TriangleSet::hlRender( H3DHapticsDevice *hd ) {
+  return;
 
-void X3DGeometryNode::TriangleSet::hlRender( HLHapticsDevice *hd ) {
   X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( userdata );
   int type = -1;
   bool adaptive_viewport = true;
@@ -545,4 +448,6 @@ glPopMatrix();
 
   }
 #endif
+
 }
+#endif

@@ -10,23 +10,24 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "H3DApi.h"
 #ifdef USE_HAPTICS
-#include "HLSurface.h"
 #include "HLFeedbackShape.h"
 #include "GL/glew.h"
 #include "X3DChildNode.h"
 #include "X3DGeometryNode.h"
-#include "HLHapticsDevice.h"
+#include "H3DHapticsDevice.h"
 
 using namespace H3D;
 
-void HLFeedbackShape::hlRender( HLHapticsDevice *hd ) {
+void HLFeedbackShape::hlRender( HAPI::HAPIHapticsDevice *hd,
+                                HLuint hl_shape_id ) {
   X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( userdata );
 #ifdef HAVE_OPENHAPTICS
-  HLSurface *s = dynamic_cast< HLSurface * >( surface );
-  if( s && closeEnoughToBound( hd->proxyPosition->getValue(), 
-                               hd->getPreviousProxyPosition(), 
-                               (Matrix4f) transform.inverse(), 
-                               geometry ) ) {
+  HAPI::OpenHapticsRenderer::HLSurface *s = 
+    dynamic_cast< HAPI::OpenHapticsRenderer::HLSurface * >( surface );
+  if( s ) { //&& closeEnoughToBound( hd->proxyPosition->getValue(), 
+    //hd->getPreviousProxyPosition(), 
+    //(Matrix4f) transform.inverse(), 
+    //geometry ) ) {
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
 #if HL_VERSION_MAJOR_NUMBER >= 2
@@ -38,7 +39,7 @@ void HLFeedbackShape::hlRender( HLHapticsDevice *hd ) {
                      m[0][2], m[1][2], m[2][2], 0,
                      m[0][3], m[1][3], m[2][3], 1 };
     glLoadMatrixd( vt );
-    s->hlRender( hd );
+    s->hlRender();
     hlTouchableFace( touchable_face );
     if( use_haptic_camera )
       hlEnable( HL_HAPTIC_CAMERA_VIEW );
@@ -68,8 +69,8 @@ void HLFeedbackShape::hlRender( HLHapticsDevice *hd ) {
 
     bool previous_allow = geometry->allowingCulling();
     geometry->allowCulling( false );
-    hlBeginShape( HL_SHAPE_FEEDBACK_BUFFER, getShapeId( hd ) );
-    geometry->hlRender( hd, (Matrix4f)transform );
+    hlBeginShape( HL_SHAPE_FEEDBACK_BUFFER, hl_shape_id );
+    geometry->displayList->callList();
     hlEndShape();
     geometry->allowCulling( previous_allow );
     

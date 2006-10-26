@@ -27,7 +27,7 @@
 #include "H3DExports.h"
 #ifdef USE_HAPTICS
 #include "DeviceInfo.h"
-#include "FakeHapticsDevice.h"
+#include "H3DHapticsDevice.h"
 #endif
 
 using namespace H3D;

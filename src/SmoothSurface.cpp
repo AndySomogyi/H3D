@@ -29,8 +29,6 @@
 #include "H3DApi.h"
 #ifdef USE_HAPTICS
 #include "SmoothSurface.h"
-#include "HLObject.h"
-#include "HLHapticsDevice.h"
 
 using namespace H3D;
 
@@ -47,9 +45,8 @@ namespace SmoothSurfaceInternals {
 }
 
 
-void SmoothSurface::hlRender( HLHapticsDevice *hd ) {
+void SmoothSurface::hlRender() {
 #ifdef HAVE_OPENHAPTICS
-  hlMakeCurrent( hd->getHapticContext() );
   hlTouchModel( HL_CONTACT );
   hlMaterialf(HL_FRONT_AND_BACK, HL_STIFFNESS, stiffness->getValue() );
   hlMaterialf(HL_FRONT_AND_BACK, HL_DAMPING, damping->getValue() );

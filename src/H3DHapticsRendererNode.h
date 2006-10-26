@@ -21,27 +21,44 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file HLObject.h.h
-/// \brief Header file for HLObject.h
+/// \file H3DHapticsRendererNode.h
+/// \brief Header file for H3DHapticsRendererNode
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-#ifndef __HLOBJECT_H__
-#define __HLOBJECT_H__
+#ifndef __H3DHAPTICSRENDERERNODE_H__
+#define __H3DHAPTICSRENDERERNODE_H__
 
-#include "H3DApi.h"
+// H3DApi includes
+#include <H3DApi.h>
+#include "Node.h"
 
-#ifdef HAVE_OPENHAPTICS
-#include <HL/hl.h>
-#endif
+// HAPI includes
+#include <HAPIHapticsRenderer.h>
 
 namespace H3D {
 
-  /// The base class for all haptic objects that uses HLAPI for haptic
-  /// rendering.
+  /// \ingroup AbstractNodes
+  /// \brief Base class for all haptic renderers, i.e. algorithms for generating
+  /// forces based on geometries. 
   /// 
+  /// All subclasses should set the renderer member.
+  class H3DAPI_API H3DHapticsRendererNode: public Node {
+  public:
 
-  class H3DAPI_API HLObject {
+    /// Constructor.
+    H3DHapticsRendererNode() {}
+
+    inline virtual HAPI::HAPIHapticsRenderer *getHapticsRenderer() {
+      return renderer;
+    }
+  
+    virtual string defaultXMLContainerField() {
+      return "hapticsRenderer";
+    }
+    
+  protected:
+    HAPI::HAPIHapticsRenderer *renderer;
   };
 }
 

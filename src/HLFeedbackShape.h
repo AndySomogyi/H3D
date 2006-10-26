@@ -1,4 +1,4 @@
-
+ 
 //////////////////////////////////////////////////////////////////////////////
 //    H3D API.   Copyright 2004, Daniel Evestedt, Mark Dixon
 //    All Rights Reserved
@@ -14,7 +14,7 @@
 #include "X3DGeometryNode.h"
 #include "H3DSurfaceNode.h"
 #include <HAPIHapticShape.h>
-#include "HLShape.h"
+#include <OpenHapticsRenderer.h>
 
 
 namespace H3D {
@@ -24,7 +24,8 @@ namespace H3D {
   /// haptics rendering of a geometry, since when the render() function
   /// is implemented to perform the graphical rendering. The shape is
   /// implemented as a HL_SHAPE_FEEDBACK_BUFFER shape in HLAPI.
-  class H3DAPI_API HLFeedbackShape: public HAPI::HAPIHapticShape, public HLShape  {
+  class H3DAPI_API HLFeedbackShape: public HAPI::HAPIHapticShape, 
+    public HAPI::OpenHapticsRenderer::HLShape  {
   public:
     #ifndef HAVE_OPENHAPTICS
     typedef int HLint;
@@ -45,7 +46,8 @@ namespace H3D {
     
     /// This function performs all the HLAPI calls that are needed to render
     /// the shape. Uses HL_SHAPE_FEEDBACK_BUFFER to render the object.     
-    virtual void hlRender( HLHapticsDevice *hd );
+    virtual void hlRender( HAPI::HAPIHapticsDevice *hd,
+                           HLuint shape_id );
   protected:
     /// A upper bound on the number of triangles that will be rendered.
     /// Negative values will use the system default value.
