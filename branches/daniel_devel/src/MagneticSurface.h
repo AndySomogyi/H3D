@@ -54,7 +54,7 @@ namespace H3D {
                      Inst< SFFloat > _snapDistance    = 0 );
   
     /// Renders the surface using hlMaterialf calls
-    virtual void hlRender( HLHapticsDevice *hd );
+    virtual void hlRender();
 
     /// The distance from the surface within which forces are generated
     /// to pull the proxy towards the surface. If the device is pulled

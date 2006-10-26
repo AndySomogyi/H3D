@@ -29,8 +29,7 @@
 #include "H3DApi.h"
 #ifdef USE_HAPTICS
 #include "MagneticSurface.h"
-#include "HLObject.h"
-#include "HLHapticsDevice.h"
+#include "H3DHapticsDevice.h"
 
 using namespace H3D;
 
@@ -46,9 +45,9 @@ namespace MagneticSurfaceInternals {
 }
 
 
-void MagneticSurface::hlRender( HLHapticsDevice *hd ) {
+void MagneticSurface::hlRender() {
 #ifdef HAVE_OPENHAPTICS
-  FrictionalSurface::hlRender( hd );
+  FrictionalSurface::hlRender();
   hlTouchModel( HL_CONSTRAINT );
   // convert to millimeters
   hlTouchModelf( HL_SNAP_DISTANCE, 1000 * snapDistance->getValue() );

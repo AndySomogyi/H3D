@@ -13,20 +13,20 @@
 #include "HLDepthBufferShape.h"
 #include "GL/glew.h"
 #include "X3DChildNode.h"
-#include "HLSurface.h"
-#include "HLHapticsDevice.h"
 
 using namespace H3D;
 #ifdef HAVE_OPENHAPTICS
 
-void HLDepthBufferShape::hlRender( HLHapticsDevice *hd ) {
+void HLDepthBufferShape::hlRender( HAPI::HAPIHapticsDevice *hd,
+                                   HLuint hl_shape_id ) {
 #ifdef HAVE_OPENHAPTICS
   X3DGeometryNode *geometry = static_cast< X3DGeometryNode *>( userdata );
-  HLSurface *s = dynamic_cast< HLSurface * >( surface );
-  if( s && closeEnoughToBound( hd->proxyPosition->getValue(),  
-                               hd->getPreviousProxyPosition(),
-                               (Matrix4f)transform.inverse(), 
-                               geometry ) ) {
+  HAPI::OpenHapticsRenderer::HLSurface *s = 
+    dynamic_cast< HAPI::OpenHapticsRenderer::HLSurface * >( surface );
+  if( s ) { //&& closeEnoughToBound( hd->proxyPosition->getValue(),  
+    //hd->getPreviousProxyPosition(),
+    //(Matrix4f)transform.inverse(), 
+    //geometry ) ) {
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
 #if HL_VERSION_MAJOR_NUMBER >= 2
@@ -38,7 +38,7 @@ void HLDepthBufferShape::hlRender( HLHapticsDevice *hd ) {
 		     m[0][2], m[1][2], m[2][2], 0,
 		     m[0][3], m[1][3], m[2][3], 1 };
     glLoadMatrixd( vt );
-    s->hlRender( hd );
+    s->hlRender();
 
     hlTouchableFace( HL_FRONT_AND_BACK );
     Matrix3d m3 = m.getScaleRotationPart();
@@ -69,9 +69,10 @@ void HLDepthBufferShape::hlRender( HLHapticsDevice *hd ) {
 
     bool previous_allow = geometry->allowingCulling();
     geometry->allowCulling( false );
-    hlBeginShape( HL_SHAPE_DEPTH_BUFFER, getShapeId( hd ) );
+    hlBeginShape( HL_SHAPE_DEPTH_BUFFER, hl_shape_id );
     glClear( GL_DEPTH_BUFFER_BIT );
-    geometry->hlRender( hd, (Matrix4f)transform );
+//    geometry->hlRender( hd, (Matrix4f)transform );
+    geometry->displayList->callList();
     hlEndShape();
     geometry->allowCulling( previous_allow );
     glFrontFace( front_face );

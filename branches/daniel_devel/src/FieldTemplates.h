@@ -41,6 +41,56 @@ namespace H3D {
 
   H3D_VALUE_EXCEPTION( string, InvalidNodeType );
 
+  /// \ingroup FieldTemplateModifiers
+  /// Template for adding the virtual function onValueChange that can be overridden
+  /// in subclasses in order to perform actions when the value of the field changes
+  /// in any way, i.e. it will only be called when the value is updated or set
+  /// to a value that is different than its previous value.
+  template < class SF >
+  class OnValueChangeSField: public SF {
+    /// This function is called when the value in the field has changed. 
+    virtual void onValueChange( const typename SF::value_type &new_value ) = 0;
+
+    virtual void setValue( const typename SF::value_type &v, int id  ) {
+      typename SF::value_type old_value = value;
+      SF::setValue( v );
+        if( value != old_value ) {
+          onValueChange( value );
+        } 
+    }
+    
+    virtual void update() {
+      typename SF::value_type old_value = value;
+      SF::update();
+      if( value != old_value ) {
+        onValueChange( value );
+      } 
+    }
+  };
+
+  /// \ingroup FieldTemplateModifiers
+  /// Template for adding the virtual function onNewValue that can be overridden
+  /// in subclasses in order to perform actions when the value is updated in any
+  /// way( setValue or update ). The difference between this and 
+  /// OnValueChangeSField is that the function is called any time the setValue
+  /// or update function is called, even if the new value is the same as the old.
+  template < class SF >
+  class OnNewValueSField: public SF {
+    /// This function is called when the field is updated to a value.
+    virtual void onNewValue( const typename SF::value_type &new_value ) = 0;
+    virtual void setValue( const typename SF::value_type &v, int id ) {
+      typename SF::value_type old_value = value;
+      SF::setValue( v );
+      onNewValue( value );
+    }
+    
+    virtual void update() {
+      typename SF::value_type old_value = value;
+      SF::update();
+      onNewValue( value );
+    }
+  };
+
   /// Template to make sure that the Node that is set in a SFNode is
   /// of a specified Node type.
   /// \param RefCountedTyoe The expected RefcountedClass type. 

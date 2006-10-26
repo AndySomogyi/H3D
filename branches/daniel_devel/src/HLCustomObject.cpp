@@ -31,21 +31,21 @@
 #include "HLCustomObject.h"
 
 #include <HAPIHapticShape.h>
-#include "HLHapticsDevice.h"
 
 using namespace H3D;
 
-void HLCustomObject::hlRender( HLHapticsDevice *hd ) {
+void HLCustomObject::hlRender( HAPI::HAPIHapticsDevice *hd,
+                               HLuint hl_shape_id ) {
 #ifdef HAVE_OPENHAPTICS
   HAPI::HAPIHapticShape *hs = dynamic_cast< HAPI::HAPIHapticShape * >( this );
-  if( hs && !closeEnoughToBound( hd->proxyPosition->getValue(), 
+/*  if( hs && !closeEnoughToBound( hd->proxyPosition->getValue(), 
                                  hd->getPreviousProxyPosition(),
                                  (Matrix4f)hs->transform.inverse(), 
                                  (X3DGeometryNode * )hs->userdata ) ) {
     return;
-  }
+  }*/
   
-  hlBeginShape(HL_SHAPE_CALLBACK, getShapeId( hd) );
+  hlBeginShape(HL_SHAPE_CALLBACK, hl_shape_id );
   hlCallback(HL_SHAPE_INTERSECT_LS, 
              (HLcallbackProc) intersectCallback, this);
   hlCallback(HL_SHAPE_CLOSEST_FEATURES, 

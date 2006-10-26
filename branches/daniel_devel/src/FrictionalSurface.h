@@ -47,7 +47,7 @@ namespace H3D {
                        Inst< SFFloat >  _dynamicFriction = 0 );
   
     /// Renders the surface using hlMaterialf calls
-    virtual void hlRender( HLHapticsDevice *hd );
+    virtual void hlRender();
 
     virtual void onContact( ContactInfo &contact );
 

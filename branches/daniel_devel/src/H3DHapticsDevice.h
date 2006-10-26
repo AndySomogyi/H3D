@@ -29,18 +29,25 @@
 #ifndef __H3DHAPTICSDEVICE_H__
 #define __H3DHAPTICSDEVICE_H__
 
-#include "H3DApi.h"
-#include "FieldTemplates.h"
+// H3D includes
+#include <FieldTemplates.h>
+#include <SFNode.h>
+#include <SFRotation.h>
+#include <SFFloat.h>
+#include <SFInt32.h>
+#include <SFBool.h>
+#include <SFMatrix4f.h>
+#include <SFVec3f.h>
+#include <H3DHapticsRendererNode.h>
+
+// H3DUtil includes
+#include <Threads.h>
+
+// HAPI includes
 #include <HAPIHapticShape.h>
+#include <HAPIHapticsDevice.h>
 #include <HapticForceEffect.h>
-#include "SFNode.h"
-#include "Threads.h"
-#include "SFRotation.h"
-#include "SFFloat.h"
-#include "SFInt32.h"
-#include "SFBool.h"
-#include "SFMatrix4f.h"
-#include "SFVec3f.h"
+
 
 namespace H3D {
 
@@ -56,6 +63,9 @@ namespace H3D {
   /// \par Internal routes:
   /// \dotfile H3DHapticsDevice.dot
   class H3DAPI_API H3DHapticsDevice: public Node {
+  protected:
+    auto_ptr< HAPI::HAPIHapticsDevice > hapi_device;
+
   public:
 
     /// Saves the value of the field in a variable that can be accessed
@@ -170,30 +180,49 @@ namespace H3D {
       }
     };
 
+
+    class H3DAPI_API SFHapticsRendererNode: public TypedSFNode< H3DHapticsRendererNode > {
+      virtual void onAdd( Node *n ) {
+        TypedSFNode< H3DHapticsRendererNode >::onAdd( n );
+        H3DHapticsRendererNode *renderer = static_cast< H3DHapticsRendererNode * >( n );
+        H3DHapticsDevice *device = static_cast< H3DHapticsDevice * >( getOwner() );
+        if( renderer ) {
+          device->hapi_device->setHapticsRenderer( renderer->getHapticsRenderer() );
+        }
+      }
+      virtual void onRemove( Node *n ) {
+        H3DHapticsRendererNode *renderer = static_cast< H3DHapticsRendererNode * >( n );
+        H3DHapticsDevice *device = static_cast< H3DHapticsDevice * >( getOwner() );
+        if( renderer ) {
+          device->hapi_device->setHapticsRenderer( NULL );
+        }
+        TypedSFNode< H3DHapticsRendererNode >::onRemove( n );
+      }
+
+    };
+
     /// Constructor.
     H3DHapticsDevice( Inst< SFVec3f         > _devicePosition         = 0,
-                   Inst< SFRotation      > _deviceOrientation      = 0,
-                   Inst< TrackerPosition > _trackerPosition        = 0,
-                   Inst< TrackerOrientation > _trackerOrientation  = 0,
-                   Inst< PosCalibration  > _positionCalibration    = 0,
-                   Inst< OrnCalibration  > _orientationCalibration = 0,
-                   Inst< SFVec3f         > _proxyPosition          = 0,
-                   Inst< WeightedProxy   > _weightedProxyPosition  = 0,     
-                   Inst< SFFloat         > _proxyWeighting         = 0,
-                   Inst< SFBool          > _main_button            = 0,
-                   Inst< SFVec3f         > _force                  = 0,
-                   Inst< SFVec3f         > _torque                 = 0,
-                   Inst< SFInt32         > _inputDOF               = 0,
-                   Inst< SFInt32         > _outputDOF              = 0,
-                   Inst< SFInt32         > _hapticsRate            = 0,
-                   Inst< SFNode          > _stylus                 = 0,
-                   Inst< SFBool          > _initialized            = 0 );
+                      Inst< SFRotation      > _deviceOrientation      = 0,
+                      Inst< TrackerPosition > _trackerPosition        = 0,
+                      Inst< TrackerOrientation > _trackerOrientation  = 0,
+                      Inst< PosCalibration  > _positionCalibration    = 0,
+                      Inst< OrnCalibration  > _orientationCalibration = 0,
+                      Inst< SFVec3f         > _proxyPosition          = 0,
+                      Inst< WeightedProxy   > _weightedProxyPosition  = 0,     
+                      Inst< SFFloat         > _proxyWeighting         = 0,
+                      Inst< SFBool          > _main_button            = 0,
+                      Inst< SFVec3f         > _force                  = 0,
+                      Inst< SFVec3f         > _torque                 = 0,
+                      Inst< SFInt32         > _inputDOF               = 0,
+                      Inst< SFInt32         > _outputDOF              = 0,
+                      Inst< SFInt32         > _hapticsRate            = 0,
+                      Inst< SFNode          > _stylus                 = 0,
+                      Inst< SFBool          > _initialized            = 0,
+                      Inst< SFHapticsRendererNode > _hapticsRenderer  = 0 );
 
-    /// Destructor. Stops haptics rendering and remove callback functions.
     virtual ~H3DHapticsDevice() {
       disableDevice();
-      if( thread )
-        delete thread;
     }
 
     /// Get the proxy position from the previous loop.
@@ -207,12 +236,16 @@ namespace H3D {
 
     /// Does all the initialization needed for the device before starting to
     /// use it.
-    virtual void initDevice() {
-      initialized->setValue( true );
-    }
+    virtual void initDevice();
 
     /// Get the thread that is used to run this haptics device.
-    inline HAPI::PeriodicThreadBase *getThread() { return thread; }
+    inline HAPI::PeriodicThreadBase *getThread() { 
+      if( hapi_device.get() ) {
+        return hapi_device->getThread();
+      } else {
+        return NULL;
+      }
+    }
 
     /// Reset the device.
     virtual void resetDevice() {}
@@ -220,16 +253,12 @@ namespace H3D {
     /// Perform cleanup and let go of all device resources that are allocated.
     /// After a call to this function no haptic rendering can be performed on
     /// the device until the initDevice() function has been called again.
-    virtual void disableDevice() {
-      initialized->setValue( false );
-    }
+    virtual void disableDevice();
 
     /// This function is used to transfer device values, such as position, 
     /// button status etc from the realtime loop to the fields of H3DHapticsDevice,
     /// and possible vice versa.
-    virtual void updateDeviceValues() {
-      previuos_proxy_pos = proxyPosition->getValue();
-    }
+    virtual void updateDeviceValues();
 
     /// This function is called at the start of each scenegraph loop before any
     /// calls to other HapticDevice functions and can be used to perform any 
@@ -248,14 +277,14 @@ namespace H3D {
     /// rendered with this function each scenegraph loop. 
     /// \param objects The haptic shapes to render.
     ///
-    virtual void renderShapes( const HapticShapeVector &shapes ) {};
+    virtual void renderShapes( const HapticShapeVector &shapes );
 
     /// Perform haptic rendering for the given HapticForceEffect instances. 
     /// HapticForceEffect objects that are to be be rendered haptically must
     /// be rendered with this function each scenegraph loop.
     /// \param objects The haptic objects to render.
     ///
-    virtual void renderEffects( const HapticEffectVector &effects ) {};
+    virtual void renderEffects( const HapticEffectVector &effects );
 #endif
     
     /// The position of the device given in the coordinate system of the 
@@ -392,14 +421,42 @@ namespace H3D {
     /// 
     /// \dotfile H3DHapticsDevice_initialized.dot
     auto_ptr< SFBool > initialized;
+
+    /// Specifies the haptics rendering algorithm to use to generate forces
+    /// from geometric shapes.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// 
+    /// \dotfile H3DHapticsDevice_hapticsRenderer.dot
+    auto_ptr< SFHapticsRendererNode > hapticsRenderer;
     
     /// Node database entry
     static H3DNodeDatabase database;
   protected:
     Vec3f previuos_proxy_pos;
 
-    /// The thread that this haptics device loop is run in.
-    HAPI::PeriodicThreadBase *thread;
+    unsigned int nr_haptics_loops;
+
+    // The time of the last call to updateDeviceValues.
+    TimeStamp last_update_values;
+
+    /// The time for the last call to the changeForceEffects callback 
+    /// function.
+    TimeStamp last_effect_change;
+    
+    /// The time between the previous two calls to changeForceEffects.
+    TimeStamp last_loop_time;
+
+    /// Callcack function to transfer the force effect vector to the 
+    /// haptics loop.
+    static HAPI::PeriodicThread::CallbackCode changeForceEffects( void *_data ); 
+    /// Callcack function to transfer the shapes vector for the 
+    /// haptics loop.
+    static HAPI::PeriodicThread::CallbackCode changeHapticShapes( void *_data ); 
+
+    // TODO
+    HAPI::HAPIHapticsRenderer::Contacts last_contacts;
+
   };
 }
 

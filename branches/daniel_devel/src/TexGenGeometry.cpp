@@ -29,9 +29,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "TexGenGeometry.h"
-#ifdef USE_HAPTICS
-#include "HLShape.h"
-#endif
 
 using namespace H3D;
 

@@ -29,8 +29,8 @@
 #ifndef __HLCUSTOMOBJECT_H__
 #define __HLCUSTOMOBJECT_H__
 
-#include "H3DTypes.h"
-#include "HLShape.h"
+#include <H3DTypes.h>
+#include <OpenHapticsRenderer.h>
 
 namespace H3D {
 
@@ -38,7 +38,7 @@ namespace H3D {
   /// Base class for objects that use HLAPI custom shape callbacks to
   /// render itself.
   ///
-  class H3DAPI_API HLCustomObject: public HLShape {
+  class H3DAPI_API HLCustomObject: public HAPI::OpenHapticsRenderer::HLShape {
   public:
   #ifdef HAVE_OPENHAPTICS
     /// Intersect the line segment from start_point to end_point with
@@ -79,7 +79,8 @@ namespace H3D {
     /// the instersectSurface and closestPointOnSurface function in the callback
     /// functions.
     /// 
-    virtual void hlRender( HLHapticsDevice *hd );
+    virtual void hlRender( HAPI::HAPIHapticsDevice *hd,
+                           HLuint shape_id );
 
 #ifdef HAVE_OPENHAPTICS
   protected:

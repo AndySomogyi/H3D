@@ -31,7 +31,6 @@
 #ifdef USE_HAPTICS
 #include "DeviceInfo.h"
 #include <GL/glew.h>
-#include "HLHapticsDevice.h"
 
 using namespace H3D;
 
@@ -106,15 +105,6 @@ void DeviceInfo::removeFromStack() {
         hd->initDevice();
       }
     }
-    for( MFDevice::const_iterator i = new_top->device->begin();
-         i != new_top->device->end(); i++ ) {
-      HLHapticsDevice *hl = dynamic_cast< HLHapticsDevice * >( *i );
-      if( hl ) {
-#ifdef HAVE_OPENHAPTICS
-        hl->initHLLayer();
-#endif
-      }
-    }
   }
 }
 
@@ -141,15 +131,6 @@ void DeviceInfo::toStackTop() {
         hd->initDevice();
       }
     }
-    for( MFDevice::const_iterator i = device->begin();
-         i != device->end(); i++ ) {
-      HLHapticsDevice *hl = dynamic_cast< HLHapticsDevice * >( *i );
-      if( hl ) {
-#ifdef HAVE_OPENHAPTICS
-        hl->initHLLayer();
-#endif
-      }
-    }
   } else {
     X3DBindableNode::toStackTop();
     for( MFDevice::const_iterator i = device->begin();
@@ -157,15 +138,6 @@ void DeviceInfo::toStackTop() {
       H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
       if( hd && !hd->initialized->getValue() ) {
         hd->initDevice();
-      }
-    }
-    for( MFDevice::const_iterator i = device->begin();
-         i != device->end(); i++ ) {
-      HLHapticsDevice *hl = dynamic_cast< HLHapticsDevice * >( *i );
-      if( hl ) {
-#ifdef HAVE_OPENHAPTICS
-        hl->initHLLayer();
-#endif
       }
     }
   }
@@ -178,15 +150,6 @@ void DeviceInfo::initialize() {
       H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
       if( hd && !hd->initialized->getValue() ) {
         hd->initDevice();
-      }
-    }
-    for( MFDevice::const_iterator i = device->begin();
-         i != device->end(); i++ ) {
-      HLHapticsDevice *hl = dynamic_cast< HLHapticsDevice * >( *i );
-      if( hl ) {
-#ifdef HAVE_OPENHAPTICS
-        hl->initHLLayer();
-#endif
       }
     }
   }
