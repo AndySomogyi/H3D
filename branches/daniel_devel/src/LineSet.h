@@ -95,11 +95,15 @@ namespace H3D {
              Inst< SFCoordinateNode > _coord          = 0,
              Inst< MFInt32          > _vertexCount    = 0 );
 
-#ifdef USE_HAPTICS
-		/// Traverse the scenegraph. A HLFeedbackShape is added for haptic
-    /// rendering if haptics is enabled.
-    virtual void traverseSG( TraverseInfo &ti ); 
-#endif
+    /// The number of lines rendered by this geometry.
+    virtual int nrLines() {
+      X3DCoordinateNode *coord_node = coord->getValue();
+      if( coord_node ) {
+        unsigned int size = coord_node->nrAvailableCoords();
+        if( size > 1 )return size - 1;
+      }
+      return 0;
+    }
 
     /// Render the LineSet with OpenGL
     virtual void render();

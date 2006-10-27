@@ -49,6 +49,7 @@ namespace H3D {
     /// Constructor.
     H3DHapticsRendererNode() {}
 
+    /// Get the HAPI haptics renderer used for this node.
     inline virtual HAPI::HAPIHapticsRenderer *getHapticsRenderer() {
       return renderer;
     }

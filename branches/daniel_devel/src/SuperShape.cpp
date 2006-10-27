@@ -257,15 +257,6 @@ void SuperShape::render() {
     }
 }
 
-#ifdef USE_HAPTICS
 void SuperShape::traverseSG( TraverseInfo &ti ) {
   useBackFaceCulling( true );
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll( getOpenGLHapticShape( 
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix() ) );
-#endif
-  }
 }
-#endif

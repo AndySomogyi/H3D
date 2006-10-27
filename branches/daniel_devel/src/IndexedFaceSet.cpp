@@ -526,7 +526,7 @@ void IndexedFaceSet::traverseSG( TraverseInfo &ti ) {
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
 
-  X3DGeometryNode::traverseSG( ti );
+  X3DComposedGeometryNode::traverseSG( ti );
 }
 
 

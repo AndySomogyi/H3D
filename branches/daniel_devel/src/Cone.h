@@ -101,10 +101,13 @@ namespace H3D {
     /// Renders the Box using OpenGL.
     virtual void render();
 
-#ifdef USE_HAPTICS
+    /// The number of triangles rendered by this geometry.
+    virtual int nrTriangles() {
+      return 560;
+    }
+
     /// Traverse the scenegraph. 
     virtual void traverseSG( TraverseInfo &ti ); 
-#endif
 
     /// The side field specifies whether the bottom cap of the cone is
     /// rendered.

@@ -137,16 +137,3 @@ void LineSet::render() {
   }
 }
 
-#ifdef USE_HAPTICS
-void LineSet::traverseSG( TraverseInfo &ti ) {
-  X3DCoordinateNode *coord_node = coord->getValue();
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() && coord_node ) {
-    HLFeedbackShape *fs = 
-      new HLFeedbackShape( this,
-                           ti.getCurrentSurface(),
-                           ti.getAccForwardMatrix(),
-                           coord_node->nrAvailableCoords());
-    ti.addHapticShapeToAll( fs );
-  }
-}
-#endif

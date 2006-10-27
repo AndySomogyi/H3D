@@ -59,6 +59,13 @@ namespace H3D {
 
     virtual void render();
 
+    /// The number of triangles renderered in this geometry.
+    virtual int nrTriangles() {
+      H3DInt32 res = resolution->getValue();
+      if( res < 0 ) return 0;
+      else return res * res * 2;
+    }
+
     float R( float phi, float m, float a, float b, 
              float n1, float n2, float n3 ) {
       float t2 = m*phi/4.0f;
@@ -115,11 +122,9 @@ namespace H3D {
                      + powf(sinf((m*phi)/4.f)/b, n3), (1 + n1)/n1));
     }
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
-#endif
     
     // Fields
     auto_ptr< SFFloat  > ss1_m;

@@ -76,13 +76,3 @@ void Polypoint2D::render() {
   glEnd();
 }
 
-#ifdef USE_HAPTICS
-void Polypoint2D::traverseSG( TraverseInfo &ti ) {
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix(),
-                                                 point->size() ) );
-  }
-}
-#endif

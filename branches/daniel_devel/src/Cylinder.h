@@ -105,11 +105,13 @@ namespace H3D {
     /// Renders the Cylinder with OpenGL.
     virtual void render();
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. Adds a HapticCylinder if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );    
-#endif
 
+    /// The number of triangles rendered by this geometry.
+    virtual int nrTriangles() {
+      return 720;
+    }
     /// Specifies if the bottom of the Cylinder should be rendered or not.
     ///
     /// <b>Access type:</b> inputOutput \n

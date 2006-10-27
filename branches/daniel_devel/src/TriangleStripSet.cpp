@@ -324,25 +324,12 @@ void TriangleStripSet::render() {
   } 
 }
 
-#ifdef USE_HAPTICS
 void TriangleStripSet::traverseSG( TraverseInfo &ti ) {
+  X3DComposedGeometryNode::traverseSG( ti );
   // use backface culling if solid is true
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
-  
-  X3DCoordinateNode *coord_node = coord->getValue();
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() && coord_node ) {
-#ifdef HAVE_OPENHAPTICS
-    HAPI::HAPIHapticShape *fs = 
-      getOpenGLHapticShape( 
-                           ti.getCurrentSurface(),
-                           ti.getAccForwardMatrix(),
-                           coord_node->nrAvailableCoords());
-    ti.addHapticShapeToAll( fs );
-#endif
-  }
 }
-#endif
 
 
 void TriangleStripSet::AutoNormal::update() {

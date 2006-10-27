@@ -310,7 +310,6 @@ void IndexedTriangleSet::render() {
   } 
 }
 
-#ifdef USE_HAPTICS
 void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 
 #if 0
@@ -367,8 +366,6 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
 }
-#endif
-
 
 void IndexedTriangleSet::AutoNormal::update() {
   bool normals_per_vertex = 

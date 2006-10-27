@@ -79,13 +79,16 @@ namespace H3D {
             Inst< SFFloat>  _radius   = 0,
             Inst< SFBool >  _solid    = 0 );
 
+    /// The number of triangles renderered in this geometry.
+    virtual int nrTriangles() {
+      return 50 * 50 * 2;
+    }
+
     /// Renders the Sphere with OpenGL.
     virtual void render();
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. Adds a HapticSphere if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );
-#endif
 
     /// The radius of the Sphere in metres.
     ///

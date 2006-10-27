@@ -105,10 +105,15 @@ namespace H3D {
     /// Starts texture coord generation and renders the geometry.
     virtual void render();
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph.
     virtual void traverseSG( TraverseInfo &ti );
-#endif
+
+    /// The number of triangles renderered in this geometry.
+    virtual int nrTriangles() {
+      X3DGeometryNode *g = geometry->getValue();
+      if( g ) return nrTriangles();
+      else return 0;
+    }
 
     /// The geometry field contains the X3DGeometryNode that we want to 
     /// generate texture coordinates for.

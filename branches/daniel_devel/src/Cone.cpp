@@ -125,19 +125,12 @@ void Cone::render() {
 }
 
 
-#ifdef USE_HAPTICS
 void Cone::traverseSG( TraverseInfo &ti ) {
+  X3DGeometryNode::traverseSG( ti );
   if( solid->getValue() ) {
     useBackFaceCulling( true );
   } else {
     useBackFaceCulling( false );
   }
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll(  getOpenGLHapticShape( ti.getCurrentSurface(),
-                                                   ti.getAccForwardMatrix()));
-#endif
-  }
 }
-#endif
 

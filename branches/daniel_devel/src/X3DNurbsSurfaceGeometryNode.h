@@ -213,6 +213,12 @@ namespace H3D {
     /// Traverse the scenegraph. 
     virtual void traverseSG( TraverseInfo &ti );  
 
+    /// The number of triangles renderered in this geometry, we don't know
+    /// so return -1
+    virtual int nrTriangles() {
+      return -1;
+    }
+
 		/// Function called by render to specify what differs between 
 		/// NurbsPatchSurface and NurbsTrimmedSurface,
 		virtual void renderBetweenBeginEnd(

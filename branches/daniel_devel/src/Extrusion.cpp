@@ -1333,19 +1333,10 @@ void Extrusion::SFBound::update() {
 	value = bb;
 }
 
-#ifdef USE_HAPTICS
 void Extrusion::traverseSG( TraverseInfo &ti ) {
+  X3DGeometryNode::traverseSG( ti );
   // enable backface culling if solid is true
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
-
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll( getOpenGLHapticShape( 
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix(),
-                                                 ( vertexVector->size() ) * 4 ) );
-#endif
-  }
 }
-#endif
+

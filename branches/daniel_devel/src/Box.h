@@ -90,11 +90,14 @@ namespace H3D {
     /// Renders the Box using OpenGL.
     virtual void render();
 
-#ifdef USE_HAPTICS
+    /// The number of triangles rendered by this geometry.
+    virtual int nrTriangles() {
+      return 12;
+    }
+
 		/// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
-#endif
 
     ///  The size field specifies the extents of the box along the X-, Y-,
     /// and Z-axes respectively.

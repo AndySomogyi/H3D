@@ -158,14 +158,20 @@ namespace H3D {
                     Inst< AutoNormal       > _autoNormal      = 0,
                     Inst< MFInt32          > _fanCount      = 0 );
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
-#endif
 
     /// Renders the TriangleFanSet with OpenGL.
     virtual void render();
+
+    /// An upper bound of the number of triangles renderered in this geometry.
+    virtual int nrTriangles() {
+      X3DCoordinateNode *coord_node = coord->getValue();
+      if( coord_node ) 
+        return coord_node->nrAvailableCoords();
+      else return 0;
+    }
 
     /// Auto-generated normals that are used if the normal field is NULL.
     /// Only accessable in C++.
