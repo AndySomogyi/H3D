@@ -35,11 +35,12 @@
 #include "OpenHapticsOptions.h"
 #include <HAPIHapticShape.h>
 #include "DeviceInfo.h"
-#include "FeedbackBufferGeometry.h"
 #include <HapticTriangleSet.h>
 #include "HLDepthBufferShape.h"
 #include "HLFeedbackShape.h"
 #endif
+
+#include <FeedbackBufferCollector.h>
 
 using namespace H3D;
 
@@ -230,8 +231,15 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
 /// The HAPIBoundTree constructs a 
 void X3DGeometryNode::SFBoundTree::update() { 
   X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( getOwner() );
-  FeedbackBufferGeometry fbg( geometry, Matrix4f() );
-  value = new HAPI::Bounds::AABBTree( fbg.triangles );
+  vector< HAPI::Bounds::Triangle > triangles;
+  vector< HAPI::Bounds::LineSegment > lines;
+  vector< HAPI::Bounds::Point > points;
+  HAPI::FeedbackBufferCollector::collectPrimitives( geometry, 
+                                                    Matrix4f(),
+                                                    triangles, 
+                                                    lines, 
+                                                    points );
+  value = new HAPI::Bounds::AABBTree( triangles );
 }
 
 void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
