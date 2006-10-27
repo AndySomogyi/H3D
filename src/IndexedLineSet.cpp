@@ -192,13 +192,3 @@ void IndexedLineSet::render() {
   }
 }
 
-#ifdef USE_HAPTICS
-void IndexedLineSet::traverseSG( TraverseInfo &ti ) {
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HLFeedbackShape( this,
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix(),
-                                                 coordIndex->size() ) );
-  }
-}
-#endif

@@ -86,11 +86,14 @@ namespace H3D {
     /// Renders the rectangle2D using OpenGL.
     virtual void render();
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
-#endif
+
+    /// The number of triangles rendered by this geometry
+    virtual int nrTriangles() {
+      return 2;
+    }
 
     /// The size field specifies the extents of the box along the X-, and
     /// Y-axes respectively and each component value shall be greater than 

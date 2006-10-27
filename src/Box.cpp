@@ -96,7 +96,7 @@ void Box::render() {
   glVertex3f  ( -x, y, -z );
   glTexCoord2f( 0, 1 );
   glVertex3f  ( x, y, -z );
-  
+
   // +y
   glNormal3f  ( 0, 1, 0 );
 
@@ -144,11 +144,10 @@ void Box::render() {
   glVertex3f  ( -x, -y, z );
   glTexCoord2f( 1, 1 );
   glVertex3f  ( -x, y, z );
-  
+
   glEnd();
 }
 
-#ifdef USE_HAPTICS
 void Box::traverseSG( TraverseInfo &ti ) {
   if( solid->getValue() ) {
     useBackFaceCulling( true );
@@ -158,4 +157,3 @@ void Box::traverseSG( TraverseInfo &ti ) {
   X3DGeometryNode::traverseSG( ti );
   
 }
-#endif

@@ -126,7 +126,7 @@ void Cylinder::render() {
     }
     glEnd();
   }
-    
+  
   // render bottom
   if ( bottom->getValue() ) {
     glBegin( GL_POLYGON );
@@ -140,23 +140,16 @@ void Cylinder::render() {
     }
     glEnd();
   }
-    
+
 };
 
 
-
-#ifdef USE_HAPTICS
 void Cylinder::traverseSG( TraverseInfo &ti ) {
+  X3DGeometryNode::traverseSG( ti );
   if( solid->getValue() ) {
     useBackFaceCulling( true );
   } else {
     useBackFaceCulling( false );
   }
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll(  getOpenGLHapticShape( ti.getCurrentSurface(),
-                                                   ti.getAccForwardMatrix()));
-#endif
-  }
 }
-#endif
+

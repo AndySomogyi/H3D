@@ -291,11 +291,14 @@ namespace H3D {
     /// Renders the IndexedFaceSet using GL_POLYGONs.
     virtual void render();
 
-#ifdef USE_HAPTICS
+    /// An upper bound on the number of triangles.
+    virtual int nrTriangles() {
+      return coordIndex->size();
+    }
+
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
-#endif
 
     /// Field for setting the value of the colorIndex field.
     /// <b>Access type:</b> inputOnly 

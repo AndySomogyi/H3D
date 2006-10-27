@@ -122,11 +122,17 @@ namespace H3D {
     ///  Renders the TriangleSet with OpenGL.
     virtual void render();
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );
-#endif
+
+    /// The number of triangles renderered in this geometry.
+    virtual int nrTriangles() {
+      X3DCoordinateNode *coord_node = coord->getValue();
+      if( coord_node ) 
+        return coord_node->nrAvailableCoords() / 3;
+      else return 0;
+    }
 
     /// Auto-generated normals that are used if the normal field is NULL.
     /// Only accessable in C++.

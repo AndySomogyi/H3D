@@ -84,18 +84,10 @@ void Sphere::render() {
   glPopMatrix();
 } 
 
-#ifdef USE_HAPTICS
 void Sphere::traverseSG( TraverseInfo &ti ) {
+  X3DGeometryNode::traverseSG( ti );
   // use backface culling if solid is true
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
-
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-    ti.addHapticShapeToAll( new HAPI::HapticSphere( radius->getValue(),
-                                              solid->getValue(),
-                                              (void * )this,
-                                              ti.getCurrentSurface(),
-                                              ti.getAccForwardMatrix() ) );
-  }
+  
 }
-#endif

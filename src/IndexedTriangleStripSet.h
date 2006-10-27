@@ -157,14 +157,17 @@ namespace H3D {
                              Inst< MFInt32          > _set_index       = 0,
                              Inst< MFInt32          > _index           = 0 );
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
-#endif
 
     /// Renders the IndexedTriangleStripSet with OpenGL.
     virtual void render();
+
+    /// An upper bound of the number of triangles renderered in this geometry.
+    virtual int nrTriangles() {
+      return index->size();
+    }
 
     /// Auto-generated normals that are used if the normal field is NULL.
     /// Only accessable in C++.

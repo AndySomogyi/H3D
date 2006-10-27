@@ -271,23 +271,12 @@ void IndexedTriangleFanSet::render() {
   } 
 }
 
-#ifdef USE_HAPTICS
 void IndexedTriangleFanSet::traverseSG( TraverseInfo &ti ) {
+  X3DComposedGeometryNode::traverseSG( ti );
   // use backface culling if solid is true
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
-
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll( getOpenGLHapticShape( 
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix(),
-                                                 index->size() ) );
-#endif
-  }
 }
-#endif
-
 
 void IndexedTriangleFanSet::AutoNormal::update() {
   bool normals_per_vertex = 

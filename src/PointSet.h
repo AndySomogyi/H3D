@@ -95,15 +95,19 @@ namespace H3D {
               Inst< SFColorNode      > _color          = 0,
               Inst< SFCoordinateNode > _coord          = 0 );
 
-#ifdef USE_HAPTICS
-    /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
-    /// rendering if haptics is enabled.
-    virtual void traverseSG( TraverseInfo &ti ); 
-#endif
-    
     /// Render the LineSet with OpenGL
     virtual void render();
     
+    /// The number of points rendered by this geometry.
+    virtual int nrPoints() {
+      X3DCoordinateNode *coord_node = coord->getValue();
+      if( coord_node ) {
+        unsigned int size = coord_node->nrAvailableCoords();
+        if( size > 1 )return size - 1;
+      }
+      return 0;
+    }
+
     /// If the color field is not NULL, it shall specify a Color node that
     /// contains at least the number of points contained in the coord
     /// node. Colours  are applied to each point in order.   

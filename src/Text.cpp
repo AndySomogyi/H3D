@@ -386,22 +386,12 @@ void Text::DisplayList::callList( bool build_list ) {
   X3DGeometryNode::DisplayList::callList( build_list );
 }
 
-#ifdef USE_HAPTICS
 void Text::traverseSG( TraverseInfo &ti ) {
+  X3DGeometryNode::traverseSG( ti );
   // use backface culling if solid is true
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
-
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll( getOpenGLHapticShape( 
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix() ) );
-#endif
-  }
 }
-#endif
-
 
 void Text::SFBound::update() {
   X3DFontStyleNode *font_style = 

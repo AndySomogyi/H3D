@@ -125,19 +125,10 @@ void TriangleSet2D::render() {
   }
 }
 
-#ifdef USE_HAPTICS
 void TriangleSet2D::traverseSG( TraverseInfo &ti ) {
+  X3DGeometryNode::traverseSG( ti );
   // use backface culling if solid is true
   if( solid->getValue() ) useBackFaceCulling( true );
   else useBackFaceCulling( false );
-
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-#ifdef HAVE_OPENHAPTICS
-    ti.addHapticShapeToAll( getOpenGLHapticShape( 
-                                                 ti.getCurrentSurface(),
-                                                 ti.getAccForwardMatrix(),
-                                                 vertices->size() ) );
-#endif
-  }
 }
-#endif
+

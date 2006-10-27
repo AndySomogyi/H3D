@@ -245,19 +245,20 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
   
     //displayList->breakCache();
 
-    vector< HAPI::Bounds::Triangle > tris;
-    tris.reserve( 200 );
-    Vec3f scale = ti.getAccInverseMatrix().getScalePart();
-    boundTree->getValue()->getTrianglesWithinRadius( ti.getAccInverseMatrix() * hd->proxyPosition->getValue() * 1e3,
-                                                     15 * H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
-                                                     tris );
-    
-    //if( tris.size() > 0 )
-    //cerr << tris.size() << endl;
 
-    int ii = tris.size();    
-    if( ti.hapticsEnabled() && ti.getCurrentSurface() && ii > 0 ) {
-
+    if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
+      vector< HAPI::Bounds::Triangle > tris;
+      tris.reserve( 200 );
+      Vec3f scale = ti.getAccInverseMatrix().getScalePart();
+      boundTree->getValue()->getTrianglesWithinRadius( ti.getAccInverseMatrix() * hd->proxyPosition->getValue() * 1e3,
+                                                       15 * H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
+                                                       tris );
+      
+      //if( tris.size() > 0 )
+      //cerr << tris.size() << endl;
+      
+      int ii = tris.size();   
+      if( ii > 0 )  {
       //cerr << ii;// << endl;
       HAPI::HapticTriangleSet * tri_set = new HAPI::HapticTriangleSet( tris ,
                                                this,
@@ -308,6 +309,7 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
       }
       
       ti.addHapticShape( i, tri_set );
+      }
     }
   }
 }

@@ -141,11 +141,12 @@ namespace H3D {
                     Inst< SFBool           > _colorPerVertex = 0,
                     Inst< MFInt32          > _coordIndex     = 0 );
 
-#ifdef USE_HAPTICS
-    /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
-    /// rendering if haptics is enabled.
-    virtual void traverseSG( TraverseInfo &ti ); 
-#endif
+    /// The number of lines rendered by this geometry.
+    virtual int nrLines() {
+      unsigned int size = coordIndex->size();
+      if( size > 1 )return size - 1;
+      else return 0;
+    }
 
     /// Render the IndexedLineSet with OpenGL
     virtual void render();

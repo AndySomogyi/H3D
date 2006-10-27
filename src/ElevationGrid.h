@@ -271,12 +271,18 @@ namespace H3D {
 
     /// Render the ElevationGrid with OpenGL.
     virtual void render();
+    
+    /// The number of triangles renderered in this geometry.
+    virtual int nrTriangles() {
+      H3DInt32 x_dim = xDimension->getValue();
+      H3DInt32 z_dim = zDimension->getValue();
+      if( x_dim < 2 || z_dim < 2 ) return 0;
+      else return (x_dim - 1) * (z_dim - 1 ) * 2;
+    }
 
-#ifdef USE_HAPTICS
 		/// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );  
-#endif
 
     /// Constructor.
     ElevationGrid( Inst< SFNode           > _metadata        = 0,

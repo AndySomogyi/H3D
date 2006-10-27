@@ -29,28 +29,32 @@
 #ifndef __X3DGEOMETRYNODE_H__
 #define __X3DGEOMETRYNODE_H__
 
-#include "X3DChildNode.h"
-#include "H3DBoundedObject.h"
-#include "H3DDisplayListObject.h"
-#include "MFBool.h"
-#include "MFVec3f.h"
-#include "AutoPtrVector.h"
-#include "H3DOptionNode.h"
-#include "MFNode.h"
+// H3Dapi includes
+#include <X3DChildNode.h>
+#include <H3DBoundedObject.h>
+#include <H3DDisplayListObject.h>
+#include <MFBool.h>
+#include <MFVec3f.h>
+#include <H3DOptionNode.h>
+#include <MFNode.h>
 
+// HAPI includes
+#include <HAPIGLShape.h>
 #include <HapticTriangleSet.h>
+
+// H3DUtil includes
+#include <AutoPtrVector.h>
 
 namespace H3D {
 
   /// \ingroup AbstractNodes
   /// \class X3DGeometryNode
   /// This is the base node type for all geometry in X3D. 
-  ///
-  /// 
   class H3DAPI_API X3DGeometryNode : 
     public X3DChildNode,
     public H3DBoundedObject,
-    public H3DDisplayListObject {
+    public H3DDisplayListObject,
+    public HAPI::HAPIGLShape {
   public:
     typedef TypedMFNode< H3DOptionNode > MFOptionsNode;
 
@@ -89,12 +93,9 @@ namespace H3D {
 
     virtual void traverseSG( TraverseInfo &ti );
 
-    /// This function will be called when rendering the geometry as a 
-    /// feedback shape or depth buffer shape for OpenHaptics and can be used 
-    /// to have other OpenGL calls for the OpenHaptics rendering than
-    /// for graphics rendering. By default it is the same is in the graphics
-    /// rendering.
-    virtual void hlRender( H3DHapticsDevice *hd, Matrix4f &transform ) {
+    /// Function overridden from HAPIGLShape. Just call the 
+    /// displayList->callList per default
+    virtual void glRender() {
       displayList->callList( false );
     }
 
