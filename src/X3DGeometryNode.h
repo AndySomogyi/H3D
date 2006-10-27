@@ -96,7 +96,10 @@ namespace H3D {
     /// Function overridden from HAPIGLShape. Just call the 
     /// displayList->callList per default
     virtual void glRender() {
+      bool previous_allow = allowingCulling();
+      allowCulling( false );
       displayList->callList( false );
+      allowCulling( previous_allow );
     }
 
     /// This function should be used by the render() function to disable
@@ -183,7 +186,21 @@ namespace H3D {
     virtual string defaultXMLContainerField() {
       return "geometry";
     }
-   
+    
+    /// Overriden from HAPIGLShape to use the bound field in he X3DGeometryNode.
+    /// An axis aligned bounding box containing  all the primitives rendered by 
+    /// the glRender function. If no such bounding box is available, size
+    /// should be set to Vec3( -1, -1, -1 )
+    virtual void getBound( HAPI::Vec3 &center, HAPI::Vec3& size ) {
+      BoxBound *b = dynamic_cast< BoxBound * >( bound->getValue() );
+      if( b ) {
+        center = b->center->getValue();
+        size = b->size->getValue();
+      } else {
+        HAPIGLShape::getBound( center, size );
+      }
+    }
+
     /// Tells if a HapticsDevice has been in contact with the geometry
     /// in the last scenegraph loop. The field contains a boolean for 
     /// each HapticsDevice with the index as specified in the DeviceInfo node.
