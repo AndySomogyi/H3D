@@ -21,45 +21,45 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file OpenHapticsOptions.cpp
-/// \brief CPP file for OpenHapticsOptions.
+/// \file HapticsOptions.cpp
+/// \brief CPP file for HapticsOptions.
 ///
 //
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "OpenHapticsOptions.h"
+#include "HapticsOptions.h"
 
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
-H3DNodeDatabase OpenHapticsOptions::database( "OpenHapticsOptions", 
-                                      &(newInstance<OpenHapticsOptions>),
-                                      typeid( OpenHapticsOptions ),
+H3DNodeDatabase HapticsOptions::database( "HapticsOptions", 
+                                      &(newInstance<HapticsOptions>),
+                                      typeid( HapticsOptions ),
                                       &H3DOptionNode::database );
 
-namespace OpenHapticsOptionsInternals {
-  FIELDDB_ELEMENT( OpenHapticsOptions, GLShape, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( OpenHapticsOptions, useAdaptiveViewport, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( OpenHapticsOptions, useHapticCameraView, INPUT_OUTPUT );
+namespace HapticsOptionsInternals {
+  FIELDDB_ELEMENT( HapticsOptions, touchableFace, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( HapticsOptions, maxDistance, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( HapticsOptions, lookAheadFactor, INPUT_OUTPUT );
 }
 
-OpenHapticsOptions::OpenHapticsOptions( 
+HapticsOptions::HapticsOptions( 
                            Inst< SFNode>  _metadata,
-                           Inst< SFString > _GLShape,
-                           Inst< SFBool    >  _useAdaptiveViewport,
-                           Inst< SFBool    >  _useHapticCameraView ) :
+                           Inst< SFString  >  _touchableFace,
+                           Inst< SFFloat   > _maxDistance,
+                           Inst< SFFloat   > _lookAheadFactor ) :
   H3DOptionNode( _metadata ),
-  GLShape( _GLShape ),
-  useAdaptiveViewport( _useAdaptiveViewport ),
-  useHapticCameraView( _useHapticCameraView ) {
-  type_name = "OpenHapticsOptions";
+  touchableFace( _touchableFace ),
+  maxDistance( _maxDistance ),
+  lookAheadFactor( _lookAheadFactor ) {
+  type_name = "HapticsOptions";
 
   database.initFields( this );
 
-  GLShape->setValue( "FEEDBACK_BUFFER" );
-  useAdaptiveViewport->setValue( true );
-  useHapticCameraView->setValue( true );
+  touchableFace->setValue( "AS_GRAPHICS" );
+  maxDistance->setValue( 0.01f );
+  lookAheadFactor->setValue( 3 );
 }
 
 
