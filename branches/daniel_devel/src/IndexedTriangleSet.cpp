@@ -30,7 +30,6 @@
 
 #include "IndexedTriangleSet.h"
 #include "Normal.h"
-#include "FeedbackBufferGeometry.h"
 #include "HapticTriangleTree.h"
 #include "H3DHapticsDevice.h"
 #include "HapticTriangle.h"
@@ -103,63 +102,6 @@ IndexedTriangleSet::IndexedTriangleSet(
 }
 
 void IndexedTriangleSet::render() {
-//  if( tree ) {
-    //tree->render( depth->getValue() );
- // }
-
-  /*if( htree ) {
-    vector< PlaneConstraint > cs;
-    DeviceInfo *di = DeviceInfo::getActive();
-    if( di ) {
-      glMatrixMode( GL_MODELVIEW );
-      glPushMatrix();
-      glScalef( 1e-3f, 1e-3f, 1e-3f );
-      
-      H3DHapticsDevice *hd = di->device->getValueByIndex( 0 );
-      htree->tree->render( 200 );
-      htree->getConstraints( hd->proxyPosition->getValue() * 1e3, 100, cs );
-      //cerr << (htree->transform.inverse() * hd->proxyPosition->getValue()) * 1e3 << endl;
-      glPopMatrix();
-      
-      glMatrixMode( GL_MODELVIEW );
-      glPushMatrix();
-      glLoadIdentity();
-      Rotation vp_orientation = Rotation( 1, 0, 0, 0 );
-      Vec3f vp_position = Vec3f( 0, 0, 0.6f ); 
-       glRotatef( (H3DFloat) -(180/Constants::pi)*vp_orientation.angle, 
-               vp_orientation.axis.x, 
-               vp_orientation.axis.y,
-               vp_orientation.axis.z );
- 
-       glTranslatef( -vp_position.x,
-                     -vp_position.y, 
-                     -vp_position.z );
-       glScalef( 1e-3f, 1e-3f, 1e-3f );
-      glDisable( GL_LIGHTING );
-      glColor3f( 0, 0, 1 );
-      glBegin( GL_LINES );
-      for( vector< PlaneConstraint >::iterator i = cs.begin();
-           i != cs.end(); i++ ) {
-        Vec3d from = (*i).point; // - (*i).normal * 10;
-        //cerr << "C: " << from  << endl;
-        //cerr << "P: " << hd->proxyPosition->getValue() * 1e3<< endl;
-        glVertex3f( from.x, from.y, from.z );
-        Vec3d to = (*i).point + (*i).normal * 50;
-        glVertex3f( to.x, to.y, to.z );
-       
-      }
-      glEnd();
-      glEnable( GL_LIGHTING );
-      glPopMatrix();
-    }
-    }*/
- /* glDisable( GL_LIGHTING );
-  glColor3f( 0, 0, 1 );
-  glBegin( GL_LINES );
-  glVertex3f( from.x ,from.y, from.z );
-  glVertex3f( to.x, to.y, to.z );
-  glEnd();
-  glEnable( GL_LIGHTING );*/
   X3DCoordinateNode *coordinate_node = coord->getValue();
   X3DTextureCoordinateNode *tex_coord_node = texCoord->getValue();
   TextureCoordinateGenerator *tex_coord_gen = 
@@ -311,56 +253,6 @@ void IndexedTriangleSet::render() {
 }
 
 void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
-
-#if 0
-  H3DHapticsDevice *hd = ti.getHapticsDevice( 0 );
-  
-  //from = ti.getAccInverseMatrix() * hd->trackerPosition->getValue();
-  //to = from + ti.getAccInverseMatrix().getScaleRotationPart() * (Matrix3f)hd->trackerOrientation->getValue() * Vec3f( 0, 0, -0.1 ); 
-  //tree->clearCollidedFlag();
-  // Bounds::IntersectionInfo info;
-  //tree->lineIntersect( from, to, info );
-
-  //displayList->breakCache();
-  Bounds::Triangle triangle( Vec3f( 0.1, -0.1, 0 ),
-                    Vec3f( -0.1, -0.1, 0 ),
-                    Vec3f( -0.1, 0.1, 0 ) );
-  vector< Bounds::Triangle > tris;
-  tris.reserve( 200 );
-  Vec3f scale = ti.getAccInverseMatrix().getScalePart();
-  boundTree->getValue()->getTrianglesWithinRadius( ti.getAccInverseMatrix() * hd->proxyPosition->getValue() * 1e3,
-                                  15 * H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
-                                  tris );
-
-  //if( tris.size() > 0 )
-  //cerr << tris.size() << endl;
-
-/*  for( unsigned int i = 0; i < tris.size(); i++ ) {
-    cerr << tris[i].a << " " << tris[i].b << " " << tris[i].c << endl;
-  }
-
-  cerr << "*******************************" << endl;
-*/
-
-
-  if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
-       int ii = tris.size();
-
-       htree = new HapticTriangleTree( new Bounds::AABBTree( tris ),
-                                       this,
-                                       ti.getCurrentSurface(),
-                                       Matrix4f( 1e3, 0, 0, 0,
-                                                 0, 1e3, 0, 0,
-                                                 0, 0, 1e3, 0,
-                                                 0, 0, 0, 1 ) *ti.getAccForwardMatrix() *
-                                       Matrix4f( 1e-3, 0, 0, 0,
-                                                 0, 1e-3, 0, 0,
-                                                 0, 0, 1e-3, 0,
-                                                 0, 0, 0, 1 ));
-    ti.addHapticShapeToAll( htree );
-
-  }
-#endif
   X3DComposedGeometryNode::traverseSG( ti );
   // use backface culling if solid is true
   if( solid->getValue() ) useBackFaceCulling( true );
