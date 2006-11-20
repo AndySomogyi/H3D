@@ -234,6 +234,8 @@ namespace H3D {
 
     auto_ptr< SFBoundTree > boundTree;
 
+    HAPI::HapticTriangleSet *tree;
+
     /// Contains nodes with options for haptics and graphics rendering.
     ///
     /// <b>Access type:</b> inputOnly

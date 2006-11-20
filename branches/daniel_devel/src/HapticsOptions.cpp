@@ -58,7 +58,7 @@ HapticsOptions::HapticsOptions(
   database.initFields( this );
 
   touchableFace->setValue( "AS_GRAPHICS" );
-  maxDistance->setValue( 0.01f );
+  maxDistance->setValue( 0.015f );
   lookAheadFactor->setValue( 3 );
 }
 
