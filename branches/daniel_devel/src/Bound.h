@@ -63,7 +63,11 @@ namespace H3D {
     template< class Iterator >
     static inline Bound *SFBoundUnion( Iterator begin, Iterator end );
 
+    /// Returns the closest point on the bound to the given point.
     virtual Vec3f closestPoint( const Vec3f &p ) = 0;
+
+    /// Render the outline of the bound with OpenGL.
+    virtual void render() {}
   };
 
   /// An InfiniteBound is a Bound that encompasses everything. So every point
@@ -244,6 +248,45 @@ namespace H3D {
         result[i] = v;
       }
       return result;
+    }
+
+    /// Render the outline of the bound with OpenGL.
+    virtual void render() {
+      Vec3f c = center->getValue();
+      Vec3f half_size = size->getValue() / 2;
+      Vec3f min = c - half_size;
+      Vec3f max = c + half_size;
+
+      glDisable( GL_LIGHTING );
+      glColor3f( 0, 0, 1 );
+      
+      glBegin( GL_LINE_STRIP );
+      glVertex3f( min.x, min.y, min.z );
+      glVertex3f( min.x, max.y, min.z );
+      glVertex3f( max.x, max.y, min.z );
+      glVertex3f( max.x, min.y, min.z );
+      glVertex3f( min.x, min.y, min.z );
+      glEnd();
+      
+      glBegin( GL_LINE_STRIP );
+      glVertex3f( min.x, min.y, max.z );
+      glVertex3f( min.x, max.y, max.z );
+      glVertex3f( max.x, max.y, max.z );
+      glVertex3f( max.x, min.y, max.z );
+      glVertex3f( min.x, min.y, max.z );
+      glEnd();
+      
+      glBegin( GL_LINES );
+      glVertex3f( min.x, min.y, max.z );
+      glVertex3f( min.x, min.y, min.z );
+      glVertex3f( max.x, min.y, max.z );
+      glVertex3f( max.x, min.y, min.z );
+      glVertex3f( min.x, max.y, max.z );
+      glVertex3f( min.x, max.y, min.z );
+      glVertex3f( max.x, max.y, max.z );
+      glVertex3f( max.x, max.y, min.z );
+      glEnd();
+      glEnable( GL_LIGHTING );
     }
 
     /// The center point of the bounding box.

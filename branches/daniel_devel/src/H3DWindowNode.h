@@ -235,6 +235,11 @@ namespace H3D {
       multi_pass_transparency = b;
     }
 
+    // Render the child node. Will be called after all viewports etc has
+    // been set up in order to render the child and everything else that
+    // needs to be rendered.
+    void renderChild( X3DChildNode *c );
+
     friend class Scene; 
 
     bool multi_pass_transparency;

@@ -56,6 +56,11 @@ namespace H3D {
     /// Destructor.
     ~Scene();
 
+    /// Returns the TraverseInfo from the previous sceneRoot traversal.
+    inline TraverseInfo * getLastTraverseInfo() {
+      return last_traverseinfo;
+    }
+
     /// Set whether this Scene instance should be active or not. If
     /// a Scene is not active it will not be rendered at all. 
     void setActive( bool _active ) {
