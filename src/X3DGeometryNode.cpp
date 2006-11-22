@@ -41,6 +41,8 @@
 #include "HLFeedbackShape.h"
 #endif
 
+#include "DebugOptions.h"
+
 #include <FeedbackBufferCollector.h>
 
 using namespace H3D;
@@ -77,7 +79,7 @@ X3DGeometryNode::X3DGeometryNode(
   options( new MFOptionsNode ),
   use_culling( false ),
   allow_culling( true ),
-  cull_face( GL_BACK ),tree( NULL) {
+  cull_face( GL_BACK ) {
 
   type_name = "X3DGeometryNode";
   
@@ -218,28 +220,42 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
 
   glCullFace( geom->getCullFace() );
 
-  if( geom->tree ) { 
-    glScalef( 1e-3, 1e-3, 1e-3 );   
-    
-    glPushAttrib( GL_CURRENT_BIT | GL_ENABLE_BIT | GL_POLYGON_BIT );
-    glDisable( GL_LIGHTING );
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-    glColor3f( 1, 1, 1 );
-    glBegin( GL_TRIANGLES );
-    for( unsigned int i = 0; i < geom->tree->triangles.size(); i++ ) {
-      HAPI::Bounds::Triangle &t = geom->tree->triangles[i];
-      glVertex3d( t.a.x, t.a.y, t.a.z );
-      glVertex3d( t.b.x, t.b.y, t.b.z );
-      glVertex3d( t.c.x, t.c.y, t.c.z );
-    }
-    glEnd();
-    glPopAttrib();
-    glScalef( 1e3, 1e3, 1e3 );
-  }
-
   BugWorkaroundDisplayList::callList( build_list );
 
-
+  H3DInt32 render_depth = -1;
+  bool render_bound = false;
+  DebugOptions *debug_options = NULL;
+  geom->getOptionNode( debug_options );
+  if( !debug_options ) {
+    GlobalSettings *default_settings = GlobalSettings::getActive();
+    if( default_settings ) {
+      default_settings->getOptionNode( debug_options );
+    }
+  }
+  
+  if( debug_options ) {
+    render_depth = debug_options->drawBoundTree->getValue();
+    render_bound = debug_options->drawBound->getValue();
+  }
+  
+  if( render_depth >= 0 ) {
+    HAPI::Bounds::BinaryBoundTree *tree = geom->boundTree->getValue();
+    if( tree ) {
+      glMatrixMode( GL_MODELVIEW );
+      glPushMatrix();
+      glScalef( 1e-3f, 1e-3f, 1e-3f ); 
+      tree->render( 1 );
+      glPopMatrix();
+    }
+  }
+  
+  if( render_bound ) {
+    Bound *b = geom->bound->getValue();
+    if( b ) {
+      b->render();
+    }
+  }
+  
   // restore previous values for culling
   if( culling_enabled ) glEnable( GL_CULL_FACE );
   else glDisable( GL_CULL_FACE );
@@ -264,7 +280,6 @@ void X3DGeometryNode::SFBoundTree::update() {
 }
 
 void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
-  tree = NULL;
   X3DChildNode::traverseSG( ti );
   
   const vector< H3DHapticsDevice * > &devices = ti.getHapticsDevices();
@@ -358,7 +373,6 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
                                                          0, 0, 0, 1 )),
                                                                        -1,
                                                                        touchable_face);
-      tree = tri_set;
 
       // if we have an OpenHapticsOptions node, then set the OpenHaptics 
       // options in the HapticTriangleSet we just created.
