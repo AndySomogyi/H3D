@@ -48,7 +48,8 @@ namespace H3D {
     HapticsOptions( Inst< SFNode >  _metadata = 0,
                     Inst< SFString  >  _touchableFace  = 0,
                     Inst< SFFloat   >  _maxDistance  = 0,
-                    Inst< SFFloat   > _lookAheadFactor = 0 );
+                    Inst< SFFloat   > _lookAheadFactor = 0,
+                    Inst< SFBool    > _useBoundTree = 0 );
     
     /// Specifies which sides of the shapes to render haptically. If "BACK"
     /// only the back side of can be felt, "FRONT" only front side and 
@@ -79,6 +80,17 @@ namespace H3D {
     /// <b>Default value: </b> 3 \n
     /// <b>Access type: </b> inputOutput \n    
     auto_ptr< SFFloat > lookAheadFactor;
+
+    /// IF true the boundTree field is used in the X3DGeometryNodes in order
+    /// to extract which triangles are close enough to the proxy. However if
+    /// it is unwanted that the boundTree is used(e.g. because the geometry
+    /// changes all the time and the overhead for rebuilding the boundTree
+    /// is too large, this field can be set to false and the closest triangles
+    /// will be extracted with OpenGL instead.
+    ///
+    /// <b>Default value: </b> true \n
+    /// <b>Access type: </b> inputOutput \n    
+    auto_ptr< SFBool > useBoundTree;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

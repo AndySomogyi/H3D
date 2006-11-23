@@ -42,17 +42,20 @@ namespace OpenHapticsOptionsInternals {
   FIELDDB_ELEMENT( OpenHapticsOptions, GLShape, INPUT_OUTPUT );
   FIELDDB_ELEMENT( OpenHapticsOptions, useAdaptiveViewport, INPUT_OUTPUT );
   FIELDDB_ELEMENT( OpenHapticsOptions, useHapticCameraView, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( OpenHapticsOptions, forceFullGeometryRender, INPUT_OUTPUT );
 }
 
 OpenHapticsOptions::OpenHapticsOptions( 
                            Inst< SFNode>  _metadata,
                            Inst< SFString > _GLShape,
                            Inst< SFBool    >  _useAdaptiveViewport,
-                           Inst< SFBool    >  _useHapticCameraView ) :
+                           Inst< SFBool    >  _useHapticCameraView,
+                           Inst< SFBool    > _forceFullGeometryRender ) :
   H3DOptionNode( _metadata ),
   GLShape( _GLShape ),
   useAdaptiveViewport( _useAdaptiveViewport ),
-  useHapticCameraView( _useHapticCameraView ) {
+  useHapticCameraView( _useHapticCameraView ),
+  forceFullGeometryRender( _forceFullGeometryRender ) {
   type_name = "OpenHapticsOptions";
 
   database.initFields( this );
@@ -60,6 +63,7 @@ OpenHapticsOptions::OpenHapticsOptions(
   GLShape->setValue( "FEEDBACK_BUFFER" );
   useAdaptiveViewport->setValue( true );
   useHapticCameraView->setValue( true );
+  forceFullGeometryRender->setValue( false );
 }
 
 

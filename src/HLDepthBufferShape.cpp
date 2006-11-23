@@ -37,7 +37,9 @@ void HLDepthBufferShape::hlRender( HAPI::HAPIHapticsDevice *hd,
 		     m[0][1], m[1][1], m[2][1], 0,
 		     m[0][2], m[1][2], m[2][2], 0,
 		     m[0][3], m[1][3], m[2][3], 1 };
-    glLoadMatrixd( vt );
+    glLoadIdentity();
+    glScalef( 1e3f, 1e3f, 1e3f ); 
+    glMultMatrixd( vt );
     s->hlRender();
 
     hlTouchableFace( HL_FRONT_AND_BACK );
