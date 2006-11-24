@@ -67,6 +67,7 @@ X3DGeometryNode::X3DGeometryNode(
                                  Inst< MFVec3f > _force,
                                  Inst< MFVec3f > _contactPoint,
                                  Inst< MFVec3f > _contactNormal,
+                                 Inst< MFVec3f > _contactTexCoord,
                                  Inst< SFBoundTree > _boundTree ) :
   X3DChildNode( _metadata ),
   H3DBoundedObject( _bound ),
@@ -75,6 +76,7 @@ X3DGeometryNode::X3DGeometryNode(
   force( _force ),
   contactPoint( _contactPoint ),
   contactNormal( _contactNormal ),
+  contactTexCoord( _contactTexCoord ),
   boundTree( _boundTree ),
   options( new MFOptionsNode ),
   use_culling( false ),

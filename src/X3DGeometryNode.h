@@ -89,6 +89,7 @@ namespace H3D {
                      Inst< MFVec3f     > _force = 0,
                      Inst< MFVec3f     > _contactPoint = 0,
                      Inst< MFVec3f     > _contactNormal = 0,
+                     Inst< MFVec3f     > _contactTexCoord = 0,
                      Inst< SFBoundTree > _boundTree = 0 );
 
     virtual void traverseSG( TraverseInfo &ti );
@@ -223,6 +224,15 @@ namespace H3D {
     ///
     /// <b>Access type:</b> outputOnly
     auto_ptr< MFVec3f >  contactPoint;
+
+    /// The texture coordinate of last the contact points of the HapticDevices
+    /// on the geometry.
+    /// The field contains a contact point for each HapticsDevice with the index
+    /// as specified in the DeviceInfo node. The value will be an empty vector
+    /// before the first contact.
+    ///
+    /// <b>Access type:</b> outputOnly
+    auto_ptr< MFVec3f >  contactTexCoord;
 
     /// The normal at the last contact points of the HapticDevices on the
     /// geometry.

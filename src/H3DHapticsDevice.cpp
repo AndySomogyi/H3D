@@ -214,6 +214,8 @@ void H3DHapticsDevice::updateDeviceValues() {
           geom->contactPoint->resize( device_index + 1, Vec3f( 0, 0, 0 ), geom->id );
         if( device_index > (int)geom->contactNormal->size() -1 )
           geom->contactNormal->resize( device_index + 1, Vec3f( 1, 0, 0 ), geom->id );
+         if( device_index > (int)geom->contactTexCoord->size() -1 )
+          geom->contactTexCoord->resize( device_index + 1, Vec3f( 0, 0, 0 ), geom->id );
         if( device_index > (int)geom->isTouched->size() -1 )
           geom->isTouched->resize( device_index + 1, false, geom->id );
         
@@ -232,7 +234,11 @@ void H3DHapticsDevice::updateDeviceValues() {
 
         if( geom->contactNormal->getValueByIndex( device_index ) != n ) 
           geom->contactNormal->setValue( device_index, n, geom->id ); 
+
+        if( geom->contactTexCoord->getValueByIndex( device_index ) != ci.tex_coord ) 
+          geom->contactTexCoord->setValue( device_index, (Vec3f) ci.tex_coord, geom->id ); 
         
+        cerr << ci.tex_coord << endl;
         Vec3f f( global_vec_to_local * ci.force_global );
 
         if( geom->force->getValueByIndex( device_index ) != f ) 
