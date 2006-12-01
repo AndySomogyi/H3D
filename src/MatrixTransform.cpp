@@ -141,6 +141,32 @@ void MatrixTransform::traverseSG( TraverseInfo &ti ) {
 }
 #endif
 
+bool MatrixTransform::lineIntersect( const Vec3f &from, 
+                                const Vec3f &to,    
+                                HAPI::Bounds::IntersectionInfo &result,
+                                bool global ) {
+  Matrix4f theMatrix;
+  Matrix4f theMatrixInverse;
+  if( global ) {
+     theMatrix = accumulatedInverse->getValue();
+     theMatrixInverse = accumulatedForward->getValue();
+  }
+  else {
+     theMatrixInverse = matrix->getValue();
+     theMatrix = theMatrixInverse.inverse();
+  }
+  Vec3f local_from = theMatrix * from;
+  Vec3f local_to = theMatrix * to;
+  bool intersection = X3DGroupingNode::lineIntersect( local_from, local_to, result, global );
+  if( intersection ) {
+    Vec3f newNormalPoint = theMatrixInverse * Vec3f( result.point + result.normal );
+    result.point = theMatrixInverse * result.point;
+    result.normal = newNormalPoint - result.point;
+    result.normal.normalize();
+  }
+  return intersection;
+}
+
 
 void MatrixTransform::SFTransformedBound::update() {
   Bound *bound = static_cast< SFBound * >( routes_in[1] )->getValue();

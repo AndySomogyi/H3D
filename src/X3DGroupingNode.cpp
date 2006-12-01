@@ -31,6 +31,7 @@
 #include "X3DGroupingNode.h"
 #include "H3DRenderStateObject.h"
 #include "MatrixTransform.h"
+#include "X3DPointingDeviceSensorNode.h"
 
 using namespace H3D;
 
@@ -133,6 +134,20 @@ void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
 }
 #endif
 
+bool X3DGroupingNode::lineIntersect( const Vec3f &from, 
+                                const Vec3f &to,    
+                                HAPI::Bounds::IntersectionInfo &result,
+                                bool global ) {
+  const NodeVector &children_nodes = children->getValue();
+  global = false;
+  bool intersect = false;
+  for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
+    if( children_nodes[i]->lineIntersect( from, to, result, global ) )
+      intersect = true;
+  }
+  return intersect;
+}
+
 void X3DGroupingNode::SFBound::update() {
   value = Bound::SFBoundUnion( routes_in.begin(),
                                routes_in.end() );
@@ -156,6 +171,10 @@ void X3DGroupingNode::MFChild::onAdd( Node *n ) {
         }
       }
     }
+    X3DPointingDeviceSensorNode * pdsn = 
+      dynamic_cast< X3DPointingDeviceSensorNode * >( n );
+    if( pdsn )
+      pdsn->addGroupNode( o );
   }
 }
 
@@ -176,6 +195,10 @@ void X3DGroupingNode::MFChild::onRemove( Node *n ) {
         }
       }
     }
+    X3DPointingDeviceSensorNode * pdsn = 
+      dynamic_cast< X3DPointingDeviceSensorNode * >( n );
+    if( pdsn )
+      pdsn->removeGroupNode( o );
   }
   MFChildBase::onRemove( n );
 }

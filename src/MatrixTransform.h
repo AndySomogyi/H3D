@@ -132,6 +132,11 @@ namespace H3D {
     virtual void traverseSG( TraverseInfo &ti );
 #endif
 
+    virtual bool lineIntersect( const Vec3f &from, 
+                                const Vec3f &to,    
+                                HAPI::Bounds::IntersectionInfo &result,
+                                bool global );
+
     /// The transformation matrix.
     /// 
     /// <b>Access type:</b> inputOutput \n

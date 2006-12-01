@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;;..\..\..\H3DUtil\src"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,9 +64,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="HAPI.lib"
 				OutputFile="$(OutDir)/H3DApi.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
+				AdditionalLibraryDirectories="C:\Markus\daniel_devel\H3DUtil\build\win32\vc8\Debug;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;;C:\Markus\HAPI\build\win32\vc8\Debug"
 				IgnoreDefaultLibraryNames=""
 				DelayLoadDLLs="dhd.dll"
 				GenerateDebugInformation="true"
@@ -125,7 +126,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\H3DUtil\src;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;WIN32;NDEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS"
 				RuntimeLibrary="2"
 				TreatWChar_tAsBuiltInType="false"
@@ -146,9 +147,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="HAPI.lib"
 				OutputFile="$(OutDir)/H3DApi.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
+				AdditionalLibraryDirectories="C:\Markus\HAPI\build\win32\vc8\release;C:\Markus\daniel_devel\H3DUtil\build\win32\vc8\Release;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
 				DelayLoadDLLs="dhd.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -276,10 +278,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Console.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Contour2D.cpp"
 				>
 			</File>
@@ -312,6 +310,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\DebugOptions.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\DefaultAppearance.cpp"
 				>
 			</File>
@@ -325,10 +327,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\DeviceLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\DHDHapticsDevice.cpp"
 				>
 			</File>
 			<File
@@ -356,15 +354,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Exception.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Extrusion.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\FakeHapticsDevice.cpp"
+				RelativePath="..\..\..\src\FeedbackBufferGeometry.cpp"
 				>
 			</File>
 			<File
@@ -389,6 +383,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\FontStyle.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\ForceDimensionDevice.cpp"
 				>
 			</File>
 			<File
@@ -440,10 +438,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\H3DFakeHapticsDevice.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\H3DFunctionNode.cpp"
 				>
 			</File>
@@ -472,10 +466,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\H3DThreadedHapticsDevice.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\H3DVideoClipDecoderNode.cpp"
 				>
 			</File>
@@ -488,15 +478,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\HapticCylinder.cpp"
+				RelativePath="..\..\..\src\HapticsOptions.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\HapticSphere.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HaptikHapticsDevice.cpp"
+				RelativePath="..\..\..\src\HapticsRenderers.cpp"
 				>
 			</File>
 			<File
@@ -509,14 +495,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\HLFeedbackShape.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HLHapticsDevice.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HLShape.cpp"
 				>
 			</File>
 			<File
@@ -584,10 +562,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\lex.yy.cc"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\LibCurlResolver.cpp"
 				>
 			</File>
@@ -616,23 +590,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Matrix3d.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix3f.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Matrix3VertexAttribute.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix4d.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix4f.cpp"
 				>
 			</File>
 			<File
@@ -669,6 +627,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\MouseSensor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\MovieTexture.cpp"
 				>
 			</File>
 			<File
@@ -721,6 +683,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\OpenHapticsOptions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\HAPI\src\OpenHapticsRenderer.cpp"
 				>
 			</File>
 			<File
@@ -792,10 +758,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Quaternion.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\RawImageLoader.cpp"
 				>
 			</File>
@@ -816,15 +778,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Rotation.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\ScalarInterpolator.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\src\Scene.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\SensAbleDevice.cpp"
 				>
 			</File>
 			<File
@@ -861,10 +823,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\SpaceballSensor.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\SpaceWareHapticsDevice.cpp"
 				>
 			</File>
 			<File
@@ -940,15 +898,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Threads.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\TimeSensor.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\TimeStamp.cpp"
 				>
 			</File>
 			<File
@@ -957,6 +907,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\ToggleGroup.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\TouchSensor.cpp"
 				>
 			</File>
 			<File
@@ -993,18 +947,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\URNResolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec2f.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec3f.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec4f.cpp"
 				>
 			</File>
 			<File
@@ -1132,6 +1074,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\X3DPointingDeviceSensorNode.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\X3DProgrammableShaderObject.cpp"
 				>
 			</File>
@@ -1196,6 +1142,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\X3DTouchSensorNode.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\X3DTriggerNode.cpp"
 				>
 			</File>
@@ -1231,18 +1181,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\AudioFileReader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\AutoPtrVector.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\AutoRef.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\AutoRefVector.h"
 				>
 			</File>
 			<File
@@ -1314,10 +1252,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Console.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Contour2D.h"
 				>
 			</File>
@@ -1350,6 +1284,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\DebugOptions.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\DefaultAppearance.h"
 				>
 			</File>
@@ -1371,10 +1309,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\DeviceLog.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\DHDHapticsDevice.h"
 				>
 			</File>
 			<File
@@ -1402,15 +1336,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Exception.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Extrusion.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\FakeHapticsDevice.h"
+				RelativePath="..\..\..\src\FeedbackBufferGeometry.h"
 				>
 			</File>
 			<File
@@ -1443,6 +1373,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\FontStyle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\ForceDimensionDevice.h"
 				>
 			</File>
 			<File
@@ -1490,10 +1424,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\H3DBasicTypes.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\H3DBoundedObject.h"
 				>
 			</File>
@@ -1514,10 +1444,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\H3DFakeHapticsDevice.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\H3DForceEffect.h"
 				>
 			</File>
@@ -1530,15 +1456,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\H3DHapticsRendererNode.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\H3DImageLoaderNode.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\src\H3DImageObject.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\H3DMath.h"
 				>
 			</File>
 			<File
@@ -1570,18 +1496,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\H3DTemplateOperators.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\H3DThreadedHapticsDevice.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\H3DTypeOperators.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\H3DTypes.h"
 				>
 			</File>
@@ -1598,35 +1512,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\HapticCylinder.h"
+				RelativePath="..\..\..\src\HapticsOptions.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\HapticForceEffect.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HapticForceField.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HapticObject.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HapticShape.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HapticSphere.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HapticSpring.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HaptikHapticsDevice.h"
+				RelativePath="..\..\..\src\HapticsRenderers.h"
 				>
 			</File>
 			<File
@@ -1639,22 +1529,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\HLFeedbackShape.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HLHapticsDevice.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HLObject.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HLShape.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\HLSurface.h"
 				>
 			</File>
 			<File
@@ -1758,23 +1632,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Matrix3d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix3f.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Matrix3VertexAttribute.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix4d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Matrix4f.h"
 				>
 			</File>
 			<File
@@ -1958,6 +1816,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\HAPI\src\OpenHapticsRenderer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\OrientationInterpolator.h"
 				>
 			</File>
@@ -2042,19 +1904,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Quaternion.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\RawImageLoader.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\src\Rectangle2D.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\RefCountedClass.h"
 				>
 			</File>
 			<File
@@ -2078,15 +1932,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Types\Rotation.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\ScalarInterpolator.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\src\Scene.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\SensAbleDevice.h"
 				>
 			</File>
 			<File
@@ -2210,10 +2064,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\SpaceWareHapticsDevice.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\SpaceWareSensor.h"
 				>
 			</File>
@@ -2286,10 +2136,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\Threads.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\ThreadSafeFields.h"
 				>
 			</File>
@@ -2298,15 +2144,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\TimeStamp.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\TimeTrigger.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\src\ToggleGroup.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\TouchSensor.h"
 				>
 			</File>
 			<File
@@ -2363,30 +2209,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\URNResolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec2d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec2f.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec3d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec3f.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec4d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Types\Vec4f.h"
 				>
 			</File>
 			<File
@@ -2526,6 +2348,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\X3DPointingDeviceSensorNode.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\X3DProgrammableShaderObject.h"
 				>
 			</File>
@@ -2590,6 +2416,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\X3DTouchSensorNode.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\X3DTriggerNode.h"
 				>
 			</File>
@@ -2610,6 +2440,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\..\src\lex.yy.cc"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -145,6 +145,11 @@ namespace H3D {
     /// Traverse the scenegraph. traverseSG() is called in all children nodes.
     virtual void traverseSG( TraverseInfo &ti );
 #endif
+
+    virtual bool lineIntersect( const Vec3f &from, 
+                                const Vec3f &to,    
+                                HAPI::Bounds::IntersectionInfo &result,
+                                bool global );
   
     /// if true a route will be set up between the bound field of the
     /// nodes in children and the bound field of the grouping node. 
