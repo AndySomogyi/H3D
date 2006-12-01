@@ -50,6 +50,12 @@ H3DNodeDatabase RuspiniRenderer::database(
                            typeid( RuspiniRenderer ),
                            &H3DHapticsRendererNode::database );
 
+H3DNodeDatabase Chai3DRenderer::database( 
+                           "Chai3DRenderer", 
+                           &(newInstance<Chai3DRenderer>), 
+                           typeid( Chai3DRenderer ),
+                           &H3DHapticsRendererNode::database );
+
 namespace HapticsRendererInternals {
   FIELDDB_ELEMENT( RuspiniRenderer, proxyRadius, INPUT_OUTPUT );
 
@@ -60,7 +66,6 @@ namespace HapticsRendererInternals {
 
 RuspiniRenderer::RuspiniRenderer( Inst< ProxyRadius > _proxyRadius ) :
   proxyRadius( _proxyRadius ) {
-  renderer = new HAPI::RuspiniRenderer;
   
   type_name = "RuspiniRenderer";
   database.initFields( this );
@@ -71,39 +76,52 @@ RuspiniRenderer::RuspiniRenderer( Inst< ProxyRadius > _proxyRadius ) :
 void RuspiniRenderer::ProxyRadius::onValueChange( const H3DFloat &v ) {
   RuspiniRenderer *ruspini_node = 
     static_cast< RuspiniRenderer * >( getOwner() );
-  HAPI::RuspiniRenderer *r = ruspini_node->getHapticsRenderer();
-  // convert to millimeters
-  r->setProxyRadius( v * 1000 );
+  for( unsigned int i = 0; i < ruspini_node->renderers.size(); i++ ) {
+    HAPI::RuspiniRenderer *r = 
+      static_cast< HAPI::RuspiniRenderer * >(ruspini_node->getHapticsRenderer( i ) );
+    // convert to millimeters
+    r->setProxyRadius( v * 1000 );
+  }
 }
 
 void OpenHapticsRenderer::ShapeType::onValueChange( const string &v ) {
   OpenHapticsRenderer *oh_node = 
     static_cast< OpenHapticsRenderer * >( getOwner() );
-  HAPI::OpenHapticsRenderer *r = oh_node->getHapticsRenderer();
+
+  for( unsigned int i = 0; i < oh_node->renderers.size(); i++ ) {
+    HAPI::OpenHapticsRenderer *r = 
+      static_cast< HAPI::OpenHapticsRenderer * >(oh_node->getHapticsRenderer( i ) );
   
-  if( v == "FEEDBACK_BUFFER" ) {
-    r->setDefaultShapeType( HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER );
-  } else if( v == "DEPTH_BUFFER" ) {
-    r->setDefaultShapeType( HAPI::OpenHapticsRenderer::OpenHapticsOptions::DEPTH_BUFFER );    
-  } else {
-    Console(4) << "Warning: Invalid OpenHaptics shape type: "
-               << v 
-               << ". Must be \"FEEDBACK_BUFFER\" or \"DEPTH_BUFFER\" "
-               << "(in \"" << getName() << "\")" << endl;
-    r->setDefaultShapeType( HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER );
+    if( v == "FEEDBACK_BUFFER" ) {
+      r->setDefaultShapeType( HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER );
+    } else if( v == "DEPTH_BUFFER" ) {
+      r->setDefaultShapeType( HAPI::OpenHapticsRenderer::OpenHapticsOptions::DEPTH_BUFFER );    
+    } else {
+      Console(4) << "Warning: Invalid OpenHaptics shape type: "
+                 << v 
+                 << ". Must be \"FEEDBACK_BUFFER\" or \"DEPTH_BUFFER\" "
+                 << "(in \"" << getName() << "\")" << endl;
+      r->setDefaultShapeType( HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER );
+    }
   }
 }
 
 void OpenHapticsRenderer::AdaptiveViewport::onValueChange( const bool &v ) {
   OpenHapticsRenderer *oh_node = 
     static_cast< OpenHapticsRenderer * >( getOwner() );
-  HAPI::OpenHapticsRenderer *r = oh_node->getHapticsRenderer();
-  r->setDefaultAdaptiveViewport( v );
+  for( unsigned int i = 0; i < oh_node->renderers.size(); i++ ) {
+    HAPI::OpenHapticsRenderer *r = 
+      static_cast< HAPI::OpenHapticsRenderer * >(oh_node->getHapticsRenderer( i ) );
+    r->setDefaultAdaptiveViewport( v );
+  }
 }
 
 void OpenHapticsRenderer::CameraView::onValueChange( const bool &v ) {
   OpenHapticsRenderer *oh_node = 
     static_cast< OpenHapticsRenderer * >( getOwner() );
-  HAPI::OpenHapticsRenderer *r = oh_node->getHapticsRenderer();
-  r->setDefaultHapticCameraView( v );
+  for( unsigned int i = 0; i < oh_node->renderers.size(); i++ ) {
+    HAPI::OpenHapticsRenderer *r = 
+      static_cast< HAPI::OpenHapticsRenderer * >(oh_node->getHapticsRenderer( i ) );
+    r->setDefaultHapticCameraView( v );
+  }
 }

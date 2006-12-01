@@ -58,11 +58,13 @@ namespace H3DHapticsDeviceInternals {
   FIELDDB_ELEMENT( H3DHapticsDevice, hapticsRate, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, stylus, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, hapticsRenderer, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( H3DHapticsDevice, proxyPositions, INPUT_OUTPUT );
 }
 
 
 /// Constructor.
-H3DHapticsDevice::H3DHapticsDevice( Inst< SFVec3f         > _devicePosition,
+H3DHapticsDevice::H3DHapticsDevice( 
+               Inst< SFVec3f         > _devicePosition,
                Inst< SFRotation      > _deviceOrientation      ,
                Inst< TrackerPosition > _trackerPosition        ,
                Inst< TrackerOrientation > _trackerOrientation  ,
@@ -79,7 +81,8 @@ H3DHapticsDevice::H3DHapticsDevice( Inst< SFVec3f         > _devicePosition,
                Inst< SFInt32         > _hapticsRate            ,
                Inst< SFNode          > _stylus                 ,
                Inst< SFBool          > _initialized            ,
-               Inst< SFHapticsRendererNode > _hapticsRenderer  ):
+               Inst< SFHapticsRendererNode > _hapticsRenderer,
+               Inst< MFVec3f         > _proxyPositions  ):
   devicePosition( _devicePosition ),
   deviceOrientation( _deviceOrientation ),
   trackerPosition( _trackerPosition ),
@@ -97,7 +100,8 @@ H3DHapticsDevice::H3DHapticsDevice( Inst< SFVec3f         > _devicePosition,
   hapticsRate( _hapticsRate ),
   stylus( _stylus ),
   initialized( _initialized ),
-  hapticsRenderer( _hapticsRenderer ) {
+  hapticsRenderer( _hapticsRenderer ),
+  proxyPositions( _proxyPositions ) {
 
   type_name = "H3DHapticsDevice";  
   database.initFields( this );
@@ -152,9 +156,22 @@ void H3DHapticsDevice::renderEffects(
 }
 
 void H3DHapticsDevice::renderShapes( 
-                         const HapticShapeVector &shapes ) {
+                         const HapticShapeVector &shapes,
+                         unsigned int layer ) {
   if( hapi_device.get() ) {
-    hapi_device->setShapes( shapes );
+
+    HAPI::HAPIHapticsRenderer *hapi_renderer = 
+      hapi_device->getHapticsRenderer( layer );
+
+    if( !hapi_renderer ) {
+      H3DHapticsRendererNode *h3d_renderer = hapticsRenderer->getValue();
+      if( h3d_renderer ) {
+        hapi_device->setHapticsRenderer( 
+                                  h3d_renderer->getHapticsRenderer( layer ), layer );
+      }
+    }
+    
+    hapi_device->setShapes( shapes, layer );
     hapi_device->transferObjects();
   }
 }
@@ -178,17 +195,32 @@ void H3DHapticsDevice::updateDeviceValues() {
     hapi_device->setOrientationCalibration( orientationCalibration->rt_orn_calibration );
     //cerr << deviceOrientation->getValue() << endl;
     //cerr << trackerOrientation->getValue() << endl;
-    HAPI::HAPIProxyBasedRenderer *proxy_renderer = 
-      dynamic_cast< HAPI::HAPIProxyBasedRenderer * >
-      ( hapi_device->getHapticsRenderer() );
-    if( proxy_renderer ) {
-      proxyPosition->setValue( (Vec3f)(proxy_renderer->getProxyPosition() * 1e-3), 
-                               id );
-    } else {
-      proxyPosition->setValue( trackerPosition->getValue(), id );
+
+    vector< Vec3f > proxies;
+
+    for( unsigned int layer = 0; layer < hapi_device->nrLayers(); layer++ ) {
+      HAPI::HAPIHapticsRenderer *renderer = 
+        hapi_device->getHapticsRenderer( layer );
+
+      HAPI::HAPIProxyBasedRenderer *proxy_renderer = 
+        dynamic_cast< HAPI::HAPIProxyBasedRenderer * >( renderer );
+      if( proxy_renderer ) {
+        Vec3f proxy_pos = (Vec3f)(proxy_renderer->getProxyPosition() * 1e-3);
+        proxies.push_back( proxy_pos );
+        if( layer == 0 ) {
+          proxyPosition->setValue( proxy_pos, id );
+        }
+      } else {
+        Vec3f tracker_pos = trackerPosition->getValue(); 
+        proxies.push_back( tracker_pos );
+        if( layer == 0 ) {
+          proxyPosition->setValue( tracker_pos, id );
+        }
+      }
     }
 
-    HAPI::HAPIHapticsRenderer *renderer = hapi_device->getHapticsRenderer();
+    proxyPositions->setValue( proxies, id );
+
     // find the index of the haptics device
     DeviceInfo *di = DeviceInfo::getActive();
     int device_index = -1;
@@ -201,9 +233,17 @@ void H3DHapticsDevice::updateDeviceValues() {
     }
     assert( device_index != -1 );
 
-    HAPI::RuspiniRenderer::Contacts contacts;
-    if( renderer ) contacts = renderer->getContacts();
-    for( HAPI::RuspiniRenderer::Contacts::iterator i = contacts.begin();
+    HAPI::RuspiniRenderer::Contacts all_contacts;
+
+    for( unsigned int layer = 0; layer < hapi_device->nrLayers(); layer++ ) {
+      HAPI::HAPIHapticsRenderer *renderer = 
+        hapi_device->getHapticsRenderer( layer );
+      HAPI::RuspiniRenderer::Contacts contacts;
+      if( renderer ) {
+        contacts = renderer->getContacts();
+        all_contacts.insert( all_contacts.end(), contacts.begin(), contacts.end() );
+      }
+      for( HAPI::RuspiniRenderer::Contacts::iterator i = contacts.begin();
            i != contacts.end(); i++ ) {
         X3DGeometryNode *geom = static_cast< X3DGeometryNode * >((*i).first->userdata );
       
@@ -238,7 +278,6 @@ void H3DHapticsDevice::updateDeviceValues() {
         if( geom->contactTexCoord->getValueByIndex( device_index ) != ci.tex_coord ) 
           geom->contactTexCoord->setValue( device_index, (Vec3f) ci.tex_coord, geom->id ); 
         
-        cerr << ci.tex_coord << endl;
         Vec3f f( global_vec_to_local * ci.force_global );
 
         if( geom->force->getValueByIndex( device_index ) != f ) 
@@ -249,26 +288,25 @@ void H3DHapticsDevice::updateDeviceValues() {
         if( !contact_last_time ) 
           geom->isTouched->setValue( device_index, true, geom->id );
       }
+    }
 
-      for( HAPI::RuspiniRenderer::Contacts::iterator j = last_contacts.begin();
-           j != last_contacts.end(); j++ ) {
-        bool still_in_contact = false;
-        for( HAPI::RuspiniRenderer::Contacts::iterator i = contacts.begin();
-             i != contacts.end(); i++ ) {
-          if( (*i).first->userdata == (*j).first->userdata ) {
-            still_in_contact = true;
-            break;
-          }
+    for( HAPI::RuspiniRenderer::Contacts::iterator j = last_contacts.begin();
+         j != last_contacts.end(); j++ ) {
+      bool still_in_contact = false;
+      for( HAPI::RuspiniRenderer::Contacts::iterator i = all_contacts.begin();
+           i != all_contacts.end(); i++ ) {
+        if( (*i).first->userdata == (*j).first->userdata ) {
+          still_in_contact = true;
+          break;
         }
-        if( !still_in_contact ) {
-          X3DGeometryNode *geom = 
-            static_cast< X3DGeometryNode * >((*j).first->userdata );
-          geom->isTouched->setValue( device_index, false, geom->id );
-        }
-           }
-      // TODO: untouch
-    
-      last_contacts.swap( contacts );
+      }
+      if( !still_in_contact ) {
+        X3DGeometryNode *geom = 
+          static_cast< X3DGeometryNode * >((*j).first->userdata );
+        geom->isTouched->setValue( device_index, false, geom->id );
+      }
+    }
+    last_contacts.swap( all_contacts );
 
     /*
     cerr << "F: " << devicePosition->getValue() * 1e3<< endl;

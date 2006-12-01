@@ -40,6 +40,7 @@
 #include <OpenHapticsRenderer.h>
 #include <RuspiniRenderer.h>
 #include <GodObjectRenderer.h>
+#include <Chai3DRenderer.h>
 
 namespace H3D {
 
@@ -50,12 +51,14 @@ namespace H3D {
     /// ShapeType specializes SFString to set the appropriate default
     /// OpenHaptics shape in the HAPI::OpenHapticsRenderer
     class ShapeType: public OnValueChangeSField< SFString > {
+    protected:
       virtual void onValueChange( const string &v );
     };
 
     /// AdaptiveViewport specializes SFBool to set the appropriate default
     /// values in the HAPI::OpenHapticsRenderer used.
     class AdaptiveViewport: public OnValueChangeSField< SFBool > {
+    protected:
       virtual void onValueChange( const bool &v );
     };
 
@@ -63,6 +66,7 @@ namespace H3D {
     /// CameraView specializes SFBool to set the appropriate default
     /// values in the HAPI::OpenHapticsRenderer used.
     class CameraView: public OnValueChangeSField< SFBool > {
+    protected:
       virtual void onValueChange( const bool &v );
     };
 
@@ -73,7 +77,6 @@ namespace H3D {
       defaultShapeType( _defaultShapeType ),
       defaultAdaptiveViewport( _defaultAdaptiveViewport ),
       defaultHapticCameraView( _defaultHapticCameraView ) {
-      renderer = new HAPI::OpenHapticsRenderer;
       type_name = "OpenHapticsRenderer";
       database.initFields( this );
 
@@ -82,9 +85,9 @@ namespace H3D {
       defaultHapticCameraView->setValue( true );
     }
 
-    /// Get the HAPI haptics renderer used for this node.
-    inline virtual HAPI::OpenHapticsRenderer *getHapticsRenderer() {
-      return static_cast< HAPI::OpenHapticsRenderer * >( renderer );
+    /// Returns a new instancs of HAPI::OpenHapticsRenderer
+    virtual HAPI::HAPIHapticsRenderer *getNewHapticsRenderer() {
+      return new HAPI::OpenHapticsRenderer;
     }
 
     /// The default shape type to use if it has not been specified with
@@ -122,14 +125,14 @@ namespace H3D {
 
     /// Constructor.
     GodObjectRenderer() {
-      renderer = new HAPI::GodObjectRenderer;
+ 
       type_name = "GodObjectRenderer";
       database.initFields( this );
     }
-
-    /// Get the HAPI haptics renderer used for this node.
-    inline virtual HAPI::GodObjectRenderer *getHapticsRenderer() {
-      return static_cast< HAPI::GodObjectRenderer * >( renderer );
+    
+    /// Returns a new instancs of HAPI::GodObjectRenderer
+    virtual HAPI::HAPIHapticsRenderer *getNewHapticsRenderer() {
+      return new HAPI::GodObjectRenderer;
     }
 
     /// The H3DNodeDatabase for this node.
@@ -151,9 +154,9 @@ namespace H3D {
     /// Constructor.
     RuspiniRenderer( Inst< ProxyRadius > _proxyRadius    = 0);
 
-    /// Get the HAPI haptics renderer used for this node.
-    inline virtual HAPI::RuspiniRenderer *getHapticsRenderer() {
-      return static_cast< HAPI::RuspiniRenderer * >( renderer );
+    /// Returns a new instancs of HAPI::RuspiniRenderer
+    virtual HAPI::HAPIHapticsRenderer *getNewHapticsRenderer() {
+      return new HAPI::RuspiniRenderer;
     }
 
     /// The radius of the proxy in metres.
@@ -161,6 +164,27 @@ namespace H3D {
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 0.0025 \n
     auto_ptr< SFFloat > proxyRadius;
+
+    /// The H3DNodeDatabase for this node.
+    static H3DNodeDatabase database;
+  };
+
+  /// \ingroup H3DNodes
+  /// \brief Haptics renderer using Chai3D(www.chai3d.org)
+  /// Uses the HAPI::Chai3DRenderer class.
+  class H3DAPI_API Chai3DRenderer: public H3DHapticsRendererNode {
+  public:
+
+    /// Constructor.
+    Chai3DRenderer() {
+      type_name = "Chai3DRenderer";
+      database.initFields( this );
+    }
+
+    /// Returns a new instancs of HAPI::Chai3DRenderer
+    virtual HAPI::HAPIHapticsRenderer *getNewHapticsRenderer() {
+      return new HAPI::Chai3DRenderer;
+    }
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

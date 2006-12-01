@@ -229,34 +229,41 @@ void renderHapticTriangles() {
         debug_options->drawHapticTriangles->getValue();
   }
 
+  unsigned int current_layer = ti->getCurrentLayer();
+
   for( unsigned int di = 0; di < ti->getHapticsDevices().size(); di++ ) {
-    const HapticShapeVector &shapes = ti->getHapticShapes( di );
-    for( HapticShapeVector::const_iterator i = shapes.begin();
-         i != shapes.end(); i++ ) {
-      bool render_triangles = global_render_triangles;
-      X3DGeometryNode *geom = 
-        static_cast< X3DGeometryNode * >( (*i)->userdata );
-      if( geom ) {
-        debug_options = NULL;
-        geom->getOptionNode( debug_options );
-        if( debug_options ) {
-          render_triangles = debug_options->drawHapticTriangles->getValue();
+    for( unsigned int l = 0; l < ti->nrLayers(); l++ ) {
+      ti->setCurrentLayer( l );
+      const HapticShapeVector &shapes = ti->getHapticShapes( di );
+      for( HapticShapeVector::const_iterator i = shapes.begin();
+           i != shapes.end(); i++ ) {
+        bool render_triangles = global_render_triangles;
+        X3DGeometryNode *geom = 
+          static_cast< X3DGeometryNode * >( (*i)->userdata );
+        if( geom ) {
+          debug_options = NULL;
+          geom->getOptionNode( debug_options );
+          if( debug_options ) {
+            render_triangles = debug_options->drawHapticTriangles->getValue();
+          }
         }
-      }
-      if( render_triangles ) {
-        glMatrixMode( GL_MODELVIEW );
-        glPushMatrix();
-        glScalef( 1e-3, 1e-3, 1e-3 );   
-        glPushAttrib( GL_CURRENT_BIT | GL_ENABLE_BIT | GL_POLYGON_BIT );
-        glDisable( GL_LIGHTING );
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        glColor3f( 1, 1, 1 );
-        (*i)->glRender();
-        glPopAttrib();
-        glPopMatrix();
+        if( render_triangles ) {
+          glMatrixMode( GL_MODELVIEW );
+          glPushMatrix();
+          glScalef( 1e-3, 1e-3, 1e-3 );   
+          glPushAttrib( GL_CURRENT_BIT | GL_ENABLE_BIT | GL_POLYGON_BIT );
+          glDisable( GL_LIGHTING );
+          glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+          glColor3f( 1, 1, 1 );
+          (*i)->glRender();
+          glPopAttrib();
+          glPopMatrix();
+        }
       }
     }
   }
+
+  ti->setCurrentLayer( current_layer );
 }
 
 void H3DWindowNode::renderChild( X3DChildNode *c ) {
