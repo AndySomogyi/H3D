@@ -39,27 +39,38 @@
 namespace H3D {
 
   /// \ingroup AbstractNodes
-  /// \brief Base class for all haptic renderers, i.e. algorithms for generating
-  /// forces based on geometries. 
-  /// 
-  /// All subclasses should set the renderer member.
+  /// \brief Base class for all haptic renderers, i.e. algorithms for 
+  /// generating forces based on geometries. 
   class H3DAPI_API H3DHapticsRendererNode: public Node {
   public:
 
     /// Constructor.
-    H3DHapticsRendererNode() {}
-
-    /// Get the HAPI haptics renderer used for this node.
-    inline virtual HAPI::HAPIHapticsRenderer *getHapticsRenderer() {
-      return renderer;
+    H3DHapticsRendererNode() {
     }
-  
+    
+    /// Get the haptics renderer to use for a certain layer.
+    virtual HAPI::HAPIHapticsRenderer *
+    getHapticsRenderer( unsigned int layer ) {
+      if( renderers.size() < layer + 1 ) {
+        renderers.resize( layer + 1, NULL );
+      }
+      if( !renderers[layer] )
+        renderers[layer] = getNewHapticsRenderer();
+      
+      return renderers[layer];
+    }
+
+
+    /// Returns the default containerField value for this node. In this
+    /// case "hapticsRenderer"
     virtual string defaultXMLContainerField() {
       return "hapticsRenderer";
     }
     
   protected:
-    HAPI::HAPIHapticsRenderer *renderer;
+    /// Create a new HAPIHapticsRenderer to use.
+    virtual HAPI::HAPIHapticsRenderer *getNewHapticsRenderer() = 0;
+    vector< HAPI::HAPIHapticsRenderer * > renderers;
   };
 }
 

@@ -38,7 +38,7 @@ using namespace H3D;
 void TraverseInfo::addHapticShapeToAll( HAPI::HAPIHapticShape *shape ) {
   shape->ref();
   if( hapticsEnabled() ) {
-    for( vector< HapticShapeVector >::iterator i = haptic_shapes.begin();
+    for( vector< vector< HapticShapeVector > >::iterator i = haptic_shapes.begin();
          i != haptic_shapes.end();
          i++ ) {
       if( shape->shape_id == -1 ) {
@@ -48,7 +48,7 @@ void TraverseInfo::addHapticShapeToAll( HAPI::HAPIHapticShape *shape ) {
           geometry->getHapticShapeId( geometry_count[ geometry ] );
         geometry_count[ geometry ]++;
       }
-      (*i).push_back( shape );
+      (*i)[current_layer].push_back( shape );
     }
   } 
   shape->unref();
@@ -103,7 +103,7 @@ void TraverseInfo::addHapticShape( int device_index,
           geometry->getHapticShapeId( geometry_count[ geometry ] );
         geometry_count[ geometry ]++;
       }
-    haptic_shapes[device_index].push_back( shape );
+    haptic_shapes[device_index][current_layer].push_back( shape );
   } else {
     shape->ref();
     shape->unref();

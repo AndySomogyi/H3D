@@ -128,7 +128,10 @@ void Scene::idle() {
     for( unsigned int i = 0; i < nr_devices; i++ ) {
       H3DHapticsDevice *hd = ti->getHapticsDevice( i );
       if( hd->initialized->getValue() ) {
-        hd->renderShapes( ti->getHapticShapes( i ) );
+        for( unsigned int l = 0; l < ti->nrLayers(); l++ ) {
+          ti->setCurrentLayer( l );
+          hd->renderShapes( ti->getHapticShapes( i ), l );
+        }
         hd->renderEffects( ti->getForceEffects( i ) );
         hd->postRender();
       }

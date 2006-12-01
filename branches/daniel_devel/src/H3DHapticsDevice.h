@@ -38,6 +38,7 @@
 #include <SFBool.h>
 #include <SFMatrix4f.h>
 #include <SFVec3f.h>
+#include <MFVec3f.h>
 #include <H3DHapticsRendererNode.h>
 
 // H3DUtil includes
@@ -181,20 +182,26 @@ namespace H3D {
     };
 
 
-    class H3DAPI_API SFHapticsRendererNode: public TypedSFNode< H3DHapticsRendererNode > {
+    class H3DAPI_API SFHapticsRendererNode: 
+      public TypedSFNode< H3DHapticsRendererNode > {
       virtual void onAdd( Node *n ) {
         TypedSFNode< H3DHapticsRendererNode >::onAdd( n );
-        H3DHapticsRendererNode *renderer = static_cast< H3DHapticsRendererNode * >( n );
-        H3DHapticsDevice *device = static_cast< H3DHapticsDevice * >( getOwner() );
+        H3DHapticsRendererNode *renderer = 
+          static_cast< H3DHapticsRendererNode * >( n );
+        H3DHapticsDevice *device = 
+          static_cast< H3DHapticsDevice * >( getOwner() );
         if( renderer ) {
-          device->hapi_device->setHapticsRenderer( renderer->getHapticsRenderer() );
+          for( unsigned int i = 0; i < device->hapi_device->nrLayers(); i++ )
+            device->hapi_device->setHapticsRenderer( 
+                                     renderer->getHapticsRenderer( i ) );
         }
       }
       virtual void onRemove( Node *n ) {
         H3DHapticsRendererNode *renderer = static_cast< H3DHapticsRendererNode * >( n );
         H3DHapticsDevice *device = static_cast< H3DHapticsDevice * >( getOwner() );
         if( renderer ) {
-          device->hapi_device->setHapticsRenderer( NULL );
+          for( unsigned int i = 0; i < device->hapi_device->nrLayers(); i++ )
+            device->hapi_device->setHapticsRenderer( NULL, i );
         }
         TypedSFNode< H3DHapticsRendererNode >::onRemove( n );
       }
@@ -219,7 +226,8 @@ namespace H3D {
                       Inst< SFInt32         > _hapticsRate            = 0,
                       Inst< SFNode          > _stylus                 = 0,
                       Inst< SFBool          > _initialized            = 0,
-                      Inst< SFHapticsRendererNode > _hapticsRenderer  = 0 );
+                      Inst< SFHapticsRendererNode > _hapticsRenderer  = 0,
+                      Inst< MFVec3f         > _proxyPositions         = 0 );
 
     virtual ~H3DHapticsDevice() {
       disableDevice();
@@ -276,8 +284,9 @@ namespace H3D {
     /// HapticShape objects that are to be be rendered haptically must be 
     /// rendered with this function each scenegraph loop. 
     /// \param objects The haptic shapes to render.
-    ///
-    virtual void renderShapes( const HapticShapeVector &shapes );
+    /// \param layer The haptic layer to render them in.
+    virtual void renderShapes( const HapticShapeVector &shapes, 
+                               unsigned int layer = 0 );
 
     /// Perform haptic rendering for the given HapticForceEffect instances. 
     /// HapticForceEffect objects that are to be be rendered haptically must
@@ -334,7 +343,7 @@ namespace H3D {
     /// \dotfile H3DHapticsDevice_orientationCalibration.dot
     auto_ptr< OrnCalibration > orientationCalibration;
 
-    /// The position of the proxy used in the haptic rendering. 
+    /// The position of the proxy used in the haptic rendering(layer 0). 
     ///
     /// <b>Access type:</b> outputOnly \n
     /// 
@@ -429,6 +438,14 @@ namespace H3D {
     /// 
     /// \dotfile H3DHapticsDevice_hapticsRenderer.dot
     auto_ptr< SFHapticsRendererNode > hapticsRenderer;
+
+    /// The positions of the proxies for each layer used in haptic
+    /// rendering(layer 0). 
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// 
+    /// \dotfile H3DHapticsDevice_proxyPositions.dot
+    auto_ptr< MFVec3f >   proxyPositions;
     
     /// Node database entry
     static H3DNodeDatabase database;
