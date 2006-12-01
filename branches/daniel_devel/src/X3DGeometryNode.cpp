@@ -477,3 +477,15 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
     }
   }
 }
+
+bool X3DGeometryNode::lineIntersect( const Vec3f &from, 
+                                const Vec3f &to,    
+                                HAPI::Bounds::IntersectionInfo &result,
+                                bool global ) {
+  bool returnValue = boundTree->getValue()->lineIntersect( 1000*from, 1000*to, result );
+  if( returnValue ) {
+    result.point = result.point / 1000;
+    result.normal = result.normal / 1000;
+  }
+  return returnValue;
+}

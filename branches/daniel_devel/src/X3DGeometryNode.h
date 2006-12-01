@@ -94,6 +94,11 @@ namespace H3D {
 
     virtual void traverseSG( TraverseInfo &ti );
 
+    virtual bool lineIntersect( const Vec3f &from, 
+                                const Vec3f &to,    
+                                HAPI::Bounds::IntersectionInfo &result,
+                                bool global );
+
     /// Function overridden from HAPIGLShape. Just call the 
     /// displayList->callList per default
     virtual void glRender() {

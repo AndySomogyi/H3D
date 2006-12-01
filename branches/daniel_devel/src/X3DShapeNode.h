@@ -184,6 +184,13 @@ namespace H3D {
     virtual void traverseSG( TraverseInfo &ti );
 #endif
 
+    virtual bool lineIntersect( const Vec3f &from, 
+                                const Vec3f &to,    
+                                HAPI::Bounds::IntersectionInfo &result,
+                                bool global ) {
+      return geometry->getValue()->lineIntersect( from, to, result, global );
+    }
+
     typedef enum {
       /// render only transparent objects
       TRANSPARENT_ONLY,
