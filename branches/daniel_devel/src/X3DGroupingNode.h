@@ -146,10 +146,13 @@ namespace H3D {
     virtual void traverseSG( TraverseInfo &ti );
 #endif
 
-    virtual bool lineIntersect( const Vec3f &from, 
-                                const Vec3f &to,    
-                                HAPI::Bounds::IntersectionInfo &result,
-                                bool global );
+    // calls lineIntersect for its children.
+    virtual bool lineIntersect(
+      const Vec3f &from, 
+      const Vec3f &to,    
+      vector< HAPI::Bounds::IntersectionInfo > &result,
+      bool global,
+      vector< X3DGeometryNode * > &theGeometry );
   
     /// if true a route will be set up between the bound field of the
     /// nodes in children and the bound field of the grouping node. 
@@ -176,6 +179,9 @@ namespace H3D {
     
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
+    protected:
+      vector< X3DPointingDeviceSensorNode * > pt_dev_sens_nodes;
 
   };
 }

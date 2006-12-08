@@ -132,10 +132,16 @@ namespace H3D {
     virtual void traverseSG( TraverseInfo &ti );
 #endif
 
-    virtual bool lineIntersect( const Vec3f &from, 
-                                const Vec3f &to,    
-                                HAPI::Bounds::IntersectionInfo &result,
-                                bool global );
+    /// Intersection between a line and this Node. Transforms
+    /// the line into correct coordinate system and also transforms
+    /// the result if there is a result. Calls lineIntersect for its
+    /// children.
+    virtual bool lineIntersect( 
+      const Vec3f &from, 
+      const Vec3f &to,    
+      vector< HAPI::Bounds::IntersectionInfo > &result,
+      bool global,
+      vector< X3DGeometryNode * > &theGeometry );
 
     /// The transformation matrix.
     /// 

@@ -75,10 +75,14 @@ namespace H3D {
     virtual void traverseSG( TraverseInfo &ti ) {}
 #endif
 
-    virtual bool lineIntersect( const Vec3f &from, 
-                                const Vec3f &to,    
-                                HAPI::Bounds::IntersectionInfo &result,
-                                bool global ) { 
+    /// Detect intersection between a line from "from" to "to"
+    /// and a Node.
+    virtual bool lineIntersect( 
+      const Vec3f &from, 
+      const Vec3f &to,    
+      vector< HAPI::Bounds::IntersectionInfo > &result,
+      bool global,
+      vector< X3DGeometryNode * > &theGeometry ) {
       return false;
     }
     

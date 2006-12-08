@@ -116,12 +116,35 @@ void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
       l->enableHapticsState( ti );
     }
   }
+
+  // If there are pointing device sensors in this node add them
+  // to the current_pt_dev_sensors vector and set the correct
+  // matrix for the sensors. ( This is done here since MatrixTransform
+  // calls X3DGroupingNodes traverseSG function.
+  vector< X3DPointingDeviceSensorNode * > old_pt_dev_sens_nodes;
+  if( !pt_dev_sens_nodes.empty() ) {
+    old_pt_dev_sens_nodes = ti.current_pt_dev_sensors;
+    ti.current_pt_dev_sensors.clear();
+    for( unsigned int i = 0; i < pt_dev_sens_nodes.size(); i++ ) {
+      pt_dev_sens_nodes[i]->setCurrentMatrix( ti.getAccInverseMatrix() );
+      ti.current_pt_dev_sensors.push_back( pt_dev_sens_nodes[i] );
+    }
+  }
+
   // not using iterators since they can become invalid if the 
   // traversal changes the children field while iterating.
   const NodeVector &c = children->getValue();
   for( unsigned int i = 0; i < c.size(); i++ ) {
     if( c[i] )
       c[i]->traverseSG( ti );
+  }
+
+  // reset the current_pt_dev_sensors vector to the previous value
+  if( !pt_dev_sens_nodes.empty() ) {
+    ti.current_pt_dev_sensors = old_pt_dev_sens_nodes;
+    for( unsigned int i = 0; i < pt_dev_sens_nodes.size(); i++ ) {
+      pt_dev_sens_nodes[i]->setCurrentMatrix( Matrix4f() );
+    }
   }
 
   for( MFNode::const_reverse_iterator i = children->rbegin();
@@ -134,16 +157,20 @@ void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
 }
 #endif
 
-bool X3DGroupingNode::lineIntersect( const Vec3f &from, 
-                                const Vec3f &to,    
-                                HAPI::Bounds::IntersectionInfo &result,
-                                bool global ) {
+bool X3DGroupingNode::lineIntersect(
+                  const Vec3f &from, 
+                  const Vec3f &to,    
+                  vector< HAPI::Bounds::IntersectionInfo > &result,
+                  bool global,
+                  vector< X3DGeometryNode * > &theGeometry ) {
   const NodeVector &children_nodes = children->getValue();
   global = false;
   bool intersect = false;
   for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
-    if( children_nodes[i]->lineIntersect( from, to, result, global ) )
+    if( children_nodes[i]->
+         lineIntersect( from, to, result, global, theGeometry ) ) {
       intersect = true;
+    }
   }
   return intersect;
 }
@@ -171,10 +198,13 @@ void X3DGroupingNode::MFChild::onAdd( Node *n ) {
         }
       }
     }
+
+    // If we have a X3DPointingDeviceSensorNode add it to a separate
+    // vector.
     X3DPointingDeviceSensorNode * pdsn = 
       dynamic_cast< X3DPointingDeviceSensorNode * >( n );
     if( pdsn )
-      pdsn->addGroupNode( o );
+      o->pt_dev_sens_nodes.push_back( pdsn );
   }
 }
 
@@ -195,10 +225,25 @@ void X3DGroupingNode::MFChild::onRemove( Node *n ) {
         }
       }
     }
-    X3DPointingDeviceSensorNode * pdsn = 
-      dynamic_cast< X3DPointingDeviceSensorNode * >( n );
-    if( pdsn )
-      pdsn->removeGroupNode( o );
+
+    // Remove eventual X3DPointingDeviceSensorNodes from the
+    // separate vector.
+    if( !o->pt_dev_sens_nodes.empty() ) {
+      X3DPointingDeviceSensorNode * pdsn = 
+        dynamic_cast< X3DPointingDeviceSensorNode * >( n );
+      if( pdsn ) {
+        vector< X3DPointingDeviceSensorNode * >::iterator i;
+        bool found = false;
+        for( i = o->pt_dev_sens_nodes.begin();
+             i < o->pt_dev_sens_nodes.end(); i++ )
+          if( *i == n ) {
+            found = true;
+            break;
+          }
+          if( found )
+            o->pt_dev_sens_nodes.erase( i );
+      }
+    }
   }
   MFChildBase::onRemove( n );
 }

@@ -43,6 +43,8 @@
 #include "GLUTWindow.h"
 #include "X3DShapeNode.h"
 
+#include "X3DPointingDeviceSensorNode.h"
+
 using namespace H3D;
 
 
@@ -108,6 +110,8 @@ void Scene::idle() {
     X3DChildNode *c = static_cast< X3DChildNode * >( sceneRoot->getValue() );
     if( c )
       c->traverseSG( *ti );
+
+    X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( c );
 
     /// traverse the stylus of all haptics devices
     DeviceInfo *di = DeviceInfo::getActive();
