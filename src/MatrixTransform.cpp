@@ -141,10 +141,12 @@ void MatrixTransform::traverseSG( TraverseInfo &ti ) {
 }
 #endif
 
-bool MatrixTransform::lineIntersect( const Vec3f &from, 
-                                const Vec3f &to,    
-                                HAPI::Bounds::IntersectionInfo &result,
-                                bool global ) {
+bool MatrixTransform::lineIntersect(
+                             const Vec3f &from, 
+                             const Vec3f &to,    
+                             vector< HAPI::Bounds::IntersectionInfo > &result,
+                             bool global,
+                             vector< X3DGeometryNode * > &theGeometry ) {
   Matrix4f theMatrix;
   Matrix4f theMatrixInverse;
   if( global ) {
@@ -157,12 +159,16 @@ bool MatrixTransform::lineIntersect( const Vec3f &from,
   }
   Vec3f local_from = theMatrix * from;
   Vec3f local_to = theMatrix * to;
-  bool intersection = X3DGroupingNode::lineIntersect( local_from, local_to, result, global );
+  bool intersection = X3DGroupingNode::lineIntersect( 
+    local_from, local_to, result, global, theGeometry );
   if( intersection ) {
-    Vec3f newNormalPoint = theMatrixInverse * Vec3f( result.point + result.normal );
-    result.point = theMatrixInverse * result.point;
-    result.normal = newNormalPoint - result.point;
-    result.normal.normalize();
+    for( unsigned int i = 0; i < result.size(); i++ ) {
+      Vec3f newNormalPoint =
+        theMatrixInverse * Vec3f( result[i].point + result[i].normal );
+      result[i].point = theMatrixInverse * result[i].point;
+      result[i].normal = newNormalPoint - result[i].point;
+      result[i].normal.normalize();
+    }
   }
   return intersection;
 }

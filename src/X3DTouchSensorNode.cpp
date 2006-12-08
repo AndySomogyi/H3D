@@ -50,11 +50,15 @@ X3DTouchSensorNode::X3DTouchSensorNode(
                               Inst< SFBool >  _isActive,
                               Inst< SFBool >  _isOver,
                               Inst< SFTime > _touchTime ) :
-  X3DPointingDeviceSensorNode( _description, _enabled, _metadata, _isActive, _isOver ),
-  touchTime ( _touchTime  ) {
+  X3DPointingDeviceSensorNode( _description, _enabled, 
+                               _metadata, _isActive, _isOver ),
+  touchTime ( _touchTime  ),
+  setTouchTime( new SetTouchTime ) {
 
   type_name = "X3DTouchSensorNode";
   database.initFields( this );
+  
+  setTouchTime->setValue( true );
+  setTouchTime->setOwner( this );
+  isActive->route( setTouchTime );
 }
-
-

@@ -358,10 +358,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\FeedbackBufferGeometry.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Field.cpp"
 				>
 			</File>
@@ -475,6 +471,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\H3DWindowNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\HapticLayeredGroup.cpp"
 				>
 			</File>
 			<File
@@ -687,6 +687,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\HAPI\src\OpenHapticsRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\OpenHapticsSurface.cpp"
 				>
 			</File>
 			<File
@@ -1003,6 +1007,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\X3DCoordinateNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\X3DDragSensorNode.cpp"
 				>
 			</File>
 			<File
@@ -1340,10 +1348,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\FeedbackBufferGeometry.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Field.h"
 				>
 			</File>
@@ -1509,6 +1513,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\H3DWindowNode.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\HapticLayeredGroup.h"
 				>
 			</File>
 			<File
@@ -1817,6 +1825,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\HAPI\src\OpenHapticsRenderer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\OpenHapticsSurface.h"
 				>
 			</File>
 			<File
@@ -2269,6 +2281,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\X3DCoordinateNode.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\X3DDragSensorNode.h"
 				>
 			</File>
 			<File

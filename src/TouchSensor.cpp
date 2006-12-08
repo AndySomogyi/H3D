@@ -56,18 +56,12 @@ TouchSensor::TouchSensor(
                          Inst< SFBool >  _isActive,
                          Inst< SFBool >  _isOver,
                          Inst< SFTime > _touchTime ) :
-  X3DTouchSensorNode( _description, _enabled, _metadata, _isActive, _isOver, _touchTime ),
+  X3DTouchSensorNode( _description, _enabled,
+                      _metadata, _isActive, _isOver, _touchTime ),
   hitNormal_changed( _hitNormal_changed ),
   hitPoint_changed( _hitPoint_changed ),
-  hitTexCoord_changed( _hitTexCoord_changed ),
-  setIsActive( new SetIsActive ){
+  hitTexCoord_changed( _hitTexCoord_changed ) {
 
   type_name = "TouchSensor";
   database.initFields( this );
-
-  setIsActive->setOwner(this);
-  mouseSensor->leftButton->routeNoEvent( setIsActive );
-  isOver->routeNoEvent( setIsActive );
 }
-
-

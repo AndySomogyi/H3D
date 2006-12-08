@@ -29,10 +29,10 @@
 #ifndef __X3DPOINTINGDEVICESENSORNODE_H__
 #define __X3DPOINTINGDEVICESENSORNODE_H__
 
-#include "X3DSensorNode.h"
-#include "X3DGroupingNode.h"
-#include "SFString.h"
 #include "MouseSensor.h"
+#include "X3DGroupingNode.h"
+#include "X3DGeometryNode.h"
+#include "SFString.h"
 
 namespace H3D {
 
@@ -105,23 +105,81 @@ namespace H3D {
   /// intersects multiple sensors' geometries, only the sensor nearest to the
   /// pointer will be eligible for activation.
   ///
-  /// TODO: only use the lowest sensor(s) in the hierarchy.
-  /// TODO: Enabling mean to not generate events until the mousebutton has been released once.
-  /// TODO: Allowing for 3D pointing device. ( which could be a haptics device perhaps)
-  /// TODO: Only activate sensor nearest to pointer e.g. depth testing.
-  /// TODO: Only generate true if the touchsensors geometry is not occluded by other geometry.
-  
+  // TODO: Allowing for 3D pointing device. 
+  // ( which could be a haptics device perhaps)
+
   class H3DAPI_API X3DPointingDeviceSensorNode : 
     public X3DSensorNode {
   public:
 
-    /// The IsOver class is specialize to detect if the X3DPointingDeviceSensorNode
-    /// is over a contained geometry. In that case it will call a virtual function
-    /// which decides what happens for the different implementations of the
-    /// X3DPointingDeviceSensorNode.
+    /// The IsActive class is specialize field to set the isActive field.
+    /// isActive is set to true if the primary pointing device button is
+    /// pressed while isOver is true. isActive is set to false when the
+    /// primary pointing device button is released if it was previously 
+    /// pressed.
     ///
-    /// routes_in[0] is the position field of a MouseSensor
-    class H3DAPI_API SetIsOver: public AutoUpdate< TypedField < SFBool, SFVec2f > > {
+    /// routes_in[0] is the isOver field
+    /// routes_in[1] is the leftButton field of a MouseSensor
+    class H3DAPI_API SetIsActive: 
+      public AutoUpdate< TypedField < SFBool, Types< SFBool, SFBool > > > {
+    public:
+      SetIsActive() {
+        leftMousePressedOutside = false;
+      }
+
+      virtual void setValue( const bool &b, int id = 0 ) {
+        SFBool::setValue( b, id );
+      }
+    protected:
+      virtual void update() {
+        SFBool::update();
+        X3DPointingDeviceSensorNode *ts = 
+              static_cast< X3DPointingDeviceSensorNode * >( getOwner() );
+        if( ts->isEnabled ) {
+          bool itIsActive = false;
+          bool leftButton = 
+            static_cast< SFBool * >( routes_in[0] )->getValue();
+          bool isOver = static_cast< SFBool * >( routes_in[1] )->getValue();
+          if( leftButton ) {
+            if( !leftMousePressedOutside && 
+                ( isOver || ts->isActive->getValue() ) )
+              itIsActive = true;
+            else
+              leftMousePressedOutside = true;
+          }
+          else {
+            itIsActive = false;
+            leftMousePressedOutside = false;
+          }
+
+          if( itIsActive != ts->isActive->getValue() ) {
+            ts->isActive->setValue( itIsActive, ts->id );
+            if( itIsActive ) {
+              someAreActive++;
+            }
+            else {
+              someAreActive--;
+            }
+          }
+        }
+      }
+      bool leftMousePressedOutside;
+    };
+#ifdef __BORLANDC__
+    friend class IsActive;
+#endif
+
+    /// The SetIsEnabled class is specialize to check if the primary pointing
+    /// device button is pressed when the enabled field is set to true. 
+    /// If so then enabled will not
+    /// cause events until the primary pointing device button is released.
+    /// Also if the enabled field is false and isActive is true then isActive
+    /// is set to false.
+    ///
+    /// routes_in[0] is the enabled field of X3DPointingDeviceSensorNode
+    /// routes_in[1] is the leftButton field of MouseSensor
+    class H3DAPI_API SetIsEnabled: 
+      public AutoUpdate< TypedField < SFBool, Types< SFBool, SFBool > > > {
     public:
       virtual void setValue( const bool &b, int id = 0 ) {
         SFBool::setValue( b, id );
@@ -129,43 +187,28 @@ namespace H3D {
     protected:
       virtual void update() {
         SFBool::update();
+        bool _enabled = static_cast< SFBool * >( routes_in[0] )->getValue();
+        bool leftButton = static_cast< SFBool * >( routes_in[1] )->getValue();
+        
         X3DPointingDeviceSensorNode *pdsn = 
-          static_cast< X3DPointingDeviceSensorNode * >( getOwner() );
-        if( pdsn->enabled->getValue() ) {
-          bool itIsOver = false;
-          if( !pdsn->parentNodes.empty() )
-          {
-            Vec2f mousePos2d = static_cast< SFVec2f * >( routes_in[0] )->getValue();
-            GLint viewport[4];
-            GLdouble mvmatrix[16], projmatrix[16];
-            GLdouble wx, wy, wz;
-            glGetIntegerv( GL_VIEWPORT, viewport );
-            glGetDoublev( GL_MODELVIEW_MATRIX, mvmatrix );
-            glGetDoublev( GL_PROJECTION_MATRIX, projmatrix );
-            mousePos2d.y = viewport[3] - (GLint ) mousePos2d.y - 1;
-            gluUnProject( (GLdouble) mousePos2d.x, (GLdouble) mousePos2d.y,
-              0.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );
-            Vec3f nearPlanePos = Vec3f( wx, wy, wz );
-            gluUnProject( (GLdouble) mousePos2d.x, (GLdouble) mousePos2d.y,
-              1.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );
-            Vec3f farPlanePos = Vec3f( wx, wy, wz );
+            static_cast< X3DPointingDeviceSensorNode * >( getOwner() );
+        if( _enabled != pdsn->isEnabled ) {
+          if( leftButton && _enabled && !pdsn->isEnabled ) {
+            pdsn->isEnabled = false;
+          }
+          else {
+            pdsn->isEnabled = _enabled;
+          }
+        }
 
-            for( unsigned int i = 0; i < pdsn->parentNodes.size(); i++ ) {
-              HAPI::Bounds::IntersectionInfo result;
-              if( pdsn->parentNodes[i]->lineIntersect( nearPlanePos, farPlanePos, result, true ) ) {
-                itIsOver = true;
-                pdsn->onIsOver( result );
-              }
-            }
-          }
-          if( pdsn->isOver->getValue() != itIsOver ) {
-            pdsn->isOver->setValue( itIsOver, pdsn->id );
-          }
+        if( routes_in[0] == event.ptr && 
+            !_enabled && pdsn->isActive->getValue( pdsn->id ) ) {
+          pdsn->isActive->setValue( _enabled, pdsn->id );
         }
       }
     };
 #ifdef __BORLANDC__
-    friend class IsOver;
+    friend class SetIsEnabled;
 #endif
 
     /// Constructor.
@@ -174,6 +217,8 @@ namespace H3D {
                                  Inst< SFNode >  _metadata = 0,
                                  Inst< SFBool >  _isActive = 0,
                                  Inst< SFBool > _isOver = 0 );
+
+    ~X3DPointingDeviceSensorNode();
 
     // Fields
     /// The description field in a X3DPointingDeviceSensorNode node specifies a
@@ -186,35 +231,90 @@ namespace H3D {
     /// \dotfile X3DPointingDeviceSensorNode_description.dot
     auto_ptr< SFString > description;
 
+    /// The isOver field reflects the state of the pointing device with regard
+    /// to whether it is pointing towards the X3DPointingDeviceSensorNode 
+    /// node's geometry or not. When the pointing device changes state from a
+    /// position such that its bearing does not intersect any of the 
+    /// X3DPointingDeviceSensorNode node's geometry to one in which it does
+    /// intersect geometry, an isOver TRUE event is generated. When the
+    /// pointing device moves from a position such that its bearing intersects
+    /// geometry to one in which it no longer intersects the geometry, or some
+    /// other geometry is obstructing the X3DPointingDeviceSensorNode node's
+    /// geometry, an isOver FALSE event is generated. These events are
+    /// generated only when the pointing device has moved and changed `over'
+    /// state. Events are not generated if the geometry itself is animating
+    /// and moving underneath the pointing device.
+    ///
+    /// <b>Access type:</b> outputOnly
+    ///
+    /// \dotfile X3DPointingDeviceSensorNode_isOver.dot
     auto_ptr< SFBool > isOver;
 
-    void addGroupNode( X3DGroupingNode * n ) {
-      parentNodes.push_back( n );
+    /// Add the geometryNode to the vector of geometryNodes.
+    /// Called in traverseSG function of X3DGeometryNode.
+    void addGeometryNode( X3DGeometryNode * n );
+
+    /// Returns the index of the geometryNode if it does exist.
+    /// Otherwise return -1
+    int findGeometry( X3DGeometryNode * n ) {
+      if( isEnabled ) {
+        for( unsigned int i = 0; i < geometryNodes.size(); i++ )
+          if( geometryNodes[i] == n )
+            return i;
+      }
+      return -1;
     }
 
-    void removeGroupNode( X3DGroupingNode * n ) {
-      vector< X3DGroupingNode * >::iterator i;
-      bool found = false;
-      for( i = parentNodes.begin(); i < parentNodes.end(); i++ )
-        if( *i == n ) {
-          found = true;
-          break;
-        }
-      if( found )
-        parentNodes.erase( i );
+    /// Sets the currentMatrix to m
+    void setCurrentMatrix( Matrix4f m ) {
+      currentMatrix = m;
     }
 
-    virtual void onIsOver( HAPI::Bounds::IntersectionInfo &result ){};
-
-    /*virtual void initialize();*/
+    static void updateX3DPointingDeviceSensors( Node * n );
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
   protected:
+
+    /// Called to generate isOver events if they should be
+    /// generated.
+    virtual void onIsOver( bool newValue, 
+      HAPI::Bounds::IntersectionInfo &result, int geometryIndex ) {
+      if( isEnabled && ( isActive->getValue() || someAreActive == 0 ) ) {
+        if( newValue != isOver->getValue() )
+          isOver->setValue( newValue, id );
+      }
+    }
+
+    /// Used to find out if the 2D pointing device ( e.g. the mouse )
+    /// has moved. In that case collision with all geometries need to be done.
+    static bool has2DPointingDeviceMoved( Vec2f & pos );
+
+    // static variables for pointing Device 2D (e.g. mouse )
     static MouseSensor *mouseSensor;
-    auto_ptr< SetIsOver > setIsOver;
-    vector< X3DGroupingNode * > parentNodes;
+    static Vec2f posDevice2D;
+
+    // To indicate how many active devices there are.
+    static int someAreActive;
+    
+    // used instead of enabled to enable and disable X3DPointingDeviceSensors.
+    // correctly.
+    bool isEnabled;
+
+    // Instances of specialized fields.
+    auto_ptr< SetIsEnabled > setIsEnabled;
+    auto_ptr< SetIsActive > setIsActive;
+
+    // Vectors for geometries and the corresponding local transformation
+    // matrix of the X3DPointingDeviceSensor for that geometry.
+    vector< X3DGeometryNode * > geometryNodes;
+    vector< Matrix4f > geometryMatrices;
+    Matrix4f currentMatrix;
+    
+  private:
+    // The instances of X3DPointingDeviceSensorNode that has been created.
+    static vector< X3DPointingDeviceSensorNode * > instances;
   };
 }
 

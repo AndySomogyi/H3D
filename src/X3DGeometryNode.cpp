@@ -45,6 +45,8 @@
 
 #include <FeedbackBufferCollector.h>
 
+#include "X3DPointingDeviceSensorNode.h"
+
 using namespace H3D;
 
 H3DNodeDatabase X3DGeometryNode::database( "X3DGeometryNode", 
@@ -286,6 +288,13 @@ void X3DGeometryNode::SFBoundTree::update() {
 
 void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
   X3DChildNode::traverseSG( ti );
+
+  // if there exist a X3DPointingDeviceSensor add this node to its
+  // geometry vector.
+  if( !ti.current_pt_dev_sensors.empty() ) {
+    for( unsigned int i = 0; i < ti.current_pt_dev_sensors.size(); i++ )
+      (ti.current_pt_dev_sensors[i])->addGeometryNode( this );
+  }
   
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
     bool force_full_oh = false;
@@ -478,14 +487,20 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
   }
 }
 
-bool X3DGeometryNode::lineIntersect( const Vec3f &from, 
-                                const Vec3f &to,    
-                                HAPI::Bounds::IntersectionInfo &result,
-                                bool global ) {
-  bool returnValue = boundTree->getValue()->lineIntersect( 1000*from, 1000*to, result );
+bool X3DGeometryNode::lineIntersect(
+                  const Vec3f &from, 
+                  const Vec3f &to,    
+                  vector< HAPI::Bounds::IntersectionInfo > &result,
+                  bool global,
+                  vector< X3DGeometryNode * > &theGeometry ) {
+  HAPI::Bounds::IntersectionInfo tempresult;
+  bool returnValue =
+    boundTree->getValue()->lineIntersect( 1000*from, 1000*to, tempresult );
   if( returnValue ) {
-    result.point = result.point / 1000;
-    result.normal = result.normal / 1000;
+    tempresult.point = tempresult.point / 1000;
+    tempresult.normal = tempresult.normal / 1000;
+    result.push_back( tempresult );
+    theGeometry.push_back( this );
   }
   return returnValue;
 }

@@ -30,10 +30,6 @@
 #define __TOUCHSENSOR_H__
 
 #include "X3DTouchSensorNode.h"
-#include "X3DShapeNode.h"
-#include "X3DGeometryNode.h"
-#include "SFVec3f.h"
-#include "SFVec2f.h"
 
 namespace H3D {
 
@@ -43,60 +39,23 @@ namespace H3D {
   /// device and detects when the user points at geometry contained by 
   /// the TouchSensor node's parent group.
   ///
-  
+  /// As the user moves the bearing over the TouchSensor node's geometry,
+  /// the point of intersection (if any) between the bearing and the geometry
+  /// is determined. Each movement of the pointing device, while isOver is
+  /// TRUE, generates hitPoint_changed, hitNormal_changed and
+  /// hitTexCoord_changed events. hitPoint_changed events contain the 3D point
+  /// on the surface of the underlying geometry, given in the TouchSensor
+  /// node's coordinate system. hitNormal_changed events contain the surface
+  /// normal vector at the hitPoint. hitTexCoord_changed events contain the
+  /// texture coordinates of that surface at the hitPoint. The values of
+  /// hitTexCoord_changed and hitNormal_changed events are computed as
+  /// appropriate for the associated shape.
+  ///
+  /// \par Internal routes:
+  /// \dotfile Extrusion.dot 
   class H3DAPI_API TouchSensor : 
     public X3DTouchSensorNode {
   public:
-
-    /// The IsActive class is specialize to send true events when isOver
-    /// is true and the primary mouse button is pressed until the primary
-    /// mouse button is released.
-    ///
-    /// routes_in[0] is the isOver field
-    /// routes_in[1] is the leftButton field of a MouseSensor
-    class H3DAPI_API SetIsActive: public AutoUpdate< TypedField < SFBool, Types< SFBool, SFBool > > > {
-    public:
-      SetIsActive() {
-        leftMousePressedOutside = false;
-      }
-
-      virtual void setValue( const bool &b, int id = 0 ) {
-        SFBool::setValue( b, id );
-      }
-    protected:
-      virtual void update() {
-        SFBool::update();
-        TouchSensor *ts = 
-              static_cast< TouchSensor * >( getOwner() );
-        if( ts->enabled->getValue() ) {
-          bool itIsActive = false;
-          bool leftButton = static_cast< SFBool * >( routes_in[0] )->getValue();
-          bool isOver = static_cast< SFBool * >( routes_in[1] )->getValue();
-          if( leftButton ) {
-            if( !leftMousePressedOutside && ( isOver || ts->isActive->getValue() ) )
-              itIsActive = true;
-            else
-              leftMousePressedOutside = true;
-          }
-          else {
-            itIsActive = false;
-            leftMousePressedOutside = false;
-          }
-
-          if( itIsActive != ts->isActive->getValue() ) {
-            ts->isActive->setValue( itIsActive, ts->id );
-            if( itIsActive )
-              ts->startTime = TimeStamp();
-            else if( ts->isOver->getValue() )
-              ts->touchTime->setValue( TimeStamp() - ts->startTime, ts->id );
-          }
-        }
-      }
-      bool leftMousePressedOutside;
-    };
-#ifdef __BORLANDC__
-    friend class IsActive;
-#endif
 
     /// Constructor.
     TouchSensor( Inst< SFString > _description = 0,
@@ -109,27 +68,61 @@ namespace H3D {
                         Inst< SFBool > _isOver = 0,
                         Inst< SFTime > _touchTime = 0 );
 
-    /// hitPoint_changed, hitNormal_changed and hitTexCoord_changed events.
-
-
     // Fields
+    /// hitNormal_changed events contain the surface normal vector
+    /// at the hitPoint. ( Given in TouchSensors local coordinates )
+    /// 
+    /// <b>Access type:</b> outputOnly \n
+    /// 
+    /// \dotfile TouchSensor_hitNormal_changed.dot 
     auto_ptr< SFVec3f > hitNormal_changed;
+
+    /// hitPoint_changed events contain the 3D point on the surface
+    /// of the underlying geometry, given in the TouchSensor node's
+    /// coordinate system.
+    /// 
+    /// <b>Access type:</b> outputOnly \n
+    /// 
+    /// \dotfile TouchSensor_hitPoint_changed.dot 
     auto_ptr< SFVec3f > hitPoint_changed;
+
+    /// hitTexCoord_changed events contain the texture coordinates of
+    /// that surface at the hitPoint.
+    /// 
+    /// <b>Access type:</b> outputOnly \n
+    /// 
+    /// \dotfile TouchSensor_hitTexCoord_changed.dot 
     auto_ptr< SFVec2f > hitTexCoord_changed;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
-    virtual void onIsOver( HAPI::Bounds::IntersectionInfo &result ) {
-      hitPoint_changed->setValue( Vec3f( result.point ), id );
-      hitNormal_changed->setValue( Vec3f( result.normal ), id );
-      hitTexCoord_changed->setValue( Vec2f( result.tex_coord.x, result.tex_coord.y ), id );
-    }
+  protected:
+    /// Called to generate isOver events and other events (dependent on isOver)
+    // if they should be generated.
+    virtual void onIsOver( bool newValue,
+                           HAPI::Bounds::IntersectionInfo &result,
+                           int geometryIndex ) {
+      if( isEnabled && ( isActive->getValue() || someAreActive == 0 ) ) {
+        X3DPointingDeviceSensorNode::onIsOver( newValue,
+                                               result,
+                                               geometryIndex );
+        if( newValue ) {
+          Vec3f newNormalPoint = geometryMatrices[geometryIndex]
+                                 * Vec3f( result.point + result.normal );
+          Vec3f newPoint =
+            geometryMatrices[geometryIndex] * Vec3f( result.point );
+          newNormalPoint = newNormalPoint - newPoint;
+          newNormalPoint.normalize();
 
-    protected:
-      auto_ptr< SetIsActive > setIsActive;
-      H3DTime startTime;
+          hitPoint_changed->setValue( Vec3f( newPoint ), id );
+          hitNormal_changed->setValue( Vec3f( newNormalPoint ), id );
+          hitTexCoord_changed->setValue( Vec2f( (H3DFloat)result.tex_coord.x,
+                                                (H3DFloat)result.tex_coord.y ),
+                                                id );
+        }
+      }
+    }
   };
 }
-
 #endif

@@ -184,11 +184,15 @@ namespace H3D {
     virtual void traverseSG( TraverseInfo &ti );
 #endif
 
-    virtual bool lineIntersect( const Vec3f &from, 
-                                const Vec3f &to,    
-                                HAPI::Bounds::IntersectionInfo &result,
-                                bool global ) {
-      return geometry->getValue()->lineIntersect( from, to, result, global );
+    /// Calls lineIntersect for the geometry
+    virtual bool lineIntersect(
+      const Vec3f &from,
+      const Vec3f &to,
+      vector< HAPI::Bounds::IntersectionInfo > &result,
+      bool global,
+      vector< X3DGeometryNode * > &theGeometry ) {
+      return geometry->getValue()->
+        lineIntersect( from, to, result, global, theGeometry );
     }
 
     typedef enum {
