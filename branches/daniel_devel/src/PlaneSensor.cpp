@@ -34,7 +34,7 @@ using namespace H3D;
 
 H3DNodeDatabase PlaneSensor::database( 
         "PlaneSensor", 
-        NULL,
+        &(newInstance< PlaneSensor > ),
         typeid( PlaneSensor ),
         &X3DDragSensorNode::database 
         );
@@ -63,7 +63,8 @@ PlaneSensor::PlaneSensor(
   maxPosition ( _maxPosition  ),
   minPosition( _minPosition ),
   offset( _offset ),
-  translation_changed( _translation_changed ){
+  translation_changed( _translation_changed ),
+  set_Events( new Set_Events ) {
 
   type_name = "PlaneSensor";
   database.initFields( this );
@@ -71,8 +72,56 @@ PlaneSensor::PlaneSensor(
   maxPosition->setValue( Vec2f( -1, -1 ) );
   minPosition->setValue( Vec2f( 0, 0 ) );
   offset->setValue( Vec3f( 0, 0, 0 ) );
+
+  getTrackPlane = true;
+  originalGeometry = -1;
+
+  set_Events->setOwner( this );
+  mouseSensor->position->routeNoEvent( set_Events );
+  isActive->routeNoEvent( set_Events );
 }
 
 /// Destructor. 
 PlaneSensor::~PlaneSensor() {
+}
+
+void PlaneSensor::onIsOver( bool newValue,
+                           HAPI::Bounds::IntersectionInfo &result,
+                           int geometryIndex ) {
+  if( isEnabled && ( isActive->getValue() || someAreActive == 0 ) ) {
+    X3DPointingDeviceSensorNode::onIsOver( newValue,
+                                           result,
+                                           geometryIndex );
+    if( newValue ) {
+      Vec3f newNormalPoint = geometryMatrices[geometryIndex]
+      * Vec3f( result.point + result.normal );
+      Vec3f newPoint =
+        geometryMatrices[geometryIndex] * Vec3f( result.point );
+      newNormalPoint = newNormalPoint - newPoint;
+      newNormalPoint.normalize();
+      oldIntersection = newPoint;
+      oldGeometry = geometryIndex;
+    }
+  }
+}
+
+int PlaneSensor::intersectSegmentPlane( Vec3f a, Vec3f b, float &t, Vec3f &q ){
+  // Compute the t value for the directed line ab intersecting the plane
+  Vec3f ab = b - a;
+  t = (planeD - planeNormal * a ) / ( planeNormal * ab );
+
+  // If t in [0..1] compute and return intersection point
+  if( t >= 0.0f && t <= 1.0f ) {
+    q = a + t * ab;
+    return 1;
+  }
+
+  // Else no intersection
+  return 0;
+}
+
+H3DFloat PlaneSensor::Clamp( H3DFloat n, H3DFloat min, H3DFloat max ) {
+	if( n < min ) return min;
+	if( n > max ) return max;
+	return n;
 }

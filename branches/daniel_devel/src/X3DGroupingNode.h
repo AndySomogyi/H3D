@@ -152,7 +152,8 @@ namespace H3D {
       const Vec3f &to,    
       vector< HAPI::Bounds::IntersectionInfo > &result,
       bool global,
-      vector< X3DGeometryNode * > &theGeometry );
+      vector< X3DGeometryNode * > &theGeometry,
+      vector< H3DInt32 > &theGeometryIndex );
   
     /// if true a route will be set up between the bound field of the
     /// nodes in children and the bound field of the grouping node. 

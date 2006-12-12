@@ -112,7 +112,7 @@ namespace H3D {
     public X3DSensorNode {
   public:
 
-    /// The IsActive class is specialize field to set the isActive field.
+    /// The SetIsActive class is specialize field to set the isActive field.
     /// isActive is set to true if the primary pointing device button is
     /// pressed while isOver is true. isActive is set to false when the
     /// primary pointing device button is released if it was previously 
@@ -204,6 +204,7 @@ namespace H3D {
         if( routes_in[0] == event.ptr && 
             !_enabled && pdsn->isActive->getValue( pdsn->id ) ) {
           pdsn->isActive->setValue( _enabled, pdsn->id );
+          someAreActive--;
         }
       }
     };
@@ -252,18 +253,11 @@ namespace H3D {
 
     /// Add the geometryNode to the vector of geometryNodes.
     /// Called in traverseSG function of X3DGeometryNode.
-    void addGeometryNode( X3DGeometryNode * n );
+    int addGeometryNode( X3DGeometryNode * n, bool newIndex );
 
     /// Returns the index of the geometryNode if it does exist.
     /// Otherwise return -1
-    int findGeometry( X3DGeometryNode * n ) {
-      if( isEnabled ) {
-        for( unsigned int i = 0; i < geometryNodes.size(); i++ )
-          if( geometryNodes[i] == n )
-            return i;
-      }
-      return -1;
-    }
+    int findGeometry( X3DGeometryNode * n, H3DInt32 index );
 
     /// Sets the currentMatrix to m
     void setCurrentMatrix( Matrix4f m ) {
@@ -271,6 +265,7 @@ namespace H3D {
     }
 
     static void updateX3DPointingDeviceSensors( Node * n );
+    static void clearGeometryNodes();
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
@@ -294,6 +289,8 @@ namespace H3D {
     // static variables for pointing Device 2D (e.g. mouse )
     static MouseSensor *mouseSensor;
     static Vec2f posDevice2D;
+    static Vec3f nearPlanePos;
+    static Vec3f farPlanePos;
 
     // To indicate how many active devices there are.
     static int someAreActive;
@@ -308,9 +305,10 @@ namespace H3D {
 
     // Vectors for geometries and the corresponding local transformation
     // matrix of the X3DPointingDeviceSensor for that geometry.
-    vector< X3DGeometryNode * > geometryNodes;
-    vector< Matrix4f > geometryMatrices;
+    map< H3DInt32, X3DGeometryNode * > geometryNodes;
+    map< H3DInt32, Matrix4f > geometryMatrices;
     Matrix4f currentMatrix;
+    static H3DInt32 geometryNodeIndex;
     
   private:
     // The instances of X3DPointingDeviceSensorNode that has been created.

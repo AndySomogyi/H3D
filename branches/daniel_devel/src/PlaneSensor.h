@@ -87,13 +87,75 @@ namespace H3D {
   /// the unclamped intersection points on the surface of the tracking plane.
   /// If the pointing device is dragged off of the tracking plane while
   /// activated (e.g., above horizon line), browsers may interpret this in a
-  /// variety ways (e.g., clamp all values to the horizon). Each movement of
+  /// variety ways (e.g., clamp all values to the horizon. H3DAPI resend the
+  /// last event and write an error message ). Each movement of
   /// the pointing device, while isActive is TRUE, generates trackPoint_changed
   /// and translation_changed events.
   
   class H3DAPI_API PlaneSensor : 
     public X3DDragSensorNode {
   public:
+
+
+    /// The Set_Translation_Changed 
+    ///
+    /// routes_in[0] is the position field of a MouseSensor
+    /// routes_in[1] is the isActive field.
+    class H3DAPI_API Set_Events: 
+      public AutoUpdate< TypedField < SFBool, Types< SFVec2f, SFBool > > > {
+    public:
+      virtual void setValue( const bool &b, int id = 0 ) {
+        SFBool::setValue( b, id );
+      }
+    protected:
+      virtual void update() {
+        SFBool::update();
+        PlaneSensor *ps = 
+          static_cast< PlaneSensor * >( getOwner() );
+        if( ps->enabled->getValue() ) {
+          bool isActive = static_cast< SFBool * >(routes_in[1])->getValue();
+          if( isActive ) {
+            if( ps->getTrackPlane ) {
+              ps->originalIntersection = ps->oldIntersection;
+              ps->originalGeometry = ps->oldGeometry;
+              ps->getTrackPlane = false;
+              ps->planeNormal = Vec3f( 0, 0, 1);
+              ps->planeD = ps->planeNormal * ps->originalIntersection;
+              ps->trackPoint_changed->setValue( ps->originalIntersection, ps->id );
+            }
+            else {
+              H3DFloat t;
+              Vec3f intersectionPoint;
+              if( ps->intersectSegmentPlane( ps->geometryMatrices[ps->oldGeometry] * nearPlanePos, ps->geometryMatrices[ps->oldGeometry] * farPlanePos, t, intersectionPoint ) ) {
+                Vec3f translation_changed = intersectionPoint - ps->originalIntersection + ps->offset->getValue();
+                if( ps->minPosition->getValue().x <= ps->maxPosition->getValue().x ) {
+                  translation_changed.x = ps->Clamp( translation_changed.x, ps->minPosition->getValue().x, ps->maxPosition->getValue().x );
+                }
+                if( ps->minPosition->getValue().y <= ps->maxPosition->getValue().y ) {
+                  translation_changed.y = ps->Clamp( translation_changed.y, ps->minPosition->getValue().y, ps->maxPosition->getValue().y );
+                }
+                ps->trackPoint_changed->setValue( intersectionPoint, ps->id );
+                ps->translation_changed->setValue( translation_changed , ps->id );
+              }
+              else {
+                cerr << "Outside the plane due to near- and farplane clipping or other reason, last event resent." << endl;
+                ps->trackPoint_changed->touch();
+                ps->translation_changed->touch();
+              }
+            }
+          }
+          else
+            if( !ps->getTrackPlane ) {
+              ps->getTrackPlane = true;
+              if( ps->autoOffset->getValue() )
+                ps->offset->setValue( ps->translation_changed->getValue(), ps->id );
+            }
+        }
+      } 
+    };
+#ifdef __BORLANDC__
+    friend class Set_Translation_Changed;
+#endif
 
     /// Constructor.
     PlaneSensor(      Inst< SFBool >  _autoOffset = 0,
@@ -151,6 +213,26 @@ namespace H3D {
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
+  protected:
+    auto_ptr< Set_Events > set_Events;
+    /// Called to generate isOver events and other events (dependent on isOver)
+    // if they should be generated.
+    virtual void onIsOver( bool newValue,
+                           HAPI::Bounds::IntersectionInfo &result,
+                           int geometryIndex );
+
+    
+    int intersectSegmentPlane( Vec3f a, Vec3f b, float &t, Vec3f &q );
+
+    H3DFloat Clamp( H3DFloat n, H3DFloat min, H3DFloat max );
+
+    Vec3f originalIntersection, oldIntersection;
+    int originalGeometry, oldGeometry;
+    bool getTrackPlane;
+
+    H3DFloat planeD;
+    Vec3f planeNormal;
   };
 }
 

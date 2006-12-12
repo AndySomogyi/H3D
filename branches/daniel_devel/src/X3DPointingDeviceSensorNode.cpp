@@ -34,9 +34,12 @@ using namespace H3D;
 
 MouseSensor * X3DPointingDeviceSensorNode::mouseSensor = NULL;
 Vec2f X3DPointingDeviceSensorNode::posDevice2D;
+Vec3f X3DPointingDeviceSensorNode::nearPlanePos;
+Vec3f X3DPointingDeviceSensorNode::farPlanePos;
 vector< X3DPointingDeviceSensorNode * > X3DPointingDeviceSensorNode::instances=
 vector< X3DPointingDeviceSensorNode * >();
 int X3DPointingDeviceSensorNode::someAreActive = 0;
+H3DInt32 X3DPointingDeviceSensorNode::geometryNodeIndex = -1;
 
 H3DNodeDatabase X3DPointingDeviceSensorNode::database( 
         "X3DPointingDeviceSensorNode", 
@@ -103,10 +106,20 @@ bool X3DPointingDeviceSensorNode::has2DPointingDeviceMoved( Vec2f & pos ) {
   return false;
 }
 
-void X3DPointingDeviceSensorNode::addGeometryNode( X3DGeometryNode * n ) {
-  if( isEnabled ) {
-    geometryNodes.push_back( n );
-    geometryMatrices.push_back( currentMatrix );
+int X3DPointingDeviceSensorNode::addGeometryNode( X3DGeometryNode * n, bool newIndex ) {
+  if( newIndex ) {
+    geometryNodeIndex++;
+  }
+  geometryNodes[geometryNodeIndex] = n;
+  geometryMatrices[geometryNodeIndex] = currentMatrix;
+  return geometryNodeIndex;
+}
+
+void X3DPointingDeviceSensorNode::clearGeometryNodes() {
+  for( int i = 0; i < instances.size(); i++ ) {
+    instances[i]->geometryNodes.clear();
+    instances[i]->geometryMatrices.clear();
+    geometryNodeIndex = -1;
   }
 }
 
@@ -124,18 +137,27 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
       theMousePos.y = viewport[3] - (GLint ) theMousePos.y - 1;
       gluUnProject( (GLdouble) theMousePos.x, (GLdouble) theMousePos.y,
         0.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );
-      Vec3f nearPlanePos = Vec3f( wx, wy, wz );
+      nearPlanePos = Vec3f( wx, wy, wz );
       gluUnProject( (GLdouble) theMousePos.x, (GLdouble) theMousePos.y,
         1.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );
-      Vec3f farPlanePos = Vec3f( wx, wy, wz );
+      farPlanePos = Vec3f( wx, wy, wz );
+
+      for( int i = 0; i < instances.size(); i++ ) {
+        for( map< H3DInt32, X3DGeometryNode * >::iterator j = instances[i]->geometryNodes.begin();
+          j != instances[i]->geometryNodes.end();
+          j++ )
+          (*j).second->resetPtDevIndication( false );
+      }  
 
       vector< HAPI::Bounds::IntersectionInfo > result;
       vector< X3DGeometryNode * > theGeometry;
+      vector< H3DInt32 > theGeometryIndex;
       if( n->lineIntersect( nearPlanePos, 
                             farPlanePos,
                             result,
                             true,
-                            theGeometry ) ) {
+                            theGeometry,
+                            theGeometryIndex ) ) {
         int closest = 0;
         if( theGeometry.size() > 1 ) {
           H3DFloat closestDistance = 
@@ -149,10 +171,10 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
           }
         }
 
-        int theSensor = -1;
         for( int i = 0; i < instances.size(); i++ ) {
           int geometryIndex =
-            instances[i]->findGeometry( theGeometry[closest] );
+            instances[i]->findGeometry( theGeometry[closest], 
+                                        theGeometryIndex[closest] );
           if( geometryIndex != -1 ){
             instances[i]->onIsOver( true, result[closest], geometryIndex );
           }
@@ -169,4 +191,30 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
       }
     }
   }
+  for( int i = 0; i < instances.size(); i++ ) {
+    for( map< H3DInt32, X3DGeometryNode * >::iterator j = instances[i]->geometryNodes.begin();
+         j != instances[i]->geometryNodes.end();
+         j++ )
+      (*j).second->resetPtDevIndication( true );
+  }  
+}
+
+int X3DPointingDeviceSensorNode::findGeometry( X3DGeometryNode * n, H3DInt32 theIndex ) {
+  if( isEnabled ) {
+    if( geometryNodes.find( theIndex ) != geometryNodes.end()
+        && geometryNodes[theIndex] == n ) {
+      return theIndex;
+    }
+
+    /*for( map< int, X3DGeometryNode * >::iterator i = geometryNodes.begin();
+      i != geometryNodes.end(); i++ ) {
+      if( (*i).second == n )
+        return (*i).first;
+    }*/
+    
+    /*for( unsigned int i = 0; i < geometryNodes.size(); i++ )
+      if( geometryNodes[i] == n )
+        return i;*/
+  }
+  return -1;
 }

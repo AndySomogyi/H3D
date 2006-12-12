@@ -124,10 +124,16 @@ void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
   vector< X3DPointingDeviceSensorNode * > old_pt_dev_sens_nodes;
   if( !pt_dev_sens_nodes.empty() ) {
     old_pt_dev_sens_nodes = ti.current_pt_dev_sensors;
-    ti.current_pt_dev_sensors.clear();
+    bool cleared = false;
     for( unsigned int i = 0; i < pt_dev_sens_nodes.size(); i++ ) {
-      pt_dev_sens_nodes[i]->setCurrentMatrix( ti.getAccInverseMatrix() );
-      ti.current_pt_dev_sensors.push_back( pt_dev_sens_nodes[i] );
+      if( !cleared && pt_dev_sens_nodes[i]->enabled->getValue() ) {
+        cleared = true;
+        ti.current_pt_dev_sensors.clear();
+      }
+      if( cleared ) {
+        pt_dev_sens_nodes[i]->setCurrentMatrix( ti.getAccInverseMatrix() );
+        ti.current_pt_dev_sensors.push_back( pt_dev_sens_nodes[i] );
+      }
     }
   }
 
@@ -162,13 +168,15 @@ bool X3DGroupingNode::lineIntersect(
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
                   bool global,
-                  vector< X3DGeometryNode * > &theGeometry ) {
+                  vector< X3DGeometryNode * > &theGeometry,
+                  vector< H3DInt32 > &theGeometryIndex ) {
   const NodeVector &children_nodes = children->getValue();
   global = false;
   bool intersect = false;
   for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
     if( children_nodes[i]->
-         lineIntersect( from, to, result, global, theGeometry ) ) {
+         lineIntersect( from, to, result, global, 
+                        theGeometry, theGeometryIndex ) ) {
       intersect = true;
     }
   }

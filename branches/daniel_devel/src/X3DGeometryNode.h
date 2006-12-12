@@ -100,7 +100,8 @@ namespace H3D {
       const Vec3f &to,    
       vector< HAPI::Bounds::IntersectionInfo > &result,
       bool global,
-      vector< X3DGeometryNode * > &theGeometry );
+      vector< X3DGeometryNode * > &theGeometry,
+      vector< H3DInt32 > &theGeometryIndex );
 
     /// Function overridden from HAPIGLShape. Just call the 
     /// displayList->callList per default
@@ -210,6 +211,8 @@ namespace H3D {
       }
     }
 
+    void resetPtDevIndication( bool clear );
+
     /// Tells if a HapticsDevice has been in contact with the geometry
     /// in the last scenegraph loop. The field contains a boolean for 
     /// each HapticsDevice with the index as specified in the DeviceInfo node.
@@ -264,6 +267,9 @@ namespace H3D {
 
     /// identifiers for the shapes geometry.
     vector< int > haptic_shape_ids;
+
+    vector< H3DInt32 > pt_dev_geometry_id;
+    H3DInt32 current_geometry_id;
 
     bool use_culling, allow_culling;
     GLenum cull_face;

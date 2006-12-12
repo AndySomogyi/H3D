@@ -190,9 +190,11 @@ namespace H3D {
       const Vec3f &to,
       vector< HAPI::Bounds::IntersectionInfo > &result,
       bool global,
-      vector< X3DGeometryNode * > &theGeometry ) {
+      vector< X3DGeometryNode * > &theGeometry,
+      vector< H3DInt32 > &theGeometryIndex ) {
       return geometry->getValue()->
-        lineIntersect( from, to, result, global, theGeometry );
+        lineIntersect( from, to, result, global, 
+                       theGeometry, theGeometryIndex );
     }
 
     typedef enum {

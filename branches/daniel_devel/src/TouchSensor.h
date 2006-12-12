@@ -102,27 +102,7 @@ namespace H3D {
     // if they should be generated.
     virtual void onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
-                           int geometryIndex ) {
-      if( isEnabled && ( isActive->getValue() || someAreActive == 0 ) ) {
-        X3DPointingDeviceSensorNode::onIsOver( newValue,
-                                               result,
-                                               geometryIndex );
-        if( newValue ) {
-          Vec3f newNormalPoint = geometryMatrices[geometryIndex]
-                                 * Vec3f( result.point + result.normal );
-          Vec3f newPoint =
-            geometryMatrices[geometryIndex] * Vec3f( result.point );
-          newNormalPoint = newNormalPoint - newPoint;
-          newNormalPoint.normalize();
-
-          hitPoint_changed->setValue( Vec3f( newPoint ), id );
-          hitNormal_changed->setValue( Vec3f( newNormalPoint ), id );
-          hitTexCoord_changed->setValue( Vec2f( (H3DFloat)result.tex_coord.x,
-                                                (H3DFloat)result.tex_coord.y ),
-                                                id );
-        }
-      }
-    }
+                           int geometryIndex );
   };
 }
 #endif
