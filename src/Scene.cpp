@@ -105,6 +105,7 @@ void Scene::idle() {
       hds.push_back( hd );
     }
 
+    X3DPointingDeviceSensorNode::clearGeometryNodes();
     // traverse the scene graph to collect the HapticObject instances to render.
     TraverseInfo *ti = new TraverseInfo( hds );
     X3DChildNode *c = static_cast< X3DChildNode * >( sceneRoot->getValue() );

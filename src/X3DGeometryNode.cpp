@@ -94,6 +94,8 @@ X3DGeometryNode::X3DGeometryNode(
   database.initFields( this );
 
   displayList->route( boundTree );
+
+  current_geometry_id = -1;
 }
 
 
@@ -292,8 +294,15 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
   // if there exist a X3DPointingDeviceSensor add this node to its
   // geometry vector.
   if( !ti.current_pt_dev_sensors.empty() ) {
-    for( unsigned int i = 0; i < ti.current_pt_dev_sensors.size(); i++ )
-      (ti.current_pt_dev_sensors[i])->addGeometryNode( this );
+    bool newIndex = true;
+    int theIndex = -1;
+    for( unsigned int i = 0; i < ti.current_pt_dev_sensors.size(); i++ ) {
+      theIndex = ti.current_pt_dev_sensors[i]->addGeometryNode( this, newIndex );
+      if( newIndex && theIndex != -1 ) 
+        newIndex = false;
+    }
+    current_geometry_id++;
+    pt_dev_geometry_id.push_back( theIndex );
   }
   
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
@@ -492,7 +501,10 @@ bool X3DGeometryNode::lineIntersect(
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
                   bool global,
-                  vector< X3DGeometryNode * > &theGeometry ) {
+                  vector< X3DGeometryNode * > &theGeometry,
+                  vector< H3DInt32 > &theGeometryIndex ) {
+  if( !pt_dev_geometry_id.empty() )
+    current_geometry_id++;
   HAPI::Bounds::IntersectionInfo tempresult;
   bool returnValue =
     boundTree->getValue()->lineIntersect( 1000*from, 1000*to, tempresult );
@@ -501,6 +513,16 @@ bool X3DGeometryNode::lineIntersect(
     tempresult.normal = tempresult.normal / 1000;
     result.push_back( tempresult );
     theGeometry.push_back( this );
+    if( !pt_dev_geometry_id.empty() )
+      theGeometryIndex.push_back( pt_dev_geometry_id[current_geometry_id] );
+    else
+      theGeometryIndex.push_back( -1 );
   }
   return returnValue;
+}
+
+void X3DGeometryNode::resetPtDevIndication( bool clear ) {
+  current_geometry_id = -1;
+  if( clear )
+    pt_dev_geometry_id.clear();
 }
