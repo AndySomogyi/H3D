@@ -56,6 +56,10 @@ void SmoothSurface::hlRender() {
 #endif
 }
 
+void SmoothSurface::chai3dMaterial( cMaterial &m ) {
+  m.setStiffness( stiffness->getValue() * 700 / 1000 );
+}
+
 /// Constructor.
 SmoothSurface::SmoothSurface( Inst< SFFloat >  _stiffness,
                               Inst< SFFloat >  _damping ):
@@ -71,7 +75,7 @@ SmoothSurface::SmoothSurface( Inst< SFFloat >  _stiffness,
 void SmoothSurface::onContact( ContactInfo &contact ) {
   Vec3d local_probe = contact.localProbePosition();
   // TODO: fix realtime field access
-  //contact.setLocalForce( Vec3d( 0, -local_probe.y/1000 * stiffness->getValue(), 0 ) );
+  //contact.setLocalForce( Vec3d( 0, -local_probe.y/1000 * stiffness->getValue() * 700, 0 ) );
   contact.setLocalForce( -local_probe/1000 * stiffness->getValue() * 700 );
   contact.proxy_movement_local = Vec2d( local_probe.x, local_probe.z );
 }

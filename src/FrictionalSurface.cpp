@@ -57,6 +57,11 @@ void FrictionalSurface::hlRender() {
 #endif
 }
 
+void FrictionalSurface::chai3dMaterial( cMaterial &m ) {
+  m.setStaticFriction( staticFriction->getValue() );
+  m.setDynamicFriction( dynamicFriction->getValue() );
+}
+
 FrictionalSurface::FrictionalSurface( Inst< SFFloat >  _stiffness,
                                       Inst< SFFloat >  _damping,
                                       Inst< SFFloat >  _staticFriction,
