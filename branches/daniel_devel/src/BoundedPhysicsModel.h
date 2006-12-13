@@ -21,44 +21,39 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file ForceField.h
-/// \brief Header file for ForceField
+/// \file BoundedPhysicsModel.h
+/// \brief Header file for BoundedPhysicsModel, X3D scene-graph node
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-#ifndef __FORCEFIELD_H__
-#define __FORCEFIELD_H__
+#ifndef __BOUNDEDPHYSICSMODEL_H__
+#define __BOUNDEDPHYSICSMODEL_H__
 
-#include "H3DForceEffect.h" 
-#include "HapticForceField.h"
-#include "SFVec3f.h"
+#include <X3DParticlePhysicsModelNode.h>
+#include <X3DGeometryNode.h>
 
 namespace H3D {
-  /// \ingroup H3DNodes 
-  /// \class ForceField
-  /// This effect adds a constant force to all haptics devices at all times.
-  class H3DAPI_API ForceField: public H3DForceEffect {
+
+  /// \ingroup X3DNodes
+  /// \class BoundedPhysicsModel
+  class H3DAPI_API BoundedPhysicsModel : public X3DParticlePhysicsModelNode {
   public:
-    /// Constructor
-    ForceField( Inst< SFVec3f > _force = 0,
-                Inst< SFNode  > _metadata = 0 );
+    typedef TypedSFNode< X3DGeometryNode > SFGeometryNode;
+    
 
-#ifdef USE_HAPTICS
-    /// Adds a HapticForceField effect to the TraverseInfo.
-    virtual void traverseSG( TraverseInfo &ti ) {
-      if( ti.hapticsEnabled() ) {
-        ti.addForceEffectToAll( new HAPI::HapticForceField( ti.getAccForwardMatrix(),
-                                                            force->getValue(),
-                                                            true ) );
-      }
-    }
-#endif
+    /// Constructor.
+    BoundedPhysicsModel( Inst< SFNode         > _metadata = 0,
+                         Inst< SFBool         > _enabled  = 0,
+                         Inst< SFGeometryNode > _geometry = 0);
 
-    /// The force to render.
-    ///
-    /// <b>Access type: </b> inputOutput \n
-    /// <b>Default value: </b> Vec3f( 0, 0, 0 ) \n
-    auto_ptr< SFVec3f > force;
+    
+    virtual void updateParticleValues( 
+                const X3DParticleEmitterNode::Particle &last_particle,
+                X3DParticleEmitterNode::Particle &particle,
+                H3DTime last_time,
+                H3DTime current_time );
+
+    auto_ptr< SFGeometryNode > geometry;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

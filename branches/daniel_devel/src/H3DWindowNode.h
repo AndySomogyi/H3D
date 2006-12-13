@@ -118,7 +118,8 @@ namespace H3D {
     /// depending on the fields.
     virtual void initWindow() = 0;
 
-    /// Virtual function to initialize the window handler if needed. E.g. glutInit().
+    /// Virtual function to initialize the window handler if needed.
+    /// E.g. glutInit().
     virtual void initWindowHandler() = 0;
 
     /// Virtual function to set whether the window should be fullscreen or not.
@@ -140,6 +141,42 @@ namespace H3D {
 
     /// This function is called when the window has to redraw itself.
     virtual void display();
+
+    /// This function should be called by a window when a key is pressed.
+    /// When special is true the key is a special key 
+    /// enumerated in X3DKeyDeviceSensorNode.h
+    /// The window handles the translation from its internal 
+    /// behaviour to ASCII and the special numbers.
+    /// \param key Specifies the key that is pressed.
+    /// \param special True when the key is a special key, and
+    /// false when it is not.
+    virtual void onKeyDown( int key, bool special );
+
+    /// This function should be called by a window when a key is released.
+    /// When special is true the key is a special key 
+    /// enumerated in X3DKeyDeviceSensorNode.h
+    /// The window handles the translation from its internal 
+    /// behaviour to ASCII and the special numbers.
+    /// \param key Specifies the key that is released
+    /// \param special True when the key is a special key, and
+    /// false when it is not.
+    virtual void onKeyUp( int key, bool special );
+
+    /// This function should be called by a window when a mouse button
+    /// is pressed or released. For values of button and state see
+    /// MouseSensor.h
+    /// \param button specifies the mouse button pressed or released
+    /// \param state shows that the button is pressed or released
+    virtual void onMouseButtonAction( int button, int state );
+
+    /// This function should be called by a window when a mouse
+    /// sends a motion event. x, y are window relative coordinates
+    virtual void onMouseMotionAction( int x, int y );
+
+    /// This function should be called by a window when a mouse
+    /// wheel is scrolled either from or towards the user
+    /// For values of direction see MouseSensor.h
+    virtual void onMouseWheelAction( int direction );
 
     /// Calculate the far and near clipping planes from the bounding
     /// box of a X3DChildNode. The far and near planes will be calculated
@@ -218,14 +255,36 @@ namespace H3D {
     HGLRC getRenderingContext() {
       return rendering_context;
     }
+
+    /// Class Conversion Operator For Window Handle 
+    /// (H3DWindowNode Can Be Used As A Window Handle)
+    operator HWND() { return hWnd; }
 #endif
+
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
   protected:
 #ifdef WIN32
     HGLRC rendering_context;
+    HWND	hWnd;
+    HINSTANCE windowInstance;
+
+    // WindowProc calls the Window Procedure stored in wpOrigProc
+    // Default is DefWindowProc
+    WNDPROC wpOrigProc;
+
+    /// Whenever a subclass to H3DWindowNode is created
+    /// this callback is a subclass callback. The only function
+    /// of this callback is to send the right events to KeySensor.
+    /// When the events are processed it calls the Window Procedure
+    /// stored in wpOrigProc.
+    static LRESULT CALLBACK WindowProc(HWND _hWnd, UINT uMsg, 
+                                       WPARAM wParam, LPARAM lParam);
+    /// Handles messages. Called by WindowProc.
+    LRESULT	Message(HWND _hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #endif
+
     /// If multi pass transparency is set to true the scene will be rendered
     /// three times graphically, once for all solid objects, once for the back
     /// side of transparent objects and once for the front face of 

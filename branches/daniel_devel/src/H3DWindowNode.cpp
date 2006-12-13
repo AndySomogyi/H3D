@@ -53,6 +53,9 @@
 #include "DebugOptions.h"
 #include <GL/glew.h>
 
+#include "X3DKeyDeviceSensorNode.h"
+#include "MouseSensor.h"
+
 using namespace H3D;
 
 
@@ -109,12 +112,20 @@ H3DWindowNode::H3DWindowNode(
   type_name = "H3DWindowNode";
   database.initFields( this );
 
+#ifdef WIN32
+  windowInstance = GetModuleHandle( NULL );
+#endif
+
   width->setValue( 800 );
   height->setValue( 600 );
   fullscreen->setValue( false );
   mirrored->setValue( false );
   renderMode->setValue( "MONO" );
   time->setValue( TimeStamp::now() );
+
+#ifdef WIN32
+  wpOrigProc = (WNDPROC)DefWindowProc;
+#endif
 
   windows.insert( this );
 }
@@ -962,3 +973,232 @@ H3DWindowNode::RenderMode::Mode H3DWindowNode::RenderMode::getRenderMode() {
                              H3D_FULL_LOCATION );
   }
 }
+
+void H3DWindowNode::onKeyDown( int key, bool special ) {
+  if( special ) {
+    X3DKeyDeviceSensorNode::keyboardSpecialDownCallback( key );
+  }
+  else
+    X3DKeyDeviceSensorNode::keyboardDownCallback( key );
+}
+
+void H3DWindowNode::onKeyUp( int key, bool special ) {
+  if( special ) {
+    X3DKeyDeviceSensorNode::keyboardSpecialUpCallback( key );
+  }
+  else
+    X3DKeyDeviceSensorNode::keyboardUpCallback( key );
+}
+
+void H3DWindowNode::onMouseButtonAction( int button, int state ) {
+  MouseSensor::buttonCallback( button, state );
+}
+
+void H3DWindowNode::onMouseMotionAction( int x, int y ) {
+  MouseSensor::motionCallback( x, y );
+}
+
+void H3DWindowNode::onMouseWheelAction( int direction ) {
+  MouseSensor::wheelCallback( direction );
+}
+
+#ifdef WIN32
+// The following callback and message function is not used
+// unless you make your own subclass to H3DWindowNode
+// that uses Windows window handling. The intent is that
+// this code should be used no matter if you use
+// an external window such as GLUT.
+LRESULT CALLBACK H3DWindowNode::WindowProc(HWND _hWnd, 
+                                           UINT uMsg, 
+                                           WPARAM wParam, 
+                                           LPARAM lParam)
+{
+  // Find this window instance
+  H3DWindowNode *thisWindow = 0;
+  for( set< H3DWindowNode *>::iterator pos = windows.begin();
+    pos != windows.end();
+    pos++ ) {
+    if( (*pos)->hWnd == _hWnd )
+      thisWindow = *pos;
+  }
+
+  // If we have a window call Message otherwise call
+  // the default window procedure.
+  if( thisWindow ) {
+    return thisWindow->Message(_hWnd, uMsg, wParam, lParam);
+  }
+  return DefWindowProc(_hWnd, uMsg, wParam, lParam);
+}
+
+// Message Handler
+LRESULT H3DWindowNode::Message(HWND _hWnd,
+                               UINT uMsg,
+                               WPARAM wParam,
+                               LPARAM lParam)
+{  
+  // Evaluate Window Message
+	switch (uMsg)
+	{    
+    case WM_SYSCOMMAND:				// Intercept System Commands
+      // Check System Calls (according to msdn the & with 0xFFF0
+      // is needed to obtain the correct result)
+			switch (wParam & 0xFFF0)
+			{
+        case SC_KEYMENU:
+          // If the Window does not have a menu
+          // then we do not want the default behaviour for SC_KEYMENU
+          // cause that means that the keySensor does not
+          // register buttons which do not generate characters.
+          // Therefore we return if there is no menu.
+          HMENU theMenu = GetMenu( _hWnd );
+          if( !theMenu )
+            return 0;
+        break;
+			}
+		break;
+
+    case WM_KEYDOWN:  
+    case WM_SYSKEYDOWN:
+      switch( wParam ) {
+        case VK_F1: onKeyDown( X3DKeyDeviceSensorNode::F1, true ); break;
+        case VK_F2: onKeyDown( X3DKeyDeviceSensorNode::F2, true ); break;
+        case VK_F3: onKeyDown( X3DKeyDeviceSensorNode::F3, true ); break;
+        case VK_F4: onKeyDown( X3DKeyDeviceSensorNode::F4, true ); break;
+        case VK_F5: onKeyDown( X3DKeyDeviceSensorNode::F5, true ); break;
+        case VK_F6: onKeyDown( X3DKeyDeviceSensorNode::F6, true ); break;
+        case VK_F7: onKeyDown( X3DKeyDeviceSensorNode::F7, true ); break;
+        case VK_F8: onKeyDown( X3DKeyDeviceSensorNode::F8, true ); break;
+        case VK_F9: onKeyDown( X3DKeyDeviceSensorNode::F9, true ); break;
+        case VK_F10: onKeyDown( X3DKeyDeviceSensorNode::F10, true ); break;
+        case VK_F11: onKeyDown( X3DKeyDeviceSensorNode::F11, true ); break;
+        case VK_F12: onKeyDown( X3DKeyDeviceSensorNode::F12, true ); break;
+        case VK_HOME: onKeyDown( X3DKeyDeviceSensorNode::HOME, true ); break;
+        case VK_END: onKeyDown( X3DKeyDeviceSensorNode::END, true ); break;
+        case VK_PRIOR: onKeyDown( X3DKeyDeviceSensorNode::PGUP, true ); break;
+        case VK_NEXT: onKeyDown( X3DKeyDeviceSensorNode::PGDN, true ); break;
+        case VK_UP: onKeyDown( X3DKeyDeviceSensorNode::UP, true ); break;
+        case VK_DOWN: onKeyDown( X3DKeyDeviceSensorNode::DOWN, true ); break;
+        case VK_LEFT: onKeyDown( X3DKeyDeviceSensorNode::LEFT, true ); break;
+        case VK_RIGHT: onKeyDown( X3DKeyDeviceSensorNode::RIGHT, true ); break;
+        case VK_MENU: onKeyDown( X3DKeyDeviceSensorNode::ALT, true ); break;
+        case VK_CONTROL: onKeyDown( X3DKeyDeviceSensorNode::CONTROL, true );
+          break;
+        case VK_SHIFT: onKeyDown( X3DKeyDeviceSensorNode::SHIFT, true ); break;
+        default: { }
+      }
+    break;
+    
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+      switch( wParam ) {
+	      case VK_F1: onKeyUp( X3DKeyDeviceSensorNode::F1, true ); break;
+        case VK_F2: onKeyUp( X3DKeyDeviceSensorNode::F2, true ); break;
+        case VK_F3: onKeyUp( X3DKeyDeviceSensorNode::F3, true ); break;
+        case VK_F4: onKeyUp( X3DKeyDeviceSensorNode::F4, true ); break;
+        case VK_F5: onKeyUp( X3DKeyDeviceSensorNode::F5, true ); break;
+        case VK_F6: onKeyUp( X3DKeyDeviceSensorNode::F6, true ); break;
+        case VK_F7: onKeyUp( X3DKeyDeviceSensorNode::F7, true ); break;
+        case VK_F8: onKeyUp( X3DKeyDeviceSensorNode::F8, true ); break;
+        case VK_F9: onKeyUp( X3DKeyDeviceSensorNode::F9, true ); break;
+        case VK_F10: onKeyUp( X3DKeyDeviceSensorNode::F10, true ); break;
+        case VK_F11: onKeyUp( X3DKeyDeviceSensorNode::F11, true ); break;
+        case VK_F12: onKeyUp( X3DKeyDeviceSensorNode::F12, true ); break;
+        case VK_HOME: onKeyUp( X3DKeyDeviceSensorNode::HOME, true ); break;
+        case VK_END: onKeyUp( X3DKeyDeviceSensorNode::END, true ); break;
+        case VK_PRIOR: onKeyUp( X3DKeyDeviceSensorNode::PGUP, true ); break;
+        case VK_NEXT: onKeyUp( X3DKeyDeviceSensorNode::PGDN, true ); break;
+        case VK_UP: onKeyUp( X3DKeyDeviceSensorNode::UP, true ); break;
+        case VK_DOWN: onKeyUp( X3DKeyDeviceSensorNode::DOWN, true ); break;
+        case VK_LEFT: onKeyUp( X3DKeyDeviceSensorNode::LEFT, true ); break;
+        case VK_RIGHT: onKeyUp( X3DKeyDeviceSensorNode::RIGHT, true ); break;
+        case VK_MENU: onKeyUp( X3DKeyDeviceSensorNode::ALT, true ); break;
+        case VK_CONTROL: onKeyUp( X3DKeyDeviceSensorNode::CONTROL, true ); 
+          break;
+        case VK_SHIFT: onKeyUp( X3DKeyDeviceSensorNode::SHIFT, true ); break;
+        default: {
+          int key = wParam;
+          BYTE state[ 256 ];
+          WORD code[ 2 ];
+
+          GetKeyboardState( state );
+
+          if( ToAscii( key, 0, state, code, 0 ) == 1 )
+            key=code[ 0 ];
+
+          onKeyUp(key, false );
+        }
+      }
+    break;
+
+    // When using ToAscii in the function called by
+    // keyboardSpecialUpCallback the dead char gets
+    // translated into something a bit strange. This
+    // causes a deadchar message to look different
+    // when the buttons is pushed than when it is
+    // released. If the application want to take care
+    // of deadchars then it should only care about
+    // keyPress events.
+    case WM_SYSDEADCHAR:
+    case WM_DEADCHAR:
+    case WM_SYSCHAR:
+    case WM_CHAR:
+      onKeyDown( wParam, false );
+    break;
+
+    case WM_MENUCHAR:
+      if( GetKeyState( VK_MENU ) >= 0 )
+        onKeyDown( wParam, false );
+    break;
+
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONDBLCLK:
+      MouseSensor::buttonCallback( MouseSensor::LEFT_BUTTON,
+                                      MouseSensor::DOWN );
+    break;
+
+    case WM_LBUTTONUP:
+      MouseSensor::buttonCallback( MouseSensor::LEFT_BUTTON,
+                                      MouseSensor::UP );
+    break;
+
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONDBLCLK:
+      MouseSensor::buttonCallback( MouseSensor::MIDDLE_BUTTON,
+                                      MouseSensor::DOWN );
+    break;
+
+    case WM_MBUTTONUP:
+      MouseSensor::buttonCallback( MouseSensor::MIDDLE_BUTTON,
+                                      MouseSensor::UP );
+    break;
+
+    case WM_RBUTTONDOWN:
+    case WM_RBUTTONDBLCLK:
+      MouseSensor::buttonCallback( MouseSensor::RIGHT_BUTTON,
+                                      MouseSensor::DOWN );
+    break;
+
+    case WM_RBUTTONUP:
+      MouseSensor::buttonCallback( MouseSensor::RIGHT_BUTTON,
+                                      MouseSensor::UP );
+    break;
+
+    case WM_MOUSEMOVE:
+      MouseSensor::motionCallback( LOWORD(lParam),
+                                   HIWORD(lParam) );
+    break;
+
+    // WM_MOUSEWHEEL = 0x020A not defined unless 
+    // _WIN32_WINNT or _WIN32_WINDOWS are defined before including windows.h
+    case 0x020A:
+      short upOrDown = HIWORD( wParam );
+      MouseSensor::wheelCallback( upOrDown > 0 ? 
+                          MouseSensor::FROM : MouseSensor::TOWARDS );
+    break;
+  }
+
+  // Call the original windows Procedure.
+	return CallWindowProc(wpOrigProc, _hWnd, uMsg, 
+        wParam, lParam); 
+}
+#endif

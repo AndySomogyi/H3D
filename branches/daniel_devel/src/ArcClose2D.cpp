@@ -109,6 +109,9 @@ void ArcClose2D::render() {
 
     start_point = (start + end)/2.f;
     start_point_tc = ( start_tc + end_tc ) / 2.f;
+  } else if( closure_type != "PIE" ) {
+    Console(3) << "Warning: The field \"closureType\" in ArcClose2D node( "
+				<< getName() << ") is not correctly defined. The value \"PIE\" will be used. " << endl;
   }
   
   H3DFloat theta, angle_increment;
@@ -119,7 +122,8 @@ void ArcClose2D::render() {
 
   glBegin( GL_TRIANGLE_FAN );
   glNormal3f( 0.f, 0.f, 1.f );
-  glTexCoord2f( start_point_tc.x, start_point_tc.y );
+  renderTexCoordForActiveTexture( Vec3f( start_point_tc.x, 
+                                         start_point_tc.y, 0 ) );
   glVertex2f( start_point.x, start_point.y );
 
   for ( theta = start_angle; 
@@ -127,7 +131,8 @@ void ArcClose2D::render() {
         theta += angle_increment ) {
     x = r * H3DCos(theta);
     y = r * H3DSin(theta);
-    glTexCoord2f( x /(r*2) + 0.5f, y / (r*2) + 0.5f );
+    renderTexCoordForActiveTexture( Vec3f( x /(r*2) + 0.5f, 
+                                           y / (r*2) + 0.5f, 0 ) );
     glVertex2f (x, y);
   }
 
@@ -135,7 +140,8 @@ void ArcClose2D::render() {
   theta = end_angle;
   x = r * H3DCos(theta);
   y = r * H3DSin(theta);
-  glTexCoord2f( x /(r*2) + 0.5f, y / (r*2) + 0.5f );
+  renderTexCoordForActiveTexture( Vec3f( x /(r*2) + 0.5f, 
+                                         y / (r*2) + 0.5f, 0 ) );
   glVertex2f (x, y);
 
  

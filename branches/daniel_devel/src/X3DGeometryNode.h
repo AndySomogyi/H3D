@@ -37,6 +37,7 @@
 #include <MFVec3f.h>
 #include <H3DOptionNode.h>
 #include <MFNode.h>
+#include <X3DTextureCoordinateNode.h>
 
 // HAPI includes
 #include <HAPIGLShape.h>
@@ -264,6 +265,10 @@ namespace H3D {
     static H3DNodeDatabase database;
 
   protected:
+
+    inline void renderTexCoordForActiveTexture( const Vec3f &tc ) {
+      X3DTextureCoordinateNode::renderTexCoordForActiveTexture( tc );
+    }
 
     /// identifiers for the shapes geometry.
     vector< int > haptic_shape_ids;
