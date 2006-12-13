@@ -30,6 +30,7 @@
 
 #include "X3DGeometryNode.h"
 #include "GlobalSettings.h"
+#include "GeometryBoundTreeOptions.h"
 
 #ifdef USE_HAPTICS
 #include "OpenHapticsOptions.h"
@@ -250,7 +251,7 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
       glMatrixMode( GL_MODELVIEW );
       glPushMatrix();
       glScalef( 1e-3f, 1e-3f, 1e-3f ); 
-      tree->render( 1 );
+      tree->render( render_depth );
       glPopMatrix();
     }
   }
@@ -285,7 +286,43 @@ void X3DGeometryNode::SFBoundTree::update() {
                                                     triangles, 
                                                     lines, 
                                                     points );
-  value = new HAPI::Bounds::AABBTree( triangles );
+  
+  GeometryBoundTreeOptions *options = NULL;
+  geometry->getOptionNode( options );
+  if( !options ) {
+    GlobalSettings *default_settings = GlobalSettings::getActive();
+    if( default_settings ) {
+      default_settings->getOptionNode( options );
+    }
+  }
+
+  if( options ) {
+    const string &type = options->boundType->getValue();
+    H3DInt32 max_triangles = options->maxTrianglesInLeaf->getValue();
+    if( type == "AABB" ) {
+      value = new HAPI::Bounds::AABBTree( triangles, 
+                                          max_triangles );
+    } else if( type == "OBB" ) {
+      value = new HAPI::Bounds::OBBTree( triangles, 
+                                         max_triangles );
+    } else if( type == "SPHERE" ) {
+      value = new HAPI::Bounds::SphereBoundTree( triangles, 
+                                                 max_triangles );
+    } else {
+      Console(4) << "Warning: Invalid boundType: "
+                 << type
+                 << ". Must be \"SPHERE\", \"OBB\" or \"AABB\" "
+                 << "(in active GeometryBoundTreeOptions node for \" "
+                 << geometry->getName() << "\" node). Using AABB instead." 
+                 << endl;
+      value = new HAPI::Bounds::AABBTree( triangles, 
+                                          max_triangles );
+    }
+
+  } else {
+    value = new HAPI::Bounds::AABBTree( triangles );
+  }
+
 }
 
 void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
@@ -373,7 +410,7 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
             Console(4) << "Warning: Invalid default touchable face: "
                        << face 
                        << ". Must be \"FRONT\", \"BACK\" or \"FRONT_AND_BACK\" "
-                       << "(in active HapticsOptions node\")" << endl;
+                       << "(in active HapticsOptions node\" )" << endl;
           }
 
           radius = haptics_options->maxDistance->getValue();
