@@ -48,43 +48,34 @@ X3DKeyDeviceSensorNode::~X3DKeyDeviceSensorNode() {
   instances.remove( this );
 }
 
-
-void X3DKeyDeviceSensorNode::glutKeyboardDownCallback( unsigned char key, 
-                                                   int x, int y ) {
-  int mods = glutGetModifiers();
+void  X3DKeyDeviceSensorNode::keyboardDownCallback( unsigned char key ) {
   for( list< X3DKeyDeviceSensorNode * >::iterator i = instances.begin();
        i != instances.end();
        i++ ) {
-    (*i)->glutKeyboardDown( key, mods, false );
+    (*i)->keyboardDown( key, false );
   }
 }
 
-void X3DKeyDeviceSensorNode::glutSpecialDownCallback( int key, 
-                                                      int x, int y ) {
-  int mods = glutGetModifiers();
+void  X3DKeyDeviceSensorNode::keyboardSpecialDownCallback( int key ) {
   for( list< X3DKeyDeviceSensorNode * >::iterator i = instances.begin();
        i != instances.end();
        i++ ) {
-    (*i)->glutKeyboardDown( key, mods, true );
+    (*i)->keyboardDown( key, true );
   }
 }
 
-void X3DKeyDeviceSensorNode::glutKeyboardUpCallback( unsigned char key, 
-                                                     int x, int y ) {
-  int mods = glutGetModifiers();
+void X3DKeyDeviceSensorNode::keyboardUpCallback( unsigned char key ) {
   for( list< X3DKeyDeviceSensorNode * >::iterator i = instances.begin();
        i != instances.end();
        i++ ) {
-    (*i)->glutKeyboardUp( key, mods, false );
+    (*i)->keyboardUp( key, false );
   }
 }
 
-void X3DKeyDeviceSensorNode::glutSpecialUpCallback( int key, 
-                                                    int x, int y ) {
-  int mods = glutGetModifiers();
+void X3DKeyDeviceSensorNode::keyboardSpecialUpCallback( int key ) {
   for( list< X3DKeyDeviceSensorNode * >::iterator i = instances.begin();
        i != instances.end();
        i++ ) {
-    (*i)->glutKeyboardUp( key, mods, true );
+    (*i)->keyboardUp( key, true );
   }
 }

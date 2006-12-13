@@ -73,71 +73,38 @@ KeySensor::KeySensor( Inst< SFBool   > _enabled,
   database.initFields( this );
 }
 
-void KeySensor::glutKeyboardDown( int stroke, 
-                                  int modifiers, 
-                                  bool special_key ) {
+void KeySensor::keyboardDown( int key, bool special_key ) {
   if( enabled->getValue() ) {
     isActive->setValue( true, id );
     if( special_key ) {
-      switch( stroke ) {
-      case GLUT_KEY_F1: actionKeyPress->setValue( F1, id ); break;
-      case GLUT_KEY_F2: actionKeyPress->setValue( F2, id  ); break;
-      case GLUT_KEY_F3: actionKeyPress->setValue( F3, id  ); break;
-      case GLUT_KEY_F4: actionKeyPress->setValue( F4, id  ); break;
-      case GLUT_KEY_F5: actionKeyPress->setValue( F5, id  ); break;
-      case GLUT_KEY_F6: actionKeyPress->setValue( F6, id  ); break;
-      case GLUT_KEY_F7: actionKeyPress->setValue( F7, id  ); break;
-      case GLUT_KEY_F8: actionKeyPress->setValue( F8, id  ); break;
-      case GLUT_KEY_F9: actionKeyPress->setValue( F9, id  ); break;
-      case GLUT_KEY_F10: actionKeyPress->setValue( F10, id  ); break;
-      case GLUT_KEY_F11: actionKeyPress->setValue( F11, id  ); break;
-      case GLUT_KEY_F12: actionKeyPress->setValue( F12, id  ); break;
-      case GLUT_KEY_PAGE_UP: actionKeyPress->setValue( PGUP, id  ); break;
-      case GLUT_KEY_PAGE_DOWN: actionKeyPress->setValue( PGDN, id  ); break;
-      case GLUT_KEY_UP: actionKeyPress->setValue( UP, id  ); break;
-      case GLUT_KEY_DOWN: actionKeyPress->setValue( DOWN, id  ); break;
-      case GLUT_KEY_LEFT: actionKeyPress->setValue( LEFT, id  ); break;
-      case GLUT_KEY_RIGHT: actionKeyPress->setValue( RIGHT, id  ); break;
-        
-      default: {}  
+      switch( key ) {
+        case ALT: altKey->setValue( true, id ); break;
+        case CONTROL: controlKey->setValue( true, id ); break;
+        case SHIFT: shiftKey->setValue( true, id ); break;
+        default: {
+          actionKeyPress->setValue( key, id );
+        }
       }
     } else {
-      keyPress->setValue( string( 1, stroke ), id  );
+      keyPress->setValue( string( 1, key ), id );
     }
   }
 }
 
-void KeySensor::glutKeyboardUp( int stroke, 
-                                int modifiers, 
-                                bool special_key ) {
+void KeySensor::keyboardUp( int key, bool special_key ) {
   if( enabled->getValue() ) {
     isActive->setValue( false, id );
     if( special_key ) {
-      switch( stroke ) {
-      case GLUT_KEY_F1: actionKeyRelease->setValue( F1, id ); break;
-      case GLUT_KEY_F2: actionKeyRelease->setValue( F2, id  ); break;
-      case GLUT_KEY_F3: actionKeyRelease->setValue( F3, id  ); break;
-      case GLUT_KEY_F4: actionKeyRelease->setValue( F4, id  ); break;
-      case GLUT_KEY_F5: actionKeyRelease->setValue( F5, id  ); break;
-      case GLUT_KEY_F6: actionKeyRelease->setValue( F6, id  ); break;
-      case GLUT_KEY_F7: actionKeyRelease->setValue( F7, id  ); break;
-      case GLUT_KEY_F8: actionKeyRelease->setValue( F8, id  ); break;
-      case GLUT_KEY_F9: actionKeyRelease->setValue( F9, id  ); break;
-      case GLUT_KEY_F10: actionKeyRelease->setValue( F10, id  ); break;
-      case GLUT_KEY_F11: actionKeyRelease->setValue( F11, id  ); break;
-      case GLUT_KEY_F12: actionKeyRelease->setValue( F12, id  ); break;
-      case GLUT_KEY_PAGE_UP: actionKeyRelease->setValue( PGUP, id  ); break;
-      case GLUT_KEY_PAGE_DOWN: actionKeyRelease->setValue( PGDN, id  ); break;
-      case GLUT_KEY_UP: actionKeyRelease->setValue( UP, id  ); break;
-      case GLUT_KEY_DOWN: actionKeyRelease->setValue( DOWN, id  ); break;
-      case GLUT_KEY_LEFT: actionKeyRelease->setValue( LEFT, id  ); break;
-      case GLUT_KEY_RIGHT: actionKeyRelease->setValue( RIGHT, id  ); break;
-        
-      default: {}  
+      switch( key ) {
+        case ALT: altKey->setValue( false, id ); break;
+        case CONTROL: controlKey->setValue( false, id ); break;
+        case SHIFT: shiftKey->setValue( false, id ); break;
+        default: {
+          actionKeyRelease->setValue( key, id );
+        }
       }
     } else {
-      keyRelease->setValue( string( 1, stroke ), id  );
+      keyRelease->setValue( string( 1, key ), id  );
     }
   }
 }
-

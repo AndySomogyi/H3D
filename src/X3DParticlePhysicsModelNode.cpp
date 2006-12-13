@@ -21,51 +21,40 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file Color.cpp
-/// \brief CPP file for Color, X3D scene-graph node
+/// \file X3DParticlePhysicsModelNode.cpp
+/// \brief CPP file for X3DParticlePhysicsModelNode, X3D scene-graph node
 ///
 //
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "Color.h"
+#include "X3DParticlePhysicsModelNode.h"
 
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
-H3DNodeDatabase Color::database( "Color", 
-                                 &(newInstance<Color>),
-                                 typeid( Color ),
-                                 &X3DColorNode::database );
+H3DNodeDatabase X3DParticlePhysicsModelNode::database( 
+                                   "X3DParticlePhysicsModelNode", 
+                                   NULL, 
+                                   typeid( X3DParticlePhysicsModelNode ),
+                                   &X3DNode::database );
 
-namespace ColorInternals {
-  FIELDDB_ELEMENT( Color, color, INPUT_OUTPUT );
+namespace X3DParticlePhysicsModelNodeInternals {
+  FIELDDB_ELEMENT( X3DParticlePhysicsModelNode, enabled, INPUT_OUTPUT );
 }
 
+X3DParticlePhysicsModelNode::X3DParticlePhysicsModelNode( 
+                      Inst< SFNode  > _metadata,
+                      Inst< SFBool > _enabled ):
+  X3DNode( _metadata ),
+  enabled( _enabled ) {
 
-Color::Color( 
-             Inst< MFColor>  _color,
-             Inst< SFNode >  _metadata ) :
-  X3DColorNode( _metadata ),
-  color   ( _color    ) {
-  type_name = "Color";
+  type_name = "X3DParticlePhysicsModelNode";
   database.initFields( this );
 
-  color->route( propertyChanged );
+  enabled->setValue( true );
 }
 
 
-/// Perform the OpenGL commands to render all verties as a vertex
-/// array.
-void Color::renderArray() {
-  if( !color->empty() ) {
-    glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(3, GL_FLOAT, 0,
-                  &(*color->begin()) );
-  }
-}
 
-/// Disable the array state enabled in renderArray().
-void Color::disableArray() {
-  glDisableClientState(GL_COLOR_ARRAY);
-}
+
