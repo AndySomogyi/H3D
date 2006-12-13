@@ -49,6 +49,10 @@ namespace H3D {
     /// Renders the surface using hlMaterialf calls
     virtual void hlRender();
 
+    /// Sets a Chai3D cMaterial describing the haptic properties for the 
+    /// surface.
+    virtual void chai3dMaterial( cMaterial &m );
+
     virtual void onContact( ContactInfo &contact );
 
     /// The friction that is experienced upon initial movement when resting on 
