@@ -64,7 +64,7 @@ PlaneSensor::PlaneSensor(
   minPosition( _minPosition ),
   offset( _offset ),
   translation_changed( _translation_changed ),
-  set_Events( new Set_Events ) {
+  set_PlaneEvents( new Set_PlaneEvents ) {
 
   type_name = "PlaneSensor";
   database.initFields( this );
@@ -73,9 +73,10 @@ PlaneSensor::PlaneSensor(
   minPosition->setValue( Vec2f( 0, 0 ) );
   offset->setValue( Vec3f( 0, 0, 0 ) );
 
-  set_Events->setOwner( this );
-  mouseSensor->position->routeNoEvent( set_Events );
-  isActive->routeNoEvent( set_Events );
+  set_PlaneEvents->setValue( true );
+  set_PlaneEvents->setOwner( this );
+  mouseSensor->position->routeNoEvent( set_PlaneEvents );
+  isActive->routeNoEvent( set_PlaneEvents );
 }
 
 /// Destructor. 
@@ -90,15 +91,14 @@ void PlaneSensor::onIsOver( bool newValue,
                                            result,
                                            geometryIndex );
     if( newValue ) {
-      Vec3f newPoint =
+      pointOfIntersection =
         geometryMatrices[geometryIndex] * Vec3f( result.point );
-      oldIntersection = newPoint;
-      oldGeometry = geometryIndex;
+      intersectionGeometry = geometryIndex;
     }
   }
 }
 
-int PlaneSensor::Set_Events::intersectSegmentPlane( 
+int PlaneSensor::Set_PlaneEvents::intersectSegmentPlane(
   Vec3f a, Vec3f b, float &t, Vec3f &q ) {
   // Compute the t value for the directed line ab intersecting the plane
   Vec3f ab = b - a;
@@ -114,14 +114,14 @@ int PlaneSensor::Set_Events::intersectSegmentPlane(
   return 0;
 }
 
-H3DFloat PlaneSensor::Set_Events::Clamp( 
+H3DFloat PlaneSensor::Set_PlaneEvents::Clamp(
   H3DFloat n, H3DFloat min, H3DFloat max ) {
 	if( n < min ) return min;
 	if( n > max ) return max;
 	return n;
 }
 
-void PlaneSensor::Set_Events::update() {
+void PlaneSensor::Set_PlaneEvents::update() {
   SFBool::update();
   PlaneSensor *ps = 
     static_cast< PlaneSensor * >( getOwner() );
@@ -129,17 +129,18 @@ void PlaneSensor::Set_Events::update() {
   if( ps->enabled->getValue() ) {
     bool isActive = static_cast< SFBool * >(routes_in[1])->getValue();
     if( isActive ) {
-      if( getTrackPlane ) {
-        originalIntersection = ps->oldIntersection;
-        originalGeometry = ps->oldGeometry;
-        getTrackPlane = false;
+      if( newPlane ) {
+        originalIntersection = ps->pointOfIntersection;
+        originalGeometry = ps->intersectionGeometry;
+        newPlane = false;
         planeD = planeNormal * originalIntersection;
         ps->trackPoint_changed->setValue( originalIntersection, ps->id );
       }
       else {
         H3DFloat t;
         Vec3f intersectionPoint;
-        Matrix4f geometryMatrix = ps->geometryMatrices[ps->oldGeometry];
+        Matrix4f geometryMatrix = 
+          ps->geometryMatrices[ps->intersectionGeometry];
         if( intersectSegmentPlane( geometryMatrix * nearPlanePos,
                                    geometryMatrix * farPlanePos, t,
                                    intersectionPoint ) ) {
@@ -161,8 +162,9 @@ void PlaneSensor::Set_Events::update() {
           ps->translation_changed->setValue( translation_changed , ps->id );
         }
         else {
-          // X3D specification states that the correct way to handle this case is
-          // "browser specific", which means doing whatever feels natural.
+          // X3D specification states that in the case of no plane intersection
+          // "browsers may interpret this in a variety of ways"
+          // which means doing whatever feels natural.
           // H3DAPI resends last event.
           cerr << "Outside the plane due to near- and farplane" <<
                   " clipping or other reason, last event resent." << endl;
@@ -172,8 +174,8 @@ void PlaneSensor::Set_Events::update() {
       }
     }
     else {
-      if( !getTrackPlane ) {
-        getTrackPlane = true;
+      if( !newPlane ) {
+        newPlane = true;
         if( ps->autoOffset->getValue() )
           ps->offset->setValue( ps->translation_changed->getValue(), ps->id );
       }
