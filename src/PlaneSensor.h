@@ -92,8 +92,8 @@ namespace H3D {
   /// the pointing device, while isActive is TRUE, generates trackPoint_changed
   /// and translation_changed events.
   ///
-  // NOTE: If the scenegraph is changed while isActive is true for a planeSensor
-  // the planeSensor might not be working correctly anymore.
+  // NOTE: If the scenegraph is changed while isActive is true for a 
+  // planeSensor the planeSensor might not be working correctly anymore.
   
   class H3DAPI_API PlaneSensor : 
     public X3DDragSensorNode {
@@ -105,14 +105,14 @@ namespace H3D {
     ///
     /// routes_in[0] is the position field of a MouseSensor
     /// routes_in[1] is the isActive field.
-    class H3DAPI_API Set_Events: 
+    class H3DAPI_API Set_PlaneEvents: 
       public AutoUpdate< TypedField < SFBool, Types< SFVec2f, SFBool > > > {
     public:
 
       // Constructor
-      Set_Events() { 
+      Set_PlaneEvents() { 
         originalGeometry = -1;
-        getTrackPlane = true;
+        newPlane = true;
         planeNormal = Vec3f( 0, 0, 1);
       }
 
@@ -135,10 +135,10 @@ namespace H3D {
       H3DInt32 originalGeometry;
       H3DFloat planeD;
       // If true a new plane will be defined.
-      bool getTrackPlane;
+      bool newPlane;
     };
 #ifdef __BORLANDC__
-    friend class Set_Translation_Changed;
+    friend class Set_PlaneEvents;
 #endif
 
     /// Constructor.
@@ -199,15 +199,15 @@ namespace H3D {
     static H3DNodeDatabase database;
 
   protected:
-    auto_ptr< Set_Events > set_Events;
+    auto_ptr< Set_PlaneEvents > set_PlaneEvents;
     /// Called to generate isOver events and other events (dependent on isOver)
     // if they should be generated.
     virtual void onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
                            int geometryIndex );
 
-    Vec3f oldIntersection;
-    int oldGeometry;
+    Vec3f pointOfIntersection;
+    int intersectionGeometry;
   };
 }
 

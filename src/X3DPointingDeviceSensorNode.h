@@ -166,7 +166,7 @@ namespace H3D {
       bool leftMousePressedOutside;
     };
 #ifdef __BORLANDC__
-    friend class IsActive;
+    friend class SetIsActive;
 #endif
 
     /// The SetIsEnabled class is specialize to check if the primary pointing
