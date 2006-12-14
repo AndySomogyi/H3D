@@ -89,14 +89,10 @@ void PointEmitter::generateParticles( ParticleSystem *ps,
 
     Vec3f dir = direction->getValue();
 
-    /// TODO: this is not random direction, fix it
+    // special case: if 0,0,0 use random direction
     if( dir == Vec3f( 0, 0, 0 ) ) {
-      dir = Vec3f( ParticleSystem::getRandomValue( -1, 1 ), 
-                   ParticleSystem::getRandomValue( -1, 1 ), 
-                   ParticleSystem::getRandomValue( -1, 1 ) ); 
+      dir = ParticleSystem::getRandomPointOnUnitSphere();
     }
-    
-    dir.normalizeSafe();
     
     Particle p = newParticle( ps, position->getValue(), dir );
     particles.push_back( p );
