@@ -69,15 +69,15 @@ TouchSensor::TouchSensor(
 void TouchSensor::onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
                            int geometryIndex ) {
-  if( isEnabled && ( isActive->getValue() || someAreActive == 0 ) ) {
+  if( is_enabled && ( isActive->getValue() || number_of_active == 0 ) ) {
     X3DPointingDeviceSensorNode::onIsOver( newValue,
                                            result,
                                            geometryIndex );
     if( newValue ) {
-      Vec3f newNormalPoint = geometryMatrices[geometryIndex]
+      Vec3f newNormalPoint = geometry_matrices[geometryIndex]
       * Vec3f( result.point + result.normal );
       Vec3f newPoint =
-        geometryMatrices[geometryIndex] * Vec3f( result.point );
+        geometry_matrices[geometryIndex] * Vec3f( result.point );
       newNormalPoint = newNormalPoint - newPoint;
       newNormalPoint.normalize();
 

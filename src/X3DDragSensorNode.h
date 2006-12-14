@@ -51,8 +51,6 @@ namespace H3D {
                        Inst< SFBool > _isOver = 0,
                        Inst< SFVec3f >  _trackPoint_changed = 0 );
 
-    ~X3DDragSensorNode();
-
     // fields
     /// If autoOffset is TRUE when the pointing-device is deactivated,
     /// the offset field is set to the sensor's last <value>_changed
@@ -76,6 +74,10 @@ namespace H3D {
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
+  protected:
+    // Clamp n in the range [min, max]
+    H3DFloat Clamp( H3DFloat n, H3DFloat min, H3DFloat max );
   };
 }
 

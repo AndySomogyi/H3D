@@ -75,7 +75,7 @@ PlaneSensor::PlaneSensor(
 
   set_PlaneEvents->setValue( true );
   set_PlaneEvents->setOwner( this );
-  mouseSensor->position->routeNoEvent( set_PlaneEvents );
+  mouse_sensor->position->routeNoEvent( set_PlaneEvents );
   isActive->routeNoEvent( set_PlaneEvents );
 }
 
@@ -86,14 +86,14 @@ PlaneSensor::~PlaneSensor() {
 void PlaneSensor::onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
                            int geometryIndex ) {
-  if( isEnabled && ( isActive->getValue() || someAreActive == 0 ) ) {
+  if( is_enabled && ( isActive->getValue() || number_of_active == 0 ) ) {
     X3DPointingDeviceSensorNode::onIsOver( newValue,
                                            result,
                                            geometryIndex );
     if( newValue ) {
-      pointOfIntersection =
-        geometryMatrices[geometryIndex] * Vec3f( result.point );
-      intersectionGeometry = geometryIndex;
+      intersection_point =
+        geometry_matrices[geometryIndex] * Vec3f( result.point );
+      intersection_geometry = geometryIndex;
     }
   }
 }
@@ -114,13 +114,6 @@ int PlaneSensor::Set_PlaneEvents::intersectSegmentPlane(
   return 0;
 }
 
-H3DFloat PlaneSensor::Set_PlaneEvents::Clamp(
-  H3DFloat n, H3DFloat min, H3DFloat max ) {
-	if( n < min ) return min;
-	if( n > max ) return max;
-	return n;
-}
-
 void PlaneSensor::Set_PlaneEvents::update() {
   SFBool::update();
   PlaneSensor *ps = 
@@ -130,31 +123,32 @@ void PlaneSensor::Set_PlaneEvents::update() {
     bool isActive = static_cast< SFBool * >(routes_in[1])->getValue();
     if( isActive ) {
       if( newPlane ) {
-        originalIntersection = ps->pointOfIntersection;
-        originalGeometry = ps->intersectionGeometry;
+        originalIntersection = ps->intersection_point;
+        originalGeometry = ps->intersection_geometry;
         newPlane = false;
         planeD = planeNormal * originalIntersection;
         ps->trackPoint_changed->setValue( originalIntersection, ps->id );
+        ps->translation_changed->setValue( Vec3f( 0, 0, 0 ) );
       }
       else {
         H3DFloat t;
         Vec3f intersectionPoint;
         Matrix4f geometryMatrix = 
-          ps->geometryMatrices[ps->intersectionGeometry];
-        if( intersectSegmentPlane( geometryMatrix * nearPlanePos,
-                                   geometryMatrix * farPlanePos, t,
+          ps->geometry_matrices[ps->intersection_geometry];
+        if( intersectSegmentPlane( geometryMatrix * near_plane_pos,
+                                   geometryMatrix * far_plane_pos, t,
                                    intersectionPoint ) ) {
           Vec3f translation_changed = intersectionPoint - originalIntersection
                                       + ps->offset->getValue();
           Vec2f minPosition = ps->minPosition->getValue();
           Vec2f maxPosition = ps->maxPosition->getValue();
           if( minPosition.x <= maxPosition.x ) {
-            translation_changed.x = Clamp( translation_changed.x,
+            translation_changed.x = ps->Clamp( translation_changed.x,
                                            minPosition.x,
                                            maxPosition.x );
           }
           if( minPosition.y <= maxPosition.y ) {
-            translation_changed.y = Clamp( translation_changed.y,
+            translation_changed.y = ps->Clamp( translation_changed.y,
                                            minPosition.y,
                                            maxPosition.y );
           }
