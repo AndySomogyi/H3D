@@ -21,55 +21,50 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file PointEmitter.cpp
-/// \brief CPP file for PointEmitter, X3D scene-graph node
+/// \file SurfaceEmitter.cpp
+/// \brief CPP file for SurfaceEmitter, X3D scene-graph node
 ///
 //
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "PointEmitter.h"
+#include "SurfaceEmitter.h"
 #include "ParticleSystem.h"
 
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
-H3DNodeDatabase PointEmitter::database( 
-                                   "PointEmitter", 
-                                   &(newInstance< PointEmitter >), 
-                                   typeid( PointEmitter ),
+H3DNodeDatabase SurfaceEmitter::database( 
+                                   "SurfaceEmitter", 
+                                   &(newInstance< SurfaceEmitter >), 
+                                   typeid( SurfaceEmitter ),
                                    &X3DParticleEmitterNode::database );
 
-namespace PointEmitterInternals {
-  FIELDDB_ELEMENT( PointEmitter, position, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( PointEmitter, direction, INPUT_OUTPUT );
+namespace SurfaceEmitterInternals {
+  FIELDDB_ELEMENT( SurfaceEmitter, surface, INPUT_OUTPUT );
 }
 
-PointEmitter::PointEmitter( 
+SurfaceEmitter::SurfaceEmitter( 
                       Inst< SFNode  > _metadata,
                       Inst< SFFloat > _speed,
                       Inst< SFFloat > _variation,
                       Inst< SFFloat > _mass,
                       Inst< SFFloat > _surfaceArea,
-                      Inst< SFVec3f > _position,
-                      Inst< SFVec3f > _direction ):
+                      Inst< SFGeometryNode > _surface ):
   X3DParticleEmitterNode( _metadata, _speed, _variation, _mass, 
                           _surfaceArea ),
-  position( _position ),
-  direction( _direction ) {
+  surface( _surface ) {
 
-  type_name = "PointEmitter";
+  type_name = "SurfaceEmitter";
   database.initFields( this );
-
-  position->setValue( Vec3f( 0, 0, 0 ) );
-  direction->setValue( Vec3f( 0, 1, 0 ) );
 }
 
-void PointEmitter::generateParticles( ParticleSystem *ps,
+void SurfaceEmitter::generateParticles( ParticleSystem *ps,
                                       H3DTime last_time,
                                       H3DTime now,
                                       list< Particle > &particles ) {
-  if( ps->maxParticles->getValue() <= 0 ) return; 
+  X3DGeometryNode *geom = surface->getValue();  
+  if( ps->maxParticles->getValue() <= 0 || !geom ) return; 
 
   H3DFloat emission_rate = 
     ps->maxParticles->getValue() / 
@@ -77,8 +72,16 @@ void PointEmitter::generateParticles( ParticleSystem *ps,
 
   H3DTime dt = now - last_time;
 
-  H3DFloat particles_to_emit = emission_rate * dt;
+  H3DFloat particles_to_emit = (H3DFloat)(emission_rate * dt);
 
+  vector< HAPI::Bounds::Triangle > tris;
+  tris.reserve( 200 );
+  geom->boundTree->getValue()->getAllTriangles( tris );
+
+  SFBool *solid_field = dynamic_cast< SFBool * >( geom->getField( "solid" ) );
+
+  bool solid = solid_field ? solid_field->getValue() : false;
+  
   while( particles_to_emit > 0 ) {
     // if the number of particles to emit is a fraction of
     // a particle only add it with the possibility of that fraction.
@@ -87,18 +90,38 @@ void PointEmitter::generateParticles( ParticleSystem *ps,
     if( particles_to_emit < 1 && 
         rand() > RAND_MAX * particles_to_emit ) break;
 
-    Vec3f dir = direction->getValue();
-
-    /// TODO: this is not random direction, fix it
-    if( dir == Vec3f( 0, 0, 0 ) ) {
-      dir = Vec3f( ParticleSystem::getRandomValue( -1, 1 ), 
-                   ParticleSystem::getRandomValue( -1, 1 ), 
-                   ParticleSystem::getRandomValue( -1, 1 ) ); 
-    }
+    // find random triangle
+    unsigned int triangle_index = (unsigned int)
+      ParticleSystem::getRandomValue( 0, 
+                                      tris.size() - 1e-7f  );
+    const HAPI::Bounds::Triangle &triangle = tris[ triangle_index ];
     
+    Vec3f ab = (Vec3f)(triangle.b - triangle.a);
+    Vec3f ac = (Vec3f)(triangle.c - triangle.a);
+    
+    // Compute normal. TODO: normal per vertex, need boundTree
+    /// triangles updated with normal info
+    Vec3f dir = ab % ac;
     dir.normalizeSafe();
+
+    // maybe flip normal if solid field is false 
+    if( !solid && ParticleSystem::getRandomValue( 0, 1 ) > 0.5 ) {
+      dir = -dir;
+    } 
+
+    // find a random point in the triangle
+    H3DFloat u = ParticleSystem::getRandomValue( 0, 1 );
+    H3DFloat v = ParticleSystem::getRandomValue( 0, 1 );
+    if( u + v > 1 ) {
+      u = 1 - u;
+      v = 1 - v; 
+    }
+
+    Vec3f pos = 
+      (Vec3f)(triangle.a * u + triangle.b * v + triangle.c * (1-u-v ));
     
-    Particle p = newParticle( ps, position->getValue(), dir );
+    // create new particle
+    Particle p = newParticle( ps, pos / 1000, dir );
     particles.push_back( p );
     particles_to_emit--;
   }

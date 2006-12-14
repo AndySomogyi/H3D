@@ -337,3 +337,22 @@ void X3DParticleEmitterNode::Particle::renderTexCoord( unsigned int index, X3DTe
     tc->render( index );
   }
 }
+
+X3DParticleEmitterNode::Particle 
+X3DParticleEmitterNode::newParticle( ParticleSystem *ps, 
+                                     const Vec3f &pos, 
+                                     const Vec3f &dir ) {
+  Vec3f vel = dir * ParticleSystem::getVariationValue( speed->getValue(), 
+                                                       variation->getValue() );
+  Particle p = Particle( pos,
+                         vel );
+  p.size = ps->particleSize->getValue();
+  p.type = ps->getCurrentParticleType(); 
+  p.surface_area = surfaceArea->getValue();
+  p.total_time_to_live = 
+    ParticleSystem::getVariationValue( ps->particleLifetime->getValue(), 
+                                       ps->lifetimeVariation->getValue() );
+  p.geometry.reset( ps->geometry->getValue() );
+  p.mass = mass->getValue();
+  return p;
+}

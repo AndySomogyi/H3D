@@ -223,6 +223,8 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
+  protected:
+    Particle newParticle( ParticleSystem *ps, const Vec3f &pos, const Vec3f &dir );
   };
 }
 
