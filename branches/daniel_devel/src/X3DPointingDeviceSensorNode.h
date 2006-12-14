@@ -124,7 +124,7 @@ namespace H3D {
       public AutoUpdate< TypedField < SFBool, Types< SFBool, SFBool > > > {
     public:
       SetIsActive() {
-        leftMousePressedOutside = false;
+        left_mouse_miss = false;
       }
 
       virtual void setValue( const bool &b, int id = 0 ) {
@@ -135,35 +135,35 @@ namespace H3D {
         SFBool::update();
         X3DPointingDeviceSensorNode *ts = 
               static_cast< X3DPointingDeviceSensorNode * >( getOwner() );
-        if( ts->isEnabled ) {
+        if( ts->is_enabled ) {
           bool itIsActive = false;
           bool leftButton = 
             static_cast< SFBool * >( routes_in[0] )->getValue();
           bool isOver = static_cast< SFBool * >( routes_in[1] )->getValue();
           if( leftButton ) {
-            if( !leftMousePressedOutside && 
+            if( !left_mouse_miss && 
                 ( isOver || ts->isActive->getValue() ) )
               itIsActive = true;
             else
-              leftMousePressedOutside = true;
+              left_mouse_miss = true;
           }
           else {
             itIsActive = false;
-            leftMousePressedOutside = false;
+            left_mouse_miss = false;
           }
 
           if( itIsActive != ts->isActive->getValue() ) {
             ts->isActive->setValue( itIsActive, ts->id );
             if( itIsActive ) {
-              someAreActive++;
+              number_of_active++;
             }
             else {
-              someAreActive--;
+              number_of_active--;
             }
           }
         }
       }
-      bool leftMousePressedOutside;
+      bool left_mouse_miss;
     };
 #ifdef __BORLANDC__
     friend class SetIsActive;
@@ -192,19 +192,19 @@ namespace H3D {
         
         X3DPointingDeviceSensorNode *pdsn = 
             static_cast< X3DPointingDeviceSensorNode * >( getOwner() );
-        if( _enabled != pdsn->isEnabled ) {
-          if( leftButton && _enabled && !pdsn->isEnabled ) {
-            pdsn->isEnabled = false;
+        if( _enabled != pdsn->is_enabled ) {
+          if( leftButton && _enabled && !pdsn->is_enabled ) {
+            pdsn->is_enabled = false;
           }
           else {
-            pdsn->isEnabled = _enabled;
+            pdsn->is_enabled = _enabled;
           }
         }
 
         if( routes_in[0] == event.ptr && 
             !_enabled && pdsn->isActive->getValue( pdsn->id ) ) {
           pdsn->isActive->setValue( _enabled, pdsn->id );
-          someAreActive--;
+          number_of_active--;
         }
       }
     };
@@ -259,9 +259,9 @@ namespace H3D {
     /// Otherwise return -1
     int findGeometry( X3DGeometryNode * n, H3DInt32 index );
 
-    /// Sets the currentMatrix to m
+    /// Sets the current_matrix to m
     void setCurrentMatrix( Matrix4f m ) {
-      currentMatrix = m;
+      current_matrix = m;
     }
 
     static void updateX3DPointingDeviceSensors( Node * n );
@@ -276,7 +276,7 @@ namespace H3D {
     /// generated.
     virtual void onIsOver( bool newValue, 
       HAPI::Bounds::IntersectionInfo &result, int geometryIndex ) {
-      if( isEnabled && ( isActive->getValue() || someAreActive == 0 ) ) {
+      if( is_enabled && ( isActive->getValue() || number_of_active == 0 ) ) {
         if( newValue != isOver->getValue() )
           isOver->setValue( newValue, id );
       }
@@ -287,17 +287,17 @@ namespace H3D {
     static bool has2DPointingDeviceMoved( Vec2f & pos );
 
     // static variables for pointing Device 2D (e.g. mouse )
-    static MouseSensor *mouseSensor;
-    static Vec2f posDevice2D;
-    static Vec3f nearPlanePos;
-    static Vec3f farPlanePos;
+    static MouseSensor *mouse_sensor;
+    static Vec2f pos_device2D;
+    static Vec3f near_plane_pos;
+    static Vec3f far_plane_pos;
 
     // To indicate how many active devices there are.
-    static int someAreActive;
+    static int number_of_active;
     
     // used instead of enabled to enable and disable X3DPointingDeviceSensors.
     // correctly.
-    bool isEnabled;
+    bool is_enabled;
 
     // Instances of specialized fields.
     auto_ptr< SetIsEnabled > setIsEnabled;
@@ -305,10 +305,10 @@ namespace H3D {
 
     // Vectors for geometries and the corresponding local transformation
     // matrix of the X3DPointingDeviceSensor for that geometry.
-    map< H3DInt32, X3DGeometryNode * > geometryNodes;
-    map< H3DInt32, Matrix4f > geometryMatrices;
-    Matrix4f currentMatrix;
-    static H3DInt32 geometryNodeIndex;
+    map< H3DInt32, X3DGeometryNode * > geometry_nodes;
+    map< H3DInt32, Matrix4f > geometry_matrices;
+    Matrix4f current_matrix;
+    static H3DInt32 geometry_index;
     
   private:
     // The instances of X3DPointingDeviceSensorNode that has been created.

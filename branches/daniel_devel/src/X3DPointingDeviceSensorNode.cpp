@@ -32,14 +32,14 @@
 
 using namespace H3D;
 
-MouseSensor * X3DPointingDeviceSensorNode::mouseSensor = NULL;
-Vec2f X3DPointingDeviceSensorNode::posDevice2D;
-Vec3f X3DPointingDeviceSensorNode::nearPlanePos;
-Vec3f X3DPointingDeviceSensorNode::farPlanePos;
+MouseSensor * X3DPointingDeviceSensorNode::mouse_sensor = NULL;
+Vec2f X3DPointingDeviceSensorNode::pos_device2D;
+Vec3f X3DPointingDeviceSensorNode::near_plane_pos;
+Vec3f X3DPointingDeviceSensorNode::far_plane_pos;
 vector< X3DPointingDeviceSensorNode * > X3DPointingDeviceSensorNode::instances=
 vector< X3DPointingDeviceSensorNode * >();
-int X3DPointingDeviceSensorNode::someAreActive = 0;
-H3DInt32 X3DPointingDeviceSensorNode::geometryNodeIndex = -1;
+int X3DPointingDeviceSensorNode::number_of_active = 0;
+H3DInt32 X3DPointingDeviceSensorNode::geometry_index = -1;
 
 H3DNodeDatabase X3DPointingDeviceSensorNode::database( 
         "X3DPointingDeviceSensorNode", 
@@ -70,19 +70,19 @@ X3DPointingDeviceSensorNode::X3DPointingDeviceSensorNode(
 
   description->setValue( "" );
 
-  if( !mouseSensor ) {
-    mouseSensor = new MouseSensor();
-    posDevice2D = mouseSensor->position->getValue();
+  if( !mouse_sensor ) {
+    mouse_sensor = new MouseSensor();
+    pos_device2D = mouse_sensor->position->getValue();
   }    
 
-  isEnabled = true;
+  is_enabled = true;
   setIsEnabled->setOwner( this );
   setIsEnabled->setValue( true );
   enabled->routeNoEvent( setIsEnabled );
-  mouseSensor->leftButton->routeNoEvent( setIsEnabled );
+  mouse_sensor->leftButton->routeNoEvent( setIsEnabled );
 
   setIsActive->setOwner(this);
-  mouseSensor->leftButton->routeNoEvent( setIsActive );
+  mouse_sensor->leftButton->routeNoEvent( setIsActive );
   isOver->routeNoEvent( setIsActive );
 
   instances.push_back( this );
@@ -91,35 +91,38 @@ X3DPointingDeviceSensorNode::X3DPointingDeviceSensorNode(
 /// Destructor. 
 X3DPointingDeviceSensorNode::~X3DPointingDeviceSensorNode() {
   instances.erase( find( instances.begin(), instances.end(), this ) );
-  if( instances.empty() )
-    mouseSensor = NULL;
+  if( instances.empty() ) {
+    delete mouse_sensor;
+    mouse_sensor = NULL;
+  }
 }
 
 bool X3DPointingDeviceSensorNode::has2DPointingDeviceMoved( Vec2f & pos ) {
-  Vec2f tempPos = mouseSensor->position->getValue();
-  if( ( tempPos - posDevice2D ).lengthSqr() > Constants::f_epsilon ) {
-    posDevice2D.x = tempPos.x;
-    posDevice2D.y = tempPos.y;
+  Vec2f tempPos = mouse_sensor->position->getValue();
+  if( ( tempPos - pos_device2D ).lengthSqr() > Constants::f_epsilon ) {
+    pos_device2D.x = tempPos.x;
+    pos_device2D.y = tempPos.y;
     pos = tempPos;
     return true;
   }
   return false;
 }
 
-int X3DPointingDeviceSensorNode::addGeometryNode( X3DGeometryNode * n, bool newIndex ) {
+int X3DPointingDeviceSensorNode::
+  addGeometryNode( X3DGeometryNode * n, bool newIndex ) {
   if( newIndex ) {
-    geometryNodeIndex++;
+    geometry_index++;
   }
-  geometryNodes[geometryNodeIndex] = n;
-  geometryMatrices[geometryNodeIndex] = currentMatrix;
-  return geometryNodeIndex;
+  geometry_nodes[geometry_index] = n;
+  geometry_matrices[geometry_index] = current_matrix;
+  return geometry_index;
 }
 
 void X3DPointingDeviceSensorNode::clearGeometryNodes() {
-  for( int i = 0; i < instances.size(); i++ ) {
-    instances[i]->geometryNodes.clear();
-    instances[i]->geometryMatrices.clear();
-    geometryNodeIndex = -1;
+  for( unsigned int i = 0; i < instances.size(); i++ ) {
+    instances[i]->geometry_nodes.clear();
+    instances[i]->geometry_matrices.clear();
+    geometry_index = -1;
   }
 }
 
@@ -134,17 +137,18 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
       glGetDoublev( GL_MODELVIEW_MATRIX, mvmatrix );
       glGetDoublev( GL_PROJECTION_MATRIX, projmatrix );
 
-      theMousePos.y = viewport[3] - (GLint ) theMousePos.y - 1;
+      theMousePos.y = viewport[3] - theMousePos.y - 1;
       gluUnProject( (GLdouble) theMousePos.x, (GLdouble) theMousePos.y,
         0.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );
-      nearPlanePos = Vec3f( wx, wy, wz );
+      near_plane_pos = Vec3f( (H3DFloat)wx, (H3DFloat)wy, (H3DFloat)wz );
       gluUnProject( (GLdouble) theMousePos.x, (GLdouble) theMousePos.y,
         1.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );
-      farPlanePos = Vec3f( wx, wy, wz );
+      far_plane_pos = Vec3f( (H3DFloat)wx, (H3DFloat)wy, (H3DFloat)wz );
 
-      for( int i = 0; i < instances.size(); i++ ) {
-        for( map< H3DInt32, X3DGeometryNode * >::iterator j = instances[i]->geometryNodes.begin();
-          j != instances[i]->geometryNodes.end();
+      for( unsigned int i = 0; i < instances.size(); i++ ) {
+        for( map< H3DInt32, X3DGeometryNode * >::iterator j = 
+          instances[i]->geometry_nodes.begin();
+          j != instances[i]->geometry_nodes.end();
           j++ )
           (*j).second->resetPtDevIndication( false );
       }  
@@ -152,8 +156,8 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
       vector< HAPI::Bounds::IntersectionInfo > result;
       vector< X3DGeometryNode * > theGeometry;
       vector< H3DInt32 > theGeometryIndex;
-      if( n->lineIntersect( nearPlanePos, 
-                            farPlanePos,
+      if( n->lineIntersect( near_plane_pos, 
+                            far_plane_pos,
                             result,
                             true,
                             theGeometry,
@@ -161,9 +165,10 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
         int closest = 0;
         if( theGeometry.size() > 1 ) {
           H3DFloat closestDistance = 
-            (result[closest].point - nearPlanePos).lengthSqr();
+            (H3DFloat)(result[closest].point - near_plane_pos).lengthSqr();
           for( unsigned int kl = 1; kl < theGeometry.size(); kl++ ) {
-            H3DFloat tempClose = (result[kl].point - nearPlanePos).lengthSqr();
+            H3DFloat tempClose = 
+              (H3DFloat)(result[kl].point - near_plane_pos).lengthSqr();
             if( tempClose < closestDistance ) {
               closestDistance = tempClose;
               closest = kl;
@@ -171,7 +176,7 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
           }
         }
 
-        for( int i = 0; i < instances.size(); i++ ) {
+        for( unsigned int i = 0; i < instances.size(); i++ ) {
           int geometryIndex =
             instances[i]->findGeometry( theGeometry[closest], 
                                         theGeometryIndex[closest] );
@@ -191,30 +196,22 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
       }
     }
   }
-  for( int i = 0; i < instances.size(); i++ ) {
-    for( map< H3DInt32, X3DGeometryNode * >::iterator j = instances[i]->geometryNodes.begin();
-         j != instances[i]->geometryNodes.end();
+  for( unsigned int i = 0; i < instances.size(); i++ ) {
+    for( map< H3DInt32, X3DGeometryNode * >::iterator j =
+          instances[i]->geometry_nodes.begin();
+         j != instances[i]->geometry_nodes.end();
          j++ )
       (*j).second->resetPtDevIndication( true );
   }  
 }
 
-int X3DPointingDeviceSensorNode::findGeometry( X3DGeometryNode * n, H3DInt32 theIndex ) {
-  if( isEnabled ) {
-    if( geometryNodes.find( theIndex ) != geometryNodes.end()
-        && geometryNodes[theIndex] == n ) {
+int X3DPointingDeviceSensorNode::
+  findGeometry( X3DGeometryNode * n, H3DInt32 theIndex ) {
+  if( is_enabled ) {
+    if( geometry_nodes.find( theIndex ) != geometry_nodes.end()
+        && geometry_nodes[theIndex] == n ) {
       return theIndex;
     }
-
-    /*for( map< int, X3DGeometryNode * >::iterator i = geometryNodes.begin();
-      i != geometryNodes.end(); i++ ) {
-      if( (*i).second == n )
-        return (*i).first;
-    }*/
-    
-    /*for( unsigned int i = 0; i < geometryNodes.size(); i++ )
-      if( geometryNodes[i] == n )
-        return i;*/
   }
   return -1;
 }

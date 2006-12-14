@@ -90,7 +90,7 @@ namespace H3D {
 
 
     /// The Set_Events field takes care of sending trackPoint_changed,
-    /// translation_changed, and offset events when they should be sent.
+    /// rotation_changed, and offset events when they should be sent.
     ///
     /// routes_in[0] is the position field of a MouseSensor
     /// routes_in[1] is the isActive field.
@@ -100,7 +100,7 @@ namespace H3D {
 
       // Constructor
       Set_SphereEvents() {
-        newRadius = true;
+        new_radius = true;
         center = Vec3f( 0, 0, 0 );
       }
 
@@ -117,10 +117,10 @@ namespace H3D {
       int intersectSegmentSphere( Vec3f a1, Vec3f a2, H3DFloat & t, Vec3f &q );
 
       H3DFloat radius;
-      Vec3f originalIntersectionPoint, center;
-      Matrix4f originalTransformationMatrix;
+      Vec3f original_intersection, center;
+      Matrix4f original_transform_matrix;
       // If true a new radius will be defined.
-      bool newRadius;
+      bool new_radius;
     };
 #ifdef __BORLANDC__
     friend class Set_SphereEvents;
@@ -136,8 +136,6 @@ namespace H3D {
                       Inst< SFBool > _isOver = 0,
                       Inst< SFRotation  >  _rotation_changed = 0,
                       Inst< SFVec3f >  _trackPoint_changed = 0 );
-
-    ~SphereSensor();
 
     // fields
     /// When the pointing device is deactivated and autoOffset is TRUE,
@@ -172,8 +170,8 @@ namespace H3D {
                            int geometryIndex );
 
     auto_ptr< Set_SphereEvents > set_SphereEvents;
-    Vec3f pointOfIntersection;
-    Matrix4f matrixAtIntersection;
+    Vec3f original_intersection;
+    Matrix4f intersection_matrix;
   };
 }
 

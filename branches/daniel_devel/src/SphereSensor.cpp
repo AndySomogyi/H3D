@@ -66,24 +66,20 @@ SphereSensor::SphereSensor(
   offset->setValue( Rotation( 0, 1, 0, 0 ) );
 
   set_SphereEvents->setOwner( this );
-  mouseSensor->position->routeNoEvent( set_SphereEvents );
+  mouse_sensor->position->routeNoEvent( set_SphereEvents );
   isActive->routeNoEvent( set_SphereEvents );
-}
-
-/// Destructor. 
-SphereSensor::~SphereSensor() {
 }
 
 void SphereSensor::onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
                            int geometryIndex ) {
-  if( isEnabled && ( isActive->getValue() || someAreActive == 0 ) ) {
+  if( is_enabled && ( isActive->getValue() || number_of_active == 0 ) ) {
     X3DPointingDeviceSensorNode::onIsOver( newValue,
                                            result,
                                            geometryIndex );
     if( newValue ) {
-      matrixAtIntersection = geometryMatrices[geometryIndex];
-      pointOfIntersection = matrixAtIntersection * Vec3f( result.point );
+      intersection_matrix = geometry_matrices[geometryIndex];
+      original_intersection = intersection_matrix * Vec3f( result.point );
     }
   }
 }
@@ -121,24 +117,25 @@ void SphereSensor::Set_SphereEvents::update() {
   if( ss->enabled->getValue() ) {
     bool isActive = static_cast< SFBool * >(routes_in[1])->getValue();
     if( isActive ) {
-      if( newRadius ) {
-        originalIntersectionPoint = ss->pointOfIntersection;
-        originalTransformationMatrix = ss->matrixAtIntersection;
-        newRadius = false;
-        radius = originalIntersectionPoint.length();
-        ss->trackPoint_changed->setValue( originalIntersectionPoint, ss->id );
-        originalIntersectionPoint.normalize();
+      if( new_radius ) {
+        original_intersection = ss->original_intersection;
+        original_transform_matrix = ss->intersection_matrix;
+        new_radius = false;
+        radius = original_intersection.length();
+        ss->trackPoint_changed->setValue( original_intersection, ss->id );
+        ss->rotation_changed->setValue( Rotation( 0, 1, 0, 0 ) );
+        original_intersection.normalize();
       }
       else {
         H3DFloat t;
         Vec3f intersectionPoint;
         if( intersectSegmentSphere( 
-                                 originalTransformationMatrix * nearPlanePos,
-                                 originalTransformationMatrix * farPlanePos, t,
-                                 intersectionPoint ) ) {
+                                 original_transform_matrix * near_plane_pos,
+                                 original_transform_matrix * far_plane_pos,
+                                 t, intersectionPoint ) ) {
           ss->trackPoint_changed->setValue( intersectionPoint, ss->id );
           intersectionPoint.normalize();
-          ss->rotation_changed->setValue( Rotation( originalIntersectionPoint,
+          ss->rotation_changed->setValue( Rotation( original_intersection,
                                                     intersectionPoint) *
                                           ss->offset->getValue(), ss->id );
         }
@@ -155,8 +152,8 @@ void SphereSensor::Set_SphereEvents::update() {
       }
     }
     else {
-      if( !newRadius ) {
-        newRadius = true;
+      if( !new_radius ) {
+        new_radius = true;
         if( ss->autoOffset->getValue() )
           ss->offset->setValue( ss->rotation_changed->getValue(), ss->id );
       }

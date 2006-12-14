@@ -60,10 +60,10 @@ namespace H3D {
         X3DTouchSensorNode *ts = 
             static_cast< X3DTouchSensorNode * >( getOwner() );
         if( isActive ) {
-          ts->startTime = TimeStamp();
+          ts->start_time = TimeStamp();
         }
         else if( ts->isOver->getValue() ) {
-          ts->touchTime->setValue( TimeStamp() - ts->startTime, ts->id );
+          ts->touchTime->setValue( TimeStamp() - ts->start_time, ts->id );
         }
       }
     };
@@ -99,7 +99,7 @@ namespace H3D {
 
   protected:
     // used to keep track on when the touching of the geometry started.
-    H3DTime startTime;
+    H3DTime start_time;
     // instance of specialized field.
     auto_ptr< SetTouchTime > setTouchTime;
   };

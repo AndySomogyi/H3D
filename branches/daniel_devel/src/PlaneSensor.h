@@ -128,9 +128,6 @@ namespace H3D {
       // t and q.
       int intersectSegmentPlane( Vec3f a, Vec3f b, float &t, Vec3f &q );
 
-      // Clamp n in the range [min, max]
-      H3DFloat Clamp( H3DFloat n, H3DFloat min, H3DFloat max );
-
       Vec3f originalIntersection, planeNormal;;
       H3DInt32 originalGeometry;
       H3DFloat planeD;
@@ -206,8 +203,8 @@ namespace H3D {
                            HAPI::Bounds::IntersectionInfo &result,
                            int geometryIndex );
 
-    Vec3f pointOfIntersection;
-    int intersectionGeometry;
+    Vec3f intersection_point;
+    int intersection_geometry;
   };
 }
 
