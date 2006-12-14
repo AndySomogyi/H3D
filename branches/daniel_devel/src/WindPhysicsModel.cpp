@@ -84,10 +84,7 @@ void WindPhysicsModel::updateParticleValues(
 
   /// TODO: what should happen really with turbulation
   if( dir == Vec3f( 0, 0, 0 ) ) {
-    dir = Vec3f( ParticleSystem::getRandomValue( -1, 1 ), 
-                 ParticleSystem::getRandomValue( -1, 1 ), 
-                 ParticleSystem::getRandomValue( -1, 1 ) ); 
-    dir.normalizeSafe();
+    dir = ParticleSystem::getRandomPointOnUnitSphere();
   } else if( turbulence->getValue() > 0 ) {
 
     // Don't know how turbulence should work.

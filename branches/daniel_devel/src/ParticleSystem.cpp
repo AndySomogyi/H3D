@@ -343,6 +343,23 @@ H3DFloat ParticleSystem::getVariationValue( H3DFloat main_value,
 
 }
 
+Vec3f ParticleSystem::getRandomPointOnUnitSphere() {
+  H3DFloat x1 = getRandomValue( -1, 1 );
+  H3DFloat x2 = getRandomValue( -1, 1 );
+
+  H3DFloat x1_sqr = x1 * x1;
+  H3DFloat x2_sqr = x2 * x2;
+  while( x1*x1 + x2*x2 >= 1 ) {
+    x2 = getRandomValue( -1, 1 );
+    x2_sqr = x2 * x2;
+  }
+
+  H3DFloat s = H3DSqrt( 1 - x1_sqr - x2_sqr );
+  return Vec3f( 2 * x1 * s,
+                2 * x2 * s,
+                1 - 2*(x1_sqr + x2_sqr ) );
+}
+
 X3DParticleEmitterNode::Particle::ParticleType
 ParticleSystem::getCurrentParticleType() {
   const string &geom_type = geometryType->getValue();

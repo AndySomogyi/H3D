@@ -227,6 +227,9 @@ namespace H3D {
     /// Returns a random value in the given range.
     static H3DFloat getRandomValue( H3DFloat min, H3DFloat max );
 
+    /// Returns a random point on the unit sphere.
+    static Vec3f getRandomPointOnUnitSphere();
+
     /// The createParticles field is used to control whether any further new 
     /// particles should be created. This allows the user to stop production
     /// of new particles, but keep those already existing in the scene to 

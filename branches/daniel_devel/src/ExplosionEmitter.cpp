@@ -71,11 +71,7 @@ void ExplosionEmitter::generateParticles( ParticleSystem *ps,
     H3DInt32 particles_to_emit = ps->maxParticles->getValue();
 
     while( particles_to_emit >= 1 ) {
-      Vec3f dir( ParticleSystem::getRandomValue( -1, 1 ), 
-                 ParticleSystem::getRandomValue( -1, 1 ), 
-                 ParticleSystem::getRandomValue( -1, 1 ) ); 
-      
-      dir.normalizeSafe();
+      Vec3f dir = ParticleSystem::getRandomPointOnUnitSphere();      
       Particle p = newParticle( ps, Vec3f( 0, 0, 0 ),
                                 dir );
       particles.push_back( p );
