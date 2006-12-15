@@ -171,7 +171,6 @@ bool X3DGroupingNode::lineIntersect(
                   vector< X3DGeometryNode * > &theGeometry,
                   vector< H3DInt32 > &theGeometryIndex ) {
   const NodeVector &children_nodes = children->getValue();
-  global = false;
   bool intersect = false;
   for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
     if( children_nodes[i]->
