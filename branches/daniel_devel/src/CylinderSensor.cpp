@@ -102,20 +102,6 @@ void CylinderSensor::onIsOver( bool newValue,
 
 int CylinderSensor::Set_CylinderEvents::intersectSegmentCylinder( 
   Vec3f sa, Vec3f sb, float &t ) {
-  // The cylinder is along the y_axis and we do want it to be long
-  // enough to intersect the segment.
-  H3DFloat theMaxValue = H3DMax( H3DAbs(sa.y), H3DAbs(sb.y) );
-  ca = Vec3f( 0.0f, -theMaxValue, 0.0f );
-  cb = Vec3f( 0.0f, theMaxValue, 0.0f );
-  // sometimes the nearplane and farplane is outside the radius of the
-  // cylinder and in that case there will be no intersection. So
-  // we move the nearplane and farplane to allow for correct intersection.
-  // This of course only affects intersection with the invisible cylinder.
-  Vec3f tempSBSA = sb - sa;
-  tempSBSA.normalize();
-  sa = sa - tempSBSA * 1.1*radius;
-  sb = sb + tempSBSA * 1.1*radius;
-
   Vec3f d = cb - ca, m = sa - ca, n = sb - sa;
 
   H3DFloat md = m * d;
@@ -200,11 +186,15 @@ void CylinderSensor::Set_CylinderEvents::update() {
         // create a new invisible cylinder if a cylinder will be used.
         original_intersection = cs->intersection_point;
         original_intersection.y = 0.0f;
-        if( use_caps )
+        if( !use_caps )
           radius = original_intersection.length();
+
         original_intersection.normalizeSafe();
         cs->trackPoint_changed->setValue( original_intersection, cs->id );
-        cs->rotation_changed->setValue( Rotation( y_axis, 0 ), cs->id );
+        cs->rotation_changed->setValue( Rotation( y_axis, 0 ) * 
+                                        Rotation( y_axis, 
+                                                  cs->offset->getValue() ),
+                                        cs->id );
         new_cylinder = false;
       }
       else {
@@ -224,6 +214,23 @@ void CylinderSensor::Set_CylinderEvents::update() {
                                        near_plane_pos;
           Vec3f farPlaneTransformed = original_transform_matrix *
                                       far_plane_pos;
+
+          // The cylinder is along the y_axis and we do want it to be long
+          // enough to intersect the segment.
+          H3DFloat theMaxValue = H3DMax( H3DAbs( nearPlaneTransformed.y ),
+                                         H3DAbs( farPlaneTransformed.y ) );
+          ca = Vec3f( 0.0f, -theMaxValue, 0.0f );
+          cb = Vec3f( 0.0f, theMaxValue, 0.0f );
+          // sometimes the nearplane and farplane is outside the radius of the
+          // cylinder and in that case there will be no intersection. So
+          // we move the nearplane and farplane to allow for correct
+          // intersection. This of course only affects intersection with the
+          // invisible cylinder.
+          Vec3f tempSBSA = farPlaneTransformed - nearPlaneTransformed;
+          tempSBSA.normalize();
+          nearPlaneTransformed = nearPlaneTransformed - tempSBSA * 1.1*radius;
+          farPlaneTransformed = farPlaneTransformed + tempSBSA * 1.1*radius;
+
           if( intersectSegmentCylinder( nearPlaneTransformed,
                                         farPlaneTransformed,
                                         t ) ) {
@@ -259,8 +266,10 @@ void CylinderSensor::Set_CylinderEvents::update() {
           // intersection "browsers may interpret this in a variety of ways"
           // which means doing whatever feels natural.
           // H3DAPI resends last event.
-          cerr << "Outside the Cylinder of rotation" <<
-                  " last event resent." << endl;
+          Console(3) << "Warning: No intersection with invisible cylinder"
+                     << " in CylinderSensor node( "
+				             << cs->getName() 
+                     << " ). Last event resent." << endl;
           cs->trackPoint_changed->touch();
           cs->rotation_changed->touch();
         }

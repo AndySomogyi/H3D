@@ -123,7 +123,8 @@ void SphereSensor::Set_SphereEvents::update() {
         new_radius = false;
         radius = original_intersection.length();
         ss->trackPoint_changed->setValue( original_intersection, ss->id );
-        ss->rotation_changed->setValue( Rotation( 0, 1, 0, 0 ) );
+        ss->rotation_changed->setValue( Rotation( 0, 1, 0, 0 ) * 
+                                        ss->offset->getValue(), ss->id );
         original_intersection.normalize();
       }
       else {
@@ -144,8 +145,10 @@ void SphereSensor::Set_SphereEvents::update() {
           // intersection "browsers may interpret this in a variety of ways"
           // which means doing whatever feels natural.
           // H3DAPI resends last event.
-          cerr << "Outside the sphere of rotation" <<
-                  " last event resent." << endl;
+          Console(3) << "Warning: No intersection with invisible sphere"
+                     << " in SphereSensor node( "
+				             << ss->getName() 
+                     << " ). Last event resent." << endl;
           ss->trackPoint_changed->touch();
           ss->rotation_changed->touch();
         }

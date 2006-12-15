@@ -151,6 +151,7 @@ bool MatrixTransform::lineIntersect(
   Matrix4f theMatrix;
   Matrix4f theMatrixInverse;
   if( global ) {
+     global = false;
      theMatrix = accumulatedInverse->getValue();
      theMatrixInverse = accumulatedForward->getValue();
   }
@@ -160,10 +161,11 @@ bool MatrixTransform::lineIntersect(
   }
   Vec3f local_from = theMatrix * from;
   Vec3f local_to = theMatrix * to;
+  H3DInt32 sizeBefore = result.size();
   bool intersection = X3DGroupingNode::lineIntersect( 
     local_from, local_to, result, global, theGeometry, theGeometryIndex );
   if( intersection ) {
-    for( unsigned int i = 0; i < result.size(); i++ ) {
+    for( unsigned int i = sizeBefore; i < result.size(); i++ ) {
       Vec3f newNormalPoint =
         theMatrixInverse * Vec3f( result[i].point + result[i].normal );
       result[i].point = theMatrixInverse * result[i].point;

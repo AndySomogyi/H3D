@@ -128,7 +128,8 @@ void PlaneSensor::Set_PlaneEvents::update() {
         newPlane = false;
         planeD = planeNormal * originalIntersection;
         ps->trackPoint_changed->setValue( originalIntersection, ps->id );
-        ps->translation_changed->setValue( Vec3f( 0, 0, 0 ) );
+        ps->translation_changed->setValue( Vec3f( 0, 0, 0 ) + 
+                                           ps->offset->getValue(), ps->id );
       }
       else {
         H3DFloat t;
