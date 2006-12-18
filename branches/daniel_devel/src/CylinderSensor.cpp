@@ -191,8 +191,7 @@ void CylinderSensor::Set_CylinderEvents::update() {
 
         original_intersection.normalizeSafe();
         cs->trackPoint_changed->setValue( original_intersection, cs->id );
-        cs->rotation_changed->setValue( Rotation( y_axis, 0 ) * 
-                                        Rotation( y_axis, 
+        cs->rotation_changed->setValue( Rotation( y_axis, 
                                                   cs->offset->getValue() ),
                                         cs->id );
         new_cylinder = false;
@@ -246,19 +245,26 @@ void CylinderSensor::Set_CylinderEvents::update() {
           intersectionPoint.y = 0.0f;
           intersectionPoint.normalizeSafe();
           H3DFloat angle = 0;
-          if( (original_intersection % intersectionPoint).y < 0.0f )
+
+          // need to clamp the calculated angle because sometimes the scalar
+          // product return a value slightly above 1 or below -1 which means
+          // that H3DAcos returns an undefined value.
+          if( (original_intersection % intersectionPoint).y < 0.0f ) {
             angle = (H3DFloat)(2*Constants::pi) - 
-              H3DAcos( original_intersection * intersectionPoint );
-          else
-            angle = H3DAcos( original_intersection * intersectionPoint );
+              H3DAcos( cs->Clamp( original_intersection * intersectionPoint,
+                                  -1, 1 ) );
+          }
+          else {
+            angle = H3DAcos( cs->Clamp( original_intersection * 
+                                        intersectionPoint, -1, 1 ) );
+          }
 
           H3DFloat minAngle = cs->minAngle->getValue();
           H3DFloat maxAngle = cs->maxAngle->getValue();
           if( minAngle <= maxAngle )
             angle = cs->Clamp( angle, minAngle, maxAngle );
 
-          cs->rotation_changed->setValue( Rotation( y_axis, angle ) *
-                                          Rotation( y_axis, 
+          cs->rotation_changed->setValue( Rotation( y_axis, angle + 
                                                     cs->offset->getValue() ),
                                           cs->id );
         } else {
