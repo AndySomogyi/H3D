@@ -69,6 +69,9 @@ namespace H3D {
 
   public:
 
+    typedef HAPI::HAPIHapticsDevice::ErrorCode ErrorCode;
+    typedef HAPI::HAPIHapticsDevice::DeviceState DeviceState;
+
     /// Saves the value of the field in a variable that can be accessed
     /// from the realtime loop.
     class H3DAPI_API PosCalibration: 
@@ -181,7 +184,9 @@ namespace H3D {
       }
     };
 
-
+    /// SFHapticsRendererNode extends TypedSFNode< H3DHapticsRendererNode >
+    /// in order to change the haptics renderer for the used HAPIHapticsDevice
+    /// when changing H3DHapticsRendererNode.
     class H3DAPI_API SFHapticsRendererNode: 
       public TypedSFNode< H3DHapticsRendererNode > {
       virtual void onAdd( Node *n ) {
@@ -208,6 +213,39 @@ namespace H3D {
 
     };
 
+
+    /// SetEnabled specializes SFBool to go into reset mode when a true event
+    /// is received.
+    class H3DAPI_API SetEnabled: public OnValueChangeSField< SFBool > {
+      virtual void onValueChange( const bool &v ) {
+        H3DHapticsDevice *hd = 
+          static_cast< H3DHapticsDevice * >( getOwner() );
+        if( v ) hd->enableDevice();
+        else hd->disableDevice();
+      }
+    };
+
+    /// The MainButton class masks out the bit 0 from the incoming integer.
+    ///
+    /// inputs[0] is the buttons field
+    class H3DAPI_API MainButton: public TypedField< SFBool, SFInt32 > {
+      virtual void update() {
+        H3DInt32 buttons   = 
+          static_cast< SFInt32 * >( routes_in[0] )->getValue();
+        value = (buttons & 0x01) != 0;
+      }
+    }; 
+
+    /// The SecondaryButton class masks out bit 1 from the incoming integer.
+    /// inputs[0] is the buttons field
+    class H3DAPI_API SecondaryButton: public TypedField< SFBool, SFInt32 > {
+      virtual void update() {
+        H3DInt32 buttons   = 
+          static_cast< SFInt32 * >( routes_in[0] )->getValue();
+        value = (buttons & 0x10) != 0;
+      }
+    }; 
+
     /// Constructor.
     H3DHapticsDevice( Inst< SFVec3f         > _devicePosition         = 0,
                       Inst< SFRotation      > _deviceOrientation      = 0,
@@ -218,17 +256,19 @@ namespace H3D {
                       Inst< SFVec3f         > _proxyPosition          = 0,
                       Inst< WeightedProxy   > _weightedProxyPosition  = 0,     
                       Inst< SFFloat         > _proxyWeighting         = 0,
-                      Inst< SFBool          > _main_button            = 0,
+                      Inst< MainButton      > _main_button            = 0,
+                      Inst< SecondaryButton > _secondary_button       = 0,
+                      Inst< SFInt32         > _buttons                = 0,
                       Inst< SFVec3f         > _force                  = 0,
                       Inst< SFVec3f         > _torque                 = 0,
                       Inst< SFInt32         > _inputDOF               = 0,
                       Inst< SFInt32         > _outputDOF              = 0,
                       Inst< SFInt32         > _hapticsRate            = 0,
                       Inst< SFNode          > _stylus                 = 0,
-                      Inst< SFBool          > _initialized            = 0,
                       Inst< SFHapticsRendererNode > _hapticsRenderer  = 0,
                       Inst< MFVec3f         > _proxyPositions         = 0 );
 
+    /// Destuctor.
     virtual ~H3DHapticsDevice() {
       disableDevice();
     }
@@ -244,7 +284,19 @@ namespace H3D {
 
     /// Does all the initialization needed for the device before starting to
     /// use it.
-    virtual void initDevice();
+    virtual ErrorCode initDevice();
+
+    /// Perform cleanup and let go of all device resources that are allocated.
+    /// After a call to this function no haptic rendering can be performed on
+    /// the device until the initDevice() function has been called again.
+    virtual ErrorCode releaseDevice();
+
+    /// Enable the device. Positions can be read and force can be sent.
+    virtual ErrorCode enableDevice();
+
+    /// Temporarily disable the device. Forces sent will be ignored and
+    /// positions and orientation will stay the same as previous values.
+    virtual ErrorCode disableDevice();
 
     /// Get the thread that is used to run this haptics device.
     inline HAPI::PeriodicThreadBase *getThread() { 
@@ -254,14 +306,6 @@ namespace H3D {
         return NULL;
       }
     }
-
-    /// Reset the device.
-    virtual void resetDevice() {}
-
-    /// Perform cleanup and let go of all device resources that are allocated.
-    /// After a call to this function no haptic rendering can be performed on
-    /// the device until the initDevice() function has been called again.
-    virtual void disableDevice();
 
     /// This function is used to transfer device values, such as position, 
     /// button status etc from the realtime loop to the fields of H3DHapticsDevice,
@@ -370,12 +414,31 @@ namespace H3D {
     /// \dotfile H3DHapticsDevice_proxyWeighting.dot
     auto_ptr< SFFloat >   proxyWeighting;
 
-    /// The state of the main button. true means that the button is pressed.
+    /// The state of the main button(button 0). 
+    /// true means that the button is pressed.
     ///
     /// <b>Access type:</b> outputOnly \n
     /// 
     /// \dotfile H3DHapticsDevice_mainButton.dot
-    auto_ptr< SFBool >   mainButton;
+    auto_ptr< MainButton >   mainButton;
+
+    /// The state of the secondary button (button 1).
+    /// true means that the button is pressed.
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// 
+    /// \dotfile H3DHapticsDevice_mainButton.dot
+    auto_ptr< SecondaryButton >   secondaryButton;
+
+    /// The state of all buttons. Bit 0 is button 0, bit 1 is button 1,..
+    /// A 1 in the bit position indicates that the button is pressed.
+    /// Use mainButton and secondaryButton fields for quick access to
+    /// button 0 and 1
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// 
+    /// \dotfile H3DHapticsDevice_buttons
+    auto_ptr< SFInt32 > buttons;
 
     /// The approximation of the force that has been rendered during the last 
     /// scenegraph loop.
@@ -446,6 +509,23 @@ namespace H3D {
     /// 
     /// \dotfile H3DHapticsDevice_proxyPositions.dot
     auto_ptr< MFVec3f >   proxyPositions;
+
+    /// Enable/disable the device. A disabled device does not update its 
+    /// positions and does not generate any forces.
+    ///
+    /// <b>Access type:</b> inputOnly \n
+    /// 
+    /// \dotfile H3DHapticsDevice_enabled.dot
+    auto_ptr< SetEnabled > set_enabled;
+
+    /// true if the device is enabled, e.g. positions and forces are updated 
+    /// and sent
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// <b>Default value:</b> false \n
+    /// 
+    /// \dotfile H3DHapticsDevice_enabled.dot
+    auto_ptr< SFBool > enabled;
     
     /// Node database entry
     static H3DNodeDatabase database;

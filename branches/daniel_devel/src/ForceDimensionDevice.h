@@ -83,14 +83,15 @@ namespace H3D {
             Inst< SFVec3f            > _proxyPosition          = 0,
             Inst< WeightedProxy      > _weightedProxyPosition  = 0,     
             Inst< SFFloat            > _proxyWeighting         = 0,
-            Inst< SFBool             > _main_button            = 0,
+            Inst< MainButton         > _main_button            = 0,
+            Inst< SecondaryButton    > _secondary_button       = 0,
+            Inst< SFInt32            > _buttons                = 0,
             Inst< SFVec3f            > _force                  = 0,
             Inst< SFVec3f            > _torque                 = 0,
             Inst< SFInt32            > _inputDOF               = 0,
             Inst< SFInt32            > _outputDOF              = 0,
             Inst< SFInt32            > _hapticsRate            = 0,
             Inst< SFNode             > _stylus                 = 0,
-            Inst< SFBool             > _initialized            = 0,
             Inst< SFFloat            > _proxyRadius            = 0,
             Inst< GravityComp        > _useGravityCompensation = 0,
             Inst< Reset              > _reset                  = 0,
@@ -101,12 +102,12 @@ namespace H3D {
     
     /// Does all the initialization needed for the device before starting to
     /// use it.
-    virtual void initDevice();
+    virtual ErrorCode initDevice();
 
     /// Perform cleanup and let go of all device resources that are allocated.
     /// After a call to this function no haptic rendering can be performed on
     /// the device until the initDevice() function has been called again.
-    virtual void disableDevice();
+    virtual ErrorCode releaseDevice();
 
     /// Enable/disable gravity compensation. A value of true enables it.
     /// When gravity compensation is enabled, the weights of the arms and of

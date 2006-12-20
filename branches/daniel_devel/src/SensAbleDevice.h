@@ -29,8 +29,11 @@
 #ifndef __SENSABLEDEVICE_H__
 #define __SENSABLEDEVICE_H__
 
-#include "H3DHapticsDevice.h"
-#include "MFString.h"
+#include <H3DHapticsDevice.h>
+#include <MFString.h>
+#include <SFString.h>
+#include <SFDouble.h>
+#include <MFVec3f.h>
 
 namespace H3D {
 
@@ -41,36 +44,6 @@ namespace H3D {
   /// Delta haptics devices.
   class H3DAPI_API SensAbleDevice: public H3DHapticsDevice {
   public:
-
-    /// Reset specializes SFBool to go into reset mode when a true event
-    /// is received.
-    class Reset: public OnNewValueSField< SFBool > {
-      virtual void onNewValue( const bool &v );
-    };
-
-    /// WaitReset specializes SFBool to go into wait on reset mode when
-    /// a true event is received.
-    class WaitReset: public OnNewValueSField< SFBool > {
-      virtual void onNewValue( const bool &v );
-    };
-
-    /// GravityComp specializes SFBool to toggle gravity compensation 
-    /// on and off.
-    class GravityComp: public OnValueChangeSField< SFBool > {
-      virtual void onValueChange( const bool &v );
-    };
-
-    /// EffectorMass specializes SFFloat to change the end effector 
-    /// mass at change of value.
-    class EffectorMass: public OnValueChangeSField< SFFloat > {
-      virtual void onValueChange( const H3DFloat &v );
-    };
-
-    /// Brakes specializes SFBool to toggle brakes
-    /// on and off.
-    class Brakes: public OnValueChangeSField< SFBool > {
-      virtual void onValueChange( const bool &v );
-    };
 
     /// Constructor.
     SensAbleDevice( 
@@ -83,80 +56,135 @@ namespace H3D {
             Inst< SFVec3f            > _proxyPosition          = 0,
             Inst< WeightedProxy      > _weightedProxyPosition  = 0,     
             Inst< SFFloat            > _proxyWeighting         = 0,
-            Inst< SFBool             > _main_button            = 0,
+            Inst< MainButton         > _main_button            = 0,
+            Inst< SecondaryButton    > _secondary_button       = 0,
+            Inst< SFInt32            > _buttons                = 0,
             Inst< SFVec3f            > _force                  = 0,
             Inst< SFVec3f            > _torque                 = 0,
             Inst< SFInt32            > _inputDOF               = 0,
             Inst< SFInt32            > _outputDOF              = 0,
             Inst< SFInt32            > _hapticsRate            = 0,
             Inst< SFNode             > _stylus                 = 0,
-            Inst< SFBool             > _initialized            = 0,
-            Inst< SFFloat            > _proxyRadius            = 0 );
+            Inst< SFFloat            > _proxyRadius            = 0,
+            Inst< SFString           > _deviceName             = 0 );
     
     /// Does all the initialization needed for the device before starting to
     /// use it.
-    virtual void initDevice();
+    virtual ErrorCode initDevice();
 
-    /// Perform cleanup and let go of all device resources that are allocated.
-    /// After a call to this function no haptic rendering can be performed on
-    /// the device until the initDevice() function has been called again.
-    virtual void disableDevice();
+    /// This function is used to transfer device values, such as position, 
+    /// button status etc from the realtime loop to the fields of 
+    /// H3DHapticsDevice, and possible vice versa.
+    virtual void updateDeviceValues();
 
-    /*    /// Enable/disable gravity compensation. A value of true enables it.
-    /// When gravity compensation is enabled, the weights of the arms and of
-    /// the end-effector are taken into account and a vertical force is 
-    /// dynamically applied to the end-effector on top of the user command.
+    /// The name of the device, as specified in Phantom Configuration
+    /// utility. If set to "", the default device will be used. 
+    ///
+    /// <b>Access type:</b> initializeOnly \n
+    /// <b>Default value:</b> "" \n
+    auto_ptr< SFString > deviceName;
+
+    ///  The HDAPI software version, in the form major.minor.build
     /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> true \n
-    auto_ptr< SFBool > useGravityCompensation;
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFString > HDAPIVersion;
 
-    /// When a true event is received, the device is put into RESET mode.
-    /// In this mode, the user is expected to put the device end-effector
-    /// at its rest position. This is how the device performs its calibration. 
+    /// The device model of the device. Undefined if device not
+    /// initialized.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFString > deviceModelType;
+
+    /// The device driver version of the device. Undefined if device not
+    /// initialized.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFString > deviceDriverVersion;
+
+    /// The device firmware version. Undefined if device not
+    /// initialized.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFDouble > deviceFirmwareVersion;
+
+    /// The vendor of the device. Undefined if device not
+    /// initialized.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFString > deviceVendor;
+
+    /// The serial number of the device. Undefined if device not
+    /// initialized.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFString > deviceSerialNumber;
+
+    /// The maximum workspace dimensions of the device, i.e. the
+    /// mechanical limits of the device. Undefined if
+    /// device not initialized. Contains two values where the first
+    /// value is the minimum values and the second the maximum values
+    /// for each axis.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< MFVec3f > maxWorkspaceDimensions;
+
+    /// the usable workspace dimensions of the device, i.e. the 
+    /// workspace in which forces are guaranteed to be reliably render.
+    /// Undefined if device not initialized. Contains two values where the
+    /// first value is the minimum values and the second the maximum values
+    /// for each axis.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< MFVec3f > usableWorkspaceDimensions;
+
+    /// The mechanical offest of the device end-effector in y from
+    /// the table top. Undefined if device not initialized.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFFloat > tabletopOffset;
+
+    /// The maximum force, i.e. the amount of force that the
+    /// device can sustain when the motors are at room temperature
+    /// Undefined if device not initialized.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFFloat > maxForce;
+
+    /// The maximum continuous force, i.e. the amount of force that the
+    /// device can sustain through a period of time.
+    /// Undefined if device not initialized.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFFloat > maxContinuousForce;
+
+    /// Current gimbal angles for the device (in radians).
+    /// From neutral position:
+    /// x - Right     = +
+    /// y - Up        = -
+    /// z - Clockwise = +
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFVec3f > gimbalAngles;
+
+    /// Current joint angles for the device (in radians).
+    /// x - turret, + = left
+    /// y - thigh,  + = up
+    /// z - shin,   + = up
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFVec3f > jointAngles;
+
+    /// This field is true if the device needs to be calibrated.
+    /// 
+    /// <b>Access type:</b> outputOnly \n   
+    auto_ptr< SFBool > needsCalibration;
+
+    /// When a true event is received, the calibration procedure for the 
+    /// device is started. The calibration procedure depends on the 
+    /// device type.
     /// 
     /// <b>Access type:</b> inputOnly \n   
-    auto_ptr< SFBool > reset;
-
-    /// When a true event is received, the device is put into RESET mode 
-    /// and wait for the user to calibrate the device.  Optionally, a 
-    /// timeout can be defined after which the call returns even if
-    /// calibration has not occured.
-    /// 
-    /// <b>Access type:</b> inputOnly \n   
-    auto_ptr< SFBool > waitForReset;
-
-    /// Set the end effector mass used in gravity compensation in order
-    /// to provide accurate gravity compensation when custom-made or 
-    /// modified end-effectors are used.
-    /// 
-    /// <b>Access type:</b> inputOnly \n   
-    auto_ptr< SFFloat > endEffectorMass;
-
-    /// Enable/disable the device electromagnetic brakes. If enabled
-    /// the device motor circuits are shortcut to produce electromagnetic
-    /// viscosity. The viscosity is sufficient to prevent the device from
-    /// falling too hard onto if forces are disabled abruptly, either by
-    /// pressing the force button or by action of a safety feature.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> true \n
-    auto_ptr< SFBool > useBrakes;
-
-    /// Contains the device type of the Force Dimension device.
-    /// Possible values are:
-    /// - DHD_DEVICE_3DOF - the Delta Haptic Device 3DOF
-    /// - DHD_DEVICE_6DOF - the Delta Haptic Device 6DOF
-    /// - DHD_DEVICE_OMEGA - the OMEGA Haptic Device
-    /// - DHD_DEVICE_OMEGA3, DHD_DEVICE_OMEGA33, DHD_DEVICE_OMEGA331 - the 
-    /// second generation OMEGA.X Haptic Devices
-    /// - DHD_DEVICE_CONTROLLER - the Force Dimension stand-alone USB 2.0
-    ///  controller (DHD_DEVICE_CONTROLLER) 
-    /// - DHD_DEVICE_SIMULATOR - the Force Dimension haptic device
-    /// simulator
-    /// - DHD_DEVICE_CUSTOM - Unknown devices.
-    /// - -1, device not initialized
-    auto_ptr< SFInt32 > deviceType;*/
+    auto_ptr< SFBool > calibrate;
 
     /// Node database entry
     static H3DNodeDatabase database;
