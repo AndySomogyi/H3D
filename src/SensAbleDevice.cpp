@@ -38,12 +38,23 @@ H3DNodeDatabase SensAbleDevice::database( "SensAbleDevice",
                                           typeid( SensAbleDevice ),
                                           &H3DHapticsDevice::database ); 
 namespace SensAbleDeviceInternals {
-  /*  FIELDDB_ELEMENT( SensAbleDevice, useGravityCompensation, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( SensAbleDevice, reset, INPUT_ONLY );
-  FIELDDB_ELEMENT( SensAbleDevice, waitForReset, INPUT_ONLY );
-  FIELDDB_ELEMENT( SensAbleDevice, endEffectorMass, INPUT_ONLY );
-  FIELDDB_ELEMENT( SensAbleDevice, useBrakes, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( SensAbleDevice, deviceType, OUTPUT_ONLY );*/
+  FIELDDB_ELEMENT( SensAbleDevice, deviceName, INITIALIZE_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, HDAPIVersion, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, deviceModelType, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, deviceDriverVersion, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, deviceFirmwareVersion, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, deviceVendor, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, deviceSerialNumber, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, maxWorkspaceDimensions, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, usableWorkspaceDimensions, OUTPUT_ONLY );  
+  FIELDDB_ELEMENT( SensAbleDevice, tabletopOffset, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, maxForce, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, maxContinuousForce, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, gimbalAngles, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, jointAngles, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SensAbleDevice, needsCalibration, OUTPUT_ONLY )
+  FIELDDB_ELEMENT( SensAbleDevice, calibrate, INPUT_ONLY )
+
 }
 
 /// Constructor.
@@ -57,79 +68,92 @@ SensAbleDevice::SensAbleDevice(
                Inst< SFVec3f         > _proxyPosition,
                Inst< WeightedProxy   > _weightedProxyPosition,     
                Inst< SFFloat         > _proxyWeighting,
-               Inst< SFBool          > _mainButton,
+               Inst< MainButton      > _mainButton,
+               Inst< SecondaryButton > _secondary_button,
+               Inst< SFInt32         > _buttons,
                Inst< SFVec3f         > _force,
                Inst< SFVec3f         > _torque,
                Inst< SFInt32         > _inputDOF,
                Inst< SFInt32         > _outputDOF,
                Inst< SFInt32         > _hapticsRate,
                Inst< SFNode          > _stylus,
-               Inst< SFBool          > _initialized,
-               Inst< SFFloat         > _proxyRadius ) :
+               Inst< SFFloat         > _proxyRadius,
+               Inst< SFString        > _deviceName ) :
   H3DHapticsDevice( _devicePosition, _deviceOrientation, _trackerPosition,
               _trackerOrientation, _positionCalibration, 
               _orientationCalibration, _proxyPosition,
               _weightedProxyPosition, _proxyWeighting, _mainButton,
+                    _secondary_button, _buttons,
               _force, _torque, _inputDOF, _outputDOF, _hapticsRate,
-              _stylus, _initialized ) {
+              _stylus ),
+    deviceName( _deviceName ),
+  HDAPIVersion( new SFString ),
+  deviceModelType( new SFString ),
+  deviceDriverVersion( new SFString ),
+  deviceFirmwareVersion( new SFDouble ),
+  deviceVendor(  new SFString ),
+  deviceSerialNumber( new SFString ),
+  maxWorkspaceDimensions( new MFVec3f ),
+  usableWorkspaceDimensions( new MFVec3f ),
+  tabletopOffset( new SFFloat ),
+  maxForce( new SFFloat ),
+  maxContinuousForce( new SFFloat ),
+  gimbalAngles( new SFVec3f ),
+  jointAngles( new SFVec3f ),
+  needsCalibration( new SFBool ),
+  calibrate( new SFBool ) { 
 
   type_name = "SensAbleDevice";  
   database.initFields( this );
 
   hapi_device.reset( new HAPI::PhantomHapticsDevice );
+
+  maxForce->setValue( 0, id );
+  maxContinuousForce->setValue( 0, id );
+  tabletopOffset->setValue( 0, id );
+  deviceFirmwareVersion->setValue( 0, id );
+  maxWorkspaceDimensions->resize( 2, Vec3f(0,0,0), id );
+  usableWorkspaceDimensions->resize( 2, Vec3f(0,0,0), id );
+  needsCalibration->setValue( false, id );
 }
 
 
-void SensAbleDevice::Reset::onNewValue( const bool &v ) {
-  SensAbleDevice *fd = 
-    static_cast< SensAbleDevice * >( getOwner() );
-  HAPI::PhantomHapticsDevice * dhd = 
-    static_cast< HAPI::PhantomHapticsDevice * >( fd->hapi_device.get() );
-//  if( v ) dhd->reset();
+H3DHapticsDevice::ErrorCode SensAbleDevice::initDevice() {
+  HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::initDevice();
+   HAPI::PhantomHapticsDevice *pd = 
+    dynamic_cast< HAPI::PhantomHapticsDevice * >(hapi_device.get() );
+  if( e == HAPI::HAPIHapticsDevice::SUCCESS && pd ) {
+    HDAPIVersion->setValue( pd->getHDAPIVersion(), id );
+    deviceModelType->setValue( pd->getDeviceModelType(), id );
+    deviceDriverVersion->setValue( pd->getDeviceDriverVersion(), id );
+    deviceVendor->setValue( pd->getDeviceVendor(), id );
+    deviceSerialNumber->setValue( pd->getDeviceSerialNumber(), id );
+    deviceFirmwareVersion->setValue( pd->getDeviceFirmwareVersion(), id );
+    HAPI::Vec3 max, min;
+    pd->getMaxWorkspaceDimensions( min, max );
+    maxWorkspaceDimensions->setValue( 0, (Vec3f)min, id ); 
+    maxWorkspaceDimensions->setValue( 1, (Vec3f)max, id ); 
+    pd->getUsableWorkspaceDimensions( min, max );
+    usableWorkspaceDimensions->setValue( 0, (Vec3f)min, id ); 
+    usableWorkspaceDimensions->setValue( 1, (Vec3f)max, id ); 
+    tabletopOffset->setValue( pd->getTabletopOffset(), id );
+    maxForce->setValue( pd->getMaxForce(), id );
+    maxContinuousForce->setValue( pd->getMaxContinuousForce(), id );
+    needsCalibration->setValue( pd->needsCalibration(), id );
+  }
+  return e;
 }
 
-void SensAbleDevice::WaitReset::onNewValue( const bool &v ) {
-  SensAbleDevice *fd = 
-    static_cast< SensAbleDevice * >( getOwner() );
-  HAPI::PhantomHapticsDevice * dhd = 
-    static_cast< HAPI::PhantomHapticsDevice * >( fd->hapi_device.get() );
- // if( v ) dhd->waitForReset();
-}
-
-void SensAbleDevice::GravityComp::onValueChange( const bool &v ) {
-  SensAbleDevice *fd = 
-    static_cast< SensAbleDevice * >( getOwner() );
-  HAPI::PhantomHapticsDevice * dhd = 
-    static_cast< HAPI::PhantomHapticsDevice * >( fd->hapi_device.get() );
- // dhd->useGravityCompensation( v );
-}
-
-void SensAbleDevice::EffectorMass::onValueChange( const H3DFloat &v ) {
-  SensAbleDevice *fd = 
-    static_cast< SensAbleDevice * >( getOwner() );
-  HAPI::PhantomHapticsDevice * dhd = 
-    static_cast< HAPI::PhantomHapticsDevice * >( fd->hapi_device.get() );
-  //dhd->setEffectorMass( v );
-}
-
-void SensAbleDevice::Brakes::onValueChange( const bool &v ) {
-  SensAbleDevice *fd = 
-    static_cast< SensAbleDevice * >( getOwner() );
-  HAPI::PhantomHapticsDevice * dhd = 
-    static_cast< HAPI::PhantomHapticsDevice * >( fd->hapi_device.get() );
-  //dhd->useBrakes( v );
-}
-
-
-void SensAbleDevice::initDevice() {
-  H3DHapticsDevice::initDevice();
-  HAPI::PhantomHapticsDevice *dhd = 
-    static_cast< HAPI::PhantomHapticsDevice * >( hapi_device.get() );
-  //if( dhd )
-  //  deviceType->setValue( dhd->getDeviceType(), id ); 
-}
-
-void SensAbleDevice::disableDevice() {
-  H3DHapticsDevice::disableDevice();
-  //deviceType->setValue( -1, id );
+void SensAbleDevice::updateDeviceValues() {
+  H3DHapticsDevice::updateDeviceValues();
+  HAPI::PhantomHapticsDevice *pd = 
+    dynamic_cast< HAPI::PhantomHapticsDevice *>(hapi_device.get() );
+  if( pd ) {
+    bool b = pd->needsCalibration();
+    if( needsCalibration->getValue() != b ) {
+      needsCalibration->setValue( b );
+    }
+    gimbalAngles->setValue( (Vec3f)pd->getGimbalAngles(), id );
+    jointAngles->setValue( (Vec3f) pd->getJointAngles(), id );
+  }
 }

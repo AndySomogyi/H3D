@@ -72,7 +72,7 @@ void DeviceInfo::renderStyli() {
        i != device->end(); i++ ) {
     H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
     Node *stylus = hd->stylus->getValue();
-    if( stylus ) {
+    if( stylus && hd->initialized->getValue() ) {
       const Vec3f &pos = hd->weightedProxyPosition->getValue();
       const Rotation &rot = hd->trackerOrientation->getValue();
       glPushMatrix();
@@ -92,7 +92,7 @@ void DeviceInfo::removeFromStack() {
        i != device->end(); i++ ) {
     H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
     if( hd ) {
-      hd->disableDevice();
+      hd->releaseDevice();
     }
   }
   DeviceInfo *new_top = 
@@ -119,7 +119,7 @@ void DeviceInfo::toStackTop() {
            i != active->device->end(); i++ ) {
         H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
         if( hd ) {
-          hd->disableDevice();
+          hd->releaseDevice();
         }
       }
     }

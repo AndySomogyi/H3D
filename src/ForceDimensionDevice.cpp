@@ -57,14 +57,15 @@ ForceDimensionDevice::ForceDimensionDevice(
                Inst< SFVec3f         > _proxyPosition,
                Inst< WeightedProxy   > _weightedProxyPosition,     
                Inst< SFFloat         > _proxyWeighting,
-               Inst< SFBool          > _mainButton,
+               Inst< MainButton      > _mainButton,
+               Inst< SecondaryButton > _secondary_button,
+               Inst< SFInt32         > _buttons,
                Inst< SFVec3f         > _force,
                Inst< SFVec3f         > _torque,
                Inst< SFInt32         > _inputDOF,
                Inst< SFInt32         > _outputDOF,
                Inst< SFInt32         > _hapticsRate,
                Inst< SFNode          > _stylus,
-               Inst< SFBool          > _initialized,
                Inst< SFFloat         > _proxyRadius,
                Inst< GravityComp     > _useGravityCompensation,
                Inst< Reset           > _reset,
@@ -76,8 +77,9 @@ ForceDimensionDevice::ForceDimensionDevice(
               _trackerOrientation, _positionCalibration, 
               _orientationCalibration, _proxyPosition,
               _weightedProxyPosition, _proxyWeighting, _mainButton,
+                    _secondary_button, _buttons,
               _force, _torque, _inputDOF, _outputDOF, _hapticsRate,
-              _stylus, _initialized ),
+              _stylus ),
   useGravityCompensation( _useGravityCompensation ),
   reset( _reset ),
   waitForReset( _waitForReset ),
@@ -137,15 +139,18 @@ void ForceDimensionDevice::Brakes::onValueChange( const bool &v ) {
 }
 
 
-void ForceDimensionDevice::initDevice() {
-  H3DHapticsDevice::initDevice();
+H3DHapticsDevice::ErrorCode ForceDimensionDevice::initDevice() {
+  HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::initDevice();
   HAPI::DHDHapticsDevice *dhd = 
     static_cast< HAPI::DHDHapticsDevice * >( hapi_device.get() );
   if( dhd )
     deviceType->setValue( dhd->getDeviceType(), id ); 
+
+  return e;
 }
 
-void ForceDimensionDevice::disableDevice() {
-  H3DHapticsDevice::disableDevice();
+H3DHapticsDevice::ErrorCode ForceDimensionDevice::releaseDevice() {
+  HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::releaseDevice();
   deviceType->setValue( -1, id );
+  return e;
 }

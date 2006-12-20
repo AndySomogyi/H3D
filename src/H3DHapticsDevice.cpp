@@ -41,7 +41,9 @@ H3DNodeDatabase H3DHapticsDevice::database( "H3DHapticsDevice",
                                          typeid( H3DHapticsDevice ) ); 
 
 namespace H3DHapticsDeviceInternals {
-  FIELDDB_ELEMENT( H3DHapticsDevice, devicePosition, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( H3DHapticsDevice, initialized, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( H3DHapticsDevice, enabled, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( H3DHapticsDevice, set_enabled, INPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, deviceOrientation, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, trackerPosition, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, trackerOrientation, OUTPUT_ONLY );
@@ -51,6 +53,8 @@ namespace H3DHapticsDeviceInternals {
   FIELDDB_ELEMENT( H3DHapticsDevice, weightedProxyPosition, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, proxyWeighting, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, mainButton, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( H3DHapticsDevice, secondaryButton, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( H3DHapticsDevice, buttons, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, force, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, torque, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, inputDOF, OUTPUT_ONLY );
@@ -73,14 +77,15 @@ H3DHapticsDevice::H3DHapticsDevice(
                Inst< SFVec3f         > _proxyPosition          ,
                Inst< WeightedProxy   > _weightedProxyPosition  ,     
                Inst< SFFloat         > _proxyWeighting         ,
-               Inst< SFBool          > _mainButton             ,
+               Inst< MainButton      > _mainButton             ,
+               Inst< SecondaryButton > _secondaryButton       ,
+               Inst< SFInt32         > _buttons                ,
                Inst< SFVec3f         > _force                  ,
                Inst< SFVec3f         > _torque                 ,
                Inst< SFInt32         > _inputDOF               ,
                Inst< SFInt32         > _outputDOF              ,
                Inst< SFInt32         > _hapticsRate            ,
                Inst< SFNode          > _stylus                 ,
-               Inst< SFBool          > _initialized            ,
                Inst< SFHapticsRendererNode > _hapticsRenderer,
                Inst< MFVec3f         > _proxyPositions  ):
   devicePosition( _devicePosition ),
@@ -93,22 +98,27 @@ H3DHapticsDevice::H3DHapticsDevice(
   weightedProxyPosition( _weightedProxyPosition ),
   proxyWeighting( _proxyWeighting ),
   mainButton( _mainButton ),
+  secondaryButton( _secondaryButton ),
+  buttons( _buttons ),
   force( _force ),
   torque( _torque ),
   inputDOF( _inputDOF ),
   outputDOF( _outputDOF ),
   hapticsRate( _hapticsRate ),
   stylus( _stylus ),
-  initialized( _initialized ),
+  initialized( new SFBool ),
   hapticsRenderer( _hapticsRenderer ),
-  proxyPositions( _proxyPositions ) {
+  proxyPositions( _proxyPositions ),
+  enabled( new SFBool ),
+  set_enabled( new SetEnabled ) {
 
   type_name = "H3DHapticsDevice";  
   database.initFields( this );
 
-  initialized->setValue( false );
+  initialized->setValue( false, id );
+  enabled->setValue( false, id );
   proxyWeighting->setValue( 0.95f );
-  mainButton->setValue( false, id );
+  buttons->setValue( 0, id );
 
   positionCalibration->route( trackerPosition, id );
   devicePosition->route( trackerPosition, id );
@@ -120,33 +130,63 @@ H3DHapticsDevice::H3DHapticsDevice(
   trackerPosition->route( weightedProxyPosition, id );
   proxyWeighting->route( weightedProxyPosition, id );
 
+  buttons->route( mainButton, id );
+  buttons->route( secondaryButton, id );
 }
 
-void H3DHapticsDevice::initDevice() {
+H3DHapticsDevice::ErrorCode H3DHapticsDevice::enableDevice() {
+  if( hapi_device.get() ) {
+    HAPI::HAPIHapticsDevice::ErrorCode e =
+      hapi_device->enableDevice();
+    if( e == HAPI::HAPIHapticsDevice::SUCCESS && enabled->getValue() ) {
+      enabled->setValue( true, id );
+    }
+    return e;
+  }
+  else return HAPI::HAPIHapticsDevice::NOT_INITIALIZED;
+}
+
+H3DHapticsDevice::ErrorCode H3DHapticsDevice::disableDevice() {
+  if( hapi_device.get() ) {
+    HAPI::HAPIHapticsDevice::ErrorCode e =
+      hapi_device->disableDevice();
+    if( e == HAPI::HAPIHapticsDevice::SUCCESS && !enabled->getValue() ) {
+      enabled->setValue( false, id );
+    }
+    return e;
+  }
+  else return HAPI::HAPIHapticsDevice::NOT_INITIALIZED;
+}
+
+
+
+H3DHapticsDevice::ErrorCode H3DHapticsDevice::initDevice() {
   if( !initialized->getValue() ) {
     if( hapi_device.get() ) {
-      if( hapi_device->initDevice() == HAPI::HAPIHapticsDevice::SUCCESS ) {
+      HAPI::HAPIHapticsDevice::ErrorCode e = hapi_device->initDevice();
+      if( e == HAPI::HAPIHapticsDevice::SUCCESS ) {
         hapi_device->enableDevice();
-        // TODO TEMP:
-        //hapi_device->setPositionCalibration( positionCalibration->getValue( ) );
-//        HAPI::RuspiniRenderer *rr = 
- //         dynamic_cast< HAPI::RuspiniRenderer * >(hapi_device->getHapticsRenderer());
- //       if( rr )
- //          rr->setProxyRadius( proxyRadius->getValue() * 1e3 );
         initialized->setValue( true, id );
       } else {
         Console(4) << hapi_device->getLastErrorMsg() << endl;
       }
+      return e;
+    } else {
+      return HAPI::HAPIHapticsDevice::FAIL;
     }
+  } else {
+    return HAPI::HAPIHapticsDevice::SUCCESS;
   }
 }
 
-void H3DHapticsDevice::disableDevice() {
+H3DHapticsDevice::ErrorCode H3DHapticsDevice::releaseDevice() {
+  initialized->setValue( false, id );
   if( hapi_device.get() ) {
     hapi_device->disableDevice();
-    hapi_device->releaseDevice();
+    return hapi_device->releaseDevice();
+  } else {
+    return HAPI::HAPIHapticsDevice::FAIL;
   }
-  initialized->setValue( false, id );
 }
 
 void H3DHapticsDevice::renderEffects( 
@@ -191,6 +231,7 @@ void H3DHapticsDevice::updateDeviceValues() {
     deviceOrientation->setValue( dv.orientation, id);
     force->setValue( (Vec3f)dv.force, id);
     torque->setValue( (Vec3f)dv.torque, id);
+    buttons->setValue( dv.button_status, id );
     hapi_device->setPositionCalibration( positionCalibration->rt_pos_calibration );
     hapi_device->setOrientationCalibration( orientationCalibration->rt_orn_calibration );
     //cerr << deviceOrientation->getValue() << endl;
@@ -208,6 +249,7 @@ void H3DHapticsDevice::updateDeviceValues() {
         Vec3f proxy_pos = (Vec3f)(proxy_renderer->getProxyPosition() * 1e-3);
         proxies.push_back( proxy_pos );
         if( layer == 0 ) {
+          //cerr << proxy_pos << endl;
           proxyPosition->setValue( proxy_pos, id );
         }
       } else {
