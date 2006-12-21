@@ -29,7 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "X3DParticleEmitterNode.h"
-#include "Viewpoint.h"
+#include "X3DViewpointNode.h"
 #include "X3DTextureNode.h"
 #include "ParticleSystem.h"
 #include "MultiTexture.h"
@@ -248,7 +248,7 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
 
     glEnd();
   } else if( type == SPRITE ) {
-    Viewpoint *vp = Viewpoint::getActive();
+    X3DViewpointNode *vp = X3DViewpointNode::getActive();
     Matrix4f vp_to_local = Matrix4f( 1, 0, 0, -position.x,
                                   0, 1, 0, -position.y,
                                   0, 0, 1, -position.z,

@@ -136,7 +136,7 @@ void GeneratedCubeMapTexture::traverseSG( TraverseInfo &ti ) {
 #endif
 
 void GeneratedCubeMapTexture::updateCubeMapTextures( X3DChildNode *n,
-                                                     Viewpoint *vp ) {
+                                                     X3DViewpointNode *vp ) {
   if( !textures_initialized )
     initializeTextures();
 
@@ -164,7 +164,7 @@ void GeneratedCubeMapTexture::updateCubeMap( GLuint texture_target,
                                              const Vec3f & camera_dir,
                                              const Vec3f & camera_up,
                                              X3DChildNode *n,
-                                             Viewpoint *vp ) {
+                                             X3DViewpointNode *vp ) {
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -253,7 +253,7 @@ void GeneratedCubeMapTexture::updateCubeMap( GLuint texture_target,
 /// GeneratedCubeMapTexture. The update field will be checked to 
 /// see if an update is required. 
 void GeneratedCubeMapTexture::updateAllCubeMapTextures( X3DChildNode *n,
-                                                        Viewpoint *vp ) {
+                                                        X3DViewpointNode *vp ) {
   for( list< GeneratedCubeMapTexture * >::iterator i = instances.begin();
        i != instances.end(); i++ ) {
     GeneratedCubeMapTexture *cubemap = 

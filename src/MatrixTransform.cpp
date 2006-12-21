@@ -145,25 +145,15 @@ bool MatrixTransform::lineIntersect(
                              const Vec3f &from, 
                              const Vec3f &to,    
                              vector< HAPI::Bounds::IntersectionInfo > &result,
-                             bool global,
                              vector< X3DGeometryNode * > &theGeometry,
                              vector< H3DInt32 > &theGeometryIndex ) {
-  Matrix4f theMatrix;
-  Matrix4f theMatrixInverse;
-  if( global ) {
-     global = false;
-     theMatrix = accumulatedInverse->getValue();
-     theMatrixInverse = accumulatedForward->getValue();
-  }
-  else {
-     theMatrixInverse = matrix->getValue();
-     theMatrix = theMatrixInverse.inverse();
-  }
+  Matrix4f theMatrixInverse = matrix->getValue();
+  Matrix4f theMatrix = theMatrixInverse.inverse();
   Vec3f local_from = theMatrix * from;
   Vec3f local_to = theMatrix * to;
   H3DInt32 sizeBefore = result.size();
   bool intersection = X3DGroupingNode::lineIntersect( 
-    local_from, local_to, result, global, theGeometry, theGeometryIndex );
+    local_from, local_to, result, theGeometry, theGeometryIndex );
   if( intersection ) {
     for( unsigned int i = sizeBefore; i < result.size(); i++ ) {
       Vec3f newNormalPoint =
@@ -174,6 +164,25 @@ bool MatrixTransform::lineIntersect(
     }
   }
   return intersection;
+}
+
+void MatrixTransform::closestPoint(
+                  const Vec3f &p,
+                  vector< Vec3f > &closest_point,
+                  vector< Vec3f > &normal,
+                  vector< Vec3f > &tex_coord ) {
+  Matrix4f theMatrixInverse = matrix->getValue();
+  Matrix4f theMatrix = theMatrixInverse.inverse();
+  Vec3f local_p = theMatrix * p;
+  H3DInt32 sizeBefore = closest_point.size();
+  X3DGroupingNode::closestPoint( local_p, closest_point, normal, tex_coord );
+  for( unsigned int i = sizeBefore; i < closest_point.size(); i++ ) {
+    Vec3f newNormalPoint =
+      theMatrixInverse * Vec3f( closest_point[i] + normal[i] );
+    closest_point[i] = theMatrixInverse * closest_point[i];
+    normal[i] = newNormalPoint - closest_point[i];
+    normal[i].normalizeSafe();
+  }
 }
 
 

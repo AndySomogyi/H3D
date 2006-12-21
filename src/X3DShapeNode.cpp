@@ -168,3 +168,21 @@ void X3DShapeNode::DisplayList::callList( bool build_list ) {
   }
   BugWorkaroundDisplayList::callList( build_list );
 }
+
+bool X3DShapeNode::lineIntersect(
+                           const Vec3f &from,
+                           const Vec3f &to,
+                           vector< HAPI::Bounds::IntersectionInfo > &result,
+                           vector< X3DGeometryNode * > &theGeometry,
+                           vector< H3DInt32 > &theGeometryIndex ) {
+  return geometry->getValue()->lineIntersect( from, to, result,
+                                              theGeometry, theGeometryIndex );
+}
+
+void X3DShapeNode::closestPoint(
+                  const Vec3f &p,
+                  vector< Vec3f > &closest_point,
+                  vector< Vec3f > &normal,
+                  vector< Vec3f > &tex_coord ) {
+  geometry->getValue()->closestPoint( p, closest_point, normal, tex_coord );
+}

@@ -184,18 +184,36 @@ namespace H3D {
     virtual void traverseSG( TraverseInfo &ti );
 #endif
 
-    /// Calls lineIntersect for the geometry
+    /// Detect intersection between a line segment and the X3DGeometryNode
+    /// in the field geometry.
+    /// \param from The start of the line segment.
+    /// \param to The end of the line segment.
+    /// \param result Contains info about the closest intersection for every
+    /// object that intersects the line
+    /// \param theGeometry is a vector of pointers to each geometry
+    /// that intersects. May contain the same pointer twice due to the 
+    /// DEF/USE feature of X3D.
+    /// \param theGeometryIndex is a vector with a specific index for each
+    /// time a Geometry is used in the Scene. Needed because of the DEF/USE
+    /// feature of X3D to be able to separate the different local coordinate
+    /// systems for X3DPointingDeviceSensors.
     virtual bool lineIntersect(
       const Vec3f &from,
       const Vec3f &to,
       vector< HAPI::Bounds::IntersectionInfo > &result,
-      bool global,
       vector< X3DGeometryNode * > &theGeometry,
-      vector< H3DInt32 > &theGeometryIndex ) {
-      return geometry->getValue()->
-        lineIntersect( from, to, result, global, 
-                       theGeometry, theGeometryIndex );
-    }
+      vector< H3DInt32 > &theGeometryIndex );
+
+    /// Find closest point on the node in the field geometry.
+    /// \param p The point to find the closest point to.
+    /// \param closest_point Return parameter for each closest point
+    /// \param normal Return parameter for normal at each closest point.
+    /// \param tex_coord Return paramater for each texture coordinate at
+    /// closest point
+    virtual void closestPoint( const Vec3f &p,
+                               vector< Vec3f > &closest_point,
+                               vector< Vec3f > &normal,
+                               vector< Vec3f > &tex_coord );
 
     typedef enum {
       /// render only transparent objects

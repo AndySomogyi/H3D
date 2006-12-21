@@ -31,7 +31,7 @@
 #define __COMPOSEDCUBEMAPTEXTURE_H__
 
 #include "X3DEnvironmentTextureNode.h"
-#include "Viewpoint.h"
+#include "X3DViewpointNode.h"
 #include "X3DTexture2DNode.h"
 #include "DependentNodeFields.h"
 #include <list>
@@ -117,7 +117,7 @@ namespace H3D {
     /// \param vp The viewpoint the scene is currently rendered with
     /// in the normal rendering.
     virtual void updateCubeMapTextures( X3DChildNode *n,
-                                        Viewpoint *vp );
+                                        X3DViewpointNode *vp );
 
 #ifdef USE_HAPTICS
     /// Saves the accumulatedForwardMatrix in the local_to_global
@@ -132,7 +132,7 @@ namespace H3D {
     /// \param vp The viewpoint the scene is currently rendered with
     /// in the normal rendering.
     static void updateAllCubeMapTextures( X3DChildNode *n,
-                                          Viewpoint *vp );
+                                          X3DViewpointNode *vp );
 
     /// The texture to use on the back face of the cube.
     ///
@@ -167,14 +167,14 @@ namespace H3D {
     /// \param camera_dir The look at vector of the camera.
     /// \param camera_up The up vector of the camera.
     /// \param n The node to render.
-    /// \param vp The Viewpoint that is used currently in the normal
+    /// \param vp The X3DViewpointNode that is used currently in the normal
     /// rendering of the scene.
     virtual void updateCubeMap( GLuint texture_target,
                                 const Vec3f & camera_position,
                                 const Vec3f & camera_dir,
                                 const Vec3f & camera_up,
                                 X3DChildNode *n,
-                                Viewpoint *vp );
+                                X3DViewpointNode *vp );
 
     /// Transformation matrix from the local coordinate system of the node
     /// to the global coordinate system.

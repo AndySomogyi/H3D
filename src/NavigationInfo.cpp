@@ -32,6 +32,8 @@
 
 using namespace H3D;
 
+Vec3f NavigationInfo::oldViewpointPos = Vec3f();
+
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase NavigationInfo::database( 
@@ -58,16 +60,20 @@ NavigationInfo::NavigationInfo( Inst< SFSetBind > _set_bind,
                                 Inst< MFFloat   > _avatarSize,
                                 Inst< SFBool    > _headlight,
                                 Inst< SFFloat   > _speed,
+                                Inst< SFTime    > _transitionTime,
                                 Inst< MFString  > _transitionType,
                                 Inst< MFString  > _type,
-                                Inst< SFFloat   > _visibilityLimit ):
+                                Inst< SFFloat   > _visibilityLimit,
+                                Inst< SFBool    > _transitionComplete ):
   X3DBindableNode( "NavigationInfo",_set_bind, _metadata, _bindTime, _isBound ),
   avatarSize( _avatarSize ),
   headlight( _headlight  ),
   speed( _speed ),
-  transitionType ( _transitionType  ),
+  transitionType( _transitionType  ),
+  transitionTime( _transitionTime ),
   type( _type ),
-  visibilityLimit ( _visibilityLimit ) {
+  visibilityLimit( _visibilityLimit ),
+  transitionComplete( _transitionComplete ) {
   
   type_name = "NavigationInfo";
   database.initFields( this );
@@ -77,10 +83,15 @@ NavigationInfo::NavigationInfo( Inst< SFSetBind > _set_bind,
   avatarSize->push_back( (H3DFloat)0.75 );
   headlight->setValue( true );
   speed->setValue( 1 );
+  transitionTime->setValue( 1.0 );
   transitionType->push_back( "LINEAR" );  
   type->push_back( "EXAMINE" );
   type->push_back( "ANY" );
   visibilityLimit->setValue( 0 );
 }
 
-
+void NavigationInfo::detectCollision( Vec3f thePoint, vector< Vec3f > &points ) {
+  /*for( unsigned int i = 0; i < points.size(); i++ ) {
+    cerr << "point: " << points[i] << " distance: " << (points[i]-thePoint).length() << endl;
+  }*/
+}

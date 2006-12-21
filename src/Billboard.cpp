@@ -29,7 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Billboard.h"
-#include "Viewpoint.h"
+#include "X3DViewpointNode.h"
 
 using namespace H3D;
 
@@ -133,7 +133,7 @@ void Billboard::SFMatrix4f::update() {
 
 #ifdef USE_HAPTICS
 void Billboard::traverseSG( TraverseInfo &ti ) {
-  Viewpoint *vp = Viewpoint::getActive();
+  X3DViewpointNode *vp = X3DViewpointNode::getActive();
   Matrix4f vp_to_local = 
     ti.getAccInverseMatrix() *
     vp->accForwardMatrix->getValue();
