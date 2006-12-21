@@ -50,11 +50,13 @@ H3DNodeDatabase RuspiniRenderer::database(
                            typeid( RuspiniRenderer ),
                            &H3DHapticsRendererNode::database );
 
+#ifdef HAVE_CHAI3D
 H3DNodeDatabase Chai3DRenderer::database( 
                            "Chai3DRenderer", 
                            &(newInstance<Chai3DRenderer>), 
                            typeid( Chai3DRenderer ),
                            &H3DHapticsRendererNode::database );
+#endif
 
 namespace HapticsRendererInternals {
   FIELDDB_ELEMENT( RuspiniRenderer, proxyRadius, INPUT_OUTPUT );

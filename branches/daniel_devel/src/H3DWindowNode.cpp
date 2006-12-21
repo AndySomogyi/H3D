@@ -549,10 +549,25 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
   // otherwise use the stack top of the Viewpoint bindable stack.
   Viewpoint *vp = static_cast< Viewpoint * >( viewpoint->getValue() );
   if( !vp ) 
-    vp = Viewpoint::getActive();
+    vp = static_cast< Viewpoint * >(Viewpoint::getActive());
   if ( ! vp ) {
     vp = new Viewpoint;
     vp_ref.reset( vp );
+  }
+
+  if( nav_info ) {
+    vector< Vec3f > the_points;
+    vector< Vec3f > the_normals;
+    vector< Vec3f > the_tex_coords;
+    Vec3f global_point = vp->accForwardMatrix->getValue() * vp->position->getValue();
+    if( global_point != NavigationInfo::oldViewpointPos ) {
+      NavigationInfo::oldViewpointPos = global_point;
+      child_to_render->closestPoint( global_point,
+                                     the_points,
+                                     the_normals,
+                                     the_tex_coords );
+      nav_info->detectCollision( global_point, the_points );
+    }
   }
 
   RenderMode::Mode stereo_mode = renderMode->getRenderMode();
@@ -595,33 +610,6 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
           stencil_mask[i*w+j]=(j+1)%2;
     }
     rebuild_stencil_mask = false;
-  }
-
-  H3DFloat fov_h, fov_v;
-  H3DFloat lwidth = (H3DFloat) width->getValue();
-  H3DFloat lheight = (H3DFloat) height->getValue();
-  H3DFloat field_of_view = vp->fieldOfView->getValue();
-  H3DFloat aspect_ratio = lwidth / lheight;
-  
-  // calculate the horizontal and vertical field of view components
-  // as defined by the X3D spec for Viewpoint.
-  if ( field_of_view > Constants::pi )
-    field_of_view = (H3DFloat) Constants::pi;
-  if ( lwidth < lheight ) {
-    // width is smallest
-    fov_h = field_of_view;
-    fov_v = 2 * atan( ( lheight * tan(fov_h/2) ) / lwidth );
-    if ( fov_v > Constants::pi ) {
-      fov_v = (H3DFloat) Constants::pi;
-      fov_h = 2 * atan( ( lwidth / lheight ) * tan(fov_v/2) );        
-    }
-  } else {
-    fov_v = field_of_view;
-    fov_h = 2 * atan( ( lwidth / lheight ) * tan(fov_v/2) );
-    if ( fov_h > Constants::pi ) {
-      fov_h = field_of_view;
-      fov_v = 2 * atan( ( lheight * tan(fov_h/2) ) / lwidth );        
-    }
   }
   
   H3DFloat clip_near = 0.01f;  // near viewing plane at 1cm
@@ -671,11 +659,12 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     H3DFloat frustum_shift = 
       half_interocular_distance * clip_near / focal_distance; 
 
-    H3DFloat top    = clip_near * tan(fov_v/2);
-    H3DFloat bottom = -top;
+    H3DFloat top, bottom, right, left;
 
-    H3DFloat right  = aspect_ratio * top;
-    H3DFloat left   = -right;
+    vp->windowFromfieldOfView( (H3DFloat) width->getValue(),
+                               (H3DFloat) height->getValue(),
+                               clip_near,
+                               top, bottom, right, left );
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -876,10 +865,12 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     swapBuffers();
   } else {
     // MONO
-    H3DFloat top    = clip_near * tan(fov_v/2);
-    H3DFloat bottom = -top;
-    H3DFloat right  = aspect_ratio * top;
-    H3DFloat left   = -right;
+    H3DFloat top, bottom, right, left;
+
+    vp->windowFromfieldOfView( (H3DFloat) width->getValue(),
+                               (H3DFloat) height->getValue(),
+                               clip_near,
+                               top, bottom, right, left );
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();

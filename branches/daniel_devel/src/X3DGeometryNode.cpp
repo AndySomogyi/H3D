@@ -537,7 +537,6 @@ bool X3DGeometryNode::lineIntersect(
                   const Vec3f &from, 
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
-                  bool global,
                   vector< X3DGeometryNode * > &theGeometry,
                   vector< H3DInt32 > &theGeometryIndex ) {
   if( !pt_dev_geometry_id.empty() )
@@ -557,6 +556,20 @@ bool X3DGeometryNode::lineIntersect(
   }
   return returnValue;
 }
+
+void X3DGeometryNode::closestPoint(
+                  const Vec3f &p,
+                  vector< Vec3f > &closest_point,
+                  vector< Vec3f > &normal,
+                  vector< Vec3f > &tex_coord ) {
+  Vec3d temp_closest_point, temp_normal, temp_tex_coord;
+  boundTree->getValue()->closestPoint( p * 1000, temp_closest_point, 
+                                       temp_normal, temp_tex_coord );
+  closest_point.push_back( (Vec3f)temp_closest_point / 1000 );
+  normal.push_back( (Vec3f)temp_normal / 1000 );
+  tex_coord.push_back( (Vec3f)temp_tex_coord );
+}
+
 
 void X3DGeometryNode::resetPtDevIndication( bool clear ) {
   current_geometry_id = -1;

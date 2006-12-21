@@ -30,7 +30,7 @@
 
 #include "ParticleSystem.h"
 
-#include "Viewpoint.h"
+#include "X3DViewpointNode.h"
 
 using namespace H3D;
 
@@ -234,7 +234,7 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
   
   vector< Particles::iterator > to_remove;
   
-  Viewpoint *vp = Viewpoint::getActive();
+  X3DViewpointNode *vp = X3DViewpointNode::getActive();
   Matrix4f vp_to_local = ti.getAccInverseMatrix() *
     vp->accForwardMatrix->getValue();
   

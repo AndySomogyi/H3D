@@ -156,7 +156,7 @@ void Sound::ALrender() {
   Vec3f listener_pos = Vec3f( 0, 0, 0 );
 
   // set up listener properties.
-  Viewpoint *vp = Viewpoint::getActive();
+  X3DViewpointNode *vp = X3DViewpointNode::getActive();
   if( vp ) {
     const Matrix4f &vp_to_global =  vp->accForwardMatrix->getValue();
     const Matrix3f &vp_to_global_rot = vp_to_global.getRotationPart();

@@ -167,19 +167,29 @@ bool X3DGroupingNode::lineIntersect(
                   const Vec3f &from, 
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
-                  bool global,
                   vector< X3DGeometryNode * > &theGeometry,
                   vector< H3DInt32 > &theGeometryIndex ) {
   const NodeVector &children_nodes = children->getValue();
   bool intersect = false;
   for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
     if( children_nodes[i]->
-         lineIntersect( from, to, result, global, 
+         lineIntersect( from, to, result, 
                         theGeometry, theGeometryIndex ) ) {
       intersect = true;
     }
   }
   return intersect;
+}
+
+void X3DGroupingNode::closestPoint(
+                  const Vec3f &p,
+                  vector< Vec3f > &closest_point,
+                  vector< Vec3f > &normal,
+                  vector< Vec3f > &tex_coord ) {
+  const NodeVector &children_nodes = children->getValue();
+  for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
+    children_nodes[i]->closestPoint( p, closest_point, normal, tex_coord);
+  }
 }
 
 void X3DGroupingNode::SFBound::update() {

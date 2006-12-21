@@ -32,7 +32,7 @@
 #ifdef USE_HAPTICS
 #include "DeviceInfo.h"
 #endif
-#include "Viewpoint.h"
+#include "X3DViewpointNode.h"
 #include "NavigationInfo.h"
 #include "StereoInfo.h"
 #include "Fog.h"
@@ -1295,7 +1295,7 @@ call the base class __init__ function." );
         return 0;
       }
 
-      return PyNode_FromNode( Viewpoint::getActive() );
+      return PyNode_FromNode( X3DViewpointNode::getActive() );
     }
 
     /////////////////////////////////////////////////////////////////////////

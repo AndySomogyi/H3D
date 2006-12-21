@@ -40,7 +40,9 @@
 #include <OpenHapticsRenderer.h>
 #include <RuspiniRenderer.h>
 #include <GodObjectRenderer.h>
+#ifdef HAVE_CHAI3D
 #include <Chai3DRenderer.h>
+#endif
 
 namespace H3D {
 
@@ -169,6 +171,7 @@ namespace H3D {
     static H3DNodeDatabase database;
   };
 
+#ifdef HAVE_CHAI3D
   /// \ingroup H3DNodes
   /// \brief Haptics renderer using Chai3D(www.chai3d.org)
   /// Uses the HAPI::Chai3DRenderer class.
@@ -189,6 +192,7 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   };
+#endif
 }
 
 #endif
