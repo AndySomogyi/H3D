@@ -112,7 +112,7 @@ namespace H3D {
 
     /// The SFSetBind field calls toStackTop() and removeFromStack() on the 
     /// X3DBindableNode it is in depending on the value that it is set to.
-    struct H3DAPI_API SFSetBind : public SFBool {
+    struct H3DAPI_API SFSetBind : public AutoUpdate< SFBool > {
       virtual inline void update() {
         SFBool::update();
         if( value )
