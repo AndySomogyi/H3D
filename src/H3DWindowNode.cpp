@@ -544,7 +544,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
   else 
     glEnable(GL_LIGHT0);
 
-    AutoRef< Viewpoint > vp_ref;
+    //AutoRef< Viewpoint > vp_ref;
   // get the viewpoint. If the H3DWindowNode viewpoint field is set use that
   // otherwise use the stack top of the Viewpoint bindable stack.
   Viewpoint *vp = static_cast< Viewpoint * >( viewpoint->getValue() );
@@ -552,23 +552,11 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     vp = static_cast< Viewpoint * >(Viewpoint::getActive());
   if ( ! vp ) {
     vp = new Viewpoint;
-    vp_ref.reset( vp );
+    //vp_ref.reset( vp );
   }
 
-  if( nav_info ) {
-    vector< Vec3f > the_points;
-    vector< Vec3f > the_normals;
-    vector< Vec3f > the_tex_coords;
-    Vec3f global_point = vp->accForwardMatrix->getValue() * vp->position->getValue();
-    if( global_point != NavigationInfo::oldViewpointPos ) {
-      NavigationInfo::oldViewpointPos = global_point;
-      child_to_render->closestPoint( global_point,
-                                     the_points,
-                                     the_normals,
-                                     the_tex_coords );
-      nav_info->detectCollision( global_point, the_points );
-    }
-  }
+  if( nav_info )
+    nav_info->detectCollision( vp, child_to_render );
 
   RenderMode::Mode stereo_mode = renderMode->getRenderMode();
 

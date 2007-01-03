@@ -29,11 +29,9 @@
 #ifndef __NAVIGATIONINFO_H__
 #define __NAVIGATIONINFO_H__
 
-#include "X3DBindableNode.h"
+#include "X3DViewpointNode.h"
 #include "MFFloat.h"
-#include "SFFloat.h"
 #include "MFString.h"
-#include "Exception.h"
 
 namespace H3D {
   /// \ingroup X3DNodes
@@ -259,7 +257,7 @@ namespace H3D {
       return static_cast< NavigationInfo * >( X3DBindableNode::getActive( "NavigationInfo" ) );
     }
 
-    static void detectCollision( Vec3f thePoint, vector< Vec3f > &points );
+    void detectCollision( X3DViewpointNode * vp, X3DChildNode *topNode );
 
     /// The avatarSize field specifies the user's physical dimensions 
     /// in the world for the purpose of collision detection and terrain
@@ -326,7 +324,15 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
-    static Vec3f oldViewpointPos;
+  protected:
+    static bool linear_interpolate;
+    static Vec3f goal_position;
+    static Rotation goal_orientation;
+    static X3DViewpointNode * old_viewpoint;
+    H3DTime start_time;
+    H3DDouble total_time;
+    Vec3f start_position, move_direction;
+    Rotation start_orientation;
   };
 }
 
