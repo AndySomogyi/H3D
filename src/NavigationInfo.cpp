@@ -32,10 +32,12 @@
 
 using namespace H3D;
 
-X3DViewpointNode * NavigationInfo::old_viewpoint = 0;
+X3DViewpointNode * NavigationInfo::old_vp = 0;
 bool NavigationInfo::linear_interpolate = false;
 Vec3f NavigationInfo::goal_position = Vec3f();
 Rotation NavigationInfo::goal_orientation = Rotation();
+Vec3f NavigationInfo::old_vp_pos = Vec3f();
+Rotation NavigationInfo::old_vp_orientation = Rotation();
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase NavigationInfo::database( 
@@ -69,7 +71,8 @@ NavigationInfo::NavigationInfo( Inst< SFSetBind > _set_bind,
                                 Inst< MFString  > _type,
                                 Inst< SFFloat   > _visibilityLimit,
                                 Inst< SFBool    > _transitionComplete ):
-  X3DBindableNode( "NavigationInfo",_set_bind, _metadata, _bindTime, _isBound ),
+  X3DBindableNode( "NavigationInfo",_set_bind, _metadata, _bindTime,
+                   _isBound ),
   avatarSize( _avatarSize ),
   headlight( _headlight  ),
   speed( _speed ),
@@ -93,118 +96,141 @@ NavigationInfo::NavigationInfo( Inst< SFSetBind > _set_bind,
   type->push_back( "ANY" );
   visibilityLimit->setValue( 0 );
 
-  old_viewpoint = X3DViewpointNode::getActive();
+  old_vp = X3DViewpointNode::getActive();
+  if( old_vp ) {
+    old_vp_pos = old_vp->position->getValue() + old_vp->rel_pos;
+    old_vp_orientation = old_vp->orientation->getValue() *
+                         old_vp->rel_orientation;
+  }
 }
 
 void NavigationInfo::detectCollision( X3DViewpointNode * vp,
                                       X3DChildNode *topNode ) {
   const Matrix4f &acc_fr_mt = vp->accForwardMatrix->getValue();
   Vec3f vp_pos = vp->position->getValue();
-  Vec3f old_vp_pos = old_viewpoint->position->getValue();
-  Vec3f global_point = acc_fr_mt * vp_pos;
+  Vec3f vp_full_pos = vp_pos + vp->rel_pos;
+  Vec3f global_point = acc_fr_mt * vp_full_pos;
   Rotation vp_orientation = vp->orientation->getValue();
-  Rotation old_vp_orientation = old_viewpoint->orientation->getValue();
+  Rotation vp_full_orientation = vp_orientation * vp->rel_orientation;
   vector< H3DFloat > avatar_size = avatarSize->getValue();
-  if( !avatar_size.empty() ) {
-    if( global_point != 
-        old_viewpoint->accForwardMatrix->getValue() * old_vp_pos ) {
-      
-      if( old_viewpoint != vp ) {
+  if( old_vp != vp ) {
 
-        // if the viewpoint is switched when a transition is going on
-        // reset the old viewpoint and calculate the new transition from
-        // current position and viewpoint.
-        if( linear_interpolate ) {
-          old_viewpoint->position->setValue( goal_position );
-          old_viewpoint->orientation->setValue( goal_orientation );
-        }
-
-        string transition = "LINEAR";
-        //TODO: allow for run-time choices of transitionType somehow.
-        // checking which values are allowed. (transitionType is a MFString).
-        if( !transitionType->empty() )
-          transition = transitionType->getValueByIndex( 0 );
-
-        if( transition == "TELEPORT" ) {
-          transitionComplete->setValue( true, id );
-        }
-        else if( transition == "ANIMATE" ) {
-          // there should be some other kind of behaviour here.
-          transitionComplete->setValue( true, id );
-        }
-        else {
-          linear_interpolate = true;
-          const Matrix4f &vp_acc_inv_mtx = vp->accInverseMatrix->getValue();
-          const Matrix4f &old_vp_acc_frw_mtx = 
-            old_viewpoint->accForwardMatrix->getValue();
-
-          start_orientation = Rotation( vp_acc_inv_mtx.getRotationPart() ) *
-                              ( Rotation(old_vp_acc_frw_mtx.getRotationPart() )
-                                * old_vp_orientation );
-          goal_orientation = vp_orientation;
-          start_position = vp_acc_inv_mtx * 
-                           (old_vp_acc_frw_mtx * old_vp_pos);
-          goal_position = vp_pos;
-          move_direction = goal_position - start_position;
-          start_time = TimeStamp();
-          total_time = transitionTime->getValue();
-        }
-        old_viewpoint = vp;
+    // if the viewpoint is switched when a transition is going on
+    // reset the old viewpoint and calculate the new transition from
+    // current position and viewpoint.
+    if( linear_interpolate ) {
+      if( !old_vp->retainUserOffsets->getValue() ) {
+        old_vp->rel_pos = goal_position;
+        old_vp->rel_orientation = goal_orientation;
       }
-
-      if( !linear_interpolate ) {
-        vector< Vec3f > the_points;
-        vector< Vec3f > the_normals;
-        vector< Vec3f > the_tex_coords;
-        topNode->closestPoint( global_point,
-                               the_points,
-                               the_normals,
-                               the_tex_coords );
-        Vec3f scaling = acc_fr_mt.getScalePart();
-        if( scaling.x == scaling.y && scaling.y == scaling.z ) {
-          for( unsigned int i = 0; i < the_points.size(); i++ ) {
-            H3DFloat distance = (the_points[i] - global_point).length();
-            if( distance < scaling.x * avatar_size[0] ) {
-              //TODO: correction of avatars position.
-            }
-          }
-        }
-        else {
-          Console(3) << "Warning: Non-uniform scaling in the active Viewpoint "
-            << "nodes local coordinate system. Collision Detection with "
-            << "Avatar is undefined ";
-        }
-      }
+      linear_interpolate = false;
     }
 
-    // When a transition takes place navigationinfo negates external
-    // use of setValue of the position field of a viewpoint
-    if( linear_interpolate ) {
-      H3DTime current_time = TimeStamp();
-      H3DDouble elapsed_time = current_time - start_time;
-      if( elapsed_time < total_time ) {
-        H3DDouble interpolation = elapsed_time / total_time;
-        vp_pos = start_position +
-          move_direction * interpolation;
-        vp->position->setValue( vp_pos );
-        vp_orientation =
-          start_orientation.slerp( goal_orientation, (H3DFloat)interpolation );
-        vp->orientation->setValue( vp_orientation );
+    if( vp->jump->getValue() ) {
+
+      string transition = "LINEAR";
+      //TODO: allow for run-time choices of transitionType somehow.
+      // checking which values are allowed. (transitionType is a MFString).
+      if( !transitionType->empty() )
+        transition = transitionType->getValueByIndex( 0 );
+
+      if( transition == "TELEPORT" ) {
+        transitionComplete->setValue( true, id );
+      }
+      else if( transition == "ANIMATE" ) {
+        // there should be some other kind of behaviour here.
+        transitionComplete->setValue( true, id );
       }
       else {
-        linear_interpolate = false;
-        transitionComplete->setValue( true, id );
-        vp_pos = goal_position;
-        vp->position->setValue( vp_pos );
-        vp_orientation = goal_orientation;
-        vp->orientation->setValue( vp_orientation );
+        linear_interpolate = true;
+        const Matrix4f &vp_acc_inv_mtx = vp->accInverseMatrix->getValue();
+        const Matrix4f &old_vp_acc_frw_mtx = 
+          old_vp->accForwardMatrix->getValue();
+
+        start_orientation = -vp_orientation * 
+          ( Rotation( vp_acc_inv_mtx.getScaleRotationPart() ) *
+          ( Rotation(old_vp_acc_frw_mtx.getScaleRotationPart() )
+          * old_vp_orientation ) );
+
+        /*start_orientation = Rotation((vp_acc_inv_mtx *
+        (old_vp_acc_frw_mtx
+        * Matrix4f(old_vp_orientation))).getRotationPart());*/
+
+        goal_orientation = vp->rel_orientation;
+
+        start_position = vp_acc_inv_mtx * 
+          (old_vp_acc_frw_mtx * old_vp_pos) - vp_pos;
+        goal_position = vp->rel_pos;
+        move_direction = goal_position - start_position;
+        start_time = TimeStamp();
+      }
+    }
+    old_vp = vp;
+  }
+
+  // When a transition takes place navigationinfo negates external
+  // use of setValue of the position field of a viewpoint
+  if( linear_interpolate ) {
+    H3DTime current_time = TimeStamp();
+    H3DTime elapsed_time = current_time - start_time;
+    H3DTime total_time = transitionTime->getValue();
+    if( elapsed_time < total_time ) {
+      H3DDouble interpolation = elapsed_time / total_time;
+      vp->rel_pos =  start_position +
+        move_direction * interpolation;
+      vp->rel_orientation = start_orientation.slerp( goal_orientation,
+        (H3DFloat)interpolation );
+    }
+    else {
+      linear_interpolate = false;
+      transitionComplete->setValue( true, id );
+      vp->rel_pos = goal_position;
+      vp_full_pos = vp_pos + goal_position;
+      vp->rel_orientation = goal_orientation;
+      vp_full_orientation = vp_orientation * goal_orientation;
+      global_point = acc_fr_mt * vp_full_pos;
+    }
+  }
+
+  if( !avatar_size.empty() ) {
+    if( !linear_interpolate &&
+        global_point != old_vp->accForwardMatrix->getValue() * old_vp_pos ) {
+      vector< Vec3f > the_points;
+      vector< Vec3f > the_normals;
+      vector< Vec3f > the_tex_coords;
+      topNode->closestPoint( global_point,
+        the_points,
+        the_normals,
+        the_tex_coords );
+      Vec3f scaling = acc_fr_mt.getScalePart();
+      if( scaling.x == scaling.y && scaling.y == scaling.z ) {
+        Vec3f resulting_move = Vec3f();
+        for( unsigned int i = 0; i < the_points.size(); i++ ) {
+          H3DFloat distance = (the_points[i] - global_point).length();
+          if( distance < scaling.x * avatar_size[0] ) {
+            //TODO: find a better correction of avatars position.
+            // this one can result in switching back and forth between
+            // two positions (or worse).
+            resulting_move += the_normals[i] * distance;
+          }
+        }
+        vp->rel_pos += resulting_move;
+        vp_full_pos = vp->rel_pos + vp_pos;
+      }
+      else {
+        Console(3) << "Warning: Non-uniform scaling in the active Viewpoint "
+          << "nodes local coordinate system. Collision Detection with "
+          << "Avatar is undefined ";
       }
     }
   }
   else {
     Console(3) << "Warning: The field avatarSize( " << avatarSize->getName()
-               << " ) in NavigationInfo node( "
-				       << getName() << " ) is empty."
-               << " No collision with avatar will be detected " << endl;
+      << " ) in NavigationInfo node( "
+      << getName() << " ) is empty."
+      << " No collision with avatar will be detected " << endl;
   }
+
+  old_vp_pos = vp_full_pos;
+  old_vp_orientation = vp_full_orientation;
 }

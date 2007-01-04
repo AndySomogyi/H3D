@@ -88,4 +88,65 @@ X3DViewpointNode::X3DViewpointNode(
   accInverseMatrix->setValue( Matrix4f(), id );
 }
 
+void X3DViewpointNode::removeFromStack() {
+  StackType &s =  stack[bindable_stack_name];
+  if( s.size() > 0 ) {
+    bool is_active = (s.front() == this);
+    X3DBindableNode::removeFromStack();
+    if( is_active ) {
+      if( s.size() > 0 ) {
+        X3DViewpointNode * new_vp =
+          static_cast<X3DViewpointNode * >(s.front());
+        if( !new_vp->jump->getValue() ) {
 
+          const Matrix4f &vp_acc_inv_mtx =
+            new_vp->accInverseMatrix->getValue();
+          const Matrix4f &old_vp_acc_frw_mtx = accForwardMatrix->getValue();
+
+          new_vp->rel_pos = vp_acc_inv_mtx *
+                            ( old_vp_acc_frw_mtx *
+                              ( position->getValue() + rel_pos ) )
+                            - new_vp->position->getValue();
+
+          new_vp->rel_orientation = -new_vp->orientation->getValue() * 
+            ( Rotation( vp_acc_inv_mtx.getScaleRotationPart() ) *
+              ( Rotation(old_vp_acc_frw_mtx.getScaleRotationPart() ) *
+                ( orientation->getValue() * rel_orientation ) ) );
+        }
+      }
+    }
+  }
+}
+
+void X3DViewpointNode::toStackTop() {
+  StackType &s =  stack[bindable_stack_name];
+  X3DBindableNode *active = NULL;
+  if( s.size() > 0 ) active = s.front();
+  if ( active != this ) {
+    if( jump->getValue() ) {
+      if( !retainUserOffsets->getValue() ) {
+        rel_pos = Vec3f( 0, 0, 0 );
+        rel_orientation = Rotation( 0, 0, 0, 0 );
+      }
+    }
+    else {
+      if( active ) {
+        X3DViewpointNode * old_vp = static_cast< X3DViewpointNode * >(active);
+        const Matrix4f &vp_acc_inv_mtx = accInverseMatrix->getValue();
+        const Matrix4f &old_vp_acc_frw_mtx =
+          old_vp->accForwardMatrix->getValue();
+
+        rel_pos = vp_acc_inv_mtx *
+                  ( old_vp_acc_frw_mtx *
+                    ( old_vp->position->getValue() + old_vp->rel_pos ) )
+                    - position->getValue();
+
+        rel_orientation = -orientation->getValue() * 
+        ( Rotation( vp_acc_inv_mtx.getScaleRotationPart() ) *
+          ( Rotation(old_vp_acc_frw_mtx.getScaleRotationPart() ) *
+            ( old_vp->orientation->getValue() * old_vp->rel_orientation ) ) );
+      }
+    }
+    X3DBindableNode::toStackTop();
+  }
+}
