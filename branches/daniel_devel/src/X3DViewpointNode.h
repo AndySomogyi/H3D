@@ -270,6 +270,12 @@ namespace H3D {
                                         H3DFloat &top, H3DFloat &bottom,
                                         H3DFloat &right, H3DFloat &left ) = 0;
 
+    /// Move this instance to the stack top. 
+    virtual void toStackTop();
+
+    /// Remove the bindable node from the stack.
+    virtual void removeFromStack();
+
     /// The centerOfRotation field specifies a center about which to
     /// rotate the user's eyepoint when in EXAMINE mode.
     ///
@@ -338,6 +344,9 @@ namespace H3D {
     auto_ptr< SFMatrix4f > accInverseMatrix;
     
     static H3DNodeDatabase database;
+
+    Vec3f rel_pos;
+    Rotation rel_orientation;
   };
 }
 

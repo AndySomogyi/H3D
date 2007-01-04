@@ -328,9 +328,10 @@ namespace H3D {
     static bool linear_interpolate;
     static Vec3f goal_position;
     static Rotation goal_orientation;
-    static X3DViewpointNode * old_viewpoint;
+    static X3DViewpointNode * old_vp;
+    static Vec3f old_vp_pos;
+    static Rotation old_vp_orientation;
     H3DTime start_time;
-    H3DDouble total_time;
     Vec3f start_position, move_direction;
     Rotation start_orientation;
   };
