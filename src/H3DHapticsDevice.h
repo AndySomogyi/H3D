@@ -270,7 +270,7 @@ namespace H3D {
 
     /// Destuctor.
     virtual ~H3DHapticsDevice() {
-      disableDevice();
+      releaseDevice();
     }
 
     /// Get the proxy position from the previous loop.
