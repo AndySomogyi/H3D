@@ -54,7 +54,7 @@ void TraverseInfo::addHapticShapeToAll( HAPI::HAPIHapticShape *shape ) {
   shape->unref();
 }
 
-void TraverseInfo::addForceEffectToAll( HAPI::HapticForceEffect *effect ) {
+void TraverseInfo::addForceEffectToAll( HAPI::HAPIForceEffect *effect ) {
   effect->ref();
   if( hapticsEnabled() ) {
     for( vector< HapticEffectVector >::iterator i = 
@@ -68,7 +68,7 @@ void TraverseInfo::addForceEffectToAll( HAPI::HapticForceEffect *effect ) {
 }
 
 void TraverseInfo::addForceEffect( int device_index, 
-                                   HAPI::HapticForceEffect *effect ) {
+                                   HAPI::HAPIForceEffect *effect ) {
   if( device_index < 0 || device_index >= (int)haptics_devices.size() ) {
     stringstream s;
     s << "TraverseInfo only has " << (unsigned int) haptics_devices.size() 
