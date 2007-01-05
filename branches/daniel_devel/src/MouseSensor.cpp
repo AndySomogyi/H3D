@@ -92,34 +92,40 @@ MouseSensor::~MouseSensor() {
 }
 
 void MouseSensor::mouseMotionAction( int x, int y ) {
-  const Vec2f &last_pos = position->getValue();
-  Vec2f new_pos = Vec2f( (H3DFloat) x, (H3DFloat) y );
-  Vec2f diff = new_pos - last_pos;
-  if( diff * diff > Constants::f_epsilon ) {
-    position->setValue( new_pos, id );
-    motion->setValue( diff, id );
+  if( enabled->getValue() ) {
+    const Vec2f &last_pos = position->getValue();
+    Vec2f new_pos = Vec2f( (H3DFloat) x, (H3DFloat) y );
+    Vec2f diff = new_pos - last_pos;
+    if( diff * diff > Constants::f_epsilon ) {
+      position->setValue( new_pos, id );
+      motion->setValue( diff, id );
+    }
   }
 }
 
 void MouseSensor::mouseButtonAction( int button, int state ) {
-  switch( button ) {
+  if( enabled->getValue() ) {
+    switch( button ) {
     case LEFT_BUTTON:
       leftButton->setValue( state == DOWN, id );
-    break;
+      break;
     case MIDDLE_BUTTON:
       middleButton->setValue( state == DOWN, id );
-    break;
+      break;
     case RIGHT_BUTTON:
       rightButton->setValue( state == DOWN, id );
-    break;
+      break;
+    }
   }
 }
 
 void MouseSensor::mouseWheelAction( int direction ) {
-  if( direction == FROM ) {
-    scrollUp->setValue( true, id );
-  } else if( direction == TOWARDS ) {
-    scrollDown->setValue( true, id );
+  if( enabled->getValue() ) {
+    if( direction == FROM ) {
+      scrollUp->setValue( true, id );
+    } else if( direction == TOWARDS ) {
+      scrollDown->setValue( true, id );
+    }
   }
 }
 

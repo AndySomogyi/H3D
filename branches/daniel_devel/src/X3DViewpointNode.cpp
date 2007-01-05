@@ -80,6 +80,7 @@ X3DViewpointNode::X3DViewpointNode(
   database.initFields( this );
 
   centerOfRotation->setValue( Vec3f( 0, 0, 0 ) );
+  jump->setValue( true );
   orientation->setValue( Rotation( 0, 0, 1, 0 ) );
   position->setValue( Vec3f( 0, 0, 10 ) );
   retainUserOffsets->setValue( false );
