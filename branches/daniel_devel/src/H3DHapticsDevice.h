@@ -47,7 +47,7 @@
 // HAPI includes
 #include <HAPIHapticShape.h>
 #include <HAPIHapticsDevice.h>
-#include <HapticForceEffect.h>
+#include <HAPIForceEffect.h>
 
 
 namespace H3D {
@@ -332,8 +332,8 @@ namespace H3D {
     virtual void renderShapes( const HapticShapeVector &shapes, 
                                unsigned int layer = 0 );
 
-    /// Perform haptic rendering for the given HapticForceEffect instances. 
-    /// HapticForceEffect objects that are to be be rendered haptically must
+    /// Perform haptic rendering for the given HAPIForceEffect instances. 
+    /// HAPIForceEffect objects that are to be be rendered haptically must
     /// be rendered with this function each scenegraph loop.
     /// \param objects The haptic objects to render.
     ///

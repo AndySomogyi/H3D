@@ -30,7 +30,7 @@
 #define __TRAVERSEINFO_H__
 
 #include <H3DTypes.h>
-#include <HapticForceEffect.h>
+#include <HAPIForceEffect.h>
 #include <HAPIHapticShape.h>
 #include <AutoRefVector.h>
 #include <sstream>
@@ -48,7 +48,7 @@ namespace H3D {
   class X3DPointingDeviceSensorNode;
 
   typedef AutoRefVector< HAPI::HAPIHapticShape > HapticShapeVector;
-  typedef AutoRefVector< HAPI::HapticForceEffect > HapticEffectVector;
+  typedef AutoRefVector< HAPI::HAPIForceEffect > HapticEffectVector;
 
   /// TraverseInfo is a structure that is passed along when traversing the 
   /// scene graph. It contains information needed during the traversing, 
@@ -175,32 +175,32 @@ namespace H3D {
       return getHapticShapes( device_index );
     }
 
-    /// Adds a HapticForceEffect to be rendered by a H3DHapticsDevice.
+    /// Adds a HAPIForceEffect to be rendered by a H3DHapticsDevice.
     /// Effects will only be added if hapticsEnabled() is true. 
     /// \param device_index The index of the H3DHapticsDevice to render the 
     /// shape on.
-    /// \param effect The HapticForceEffect to render.
+    /// \param effect The HAPIForceEffect to render.
     ///
-    void addForceEffect( int device_index, HAPI::HapticForceEffect *effect );
+    void addForceEffect( int device_index, HAPI::HAPIForceEffect *effect );
 
-    /// Adds a HapticForceEffect to be rendered by a H3DHapticsDevice.
+    /// Adds a HAPIForceEffect to be rendered by a H3DHapticsDevice.
     /// Shapes will only be added if hapticsEnabled() is true. 
     /// \param hd The H3DHapticsDevice to render the shape on.
-    /// \param effect The HapticForceEffect to render.
+    /// \param effect The HAPIForceEffect to render.
     ///
     inline void addForceEffect( H3DHapticsDevice *hd, 
-                                HAPI::HapticForceEffect *effect ) {
+                                HAPI::HAPIForceEffect *effect ) {
       int device_index = getHapticsDeviceIndex( hd );
       addForceEffect( device_index, effect );
     }
     
-    /// Adds a HapticForceEffect to be rendered by all H3DHapticsDevices.
+    /// Adds a HAPIForceEffect to be rendered by all H3DHapticsDevices.
     /// Effects will only be added if hapticsEnabled() is true. 
-    /// \param effect The HapticForceEffect to render.
+    /// \param effect The HAPIForceEffect to render.
     ///
-                                void addForceEffectToAll( HAPI::HapticForceEffect *effect );
+    void addForceEffectToAll( HAPI::HAPIForceEffect *effect );
 		
-    /// Get the HapticForceEffects that has been added for the H3DHapticsDevice
+    /// Get the HAPIForceEffects that has been added for the H3DHapticsDevice
     /// with the given device_index.
     ///
     inline const HapticEffectVector 
@@ -216,7 +216,7 @@ namespace H3D {
       return haptic_effects[ device_index ];
     }
     
-    /// Get the HapticForceEffects that has been added for the given 
+    /// Get the HAPIForceEffects that has been added for the given 
     /// H3DHapticsDevice
     inline const HapticEffectVector
       &getForceEffects( H3DHapticsDevice * hd ) {

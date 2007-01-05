@@ -144,7 +144,7 @@ void Scene::idle() {
 
     // remove the TraverseInfo instance from the last loop. TraverseInfo 
     // instances must be kept alive until its HapticShapes and 
-    // HapticForceEffects are not rendered anymore, which in this case is
+    // HAPIForceEffects are not rendered anymore, which in this case is
     // one scenegraph loop.
     if( last_traverseinfo )
       delete last_traverseinfo;
@@ -161,7 +161,7 @@ void Scene::idle() {
     X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( c );
     // remove the TraverseInfo instance from the last loop. TraverseInfo 
     // instances must be kept alive until its HapticShapes and 
-    // HapticForceEffects are not rendered anymore, which in this case is 
+    // HAPIForceEffects are not rendered anymore, which in this case is 
     // one scenegraph loop.
     if( last_traverseinfo )
       delete last_traverseinfo;
