@@ -193,10 +193,6 @@ namespace H3D {
       option = NULL;
     }
 
- #ifdef HAVE_OPENHAPTICS   
-    /// Destructor. Deletes the hl_shape_id.
-    virtual ~X3DGeometryNode();
- 
     /// Get a shape id to be used for rendering of this geometry with HLAPI for
     /// the given haptics device.
     /// Since the geometry can appear in several places in the scene graph
@@ -204,6 +200,10 @@ namespace H3D {
     /// get is determined by the index argument.
     int getHapticShapeId( unsigned int index );
 
+ #ifdef HAVE_OPENHAPTICS   
+    /// Destructor. Deletes the hl_shape_id.
+    virtual ~X3DGeometryNode();
+ 
     /// Returns a either a HLFeedbackShape or a HLDepthBufferShape with
     /// the X3DGeometryNode. Which type depents on possible 
     /// OpenHapticsOptions nodes in the options field and

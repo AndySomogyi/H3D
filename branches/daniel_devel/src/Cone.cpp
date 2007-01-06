@@ -87,7 +87,6 @@ void Cone::render() {
   
   const H3DFloat l_radius = bottomRadius->getValue();
   const H3DFloat l_height = height->getValue();
-  bool is_solid = solid->getValue();
   int nr_faces = 120;
   
   // render side

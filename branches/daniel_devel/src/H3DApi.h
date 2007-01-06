@@ -33,10 +33,6 @@
 #ifndef __H3DApi_H__
 #define __H3DApi_H__
 
-/// Undef if you do not have OpenHaptics(www.sensable.com) installed. 
-/// Haptics will then be disabled.
-#define HAVE_OPENHAPTICS
-
 /// Undef if you do not want to use haptics at all.
 /// HAVE_OPENHAPTICS must also be undef.
 #define USE_HAPTICS
@@ -90,11 +86,6 @@
 #ifdef WIN32
 #define HAVE_DSHOW
 #endif
-
-/// Undef if you do not have the DHD-API from ForceDimension. Needed
-/// for the DHDHapticsDevice, e.g. support for Omega and Delta haptics
-/// devices
-#define HAVE_DHDAPI
 
 /// Undef if you do not have Haptik(www.haptiklibrary.org). Needed
 /// for the HaptikHapticsDevice

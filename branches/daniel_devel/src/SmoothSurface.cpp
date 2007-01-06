@@ -45,21 +45,6 @@ namespace SmoothSurfaceInternals {
 }
 
 
-void SmoothSurface::hlRender() {
-#ifdef HAVE_OPENHAPTICS
-  hlTouchModel( HL_CONTACT );
-  hlMaterialf(HL_FRONT_AND_BACK, HL_STIFFNESS, stiffness->getValue() );
-  hlMaterialf(HL_FRONT_AND_BACK, HL_DAMPING, damping->getValue() );
-  hlMaterialf(HL_FRONT_AND_BACK, HL_DYNAMIC_FRICTION, 0 );
-  hlMaterialf(HL_FRONT_AND_BACK, HL_STATIC_FRICTION, 0 );
-
-#endif
-}
-
-void SmoothSurface::chai3dMaterial( cMaterial &m ) {
-  m.setStiffness( stiffness->getValue() * 700 / 1000 );
-}
-
 /// Constructor.
 SmoothSurface::SmoothSurface( Inst< SFFloat >  _stiffness,
                               Inst< SFFloat >  _damping ):

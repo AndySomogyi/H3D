@@ -69,13 +69,13 @@ namespace H3D {
     /// to render HapticShapes on.
     /// 
     TraverseInfo( const vector< H3DHapticsDevice * > &_haptics_devices ) :
+      current_layer( 0 ),
       current_surface( NULL ),
       haptics_devices( _haptics_devices ),
       haptic_shapes( _haptics_devices.size() ),
       haptic_effects( _haptics_devices.size() ),
       haptics_enabled( true ),
-      multi_pass_transparency( false ),
-      current_layer( 0 ) {
+      multi_pass_transparency( false ) {
       
       initializeLayers( 1 );
 

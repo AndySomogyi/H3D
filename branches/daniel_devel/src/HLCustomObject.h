@@ -26,11 +26,14 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
+
 #ifndef __HLCUSTOMOBJECT_H__
 #define __HLCUSTOMOBJECT_H__
 
 #include <H3DTypes.h>
 #include <OpenHapticsRenderer.h>
+
+#ifdef HAVE_OPENHAPTICS
 
 namespace H3D {
 
@@ -40,7 +43,7 @@ namespace H3D {
   ///
   class H3DAPI_API HLCustomObject: public HAPI::OpenHapticsRenderer::HLShape {
   public:
-  #ifdef HAVE_OPENHAPTICS
+d
     /// Intersect the line segment from start_point to end_point with
     /// the object.  
     /// \param start_point The start point of the line segment.
@@ -73,7 +76,7 @@ namespace H3D {
                                  const Vec3f &target_point,
                                  HLgeom *geom,
                                  Vec3f &closest_point ) = 0;
-#endif
+
     /// This function performs all the HLAPI calls that are needed to render
     /// the object. It sets the object up as a HL_SHAPE_CALLBACK shape and uses
     /// the instersectSurface and closestPointOnSurface function in the callback
@@ -82,7 +85,6 @@ namespace H3D {
     virtual void hlRender( HAPI::HAPIHapticsDevice *hd,
                            HLuint shape_id );
 
-#ifdef HAVE_OPENHAPTICS
   protected:
     /// Callback function for finding the intersection between a line segment
     /// and the object. Used in hlRender. 
@@ -142,8 +144,9 @@ namespace H3D {
 
       return b;
     }
-    #endif
   };
 }
+
+#endif
 
 #endif

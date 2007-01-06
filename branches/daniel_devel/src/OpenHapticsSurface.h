@@ -34,6 +34,8 @@
 #include <SFFloat.h>
 #include <SFBool.h>
 
+#ifdef HAVE_OPENHAPTICS
+
 namespace H3D {
 
   /// \ingroup H3DNodes
@@ -109,4 +111,5 @@ namespace H3D {
   };
 }
 
+#endif
 #endif

@@ -26,11 +26,15 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
+
 #include "H3DApi.h"
-#ifdef USE_HAPTICS
+
+
 #include "HLCustomObject.h"
 
 #include <HAPIHapticShape.h>
+
+#ifdef HAVE_OPENHAPTICS
 
 using namespace H3D;
 
@@ -51,6 +55,7 @@ void HLCustomObject::hlRender( HAPI::HAPIHapticsDevice *hd,
   hlCallback(HL_SHAPE_CLOSEST_FEATURES, 
              (HLcallbackProc) closestFeaturesCallback, this);
   hlEndShape();
-#endif
+
 };
+#endif
 #endif

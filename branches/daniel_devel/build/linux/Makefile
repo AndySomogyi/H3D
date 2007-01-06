@@ -8,13 +8,13 @@ include Makefile.objects
 # You should only need to edit these:
 #
 
-FREEIMAGE_INCLUDE = ../../../FreeImage/Dist
-FREEIMAGE_LIBS    = ../../../FreeImage/
+FREEIMAGE_INCLUDE = /home/Knok/H3D/External/FreeImage/Source
+FREEIMAGE_LIBS    = /usr/lib
 
 FREETYPE_INCLUDE  = /usr/include/freetype2
 FREETYPE_LIBS     = /usr/lib
 
-FTGL_INCLUDE      = /usr/include/FTGL
+FTGL_INCLUDE      = /usr/local/include/FTGL
 FTGL_LIBS         = /usr/lib
 
 PYTHON_INCLUDE    = /usr/include/python2.4
@@ -25,6 +25,8 @@ OPENAL_LIBS       = /usr/lib
 
 XERCESC_INCLUDE   = /usr/include
 XERCESC_LIBS      = /usr/lib
+
+SPACEWARE_INCLUDE = /home/Knok/3dx
 
 H3D_HOME          = ../..
 H3DUTIL_HOME      = ../../../H3DUtil
@@ -37,7 +39,7 @@ HAPI_HOME         = ../../../HAPI
 CXX        = g++
 SHARED     = -shared -export-dynamic
 INCLUDES   = -I$(H3D_HOME)/src
-CXXFLAGS   = -g $(INCLUDES)
+CXXFLAGS   = -Wall -g $(INCLUDES)
 LDFLAGS    = 
 
 #H3DUtil
@@ -68,6 +70,11 @@ INCLUDES  += -I$(FREEIMAGE_INCLUDE)
 CXXLIBS   += -L$(FREETYPE_LIBS) -lfreetype
 INCLUDES  += -I$(FREETYPE_INCLUDE)
 
+#SpaceWare
+INCLUDES  += -I$(SPACEWARE_INCLUDE)
+OBJECTS   += $(SPACEWARE_INCLUDE)/xdrvlib.o
+
+
 # FTGL
 ##FTGL_CPPFLAGS := $(shell pkg-config --cflags ftgl)
 ##FTGL_LDFLAGS  := $(shell pkg-config --libs-only-L ftgl)
@@ -80,7 +87,7 @@ CXXLIBS   += -L$(XERCESC_LIBS) -lxerces-c
 INCLUDES  += -I$(XERCESC_INCLUDE)
 
 # OpenHaptics
-CXXLIBS   += -lHL -lHLU -lHDU -lHD -lrt
+#CXXLIBS   += -lHL -lHLU -lHDU -lHD -lrt
 
 # Python
 CXXLIBS   += -L$(PYTHON_LIBS) -lpython2.4 -lutil

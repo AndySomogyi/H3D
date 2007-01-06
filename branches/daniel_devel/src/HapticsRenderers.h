@@ -82,6 +82,13 @@ namespace H3D {
       type_name = "OpenHapticsRenderer";
       database.initFields( this );
 
+#ifndef HAVE_OPENHAPTICS
+      Console(4) << "Cannot use OpenHapticsRenderer. HAPI compiled without"
+		 << " OpenHaptics support. Recompile HAPI with "
+		 << "HAVE_OPENHAPTICS defined"
+		 << " in order to use it." << endl;
+#endif
+
       defaultShapeType->setValue( "FEEDBACK_BUFFER" );
       defaultAdaptiveViewport->setValue( true );
       defaultHapticCameraView->setValue( true );
@@ -89,7 +96,11 @@ namespace H3D {
 
     /// Returns a new instancs of HAPI::OpenHapticsRenderer
     virtual HAPI::HAPIHapticsRenderer *getNewHapticsRenderer() {
+#ifdef HAVE_OPENHAPTICS
       return new HAPI::OpenHapticsRenderer;
+#else
+      return NULL;
+#endif
     }
 
     /// The default shape type to use if it has not been specified with

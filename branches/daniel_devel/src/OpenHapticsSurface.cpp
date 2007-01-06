@@ -29,6 +29,8 @@
 
 #include "OpenHapticsSurface.h"
 
+#ifdef HAVE_OPENHAPTICS
+
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
@@ -96,4 +98,4 @@ void OpenHapticsSurface::onContact( ContactInfo &contact ) {
   //contact.proxy_movement_local = Vec2d( local_probe.x, local_probe.z );
 }
 
-
+#endif

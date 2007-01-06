@@ -9,19 +9,19 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include "H3DApi.h"
-#ifdef USE_HAPTICS
 #include "HLFeedbackShape.h"
 #include "GL/glew.h"
 #include "X3DChildNode.h"
 #include "X3DGeometryNode.h"
 #include "H3DHapticsDevice.h"
 
+#ifdef HAVE_OPENHAPTICS
+
 using namespace H3D;
 
 void HLFeedbackShape::hlRender( HAPI::HAPIHapticsDevice *hd,
                                 HLuint hl_shape_id ) {
   X3DGeometryNode *geometry = static_cast< X3DGeometryNode * >( userdata );
-#ifdef HAVE_OPENHAPTICS
   HAPI::OpenHapticsRenderer::HLSurface *s = 
     dynamic_cast< HAPI::OpenHapticsRenderer::HLSurface * >( surface );
   if( s ) { //&& closeEnoughToBound( hd->proxyPosition->getValue(), 
@@ -82,7 +82,6 @@ void HLFeedbackShape::hlRender( HAPI::HAPIHapticsDevice *hd,
 #endif
     glPopMatrix();
   }
-#endif
 }
 #endif
 

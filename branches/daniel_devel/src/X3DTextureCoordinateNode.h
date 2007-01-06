@@ -71,7 +71,7 @@ namespace H3D {
     
     /// Render the texture coordinate for all texture units used by
     /// the texture in X3DTextureNode::getActiveTexture.
-    inline void renderForActiveTexture( int index );
+    void renderForActiveTexture( int index );
 
     /// Returns the default xml containerField attribute value.
     /// For this node it is "texCoord".

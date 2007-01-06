@@ -100,13 +100,13 @@ namespace H3D {
                 const Vec2f &_size     = Vec2f( 0, 0 ),
                 H3DFloat _mass         = 0,
                 H3DFloat _surface_area = 0 ):
-        position( _position ),
-        velocity( _velocity ),
-        size( _size ),
         mass( _mass ),
         surface_area( _surface_area ),
-        geometry( NULL ),
+        position( _position ),
+        velocity( _velocity ),
         time_lived( 0 ),
+        size( _size ),
+        geometry( NULL ),
         distance_from_viewer( 0 ) {}
       
       inline void updateParticle( const Matrix4f &_global_to_local,
@@ -144,7 +144,7 @@ namespace H3D {
         return -1;  // something must have gone wrong to get here
       }   
 
-      virtual void render( ParticleSystem *ps );
+      void render( ParticleSystem *ps );
 
       inline bool isDead() {
         return time_lived > total_time_to_live;
