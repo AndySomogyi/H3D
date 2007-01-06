@@ -40,9 +40,7 @@
 #include <OpenHapticsRenderer.h>
 #include <RuspiniRenderer.h>
 #include <GodObjectRenderer.h>
-#ifdef HAVE_CHAI3D
 #include <Chai3DRenderer.h>
-#endif
 
 namespace H3D {
 
