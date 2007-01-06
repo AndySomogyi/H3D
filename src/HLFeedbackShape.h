@@ -28,8 +28,8 @@ namespace H3D {
   class H3DAPI_API HLFeedbackShape: public HAPI::HAPIHapticShape, 
     public HAPI::OpenHapticsRenderer::HLShape  {
   public:
-    typedef int HLint;
-    typedef enum { HL_FRONT, HL_BACK, HL_FRONT_AND_BACK } HLenum;
+    //    typedef int HLint;
+    //typedef enum { HL_FRONT, HL_BACK, HL_FRONT_AND_BACK } HLenum;
 
     /// Constructor.
     HLFeedbackShape( X3DGeometryNode *_geometry,

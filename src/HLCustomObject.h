@@ -43,7 +43,7 @@ namespace H3D {
   ///
   class H3DAPI_API HLCustomObject: public HAPI::OpenHapticsRenderer::HLShape {
   public:
-d
+
     /// Intersect the line segment from start_point to end_point with
     /// the object.  
     /// \param start_point The start point of the line segment.
