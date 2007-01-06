@@ -91,7 +91,6 @@ void Cylinder::render() {
   
   const float l_radius = radius->getValue();
   const float l_height = height->getValue();
-  bool is_solid = solid->getValue();
   int nr_faces = 120;
 
   // render side

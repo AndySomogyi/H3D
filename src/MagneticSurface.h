@@ -53,9 +53,6 @@ namespace H3D {
                      Inst< SFFloat > _dynamicFriction = 0,
                      Inst< SFFloat > _snapDistance    = 0 );
   
-    /// Renders the surface using hlMaterialf calls
-    virtual void hlRender();
-
     /// The distance from the surface within which forces are generated
     /// to pull the proxy towards the surface. If the device is pulled
     /// outside this distance from the surface it will be freed from the

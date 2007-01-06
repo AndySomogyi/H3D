@@ -109,8 +109,8 @@ H3DHapticsDevice::H3DHapticsDevice(
   initialized( new SFBool ),
   hapticsRenderer( _hapticsRenderer ),
   proxyPositions( _proxyPositions ),
-  enabled( new SFBool ),
-  set_enabled( new SetEnabled ) {
+  set_enabled( new SetEnabled ),
+  enabled( new SFBool ) {
 
   type_name = "H3DHapticsDevice";  
   database.initFields( this );

@@ -52,18 +52,18 @@ namespace H3D {
     virtual void onValueChange( const typename SF::value_type &new_value ) = 0;
 
     virtual void setValue( const typename SF::value_type &v, int id  ) {
-      typename SF::value_type old_value = value;
+      typename SF::value_type old_value = this->value;
       SF::setValue( v );
-        if( value != old_value ) {
-          onValueChange( value );
+        if( this->value != old_value ) {
+          onValueChange( this->value );
         } 
     }
     
     virtual void update() {
-      typename SF::value_type old_value = value;
+      typename SF::value_type old_value = this->value;
       SF::update();
-      if( value != old_value ) {
-        onValueChange( value );
+      if( this->value != old_value ) {
+        onValueChange( this->value );
       } 
     }
   };
@@ -79,15 +79,13 @@ namespace H3D {
     /// This function is called when the field is updated to a value.
     virtual void onNewValue( const typename SF::value_type &new_value ) = 0;
     virtual void setValue( const typename SF::value_type &v, int id ) {
-      typename SF::value_type old_value = value;
       SF::setValue( v );
-      onNewValue( value );
+      onNewValue( this->value );
     }
     
     virtual void update() {
-      typename SF::value_type old_value = value;
       SF::update();
-      onNewValue( value );
+      onNewValue( this->value );
     }
   };
 

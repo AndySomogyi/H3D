@@ -27,7 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include "H3DApi.h"
-#ifdef USE_HAPTICS
+
 #include "MagneticSurface.h"
 #include "H3DHapticsDevice.h"
 
@@ -45,15 +45,6 @@ namespace MagneticSurfaceInternals {
 }
 
 
-void MagneticSurface::hlRender() {
-#ifdef HAVE_OPENHAPTICS
-  FrictionalSurface::hlRender();
-  hlTouchModel( HL_CONSTRAINT );
-  // convert to millimeters
-  hlTouchModelf( HL_SNAP_DISTANCE, 1000 * snapDistance->getValue() );
-#endif
-}
-
 /// Constructor.
 MagneticSurface::MagneticSurface( Inst< SFFloat >  _stiffness,
                                   Inst< SFFloat >  _damping,
@@ -68,4 +59,3 @@ MagneticSurface::MagneticSurface( Inst< SFFloat >  _stiffness,
   
   snapDistance->setValue( (H3DFloat)0.01 );
 }
-#endif

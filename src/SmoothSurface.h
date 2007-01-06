@@ -31,8 +31,6 @@
 
 #include "H3DSurfaceNode.h"
 #include <HAPISurfaceObject.h>
-#include <OpenHapticsRenderer.h>
-#include <Chai3DRenderer.h>
 #include "SFFloat.h"
 
 namespace H3D {
@@ -43,21 +41,12 @@ namespace H3D {
   /// can be specified. The stiffness is specified as a value between 0 and 1
   /// where 1 is the maximum stiffness the device can handle.
   ///
-  class H3DAPI_API SmoothSurface: public H3DSurfaceNode, 
-                                  public HAPI::OpenHapticsRenderer::HLSurface,
-                                  public HAPI::Chai3DRenderer::Chai3DSurface {
+  class H3DAPI_API SmoothSurface: public H3DSurfaceNode {
   public:
 
     /// Constructor.
     SmoothSurface( Inst< SFFloat >  _stiffness = 0,
                    Inst< SFFloat >  _damping   = 0 );
-  
-    /// Renders the surface using hlMaterialf calls
-    virtual void hlRender();
-
-    /// Sets a Chai3D cMaterial describing the haptic properties for the 
-    /// surface.
-    virtual void chai3dMaterial( cMaterial &m );
 
     virtual void onContact( ContactInfo &contact );
 

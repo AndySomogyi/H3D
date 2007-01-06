@@ -98,8 +98,8 @@ ParticleSystem::ParticleSystem(
   physics( _physics ),
   texCoordRamp( _texCoordRamp ),
   texCoordKey( _texCoordKey ),
-  update_bound( false ),
-  particle_system_time( 0 ) {
+  particle_system_time( 0 ),
+  update_bound( false ) {
   
   type_name = "ParticleSystem";
   database.initFields( this );
@@ -120,8 +120,6 @@ void ParticleSystem::render() {
   X3DChildNode::render();
   X3DAppearanceNode *a = appearance->getValue();
   X3DGeometryNode *g = geometry->getValue();
-
-  GLboolean lighting_on;
 
   if ( a ) {
     a->preRender();
@@ -278,6 +276,8 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
 
   particles.sort();
 
+
+  // update bounding box
   if( particles.size() > 0 && 
       bboxSize->getValue() == Vec3f( -1, -1, -1 )) {
 
@@ -301,7 +301,7 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
     if( geometryType->getValue() == "GEOMETRY" ) {
       if( (*p).geometry.get() ) {
         X3DGeometryNode *g = (*p).geometry.get();
-        BoxBound *bb = dynamic_cast< BoxBound * >( bound->getValue() );
+        BoxBound *bb = dynamic_cast< BoxBound * >( g->bound->getValue() );
         if( bb ) {
           Vec3f center = bb->center->getValue();
           Vec3f half_size = bb->size->getValue();

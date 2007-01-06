@@ -78,8 +78,8 @@ X3DGeometryNode::X3DGeometryNode(
   isTouched( _isTouched ),
   force( _force ),
   contactPoint( _contactPoint ),
-  contactNormal( _contactNormal ),
   contactTexCoord( _contactTexCoord ),
+  contactNormal( _contactNormal ),
   boundTree( _boundTree ),
   options( new MFOptionsNode ),
   use_culling( false ),
@@ -111,6 +111,7 @@ int X3DGeometryNode::getHapticShapeId( unsigned int index ) {
   return haptic_shape_ids[ index ];
 }
 
+#ifdef HAVE_OPENHAPTICS
 X3DGeometryNode::~X3DGeometryNode() {/*
   for( ShapeIdMap::iterator entry = hl_shape_ids.begin();
        entry != hl_shape_ids.end();
@@ -207,6 +208,8 @@ HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_s
                                 camera_view );
   }
 }
+
+#endif
 
 void X3DGeometryNode::DisplayList::callList( bool build_list ) {
     
@@ -361,9 +364,11 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
     }
     
     if( force_full_oh ) {
+#ifdef HAVE_OPENHAPTICS
       ti.addHapticShapeToAll( getOpenGLHapticShape( ti.getCurrentSurface(),
                                                     ti.getAccForwardMatrix(),
                                                     nrVertices() ) );
+#endif
     } else {
       const vector< H3DHapticsDevice * > &devices = ti.getHapticsDevices();
     
@@ -497,6 +502,7 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
                                          touchable_face);
       
 
+#ifdef HAVE_OPENHAPTICS
           if( openhaptics_options ) {
             HAPI::OpenHapticsRenderer::OpenHapticsOptions::ShapeType type;
             bool adaptive_viewport;
@@ -525,6 +531,7 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
                                                                 adaptive_viewport,
                                                                 camera_view ) );
           }
+#endif
       
           ti.addHapticShape( i, tri_set );
         }

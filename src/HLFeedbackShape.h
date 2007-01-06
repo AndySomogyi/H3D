@@ -16,6 +16,7 @@
 #include <HAPIHapticShape.h>
 #include <OpenHapticsRenderer.h>
 
+#ifdef HAVE_OPENHAPTICS
 
 namespace H3D {
 
@@ -27,10 +28,8 @@ namespace H3D {
   class H3DAPI_API HLFeedbackShape: public HAPI::HAPIHapticShape, 
     public HAPI::OpenHapticsRenderer::HLShape  {
   public:
-    #ifndef HAVE_OPENHAPTICS
     typedef int HLint;
     typedef enum { HL_FRONT, HL_BACK, HL_FRONT_AND_BACK } HLenum;
-    #endif
 
     /// Constructor.
     HLFeedbackShape( X3DGeometryNode *_geometry,
@@ -60,5 +59,7 @@ namespace H3D {
     bool use_haptic_camera;
   };
 }
+
+#endif
 
 #endif

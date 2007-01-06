@@ -87,6 +87,7 @@ void RuspiniRenderer::ProxyRadius::onValueChange( const H3DFloat &v ) {
 }
 
 void OpenHapticsRenderer::ShapeType::onValueChange( const string &v ) {
+#ifdef HAVE_OPENHAPTICS
   OpenHapticsRenderer *oh_node = 
     static_cast< OpenHapticsRenderer * >( getOwner() );
 
@@ -106,9 +107,11 @@ void OpenHapticsRenderer::ShapeType::onValueChange( const string &v ) {
       r->setDefaultShapeType( HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER );
     }
   }
+#endif
 }
 
 void OpenHapticsRenderer::AdaptiveViewport::onValueChange( const bool &v ) {
+#ifdef HAVE_OPENHAPTICS
   OpenHapticsRenderer *oh_node = 
     static_cast< OpenHapticsRenderer * >( getOwner() );
   for( unsigned int i = 0; i < oh_node->renderers.size(); i++ ) {
@@ -116,9 +119,11 @@ void OpenHapticsRenderer::AdaptiveViewport::onValueChange( const bool &v ) {
       static_cast< HAPI::OpenHapticsRenderer * >(oh_node->getHapticsRenderer( i ) );
     r->setDefaultAdaptiveViewport( v );
   }
+#endif
 }
 
 void OpenHapticsRenderer::CameraView::onValueChange( const bool &v ) {
+#ifdef HAVE_OPENHAPTICS
   OpenHapticsRenderer *oh_node = 
     static_cast< OpenHapticsRenderer * >( getOwner() );
   for( unsigned int i = 0; i < oh_node->renderers.size(); i++ ) {
@@ -126,4 +131,5 @@ void OpenHapticsRenderer::CameraView::onValueChange( const bool &v ) {
       static_cast< HAPI::OpenHapticsRenderer * >(oh_node->getHapticsRenderer( i ) );
     r->setDefaultHapticCameraView( v );
   }
+#endif
 }

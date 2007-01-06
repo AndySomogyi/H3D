@@ -138,6 +138,7 @@ string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
 
 
 int main(int argc, char* argv[]) {
+
   PythonScript::setargv( argc, argv );
   
   // Settings and command line arguments ---
@@ -168,8 +169,13 @@ int main(int argc, char* argv[]) {
   
   // H3D root, XML file and setup file
   
+
   vector<string> xml_files;
-  string h3d_root = getenv( "H3D_ROOT" );
+
+  char *r = getenv( "H3D_ROOT" );
+
+  string h3d_root = r ? r : ""; 
+
   INIFile ini_file( h3d_root + "/settings/h3dload.ini" );
   
   // Console settings
