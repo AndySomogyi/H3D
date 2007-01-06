@@ -27,6 +27,8 @@ XERCESC_INCLUDE   = /usr/include
 XERCESC_LIBS      = /usr/lib
 
 H3D_HOME          = ../..
+H3DUTIL_HOME      = ../../../H3DUtil
+HAPI_HOME         = ../../../HAPI
 
 #
 #
@@ -37,6 +39,14 @@ SHARED     = -shared -export-dynamic
 INCLUDES   = -I$(H3D_HOME)/src
 CXXFLAGS   = -g $(INCLUDES)
 LDFLAGS    = 
+
+#H3DUtil
+CXXLIBS   += -lH3DUtil
+INCLUDES  += -I$(H3DUTIL_HOME)/src
+
+#HAPI
+CXXLIBS   += -lHAPI
+INCLUDES  += -I$(HAPI_HOME)/src
 
 #libcurl
 CXXLIBS   += -lcurl
@@ -97,7 +107,7 @@ H3DLoad:	$(H3D_HOME)/src/H3DLoad.o libH3DApi.so
 	$(CXX) $(LDFLAGS) -o $@ $^ $(CXXLIBS) 
 
 clean:	
-	$(RM) $(H3D_HOME)/src/*~ $(H3D_HOME)/src/*.o $(H3D_HOME)/src/Types/*~ $(H3D_HOME)/src/Types/*.o
+	$(RM) $(H3D_HOME)/src/*~ $(H3D_HOME)/src/*.o 
 
 install: libH3DApi.so
 	cp libH3DApi.so /usr/lib
@@ -109,7 +119,7 @@ update:
 	$(MAKE) depend
 
 sources:
-	ls $(H3D_HOME)/src/*.cpp $(H3D_HOME)/src/Types/*.cpp $(H3D_HOME)/src/*.cc> Makefile.sources
+	ls $(H3D_HOME)/src/*.cpp  $(H3D_HOME)/src/*.cc> Makefile.sources
 	echo -n "SOURCES=" > Makefile.sources2
 	cat Makefile.sources \
 	  | sed 's/.cpp/.cpp \\/g' \
@@ -118,7 +128,7 @@ sources:
 	mv Makefile.sources2 Makefile.sources
 
 objects:
-	ls $(H3D_HOME)/src/*.cpp $(H3D_HOME)/src/Types/*.cpp $(H3D_HOME)/src/*.cc > Makefile.objects
+	ls $(H3D_HOME)/src/*.cpp  $(H3D_HOME)/src/*.cc > Makefile.objects
 	echo -n "OBJECTS=" > Makefile.objects2
 	cat Makefile.objects \
 	  | grep -v "H3DLoad.cpp" \
