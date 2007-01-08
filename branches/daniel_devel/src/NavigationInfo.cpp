@@ -140,7 +140,7 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
   Rotation vp_orientation = vp->orientation->getValue();
   Rotation vp_full_orientation = vp_orientation * vp->rel_orientation;
   the_root = topNode;
-  if( old_vp != vp ) {
+  if( old_vp && old_vp != vp ) {
     // if the viewpoint is switched when a transition is going on
     // reset the old viewpoint and calculate the new transition from
     // current position and viewpoint.
