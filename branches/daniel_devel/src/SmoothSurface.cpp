@@ -44,6 +44,22 @@ namespace SmoothSurfaceInternals {
   FIELDDB_ELEMENT( SmoothSurface, damping, INPUT_OUTPUT );
 }
 
+#ifdef HAVE_OPENHAPTICS
+void SmoothSurface::hlRender() {
+  HAPI::OpenHapticsRenderer::hlRenderRelative( stiffness->getValue(),
+                                               damping->getValue(),
+                                               0,
+                                               0, 
+                                               false,
+                                               0 );
+}
+#endif
+
+#ifdef HAVE_CHAI3D
+void SmoothSurface::chai3dMaterial( cMaterial &m ) {
+  m.setStiffness( stiffness->getValue() * 700 / 1000 );
+}
+#endif
 
 /// Constructor.
 SmoothSurface::SmoothSurface( Inst< SFFloat >  _stiffness,
