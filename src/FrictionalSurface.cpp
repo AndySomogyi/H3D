@@ -44,7 +44,25 @@ namespace FritionalSurfaceInternals {
   FIELDDB_ELEMENT( FrictionalSurface, staticFriction, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrictionalSurface, dynamicFriction, INPUT_OUTPUT );
 }
-  
+
+#ifdef HAVE_OPENHAPTICS  
+void FrictionalSurface::hlRender() {
+  HAPI::OpenHapticsRenderer::hlRenderRelative( stiffness->getValue(),
+                                               damping->getValue(),
+                                               staticFriction->getValue(),
+                                               dynamicFriction->getValue(), 
+                                               false,
+                                               0 );
+}
+#endif
+
+#ifdef HAVE_CHAI3D
+void FrictionalSurface::chai3dMaterial( cMaterial &m ) {
+  m.setStaticFriction( staticFriction->getValue() );
+  m.setDynamicFriction( dynamicFriction->getValue() );
+}
+#endif
+
 FrictionalSurface::FrictionalSurface( Inst< SFFloat >  _stiffness,
                                       Inst< SFFloat >  _damping,
                                       Inst< SFFloat >  _staticFriction,
@@ -77,7 +95,7 @@ void FrictionalSurface::onContact( ContactInfo &contact ) {
 
   if( !in_static_contact ) {
     H3DDouble b = 1;
-    //    H3DDouble dt = 1e-3;
+    H3DDouble dt = 1e-3;
     H3DDouble velocity = 
       ( force_t.length() - dynamicFriction->getValue() * force.y ) / b;
 
