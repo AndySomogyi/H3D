@@ -29,10 +29,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "X3DGeometryNode.h"
+#include "H3DSurfaceNode.h"
 #include "GlobalSettings.h"
 #include "GeometryBoundTreeOptions.h"
 
-#ifdef USE_HAPTICS
 #include "OpenHapticsOptions.h"
 #include "HapticsOptions.h"
 #include <HAPIHapticShape.h>
@@ -40,7 +40,6 @@
 #include <HapticTriangleSet.h>
 #include "HLDepthBufferShape.h"
 #include "HLFeedbackShape.h"
-#endif
 
 #include "DebugOptions.h"
 
@@ -142,13 +141,13 @@ HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_s
   int type = -1;
   bool adaptive_viewport = true;
   bool camera_view = true;
-  HLenum touchable_face;
+  HAPI::Bounds::FaceType touchable_face;
   
   if( usingCulling() ) {
-      if( getCullFace() == GL_FRONT ) touchable_face = HL_BACK;
-      else touchable_face = HL_FRONT;
+    if( getCullFace() == GL_FRONT ) touchable_face = HAPI::Bounds::BACK;
+    else touchable_face = HAPI::Bounds::FRONT;
   } else {
-      touchable_face = HL_FRONT_AND_BACK;
+    touchable_face = HAPI::Bounds::FRONT_AND_BACK;
   }
 
   OpenHapticsOptions *openhaptics_options = NULL;
@@ -193,19 +192,19 @@ HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_s
   }
 
   if( type == 1 ) {
-    return new HLDepthBufferShape( this,
-                                   _surface,
-                                   _transform,
-                                   touchable_face,
-                                   camera_view,
-                                   adaptive_viewport );
+    return new HAPI::HLDepthBufferShape( this,
+                                         _surface,
+                                         _transform,
+                                         touchable_face,
+                                         camera_view,
+                                         adaptive_viewport );
   } else {
-    return new HLFeedbackShape( this,
-                                _surface,
-                                _transform,
-                                _nr_vertices,
-                                touchable_face,
-                                camera_view );
+    return new HAPI::HLFeedbackShape( this,
+                                      _surface,
+                                      _transform,
+                                      _nr_vertices,
+                                      touchable_face,
+                                      camera_view );
   }
 }
 
