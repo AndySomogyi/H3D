@@ -49,24 +49,14 @@ namespace OpenHapticsSurfaceInternals {
   FIELDDB_ELEMENT( OpenHapticsSurface, magnetic, INPUT_OUTPUT );
 }
 
-
 void OpenHapticsSurface::hlRender() {
-#ifdef HAVE_OPENHAPTICS
-  hlTouchModel( HL_CONTACT );
-  hlMaterialf(HL_FRONT_AND_BACK, HL_STIFFNESS, stiffness->getValue() );
-  hlMaterialf(HL_FRONT_AND_BACK, HL_DAMPING, damping->getValue() );
-  hlMaterialf(HL_FRONT_AND_BACK, 
-              HL_DYNAMIC_FRICTION, 
-              dynamicFriction->getValue() );
-  hlMaterialf(HL_FRONT_AND_BACK, 
-              HL_STATIC_FRICTION, 
-              staticFriction->getValue() );
-  if( magnetic->getValue() ) hlTouchModel( HL_CONSTRAINT );
-  else hlTouchModel( HL_CONTACT );
-  // convert to millimeters
-  hlTouchModelf( HL_SNAP_DISTANCE, 1000 * snapDistance->getValue() );
-
-#endif
+  HAPI::OpenHapticsRenderer::hlRenderRelative( 
+                                       stiffness->getValue(),
+                                       damping->getValue(),
+                                       staticFriction->getValue(),
+                                       dynamicFriction->getValue(), 
+                                       magnetic->getValue(),
+                                       1000 * snapDistance->getValue() );  
 }
 
 /// Constructor.
