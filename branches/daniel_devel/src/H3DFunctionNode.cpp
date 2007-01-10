@@ -31,6 +31,43 @@
 
 using namespace H3D;
 
-H3DFunctionNode::H3DFunctionNode( Inst< SFNode>  _metadata ) :
-  functionChanged( new Field ) {}
+H3DFunctionNode::H3DFunctionNode( Inst< SFNode>  _metadata,
+                                  Inst< MFDouble  > _input,
+                                  Inst< Value    > _output ) :
+  input( _input ),
+  output( _output ),
+  functionChanged( new Field ) {
 
+  output->setValue( 0, id );
+  
+  input->routeNoEvent( output, id );
+}
+
+void H3DFunctionNode::Value::update() {
+  H3DFunctionNode *function = static_cast< H3DFunctionNode *>( owner );
+    const vector< H3DDouble > &input = 
+    static_cast< MFDouble * >( routes_in[0] )->getValue();
+
+  if( input.size() != function->nrInputValues() ) {
+    H3DUtil::Console(3) 
+      << "Invalid number of parameters in \"input\" field in \""
+      << owner->getName() << "\". Got " << input.size() 
+      << ", expected " << function->nrInputValues() << endl;
+    value = 0;
+  }
+
+  if( input.size() <= 8 ) {
+    H3DDouble inp[8];
+    for( unsigned int i = 0; i <=input.size(); i++ ) {
+      inp[i] = input[i];
+    }
+    value = function->evaluate( inp );
+  } else {
+    H3DDouble *inp = new H3DDouble[input.size()];
+    for( unsigned int i = 0; i <=input.size(); i++ ) {
+      inp[i] = input[i];
+    }
+    value = function->evaluate( inp );
+    delete inp;
+  }
+}
