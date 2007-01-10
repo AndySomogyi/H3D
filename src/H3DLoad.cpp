@@ -20,9 +20,7 @@
 #endif
 #include "DEFNodes.h"
 #include "Viewpoint.h"
-#ifdef USE_HAPTICS
 #include "DeviceInfo.h"
-#endif
 #include "INIFile.h"
 #include "ResourceResolver.h"
 #include "PythonScript.h"
@@ -385,7 +383,6 @@ int main(int argc, char* argv[]) {
       }
     }
 
-#ifdef USE_HAPTICS
     DeviceInfo *di = DeviceInfo::getActive();
     if( di && stylus_file.size() ) {
       AutoRef< Node > default_stylus;
@@ -404,7 +401,6 @@ int main(int argc, char* argv[]) {
           d->stylus->setValue( default_stylus );
       }
     }
-#endif
     
     for( vector<string>::iterator file = xml_files.begin() ;
          file != xml_files.end() ; file++ ){
