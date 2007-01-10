@@ -127,7 +127,6 @@ void MatrixTransform::render() {
   glPopMatrix();
 };
 
-#ifdef USE_HAPTICS
 /// Traverse the scenegraph. 
 void MatrixTransform::traverseSG( TraverseInfo &ti ) {
   ti.pushMatrices( matrix->getValue(),
@@ -139,7 +138,6 @@ void MatrixTransform::traverseSG( TraverseInfo &ti ) {
   X3DGroupingNode::traverseSG( ti );
   ti.popMatrices();
 }
-#endif
 
 bool MatrixTransform::lineIntersect(
                              const Vec3f &from, 
@@ -147,18 +145,18 @@ bool MatrixTransform::lineIntersect(
                              vector< HAPI::Bounds::IntersectionInfo > &result,
                              vector< X3DGeometryNode * > &theGeometry,
                              vector< H3DInt32 > &theGeometryIndex ) {
-  Matrix4f theMatrixInverse = matrix->getValue();
-  Matrix4f theMatrix = theMatrixInverse.inverse();
-  Vec3f local_from = theMatrix * from;
-  Vec3f local_to = theMatrix * to;
+  Matrix4f theMatrix = matrix->getValue();
+  Matrix4f theMatrixInverse = theMatrix.inverse();
+  Vec3f local_from = theMatrixInverse * from;
+  Vec3f local_to = theMatrixInverse * to;
   H3DInt32 sizeBefore = result.size();
   bool intersection = X3DGroupingNode::lineIntersect( 
     local_from, local_to, result, theGeometry, theGeometryIndex );
   if( intersection ) {
     for( unsigned int i = sizeBefore; i < result.size(); i++ ) {
       Vec3f newNormalPoint =
-        theMatrixInverse * Vec3f( result[i].point + result[i].normal );
-      result[i].point = theMatrixInverse * result[i].point;
+        theMatrix * Vec3f( result[i].point + result[i].normal );
+      result[i].point = theMatrix * result[i].point;
       result[i].normal = newNormalPoint - result[i].point;
       result[i].normal.normalize();
     }
@@ -171,15 +169,15 @@ void MatrixTransform::closestPoint(
                   vector< Vec3f > &closest_point,
                   vector< Vec3f > &normal,
                   vector< Vec3f > &tex_coord ) {
-  Matrix4f theMatrixInverse = matrix->getValue();
-  Matrix4f theMatrix = theMatrixInverse.inverse();
-  Vec3f local_p = theMatrix * p;
+  Matrix4f theMatrix = matrix->getValue();
+  Matrix4f theMatrixInverse = theMatrix.inverse();
+  Vec3f local_p = theMatrixInverse * p;
   H3DInt32 sizeBefore = closest_point.size();
   X3DGroupingNode::closestPoint( local_p, closest_point, normal, tex_coord );
   for( unsigned int i = sizeBefore; i < closest_point.size(); i++ ) {
     Vec3f newNormalPoint =
-      theMatrixInverse * Vec3f( closest_point[i] + normal[i] );
-    closest_point[i] = theMatrixInverse * closest_point[i];
+      theMatrix * Vec3f( closest_point[i] + normal[i] );
+    closest_point[i] = theMatrix * closest_point[i];
     normal[i] = newNormalPoint - closest_point[i];
     normal[i].normalizeSafe();
   }
@@ -200,4 +198,22 @@ void MatrixTransform::SFTransformedBound::update() {
     s << "Unsupported Bound type " << typeid( *bound ).name();
     throw Exception::H3DAPIException( s.str(), H3D_FULL_LOCATION );
   }
+}
+
+bool MatrixTransform::movingSphereIntersect( H3DFloat radius,
+                                             const Vec3f &from, 
+                                             const Vec3f &to ) {
+  Matrix4f theMatrix = matrix->getValue();
+  Matrix4f theMatrixInverse = theMatrix.inverse();
+  Vec3f local_from = theMatrixInverse * from;
+  Vec3f local_to = theMatrixInverse * to;
+  Vec3f scaling_values = theMatrixInverse.getScalePart();
+  H3DFloat scale_value = scaling_values.x;
+  if( scale_value < scaling_values.y )
+    scale_value = scaling_values.y;
+  if( scale_value < scaling_values.z )
+    scale_value = scaling_values.z;
+  H3DFloat local_radius = radius * scale_value;
+  return X3DGroupingNode::movingSphereIntersect( 
+    local_radius, local_from, local_to );
 }

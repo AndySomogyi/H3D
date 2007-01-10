@@ -29,10 +29,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Sphere.h"
-#ifdef USE_HAPTICS
 #include "HapticSphere.h"
 #include "H3DSurfaceNode.h"
-#endif
 
 using namespace H3D;
 

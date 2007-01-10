@@ -30,9 +30,7 @@
 
 #include "Scene.h"
 #include "TimeStamp.h"
-#ifdef USE_HAPTICS
 #include "DeviceInfo.h"
-#endif
 #include <GL/glew.h>
 #ifdef MACOSX
 #include <GLUT/glut.h>
@@ -89,7 +87,6 @@ void Scene::idle() {
   last_time = t;
   time->setValue( t, id );
 
-#ifdef USE_HAPTICS
   DeviceInfo *di = DeviceInfo::getActive();
   if( di ) {
     vector< H3DHapticsDevice * > hds;
@@ -167,7 +164,6 @@ void Scene::idle() {
       delete last_traverseinfo;
     last_traverseinfo = ti;
   }
-#endif
   
   // call window's render function
   for( MFWindow::const_iterator w = window->begin(); 
@@ -195,12 +191,8 @@ Scene::Scene( Inst< SFChildNode >  _sceneRoot,
   sceneRoot( _sceneRoot ),
   window   ( _window    ),
   frameRate( _frameRate ),
-  active( true )
-#ifdef USE_HAPTICS
-	,
-  last_traverseinfo( NULL )
-#endif
-	{
+  active( true ),
+  last_traverseinfo( NULL )	{
   
   scenes.insert( this );
   
@@ -215,10 +207,8 @@ Scene::Scene( Inst< SFChildNode >  _sceneRoot,
 Scene::~Scene() {
   scenes.erase( this );
 
-#ifdef USE_HAPTICS
   if( last_traverseinfo )
     delete last_traverseinfo;
-#endif
 }
 
 void Scene::mainLoop() {

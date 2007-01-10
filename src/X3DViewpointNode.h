@@ -249,7 +249,6 @@ namespace H3D {
               Inst< SFMatrix4f > _accForwardMatrix = 0,
               Inst< SFMatrix4f > _accInverseMatrix = 0 );
 
-    #ifdef USE_HAPTICS
 		/// Traverse the scenegraph. Saves the accumulated inverse
     /// matrix for later use when transforming the X3DViewpointNode in
     /// GLWindow.
@@ -257,7 +256,6 @@ namespace H3D {
       accInverseMatrix->setValue( ti.getAccInverseMatrix(), id );
       accForwardMatrix->setValue( ti.getAccForwardMatrix(), id );
     }
-		#endif
 
     /// Convenience function to get the top of the X3DViewpointNode stack.
     static inline X3DViewpointNode *getActive() {

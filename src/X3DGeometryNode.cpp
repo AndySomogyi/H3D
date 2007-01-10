@@ -582,3 +582,23 @@ void X3DGeometryNode::resetPtDevIndication( bool clear ) {
   if( clear )
     pt_dev_geometry_id.clear();
 }
+
+bool X3DGeometryNode::movingSphereIntersect( H3DFloat radius,
+                                             const Vec3f &from, 
+                                             const Vec3f &to ) {
+  H3DFloat local_radius = radius * 1000.0f;
+Vec3f local_from = from * 1000.0f;
+  Vec3f local_to = to * 1000.0f;
+
+  bool intersect = boundTree->getValue()->movingSphereIntersect( local_radius,
+                                                       local_from,
+                                                       local_to );
+  /*Vec3f local_to = to;
+  Vec3f local_from = from;*/
+  local_to /=1000;
+  local_from/=1000;
+  cerr << "after this" << endl;
+  /*if( intersect )
+    cerr << getName() << " from: " << from << " local_from.length() " << local_from.length() << endl << " to: " << to  << " to_length: " << local_to.length() << endl;*/
+  return intersect;
+}

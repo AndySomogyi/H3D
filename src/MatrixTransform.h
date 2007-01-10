@@ -127,10 +127,8 @@ namespace H3D {
 
     virtual void render();
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. 
     virtual void traverseSG( TraverseInfo &ti );
-#endif
 
     /// Detect intersection between a line segment and this Node.
     /// Transforms the line into correct coordinate system and also transforms
@@ -164,6 +162,17 @@ namespace H3D {
                                vector< Vec3f > &closest_point,
                                vector< Vec3f > &normal,
                                vector< Vec3f > &tex_coord );
+
+    /// Detect collision between a moving sphere and the Node.
+    /// Transforms points and radius (if non-uniform scaling the biggest
+    /// of the scale parameters is chosen)
+    /// \param The radius of the sphere
+    /// \param from The start position of the sphere
+    /// \param to The end position of the sphere.
+    /// \returns true if intersected, false otherwise.
+    virtual bool movingSphereIntersect( H3DFloat radius,
+                                        const Vec3f &from, 
+                                        const Vec3f &to );
 
     /// The transformation matrix.
     /// 

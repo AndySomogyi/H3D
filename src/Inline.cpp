@@ -89,7 +89,6 @@ void Inline::render() {
   }
 }
 
-#ifdef USE_HAPTICS
 void Inline::traverseSG( TraverseInfo &ti ) {
   if( load->getValue() ) {
     for( unsigned int i = 0; i < loadedScene->size(); i++ ) {
@@ -98,7 +97,6 @@ void Inline::traverseSG( TraverseInfo &ti ) {
     }
   }
 }
-#endif
 
 void Inline::LoadedScene::update() {
   Inline *inline_node = static_cast< Inline * >( getOwner() );

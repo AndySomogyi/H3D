@@ -32,7 +32,9 @@
 #include "H3DSurfaceNode.h"
 #include <HAPISurfaceObject.h>
 #include <OpenHapticsRenderer.h>
+#ifdef HAVE_CHAI3D
 #include <Chai3DRenderer.h>
+#endif
 #include "SFFloat.h"
 
 namespace H3D {

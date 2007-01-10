@@ -107,7 +107,6 @@ void X3DGroupingNode::render()     {
 
 };
 
-#ifdef USE_HAPTICS
 void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
   for( MFNode::const_iterator i = children->begin();
        i != children->end(); i++ ) {
@@ -161,7 +160,6 @@ void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
     }
   }
 }
-#endif
 
 bool X3DGroupingNode::lineIntersect(
                   const Vec3f &from, 
@@ -263,4 +261,16 @@ void X3DGroupingNode::MFChild::onRemove( Node *n ) {
     }
   }
   MFChildBase::onRemove( n );
+}
+
+
+bool X3DGroupingNode::movingSphereIntersect( H3DFloat radius,
+                                             const Vec3f &from, 
+                                             const Vec3f &to ) {
+  const NodeVector &children_nodes = children->getValue();
+  for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
+    if( children_nodes[i]->movingSphereIntersect( radius, from, to ) )
+      return true;
+  }
+  return false;
 }

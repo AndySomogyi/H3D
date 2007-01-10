@@ -75,14 +75,12 @@ namespace H3D {
     /// Turn the clip plane off.
     virtual void disableGraphicsState();
 
-#ifdef USE_HAPTICS
     /// Disable haptics if device position is on the clipped side
     /// of the clip plane.
     virtual void enableHapticsState( TraverseInfo &ti );
 
     /// Reenable haptics.
     virtual void disableHapticsState( TraverseInfo &ti );
-#endif
   
     /// Specifies if the clipping plane should be enabled or not.
     ///

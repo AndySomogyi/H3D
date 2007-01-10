@@ -27,7 +27,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include "H3DApi.h"
-#ifdef USE_HAPTICS
 #include "MagneticSurface.h"
 #include "H3DHapticsDevice.h"
 
@@ -70,4 +69,3 @@ MagneticSurface::MagneticSurface( Inst< SFFloat >  _stiffness,
   
   snapDistance->setValue( (H3DFloat)0.01 );
 }
-#endif

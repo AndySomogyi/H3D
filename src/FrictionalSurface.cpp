@@ -27,7 +27,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include "H3DApi.h"
-#ifdef USE_HAPTICS
 #include "FrictionalSurface.h"
 
 using namespace H3D;
@@ -116,5 +115,4 @@ void FrictionalSurface::onContact( ContactInfo &contact ) {
   }
 }
 
-#endif
 

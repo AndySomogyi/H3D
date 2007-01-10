@@ -30,9 +30,7 @@
 
 #include "GeneratedCubeMapTexture.h"
 #include "X3DBackgroundNode.h"
-#ifdef USE_HAPTICS
 #include "DeviceInfo.h"
-#endif
 
 using namespace H3D;
 
@@ -128,12 +126,10 @@ void GeneratedCubeMapTexture::disableTexturing() {
   glDisable( GL_TEXTURE_CUBE_MAP_ARB );
 }
 
-#ifdef USE_HAPTICS
 void GeneratedCubeMapTexture::traverseSG( TraverseInfo &ti ) {
   X3DEnvironmentTextureNode::traverseSG( ti );
   local_to_global = ti.getAccForwardMatrix();
 }
-#endif
 
 void GeneratedCubeMapTexture::updateCubeMapTextures( X3DChildNode *n,
                                                      X3DViewpointNode *vp ) {
@@ -227,13 +223,11 @@ void GeneratedCubeMapTexture::updateCubeMap( GLuint texture_target,
              c_ref.x, c_ref.y, c_ref.z, 
              c_up.x, c_up.y, c_up.z );
 
-#ifdef USE_HAPTICS
 	// Render the stylus of all haptics devices.
   DeviceInfo *di = DeviceInfo::getActive();
   if( di ) {
     di->renderStyli();
   }
-#endif
 
   // Render the scene.
   H3DDisplayListObject *dlo = 

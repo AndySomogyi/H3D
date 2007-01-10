@@ -27,7 +27,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include "H3DApi.h"
-#ifdef USE_HAPTICS
 #include "SmoothSurface.h"
 
 using namespace H3D;
@@ -81,5 +80,4 @@ void SmoothSurface::onContact( ContactInfo &contact ) {
   contact.proxy_movement_local = Vec2d( local_probe.x, local_probe.z );
 }
 
-#endif
 
