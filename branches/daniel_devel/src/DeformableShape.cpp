@@ -30,9 +30,7 @@
 
 #include "DeformableShape.h"
 #include "Coordinate.h"
-#ifdef USE_HAPTICS
 #include "H3DHapticsDevice.h"
-#endif
 
 using namespace H3D;
 
@@ -77,7 +75,6 @@ DeformableShape::DeformableShape(
   deformedCoord->setValue( new Coordinate, id );
 }
 
-#ifdef USE_HAPTICS
 void DeformableShape::traverseSG( TraverseInfo &ti ) {
   X3DShapeNode::traverseSG( ti );
   X3DComposedGeometryNode *graphics_geom = dynamic_cast< X3DComposedGeometryNode * >( geometry->getValue() );
@@ -136,5 +133,4 @@ void DeformableShape::traverseSG( TraverseInfo &ti ) {
     }
   }
 }
-#endif
 

@@ -32,9 +32,7 @@
 #include "Instantiate.h"
 #include <H3DNodeDatabase.h>
 #include "RefCountedClass.h"
-#ifdef USE_HAPTICS
 #include "TraverseInfo.h"
-#endif
 #include "Console.h"
 
 //#include "FieldTemplates.h"
@@ -64,7 +62,6 @@ namespace H3D {
     /// of the scene-graph. 
     virtual void render()     { };
 
-#ifdef USE_HAPTICS
 		/// traverseSG is called onve per scenegraph loop on the scene in order to
     /// traverse the scenegraph. During this traversal things can be updated
     /// in the node and HapticObject instances to be rendered should be added 
@@ -73,7 +70,6 @@ namespace H3D {
     /// traversal.
     /// 
     virtual void traverseSG( TraverseInfo &ti ) {}
-#endif
 
     /// Detect intersection between a line segment and a Node.
     /// \param from The start of the line segment.
@@ -98,9 +94,8 @@ namespace H3D {
       return false;
     }
 
-    //TODO(for node Collision to (see x3dspec))
-    /// Find closest point on Node to p. Only returns
-    /// something if there is a geometryNode.
+    /// Find closest point on Node to p. Only nodes to which
+    /// collision is possible will return true.
     /// \param p The point to find the closest point to.
     /// \param closest_point Return parameter for each closest point
     /// \param normal Return parameter for normal at each closest point.
@@ -110,6 +105,18 @@ namespace H3D {
                                vector< Vec3f > &closest_point,
                                vector< Vec3f > &normal,
                                vector< Vec3f > &tex_coord ){}
+
+    /// Detect collision between a moving sphere and the Node.
+    /// Only nodes to which collision is possible will return true
+    /// \param The radius of the sphere
+    /// \param from The start position of the sphere
+    /// \param to The end position of the sphere.
+    /// \returns true if intersected, false otherwise.
+    virtual bool movingSphereIntersect( H3DFloat radius,
+                                        const Vec3f &from, 
+                                        const Vec3f &to ){
+    return false;
+    }
     
     /// Returns the default xml containerField attribute value.
     /// For this node it is "children".

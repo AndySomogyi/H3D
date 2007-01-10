@@ -139,7 +139,6 @@ Sound::Sound(
 #endif
 }
 
-#ifdef USE_HAPTICS
 void Sound::traverseSG( TraverseInfo &ti ) {
   X3DSoundSourceNode *sound_source = source->getValue();
   if( sound_source ) {
@@ -147,7 +146,6 @@ void Sound::traverseSG( TraverseInfo &ti ) {
   }
   accForwardMatrix->setValue( ti.getAccForwardMatrix() );
 }
-#endif
 
 void Sound::ALrender() {
 #ifdef HAVE_OPENAL

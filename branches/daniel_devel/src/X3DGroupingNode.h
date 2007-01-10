@@ -141,10 +141,8 @@ namespace H3D {
     /// Render the children.
     virtual void render();
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. traverseSG() is called in all children nodes.
     virtual void traverseSG( TraverseInfo &ti );
-#endif
 
     /// Detect intersection between a line segment and a Node.
     /// Calls lineIntersect for all children
@@ -177,6 +175,16 @@ namespace H3D {
                                vector< Vec3f > &closest_point,
                                vector< Vec3f > &normal,
                                vector< Vec3f > &tex_coord );
+
+    /// Detect collision between a moving sphere and the Node.
+    /// Calls movingSphereIntersect for all children
+    /// \param The radius of the sphere
+    /// \param from The start position of the sphere
+    /// \param to The end position of the sphere.
+    /// \returns true if intersected, false otherwise.
+    virtual bool movingSphereIntersect( H3DFloat radius,
+                                        const Vec3f &from, 
+                                        const Vec3f &to );
   
     /// if true a route will be set up between the bound field of the
     /// nodes in children and the bound field of the grouping node. 

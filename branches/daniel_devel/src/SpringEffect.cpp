@@ -86,7 +86,6 @@ SpringEffect::SpringEffect( Inst< SFVec3f     > _position,
 // which can cause the spring to be added even though it should not.
 int counter = 0;
 
-#ifdef USE_HAPTICS
 void SpringEffect::traverseSG( TraverseInfo &ti ) {
   if( counter < 5 ) {
     counter++;
@@ -124,4 +123,3 @@ void SpringEffect::traverseSG( TraverseInfo &ti ) {
     }
   }
 }
-#endif

@@ -73,7 +73,6 @@ LoadSensor::LoadSensor( Inst< SFBool > _enabled ,
   progress->setValue( 0, id );
 }
 
-#ifdef USE_HAPTICS
 void LoadSensor::traverseSG( TraverseInfo &ti ) {
   X3DNetworkSensorNode::traverseSG( ti );
   
@@ -123,5 +122,4 @@ void LoadSensor::traverseSG( TraverseInfo &ti ) {
     }
   }
 }
-#endif
  

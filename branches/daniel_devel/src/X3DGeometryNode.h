@@ -125,6 +125,15 @@ namespace H3D {
                                vector< Vec3f > &normal,
                                vector< Vec3f > &tex_coord );
 
+    /// Detect collision between a moving sphere and the geometry.
+    /// \param The radius of the sphere
+    /// \param from The start position of the sphere
+    /// \param to The end position of the sphere.
+    /// \returns true if intersected, false otherwise.
+    virtual bool movingSphereIntersect( H3DFloat radius,
+                                        const Vec3f &from, 
+                                        const Vec3f &to );
+
     /// Function overridden from HAPIGLShape. Just call the 
     /// displayList->callList per default
     virtual void glRender() {

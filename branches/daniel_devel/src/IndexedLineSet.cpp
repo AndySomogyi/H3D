@@ -29,9 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "IndexedLineSet.h"
-#ifdef USE_HAPTICS
 #include "HLFeedbackShape.h"
-#endif
 #include "X3DTextureNode.h"
 
 using namespace H3D;

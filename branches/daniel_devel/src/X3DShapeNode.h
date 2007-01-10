@@ -179,10 +179,8 @@ namespace H3D {
     /// Render the shape using OpenGL.
     virtual void render();
 
-#ifdef USE_HAPTICS
     /// Traverse the scenegraph. Calls traverseSG on appeance and geometry.
     virtual void traverseSG( TraverseInfo &ti );
-#endif
 
     /// Detect intersection between a line segment and the X3DGeometryNode
     /// in the field geometry.
@@ -214,6 +212,16 @@ namespace H3D {
                                vector< Vec3f > &closest_point,
                                vector< Vec3f > &normal,
                                vector< Vec3f > &tex_coord );
+
+    /// Detect collision between a moving sphere and the geometry
+    /// in the geometry field.
+    /// \param The radius of the sphere
+    /// \param from The start position of the sphere
+    /// \param to The end position of the sphere.
+    /// \returns true if intersected, false otherwise.
+    virtual bool movingSphereIntersect( H3DFloat radius,
+                                        const Vec3f &from, 
+                                        const Vec3f &to );
 
     typedef enum {
       /// render only transparent objects

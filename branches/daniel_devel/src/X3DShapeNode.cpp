@@ -138,7 +138,6 @@ void X3DShapeNode::render() {
     glEnable( GL_LIGHTING );
 };
 
-#ifdef USE_HAPTICS
 void X3DShapeNode::traverseSG( TraverseInfo &ti ) {
   X3DAppearanceNode *a = appearance->getValue();
   Node *g = geometry->getValue();
@@ -160,7 +159,6 @@ void X3DShapeNode::traverseSG( TraverseInfo &ti ) {
   // so we remove it when the geometry has been rendered.
   ti.setCurrentSurface( NULL );
 }
-#endif
 
 void X3DShapeNode::DisplayList::callList( bool build_list ) {
   if( X3DShapeNode::geometry_render_mode != ALL ) {
@@ -185,4 +183,10 @@ void X3DShapeNode::closestPoint(
                   vector< Vec3f > &normal,
                   vector< Vec3f > &tex_coord ) {
   geometry->getValue()->closestPoint( p, closest_point, normal, tex_coord );
+}
+
+bool X3DShapeNode::movingSphereIntersect( H3DFloat radius,
+                                          const Vec3f &from, 
+                                          const Vec3f &to ) {
+  return geometry->getValue()->movingSphereIntersect( radius, from, to );
 }

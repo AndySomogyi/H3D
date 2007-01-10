@@ -143,7 +143,6 @@ namespace H3D {
 	( X3DBindableNode::getActive( "X3DBackgroundNode" ) );
     }
 
-#ifdef USE_HAPTICS
     /// Saves the accForwardMatrix for use in the render function.
     virtual void traverseSG( TraverseInfo &ti ) {
       X3DBindableNode::traverseSG( ti );
@@ -151,7 +150,6 @@ namespace H3D {
         localToGlobal->setValue( ti.getAccForwardMatrix() );
       }
     }
-#endif
 
     /// Renders the background with OpenGL. Have to have a special call
     /// to be used by GLWindow instead of render() to avoid the background

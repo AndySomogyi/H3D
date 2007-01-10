@@ -28,7 +28,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include "H3DApi.h"
-#ifdef USE_HAPTICS
 #include "DeviceInfo.h"
 #include <GL/glew.h>
 
@@ -154,4 +153,3 @@ void DeviceInfo::initialize() {
     }
   }
 }
-#endif

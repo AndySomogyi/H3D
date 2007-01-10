@@ -30,9 +30,7 @@
 
 #include "PointSet.h"
 #include "X3DTextureNode.h"
-#ifdef USE_HAPTICS
 #include "HLFeedbackShape.h"
-#endif
 
 using namespace H3D;
 

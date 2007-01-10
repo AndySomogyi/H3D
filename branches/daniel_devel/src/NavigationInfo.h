@@ -243,11 +243,31 @@ namespace H3D {
 
     /// The MoveAvatar class is specialize to take care of navigation
     /// from keyInput
-    class MoveAvatar : public AutoUpdate< TypedField< SFBool,
+    class MoveAvatar : public TypedField< SFBool,
                                           Types< SFInt32,
                                                  SFBool,
-                                                 SFVec2f > > > {
-        virtual void update();
+                                                 SFVec2f > > {
+    public:
+      virtual void update();
+      
+      void ifExamine( X3DViewpointNode * vp,
+                      bool button_pressed,
+                      Vec2f motion );
+      
+      void ifFlyOrWalk( X3DViewpointNode * vp,
+                        bool button_pressed,
+                        Vec2f motion );
+      
+      void ifLookAt( X3DViewpointNode * vp,
+                     bool button_pressed,
+                     Vec2f motion );
+      
+      void ifAny( X3DViewpointNode * vp,
+                  bool button_pressed,
+                  Vec2f motion );
+
+      Vec3f move_dir;
+      Rotation rotate_dir;
     };
 #ifdef __BORLANDC__
     friend class MoveAvatar;
@@ -265,8 +285,7 @@ namespace H3D {
                     Inst< MFString  > _transitionType   = 0,
                     Inst< MFString  > _type             = 0,
                     Inst< SFFloat   > _visibilityLimit  = 0,
-                    Inst< SFBool    > _transitionComplete = 0,
-                    Inst< SFBool    > _useNavigationKeys = 0 );
+                    Inst< SFBool    > _transitionComplete = 0 );
     
     /// Convenience function to get the top of the NavigationInfo stack.
     static inline NavigationInfo *getActive() {
@@ -280,6 +299,10 @@ namespace H3D {
 
     /// Remove the bindable node from the stack.
     virtual void removeFromStack();
+
+    inline void setNavType( string type ) { nav_type = type; }
+
+    string getUsedNavType();
 
     /// The avatarSize field specifies the user's physical dimensions 
     /// in the world for the purpose of collision detection and terrain
@@ -343,12 +366,6 @@ namespace H3D {
     /// <b>Access type:</b> outputOnly \n
     auto_ptr< SFBool > transitionComplete;
 
-    /// If true navigationInfo accepts keyboard inputs
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> TRUE \n
-    auto_ptr< SFBool > useNavigationKeys;
-
     auto_ptr< MoveAvatar > moveAvatar;
 
     /// The H3DNodeDatabase for this node.
@@ -365,10 +382,14 @@ namespace H3D {
     Vec3f start_position, move_direction;
     Rotation start_orientation;
 
+    string nav_type;
+
     KeySensor *keySensor;
     MouseSensor *mouseSensor;
 
     X3DChildNode * the_root;
+
+    H3DTime last_time;
   };
 }
 

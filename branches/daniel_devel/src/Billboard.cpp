@@ -131,7 +131,6 @@ void Billboard::SFMatrix4f::update() {
   }
 }
 
-#ifdef USE_HAPTICS
 void Billboard::traverseSG( TraverseInfo &ti ) {
   X3DViewpointNode *vp = X3DViewpointNode::getActive();
   Matrix4f vp_to_local = 
@@ -150,5 +149,4 @@ void Billboard::traverseSG( TraverseInfo &ti ) {
     vpUp->setValue( vp_y_axis );
   MatrixTransform::traverseSG( ti );
 }
-#endif
 

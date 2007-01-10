@@ -54,7 +54,6 @@ namespace H3D {
                         _scaleToP2, _image, _textureProperties ),
       frame_bytes_allocated( 0 ) {}
 
-#ifdef USE_HAPTICS
     /// Traverse the senegraph. 
     virtual void traverseSG( TraverseInfo &ti ) {
       // break the display list cache if we have a new frame
@@ -62,7 +61,6 @@ namespace H3D {
         repeatS->touch();
       X3DTexture2DNode::traverseSG( ti );
     }
-#endif
 
     /// Render the texture.
     virtual void render();

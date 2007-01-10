@@ -127,10 +127,8 @@ namespace H3D {
     bool active;
     // the time of the start of the last loop.
     TimeStamp last_time;
-#ifdef USE_HAPTICS
     // the TraverseInfo instance from the previous scenegraph loop.
     TraverseInfo *last_traverseinfo;
-#endif
   };
 }
 

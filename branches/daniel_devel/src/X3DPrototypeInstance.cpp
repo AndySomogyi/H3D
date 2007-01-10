@@ -59,11 +59,9 @@ void X3DPrototypeInstance::render() {
   }
 }
  
-#ifdef USE_HAPTICS
 void X3DPrototypeInstance::traverseSG( TraverseInfo &ti ) {
   if( prototyped_node.get() )
     prototyped_node.get()->traverseSG( ti );
 }
-#endif
 
 

@@ -33,10 +33,6 @@
 #ifndef __H3DApi_H__
 #define __H3DApi_H__
 
-/// Undef if you do not want to use haptics at all.
-/// HAVE_OPENHAPTICS must also be undef.
-#define USE_HAPTICS
-
 /// Undef if you do not have OpenAL(www.openal.org) installed. Sounds will
 /// then be disabled.
 #define HAVE_OPENAL

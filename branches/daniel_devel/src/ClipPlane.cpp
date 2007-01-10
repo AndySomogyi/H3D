@@ -29,9 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "ClipPlane.h"
-#ifdef USE_HAPTICS
 #include "H3DHapticsDevice.h"
-#endif
 
 using namespace H3D;
 
@@ -80,7 +78,6 @@ ClipPlane::ClipPlane( Inst< SFNode  >  _metadata,
   plane->route( displayList );
 }
 
-#ifdef USE_HAPTICS
 void ClipPlane::enableHapticsState( TraverseInfo &ti ) {
   haptics_enabled = ti.hapticsEnabled();
   if( clipHaptics->getValue() && ti.getHapticsDevices().size() > 0 ) {
@@ -92,16 +89,13 @@ void ClipPlane::enableHapticsState( TraverseInfo &ti ) {
       ti.disableHaptics();
   }
 }
-#endif
 
-#ifdef USE_HAPTICS
 void ClipPlane::disableHapticsState( TraverseInfo &ti ) {
   if( haptics_enabled )
     ti.enableHaptics();
   else
     ti.disableHaptics();
 }
-#endif
 
 void ClipPlane::enableGraphicsState() { 
   if( max_nr_clip_planes == -1 )

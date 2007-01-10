@@ -30,9 +30,7 @@
 
 #include "NurbsTrimmedSurface.h"
 #include "Coordinate.h"
-#ifdef USE_HAPTICS
 #include "HLFeedbackShape.h"
-#endif
 #include "TextureCoordinateGenerator.h"
 
 using namespace H3D;
