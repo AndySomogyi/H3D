@@ -304,7 +304,7 @@ void H3DWindowNode::renderChild( X3DChildNode *c ) {
 bool H3DWindowNode::calculateFarAndNearPlane( H3DFloat &clip_far,
                                          H3DFloat &clip_near,
                                          X3DChildNode *child_to_render,
-                                         Viewpoint *vp,
+                                         X3DViewpointNode *vp,
                                          bool include_styli ) {
 
   // calculate the far and near clipping planes from the union of the 
@@ -542,9 +542,10 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     //AutoRef< Viewpoint > vp_ref;
   // get the viewpoint. If the H3DWindowNode viewpoint field is set use that
   // otherwise use the stack top of the Viewpoint bindable stack.
-  Viewpoint *vp = static_cast< Viewpoint * >( viewpoint->getValue() );
+  X3DViewpointNode *vp =
+    static_cast< X3DViewpointNode * >( viewpoint->getValue() );
   if( !vp ) 
-    vp = static_cast< Viewpoint * >(Viewpoint::getActive());
+    vp = static_cast< X3DViewpointNode * >(X3DViewpointNode::getActive());
   if ( ! vp ) {
     vp = new Viewpoint;
     //vp_ref.reset( vp );
@@ -659,10 +660,18 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glFrontFace( GL_CCW );
     }
     
-    glFrustum( left + frustum_shift,
+    //TODO: correct the stereo for ORTHO (if possible)
+    if( dynamic_cast< Viewpoint * >(vp) ) {
+      glFrustum( left + frustum_shift,
+                 right + frustum_shift,
+                 bottom, top, 
+                 clip_near, clip_far );
+    } else {
+      glOrtho( left + frustum_shift,
                right + frustum_shift,
-               bottom, top, 
+               bottom, top,
                clip_near, clip_far );
+    }
     
     glDrawBuffer(GL_BACK_LEFT);
     
@@ -733,10 +742,18 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     } else {
       glFrontFace( GL_CCW );
     }
-    glFrustum( left - frustum_shift,
+    //TODO: correct the stereo for ORTHO (if possible)
+    if( dynamic_cast< Viewpoint * >(vp) ) {
+      glFrustum( left - frustum_shift,
+                 right - frustum_shift,
+                 bottom, top, 
+                 clip_near, clip_far );
+    } else {
+      glOrtho( left - frustum_shift,
                right - frustum_shift,
-               bottom, top, 
+               bottom, top,
                clip_near, clip_far );
+    }
     
     if( stereo_mode == RenderMode::QUAD_BUFFERED_STEREO ) {
       glDrawBuffer(GL_BACK_RIGHT);
@@ -865,7 +882,12 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     } else {
       glFrontFace( GL_CCW );
     }
-    glFrustum(left,right,bottom,top,clip_near,clip_far);
+    if( dynamic_cast< Viewpoint * >(vp) ) {
+      glFrustum(left,right,bottom,top,clip_near,clip_far);
+    }
+    else {
+      glOrtho( left, right, bottom, top, clip_near, clip_far );
+    }
     
     glMatrixMode(GL_MODELVIEW);
     glDrawBuffer(GL_BACK);
