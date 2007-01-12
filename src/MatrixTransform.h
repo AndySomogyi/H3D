@@ -149,7 +149,9 @@ namespace H3D {
       const Vec3f &to,    
       vector< HAPI::Bounds::IntersectionInfo > &result,
       vector< X3DGeometryNode * > &theGeometry,
-      vector< H3DInt32 > &theGeometryIndex );
+      vector< H3DInt32 > &theGeometryIndex,
+      const Matrix4f &current_matrix,
+      vector< Matrix4f > &geometry_transforms );
 
     /// Find closest point on Node to p. Transforms point
     /// p and calls closestPoint for all children.

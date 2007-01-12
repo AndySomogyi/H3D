@@ -29,6 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "NavigationInfo.h"
+#include "X3DGeometryNode.h"
 
 using namespace H3D;
 
@@ -219,7 +220,7 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
   }
 
   if( !linear_interpolate ) {
-    if( navigation_type == "EXAMINE" ) {
+    if( navigation_type == "EXAMINE" || navigation_type == "ANY" ) {
       if( moveAvatar->getValue() ) {
         Vec3f center_of_rot = vp->centerOfRotation->getValue();
         Rotation rotation_value = moveAvatar->rotate_dir;
@@ -233,18 +234,14 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
 
         if( no_collision ) {
           vp->rel_pos = new_pos - vp_pos;
-          Rotation full_rotation = vp->orientation->getValue() * vp->rel_orientation;
-          Rotation new_rotation = rotation_value * full_rotation;
-          vp->rel_orientation = -vp->orientation->getValue() * new_rotation;
+          Rotation new_rotation = rotation_value * vp_full_orientation;
+          vp->rel_orientation = -vp_orientation * new_rotation;
+          vp_full_orientation = new_rotation;
         }
         moveAvatar->setValue( false );
       }
     }
     else if( navigation_type == "WALK" ) {
-      if( moveAvatar->getValue() ) {
-      }
-    }
-    else if( navigation_type == "FLY" ) {
       if( moveAvatar->getValue() ) {
         Vec3f scaling = acc_fr_mt.getScalePart();
         if( H3DAbs( scaling.x - scaling.y ) < Constants::f_epsilon
@@ -255,21 +252,47 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
           translation_delta = translation_delta * scaling.x * speed->getValue() * delta_time;
           Vec3f new_pos = vp_full_pos + translation_delta;
           vector< H3DFloat > avatar_size = avatarSize->getValue();
-          cerr << vp_full_pos << " " << new_pos << " " << translation_delta.length() << " avatar empty: " << avatar_size.empty() << endl;
           if( avatar_size.empty() ||
             !topNode->movingSphereIntersect( avatar_size[0], 
                                              acc_fr_mt * vp_full_pos,
                                              acc_fr_mt * new_pos ) ) {
             vp->rel_pos = new_pos - vp_pos;
-            vp_full_pos = vp_pos + vp->rel_pos;
+            vp_full_pos = new_pos;
           }
-          /*else {
-            vp->rel_pos = vp_full_pos - translation_delta * 0.1f - vp_pos;
-            vp_full_pos = vp_pos + vp->rel_pos;
-          }*/
         }
         else {
-          Console(3) << "Warning: Non-uniform scaling in the active Viewpoint ( "
+          Console(3) << "Warning: Non-uniform scaling in the"
+            << " active Viewpoint ( "
+            << vp->getName()
+            << " ) nodes local coordinate system. Speed of "
+            << "Avatar is undefined ";
+        }
+        moveAvatar->setValue( false );
+      }
+    }
+    else if( navigation_type == "FLY" ) {
+      if( moveAvatar->getValue() ) {
+        Vec3f scaling = acc_fr_mt.getScalePart();
+        if( H3DAbs( scaling.x - scaling.y ) < Constants::f_epsilon
+          && H3DAbs( scaling.y - scaling.z ) < Constants::f_epsilon ) {
+
+          Vec3f translation_delta = moveAvatar->move_dir;
+          translation_delta.normalizeSafe();
+          translation_delta =
+            translation_delta * scaling.x * speed->getValue() * delta_time;
+          Vec3f new_pos = vp_full_pos + translation_delta;
+          vector< H3DFloat > avatar_size = avatarSize->getValue();
+          if( avatar_size.empty() ||
+            !topNode->movingSphereIntersect( avatar_size[0], 
+                                             acc_fr_mt * vp_full_pos,
+                                             acc_fr_mt * new_pos ) ) {
+            vp->rel_pos = new_pos - vp_pos;
+            vp_full_pos = new_pos;
+          }
+        }
+        else {
+          Console(3) << "Warning: Non-uniform scaling in the"
+            << " active Viewpoint ( "
             << vp->getName()
             << " ) nodes local coordinate system. Speed of "
             << "Avatar is undefined ";
@@ -278,10 +301,99 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
       }
     }
     else if( navigation_type == "LOOKAT" ) {
-    }
-    else if( navigation_type == "ANY" ) {
+      if( moveAvatar->getValue() ) {
+        GLint viewport[4];
+        GLdouble mvmatrix[16], projmatrix[16];
+        GLdouble wx, wy, wz;
+        glGetIntegerv( GL_VIEWPORT, viewport );
+        glGetDoublev( GL_MODELVIEW_MATRIX, mvmatrix );
+        glGetDoublev( GL_PROJECTION_MATRIX, projmatrix );
+
+        Vec2f mouse_pos = mouseSensor->position->getValue();
+        mouse_pos.y = viewport[3] - mouse_pos.y - 1;
+        gluUnProject( (GLdouble) mouse_pos.x, (GLdouble) mouse_pos.y,
+          0.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );
+        Vec3f near_plane_pos =
+          Vec3f( (H3DFloat)wx, (H3DFloat)wy, (H3DFloat)wz );
+        gluUnProject( (GLdouble) mouse_pos.x, (GLdouble) mouse_pos.y,
+          1.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );
+        Vec3f far_plane_pos =
+          Vec3f( (H3DFloat)wx, (H3DFloat)wy, (H3DFloat)wz );
+
+        vector< HAPI::Bounds::IntersectionInfo > result;
+        vector< X3DGeometryNode * > theGeometry;
+        vector< H3DInt32 > theGeometryIndex;
+        Matrix4f temp_matrix;
+        vector< Matrix4f > transform_matrices;
+        if( topNode->lineIntersect( near_plane_pos, 
+                              far_plane_pos,
+                              result,
+                              theGeometry,
+                              theGeometryIndex,
+                              temp_matrix,
+                              transform_matrices ) ) {
+          int closest = 0;
+          if( theGeometry.size() > 1 ) {
+            H3DFloat closestDistance = 
+              (H3DFloat)(result[closest].point - near_plane_pos).lengthSqr();
+            for( unsigned int kl = 1; kl < theGeometry.size(); kl++ ) {
+              H3DFloat tempClose = 
+                (H3DFloat)(result[kl].point - near_plane_pos).lengthSqr();
+              if( tempClose < closestDistance ) {
+                closestDistance = tempClose;
+                closest = kl;
+              }
+            }
+          }
+          
+          Vec3f approx_center;
+          H3DFloat viewing_distance;
+          BoxBound *box_bound = dynamic_cast< BoxBound * >(
+            theGeometry[closest]->bound->getValue() );
+          const Matrix4f &vp_acc_inv_mtx = vp->accInverseMatrix->getValue();
+          
+          if( box_bound ) {
+            approx_center = vp_acc_inv_mtx *
+              ( transform_matrices[closest ] * box_bound->center->getValue() );
+            Vec3f acc_inv_scale = vp_acc_inv_mtx.getScalePart();
+            Vec3f geom_scale = transform_matrices[closest].getScalePart();
+            Vec3f size = H3DMax( H3DMax( acc_inv_scale.x, acc_inv_scale.y ),
+                                 acc_inv_scale.z ) *
+                         ( H3DMax( H3DMax( geom_scale.x, geom_scale.y ),
+                                   geom_scale.z ) *
+                         box_bound->size->getValue() );
+
+            viewing_distance = 2 * size.length();
+          }
+          else {
+            // calculate the center and viewing distance
+            // since we know nothing about the geometry except
+            // the point of intersection this is just a crude guess
+            approx_center = vp_acc_inv_mtx *
+              ( transform_matrices[closest ] * approx_center );
+            viewing_distance = (vp_acc_inv_mtx *( transform_matrices[closest]
+              * result[closest].point ) ).length() * 2;
+          }
+          Vec3f backward = vp_full_orientation * Vec3f( 0, 0, 1 );
+          vp->centerOfRotation->setValue( approx_center );
+
+          Vec3f new_pos = approx_center + viewing_distance * backward;
+          vp->rel_pos = new_pos - vp_pos;
+          vp_full_pos = new_pos;
+
+          // No check is done to make sure that the selected object is not
+          // obscured by other objects or that the new position is in a place
+          // where fly and walk would detect collision.
+        }
+        moveAvatar->setValue( false );
+      }
     }
     else if( navigation_type == "NONE" ) {
+      // Forcing the user to navigate using only mechanisms in the scene
+      // if the user want navigation again, a new navigationinfo has to
+      // be bound. ( or rebind the current one with type changed )
+      keySensor->enabled->setValue( false );
+      mouseSensor->enabled->setValue( false );
     }
   }
 
@@ -309,10 +421,28 @@ void NavigationInfo::toStackTop() {
 string NavigationInfo::getUsedNavType() {
   vector< string > navigation_types = type->getValue();
 
+  bool hasAny = false;
+
   if( !nav_type.empty() ) {
     for( unsigned int i = 0; i < navigation_types.size(); i++ ) {
-      if( nav_type == navigation_types[i] )
+      if( navigation_types[i] == "ANY" ) {
+        hasAny = true;
+        break;
+      }
+    }
+    if( hasAny ) {
+      if( nav_type == "EXAMINE" ||
+          nav_type == "WALK" ||
+          nav_type == "FLY" ||
+          nav_type == "LOOKAT" ||
+          nav_type == "NONE" )
         return nav_type;
+    }
+    else {
+      for( unsigned int i = 0; i < navigation_types.size(); i++ ) {
+        if( nav_type == navigation_types[i] )
+          return nav_type;
+      }
     }
   }
 
@@ -352,28 +482,24 @@ void NavigationInfo::MoveAvatar::update() {
   //motion.y = -motion.y;
   X3DViewpointNode * vp = X3DViewpointNode::getActive();
 
-  if( vp && ( event.ptr == routes_in[0] ||
-      ( event.ptr == routes_in[2] && button_pressed &&
-        motion * motion > Constants::f_epsilon ) ) ) {
-    value = true;
+  if( vp && ( event.ptr == routes_in[0] || button_pressed ) ) {
     NavigationInfo *nI = 
           static_cast< NavigationInfo * >( getOwner() );
     string navigation_type = nI->getUsedNavType();
-    if( navigation_type == "EXAMINE" ) {
+    if( navigation_type == "EXAMINE" || navigation_type == "ANY" ) {
       ifExamine( vp, button_pressed, motion );
     }
     else if( navigation_type == "FLY" || navigation_type == "WALK" ) {
       ifFlyOrWalk( vp, button_pressed, motion );
     }
     else if( navigation_type == "LOOKAT" ) {
+      if( event.ptr == routes_in[1] ) {
+        value = true;
+      }
+      else {
+        value = false;
+      }
     }
-    else if( navigation_type == "ANY" ) {
-    }
-    else if( navigation_type == "NONE" ) {
-    }
-  }
-  else {
-    value = false;
   }
 }
 
@@ -389,6 +515,7 @@ void NavigationInfo::MoveAvatar::ifExamine( X3DViewpointNode * vp,
       vp->rel_orientation ) *
       Vec3f( perp.x, perp.y, 0 );
     rotation_value = Rotation( axis, motion.length() * 0.01f );
+    value = true;
   }
   else if( event.ptr == routes_in[0] ) {
     int key = static_cast< SFInt32 * >(routes_in[0])->getValue();
@@ -412,6 +539,10 @@ void NavigationInfo::MoveAvatar::ifExamine( X3DViewpointNode * vp,
         vp->rel_orientation ) * Vec3f( 0, 1, 0 );
       rotation_value = Rotation( axis, -0.1f );
     }
+    value = true;
+  }
+  else {
+    value = false;
   }
   
   rotate_dir = rotation_value;
@@ -431,6 +562,7 @@ void NavigationInfo::MoveAvatar::ifFlyOrWalk( X3DViewpointNode * vp,
     H3DFloat motion_length = motion.length();
     translation_delta = (forward * -motion.y / motion_length
                          + right * motion.x / motion_length);
+    value = true;
   }
   else if( event.ptr == routes_in[0] ) {
     int key = static_cast< SFInt32 * >(routes_in[0])->getValue();
@@ -446,17 +578,11 @@ void NavigationInfo::MoveAvatar::ifFlyOrWalk( X3DViewpointNode * vp,
     if( key == KeySensor::RIGHT ) {
       translation_delta = right;
     }
+    value = true;
+  }
+  else {
+    value = false;
   }
 
   move_dir = translation_delta;
-}
-
-void NavigationInfo::MoveAvatar::ifLookAt( X3DViewpointNode * vp,
-                                           bool button_pressed,
-                                           Vec2f motion ) {
-}
-
-void NavigationInfo::MoveAvatar::ifAny( X3DViewpointNode * vp,
-                                        bool button_pressed,
-                                        Vec2f motion ) {
 }

@@ -259,8 +259,7 @@ namespace H3D {
                         Vec2f motion );
       
       void ifLookAt( X3DViewpointNode * vp,
-                     bool button_pressed,
-                     Vec2f motion );
+                     Vec2f mouse_position );
       
       void ifAny( X3DViewpointNode * vp,
                   bool button_pressed,
