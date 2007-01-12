@@ -262,7 +262,7 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
         }
         else {
           Console(3) << "Warning: Non-uniform scaling in the"
-            << " active Viewpoint ( "
+            << " active X3DViewpointNode ( "
             << vp->getName()
             << " ) nodes local coordinate system. Speed of "
             << "Avatar is undefined ";
@@ -292,7 +292,7 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
         }
         else {
           Console(3) << "Warning: Non-uniform scaling in the"
-            << " active Viewpoint ( "
+            << " active X3DViewpointNode ( "
             << vp->getName()
             << " ) nodes local coordinate system. Speed of "
             << "Avatar is undefined ";

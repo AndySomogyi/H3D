@@ -29,7 +29,7 @@
 #ifndef __H3DWINDOWNODE_H__
 #define __H3DWINDOWNODE_H__
 
-#include "Viewpoint.h"
+#include "X3DViewpointNode.h"
 #include "MFNode.h"
 #include "SFInt32.h"
 #include "DefaultAppearance.h"
@@ -49,7 +49,7 @@ namespace H3D {
   class H3DAPI_API H3DWindowNode : public Node {
   public:
     
-    typedef TypedSFNode< Viewpoint > SFViewpoint;
+    typedef TypedSFNode< X3DViewpointNode > SFViewpoint;
 
     /// The mode for rendering specified as a string.
     class RenderMode: public SFString {
@@ -195,7 +195,7 @@ namespace H3D {
     bool calculateFarAndNearPlane( H3DFloat &far,
                                    H3DFloat &near,
                                    X3DChildNode *child,
-                                   Viewpoint *vp,
+                                   X3DViewpointNode *vp,
                                    bool include_stylus );
 
     /// The width in pixels of the window.
