@@ -166,13 +166,17 @@ bool X3DGroupingNode::lineIntersect(
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
                   vector< X3DGeometryNode * > &theGeometry,
-                  vector< H3DInt32 > &theGeometryIndex ) {
+                  vector< H3DInt32 > &theGeometryIndex,
+                  const Matrix4f &current_matrix,
+                  vector< Matrix4f > &geometry_transforms ) {
   const NodeVector &children_nodes = children->getValue();
   bool intersect = false;
   for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
     if( children_nodes[i]->
          lineIntersect( from, to, result, 
-                        theGeometry, theGeometryIndex ) ) {
+                        theGeometry, theGeometryIndex,
+                        current_matrix,
+                        geometry_transforms ) ) {
       intersect = true;
     }
   }

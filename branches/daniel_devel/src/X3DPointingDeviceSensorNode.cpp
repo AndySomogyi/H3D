@@ -156,11 +156,15 @@ void X3DPointingDeviceSensorNode::updateX3DPointingDeviceSensors( Node * n ) {
       vector< HAPI::Bounds::IntersectionInfo > result;
       vector< X3DGeometryNode * > theGeometry;
       vector< H3DInt32 > theGeometryIndex;
+      vector< Matrix4f > matrix_vector;
+      Matrix4f temp_matrix;
       if( n->lineIntersect( near_plane_pos, 
                             far_plane_pos,
                             result,
                             theGeometry,
-                            theGeometryIndex ) ) {
+                            theGeometryIndex,
+                            temp_matrix,
+                            matrix_vector ) ) {
         int closest = 0;
         if( theGeometry.size() > 1 ) {
           H3DFloat closestDistance = 
