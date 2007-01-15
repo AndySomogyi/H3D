@@ -169,15 +169,19 @@ bool X3DGroupingNode::lineIntersect(
                   vector< H3DInt32 > &theGeometryIndex,
                   const Matrix4f &current_matrix,
                   vector< Matrix4f > &geometry_transforms ) {
-  const NodeVector &children_nodes = children->getValue();
   bool intersect = false;
-  for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
-    if( children_nodes[i]->
-         lineIntersect( from, to, result, 
-                        theGeometry, theGeometryIndex,
-                        current_matrix,
-                        geometry_transforms ) ) {
-      intersect = true;
+  bool traverse_children = false;
+  Bound * the_bound = bound->getValue();
+  if( !the_bound ||
+      the_bound->lineSegmentIntersect( from, to ) ) {
+    const NodeVector &children_nodes = children->getValue();
+    for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
+      if( children_nodes[i]->lineIntersect( from, to, result,
+                                            theGeometry, theGeometryIndex,
+                                            current_matrix,
+                                            geometry_transforms ) ) {
+          intersect = true;
+      }
     }
   }
   return intersect;
@@ -188,6 +192,7 @@ void X3DGroupingNode::closestPoint(
                   vector< Vec3f > &closest_point,
                   vector< Vec3f > &normal,
                   vector< Vec3f > &tex_coord ) {
+                    Bound *the_bound = bound->getValue();
   const NodeVector &children_nodes = children->getValue();
   for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
     children_nodes[i]->closestPoint( p, closest_point, normal, tex_coord);
