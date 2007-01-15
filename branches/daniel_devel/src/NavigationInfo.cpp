@@ -30,6 +30,7 @@
 
 #include "NavigationInfo.h"
 #include "X3DGeometryNode.h"
+#include "Scene.h"
 
 using namespace H3D;
 
@@ -139,7 +140,7 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
   Rotation vp_orientation = vp->orientation->getValue();
   Rotation vp_full_orientation = vp_orientation * vp->rel_orientation;
   the_root = topNode;
-  H3DTime current_time = TimeStamp();
+  H3DTime current_time = Scene::time->getValue();
   H3DTime delta_time = current_time - last_time;
   last_time = current_time;
   string navigation_type = getUsedNavType();
@@ -191,7 +192,7 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
           (old_vp_acc_frw_mtx * old_vp_pos) - vp_pos;
         goal_position = vp->rel_pos;
         move_direction = goal_position - start_position;
-        start_time = TimeStamp();
+        start_time = current_time;
       }
     }
     old_vp = vp;
