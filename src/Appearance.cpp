@@ -115,10 +115,10 @@ void Appearance::render()     {
   X3DTextureTransformNode *tt = textureTransform->getValue();
   if ( tt ) {
     MultiTexture *mt = dynamic_cast< MultiTexture * >( t );
-    if( mt ) 
+    if( mt && mt->texture->size() > 0 ) 
       tt->renderForTextureUnits( 0, mt->texture->size() - 1 );
     else
-      tt->render();
+      tt->renderForTextureUnit( 0 );
   } else {
     GLint saved_mode;
     glGetIntegerv( GL_MATRIX_MODE, &saved_mode );
