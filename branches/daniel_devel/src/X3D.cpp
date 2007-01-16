@@ -11,6 +11,16 @@
 #include "ResourceResolver.h"
 #include "VrmlParser.h"
 #include <sstream>
+#include <zlib.h>
+
+#ifdef HAVE_ZLIB
+#ifdef _MSC_VER
+#pragma comment( lib, "zdll.lib" )
+#endif
+
+#define ZIP_MAGIC_NR 0x8B1F
+
+#endif
 
 using namespace H3D;
 
@@ -126,6 +136,40 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
   if( resolved_url == "" )
     parser->parse( url.c_str() );
   else {
+    // determines if resolved_url file should be deleted or not
+    bool delete_file = false;
+
+#ifdef HAVE_ZLIB
+    // check if zip-file
+    ifstream ifs( resolved_url.c_str(), ios::binary );
+    unsigned short magic_nr;
+    ifs.read( (char *)&magic_nr, sizeof( unsigned short ) );
+    bool file_exists = ifs.good();
+    ifs.close();
+
+    // then unpack it
+    if( file_exists && magic_nr == ZIP_MAGIC_NR ) {
+      char tmp_file[ L_tmpnam ];
+      if( tmpnam( tmp_file ) ) { 
+        gzFile in  = gzopen( resolved_url.c_str(),"rb");
+        ofstream ofs( tmp_file, ios::binary );
+        if( in && ofs.good() ) {
+          resolved_url = tmp_file;
+          delete_file = true;
+          bool status = true;
+          char buf[ 16384 ];	
+          int len = 0;
+          while( (len = gzread( in, buf, sizeof(buf))) != 0 ) {
+            ofs.write( buf, len );
+          }
+          gzclose(in);
+          ofs.close();
+        }
+      }
+    }
+#endif
+
+  
     XERCES_CPP_NAMESPACE_USE
     ifstream istest( resolved_url.c_str() );
     if ( isVRML( istest ) )
@@ -139,7 +183,8 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
     url_ch[ url.size() ] = '\0'; 
     parser->parse( IStreamInputSource( is, url_ch ) );
     delete url_ch;
-	is.close();
+    is.close();
+    if( delete_file ) remove( resolved_url.c_str() );
   }
   ResourceResolver::setBaseURL( old_base );
   return handler.getResultingNode();

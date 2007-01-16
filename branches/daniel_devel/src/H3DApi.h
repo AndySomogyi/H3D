@@ -33,6 +33,10 @@
 #ifndef __H3DApi_H__
 #define __H3DApi_H__
 
+/// Undef if you do not have zlib(http://www.zlib.net/) installed. 
+/// Required for support for parsing zipped x3d files.
+#define HAVE_ZLIB
+
 /// Undef if you do not have OpenAL(www.openal.org) installed. Sounds will
 /// then be disabled.
 #define HAVE_OPENAL
