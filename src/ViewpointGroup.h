@@ -97,6 +97,10 @@ namespace H3D {
     /// Remove the bindable node from the stack.
     virtual void removeFromStack() {}
 
+    /// Returns true if the given viewpoint is in the children field
+    /// any ViewpointGroups in the the children field.
+    bool containsViewpoint( X3DViewpointNode *vp ) const;
+
     /// The center field provides a position offset from origin of local
     /// coordinate system.
     ///

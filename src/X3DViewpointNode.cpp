@@ -29,8 +29,11 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "X3DViewpointNode.h"
+#include "ViewpointGroup.h"
 
 using namespace H3D;
+
+list<X3DViewpointNode *> X3DViewpointNode::viewpoints;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase X3DViewpointNode::database( 
@@ -87,6 +90,8 @@ X3DViewpointNode::X3DViewpointNode(
   // need to give the id since the fields are output only.
   accForwardMatrix->setValue( Matrix4f(), id );
   accInverseMatrix->setValue( Matrix4f(), id );
+
+  viewpoints.push_back( this );
 }
 
 void X3DViewpointNode::removeFromStack() {
@@ -150,4 +155,36 @@ void X3DViewpointNode::toStackTop() {
     }
     X3DBindableNode::toStackTop();
   }
+}
+
+
+X3DViewpointNode::ViewpointList X3DViewpointNode::getViewpointHierarchy() {
+  list< ViewpointGroup *> groups;
+  
+  ViewpointList vps;
+
+  for( ViewpointList::iterator i = viewpoints.begin();
+       i != viewpoints.end(); i++ ) {
+    if( ViewpointGroup *vg = dynamic_cast< ViewpointGroup * >( *i ) ) {
+      groups.push_back( vg );
+    }
+  }
+
+  if( groups.size() == 0 ) return viewpoints;
+  for( ViewpointList::iterator i = viewpoints.begin();
+       i != viewpoints.end(); i++ ) {
+    bool standalone_vp = true;
+    if( !dynamic_cast< ViewpointGroup * >( *i ) ) {
+      for( list< ViewpointGroup * >::iterator g = groups.begin();
+           g != groups.end(); g++ ) {
+        if( (*g)->containsViewpoint( *i ) ) {
+          standalone_vp = false;
+          break;
+        }
+      }
+    }
+    if( standalone_vp ) vps.push_back( *i );
+  }
+
+  return vps;
 }

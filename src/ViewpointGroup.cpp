@@ -115,3 +115,15 @@ void ViewpointGroup::traverseSG( TraverseInfo &ti ) {
     display_in_list = false;
   }
 }
+
+bool ViewpointGroup::containsViewpoint( X3DViewpointNode *vp ) const {
+  for( MFChild::const_iterator i = children->begin();
+       i != children->end(); i++ ) {
+    if( ViewpointGroup *g = dynamic_cast< ViewpointGroup * >( *i ) ) {
+      if( g->containsViewpoint( vp ) ) return true;
+    } else {
+      if( (*i) == vp ) return true;
+    }
+  }
+  return false;
+}

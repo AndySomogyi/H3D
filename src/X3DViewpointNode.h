@@ -249,6 +249,11 @@ namespace H3D {
               Inst< SFMatrix4f > _accForwardMatrix = 0,
               Inst< SFMatrix4f > _accInverseMatrix = 0 );
 
+    /// Destructor
+    virtual ~X3DViewpointNode() {
+      viewpoints.remove( this );
+    }
+
 		/// Traverse the scenegraph. Saves the accumulated inverse
     /// matrix for later use when transforming the X3DViewpointNode in
     /// GLWindow.
@@ -274,6 +279,18 @@ namespace H3D {
     /// Remove the bindable node from the stack.
     virtual void removeFromStack();
 
+    typedef list< X3DViewpointNode * > ViewpointList;
+    
+    /// Returns a list of all current X3DViewpointNode instances.
+    static const ViewpointList &getAllViewpoints() {
+      return viewpoints;
+    }
+
+    /// Get the all X3DViewpointNode instances with the X3DViewpointNode
+    /// that are in ViewpointGroup only present in the group and not 
+    /// by them self in the list.
+    static ViewpointList getViewpointHierarchy();
+    
     /// The centerOfRotation field specifies a center about which to
     /// rotate the user's eyepoint when in EXAMINE mode.
     ///
@@ -345,6 +362,8 @@ namespace H3D {
 
     Vec3f rel_pos;
     Rotation rel_orientation;
+  protected:
+    static ViewpointList viewpoints; 
   };
 }
 
