@@ -30,6 +30,8 @@
 
 #include "GeneralFunction.h"
 
+#ifdef HAVE_FPARSER
+
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
@@ -102,3 +104,5 @@ unsigned int GeneralFunction::nrInputValues() {
   if( has_non_whitespace ) return nr_commas + 1;
   else return 0;
 }
+
+#endif
