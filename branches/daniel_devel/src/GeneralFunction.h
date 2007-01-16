@@ -36,6 +36,7 @@
 //HAPI includes
 #include <ParsedFunction.h>
 
+#ifdef HAVE_FPARSER
 
 namespace H3D {
   /// \ingroup H3DNodes
@@ -192,4 +193,5 @@ namespace H3D {
   };
 }
 
+#endif
 #endif
