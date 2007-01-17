@@ -548,7 +548,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     vp = static_cast< X3DViewpointNode * >(X3DViewpointNode::getActive());
   if ( ! vp ) {
     vp = new Viewpoint;
-    vp_ref.reset( vp );
+    vp_ref.reset( static_cast<Viewpoint *>(vp) );
   }
 
   if( nav_info )
