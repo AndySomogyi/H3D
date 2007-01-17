@@ -539,7 +539,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
   else 
     glEnable(GL_LIGHT0);
 
-    //AutoRef< Viewpoint > vp_ref;
+    AutoRef< Viewpoint > vp_ref;
   // get the viewpoint. If the H3DWindowNode viewpoint field is set use that
   // otherwise use the stack top of the Viewpoint bindable stack.
   X3DViewpointNode *vp =
@@ -548,7 +548,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     vp = static_cast< X3DViewpointNode * >(X3DViewpointNode::getActive());
   if ( ! vp ) {
     vp = new Viewpoint;
-    //vp_ref.reset( vp );
+    vp_ref.reset( vp );
   }
 
   if( nav_info )
