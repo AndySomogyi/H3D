@@ -148,6 +148,15 @@ namespace H3D {
       throw glTexImageFunctionNotDefined( "", H3D_FULL_LOCATION ); 
     }
 
+    /// If set to true all images that are read from an url will be 
+    /// downloaded in a separate
+    /// thread allowing the program to continue execution while waiting
+    /// for the textures to download. The textures will then be applied
+    /// as soon as they are downloaded.
+    ///
+    /// By default it is set to true.
+    static bool load_images_in_separate_thread;
+
   protected:
     // The glTexImage functions needs each line of image data to be 4 byte 
     // aligned. This function takes a pointer to image data and width,height

@@ -51,6 +51,9 @@ using namespace H3D;
 // Initialize static members
 //
 
+HAPI::MutexLock Scene::callback_lock;
+Scene::CallbackList Scene::callbacks;
+
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase Scene::database( 
                                 "Scene", 
@@ -176,6 +179,15 @@ void Scene::idle() {
 
   // update the eventSink
   eventSink->upToDate();
+
+  // execute callbacks
+  for( CallbackList::iterator i = callbacks.begin();
+       i != callbacks.end(); i++ ) {
+    CallbackCode c = (*i).first( (*i).second );
+    if( c == CALLBACK_DONE ) {
+      i = callbacks.erase( i );
+    }
+  }
 }
 
 
