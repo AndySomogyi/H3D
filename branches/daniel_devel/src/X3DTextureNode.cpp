@@ -36,6 +36,7 @@ using namespace H3D;
 H3D_API_EXCEPTION( UnsupportedPixelComponentType );
 H3D_VALUE_EXCEPTION( Image::PixelType, UnsupportedPixelType );
 
+bool X3DTextureNode::load_images_in_separate_thread = true;
 X3DTextureNode *X3DTextureNode::active_texture = NULL;
 
 GLint X3DTextureNode::glInternalFormat( Image *i ) {

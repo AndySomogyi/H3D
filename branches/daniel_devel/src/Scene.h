@@ -29,8 +29,11 @@
 #ifndef __SCENE_H__
 #define __SCENE_H__
 
-#include "X3DChildNode.h"
-#include "H3DWindowNode.h"
+#include <X3DChildNode.h>
+#include <H3DWindowNode.h>
+
+// HAPI includes
+#include <Threads.h>
 
 namespace H3D {
 
@@ -107,7 +110,32 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
+    /// Return code for callback functions. 
+    typedef enum {
+      /// The callback is done and should not be called any more.
+      CALLBACK_DONE,
+      /// The callback should be rescheduled and called the next loop 
+      /// again.
+      CALLBACK_CONTINUE
+    } CallbackCode;
+
+    /// Callback function type.
+    typedef CallbackCode (*CallbackFunc)(void *data); 
+
+    static void addCallback( CallbackFunc func, void *data ) {
+      callback_lock.lock();
+      callbacks.push_back( make_pair( func, data ) );
+      callback_lock.unlock();
+    }
+
+    
   protected:
+    static HAPI::MutexLock callback_lock;
+
+    typedef std::list< std::pair< CallbackFunc, void * > > CallbackList;
+    // A list of the callback functions to run.
+    static CallbackList callbacks;
+    
     /// The EventSink class makes all fields up-to-date what are routed 
     /// to it, with the exception of PeriodicUpdateFields. These are
     /// only updated when the timeToUpdate() function returs true.
