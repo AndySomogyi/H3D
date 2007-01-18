@@ -300,7 +300,7 @@ void X3DComposedGeometryNode::renderTexCoord( int index,
     dynamic_cast< MultiTextureCoordinate * >( tc );
 
   if( tc ) {
-    if( mt ) {
+    if( mt && mt->texture->size() > 0 ) {
       size_t texture_units = mt->texture->size();
       tc->renderForTextureUnits( index, 0, texture_units -1 );
     } else {
