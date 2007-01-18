@@ -394,7 +394,8 @@ X3DNormalNode *IndexedFaceSet::AutoNormal::generateNormalsPerVertex(
                              Vec3f( 0, 0, 0 ) );
     normals.clear();
 
-    std::map< int, vector< Vec3f > > point_to_face_normal_map;
+    std::vector< vector< int > > point_to_face_normal_map;
+    point_to_face_normal_map.resize( coord->nrAvailableCoords() );
 
     H3DFloat cos_crease_angle = H3DCos( crease_angle );
 
@@ -404,14 +405,14 @@ X3DNormalNode *IndexedFaceSet::AutoNormal::generateNormalsPerVertex(
          face < normals_per_face->nrAvailableNormals(); face++ ) {
       while( i < coord_index.size() && coord_index[i] != -1 ) {    
         int index = coord_index[i++];
-        Vec3f face_normal = normals_per_face->getNormal( face );
-        point_to_face_normal_map[ index ].push_back( face_normal );
+        vector< int > &v =point_to_face_normal_map[ index ];
+        v.push_back( face );
       }
       i++;
     }
 
     i = 0;
-
+    
     // the normal for the vertex is the average of all normals of the faces
     // which normal angle from the current face is less than the crease angle
     for( unsigned int face = 0; 
@@ -421,14 +422,15 @@ X3DNormalNode *IndexedFaceSet::AutoNormal::generateNormalsPerVertex(
         Vec3f face_normal = normals_per_face->getNormal( face );
         Vec3f point_normal( 0, 0, 0 );
 
-        const vector< Vec3f > &face_normals = 
+        const vector< int > &face_normals = 
           point_to_face_normal_map[ index ];
         
-        for( vector< Vec3f >::const_iterator n = face_normals.begin();
+        for( vector< int >::const_iterator n = face_normals.begin();
              n != face_normals.end(); n++ ) {
           // a < b <=> cos(a) > cos(b)
-          if( face_normal * (*n) > cos_crease_angle ) {
-            point_normal += *n;
+          Vec3f nn = normals_per_face->getNormal( *n );
+          if( face_normal * nn > cos_crease_angle ) {
+            point_normal += nn;
           }
         }
         point_normal.normalizeSafe();
