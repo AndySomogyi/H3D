@@ -40,6 +40,7 @@ Vec3f NavigationInfo::goal_position = Vec3f();
 Rotation NavigationInfo::goal_orientation = Rotation();
 Vec3f NavigationInfo::old_vp_pos = Vec3f();
 Rotation NavigationInfo::old_vp_orientation = Rotation();
+list<NavigationInfo *> NavigationInfo::navigationInfos;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase NavigationInfo::database( 
@@ -130,6 +131,8 @@ NavigationInfo::NavigationInfo( Inst< SFSetBind > _set_bind,
   the_root = 0;
   last_time = TimeStamp();
   nav_type = "";
+
+  navigationInfos.push_back( this );
 }
 
 void NavigationInfo::detectCollision( X3DViewpointNode * vp,
