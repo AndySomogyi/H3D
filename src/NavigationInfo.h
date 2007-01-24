@@ -303,6 +303,13 @@ namespace H3D {
 
     string getUsedNavType();
 
+    typedef list< NavigationInfo * > NavigationInfoList;
+    
+    /// Returns a list of all current X3DViewpointNode instances.
+    static const NavigationInfoList &getAllNavigationInfos() {
+      return navigationInfos;
+    }
+
     /// The avatarSize field specifies the user's physical dimensions 
     /// in the world for the purpose of collision detection and terrain
     /// following.
@@ -389,6 +396,7 @@ namespace H3D {
     X3DChildNode * the_root;
 
     H3DTime last_time;
+    static NavigationInfoList navigationInfos; 
   };
 }
 

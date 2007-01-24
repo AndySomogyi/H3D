@@ -158,11 +158,8 @@ bool MatrixTransform::lineIntersect(
     accumulatedForward->getValue(), geometry_transforms );
   if( intersection ) {
     for( unsigned int i = sizeBefore; i < result.size(); i++ ) {
-      Vec3f newNormalPoint =
-        theMatrix * Vec3f( result[i].point + result[i].normal );
       result[i].point = theMatrix * result[i].point;
-      result[i].normal = newNormalPoint - result[i].point;
-      result[i].normal.normalize();
+      result[i].normal = theMatrix.getRotationPart() * result[i].normal;
     }
   }
   return intersection;
@@ -179,11 +176,8 @@ void MatrixTransform::closestPoint(
   H3DInt32 sizeBefore = closest_point.size();
   X3DGroupingNode::closestPoint( local_p, closest_point, normal, tex_coord );
   for( unsigned int i = sizeBefore; i < closest_point.size(); i++ ) {
-    Vec3f newNormalPoint =
-      theMatrix * Vec3f( closest_point[i] + normal[i] );
     closest_point[i] = theMatrix * closest_point[i];
-    normal[i] = newNormalPoint - closest_point[i];
-    normal[i].normalizeSafe();
+    normal[i] = theMatrix.getRotationPart() * normal[i];
   }
 }
 
