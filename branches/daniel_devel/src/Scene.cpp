@@ -180,6 +180,7 @@ void Scene::idle() {
   // update the eventSink
   eventSink->upToDate();
 
+  callback_lock.lock();
   // execute callbacks
   for( CallbackList::iterator i = callbacks.begin();
        i != callbacks.end(); i++ ) {
@@ -188,6 +189,7 @@ void Scene::idle() {
       i = callbacks.erase( i );
     }
   }
+  callback_lock.unlock();
 }
 
 
