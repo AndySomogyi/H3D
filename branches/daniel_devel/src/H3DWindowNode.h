@@ -88,6 +88,30 @@ namespace H3D {
         RED_CYAN_STEREO
       } Mode;
 
+      /// setValue is specialized so that the stecil mask is rebuilt if
+      /// the mode choosen is one that requires a stencil mask
+      virtual void setValue( const string &v,  int id = 0 ) {
+        SFString::setValue( v, id );
+        if( value == "VERTICAL_INTERLACED" ||
+            value == "HORIZONTAL_INTERLACED" ||
+            value == "VERTICAL_INTERLACED_GREEN_SHIFT" ) {
+          H3DWindowNode *window = static_cast< H3DWindowNode * >( getOwner() );
+          window->rebuild_stencil_mask = true;
+        }
+      }
+
+      /// update is specialized so that the stecil mask is rebuilt if
+      /// the mode choosen is one that requires a stencil mask
+      virtual void update() {
+        SFString::update();
+        if( value == "VERTICAL_INTERLACED" ||
+            value == "HORIZONTAL_INTERLACED" ||
+            value == "VERTICAL_INTERLACED_GREEN_SHIFT" ) {
+          H3DWindowNode *window = static_cast< H3DWindowNode * >( getOwner() );
+          window->rebuild_stencil_mask = true;
+        }
+      }
+
       /// Returns true if the current render mode is a stereo mode.
       inline bool isStereoMode() { 
         upToDate();
