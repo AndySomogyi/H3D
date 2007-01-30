@@ -62,17 +62,17 @@ namespace H3D {
 
     /// Destructor.
     ~FreeImageImage() {
-      if( bitmap.get() ) FreeImage_Unload( bitmap.get() );
+      if( bitmap ) FreeImage_Unload( bitmap );
     }
 
     /// Returns the width of the image in pixels.
     virtual unsigned int width() {
-      return FreeImage_GetWidth( bitmap.get() );
+      return FreeImage_GetWidth( bitmap );
     }
 
     /// Returns the height of the image in pixels.
     virtual unsigned int height() {
-      return FreeImage_GetHeight( bitmap.get() );
+      return FreeImage_GetHeight( bitmap );
     }
 
     /// Returns the depth of the image in pixels.
@@ -82,12 +82,12 @@ namespace H3D {
 
     /// Returns the number of bits used for each pixel in the image.
     virtual unsigned int bitsPerPixel() {
-      return FreeImage_GetBPP( bitmap.get() );
+      return FreeImage_GetBPP( bitmap );
     }
 
     /// Returns the PixelType of the image.
     virtual PixelType pixelType() {
-      FREE_IMAGE_COLOR_TYPE t = FreeImage_GetColorType( bitmap.get() );
+      FREE_IMAGE_COLOR_TYPE t = FreeImage_GetColorType( bitmap );
       switch( t ) {
       case FIC_MINISBLACK: 
       case FIC_MINISWHITE: return LUMINANCE;
@@ -105,7 +105,7 @@ namespace H3D {
         
     /// Returns the PixelComponentType of the image.
     virtual PixelComponentType pixelComponentType() {
-      FREE_IMAGE_TYPE t = FreeImage_GetImageType( bitmap.get() );
+      FREE_IMAGE_TYPE t = FreeImage_GetImageType( bitmap );
       switch( t ) {
       case FIT_BITMAP:
       case FIT_UINT16: 
@@ -121,11 +121,11 @@ namespace H3D {
         
     /// Returns a pointer to the raw image data. 
     virtual void *getImageData() {
-      return FreeImage_GetBits( bitmap.get() );
+      return FreeImage_GetBits( bitmap );
     }
 
   protected:
-    auto_ptr< FIBITMAP > bitmap;
+    FIBITMAP * bitmap;
   };
 
     
