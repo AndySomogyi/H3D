@@ -24,6 +24,8 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #endif
 
+
+#include "consoleDialog.h"
 using namespace std;
 using namespace H3D;
 
@@ -179,6 +181,8 @@ private:
 	AutoRef< Node > viewpoint;
 	AutoRef< Node > default_stylus;
 	AutoRef< Group > g;
+
+  auto_ptr< consoleDialog > theConsole;
 
 protected:
   DECLARE_EVENT_TABLE()

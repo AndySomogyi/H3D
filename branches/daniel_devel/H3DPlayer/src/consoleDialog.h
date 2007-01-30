@@ -1,3 +1,6 @@
+#ifndef __CONSOLEDIALOG__
+#define __CONSOLEDIALOG__
+
 // ---------------------------------------------------------------------------
 //  Console Dialog Class
 // ---------------------------------------------------------------------------
@@ -19,3 +22,5 @@ private:
 	void OnConsoleClose (wxCommandEvent & event);
 	DECLARE_EVENT_TABLE();
 };
+
+#endif
