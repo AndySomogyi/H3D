@@ -75,6 +75,9 @@ H3DWxFrame::H3DWxFrame( wxWindow *_parent, wxWindowID _id,
                         const wxString& _name ):
 wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 {
+  theConsole.reset( new consoleDialog(this, wxID_ANY, "Console", wxDefaultPosition, 
+                                     wxDefaultSize, wxDEFAULT_DIALOG_STYLE) );
+
   wxAcceleratorEntry entries[1];
   entries[0].Set(wxACCEL_NORMAL, (int) WXK_ESCAPE, FRAME_RESTORE);
   wxAcceleratorTable accel(1, entries);
@@ -102,7 +105,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 	t->children->clear();
 	//g->children->clear();
 
-	t->children->push_back( X3D::createVRMLFromString( "<Group />") );
+	//t->children->push_back( X3D::createVRMLFromString( "<Group />") );
 	g->children->push_back( t.get() );
 	scene->window->push_back( glwindow );
 	scene->sceneRoot->setValue( g.get() );
@@ -225,8 +228,6 @@ END_EVENT_TABLE()
 //Open a file
 void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
 {
-	      Console(4) << "Invalid valid value \"" << endl;
-
 	wxFileDialog * openFileDialog = new wxFileDialog ( this,
 													   "Open file",
 													   GetCurrentPath(),
@@ -721,8 +722,7 @@ void H3DWxFrame::RenderMode(wxCommandEvent & event)
 //Show console event
 void H3DWxFrame::ShowConsole(wxCommandEvent & event)
 {
-    consoleDialog *theConsole = new consoleDialog(this, wxID_ANY, "Console", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE);
-	theConsole->Show();
+  theConsole->Show();
 }
 
 //Change Viewpoint

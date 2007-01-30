@@ -5,6 +5,7 @@
 #include <wx/wx.h>
 #include <iostream>
 #include "consoleDialog.h"
+#include <Console.h>
 
 using namespace std;
 //using namespace h3d;
@@ -28,7 +29,7 @@ wxDialog (parent, id, title, pos, size, style)
 
 	// create text ctrl with minimal size 400x200
 	logText = (wxTextCtrl *) NULL;
-	logText = new wxTextCtrl ( this, -1, "this is some text", wxDefaultPosition, wxSize(400, 200), wxTE_MULTILINE | wxTE_READONLY );
+	logText = new wxTextCtrl ( this, -1, "", wxDefaultPosition, wxSize(400, 200), wxTE_MULTILINE | wxTE_READONLY );
 
 	topsizer->Add(logText, 
 				  1,            // make vertically stretchable
@@ -52,10 +53,13 @@ wxDialog (parent, id, title, pos, size, style)
 
 	topsizer->SetSizeHints( this );   // set size hints to honour minimum size
 
-/*	std::streambuf *sbOld = std::cerr.rdbuf();
+  std::streambuf *sbOld = std::cerr.rdbuf();
 	std::cerr.rdbuf(logText);
-	ostream stream(logText);
-	std::cerr.rdbuf(sbOld); */
+	ostream *t = new ostream(logText);
+  H3DUtil::Console.setOutputStream( *t );
+	
+  std::cerr.rdbuf(sbOld); 
+  std::cerr << "TESTS" << endl;
 	//*logText << 123.456 << " some text\n";
 }
 
