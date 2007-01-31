@@ -120,6 +120,9 @@ namespace H3D {
       /// Returns true if caching is in use and false otherwise.
       bool usingCaching();
 
+      /// Force a rebuild of all display lists created.
+      static void rebuildAllDisplayLists();
+
       /// Returns the number of loops the DisplayList must render without
       /// receiving an event before a display is built.
       unsigned int cachingDelay();
@@ -193,6 +196,10 @@ namespace H3D {
       /// The isActive field is true if the callList() function has been called
       /// in the last scenegraph loop, and false otherwise.
       auto_ptr< IsActive > isActive;
+
+      /// This field is routed to all instances of DisplayList and can be used 
+      /// to force a rebuild of all display lists.
+      static auto_ptr< Field > break_list_field; 
 
       friend class H3DDisplayListObject;
     };

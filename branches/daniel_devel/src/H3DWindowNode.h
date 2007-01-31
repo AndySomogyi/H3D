@@ -333,6 +333,7 @@ namespace H3D {
     unsigned char *stencil_mask;
     unsigned int stencil_mask_height;
     unsigned int stencil_mask_width;
+    bool last_loop_mirrored;
   };
 }
 

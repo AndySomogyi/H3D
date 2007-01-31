@@ -37,6 +37,12 @@
 
 using namespace H3D;
 
+auto_ptr< Field > H3DDisplayListObject::DisplayList::break_list_field( new Field );
+
+void H3DDisplayListObject::DisplayList::rebuildAllDisplayLists() {
+  break_list_field->touch();
+}
+
 /// Constructor
 H3DDisplayListObject::DisplayList::DisplayList():
   display_list( 0 ),
@@ -47,6 +53,8 @@ H3DDisplayListObject::DisplayList::DisplayList():
   delay_cache_counter = cachingDelay();
   isActive->setValue( true );
   Scene::time->routeNoEvent( isActive );
+
+  break_list_field->route( this );
 }
 
 H3DDisplayListObject::H3DDisplayListObject( 
