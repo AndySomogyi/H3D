@@ -105,7 +105,8 @@ H3DWindowNode::H3DWindowNode(
   rebuild_stencil_mask( false ),
   stencil_mask( NULL ),
   stencil_mask_height( 0 ),
-  stencil_mask_width( 0 ) {
+  stencil_mask_width( 0 ),
+  last_loop_mirrored( false ) {
   
   type_name = "H3DWindowNode";
   database.initFields( this );
@@ -653,7 +654,13 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    if( mirrored->getValue() ) {
+
+    bool mirror = mirrored->getValue();
+    
+    if( mirror != last_loop_mirrored ) 
+      H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+
+    if( mirror ) {
       glScalef( 1, -1, 1 );
       glFrontFace( GL_CW );
     } else {
