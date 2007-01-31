@@ -57,7 +57,7 @@ H3DWxWidgetsWindow::H3DWxWidgetsWindow( wxWindow *_theParent,
   type_name = "H3DWxWidgetsWindow";
   database.initFields( this );
   
-  int attribList[7];
+  int attribList[8];
   attribList[0] = WX_GL_RGBA;
   attribList[1] = WX_GL_DOUBLEBUFFER;
   attribList[2] = WX_GL_STEREO;
@@ -65,6 +65,7 @@ H3DWxWidgetsWindow::H3DWxWidgetsWindow( wxWindow *_theParent,
   attribList[4] = 24;
   attribList[5] = WX_GL_STENCIL_SIZE;
   attribList[6] = 8;
+  attribList[7] = 0;
   
   if( !theWindow ) {
      theWindow = new wxFrame( NULL, wxID_ANY, "H3DwxFrame", wxDefaultPosition,
