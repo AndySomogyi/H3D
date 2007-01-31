@@ -188,6 +188,8 @@ void Scene::idle() {
     if( c == CALLBACK_DONE ) {
       i = callbacks.erase( i );
     }
+    if( i == callbacks.end() )
+      break;
   }
   callback_lock.unlock();
 }
