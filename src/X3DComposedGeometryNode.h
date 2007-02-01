@@ -149,10 +149,10 @@ namespace H3D {
     /// from the bounding box of the geometry as defined in the X3D 
     /// specification. If tex_coord_gen is not NULL then we use the 
     /// TextureCoordinateGenerator to define the texture coordinate generation.
-    virtual void startTexGen( TextureCoordinateGenerator *tex_coord_gen );
+    virtual void startTexGen( X3DTextureCoordinateNode *tex_coord );
 
     /// Stop texture coordinate generation.
-    virtual void stopTexGen( TextureCoordinateGenerator *tex_coord_gen );
+    virtual void stopTexGen( X3DTextureCoordinateNode *tex_coord );
 
     /// Render the texure coordinate with the given index from the 
     /// tc argument. If the currently active texture is a MultiTexture

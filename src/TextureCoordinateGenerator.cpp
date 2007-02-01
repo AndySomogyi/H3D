@@ -62,40 +62,6 @@ TextureCoordinateGenerator::TextureCoordinateGenerator(
   mode->setValue( "GL_SPHERE" );
 }
 
-void TextureCoordinateGenerator::render( int index ) {
-  throw Exception::H3DAPIException("Should not be called", 
-                                   H3D_FULL_LOCATION ); 
-}
-
-void TextureCoordinateGenerator::renderForTextureUnit( int index,
-                                  unsigned int texture_unit ) {
-  throw Exception::H3DAPIException("Should not be called", 
-                                   H3D_FULL_LOCATION ); 
-}
-
-void TextureCoordinateGenerator::renderArray() {
-  throw Exception::H3DAPIException("Should not be called", 
-                                   H3D_FULL_LOCATION ); 
-}
-
-
-void TextureCoordinateGenerator::renderArrayForTextureUnit( 
-                                  unsigned int texture_unit ) {
-  throw Exception::H3DAPIException("Should not be called", 
-                                   H3D_FULL_LOCATION ); 
-}
-
-/// Disable the array state enabled in renderAttay().
-void TextureCoordinateGenerator::disableArray() {
-  throw Exception::H3DAPIException("Should not be called", 
-                                   H3D_FULL_LOCATION ); 
-}
-
-void TextureCoordinateGenerator::disableArrayForTextureUnit( unsigned int texture_unit ) {
-  throw Exception::H3DAPIException("Should not be called", 
-                                   H3D_FULL_LOCATION ); 
-}
-
 void TextureCoordinateGenerator::startTexGen() {  
   
   const string &gen_mode = mode->getValue();

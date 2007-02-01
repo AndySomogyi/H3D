@@ -30,8 +30,6 @@
 
 #include "IndexedFaceSet.h"
 #include "Normal.h"
-#include "TextureCoordinateGenerator.h"
-
 
 using namespace H3D;
 
@@ -133,8 +131,7 @@ void IndexedFaceSet::render() {
   //  X3DCoordinateNode *coords = static_cast< X3DCoordinateNode * >( coord->getValue() );
   X3DCoordinateNode *coords = getCoord();
   X3DTextureCoordinateNode *tex_coords = texCoord->getValue();
-  TextureCoordinateGenerator *tex_coord_gen = 
-    dynamic_cast< TextureCoordinateGenerator * >( tex_coords );
+
   X3DColorNode *colors = color->getValue();
   X3DNormalNode *normals = normal->getValue();
   bool using_auto_normals = normals == NULL;
@@ -142,7 +139,8 @@ void IndexedFaceSet::render() {
     normals = autoNormal->getValue();
   }
 
-  bool tex_coords_per_vertex = tex_coords && !tex_coord_gen;
+  bool tex_coord_gen = !tex_coords || (tex_coords && tex_coords->supportsTexGen());
+  bool tex_coords_per_vertex = tex_coords && tex_coords->supportsExplicitTexCoords();
 
   const vector< int > &color_index     = colorIndex->getValue();
   const vector< int > &coord_index     = coordIndex->getValue();
@@ -153,10 +151,11 @@ void IndexedFaceSet::render() {
 
   // we need coordinates to render 
   if( coords ) {
-    // no X3DTextureCoordinateNode, so we generate texture coordinates
+    // if no X3DTextureCoordinateNode, we generate texture coordinates
     // based on the bounding box according to the X3D specification.
-    if( !tex_coords_per_vertex )
-      startTexGen( tex_coord_gen );
+    // also if X3DTextureCoordinateNode is generated based the texture
+    // coordinate generation will start
+    if( tex_coord_gen ) startTexGen( tex_coords );
 
     // if we have a color node we use the color from that instead
     // of the previously installed Material node.
@@ -317,8 +316,8 @@ void IndexedFaceSet::render() {
     }
 
     // disable texture coordinate generation.
-    if( !tex_coords_per_vertex ) 
-      stopTexGen( tex_coord_gen );
+    if( tex_coord_gen ) stopTexGen( tex_coords );
+
     if ( colors ) {
       glDisable( GL_COLOR_MATERIAL );
     } 
