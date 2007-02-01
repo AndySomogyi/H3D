@@ -44,6 +44,9 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #endif
 
+#include "HapticsRenderers.h"
+//#include "OpenHapticsRenderer.h"
+
 using namespace std;
 using namespace H3D;
 
@@ -128,7 +131,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 
   //sub menus
   renderoptionsMenu = (wxMenu *) NULL;
-  devicecontrolMenu = (wxMenu *) NULL;
+//  devicecontrolMenu = (wxMenu *) NULL;
 
   //Status Bar
   CreateStatusBar(2);
@@ -152,19 +155,20 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   rendererMenu->AppendCheckItem(FRAME_FULLSCREEN, "Fullscreen Mode", "View in fullscreen");
   rendererMenu->AppendCheckItem(FRAME_MIRROR, "Mirror in Y", "Mirror Scene in Y");
   rendererMenu->AppendSeparator();
-  rendererMenu->Append(BASIC_CHOOSERENDERER, "Choose Haptics Renderer", "Select a haptics renderer");
+  rendererMenu->Append(FRAME_CHOOSERENDERER, "Choose Haptics Renderer", "Select a haptics renderer");
   rendererMenu->Append(FRAME_RENDERMODE, "Render Mode...", "Graphical Renderer Options");
   rendererMenu->AppendSeparator();
   rendererMenu->Append(BASIC_PREFRENDERER, "Rendering Options...", renderoptionsMenu, "Scenegraph rendering options");
 
-  //Device Control submenu
+/*  //Device Control submenu
   devicecontrolMenu = new wxMenu;
   devicecontrolMenu->AppendRadioItem(BASIC_STARTDEVICE, "Start", "Start haptic device(s)");
-  devicecontrolMenu->AppendRadioItem(BASIC_STOPDEVICE, "Stop", "Stop haptic device(s)");
+  devicecontrolMenu->AppendRadioItem(BASIC_STOPDEVICE, "Stop", "Stop haptic device(s)"); */
 
   //Device Control Menu
   deviceMenu = new wxMenu;
-  deviceMenu->Append(BASIC_DEVICECONTROL, "Haptics", devicecontrolMenu, "Start/Stop haptic devices");
+  deviceMenu->AppendCheckItem(FRAME_DEVICECONTROL, "Toggle Haptics", "Start/Stop haptic devices");
+  deviceMenu->AppendSeparator();
 
   //Viewpoint Menu
   viewpointMenu = new wxMenu;
@@ -197,6 +201,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   SetMenuBar(menuBar);
 
   //Disable some menus initially
+  menuBar->EnableTop(2, false);
   menuBar->EnableTop(3, false);
   menuBar->EnableTop(4, false);
 
@@ -208,13 +213,16 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
 	EVT_MENU (FRAME_OPEN, H3DWxFrame::OnOpenFile)
 	EVT_MENU (FRAME_CLOSE, H3DWxFrame::OnCloseFile)
 	EVT_MENU (FRAME_FULLSCREEN, H3DWxFrame::OnFullscreen)
-	EVT_MENU (FRAME_RESTORE, H3DWxFrame::RestoreWindow)
+//  EVT_CHAR (H3DWxFrame::RestoreWindow)
+  EVT_MENU (FRAME_RESTORE, H3DWxFrame::RestoreWindow)
 	EVT_MENU (FRAME_MIRROR, H3DWxFrame::MirrorScene)
 	EVT_MENU (FRAME_RENDERMODE, H3DWxFrame::RenderMode)
 	EVT_MENU (FRAME_CONSOLE, H3DWxFrame::ShowConsole)
 	EVT_MENU_HIGHLIGHT (FRAME_SELECTION, H3DWxFrame::GetSelection)
 	EVT_MENU (FRAME_VIEWPOINT, H3DWxFrame::ChangeViewpoint)
 	EVT_MENU (FRAME_NAVIGATION, H3DWxFrame::ChangeNavigation)
+  EVT_MENU (FRAME_CHOOSERENDERER, H3DWxFrame::ChangeRenderer)
+  EVT_MENU (FRAME_DEVICECONTROL, H3DWxFrame::ToggleHaptics)
 	//EVT_MENU (BASIC_SAVE, BasicFrame::OnSave)
 	//EVT_MENU (BASIC_SAVE_AS, BasicFrame::OnSaveAs)
 	//EVT_MENU (BASIC_FONT, BasicFrame::OnChooseFont)
@@ -419,7 +427,7 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
     if( use_space_mouse ) ss.reset( new SpaceWareSensor );
 #endif
     X3D::DEFNodes dn;
-    KeyRotation *kr = new KeyRotation;
+//    KeyRotation *kr = new KeyRotation;
     QuitAPIField *quit_api = new QuitAPIField;
     
     if( deviceinfo_file.size() ){
@@ -495,10 +503,26 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
 	menuBar->EnableTop(4, true);
 //	H3DWxFrame::buildNavMenu();
 	buildNavMenu();
+//  mynav->setNavType ((navigationMenu->GetLabel(FRAME_NAVIGATION)).c_str());
+//  navigationMenu->Check(FRAME_NAVIGATION, true);
 
+	/****************************Device Info****************************/
+	//Enable Device Menu
+	menuBar->EnableTop(2, true);
+  mydevice = DeviceInfo::getActive();
+  //myH3Ddevice = mydevice->device->getValue();
+  allDevices = mydevice->device->getValue();
+  NodeVector::const_iterator nv = allDevices.begin();
+
+  int i = 0;
+  for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
+    wxString item = wxString ("Device ") << i;
+		deviceMenu->AppendRadioItem(FRAME_DEVICE + i, item, "Select a viewpoint");
+    i++;
+  }
 
     // set up routes to rotate the model
-    ks->keyPress->route( quit_api );
+/*    ks->keyPress->route( quit_api );
     ks->actionKeyPress->route( kr );
     ms->leftButton->route( kr );
     ms->motion->route( kr );
@@ -507,7 +531,7 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
       ss->instantRotation->route( kr );
 #endif
 	//kr->setValue( Rotation(1, 0, 0, 0 ) );
-	kr->route( t->rotation );
+	kr->route( t->rotation ); */
 
 #ifndef MACOSX
     if( use_space_mouse )
@@ -520,11 +544,10 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
       try {
         viewpoint = X3D::createX3DNodeFromURL( viewpoint_file );
       } catch( const Exception::H3DException &e ) {
-		  wxString viewpoint_error = "Warning: Could not create default Viewpoint node from file ";
+/*		  wxString viewpoint_error = "Warning: Could not create default Viewpoint node from file ";
 		  viewpoint_error.append(viewpoint_file.c_str());
-//		  viewpoint_error.append(e.c_str());
 		  wxMessageDialog viewpointerrorDialog ( this, viewpoint_error, _T("Viewpoint Error"), wxICON_ERROR);
-		  viewpointerrorDialog.ShowModal();
+		  viewpointerrorDialog.ShowModal(); */
         Console(3) << "Warning: Could not create default Viewpoint node "
                    << "from file \"" << viewpoint_file << "\": "
                    << e << endl;
@@ -637,7 +660,11 @@ void H3DWxFrame::OnFullscreen (wxCommandEvent & event)
 	glwindow->fullscreen->setValue( true );
 	rendererMenu->Check(FRAME_FULLSCREEN, true);
 	SetStatusText("Press ESC to exit fullscreen mode", 0);
-    SetStatusText("Viewing in Fullscreen", 1);
+  SetStatusText("Viewing in Fullscreen", 1);
+    wxString t = "Restoring Window";
+  wxMessageDialog testDialog ( this, t, ABOUT, wxOK);
+  testDialog.ShowModal();
+
 }
 
 //Restore from fullscreen
@@ -719,6 +746,65 @@ void H3DWxFrame::RenderMode(wxCommandEvent & event)
     }
 }
 
+//Choose Haptics Renderer
+void H3DWxFrame::ChangeRenderer(wxCommandEvent & event)
+{
+  const wxString hapticrenderers[] = { _T("OpenHaptics"), 
+									 _T("CHAI3D"),
+									 _T("God Object"),
+									 _T("Ruspini") } ;
+
+	wxSingleChoiceDialog selectHapticRenderer(this,
+                                _T("Please select a haptic renderer"),
+                                _T("Haptic Renderers"),
+                                WXSIZEOF(hapticrenderers), hapticrenderers);
+
+	if (selectHapticRenderer.ShowModal() == wxID_OK) {
+		switch ( selectHapticRenderer.GetSelection() ) {
+			case 0:
+//				renderMode = "OpenHaptics";
+/*        myH3Ddevice = mydevice->device->getValueByIndex(0);
+        myH3Ddevice->hapticsRenderer->setValue(new OpenHapticsRenderer()); */
+//        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
+//          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new OpenHapticsRenderer);
+//        }
+				break;
+			case 1:
+//				renderMode = "CHAI3D";
+#ifdef HAVE_CHAI3D
+//        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
+//          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new CHAI3DRenderer);
+//        }
+#endif
+				break;
+			case 2:
+//				renderMode = "God Object";
+/*        myH3Ddevice = mydevice->device->getValueByIndex(0);
+        myH3Ddevice->hapticsRenderer->setValue(new GodObjectRenderer); */
+//        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
+//          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new GodObjectRenderer);
+//        }
+				break;
+			case 3:
+				renderMode = "Ruspini";
+        myH3Ddevice = mydevice->device->getValueByIndex(0);
+        myH3Ddevice->hapticsRenderer->setValue(new RuspiniRenderer);
+/*        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
+          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new RuspiniRenderer);
+        } */
+				break;
+    }
+  }
+        //wxMessageDialog dialog2(this, selectMode.GetStringSelection(), _T("Got string"));
+        //dialog2.ShowModal();
+
+}
+
+//Toggle haptics
+void H3DWxFrame::ToggleHaptics (wxCommandEvent & event) {
+  	//device_info.reset (NULL);
+}
+
 //Show console event
 void H3DWxFrame::ShowConsole(wxCommandEvent & event)
 {
@@ -751,6 +837,7 @@ void H3DWxFrame::ChangeNavigation (wxCommandEvent & event)
 	mynav->setNavType ((navigationMenu->GetLabel(selection)).c_str());
 }
 
+//Gets Menu Selections
 void H3DWxFrame::GetSelection (wxMenuEvent & event)
 {
 	selection = event.GetMenuId();
@@ -804,15 +891,29 @@ void H3DWxFrame::buildNavMenu () {
 		else {
 			vector<string> allowedTypes;
 			vector<string>::iterator navList = navTypes.begin();
+      bool hasAny = false;
 			for (vector<string>::iterator navList = navTypes.begin(); navList != navTypes.end(); navList++) {
 				if (validateNavType(*navList) && (*navList != "NONE")) {
 					if (allowedTypes.empty()) {
-						allowedTypes.push_back(*navList);
-					}
+            if ((*navList != "ANY")) {
+              allowedTypes.push_back(*navList);
+            }
+            else {
+              allowedTypes.push_back("EXAMINE");
+              allowedTypes.push_back("FLY");
+              allowedTypes.push_back("WALK");
+              allowedTypes.push_back("LOOKAT");
+              break;
+            }
+          }
 					else {
 						bool found = false;
 						for (vector<string>::iterator allowedList = allowedTypes.begin(); allowedList != allowedTypes.end(); allowedList++) {
-							if ((*allowedList) == (*navList)) {
+              if ((*navList == "ANY")) {
+                hasAny = true;
+                found = true;
+              }
+              else if ((*allowedList) == (*navList)) {
 								found = true;
 								break;
 							}
@@ -822,7 +923,27 @@ void H3DWxFrame::buildNavMenu () {
 						}
 					}
 				}
-			}
+      }
+      if (hasAny) {
+        vector<string> allTypes;
+        allTypes.push_back("EXAMINE");
+        allTypes.push_back("FLY");
+        allTypes.push_back("WALK");
+        allTypes.push_back("LOOKAT");
+   			vector<string>::iterator allList = allTypes.begin();
+  			for (vector<string>::iterator allList = allTypes.begin(); allList != allTypes.end(); allList++) {
+          bool found = false;
+          for (vector<string>::iterator allowedList = allowedTypes.begin(); allowedList != allowedTypes.end(); allowedList++) {
+            if ((*allowedList) == (*allList)) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            allowedTypes.push_back(*allList);
+          }
+        }
+      }
 			navTypeCount = allowedTypes.size();
 			int j = 0;
 			for (vector<string>::iterator menuList = allowedTypes.begin(); menuList != allowedTypes.end(); menuList++) {
@@ -831,153 +952,18 @@ void H3DWxFrame::buildNavMenu () {
 				Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
 				Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
 				j++;
-			}
+      }
+/*      if ((mynav->getUsedNavType() == "ANY") && (navTypeCount > 1)) {
+        mynav->setNavType ((navigationMenu->GetLabel(FRAME_NAVIGATION)).c_str());
+        navigationMenu->Check(FRAME_NAVIGATION, true);
+      }
+      else {
+        mynav->setNavType ("NULL");
+      } */
 		}
 	}
 }
 
-
-/*						vector<string>::iterator allowedList = allowedTypes.begin();
-						do {
-							if ((*allowedList) == (*navList)) {
-								break;
-							}
-							else if (allowedList == allowedTypes.end()) {
-								allowedTypes.push_back(*navList);
-							}
-							allowedList++;
-						}
-						while (allowedList != allowedTypes.end()); */
-
-
-/*	//Get active navigation info object
-	if (NavigationInfo::getActive()) {
-		mynav = NavigationInfo::getActive();
-		//Store allowed navigation types and count
-		vector<string> navTypes = mynav->type->getValue();
-		int typeCount = navTypes.size();
-		//string currentType = mynav->getUsedNavType();
-
-		int j = 0;
-		if (typeCount == 0) {
-			navigationMenu->Append(FRAME_NAVIGATION, "Unavailable", "No navigation info found in file");
-			navigationMenu->Enable(FRAME_NAVIGATION, false);
-		}
-		else if (validateNavType(mynav->getUsedNavType())) {
-			if (mynav->getUsedNavType() == "NONE") {
-				navigationMenu->Append(FRAME_NAVIGATION, "Unavailable", "Navigation Disabled");
-				navigationMenu->Enable(FRAME_NAVIGATION, false);
-			}
-			else {
-				for (vector<string>::iterator navList = navTypes.begin(); navList != navTypes.end(); navList++) {
-					string typeName = (*navList);
-					if (validateNavType(typeName)) {
-						if (typeName == "NONE") {
-							//Do nothing; ignore
-						}
-						else {
-							navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, typeName.c_str(), "Select a navigation mode");
-							Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-							Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-							j++;
-						}
-					}
-				}
-			}
-		}
-	}
-}
-/*		//Count = 0
-		if (typeCount == 0) {
-			navigationMenu->Append(FRAME_NAVIGATION, "Unavailable", "No navigation info found in file");
-			navigationMenu->Enable(FRAME_NAVIGATION, false);
-		}
-		//Count = 1
-		if (typeCount == 1) {
-			if (validateNavType(currentType)) {
-				int j = 0;
-				if (currentType == "NONE") {
-					navigationMenu->Append(FRAME_NAVIGATION, "Unavailable", "Navigation Disabled");
-					navigationMenu->Enable(FRAME_NAVIGATION, false);
-				}
-				else if (currentType == "ANY") {
-					//Walk
-					navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, "Walk", "Walk mode");
-					Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-					Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-					//Fly
-					navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j + 1, "Fly", "Fly mode");
-					Connect(FRAME_NAVIGATION + j + 1,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-					Connect(FRAME_NAVIGATION + j + 1,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-					//Examine
-					navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j + 2, "Examine", "Examine mode");
-					Connect(FRAME_NAVIGATION + j + 2,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-					Connect(FRAME_NAVIGATION + j + 2,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-					//Lookat
-					navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j + 3, "Lookat", "Lookat mode");
-					Connect(FRAME_NAVIGATION + j + 3,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-					Connect(FRAME_NAVIGATION + j + 3,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-				}
-				else {
-					navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, currentType.c_str(), "");
-					Connect(FRAME_NAVIGATION + j, wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-					Connect(FRAME_NAVIGATION + j, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-				}
-			}
-		}
-		//Count > 1
-		if (typeCount > 1) {
-			if (validateNavType(currentType)) {
-				navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, currentType.c_str(), "Select a navigation mode");
-				Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-				Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-				j++;
-			}
-			for (vector<string>::iterator navList = navTypes.begin(); navList != navTypes.end(); navList++) {
-				string typeName = (*navList);
-				if (currentType != typeName && validateNavType(typeName)) {
-					navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, typeName.c_str(), "Select a navigation mode");
-					Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-					Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-					j++;
-				}
-			}
-
-
-		}
-
-
-
-		//Get used navigation type
-		int j = 0;
-		string currentType = mynav->getUsedNavType();
-		if (currentType == "NONE") {
-			navigationMenu->Append(FRAME_NAVIGATION + j, "Unavailable", "Navigation Disabled");
-			navigationMenu->Enable(FRAME_NAVIGATION + j, false);
-		}
-		else if (currentType != "NONE") {
-			navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, currentType.c_str(), "Select a navigation mode");
-			Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-			Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-			j++;
-			//Cycle through and create Navigation menu
-			for (vector<string>::iterator navList = navTypes.begin(); navList != navTypes.end(); navList++) {
-				string typeName = (*navList);
-				if (currentType != typeName) {
-					navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, typeName.c_str(), "Select a navigation mode");
-					Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-					Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
-					j++;
-				}
-			}
-			navTypeCount = j;
-		}
-	}
-	else {
-		navigationMenu->Append(FRAME_NAVIGATION, "Unavailable", "Navigation info not found");
-		navigationMenu->Enable(FRAME_NAVIGATION, false);
-	}
-} */
 
 //Validate NavType
 //Checks whether a navigation type is valid
