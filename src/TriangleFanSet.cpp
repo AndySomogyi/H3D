@@ -85,8 +85,6 @@ TriangleFanSet::TriangleFanSet(
 void TriangleFanSet::render() {
   X3DCoordinateNode *coordinate_node = coord->getValue();
   X3DTextureCoordinateNode *tex_coord_node = texCoord->getValue();
-  TextureCoordinateGenerator *tex_coord_gen = 
-    dynamic_cast< TextureCoordinateGenerator * >( tex_coord_node );
   X3DColorNode *color_node = color->getValue();
   X3DNormalNode *normal_node = normal->getValue();
 
@@ -94,17 +92,22 @@ void TriangleFanSet::render() {
     normal_node = autoNormal->getValue();
   }
 
-  bool tex_coords_per_vertex = tex_coord_node && !tex_coord_gen;
+  bool tex_coord_gen = 
+    !tex_coord_node || (tex_coord_node && tex_coord_node->supportsTexGen());
+  bool tex_coords_per_vertex = 
+    tex_coord_node && tex_coord_node->supportsExplicitTexCoords();
+
   const vector< int > &fan_count  = fanCount->getValue();
  
   if( coordinate_node ) {
     
     // no X3DTextureCoordinateNode, so we generate texture coordinates
     // based on the bounding box according to the X3D specification.
-    if( !tex_coords_per_vertex ) {
-      startTexGen( tex_coord_gen );
-    } else if( coordinate_node->nrAvailableCoords() > 
-               tex_coord_node->nrAvailableTexCoords() ) {
+    if( tex_coord_gen ) startTexGen( tex_coord_node );
+    
+    if( tex_coords_per_vertex &&
+        coordinate_node->nrAvailableCoords() > 
+        tex_coord_node->nrAvailableTexCoords() ) {
       stringstream s;
       s << "Must contain at least as many elements as coord (" 
         << coordinate_node->nrAvailableCoords() << ") in \"" 
@@ -279,9 +282,7 @@ void TriangleFanSet::render() {
       }
     }
     // disable texture coordinate generation.
-    if( !tex_coords_per_vertex ) {
-      stopTexGen( tex_coord_gen );
-    }
+    if( tex_coord_gen ) stopTexGen( tex_coord_node );
 
     if ( color_node ) {
       glDisable( GL_COLOR_MATERIAL );
