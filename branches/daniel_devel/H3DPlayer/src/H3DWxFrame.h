@@ -127,8 +127,11 @@ public:
 
   wxObject menuItem;
 
+  bool loadFile( const string &file );
+
   /***************Member Functions*****************/
   void OnOpenFile	(wxCommandEvent & event);
+  void OnOpenFileURL	(wxCommandEvent & event);
   void OnCloseFile	(wxCommandEvent & event);
   void OnExit     	(wxCommandEvent & event);
   void OnAbout		(wxCommandEvent & event);
@@ -196,6 +199,7 @@ protected:
 enum
 { FRAME_EXIT    =   wxID_HIGHEST + 1,
   FRAME_OPEN,
+  FRAME_OPEN_URL,
   FRAME_CLOSE,
   FRAME_FULLSCREEN,
   FRAME_RESTORE,

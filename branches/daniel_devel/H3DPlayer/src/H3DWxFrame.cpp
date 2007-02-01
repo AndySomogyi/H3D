@@ -140,6 +140,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   //File menu
   fileMenu = new wxMenu;
   fileMenu->Append(FRAME_OPEN,"&Open file...\tCtrl+O","Open a file");
+  fileMenu->Append(FRAME_OPEN_URL, "&Open file from URL...", "Open a file from URL" );
   fileMenu->Append(FRAME_CLOSE, "&Close file","Close file");
   fileMenu->AppendSeparator();
   fileMenu->Append(FRAME_EXIT,"E&xit\tCtrl+X", "Exit");
@@ -211,6 +212,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
 	EVT_MENU (FRAME_EXIT, H3DWxFrame::OnExit)
 	EVT_MENU (FRAME_OPEN, H3DWxFrame::OnOpenFile)
+  EVT_MENU (FRAME_OPEN_URL, H3DWxFrame::OnOpenFileURL)
 	EVT_MENU (FRAME_CLOSE, H3DWxFrame::OnCloseFile)
 	EVT_MENU (FRAME_FULLSCREEN, H3DWxFrame::OnFullscreen)
 //  EVT_CHAR (H3DWxFrame::RestoreWindow)
@@ -233,39 +235,14 @@ END_EVENT_TABLE()
 
 
 /*******************Member Functions*********************/
-//Open a file
-void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
-{
-	wxFileDialog * openFileDialog = new wxFileDialog ( this,
-													   "Open file",
-													   GetCurrentPath(),
-													   "",
-													   FILETYPES,
-													   wxOPEN,
-													   wxDefaultPosition);
 
-	//Open an X3D file
-	if (openFileDialog->ShowModal() == wxID_OK) {
-	//if (currentFilename != openFileDialog->GetFilename()) {
-	  SetCurrentFilename(openFileDialog->GetFilename());	
-	  SetCurrentPath(openFileDialog->GetDirectory());
-      SetStatusText(GetCurrentFilename(), 0);
-      SetStatusText(openFileDialog->GetDirectory(),1);
-
-	  //bool use_space_mouse = false; */
-
-	  vector<string> xml_files;
-	  string h3d_root = getenv( "H3D_ROOT" );
-	  INIFile ini_file( h3d_root + "/settings/h3dload.ini" );
-	  currentPath += "\\";
-	  currentPath += currentFilename;
-
-	  xml_files.push_back(currentPath.c_str());
-
-	  //Clear existing data
-	  t->children->clear();
-	  //g->children->clear();
-	  viewpoint.reset (NULL);
+bool H3DWxFrame::loadFile( const string &filename ) {
+  string h3d_root = getenv( "H3D_ROOT" );
+  INIFile ini_file( h3d_root + "/settings/h3dload.ini" );
+  
+  //Clear existing data
+  t->children->clear();
+  viewpoint.reset (NULL);
 
   settings_path = 
     GET_ENV_INI_DEFAULT( "H3D_DISPLAY",
@@ -321,105 +298,9 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
                  << "\" on environment "
                  << "variable H3D_MIRRORED. Must be TRUE or FALSE. "<< endl;
   }
-  
+
   bool use_space_mouse = false;
 
-  // Command line arguments ---
-  /*
-  for( int i = 1 ; i < argc ; i++ ){
-    
-    if( argv[i][0] != '-' ){
-      xml_files.push_back( string(argv[i]) );
-      continue;
-    }
-    
-    switch(argv[i][1]){
-      
-      // Long arguments ---
-      
-    case '-':
-      
-      if( !strcmp(argv[i]+2,"help") ){
-        std::cout << help_message << endl;
-        return false;
-      }
-      
-      else if( !strcmp(argv[i]+2,"mirror") ){
-        mirrored = true; }
-      
-      else if( !strcmp(argv[i]+2,"no-mirror") ){
-        mirrored = false; }
-      
-      else if( !strcmp(argv[i]+2,"fullscreen") ){
-        fullscreen = true; }
-      
-      else if( !strcmp(argv[i]+2,"no-fullscreen") ){
-        fullscreen = false; }
-      
-      else if( !strncmp(argv[i]+2,"screen=",
-                        strlen("screen=")) ){
-        height = atoi( strstr(argv[i],"x")+1 );
-        *strstr(argv[i],"x") = '\0';
-        width = atoi( strstr(argv[i],"=")+1 );
-      }
-      
-      else if( !strncmp(argv[i]+2,"deviceinfo=",
-                        strlen("deviceinfo=")) ){
-        deviceinfo_file = strstr(argv[i],"=")+1; }
-      
-      else if( !strncmp(argv[i]+2,"stylus=",
-                        strlen("stylus=")) ){
-        stylus_file = strstr(argv[i],"=")+1; }
-      
-      else if( !strncmp(argv[i]+2,"viewpoint=",
-                        strlen("viewpoint=")) ){
-        viewpoint_file = strstr(argv[i],"=")+1; }
-      
-      else if( !strncmp(argv[i]+2,"rendermode=",
-                        strlen("rendermode=")) ){
-        render_mode = strstr(argv[i],"=")+1; }
-
-       else if( !strcmp(argv[i]+2,"spacemouse") ){
-        use_space_mouse = true; }
-      else {
-        Console(4) << "Unknown argument "
-                   << "'" << argv[i] << "'" << endl; }
-      break;
-      
-      // Short arguments ---
-      
-    case 'm':
-      mirrored = true;
-      break;
-      
-    case 'M':
-      mirrored = false;
-      break;
-      
-    case 'f':
-      fullscreen = true;
-      break;
-      
-    case 'F':
-      fullscreen = false;
-      break;
-      
-    case 's':
-      use_space_mouse = true;
-      break;
-
-    default:
-      Console(4) << "Unknown argument "
-                 << "'" << argv[i] << "'" << endl;
-    }
-  }
-  
-  if (!xml_files.size()){
-    Console(4) << help_message << endl;
-    //return false;
-  }
-  */
-  
   // Loading X3D file and setting up VR environment ---
   
   try {
@@ -458,17 +339,15 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
       }
     }
 
-    for( vector<string>::iterator file = xml_files.begin() ;
-         file != xml_files.end() ; file++ ){
-      Console(3) << "Loading " << *file << endl;
-      if ( file->size() > 4 && 
-           file->find( ".wrl", file->size()-5 ) != string::npos )
-        t->children->push_back( X3D::createVRMLFromURL( *file, 
-                                                        &dn ) );
+    Console(3) << "Loading " << filename << endl;
+    if ( filename.size() > 4 && 
+         filename.find( ".wrl", filename.size()-5 ) != string::npos )
+      t->children->push_back( X3D::createVRMLFromURL( filename, 
+                                                      &dn ) );
       else
-        t->children->push_back( X3D::createX3DFromURL( *file, 
+        t->children->push_back( X3D::createX3DFromURL( filename, 
                                                        &dn ) );
-    }
+  
 
 	/****************************Intialize Viewpoints****************************/
 	//Enable Viewpoints Menu
@@ -493,9 +372,9 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
 			}
 			Connect(FRAME_VIEWPOINT +i,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
 			Connect(FRAME_VIEWPOINT +i,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeViewpoint));
-		i++;
+      i++;
 		}
-	}
+  }
 
 
 	/****************************Navigation Info****************************/
@@ -595,14 +474,44 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
   catch (const Exception::H3DException &e) {
     MessageBox(HWND_DESKTOP, e.message.c_str(), 
                              "Error", MB_OK | MB_ICONEXCLAMATION);
-    //return false;
+    return false;
+  }
+  return true;
+}
+
+//Open a file
+void H3DWxFrame::OnOpenFileURL(wxCommandEvent & event) {
+   auto_ptr< wxTextEntryDialog > text_dialog( new wxTextEntryDialog ( this,
+													   "Open URL",
+													   GetCurrentPath(),
+													   "") );
+   if( text_dialog->ShowModal() == wxID_OK ) {
+     string s = text_dialog->GetValue();
+     loadFile( s );
+   }
+}
+
+void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
+{
+	auto_ptr< wxFileDialog > openFileDialog( new wxFileDialog ( this,
+													   "Open file",
+													   GetCurrentPath(),
+													   "",
+													   FILETYPES,
+													   wxOPEN,
+													   wxDefaultPosition) );
+
+	//Open an X3D file
+	if (openFileDialog->ShowModal() == wxID_OK) {
+	  SetCurrentFilename(openFileDialog->GetFilename());	
+	  SetCurrentPath(openFileDialog->GetDirectory());
+    SetStatusText(GetCurrentFilename(), 0);
+    SetStatusText(openFileDialog->GetDirectory(),1);
+    
+    string filename =  currentPath += "\\" + currentFilename;
+    loadFile( filename );
   }
 
-  //return true;
-
-//End of code
-
-}
 }
 
 //Close File
