@@ -2,11 +2,13 @@
 //  Includes
 // ---------------------------------------------------------------------------
 
-#include <wx/wx.h>
-#include <iostream>
+
+
 #include "consoleDialog.h"
 #include <Console.h>
 
+//#include <wx/wx.h>
+//#include <iostream>
 using namespace std;
 //using namespace h3d;
 

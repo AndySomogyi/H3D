@@ -33,7 +33,7 @@ using namespace H3D;
 //  Required class
 // ---------------------------------------------------------------------------
 
-class KeyRotation : public TypedField< SFRotation, 
+/* class KeyRotation : public TypedField< SFRotation, 
                                        Types< SFInt32,
                                               SFBool,
                                               SFVec2f,
@@ -72,7 +72,7 @@ class KeyRotation : public TypedField< SFRotation,
       }
     }
   }
-};
+}; */
 
 
 
@@ -123,7 +123,7 @@ public:
   wxMenu     *fileMenu, *rendererMenu, *deviceMenu, *viewpointMenu, *navigationMenu, *advancedMenu, *helpMenu;
   //Submenus
   wxMenu *renderoptionsMenu;
-  wxMenu *devicecontrolMenu;
+  //wxMenu *devicecontrolMenu;
 
   wxObject menuItem;
 
@@ -141,6 +141,8 @@ public:
   void GetSelection (wxMenuEvent & event);
   void ChangeViewpoint (wxCommandEvent & event);
   void ChangeNavigation (wxCommandEvent & event);
+  void ChangeRenderer (wxCommandEvent & event);
+  void ToggleHaptics  (wxCommandEvent & event);
 
   /***************Standard trivial functions***************/
   wxString GetCurrentFilename();
@@ -160,6 +162,9 @@ private:
 	int navTypeCount;
 	X3DViewpointNode::ViewpointList VPlist;
 	NavigationInfo *mynav;
+	DeviceInfo *mydevice;
+	H3DHapticsDevice *myH3Ddevice;
+	NodeVector allDevices;
 
 	//One time intialization variables
 	string settings_path;
@@ -182,7 +187,7 @@ private:
 	AutoRef< Node > default_stylus;
 	AutoRef< Group > g;
 
-  auto_ptr< consoleDialog > theConsole;
+	auto_ptr< consoleDialog > theConsole;
 
 protected:
   DECLARE_EVENT_TABLE()
@@ -206,16 +211,15 @@ enum
 //  BASIC_SAVE_AS,
 //  BASIC_FONT,
   FRAME_NAVIGATION = 6500,
-  BASIC_CHOOSERENDERER = 6550,
+  FRAME_DEVICE = 6550,
+  FRAME_CHOOSERENDERER = 6600,
   FRAME_RENDERMODE,
+  FRAME_DEVICECONTROL,
   BASIC_PREFRENDERER,
   BASIC_WIREFRAME,
   BASIC_NOTEXTURES,
   BASIC_SMOOTHSHADING,
   BASIC_SELECT,
-  BASIC_DEVICECONTROL,
-  BASIC_STARTDEVICE,
-  BASIC_STOPDEVICE,
   BASIC_NAVWALK,
   BASIC_NAVEXAMINE,
   BASIC_NAVFLY,
