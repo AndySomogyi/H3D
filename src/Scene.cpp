@@ -183,13 +183,13 @@ void Scene::idle() {
   callback_lock.lock();
   // execute callbacks
   for( CallbackList::iterator i = callbacks.begin();
-       i != callbacks.end(); i++ ) {
+       i != callbacks.end(); ) {
     CallbackCode c = (*i).first( (*i).second );
     if( c == CALLBACK_DONE ) {
       i = callbacks.erase( i );
+    } else {
+      i++;
     }
-    if( i == callbacks.end() )
-      break;
   }
   callback_lock.unlock();
 }
