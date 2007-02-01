@@ -74,28 +74,9 @@ void TextureCoordinate::renderArray() {
   }
 }
 
-
-void TextureCoordinate::renderArrayForTextureUnit( unsigned int texture_unit ) {
-  if( !point->empty() ) {
-    GLint saved_texture;
-    glGetIntegerv( GL_CLIENT_ACTIVE_TEXTURE_ARB, &saved_texture );
-    glClientActiveTexture( GL_TEXTURE0_ARB + texture_unit );
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, 0,
-                     &(*point->begin()) );
-    glClientActiveTexture( saved_texture );
-  }
-}
-
 /// Disable the array state enabled in renderAttay().
 void TextureCoordinate::disableArray() {
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-void TextureCoordinate::disableArrayForTextureUnit( unsigned int texture_unit ) {
-  GLint saved_texture;
-  glGetIntegerv( GL_CLIENT_ACTIVE_TEXTURE_ARB, &saved_texture );
-  glClientActiveTexture( GL_TEXTURE0_ARB + texture_unit );
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glClientActiveTexture( saved_texture );
-}
+

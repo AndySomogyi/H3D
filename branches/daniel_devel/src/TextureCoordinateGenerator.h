@@ -91,37 +91,10 @@ namespace H3D {
                                 Inst< SFString > _mode      = 0,
                                 Inst< MFFloat  > _parameter = 0 );
     
-    /// This function should not be called. Throws an exception. Use
-    /// startTexGen() to start hardware texture coordinate generation.
-    virtual void render( int index );
-
-    /// This function should not be called. Throws an exception. Use
-    /// startTexGen() to start hardware texture coordinate generation.
-    virtual void renderForTextureUnit( int index,
-                                       unsigned int texture_unit );
-
-    /// This function should not be called. Throws an exception. Use
-    /// startTexGen() to start hardware texture coordinate generation.
-    virtual void renderArray();
-
-    /// This function should not be called. Throws an exception. Use
-    /// startTexGen() to start hardware texture coordinate generation.
-    virtual void renderArrayForTextureUnit( unsigned int texture_unit );
-
-    /// This function should not be called. Throws an exception. Use
-    /// startTexGen() to start hardware texture coordinate generation.
-    virtual void disableArray();
-
-    /// This function should not be called. Throws an exception. Use
-    /// startTexGen() to start hardware texture coordinate generation.
-    virtual void disableArrayForTextureUnit( unsigned int texture_unit );
-
-    /// Returns 0 since only startTexGen() should be used to start
-    /// hardware texture coordinate generation. None of the indexed
-    /// render functions should be used.
-    virtual unsigned int nrAvailableTexCoords() {
-      return 0;
-    }
+    /// Returns true
+    virtual bool supportsTexGen() {
+      return true;
+    } 
 
     /// Start hardware texture coordinate generation. Algorithm depends
     /// on the value of the mode field.
