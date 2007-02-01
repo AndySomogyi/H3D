@@ -52,14 +52,14 @@ namespace H3D {
   public:
     /// ShapeType specializes SFString to set the appropriate default
     /// OpenHaptics shape in the HAPI::OpenHapticsRenderer
-    class ShapeType: public OnValueChangeSField< SFString > {
+    class H3DAPI_API ShapeType: public OnValueChangeSField< SFString > {
     protected:
       virtual void onValueChange( const string &v );
     };
 
     /// AdaptiveViewport specializes SFBool to set the appropriate default
     /// values in the HAPI::OpenHapticsRenderer used.
-    class AdaptiveViewport: public OnValueChangeSField< SFBool > {
+    class H3DAPI_API AdaptiveViewport: public OnValueChangeSField< SFBool > {
     protected:
       virtual void onValueChange( const bool &v );
     };
@@ -67,7 +67,7 @@ namespace H3D {
     
     /// CameraView specializes SFBool to set the appropriate default
     /// values in the HAPI::OpenHapticsRenderer used.
-    class CameraView: public OnValueChangeSField< SFBool > {
+    class H3DAPI_API CameraView: public OnValueChangeSField< SFBool > {
     protected:
       virtual void onValueChange( const bool &v );
     };
@@ -160,7 +160,7 @@ namespace H3D {
   public:
     /// ProxyRadius specializes SFFloat to set the proxy radius
     /// in the HAPI::RuspiniRenderer used.
-    class ProxyRadius: public OnValueChangeSField< SFFloat > {
+    class H3DAPI_API ProxyRadius: public OnValueChangeSField< SFFloat > {
       virtual void onValueChange( const H3DFloat &v );
     };
 
