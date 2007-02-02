@@ -177,9 +177,6 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 
   //Navigation Menu
   navigationMenu = new wxMenu;
-/*  navigationMenu->AppendRadioItem(BASIC_NAVWALK, "Walk", "Walk mode");
-  navigationMenu->AppendRadioItem(BASIC_NAVEXAMINE, "Examine", "Examine mode");
-  navigationMenu->AppendRadioItem(BASIC_NAVFLY, "Fly", "Fly mode"); */
 
   //Advanced Menu
   advancedMenu = new wxMenu;
@@ -215,7 +212,6 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
   EVT_MENU (FRAME_OPEN_URL, H3DWxFrame::OnOpenFileURL)
 	EVT_MENU (FRAME_CLOSE, H3DWxFrame::OnCloseFile)
 	EVT_MENU (FRAME_FULLSCREEN, H3DWxFrame::OnFullscreen)
-//  EVT_CHAR (H3DWxFrame::RestoreWindow)
   EVT_MENU (FRAME_RESTORE, H3DWxFrame::RestoreWindow)
 	EVT_MENU (FRAME_MIRROR, H3DWxFrame::MirrorScene)
 	EVT_MENU (FRAME_RENDERMODE, H3DWxFrame::RenderMode)
@@ -382,16 +378,16 @@ bool H3DWxFrame::loadFile( const string &filename ) {
 	menuBar->EnableTop(4, true);
 //	H3DWxFrame::buildNavMenu();
 	buildNavMenu();
-//  mynav->setNavType ((navigationMenu->GetLabel(FRAME_NAVIGATION)).c_str());
-//  navigationMenu->Check(FRAME_NAVIGATION, true);
 
 	/****************************Device Info****************************/
 	//Enable Device Menu
 	menuBar->EnableTop(2, true);
-  mydevice = DeviceInfo::getActive();
-  //myH3Ddevice = mydevice->device->getValue();
-  allDevices = mydevice->device->getValue();
-  NodeVector::const_iterator nv = allDevices.begin();
+  if (DeviceInfo::getActive()) {
+    mydevice = DeviceInfo::getActive();
+    //myH3Ddevice = mydevice->device->getValue();
+    allDevices = mydevice->device->getValue();
+    NodeVector::const_iterator nv = allDevices.begin();
+  }
 
   int i = 0;
   for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
@@ -417,16 +413,10 @@ bool H3DWxFrame::loadFile( const string &filename ) {
       g->children->push_back(ss.get());
 #endif    
     // create a Viewpoint if it does not exist.
-	/* if(viewpoint.get())
-		static_cast<Viewpoint * >(viewpoint.get())->set_bind->setValue(false); */
     if( !Viewpoint::getActive() && viewpoint_file.size() ) {
       try {
         viewpoint = X3D::createX3DNodeFromURL( viewpoint_file );
       } catch( const Exception::H3DException &e ) {
-/*		  wxString viewpoint_error = "Warning: Could not create default Viewpoint node from file ";
-		  viewpoint_error.append(viewpoint_file.c_str());
-		  wxMessageDialog viewpointerrorDialog ( this, viewpoint_error, _T("Viewpoint Error"), wxICON_ERROR);
-		  viewpointerrorDialog.ShowModal(); */
         Console(3) << "Warning: Could not create default Viewpoint node "
                    << "from file \"" << viewpoint_file << "\": "
                    << e << endl;
@@ -517,9 +507,8 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
 //Close File
 void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
 	t->children->clear();
-	//g->children->clear();
 	SetStatusText("Open a file...", 0);
-    SetStatusText("",1);
+  SetStatusText("",1);
 	//Viewpoint::set_bind(false);
 	//viewpoint.get()->set_bind->setValue(false);
 	viewpoint.reset (NULL);
@@ -541,6 +530,7 @@ void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
 	}
 
 	//Disable menus again
+  menuBar->EnableTop(2, false);
 	menuBar->EnableTop(3, false);
 	menuBar->EnableTop(4, false);
 }
@@ -570,10 +560,6 @@ void H3DWxFrame::OnFullscreen (wxCommandEvent & event)
 	rendererMenu->Check(FRAME_FULLSCREEN, true);
 	SetStatusText("Press ESC to exit fullscreen mode", 0);
   SetStatusText("Viewing in Fullscreen", 1);
-    wxString t = "Restoring Window";
-  wxMessageDialog testDialog ( this, t, ABOUT, wxOK);
-  testDialog.ShowModal();
-
 }
 
 //Restore from fullscreen
@@ -671,9 +657,9 @@ void H3DWxFrame::ChangeRenderer(wxCommandEvent & event)
 	if (selectHapticRenderer.ShowModal() == wxID_OK) {
 		switch ( selectHapticRenderer.GetSelection() ) {
 			case 0:
-//				renderMode = "OpenHaptics";
-/*        myH3Ddevice = mydevice->device->getValueByIndex(0);
-        myH3Ddevice->hapticsRenderer->setValue(new OpenHapticsRenderer()); */
+				renderMode = "OpenHaptics";
+        myH3Ddevice = mydevice->device->getValueByIndex(0);
+        myH3Ddevice->hapticsRenderer->setValue(new OpenHapticsRenderer());
 //        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
 //          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new OpenHapticsRenderer);
 //        }
@@ -687,9 +673,9 @@ void H3DWxFrame::ChangeRenderer(wxCommandEvent & event)
 #endif
 				break;
 			case 2:
-//				renderMode = "God Object";
-/*        myH3Ddevice = mydevice->device->getValueByIndex(0);
-        myH3Ddevice->hapticsRenderer->setValue(new GodObjectRenderer); */
+				renderMode = "God Object";
+        myH3Ddevice = mydevice->device->getValueByIndex(0);
+        myH3Ddevice->hapticsRenderer->setValue(new GodObjectRenderer);
 //        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
 //          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new GodObjectRenderer);
 //        }
@@ -704,9 +690,6 @@ void H3DWxFrame::ChangeRenderer(wxCommandEvent & event)
 				break;
     }
   }
-        //wxMessageDialog dialog2(this, selectMode.GetStringSelection(), _T("Got string"));
-        //dialog2.ShowModal();
-
 }
 
 //Toggle haptics
@@ -790,8 +773,6 @@ void H3DWxFrame::buildNavMenu () {
 		mynav = NavigationInfo::getActive();
 		//Store allowed navigation types and count
 		vector<string> navTypes = mynav->type->getValue();
-		//int typeCount = navTypes.size();
-		//string currentType = mynav->getUsedNavType();
 
 		if (mynav->getUsedNavType() == "NONE") {
 			navigationMenu->Append(FRAME_NAVIGATION, "Unavailable", "Navigation Disabled");
@@ -869,8 +850,33 @@ void H3DWxFrame::buildNavMenu () {
       else {
         mynav->setNavType ("NULL");
       } */
-		}
-	}
+    int index = 0;
+ 		  for (vector<string>::iterator menuList = allowedTypes.begin(); menuList != allowedTypes.end(); menuList++) {
+        if (mynav->getUsedNavType() == (*menuList)) {
+          navigationMenu->Check(FRAME_NAVIGATION+index, true);
+          break;
+        }
+        index++;
+      }
+    }
+  }
+  else {
+    mynav = new NavigationInfo;
+    vector<string> allTypes;
+    allTypes.push_back("EXAMINE");
+    allTypes.push_back("FLY");
+    allTypes.push_back("WALK");
+    allTypes.push_back("LOOKAT");
+    allTypes.push_back("NONE");
+    int j = 0;
+    for (vector<string>::iterator allList = allTypes.begin(); allList != allTypes.end(); allList++) {
+      navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, (*allList), "Select a navigation mode");
+		  Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
+			Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
+			j++;
+    }
+    mynav->setNavType ("EXAMINE");
+  }
 }
 
 
