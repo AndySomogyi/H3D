@@ -396,8 +396,11 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
       // Forcing the user to navigate using only mechanisms in the scene
       // if the user want navigation again, a new navigationinfo has to
       // be bound. ( or rebind the current one with type changed )
-      keySensor->enabled->setValue( false );
-      mouseSensor->enabled->setValue( false );
+      //keySensor->enabled->setValue( false );
+      //mouseSensor->enabled->setValue( false );
+      
+      // Do nothing cause of no navigation.
+      moveAvatar->setValue( false );
     }
   }
 
