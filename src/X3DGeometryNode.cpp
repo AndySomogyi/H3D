@@ -46,6 +46,8 @@
 #include <FeedbackBufferCollector.h>
 
 #include "X3DPointingDeviceSensorNode.h"
+#include <HapticLineSet.h>
+#include <HapticPointSet.h>
 
 using namespace H3D;
 
@@ -302,13 +304,19 @@ void X3DGeometryNode::SFBoundTree::update() {
     const string &type = options->boundType->getValue();
     H3DInt32 max_triangles = options->maxTrianglesInLeaf->getValue();
     if( type == "AABB" ) {
-      value = new HAPI::Bounds::AABBTree( triangles, 
+      value = new HAPI::Bounds::AABBTree( triangles,
+                                          lines,
+                                          points,
                                           max_triangles );
     } else if( type == "OBB" ) {
-      value = new HAPI::Bounds::OBBTree( triangles, 
+      value = new HAPI::Bounds::OBBTree( triangles,
+                                         lines,
+                                         points,
                                          max_triangles );
     } else if( type == "SPHERE" ) {
-      value = new HAPI::Bounds::SphereBoundTree( triangles, 
+      value = new HAPI::Bounds::SphereBoundTree( triangles,
+                                                 lines,
+                                                 points,
                                                  max_triangles );
     } else {
       Console(4) << "Warning: Invalid boundType: "
@@ -317,12 +325,14 @@ void X3DGeometryNode::SFBoundTree::update() {
                  << "(in active GeometryBoundTreeOptions node for \" "
                  << geometry->getName() << "\" node). Using AABB instead." 
                  << endl;
-      value = new HAPI::Bounds::AABBTree( triangles, 
+      value = new HAPI::Bounds::AABBTree( triangles,
+                                          lines,
+                                          points,
                                           max_triangles );
     }
 
   } else {
-    value = new HAPI::Bounds::AABBTree( triangles );
+    value = new HAPI::Bounds::AABBTree( triangles, lines, points );
   }
 
 }
@@ -379,6 +389,10 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
         
         vector< HAPI::Bounds::Triangle > tris;
         tris.reserve( 200 );
+        vector< HAPI::Bounds::LineSegment > lines;
+        lines.reserve( 200 );
+        vector< HAPI::Bounds::Point > points;
+        points.reserve( 200 );
 
         HapticsOptions *haptics_options = NULL;
         getOptionNode( haptics_options );
@@ -435,13 +449,21 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
 
         if( use_bound_tree ) {
           if( radius < 0 ) {
-            boundTree->getValue()->getAllTriangles( tris );
+            /*boundTree->getValue()->getAllTriangles( tris );*/
+            boundTree->getValue()->getAllPrimitives( tris, lines, points );
           } {
-            boundTree->getValue()->getTrianglesIntersectedByMovingSphere( 
+            /*boundTree->getValue()->getTrianglesIntersectedByMovingSphere(
               radius * 1e3 * H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
               local_proxy,
               local_proxy + movement * lookahead_factor,
-              tris );
+              tris );*/
+            boundTree->getValue()->getPrimitivesIntersectedByMovingSphere(
+              radius * 1e3 * H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
+              local_proxy,
+              local_proxy + movement * lookahead_factor,
+              tris,
+              lines,
+              points );
           }
         } else {
           if( radius < 0 ) {
@@ -533,6 +555,112 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
 #endif
       
           ti.addHapticShape( i, tri_set );
+        }
+
+        if( lines.size() > 0 )  {
+          //cerr << lines.size();// << endl;
+          HAPI::HapticLineSet * lin_set = 
+            new HAPI::HapticLineSet( lines ,
+                                         this,
+                                         ti.getCurrentSurface(),
+                                         Matrix4f( 1e3, 0, 0, 0,
+                                                   0, 1e3, 0, 0,
+                                                   0, 0, 1e3, 0,
+                                                   0, 0, 0, 1 ) *
+                                         (ti.getAccForwardMatrix() *
+                                          Matrix4f( 1e-3, 0, 0, 0,
+                                                    0, 1e-3, 0, 0,
+                                                    0, 0, 1e-3, 0,
+                                                    0, 0, 0, 1 )),
+                                         -1,
+                                         touchable_face);
+      
+
+#ifdef HAVE_OPENHAPTICS
+          if( openhaptics_options ) {
+            HAPI::OpenHapticsRenderer::OpenHapticsOptions::ShapeType type;
+            bool adaptive_viewport;
+            bool camera_view;
+
+            const string &shape = openhaptics_options->GLShape->getValue();
+            if( shape == "FEEDBACK_BUFFER" ) {
+              type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER;
+            } else if( shape == "DEPTH_BUFFER" ) {
+              type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::DEPTH_BUFFER;
+            } else if( shape == "CUSTOM" ) {
+              type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::CUSTOM;
+            } else {
+              type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER;
+              Console(4) << "Warning: Invalid OpenHaptics GLShape type: "
+                         << shape 
+                         << ". Must be \"FEEDBACK_BUFFER\" or \"DEPTH_BUFFER\" "
+                         << "(in \"" << getName() << "\")" << endl;
+            }
+        
+            adaptive_viewport = 
+              openhaptics_options->useAdaptiveViewport->getValue();
+            camera_view = openhaptics_options->useHapticCameraView->getValue();
+            lin_set->addRenderOption( 
+             new HAPI::OpenHapticsRenderer::OpenHapticsOptions( type,
+                                                                adaptive_viewport,
+                                                                camera_view ) );
+          }
+#endif
+      
+          ti.addHapticShape( i, lin_set );
+        }
+
+        if( points.size() > 0 )  {
+          //cerr << lines.size();// << endl;
+          HAPI::HapticPointSet * pt_set = 
+            new HAPI::HapticPointSet( points ,
+                                         this,
+                                         ti.getCurrentSurface(),
+                                         Matrix4f( 1e3, 0, 0, 0,
+                                                   0, 1e3, 0, 0,
+                                                   0, 0, 1e3, 0,
+                                                   0, 0, 0, 1 ) *
+                                         (ti.getAccForwardMatrix() *
+                                          Matrix4f( 1e-3, 0, 0, 0,
+                                                    0, 1e-3, 0, 0,
+                                                    0, 0, 1e-3, 0,
+                                                    0, 0, 0, 1 )),
+                                         -1,
+                                         touchable_face);
+      
+
+#ifdef HAVE_OPENHAPTICS
+          if( openhaptics_options ) {
+            HAPI::OpenHapticsRenderer::OpenHapticsOptions::ShapeType type;
+            bool adaptive_viewport;
+            bool camera_view;
+
+            const string &shape = openhaptics_options->GLShape->getValue();
+            if( shape == "FEEDBACK_BUFFER" ) {
+              type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER;
+            } else if( shape == "DEPTH_BUFFER" ) {
+              type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::DEPTH_BUFFER;
+            } else if( shape == "CUSTOM" ) {
+              type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::CUSTOM;
+            } else {
+              type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER;
+              Console(4) << "Warning: Invalid OpenHaptics GLShape type: "
+                         << shape 
+                         << ". Must be \"FEEDBACK_BUFFER\" or \"DEPTH_BUFFER\" "
+                         << "(in \"" << getName() << "\")" << endl;
+            }
+        
+            adaptive_viewport = 
+              openhaptics_options->useAdaptiveViewport->getValue();
+            camera_view = openhaptics_options->useHapticCameraView->getValue();
+            pt_set->addRenderOption( 
+             new HAPI::OpenHapticsRenderer::OpenHapticsOptions( type,
+                                                                adaptive_viewport,
+                                                                camera_view ) );
+          }
+#endif
+      
+          ti.addHapticShape( i, pt_set );
         }
       }
     }
