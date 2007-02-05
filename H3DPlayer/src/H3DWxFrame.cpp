@@ -160,6 +160,8 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   rendererMenu->Append(FRAME_RENDERMODE, "Render Mode...", "Graphical Renderer Options");
   rendererMenu->AppendSeparator();
   rendererMenu->Append(BASIC_PREFRENDERER, "Rendering Options...", renderoptionsMenu, "Scenegraph rendering options");
+  rendererMenu->AppendSeparator();
+  rendererMenu->Append(FRAME_SETTINGS, "Settings...", "Scenegraph rendering options");
 
 /*  //Device Control submenu
   devicecontrolMenu = new wxMenu;
@@ -212,6 +214,7 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
   EVT_MENU (FRAME_OPEN_URL, H3DWxFrame::OnOpenFileURL)
 	EVT_MENU (FRAME_CLOSE, H3DWxFrame::OnCloseFile)
 	EVT_MENU (FRAME_FULLSCREEN, H3DWxFrame::OnFullscreen)
+	EVT_MENU (FRAME_SETTINGS, H3DWxFrame::OnSettings)
   EVT_MENU (FRAME_RESTORE, H3DWxFrame::RestoreWindow)
 	EVT_MENU (FRAME_MIRROR, H3DWxFrame::MirrorScene)
 	EVT_MENU (FRAME_RENDERMODE, H3DWxFrame::RenderMode)
@@ -888,3 +891,248 @@ bool H3DWxFrame::validateNavType (string a) {
 	}
 	return false;
 }
+
+
+void H3DWxFrame::OnSettings (wxCommandEvent & event) {
+  SettingsDialog dialog(this, event.GetId());
+  dialog.ShowModal();
+}
+
+
+// ----------------------------------------------------------------------------
+// SettingsDialog
+// ----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(SettingsDialog, wxPropertySheetDialog)
+
+BEGIN_EVENT_TABLE(SettingsDialog, wxPropertySheetDialog)
+END_EVENT_TABLE()
+
+SettingsDialog::SettingsDialog(wxWindow* win, int dialogType)
+{
+    SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
+
+    int tabImage1 = -1;
+    int tabImage2 = -1;
+    int tabImage3 = -1;
+
+    int resizeBorder = wxRESIZE_BORDER;
+
+    m_imageList = NULL;
+
+    Create(win, wxID_ANY, _("Settings"), wxDefaultPosition, wxDefaultSize,
+        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+    );
+
+    // If using a toolbook, also follow Mac style and don't create buttons
+    CreateButtons(wxOK | wxCANCEL |
+                        (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, wxHELP)
+    );
+
+    wxBookCtrlBase* notebook = GetBookCtrl();
+    notebook->SetImageList(m_imageList);
+
+    wxPanel* generalSettings = CreateGeneralSettingsPage(notebook);
+    wxPanel* openhaptics_settings = CreateOpenHapticsSettingsPage(notebook);
+    wxPanel* debug_settings = CreateDebugSettingsPage(notebook);
+
+    notebook->AddPage(generalSettings, _("General"), true, tabImage1);
+    notebook->AddPage(openhaptics_settings, _("OpenHaptics"), false, tabImage2);
+    notebook->AddPage(debug_settings, _("Debug"), false, tabImage3);
+
+    LayoutDialog();
+}
+
+SettingsDialog::~SettingsDialog()
+{
+    
+}
+
+wxPanel* SettingsDialog::CreateDebugSettingsPage(wxWindow* parent) {
+    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+
+    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    //// adaptive viewpoirt
+
+    wxBoxSizer* draw_bound_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* draw_bound = new wxCheckBox(panel, ID_DRAW_BOUNDS, _("&Draw geometry bounding boxes"), wxDefaultPosition, wxDefaultSize);
+    draw_bound_sizer->Add(draw_bound, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add( draw_bound_sizer, 0, wxGROW|wxALL, 0);
+
+    wxBoxSizer* draw_triangles_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* draw_triangles = new wxCheckBox(panel, ID_DRAW_TRIANGLES, _("&Draw haptic triangles"), wxDefaultPosition, wxDefaultSize);
+    draw_triangles_sizer->Add(draw_triangles, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add( draw_triangles_sizer, 0, wxGROW|wxALL, 0);
+
+    wxBoxSizer* draw_tree_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* draw_tree = new wxCheckBox(panel, ID_DRAW_BOUND_TREE, _("&Draw bound tree"), wxDefaultPosition, wxDefaultSize);
+    draw_tree_sizer->Add(draw_tree, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add( draw_tree_sizer, 0, wxGROW|wxALL, 0);
+
+    wxBoxSizer* depth_sizer = new wxBoxSizer( wxHORIZONTAL );
+    depth_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Depth:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    wxSpinCtrl* depth_spin = new wxSpinCtrl(panel, ID_CACHING_DELAY, wxEmptyString, wxDefaultPosition,
+        wxSize(80, wxDefaultCoord));
+    depth_sizer->Add(depth_spin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add( depth_sizer );
+  
+    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+
+    panel->SetSizer(topSizer);
+    topSizer->Fit(panel);
+
+    return panel;
+}
+
+
+wxPanel* SettingsDialog::CreateOpenHapticsSettingsPage(wxWindow* parent) {
+    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+
+    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    //// adaptive viewpoirt
+
+    wxBoxSizer* adaptive_viewport_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* adaptive_viewport = new wxCheckBox(panel, ID_ADAPTIVE_VIEWPORT, _("&Use adaptive viewport"), wxDefaultPosition, wxDefaultSize);
+    adaptive_viewport_sizer->Add(adaptive_viewport, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add( adaptive_viewport_sizer, 0, wxGROW|wxALL, 0);
+
+    wxBoxSizer* haptic_camera_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* haptic_camera = new wxCheckBox(panel, ID_HAPTIC_CAMERA, _("&Use haptic camera view"), wxDefaultPosition, wxDefaultSize);
+    haptic_camera_sizer->Add(haptic_camera, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add( haptic_camera_sizer, 0, wxGROW|wxALL, 0);
+
+    wxBoxSizer* full_geom_render_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* full_geom_render = new wxCheckBox(panel, ID_FULL_GEOMETRY_RENDER, _("&Force full geometry render"), wxDefaultPosition, wxDefaultSize);
+    full_geom_render_sizer->Add(full_geom_render, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add( full_geom_render_sizer, 0, wxGROW|wxALL, 0);
+
+    wxArrayString shape_choices;
+    shape_choices.Add(wxT("Feedback buffer"));
+    shape_choices.Add(wxT("Depth buffer"));
+    shape_choices.Add(wxT("Custom"));
+
+    wxBoxSizer* shape_sizer = new wxBoxSizer( wxHORIZONTAL );
+ 
+    shape_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Default shape type:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxChoice* shape_choice = new wxChoice(panel, ID_BOUND_TYPE, wxDefaultPosition, wxDefaultSize, shape_choices );
+    shape_sizer->Add(shape_choice, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add(shape_sizer, 0, wxGROW|wxALL, 5);
+
+    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+
+    panel->SetSizer(topSizer);
+    topSizer->Fit(panel);
+
+    return panel;
+}
+
+wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
+{
+    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+
+    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    //// Graphics caching
+    wxStaticBox* graphics_caching_box = new wxStaticBox(panel, wxID_ANY, _("Graphics caching:"));
+
+    wxBoxSizer* graphics_caching_sizer = new wxStaticBoxSizer( graphics_caching_box, wxVERTICAL );
+    item0->Add(graphics_caching_sizer, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* display_list_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* display_list_checkbox = new wxCheckBox(panel, ID_USE_DISPLAY_LISTS, _("&Use display lists"), wxDefaultPosition, wxDefaultSize);
+    display_list_sizer->Add(display_list_checkbox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    graphics_caching_sizer->Add(display_list_sizer, 0, wxGROW|wxALL, 0);
+
+    wxCheckBox* only_geoms_checkbox = new wxCheckBox(panel, ID_CACHE_ONLY_GEOMS, _("&Cache only geometries"), wxDefaultPosition, wxDefaultSize);
+    display_list_sizer->Add(only_geoms_checkbox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  //  graphics_caching_sizer->Add(only_geoms_sizer, 0, wxGROW|wxALL, 0);
+
+    wxBoxSizer* caching_delay_sizer = new wxBoxSizer( wxHORIZONTAL );
+    caching_delay_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Caching delay:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    wxSpinCtrl* caching_delay_spin = new wxSpinCtrl(panel, ID_CACHING_DELAY, wxEmptyString, wxDefaultPosition,
+        wxSize(80, wxDefaultCoord));
+    caching_delay_sizer->Add(caching_delay_spin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    graphics_caching_sizer->Add( caching_delay_sizer );
+
+    // Geometry bound
+    wxStaticBox* bound_tree_box = new wxStaticBox(panel, wxID_ANY, _("Bound tree:"));
+
+    wxArrayString bound_choices;
+    bound_choices.Add(wxT("Oriented bounding box"));
+    bound_choices.Add(wxT("Axis-aligned bounding box"));
+    bound_choices.Add(wxT("Sphere"));
+
+    wxBoxSizer* bound_tree_sizer = new wxStaticBoxSizer( bound_tree_box, wxVERTICAL );
+    item0->Add(bound_tree_sizer, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* itemSizer2 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxChoice* choice2 = new wxChoice(panel, ID_BOUND_TYPE, wxDefaultPosition, wxDefaultSize, bound_choices );
+
+    itemSizer2->Add(new wxStaticText(panel, wxID_ANY, _("&Bound type:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+   // itemSizer2->Add(5, 5, 1, wxALL, 0);
+    itemSizer2->Add(choice2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    bound_tree_sizer->Add(itemSizer2, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* max_triangles_sizer = new wxBoxSizer( wxHORIZONTAL );
+    max_triangles_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Max triangles:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    wxSpinCtrl* max_triangles_spin = new wxSpinCtrl(panel, ID_MAX_TRIANGLES, wxEmptyString, wxDefaultPosition,
+        wxSize(80, wxDefaultCoord));
+    max_triangles_sizer->Add(max_triangles_spin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    bound_tree_sizer->Add( max_triangles_sizer );
+
+    //// FONT SIZE SELECTION
+
+    wxStaticBox* haptics_box = new wxStaticBox(panel, wxID_ANY, _("Haptics options:"));
+    wxBoxSizer* haptics_box_sizer = new wxStaticBoxSizer( haptics_box, wxVERTICAL );
+
+    wxArrayString face_choices;
+    face_choices.Add(wxT("Front and back"));
+    face_choices.Add(wxT("Front only"));
+    face_choices.Add(wxT("Back only"));
+
+    wxBoxSizer* face_choice_sizer = new wxBoxSizer( wxHORIZONTAL );
+    face_choice_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Touchable face:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxChoice* face_choice = new wxChoice(panel, ID_TOUCHABLE_FACE, wxDefaultPosition, wxDefaultSize, face_choices );
+    face_choice_sizer->Add(face_choice, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    haptics_box_sizer->Add(face_choice_sizer, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* max_distance_sizer = new wxBoxSizer( wxHORIZONTAL );
+    max_distance_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Max distance:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* max_distance = new wxTextCtrl(panel, ID_MAX_DISTANCE, wxEmptyString, wxDefaultPosition,
+        wxSize(40, wxDefaultCoord)); 
+    max_distance_sizer->Add(max_distance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    haptics_box_sizer->Add(max_distance_sizer, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* look_ahead_sizer = new wxBoxSizer( wxHORIZONTAL );
+    look_ahead_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Look ahead factor:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* look_ahead = new wxTextCtrl(panel, ID_LOOK_AHEAD_FACTOR, wxEmptyString, wxDefaultPosition,
+        wxSize(40, wxDefaultCoord) );
+    look_ahead_sizer->Add(look_ahead, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    haptics_box_sizer->Add(look_ahead_sizer, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* use_bound_tree_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* use_bound_tree_checkbox = new wxCheckBox(panel, ID_USE_BOUND_TREE, _("&Use bound tree"), wxDefaultPosition, wxDefaultSize);
+    use_bound_tree_sizer->Add(use_bound_tree_checkbox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    //haptics_box_sizer->Add(use_bound_tree_checkbox, 0, wxGROW|wxALL, 0);
+    haptics_box_sizer->Add(use_bound_tree_sizer, 0, wxGROW|wxALL, 0);
+
+    item0->Add(haptics_box_sizer, 0, wxGROW|wxLEFT|wxRIGHT, 5);
+
+    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+    topSizer->AddSpacer(5);
+
+    panel->SetSizer(topSizer);
+    topSizer->Fit(panel);
+
+    return panel;
+}
+
