@@ -129,6 +129,9 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   advancedMenu = (wxMenu *) NULL;
   helpMenu = (wxMenu *)	NULL;
 
+  //File History
+  recentFiles = (wxFileHistory *) NULL;
+
   //sub menus
   renderoptionsMenu = (wxMenu *) NULL;
 //  devicecontrolMenu = (wxMenu *) NULL;
@@ -144,6 +147,10 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   fileMenu->Append(FRAME_CLOSE, "&Close file","Close file");
   fileMenu->AppendSeparator();
   fileMenu->Append(FRAME_EXIT,"E&xit\tCtrl+X", "Exit");
+
+  //File History
+  recentFiles = new wxFileHistory;
+  recentFiles->UseMenu(fileMenu);
 
   //Render Options submenu
   renderoptionsMenu = new wxMenu;
@@ -211,6 +218,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
 	EVT_MENU (FRAME_EXIT, H3DWxFrame::OnExit)
 	EVT_MENU (FRAME_OPEN, H3DWxFrame::OnOpenFile)
+  EVT_MENU_RANGE (wxID_FILE1, wxID_FILE9, H3DWxFrame::OnMRUFile)
   EVT_MENU (FRAME_OPEN_URL, H3DWxFrame::OnOpenFileURL)
 	EVT_MENU (FRAME_CLOSE, H3DWxFrame::OnCloseFile)
 	EVT_MENU (FRAME_FULLSCREEN, H3DWxFrame::OnFullscreen)
@@ -503,8 +511,18 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
     
     string filename =  currentPath += "\\" + currentFilename;
     loadFile( filename );
+    recentFiles->AddFileToHistory ( filename );
   }
 
+}
+
+//Open a file from file history
+void H3DWxFrame::OnMRUFile(wxCommandEvent & event)
+{
+  wxString filename(recentFiles->GetHistoryFile(event.GetId() - wxID_FILE1));
+  if (filename != "") {
+    loadFile( filename.c_str() );
+  }
 }
 
 //Close File

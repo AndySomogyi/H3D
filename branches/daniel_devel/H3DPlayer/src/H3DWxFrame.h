@@ -1,6 +1,7 @@
 #include <wx/wx.h>
 #include <wx/propdlg.h> 
 #include <wx/bookctrl.h>
+#include <wx/docview.h>
 #include <wx/spinctrl.h>
 #include "H3DWxWidgetsWindow.h"
 
@@ -124,6 +125,8 @@ public:
   wxMenuBar  *menuBar;
   //Menu Bar Items
   wxMenu     *fileMenu, *rendererMenu, *deviceMenu, *viewpointMenu, *navigationMenu, *advancedMenu, *helpMenu;
+  //File History Menu
+  wxFileHistory *recentFiles;
   //Submenus
   wxMenu *renderoptionsMenu;
   //wxMenu *devicecontrolMenu;
@@ -134,6 +137,7 @@ public:
 
   /***************Member Functions*****************/
   void OnOpenFile	(wxCommandEvent & event);
+  void OnMRUFile  (wxCommandEvent & event);
   void OnOpenFileURL	(wxCommandEvent & event);
   void OnCloseFile	(wxCommandEvent & event);
   void OnExit     	(wxCommandEvent & event);
