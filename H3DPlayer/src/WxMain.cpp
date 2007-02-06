@@ -103,7 +103,7 @@ bool MyApp::OnInit()
 	//glwindow constructed in the frame constructor.  Next line redundant.
 	//theWxFrame->glwindow = new H3DWxWidgetsWindow(theWxFrame);
 	theWxFrame->Show(true);
-	//This next line is used to set the icon file h3d.ico, when created.
+  //This next line is used to set the icon file h3d.ico, when created.
 	//theWxframe->SetIcon(wxIcon(_T("h3d_icn")));
 
     
