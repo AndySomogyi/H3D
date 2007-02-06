@@ -94,6 +94,9 @@ namespace SpaceWareSensorInternal {
   FIELDDB_ELEMENT( SpaceWareSensor, buttons, OUTPUT_ONLY );
   FIELDDB_ELEMENT( SpaceWareSensor, latestButtonPress, OUTPUT_ONLY );
   FIELDDB_ELEMENT( SpaceWareSensor, latestButtonRelease, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( SpaceWareSensor, accumulateTimeDependent, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( SpaceWareSensor, resetAccumulatedTranslation, INPUT_ONLY );
+  FIELDDB_ELEMENT( SpaceWareSensor, resetAccumulatedRotation, INPUT_ONLY );
 
   H3D_API_EXCEPTION( CouldNotInitSpaceWare );
   H3D_API_EXCEPTION( CreateWindowError );
@@ -445,7 +448,10 @@ SpaceWareSensor::SpaceWareSensor(
               Inst< SFFloat               > _rotationScale,
               Inst< SFInt32               > _buttons,
               Inst< SFInt32               > _latestButtonPress,
-              Inst< SFInt32               > _latestButtonRelease ) :
+              Inst< SFInt32               > _latestButtonRelease,
+              Inst< SFBool                > _accumulateTimeDependent,
+     Inst< ResetAccumulatedTranslation > _resetAccumulatedTranslation,
+     Inst< ResetAccumulatedRotation > _resetAccumulatedRotation ) :
   X3DSensorNode( _enabled, _metadata, _isActive ),
   rawTranslation( _rawTranslation ),
   rawYaw( _rawYaw ),
@@ -467,6 +473,9 @@ SpaceWareSensor::SpaceWareSensor(
   buttons( _buttons ),
   latestButtonPress( _latestButtonPress ),
   latestButtonRelease( _latestButtonRelease ),
+  accumulateTimeDependent( _accumulateTimeDependent ),
+  resetAccumulatedTranslation( _resetAccumulatedTranslation ),
+  resetAccumulatedRotation(_resetAccumulatedRotation ),
   thread_motion_event( false ) {
 
   type_name = "SpaceWareSensor";
@@ -485,6 +494,11 @@ SpaceWareSensor::SpaceWareSensor(
   buttons->setValue( 0, id  );
   latestButtonPress->setValue( 0, id  );
   latestButtonRelease->setValue( 0, id  );
+
+  accumulateTimeDependent->setValue( true );
+
+  resetAccumulatedTranslation->setValue( Vec3f(), id );
+  resetAccumulatedRotation->setValue( Rotation(), id );
 
   rawTranslation->route( instantTranslation, id  );
   translationScale->route( instantTranslation, id  );
