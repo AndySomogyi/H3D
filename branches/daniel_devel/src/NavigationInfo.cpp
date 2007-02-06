@@ -34,7 +34,7 @@
 
 using namespace H3D;
 
-X3DViewpointNode * NavigationInfo::old_vp = 0;
+AutoRef< X3DViewpointNode > NavigationInfo::old_vp( 0 );
 bool NavigationInfo::linear_interpolate = false;
 Vec3f NavigationInfo::goal_position = Vec3f();
 Rotation NavigationInfo::goal_orientation = Rotation();
@@ -100,8 +100,8 @@ NavigationInfo::NavigationInfo( Inst< SFSetBind > _set_bind,
   type->push_back( "ANY" );
   visibilityLimit->setValue( 0 );
 
-  old_vp = X3DViewpointNode::getActive();
-  if( old_vp ) {
+  old_vp.reset( X3DViewpointNode::getActive() );
+  if( old_vp.get() ) {
     old_vp_pos = old_vp->position->getValue() + old_vp->rel_pos;
     old_vp_orientation = old_vp->orientation->getValue() *
                          old_vp->rel_orientation;
@@ -147,7 +147,7 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
   H3DTime delta_time = current_time - last_time;
   last_time = current_time;
   string navigation_type = getUsedNavType();
-  if( old_vp && old_vp != vp ) {
+  if( old_vp.get() && old_vp.get() != vp ) {
     // if the viewpoint is switched when a transition is going on
     // reset the old viewpoint and calculate the new transition from
     // current position and viewpoint.
@@ -198,7 +198,7 @@ void NavigationInfo::detectCollision( X3DViewpointNode * vp,
         start_time = current_time;
       }
     }
-    old_vp = vp;
+    old_vp.reset( vp );
   }
 
   // When a transition takes place navigationinfo negates external

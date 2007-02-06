@@ -285,6 +285,12 @@ namespace H3D {
                     Inst< MFString  > _type             = 0,
                     Inst< SFFloat   > _visibilityLimit  = 0,
                     Inst< SFBool    > _transitionComplete = 0 );
+
+    virtual ~NavigationInfo() {
+      navigationInfos.remove( this );
+      if( navigationInfos.empty() )
+        old_vp.reset( 0 );
+    }
     
     /// Convenience function to get the top of the NavigationInfo stack.
     static inline NavigationInfo *getActive() {
@@ -381,7 +387,7 @@ namespace H3D {
     static bool linear_interpolate;
     static Vec3f goal_position;
     static Rotation goal_orientation;
-    static X3DViewpointNode * old_vp;
+    static AutoRef< X3DViewpointNode > old_vp;
     static Vec3f old_vp_pos;
     static Rotation old_vp_orientation;
     H3DTime start_time;
