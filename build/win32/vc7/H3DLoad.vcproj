@@ -104,7 +104,7 @@
 				OutputFile="$(OutDir)/H3DLoad.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\H3D\H3DUtil\build\win32\vc7\Debug;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\build\win32\vc7\release;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
-				DelayLoadDLLs=""
+				DelayLoadDLLs="OpenHapticsRenderer.dll"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="1"/>
@@ -137,19 +137,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\..\..\VolumeViewer\src\AccumulateTransform.cpp">
-		</File>
-		<File
-			RelativePath="..\..\..\..\VolumeViewer\src\GraspTransform.cpp">
-		</File>
-		<File
 			RelativePath="..\..\..\src\H3DLoad.cpp">
-		</File>
-		<File
-			RelativePath="..\..\..\src\HAPIDevice.cpp">
-		</File>
-		<File
-			RelativePath="..\..\..\..\VolumeViewer\src\Navigator.cpp">
 		</File>
 	</Files>
 	<Globals>
