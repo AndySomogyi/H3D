@@ -44,11 +44,20 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #endif
 
+#include <GraphicsCachingOptions.h>
+#include <DebugOptions.h>
+#include <HapticsOptions.h>
+#include <GeometryBoundTreeOptions.h>
+#include <OpenHapticsOptions.h>
+
 #include "HapticsRenderers.h"
 //#include "OpenHapticsRenderer.h"
 
 using namespace std;
 using namespace H3D;
+
+
+AutoRef< GlobalSettings > global_settings;
 
 /*******************Required Class***********************/
 
@@ -90,7 +99,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 	ks.reset ( new KeySensor );
 	ms.reset ( new MouseSensor );
 	#ifndef MACOSX
-	ss.reset (new SpaceWareSensor);
+	//ss.reset (new SpaceWareSensor);
 	#endif
 	t.reset ( new Transform );
 	default_stylus.reset (new Node);
@@ -128,6 +137,11 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   navigationMenu = (wxMenu *) NULL;
   advancedMenu = (wxMenu *) NULL;
   helpMenu = (wxMenu *)	NULL;
+
+  global_settings.reset( new GlobalSettings );
+  readSettingsFromINIFile( "H3DPlayer.ini", global_settings.get() );
+
+  settings.reset( new SettingsDialog(this, global_settings.get() ) );
 
   //File History
   recentFiles = (wxFileHistory *) NULL;
@@ -241,6 +255,117 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
 END_EVENT_TABLE()
 
 
+/*******************Event Table*********************/
+
+void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
+  DebugOptions *dgo = NULL;
+  global_settings->getOptionNode( dgo );
+  int id = event.GetId(); 
+  if( dgo ) {
+    if( id == ID_DRAW_BOUNDS ) 
+      dgo->drawBound->setValue( event.IsChecked() );
+    else if( id == ID_DRAW_BOUND_TREE ) {
+      if( event.IsChecked() ) dgo->drawBoundTree->setValue( 1 );
+      else dgo->drawBoundTree->setValue( -1 );
+    } else if( id == ID_DRAW_TREE_DEPTH ) {
+      dgo->drawBoundTree->setValue( event.GetInt() );
+    }
+      
+    H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();    
+  }
+
+  GraphicsCachingOptions *gco = NULL;
+  global_settings->getOptionNode( gco );
+
+  if( gco ) {
+    if( id == ID_USE_DISPLAY_LISTS ) 
+      gco->useCaching->setValue( event.IsChecked() );
+    else if( id == ID_CACHE_ONLY_GEOMS ) {
+      gco->cacheOnlyGeometries->setValue( event.IsChecked() );
+    }
+  }
+
+  HapticsOptions *ho = NULL;
+  global_settings->getOptionNode( ho );
+
+  if( ho ) {
+    if( id == ID_TOUCHABLE_FACE ) {
+      int i = event.GetSelection();
+      if( i == 0 ) ho->touchableFace->setValue( "AS_GRAPHICS" );
+      else if( i == 1 ) ho->touchableFace->setValue( "FRONT_AND_BACK" );
+      else if( i == 2 ) ho->touchableFace->setValue( "FRONT" );
+      else if( i == 3 ) ho->touchableFace->setValue( "BACK" );
+    } else if( id == ID_MAX_DISTANCE ) {
+      ho->maxDistance->setValue( atof( event.GetString() ) );
+    } else if( id == ID_LOOK_AHEAD_FACTOR ) {
+      ho->lookAheadFactor->setValue( atof( event.GetString() ) );
+    } else if( id == ID_USE_BOUND_TREE ) {
+      ho->useBoundTree->setValue( event.IsChecked() );
+    }
+  }
+
+  OpenHapticsOptions *oho = NULL;
+
+  global_settings->getOptionNode( oho );
+
+  if( oho ) {
+    if( id == ID_OH_SHAPE_TYPE ) {
+      int i = event.GetSelection();
+      if( i == 0 ) oho->GLShape->setValue( "FEEDBACK_BUFFER" );
+      else if( i == 1 ) oho->GLShape->setValue( "DEPTH_BUFFER" );
+      else if( i == 2 ) oho->GLShape->setValue( "CUSTOM" );
+    } else if( id == ID_ADAPTIVE_VIEWPORT ) {
+      oho->useAdaptiveViewport->setValue( event.IsChecked() );
+    } else if( id == ID_HAPTIC_CAMERA ) {
+      oho->useHapticCameraView->setValue( event.IsChecked() );
+    } else if( id == ID_FULL_GEOMETRY_RENDER ) {
+      oho->forceFullGeometryRender->setValue( event.IsChecked() );
+    }
+  }
+
+  GeometryBoundTreeOptions *gbto = NULL;
+  global_settings->getOptionNode( gbto );
+
+  if( gbto ) {
+    if( id == ID_BOUND_TYPE ) {
+      int i = event.GetSelection();
+      if( i == 0 ) gbto->boundType->setValue( "OBB" );
+      else if( i == 1 ) gbto->boundType->setValue( "AABB" );
+      else if( i == 2 ) gbto->boundType->setValue( "SPHERE" );
+    }
+  }
+}
+
+void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
+  DebugOptions *dgo = NULL;
+  global_settings->getOptionNode( dgo );
+  int id = event.GetId(); 
+  if( dgo ) {
+    if( id == ID_DRAW_TREE_DEPTH ) {
+      dgo->drawBoundTree->setValue( event.GetInt() );
+    }
+      
+    H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();    
+  }
+
+  GraphicsCachingOptions *gco = NULL;
+  global_settings->getOptionNode( gco );
+
+  if( gco ) {
+    if( id == ID_CACHING_DELAY ) 
+      gco->cachingDelay->setValue( event.GetInt() );
+  }
+
+  GeometryBoundTreeOptions *gbto = NULL;
+  global_settings->getOptionNode( gbto );
+
+  if( gbto ) {
+    if( id == ID_MAX_TRIANGLES ) 
+      gbto->maxTrianglesInLeaf->setValue( event.GetInt() );
+  }
+}
+
+
 /*******************Member Functions*********************/
 
 bool H3DWxFrame::loadFile( const string &filename ) {
@@ -312,7 +437,7 @@ bool H3DWxFrame::loadFile( const string &filename ) {
   
   try {
 #ifndef MACOSX
-    if( use_space_mouse ) ss.reset( new SpaceWareSensor );
+    //if( use_space_mouse ) ss.reset( new SpaceWareSensor );
 #endif
     X3D::DEFNodes dn;
 //    KeyRotation *kr = new KeyRotation;
@@ -912,8 +1037,8 @@ bool H3DWxFrame::validateNavType (string a) {
 
 
 void H3DWxFrame::OnSettings (wxCommandEvent & event) {
-  SettingsDialog dialog(this, event.GetId());
-  dialog.ShowModal();
+ 
+  settings->Show();
 }
 
 
@@ -924,9 +1049,31 @@ void H3DWxFrame::OnSettings (wxCommandEvent & event) {
 IMPLEMENT_CLASS(SettingsDialog, wxPropertySheetDialog)
 
 BEGIN_EVENT_TABLE(SettingsDialog, wxPropertySheetDialog)
+	EVT_CHECKBOX (ID_DRAW_BOUNDS, SettingsDialog::handleSettingsChange)
+	EVT_CHECKBOX (ID_DRAW_BOUND_TREE, SettingsDialog::handleSettingsChange)
+	EVT_SPINCTRL (ID_DRAW_TREE_DEPTH, SettingsDialog::handleSpinEvent)
+
+  EVT_CHECKBOX (ID_USE_DISPLAY_LISTS, SettingsDialog::handleSettingsChange)
+  EVT_CHECKBOX (ID_CACHE_ONLY_GEOMS, SettingsDialog::handleSettingsChange)
+  EVT_SPINCTRL (ID_CACHING_DELAY, SettingsDialog::handleSpinEvent )
+
+  EVT_CHOICE(ID_TOUCHABLE_FACE, SettingsDialog::handleSettingsChange)
+  EVT_TEXT(ID_MAX_DISTANCE, SettingsDialog::handleSettingsChange )
+  EVT_TEXT(ID_LOOK_AHEAD_FACTOR, SettingsDialog::handleSettingsChange )
+  EVT_CHECKBOX( ID_USE_BOUND_TREE, SettingsDialog::handleSettingsChange)
+
+  EVT_CHOICE( ID_OH_SHAPE_TYPE, SettingsDialog::handleSettingsChange)
+  EVT_CHECKBOX( ID_ADAPTIVE_VIEWPORT, SettingsDialog::handleSettingsChange)
+  EVT_CHECKBOX( ID_HAPTIC_CAMERA, SettingsDialog::handleSettingsChange)
+  EVT_CHECKBOX( ID_FULL_GEOMETRY_RENDER, SettingsDialog::handleSettingsChange )
+  
+  EVT_SPINCTRL (ID_MAX_TRIANGLES, SettingsDialog::handleSpinEvent)
+  EVT_CHOICE( ID_BOUND_TYPE, SettingsDialog::handleSettingsChange )
+
 END_EVENT_TABLE()
 
-SettingsDialog::SettingsDialog(wxWindow* win, int dialogType)
+
+SettingsDialog::SettingsDialog(wxWindow* win, GlobalSettings *gs )
 {
     SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -950,9 +1097,9 @@ SettingsDialog::SettingsDialog(wxWindow* win, int dialogType)
     wxBookCtrlBase* notebook = GetBookCtrl();
     notebook->SetImageList(m_imageList);
 
-    wxPanel* generalSettings = CreateGeneralSettingsPage(notebook);
-    wxPanel* openhaptics_settings = CreateOpenHapticsSettingsPage(notebook);
-    wxPanel* debug_settings = CreateDebugSettingsPage(notebook);
+    wxPanel* generalSettings = CreateGeneralSettingsPage(notebook, gs );
+    wxPanel* openhaptics_settings = CreateOpenHapticsSettingsPage(notebook, gs);
+    wxPanel* debug_settings = CreateDebugSettingsPage(notebook, gs);
 
     notebook->AddPage(generalSettings, _("General"), true, tabImage1);
     notebook->AddPage(openhaptics_settings, _("OpenHaptics"), false, tabImage2);
@@ -966,34 +1113,60 @@ SettingsDialog::~SettingsDialog()
     
 }
 
-wxPanel* SettingsDialog::CreateDebugSettingsPage(wxWindow* parent) {
+wxPanel* SettingsDialog::CreateDebugSettingsPage(wxWindow* parent,
+                                                 GlobalSettings *gs ) {
     wxPanel* panel = new wxPanel(parent, wxID_ANY);
 
     wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
+    DebugOptions *debug = NULL;
+
+    bool draw_bound = false;
+    bool draw_tree = false;
+    int draw_tree_depth = 1;
+    bool draw_triangles = false;
+      
+
+  if( gs ) {
+    gs->getOptionNode( debug );
+    if( debug ) {
+      draw_bound = debug->drawBound->getValue();
+      int d = debug->drawBoundTree->getValue();
+      if( d != -1 ) {
+        draw_tree = true;
+        draw_tree_depth = d;
+      }
+      draw_triangles = debug->drawHapticTriangles->getValue();
+    }
+  }
+
     //// adaptive viewpoirt
 
     wxBoxSizer* draw_bound_sizer = new wxBoxSizer( wxHORIZONTAL );
-    wxCheckBox* draw_bound = new wxCheckBox(panel, ID_DRAW_BOUNDS, _("&Draw geometry bounding boxes"), wxDefaultPosition, wxDefaultSize);
-    draw_bound_sizer->Add(draw_bound, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxCheckBox* draw_bound_box = new wxCheckBox(panel, ID_DRAW_BOUNDS, _("&Draw geometry bounding boxes"), wxDefaultPosition, wxDefaultSize);
+    draw_bound_sizer->Add(draw_bound_box, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    draw_bound_box->SetValue( draw_bound );
     item0->Add( draw_bound_sizer, 0, wxGROW|wxALL, 0);
 
     wxBoxSizer* draw_triangles_sizer = new wxBoxSizer( wxHORIZONTAL );
-    wxCheckBox* draw_triangles = new wxCheckBox(panel, ID_DRAW_TRIANGLES, _("&Draw haptic triangles"), wxDefaultPosition, wxDefaultSize);
-    draw_triangles_sizer->Add(draw_triangles, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxCheckBox* draw_triangles_box = new wxCheckBox(panel, ID_DRAW_TRIANGLES, _("&Draw haptic triangles"), wxDefaultPosition, wxDefaultSize);
+    draw_triangles_box->SetValue( draw_triangles );
+    draw_triangles_sizer->Add(draw_triangles_box, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add( draw_triangles_sizer, 0, wxGROW|wxALL, 0);
 
     wxBoxSizer* draw_tree_sizer = new wxBoxSizer( wxHORIZONTAL );
-    wxCheckBox* draw_tree = new wxCheckBox(panel, ID_DRAW_BOUND_TREE, _("&Draw bound tree"), wxDefaultPosition, wxDefaultSize);
-    draw_tree_sizer->Add(draw_tree, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxCheckBox* draw_tree_box = new wxCheckBox(panel, ID_DRAW_BOUND_TREE, _("&Draw bound tree"), wxDefaultPosition, wxDefaultSize);
+    draw_tree_box->SetValue( draw_tree );
+    draw_tree_sizer->Add(draw_tree_box, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add( draw_tree_sizer, 0, wxGROW|wxALL, 0);
 
     wxBoxSizer* depth_sizer = new wxBoxSizer( wxHORIZONTAL );
     depth_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Depth:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     
-    wxSpinCtrl* depth_spin = new wxSpinCtrl(panel, ID_CACHING_DELAY, wxEmptyString, wxDefaultPosition,
+    wxSpinCtrl* depth_spin = new wxSpinCtrl(panel, ID_DRAW_TREE_DEPTH, wxEmptyString, wxDefaultPosition,
         wxSize(80, wxDefaultCoord));
+    depth_spin->SetValue( draw_tree_depth );
     depth_sizer->Add(depth_spin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add( depth_sizer );
   
@@ -1006,26 +1179,52 @@ wxPanel* SettingsDialog::CreateDebugSettingsPage(wxWindow* parent) {
 }
 
 
-wxPanel* SettingsDialog::CreateOpenHapticsSettingsPage(wxWindow* parent) {
+wxPanel* SettingsDialog::CreateOpenHapticsSettingsPage(wxWindow* parent, GlobalSettings *gs) {
     wxPanel* panel = new wxPanel(parent, wxID_ANY);
 
     wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
+    OpenHapticsOptions *oho = NULL;
+
+    bool use_adaptive_viewport = true;
+    bool use_haptic_camera_view = true;
+    int shape_type = 0;
+    bool force_full_geometry_render = false;
+      
+
+  if( gs ) {
+    gs->getOptionNode( oho );
+    if( oho ) {
+      use_adaptive_viewport = oho->useAdaptiveViewport->getValue();
+      use_haptic_camera_view = oho->useHapticCameraView->getValue();
+      force_full_geometry_render = oho->forceFullGeometryRender->getValue();
+
+      const string &shape = oho->GLShape->getValue();
+      if( shape == "FEEDBACK_BUFFER" ) shape_type = 0;
+      else if( shape == "DEPTH_BUFFER" ) shape_type = 1;
+      else if( shape == "CUSTOM" ) shape_type = 2;
+    }
+  }
+
+
     //// adaptive viewpoirt
 
     wxBoxSizer* adaptive_viewport_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxCheckBox* adaptive_viewport = new wxCheckBox(panel, ID_ADAPTIVE_VIEWPORT, _("&Use adaptive viewport"), wxDefaultPosition, wxDefaultSize);
+    adaptive_viewport->SetValue( use_adaptive_viewport );
     adaptive_viewport_sizer->Add(adaptive_viewport, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add( adaptive_viewport_sizer, 0, wxGROW|wxALL, 0);
 
     wxBoxSizer* haptic_camera_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxCheckBox* haptic_camera = new wxCheckBox(panel, ID_HAPTIC_CAMERA, _("&Use haptic camera view"), wxDefaultPosition, wxDefaultSize);
+    haptic_camera->SetValue( use_haptic_camera_view );
     haptic_camera_sizer->Add(haptic_camera, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add( haptic_camera_sizer, 0, wxGROW|wxALL, 0);
 
     wxBoxSizer* full_geom_render_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxCheckBox* full_geom_render = new wxCheckBox(panel, ID_FULL_GEOMETRY_RENDER, _("&Force full geometry render"), wxDefaultPosition, wxDefaultSize);
+    full_geom_render->SetValue( force_full_geometry_render );
     full_geom_render_sizer->Add(full_geom_render, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add( full_geom_render_sizer, 0, wxGROW|wxALL, 0);
 
@@ -1037,7 +1236,8 @@ wxPanel* SettingsDialog::CreateOpenHapticsSettingsPage(wxWindow* parent) {
     wxBoxSizer* shape_sizer = new wxBoxSizer( wxHORIZONTAL );
  
     shape_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Default shape type:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxChoice* shape_choice = new wxChoice(panel, ID_BOUND_TYPE, wxDefaultPosition, wxDefaultSize, shape_choices );
+    wxChoice* shape_choice = new wxChoice(panel, ID_OH_SHAPE_TYPE, wxDefaultPosition, wxDefaultSize, shape_choices );
+    shape_choice->SetSelection( shape_type );
     shape_sizer->Add(shape_choice, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(shape_sizer, 0, wxGROW|wxALL, 5);
 
@@ -1049,9 +1249,25 @@ wxPanel* SettingsDialog::CreateOpenHapticsSettingsPage(wxWindow* parent) {
     return panel;
 }
 
-wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
+wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent, 
+                                                   GlobalSettings *gs )
 {
-    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+  bool use_display_lists = true;
+  bool cache_only_geometries = false;
+  int caching_delay = 5;
+
+  GraphicsCachingOptions *gco = NULL;
+
+  if( gs ) {
+    gs->getOptionNode( gco );
+    if( gco ) {
+      use_display_lists = gco->useCaching->getValue();
+      cache_only_geometries = gco->cacheOnlyGeometries->getValue();
+      caching_delay = gco->cachingDelay->getValue();
+    }
+  }
+
+  wxPanel* panel = new wxPanel(parent, wxID_ANY);
 
     wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
@@ -1064,10 +1280,12 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
 
     wxBoxSizer* display_list_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxCheckBox* display_list_checkbox = new wxCheckBox(panel, ID_USE_DISPLAY_LISTS, _("&Use display lists"), wxDefaultPosition, wxDefaultSize);
+    display_list_checkbox->SetValue( use_display_lists );
     display_list_sizer->Add(display_list_checkbox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     graphics_caching_sizer->Add(display_list_sizer, 0, wxGROW|wxALL, 0);
-
+    
     wxCheckBox* only_geoms_checkbox = new wxCheckBox(panel, ID_CACHE_ONLY_GEOMS, _("&Cache only geometries"), wxDefaultPosition, wxDefaultSize);
+    only_geoms_checkbox->SetValue( cache_only_geometries );
     display_list_sizer->Add(only_geoms_checkbox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
   //  graphics_caching_sizer->Add(only_geoms_sizer, 0, wxGROW|wxALL, 0);
 
@@ -1076,8 +1294,26 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
     
     wxSpinCtrl* caching_delay_spin = new wxSpinCtrl(panel, ID_CACHING_DELAY, wxEmptyString, wxDefaultPosition,
         wxSize(80, wxDefaultCoord));
+    caching_delay_spin->SetValue( caching_delay );
     caching_delay_sizer->Add(caching_delay_spin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     graphics_caching_sizer->Add( caching_delay_sizer );
+
+
+      int bound_type = 1;
+      int max_triangles_in_leaf = 1;
+      
+      GeometryBoundTreeOptions *gbto = NULL;
+
+      if( gs ) {
+        gs->getOptionNode( gbto );
+        if( gbto ) {
+          max_triangles_in_leaf = gbto->maxTrianglesInLeaf->getValue();
+          const string &type =  gbto->boundType->getValue();
+          if( type == "OBB" ) bound_type = 0;
+          else if( type == "AABB" ) bound_type = 1;
+          else if( type == "SPHERE" ) bound_type = 2;
+        }
+      }
 
     // Geometry bound
     wxStaticBox* bound_tree_box = new wxStaticBox(panel, wxID_ANY, _("Bound tree:"));
@@ -1093,6 +1329,7 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
     wxBoxSizer* itemSizer2 = new wxBoxSizer( wxHORIZONTAL );
 
     wxChoice* choice2 = new wxChoice(panel, ID_BOUND_TYPE, wxDefaultPosition, wxDefaultSize, bound_choices );
+    choice2->SetSelection( bound_type );
 
     itemSizer2->Add(new wxStaticText(panel, wxID_ANY, _("&Bound type:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
    // itemSizer2->Add(5, 5, 1, wxALL, 0);
@@ -1104,15 +1341,42 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
     
     wxSpinCtrl* max_triangles_spin = new wxSpinCtrl(panel, ID_MAX_TRIANGLES, wxEmptyString, wxDefaultPosition,
         wxSize(80, wxDefaultCoord));
+    max_triangles_spin->SetRange( 1, 1000 );
+    max_triangles_spin->SetValue( max_triangles_in_leaf );
     max_triangles_sizer->Add(max_triangles_spin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     bound_tree_sizer->Add( max_triangles_sizer );
 
-    //// FONT SIZE SELECTION
+    //// haptics options
+
+    HapticsOptions *ho = NULL;
+
+    int touchable_face = 0;
+    string max_distance = "0.015";
+    string look_ahead_factor = "3";
+    bool use_bound_tree = true;
+      
+
+  if( gs ) {
+    gs->getOptionNode( ho );
+    if( ho ) {
+      use_bound_tree = ho->useBoundTree->getValue();
+
+      const string &face = ho->touchableFace->getValue();
+      if( face == "AS_GRAPHICS" ) touchable_face = 0;
+      else if( face == "FRONT_AND_BACK" ) touchable_face = 1;
+      else if( face == "FRONT" ) touchable_face = 2;
+      else if( face == "BACK" ) touchable_face = 3;
+      
+      // TODO: maxdistance lookahead
+      //max_distance = ho->drawHapticTriangles->getValue();
+    }
+  }
 
     wxStaticBox* haptics_box = new wxStaticBox(panel, wxID_ANY, _("Haptics options:"));
     wxBoxSizer* haptics_box_sizer = new wxStaticBoxSizer( haptics_box, wxVERTICAL );
 
     wxArrayString face_choices;
+    face_choices.Add(wxT("As graphics"));
     face_choices.Add(wxT("Front and back"));
     face_choices.Add(wxT("Front only"));
     face_choices.Add(wxT("Back only"));
@@ -1120,25 +1384,29 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
     wxBoxSizer* face_choice_sizer = new wxBoxSizer( wxHORIZONTAL );
     face_choice_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Touchable face:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     wxChoice* face_choice = new wxChoice(panel, ID_TOUCHABLE_FACE, wxDefaultPosition, wxDefaultSize, face_choices );
+    face_choice->SetSelection( touchable_face );
     face_choice_sizer->Add(face_choice, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     haptics_box_sizer->Add(face_choice_sizer, 0, wxGROW|wxALL, 5);
 
     wxBoxSizer* max_distance_sizer = new wxBoxSizer( wxHORIZONTAL );
     max_distance_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Max distance:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* max_distance = new wxTextCtrl(panel, ID_MAX_DISTANCE, wxEmptyString, wxDefaultPosition,
+    wxTextCtrl* max_distance_text = new wxTextCtrl(panel, ID_MAX_DISTANCE, wxEmptyString, wxDefaultPosition,
         wxSize(40, wxDefaultCoord)); 
-    max_distance_sizer->Add(max_distance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    max_distance_text->SetValue( max_distance );
+    max_distance_sizer->Add(max_distance_text, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     haptics_box_sizer->Add(max_distance_sizer, 0, wxGROW|wxALL, 5);
 
     wxBoxSizer* look_ahead_sizer = new wxBoxSizer( wxHORIZONTAL );
     look_ahead_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Look ahead factor:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* look_ahead = new wxTextCtrl(panel, ID_LOOK_AHEAD_FACTOR, wxEmptyString, wxDefaultPosition,
+    wxTextCtrl* look_ahead_text = new wxTextCtrl(panel, ID_LOOK_AHEAD_FACTOR, wxEmptyString, wxDefaultPosition,
         wxSize(40, wxDefaultCoord) );
-    look_ahead_sizer->Add(look_ahead, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    look_ahead_text->SetValue( look_ahead_factor );
+    look_ahead_sizer->Add(look_ahead_text, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     haptics_box_sizer->Add(look_ahead_sizer, 0, wxGROW|wxALL, 5);
 
     wxBoxSizer* use_bound_tree_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxCheckBox* use_bound_tree_checkbox = new wxCheckBox(panel, ID_USE_BOUND_TREE, _("&Use bound tree"), wxDefaultPosition, wxDefaultSize);
+    use_bound_tree_checkbox->SetValue( use_bound_tree );
     use_bound_tree_sizer->Add(use_bound_tree_checkbox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     //haptics_box_sizer->Add(use_bound_tree_checkbox, 0, wxGROW|wxALL, 0);
     haptics_box_sizer->Add(use_bound_tree_sizer, 0, wxGROW|wxALL, 0);
@@ -1152,5 +1420,132 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
     topSizer->Fit(panel);
 
     return panel;
+}
+
+
+
+void H3DWxFrame::readSettingsFromINIFile( const string &filename, 
+                                          GlobalSettings *gs ) {
+  gs->options->clear();
+
+  // default values
+
+  INIFile ini_file( filename );
+
+  // graphics caching options
+  
+  GraphicsCachingOptions *gco = new GraphicsCachingOptions;
+
+  if( ini_file.hasOption( "graphics caching",
+                          "use_display_lists" ) ) 
+    gco->useCaching->setValue( ini_file.getBoolean( "graphics caching",
+                                                    "use_display_lists" ) );
+
+  if( ini_file.hasOption( "graphics caching",
+                          "cache_only_geometries" ) ) 
+    gco->cacheOnlyGeometries->setValue( ini_file.getBoolean( "graphics caching",
+                                                             "cache_only_geometries" ) );
+
+  if( ini_file.hasOption( "graphics caching",
+                          "caching_delay" ) ) 
+    gco->cachingDelay->setValue( atoi( ini_file.get( "graphics caching",
+                                                     "caching_delay" ).c_str() ) );
+
+  global_settings->options->push_back( gco );
+
+  // debug options
+
+  DebugOptions *debug = new DebugOptions;
+
+  if( ini_file.hasOption( "debug",
+                          "draw_bound" ) ) 
+    debug->drawBound->setValue( ini_file.getBoolean( "debug",
+                                                     "draw_bound" ) );
+
+  if( ini_file.hasOption( "debug",
+                          "draw_tree" ) &&
+      ini_file.hasOption( "debug",
+                          "draw_tree_depth" )) {
+    if( ini_file.getBoolean( "debug", "draw_tree" ) ) {
+      debug->drawBoundTree->setValue( atoi( ini_file.get( "debug",
+                                                          "draw_tree_depth" ).c_str() ) );
+    } 
+  }
+
+  if( ini_file.hasOption( "debug",
+                          "draw_triangles" ) ) 
+    debug->drawHapticTriangles->setValue( ini_file.getBoolean( "debug",
+                                                               "draw_triangles" ) );
+  global_settings->options->push_back( debug );
+
+  // haptics options
+
+  HapticsOptions *ho = new HapticsOptions;
+
+  if( ini_file.hasOption( "haptics",
+                          "touchable_face" ) ) 
+    ho->touchableFace->setValue( ini_file.get( "haptics",
+                                               "touchable_face" ) );
+
+  if( ini_file.hasOption( "haptics",
+                          "max_distance" ) ) {
+    ho->maxDistance->setValue( atof( ini_file.get( "haptics",
+                                                   "max_distance" ).c_str() ) );
+  } 
+
+  if( ini_file.hasOption( "haptics",
+                          "look_ahead_factor" ) ) {
+    ho->lookAheadFactor->setValue( atof( ini_file.get( "haptics",
+                                                       "look_ahead_factor" ).c_str() ) );
+  } 
+
+  if( ini_file.hasOption( "haptics",
+                          "use_bound_tree" ) ) 
+    ho->useBoundTree->setValue( ini_file.getBoolean( "haptics",
+                                                     "use_bound_tree" ) );
+  global_settings->options->push_back( ho );
+
+  // geometry bound tree
+
+  GeometryBoundTreeOptions *gbto = new GeometryBoundTreeOptions;
+
+  if( ini_file.hasOption( "bound tree",
+                          "max_triangles_in_leaf" ) ) 
+    gbto->maxTrianglesInLeaf->setValue( atoi( ini_file.get( "bound tree",
+                                                            "max_triangles_in_leaf" ).c_str() ) );
+
+  if( ini_file.hasOption( "bound tree",
+                          "bound_type" ) ) {
+    gbto->boundType->setValue( ini_file.get( "bound tree",
+                                             "bound_type" ).c_str() );
+  } 
+
+  global_settings->options->push_back( gbto );
+
+  // OpenHaptics
+
+  OpenHapticsOptions *oho = new OpenHapticsOptions;
+
+  if( ini_file.hasOption( "OpenHaptics",
+                          "default_shape" ) ) 
+    oho->GLShape->setValue( ini_file.get( "OpenHaptics",
+                                          "default_shape" ) );
+
+  if( ini_file.hasOption( "OpenHaptics",
+                          "use_adaptive_viewport" ) ) 
+    oho->useAdaptiveViewport->setValue( ini_file.getBoolean( "OpenHaptics",
+                                                             "use_adaptive_viewport" ) );
+
+  if( ini_file.hasOption( "OpenHaptics",
+                          "use_haptic_camera_view" ) ) 
+    oho->useHapticCameraView->setValue( ini_file.getBoolean( "OpenHaptics",
+                                                             "use_haptic_camera_view" ) );
+
+  if( ini_file.hasOption( "OpenHaptics",
+                          "force_full_geometry_render" ) ) 
+    oho->forceFullGeometryRender->setValue( ini_file.getBoolean( "OpenHaptics",
+                                                                 "force_full_geometry_render" ) );
+
+  global_settings->options->push_back( oho );
 }
 

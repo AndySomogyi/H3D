@@ -4,6 +4,7 @@
 #include <wx/docview.h>
 #include <wx/spinctrl.h>
 #include "H3DWxWidgetsWindow.h"
+#include "GlobalSettings.h"
 
 #include "Group.h"
 #include "Transform.h"
@@ -105,6 +106,60 @@ using namespace H3D;
   return "";
 } */
 
+// Property sheet dialog
+class SettingsDialog: public wxPropertySheetDialog
+{
+DECLARE_CLASS(SettingsDialog)
+public:
+    SettingsDialog(wxWindow* parent, GlobalSettings *gs );
+    ~SettingsDialog();
+
+  void handleSettingsChange (wxCommandEvent & event);
+  void handleSpinEvent (wxSpinEvent & event);
+
+    wxPanel* CreateGeneralSettingsPage(wxWindow* parent, GlobalSettings *gs );
+    wxPanel* CreateOpenHapticsSettingsPage(wxWindow* parent, GlobalSettings *gs);
+  wxPanel* CreateDebugSettingsPage(wxWindow* parent, GlobalSettings *gs);
+  
+  
+protected:
+
+    enum {
+        ID_SHOW_TOOLTIPS = 100,
+
+        ID_AUTO_SAVE,
+        ID_AUTO_SAVE_MINS,
+        ID_LOAD_LAST_PROJECT,
+
+        ID_APPLY_SETTINGS_TO,
+        ID_BACKGROUND_STYLE,
+        ID_FONT_SIZE,
+
+        ID_MAX_TRIANGLES,
+        ID_USE_DISPLAY_LISTS,
+        ID_CACHE_ONLY_GEOMS,
+        ID_CACHING_DELAY,
+        ID_BOUND_TYPE,
+        ID_MAX_DISTANCE,
+        ID_TOUCHABLE_FACE,
+        ID_LOOK_AHEAD_FACTOR,
+        ID_USE_BOUND_TREE,
+        ID_OH_SHAPE_TYPE,
+        ID_ADAPTIVE_VIEWPORT,
+        ID_HAPTIC_CAMERA,
+        ID_FULL_GEOMETRY_RENDER,
+        ID_DRAW_BOUNDS,
+        ID_DRAW_TRIANGLES,
+        ID_DRAW_BOUND_TREE,
+        ID_DRAW_TREE_DEPTH
+        
+    };
+
+    wxImageList*    m_imageList;
+
+DECLARE_EVENT_TABLE()
+};
+
 // ---------------------------------------------------------------------------
 //  H3DWxFrame Definition
 // ---------------------------------------------------------------------------
@@ -162,6 +217,7 @@ public:
   wxString GetCurrentPath();
   bool validateNavType(string);
   void buildNavMenu();
+  void readSettingsFromINIFile( const string &filename,GlobalSettings *gs );
 
 private:
 	wxString currentFilename;
@@ -199,6 +255,7 @@ private:
 	AutoRef< Group > g;
 
 	auto_ptr< consoleDialog > theConsole;
+  auto_ptr< SettingsDialog > settings;
 
 protected:
   DECLARE_EVENT_TABLE()
@@ -244,51 +301,4 @@ enum
   FRAME_SETTINGS
 };
 
-// Property sheet dialog
-class SettingsDialog: public wxPropertySheetDialog
-{
-DECLARE_CLASS(SettingsDialog)
-public:
-    SettingsDialog(wxWindow* parent, int dialogType);
-    ~SettingsDialog();
 
-    wxPanel* CreateGeneralSettingsPage(wxWindow* parent);
-    wxPanel* CreateOpenHapticsSettingsPage(wxWindow* parent);
-  wxPanel* CreateDebugSettingsPage(wxWindow* parent);
-
-protected:
-
-    enum {
-        ID_SHOW_TOOLTIPS = 100,
-
-        ID_AUTO_SAVE,
-        ID_AUTO_SAVE_MINS,
-        ID_LOAD_LAST_PROJECT,
-
-        ID_APPLY_SETTINGS_TO,
-        ID_BACKGROUND_STYLE,
-        ID_FONT_SIZE,
-
-        ID_MAX_TRIANGLES,
-        ID_USE_DISPLAY_LISTS,
-        ID_CACHE_ONLY_GEOMS,
-        ID_CACHING_DELAY,
-        ID_BOUND_TYPE,
-        ID_MAX_DISTANCE,
-        ID_TOUCHABLE_FACE,
-        ID_LOOK_AHEAD_FACTOR,
-        ID_USE_BOUND_TREE,
-        ID_OH_SHAPE_TYPE,
-        ID_ADAPTIVE_VIEWPORT,
-        ID_HAPTIC_CAMERA,
-        ID_FULL_GEOMETRY_RENDER,
-        ID_DRAW_BOUNDS,
-        ID_DRAW_TRIANGLES,
-        ID_DRAW_BOUND_TREE
-        
-    };
-
-    wxImageList*    m_imageList;
-
-DECLARE_EVENT_TABLE()
-};
