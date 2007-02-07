@@ -140,8 +140,11 @@ namespace H3D {
     /// displayList->callList per default
     virtual void glRender() {
       bool previous_allow = allowingCulling();
+      bool prev_draw = draw_debug_options;
       allowCulling( false );
+      draw_debug_options = false;
       displayList->callList( false );
+      draw_debug_options = prev_draw;
       allowCulling( previous_allow );
     }
 
@@ -309,6 +312,7 @@ namespace H3D {
     H3DInt32 current_geometry_id;
 
     bool use_culling, allow_culling;
+    bool draw_debug_options;
     GLenum cull_face;
     friend class H3DHapticsDevice;
   };

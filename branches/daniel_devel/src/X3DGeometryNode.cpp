@@ -85,6 +85,7 @@ X3DGeometryNode::X3DGeometryNode(
   options( new MFOptionsNode ),
   use_culling( false ),
   allow_culling( true ),
+  draw_debug_options( true ),
   cull_face( GL_BACK ) {
 
   type_name = "X3DGeometryNode";
@@ -233,37 +234,39 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
 
   BugWorkaroundDisplayList::callList( build_list );
 
-  H3DInt32 render_depth = -1;
-  bool render_bound = false;
-  DebugOptions *debug_options = NULL;
-  geom->getOptionNode( debug_options );
-  if( !debug_options ) {
-    GlobalSettings *default_settings = GlobalSettings::getActive();
-    if( default_settings ) {
-      default_settings->getOptionNode( debug_options );
+  if( geom->draw_debug_options ) {
+    H3DInt32 render_depth = -1;
+    bool render_bound = false;
+    DebugOptions *debug_options = NULL;
+    geom->getOptionNode( debug_options );
+    if( !debug_options ) {
+      GlobalSettings *default_settings = GlobalSettings::getActive();
+      if( default_settings ) {
+        default_settings->getOptionNode( debug_options );
+      }
     }
-  }
-  
-  if( debug_options ) {
-    render_depth = debug_options->drawBoundTree->getValue();
-    render_bound = debug_options->drawBound->getValue();
-  }
-  
-  if( render_depth >= 0 ) {
-    HAPI::Bounds::BinaryBoundTree *tree = geom->boundTree->getValue();
-    if( tree ) {
-      glMatrixMode( GL_MODELVIEW );
-      glPushMatrix();
-      glScalef( 1e-3f, 1e-3f, 1e-3f ); 
-      tree->render( render_depth );
-      glPopMatrix();
+    
+    if( debug_options ) {
+      render_depth = debug_options->drawBoundTree->getValue();
+      render_bound = debug_options->drawBound->getValue();
     }
-  }
+    
+    if( render_depth >= 0 ) {
+      HAPI::Bounds::BinaryBoundTree *tree = geom->boundTree->getValue();
+      if( tree ) {
+        glMatrixMode( GL_MODELVIEW );
+        glPushMatrix();
+        glScalef( 1e-3f, 1e-3f, 1e-3f ); 
+        tree->render( render_depth );
+        glPopMatrix();
+      }
+    }
   
-  if( render_bound ) {
-    Bound *b = geom->bound->getValue();
-    if( b ) {
-      b->render();
+    if( render_bound ) {
+      Bound *b = geom->bound->getValue();
+      if( b ) {
+        b->render();
+      }
     }
   }
   
@@ -303,6 +306,9 @@ void X3DGeometryNode::SFBoundTree::update() {
   if( options ) {
     const string &type = options->boundType->getValue();
     H3DInt32 max_triangles = options->maxTrianglesInLeaf->getValue();
+    if( lines.size() > 0 ) {
+      cerr << "NOO!" <<endl;
+    }
     if( type == "AABB" ) {
       value = new HAPI::Bounds::AABBTree( triangles,
                                           lines,
