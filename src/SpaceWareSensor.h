@@ -151,9 +151,9 @@ namespace H3D {
           Rotation( 0, 0, 1, euler_angles.z ), sws->id );     
       }
     };
-//#ifdef __BORLANDC__
+#ifdef __BORLANDC__
     friend class ResetAccumulatedRotation;
-//#endif
+#endif
 
     /// This class is an AutoUpdate class that accumulates the Vec3f
     /// values routed to it, i.e. each time a field generates an event the 
@@ -199,9 +199,9 @@ namespace H3D {
         sws->accumulatedTranslation->setValue( value, sws->id );
       }
     };
-//#ifdef __BORLANDC__
+#ifdef __BORLANDC__
     friend class ResetAccumulatedTranslation;
-//#endif
+#endif
   
     /// Constructor.
     SpaceWareSensor( 
