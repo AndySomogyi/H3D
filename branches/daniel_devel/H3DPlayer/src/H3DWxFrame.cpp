@@ -264,6 +264,8 @@ void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
   if( dgo ) {
     if( id == ID_DRAW_BOUNDS ) 
       dgo->drawBound->setValue( event.IsChecked() );
+    else if( id == ID_DRAW_TRIANGLES ) 
+      dgo->drawHapticTriangles->setValue( event.IsChecked() );
     else if( id == ID_DRAW_BOUND_TREE ) {
       if( event.IsChecked() ) dgo->drawBoundTree->setValue( 1 );
       else dgo->drawBoundTree->setValue( -1 );
@@ -1052,6 +1054,7 @@ BEGIN_EVENT_TABLE(SettingsDialog, wxPropertySheetDialog)
 	EVT_CHECKBOX (ID_DRAW_BOUNDS, SettingsDialog::handleSettingsChange)
 	EVT_CHECKBOX (ID_DRAW_BOUND_TREE, SettingsDialog::handleSettingsChange)
 	EVT_SPINCTRL (ID_DRAW_TREE_DEPTH, SettingsDialog::handleSpinEvent)
+  EVT_CHECKBOX( ID_DRAW_TRIANGLES, SettingsDialog::handleSettingsChange)
 
   EVT_CHECKBOX (ID_USE_DISPLAY_LISTS, SettingsDialog::handleSettingsChange)
   EVT_CHECKBOX (ID_CACHE_ONLY_GEOMS, SettingsDialog::handleSettingsChange)
