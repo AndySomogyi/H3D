@@ -626,6 +626,13 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
 
   H3DFloat half_interocular_distance = interocular_distance / 2;
 
+  bool mirror_in_y = mirrored->getValue();
+    
+  if( mirror_in_y != last_loop_mirrored ) 
+    H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+
+  last_loop_mirrored = mirror_in_y;
+
   if( renderMode->isStereoMode() ) {
     // make sure the focal plane is between the near and far 
     // clipping planes.
@@ -655,12 +662,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    bool mirror = mirrored->getValue();
-    
-    if( mirror != last_loop_mirrored ) 
-      H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
-
-    if( mirror ) {
+    if( mirror_in_y ) {
       glScalef( 1, -1, 1 );
       glFrontFace( GL_CW );
     } else {
@@ -743,7 +745,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    if( mirrored->getValue() ) {
+    if( mirror_in_y ) {
       glScalef( 1, -1, 1 );
       glFrontFace( GL_CW );
     } else {
@@ -883,7 +885,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    if( mirrored->getValue() ) {
+    if( mirror_in_y ) {
       glScalef( 1, -1, 1 );
       glFrontFace( GL_CW );
     } else {
