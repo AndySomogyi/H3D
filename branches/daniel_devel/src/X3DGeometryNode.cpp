@@ -440,7 +440,7 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
           radius = haptics_options->maxDistance->getValue();
           lookahead_factor = haptics_options->lookAheadFactor->getValue();
           use_bound_tree = haptics_options->useBoundTree->getValue();
-        }
+        } 
 
         Vec3f scale = ti.getAccInverseMatrix().getScalePart();
         Matrix4f to_local = ti.getAccInverseMatrix();
@@ -485,7 +485,6 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
             bool done = false;
             H3DFloat d = 2 * radius;
             Vec3f full_movement = movement * lookahead_factor;
-            Vec3f size = full_movement + Vec3f( d, d, d );
             Vec3f center = (local_proxy + local_proxy + full_movement)/2; 
             glMatrixMode( GL_MODELVIEW );
             glPushMatrix();
@@ -494,7 +493,11 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
             while( !done ) {
               HAPI::FeedbackBufferCollector::startCollecting( nr_values, 
                                                               center * 1e3f, 
-                                                              size * 1e3f );
+                              (full_movement + 
+                               Vec3f( d, d, d ) *  H3DMax( scale.x, 
+                                                           H3DMax( scale.y, 
+                                                                   scale.z ) ) 
+                               * 1e3f  ) );
               glRender();
               HAPI::FeedbackBufferCollector::ErrorType e = 
                 HAPI::FeedbackBufferCollector::endCollecting( tris );
