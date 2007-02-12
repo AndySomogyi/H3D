@@ -139,7 +139,13 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   helpMenu = (wxMenu *)	NULL;
 
   global_settings.reset( new GlobalSettings );
-  readSettingsFromINIFile( "H3DPlayer.ini", global_settings.get() );
+  global_settings->options->push_back( new DebugOptions );
+  global_settings->options->push_back( new GraphicsCachingOptions );
+  global_settings->options->push_back( new GeometryBoundTreeOptions );
+  global_settings->options->push_back( new OpenHapticsOptions );
+  global_settings->options->push_back( new HapticsOptions );
+
+  //readSettingsFromINIFile( "H3DPlayer.ini", global_settings.get() );
 
   settings.reset( new SettingsDialog(this, global_settings.get() ) );
 
@@ -565,9 +571,6 @@ bool H3DWxFrame::loadFile( const string &filename ) {
       device_info.reset( NULL );
     }
 
-    g->children->push_back( t.get() );
-
-    
     // create a window to display
     
 //    H3DWxFrame *theWxFrame = new H3DWxFrame(NULL, wxID_ANY, "H3D Player", wxDefaultPosition, wxSize(800, 600));
