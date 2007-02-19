@@ -98,8 +98,10 @@ bool MyApp::OnExceptionInMainLoop() {
 
 bool MyApp::OnInit()
 {
-    // create a window to display
-    H3DWxFrame *theWxFrame = new H3DWxFrame(NULL, wxID_ANY, "H3D Player", wxDefaultPosition, wxSize(800, 600));
+  SetVendorName(_T("SenseGraphics AB"));
+  SetAppName(_T("H3D Player"));
+  // create a window to display
+  H3DWxFrame *theWxFrame = new H3DWxFrame(NULL, wxID_ANY, "H3D Player", wxDefaultPosition, wxSize(800, 600));
 	//glwindow constructed in the frame constructor.  Next line redundant.
 	//theWxFrame->glwindow = new H3DWxWidgetsWindow(theWxFrame);
 	theWxFrame->Show(true);
