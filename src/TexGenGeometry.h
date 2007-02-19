@@ -111,7 +111,7 @@ namespace H3D {
     /// The number of triangles renderered in this geometry.
     virtual int nrTriangles() {
       X3DGeometryNode *g = geometry->getValue();
-      if( g ) return nrTriangles();
+      if( g ) return g->nrTriangles();
       else return 0;
     }
 
