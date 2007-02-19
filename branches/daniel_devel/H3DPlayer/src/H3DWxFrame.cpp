@@ -6,7 +6,7 @@
 #include "consoleDialog.h"
 #include <vector>
 #include "H3DWxWidgetsWindow.h"
-//#include <wx/string.h>
+
 #include <wx/wx.h>
 #include "envini.h"
 
@@ -151,6 +151,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 
   //File History
   recentFiles = (wxFileHistory *) NULL;
+  recentList = (wxConfigBase *) NULL;
 
   //sub menus
   renderoptionsMenu = (wxMenu *) NULL;
@@ -172,6 +173,20 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   recentFiles = new wxFileHistory;
   recentFiles->UseMenu(fileMenu);
 
+  //Initialize config object
+  wxConfigBase *recentList = wxConfigBase::Get();
+
+  //Load file history from previous sessions
+  recentList->SetPath(_T("/Recent/Count"));
+  int count = recentList->Read(_T("Count"), 9);
+  recentList->SetPath(_T("/Recent/List"));
+  for (int i = 0; i < count; i++) {
+    wxString entry = wxString("") << i;
+    if (recentList->Exists(entry)) {
+      recentFiles->AddFileToHistory (recentList->Read(entry));
+    }
+  }
+
   //Render Options submenu
   renderoptionsMenu = new wxMenu;
   renderoptionsMenu->AppendCheckItem(BASIC_WIREFRAME, "Wireframe", "Wireframe");
@@ -190,11 +205,6 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   rendererMenu->AppendSeparator();
   rendererMenu->Append(FRAME_SETTINGS, "Settings...", "Scenegraph rendering options");
 
-/*  //Device Control submenu
-  devicecontrolMenu = new wxMenu;
-  devicecontrolMenu->AppendRadioItem(BASIC_STARTDEVICE, "Start", "Start haptic device(s)");
-  devicecontrolMenu->AppendRadioItem(BASIC_STOPDEVICE, "Stop", "Stop haptic device(s)"); */
-
   //Device Control Menu
   deviceMenu = new wxMenu;
   deviceMenu->AppendCheckItem(FRAME_DEVICECONTROL, "Toggle Haptics", "Start/Stop haptic devices");
@@ -202,7 +212,6 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 
   //Viewpoint Menu
   viewpointMenu = new wxMenu;
-//  viewpointMenu->Append(BASIC_SELECT, "Select", "Select a viewpoint");
 
   //Navigation Menu
   navigationMenu = new wxMenu;
@@ -252,10 +261,6 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
 	EVT_MENU (FRAME_NAVIGATION, H3DWxFrame::ChangeNavigation)
   EVT_MENU (FRAME_CHOOSERENDERER, H3DWxFrame::ChangeRenderer)
   EVT_MENU (FRAME_DEVICECONTROL, H3DWxFrame::ToggleHaptics)
-	//EVT_MENU (BASIC_SAVE, BasicFrame::OnSave)
-	//EVT_MENU (BASIC_SAVE_AS, BasicFrame::OnSaveAs)
-	//EVT_MENU (BASIC_FONT, BasicFrame::OnChooseFont)
-	//EVT_MENU (BASIC_DIR, BasicFrame::OnChooseDir)
 	EVT_MENU (FRAME_ABOUT, H3DWxFrame::OnAbout)
 	EVT_MENU (FRAME_HELP, H3DWxFrame::OnHelp)
 END_EVENT_TABLE()
@@ -376,7 +381,8 @@ void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
 
 /*******************Member Functions*********************/
 
-bool H3DWxFrame::loadFile( const string &filename ) {
+bool H3DWxFrame::loadFile( const string &filename) {
+  clearData();
   string h3d_root = getenv( "H3D_ROOT" );
   INIFile ini_file( h3d_root + "/settings/h3dload.ini" );
   
@@ -492,29 +498,43 @@ bool H3DWxFrame::loadFile( const string &filename ) {
 	/****************************Intialize Viewpoints****************************/
 	//Enable Viewpoints Menu
 	menuBar->EnableTop(3, true);
-	//Create Viewpoint list
-	VPlist = X3DViewpointNode::getViewpointHierarchy();
-	//Store number of viewpoints for processing later
-	viewpointCount = VPlist.size();
-	//Create Viewpoints menu using list
-	//If no viewpoints are specified in the file
-	if (viewpointCount == 0) {
-		viewpointMenu->Append(FRAME_VIEWPOINT, "Default", "Default Viewpoint");
-		viewpointMenu->Enable(FRAME_VIEWPOINT, false);
-	}
-	else {
-		int i = 0;
-		for (X3DViewpointNode::ViewpointList::iterator vp = VPlist.begin(); vp != VPlist.end(); vp++) {
-			string vpDescription = (*vp)->description->getValue();
-			viewpointMenu->AppendRadioItem(FRAME_VIEWPOINT + i, vpDescription.c_str(), "Select a viewpoint");
-			if ((*vp)->isBound->getValue()) {
-				viewpointMenu->Check(FRAME_VIEWPOINT+i, true);
-			}
-			Connect(FRAME_VIEWPOINT +i,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
-			Connect(FRAME_VIEWPOINT +i,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeViewpoint));
-      i++;
-		}
-  }
+  // create a Viewpoint if it does not exist.
+  //if( !Viewpoint::getActive() && viewpoint_file.size() ) {
+  //  try {
+  //    viewpoint = X3D::createX3DNodeFromURL( viewpoint_file );
+  //  } catch( const Exception::H3DException &e ) {
+  //    Console(3) << "Warning: Could not create default Viewpoint node "
+  //               << "from file \"" << viewpoint_file << "\": "
+  //               << e << endl;
+  //  }
+  //}
+  //else {
+	  //Create Viewpoint list
+	  VPlist = X3DViewpointNode::getViewpointHierarchy();
+	  //Store number of viewpoints for processing later
+	  viewpointCount = VPlist.size();
+    Console (3) << "Viewpoint Count is " << viewpointCount << endl;
+	  //Create Viewpoints menu using list
+	  //If no viewpoints are specified in the file
+    if (viewpointCount <= 1) {
+		  viewpointMenu->Append(FRAME_VIEWPOINT, "Default", "Default Viewpoint");
+		  viewpointMenu->Enable(FRAME_VIEWPOINT, false);
+	  }
+	  else {
+		  int i = 0;
+		  for (X3DViewpointNode::ViewpointList::iterator vp = VPlist.begin(); vp != VPlist.end(); vp++) {
+			  string vpDescription = (*vp)->description->getValue();
+			  viewpointMenu->AppendRadioItem(FRAME_VIEWPOINT + i, vpDescription.c_str(), "Select a viewpoint");
+			  //if ((*vp)->isBound->getValue()) {
+        if ((*vp) == Viewpoint::getActive()) {
+				  viewpointMenu->Check(FRAME_VIEWPOINT+i, true);
+			  }
+			  Connect(FRAME_VIEWPOINT +i,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
+			  Connect(FRAME_VIEWPOINT +i,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeViewpoint));
+        i++;
+		  }
+    }
+//  }
 
 
 	/****************************Navigation Info****************************/
@@ -533,12 +553,13 @@ bool H3DWxFrame::loadFile( const string &filename ) {
     NodeVector::const_iterator nv = allDevices.begin();
   }
 
-  int i = 0;
-  for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
-    wxString item = wxString ("Device ") << i;
-		deviceMenu->AppendRadioItem(FRAME_DEVICE + i, item, "Select a viewpoint");
-    i++;
-  }
+  //int i = 0;
+  //for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
+  //  wxString item = wxString ("Device ") << i;
+		//deviceMenu->AppendRadioItem(FRAME_DEVICE + i, item, "Select haptic device");
+  //  i++;
+  //}
+//  deviceCount = i;
 
     // set up routes to rotate the model
 /*    ks->keyPress->route( quit_api );
@@ -610,6 +631,34 @@ bool H3DWxFrame::loadFile( const string &filename ) {
   return true;
 }
 
+//Clear data when closing file
+void H3DWxFrame::clearData () {
+  t->children->clear();
+	viewpoint.reset (NULL);
+	device_info.reset (NULL);
+
+	//Delete items from viewpoint menu & disconnect events
+	for (int i = 0; i <= viewpointCount; i++) {
+		viewpointMenu->Destroy(FRAME_VIEWPOINT + i);
+		Disconnect(FRAME_VIEWPOINT + i,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
+		Disconnect(FRAME_VIEWPOINT + i,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeViewpoint));
+	}
+
+	//Delete items from navigation menu & disconnect events
+	for (int j = 0; j <= navTypeCount; j++) {
+		navigationMenu->Destroy(FRAME_NAVIGATION + j);
+		Disconnect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
+		Disconnect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
+	}
+
+  //Delete items from device menu
+  for (int k = 0; k <= deviceCount; k++) {
+  	deviceMenu->Destroy(FRAME_DEVICE + k);
+} 
+
+}
+
+
 //Open a file
 void H3DWxFrame::OnOpenFileURL(wxCommandEvent & event) {
    auto_ptr< wxTextEntryDialog > text_dialog( new wxTextEntryDialog ( this,
@@ -643,7 +692,6 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
     loadFile( filename );
     recentFiles->AddFileToHistory ( filename );
   }
-
 }
 
 //Open a file from file history
@@ -784,11 +832,7 @@ void H3DWxFrame::RenderMode(wxCommandEvent & event)
 				renderMode = "RED_CYAN_STEREO";
 				break;
 		}
-
 		glwindow->renderMode->setValue( renderMode.c_str());
-
-        //wxMessageDialog dialog2(this, selectMode.GetStringSelection(), _T("Got string"));
-        //dialog2.ShowModal();
     }
 }
 
@@ -858,7 +902,7 @@ void H3DWxFrame::ShowConsole(wxCommandEvent & event)
 void H3DWxFrame::ChangeViewpoint (wxCommandEvent & event)
 {	
 	//Default viewpoint
-	if (viewpointCount == 0) {
+	if (viewpointCount <= 1) {
 		//do nothing
 	}
 	else {
@@ -871,6 +915,21 @@ void H3DWxFrame::ChangeViewpoint (wxCommandEvent & event)
 		}
 		//Enable that viewpoint
 		(*vp)->set_bind->setValue(true);
+    //Console (3) << "Index is " << index << endl;
+//    wxString t = wxString ("") << index;
+//    wxMessageDialog aboutDialog ( this, t, ABOUT, wxOK);
+//    aboutDialog.ShowModal();
+    //cerr << index;
+    int i = 0;
+    for (vp = VPlist.begin(); vp != VPlist.end(); vp++) {
+      if ((*vp) == Viewpoint::getActive()) {
+          Console (3) << i << endl;
+          viewpointMenu->Check(FRAME_VIEWPOINT + i, true);
+          break;
+      }
+      i++;
+    }
+    //viewpointMenu->Check(FRAME_VIEWPOINT + index, true);
 	}
 }
 
@@ -889,6 +948,8 @@ void H3DWxFrame::GetSelection (wxMenuEvent & event)
 //Exit event
 void H3DWxFrame::OnExit (wxCommandEvent & event)
 {
+  SaveMRU();
+  delete wxConfigBase::Set((wxConfigBase *) NULL);
 	Close(TRUE); 
 }
 
@@ -915,6 +976,21 @@ wxString H3DWxFrame::GetCurrentPath()
 void H3DWxFrame::SetCurrentPath(wxString n)
 {
  currentPath = n;
+}
+
+////Save file history for next initialization
+void H3DWxFrame::SaveMRU () {
+  //Store number of files in history
+  recentList = wxConfigBase::Get();
+  recentList->SetPath(_T("/Recent/Count"));
+  recentList->Write(_T("Count"), (long) recentFiles->GetCount());
+
+  //Store each individual file info
+  recentList->SetPath(_T("/Recent/List"));
+  for (int i = 0; i < recentFiles->GetCount(); i++) {
+    wxString entry = wxString ("") << i;
+    recentList->Write(entry, recentFiles->GetHistoryFile(i));
+  }
 }
 
 //Build Navigation Menu
@@ -994,13 +1070,7 @@ void H3DWxFrame::buildNavMenu () {
 				Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
 				j++;
       }
-/*      if ((mynav->getUsedNavType() == "ANY") && (navTypeCount > 1)) {
-        mynav->setNavType ((navigationMenu->GetLabel(FRAME_NAVIGATION)).c_str());
-        navigationMenu->Check(FRAME_NAVIGATION, true);
-      }
-      else {
-        mynav->setNavType ("NULL");
-      } */
+
     int index = 0;
  		  for (vector<string>::iterator menuList = allowedTypes.begin(); menuList != allowedTypes.end(); menuList++) {
         if (mynav->getUsedNavType() == (*menuList)) {
