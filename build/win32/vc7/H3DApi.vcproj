@@ -11,9 +11,9 @@
 	</Platforms>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug\obj"
+			Name="Debug DLL|Win32"
+			OutputDirectory="..\..\..\lib"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -33,14 +33,68 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="HAPI.lib OpenHapticsRenderer.lib"
-				OutputFile="$(OutDir)/H3DApi.dll"
+				AdditionalDependencies="H3DUtil_d.lib"
+				OutputFile="$(OutDir)/H3DApi_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\H3D\chai3d\lib\msvc7;C:\H3D\H3DUtil\build\win32\vc7\Debug;..\..\..\..\HAPI\build\win32\vc7\Release;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
-				DelayLoadDLLs="dhd.dll; OpenHapticsRenderer.dll;"
+				AdditionalLibraryDirectories="C:\H3D\chai3d\lib\msvc7;..\..\..\..\H3DUtil\lib;..\..\..\..\HAPI\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
+				DelayLoadDLLs="OpenHapticsRenderer_d.dll;audiofile.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName)_d.pdb"
 				SubSystem="2"
+				ImportLibrary="$(OutDir)\H3DApi_d.lib"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="Release DLL|Win32"
+			OutputDirectory="..\..\..\lib"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				AdditionalIncludeDirectories="C:\H3D\chai3d\include;C:\H3D\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="H3DUtil.lib"
+				OutputFile="$(OutDir)/H3DApi.dll"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\H3D\chai3d\lib\msvc7;..\..\..\..\H3DUtil\lib;..\..\..\..\HAPI\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
+				DelayLoadDLLs="OpenHapticsRenderer.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
+				GenerateDebugInformation="TRUE"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				ImportLibrary="$(OutDir)\H3DApi.lib"
 				TargetMachine="1"/>
 			<Tool
@@ -65,36 +119,30 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release\obj"
-			ConfigurationType="2"
+			Name="Debug Static|Win32"
+			OutputDirectory="..\..\..\lib"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="0"
 				AdditionalIncludeDirectories="C:\H3D\chai3d\include;C:\H3D\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;HAPI_LIB;H3DUTIL_LIB;H3DAPI_LIB"
+				MinimalRebuild="TRUE"
+				BasicRuntimeChecks="3"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="3"/>
+				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="HAPI.lib"
-				OutputFile="$(OutDir)/H3DApi.dll"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\H3D\chai3d\lib\msvc7;C:\H3D\H3DUtil\build\win32\vc7\release;..\..\..\..\HAPI\build\win32\vc7\Release;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
-				DelayLoadDLLs="dhd.dll"
-				GenerateDebugInformation="TRUE"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)\H3DApi.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/libH3DAPI_d.lib"
+				AdditionalLibraryDirectories=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -110,7 +158,45 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="Release Static|Win32"
+			OutputDirectory="..\..\..\lib"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="C:\H3D\chai3d\include;C:\H3D\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;HAPI_LIB;H3DUTIL_LIB;H3DAPI_LIB"
+				RuntimeLibrary="2"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/libH3DApi.lib"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
@@ -294,6 +380,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\FrictionalSurface.cpp">
+				<FileConfiguration
+					Name="Release DLL|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\src\FunctionPlotTexture.cpp">
@@ -372,6 +464,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\HapticsRenderers.cpp">
+				<FileConfiguration
+					Name="Release DLL|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\src\Image3DTexture.cpp">
@@ -441,6 +539,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\MagneticSurface.cpp">
+				<FileConfiguration
+					Name="Release DLL|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\src\Material.cpp">
@@ -516,6 +620,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\OpenHapticsSurface.cpp">
+				<FileConfiguration
+					Name="Release DLL|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\src\OrientationInterpolator.cpp">
@@ -621,6 +731,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\SmoothSurface.cpp">
+				<FileConfiguration
+					Name="Release DLL|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\src\Sound.cpp">
@@ -1939,6 +2055,9 @@
 				RelativePath="..\..\..\src\X3DVertexAttributeNode.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\Release\H3DLoad3.dpsession">
+		</File>
 	</Files>
 	<Globals>
 		<Global
