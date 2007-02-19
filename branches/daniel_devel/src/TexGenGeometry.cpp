@@ -59,6 +59,9 @@ TexGenGeometry::TexGenGeometry(
 
   type_name = "TexGenGeometry";
   database.initFields( this );
+  
+  geometry->route( displayList );
+  texCoord->route( displayList );
 }
 
 void TexGenGeometry::traverseSG( TraverseInfo &ti ) {
