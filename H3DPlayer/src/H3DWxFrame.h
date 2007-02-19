@@ -3,6 +3,8 @@
 #include <wx/bookctrl.h>
 #include <wx/docview.h>
 #include <wx/spinctrl.h>
+#include <wx/config.h>
+#include <wx/confbase.h>
 #include "H3DWxWidgetsWindow.h"
 #include "GlobalSettings.h"
 
@@ -184,11 +186,13 @@ public:
   wxFileHistory *recentFiles;
   //Submenus
   wxMenu *renderoptionsMenu;
-  //wxMenu *devicecontrolMenu;
 
-  wxObject menuItem;
+
+  //Config object to save information (settings, file history etc...)
+  wxConfigBase *recentList;
 
   bool loadFile( const string &file );
+  void clearData();
 
   /***************Member Functions*****************/
   void OnOpenFile	(wxCommandEvent & event);
@@ -216,6 +220,7 @@ public:
   void SetCurrentPath(wxString);
   wxString GetCurrentPath();
   bool validateNavType(string);
+  void SaveMRU ();
   void buildNavMenu();
   void readSettingsFromINIFile( const string &filename,GlobalSettings *gs );
 
@@ -227,6 +232,7 @@ private:
 	int selection;
 	int viewpointCount;
 	int navTypeCount;
+  int deviceCount;
 	X3DViewpointNode::ViewpointList VPlist;
 	NavigationInfo *mynav;
 	DeviceInfo *mydevice;
@@ -274,14 +280,7 @@ enum
   FRAME_MIRROR,
   FRAME_CONSOLE,
   FRAME_SELECTION,
-  FRAME_VIEWPOINTSELECTION,
   FRAME_VIEWPOINT,
-//  FRAME_VIEWPOINT,
-//  FRAME_MIRRORON,
-//  FRAME_MIRROROFF,
-//  BASIC_SAVE,
-//  BASIC_SAVE_AS,
-//  BASIC_FONT,
   FRAME_NAVIGATION = 6500,
   FRAME_DEVICE = 6550,
   FRAME_CHOOSERENDERER = 6600,
