@@ -136,6 +136,10 @@ string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
 
 
 int main(int argc, char* argv[]) {
+#ifdef H3DAPI_LIB
+  initializeH3D();
+#endif
+
 
   PythonScript::setargv( argc, argv );
   
@@ -467,9 +471,15 @@ int main(int argc, char* argv[]) {
 
   catch (const Exception::H3DException &e) {
     Console(4) << e << endl;
+#ifdef H3DAPI_LIB
+    deinitializeH3D();
+#endif
     return 1;
   }
 
+#ifdef H3DAPI_LIB
+  deinitializeH3D();
+#endif
   return 0;
 }
 

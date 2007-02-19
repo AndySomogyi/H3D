@@ -41,50 +41,71 @@
 
 #include "ResourceResolver.h"
 
+#ifdef HAVE_FREEIMAGE
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+#pragma comment( lib, "FreeImage.lib" )
+#endif
+#endif
+
 using namespace H3D;
+
+/// Initialize H3D API(only needed if using H3D API as a static library). 
+void H3D::initializeH3D() {
+  XERCES_CPP_NAMESPACE_USE
+#ifdef HAVE_FREEIMAGE
+    FreeImage_Initialise();
+#endif
+#ifdef LINUX
+    FcInit();
+#endif 
+  XMLPlatformUtils::Initialize();
+  /*
+    string urn_config_file = "index.urn";
+    char *buffer = getenv( "H3D_URN_CONFIG_FILE" );
+    if( buffer ) urn_config_file = buffer;
+    else if( buffer = getenv( "H3D_ROOT" ) ) {
+    urn_config_file = buffer;
+    urn_config_file += "/index.urn";
+    }
+    ResourceResolver::setURNResolver( new URNResolver( urn_config_file ) );
+  */
+#ifdef HAVE_LIBCURL
+  curl_global_init( CURL_GLOBAL_ALL );
+  ResourceResolver::addResolver( new LibCurlResolver );
+#endif
+}
+
+  /// Deinitialize H3D API(only needed if using H3D API as a static library). 
+void H3D::deinitializeH3D() {
+  XERCES_CPP_NAMESPACE_USE
+#ifdef HAVE_FREEIMAGE
+  FreeImage_DeInitialise();
+#endif
+#ifdef HAVE_LIBCURL
+  curl_global_cleanup();
+#endif
+  XMLPlatformUtils::Terminate();
+}
+
 
 #ifdef WIN32
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
                        LPVOID lpReserved
                        ) {
-  XERCES_CPP_NAMESPACE_USE
-    switch (ul_reason_for_call) {
-    case DLL_PROCESS_ATTACH: {
-#ifdef HAVE_FREEIMAGE
-      FreeImage_Initialise();
-#endif
-      XMLPlatformUtils::Initialize();
-      /*
-      string urn_config_file = "index.urn";
-      char *buffer = getenv( "H3D_URN_CONFIG_FILE" );
-      if( buffer ) urn_config_file = buffer;
-      else if( buffer = getenv( "H3D_ROOT" ) ) {
-        urn_config_file = buffer;
-        urn_config_file += "/index.urn";
-      }
-      ResourceResolver::setURNResolver( new URNResolver( urn_config_file ) );
-      */
-#ifdef HAVE_LIBCURL
-      curl_global_init( CURL_GLOBAL_ALL );
-      ResourceResolver::addResolver( new LibCurlResolver );
-#endif
-      break;
-    }
-    case DLL_THREAD_ATTACH:
-      break;
-    case DLL_THREAD_DETACH:
-      break;
-    case DLL_PROCESS_DETACH:
-#ifdef HAVE_FREEIMAGE
-      FreeImage_DeInitialise();
-#endif
-#ifdef HAVE_LIBCURL
-    curl_global_cleanup();
-#endif
-      XMLPlatformUtils::Terminate();
-      break;
-    }
+  switch (ul_reason_for_call) {
+  case DLL_PROCESS_ATTACH: {
+    initializeH3D();
+    break;
+  }
+  case DLL_THREAD_ATTACH:
+    break;
+  case DLL_THREAD_DETACH:
+    break;
+  case DLL_PROCESS_DETACH:
+    deinitializeH3D();
+    break;
+  }
   return TRUE;
 }
 #else 
@@ -92,38 +113,10 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 extern "C" {
 #endif
   void __attribute__((constructor)) initAPI( void ) {
-    XERCES_CPP_NAMESPACE_USE
-#ifdef HAVE_FREEIMAGE
-    FreeImage_Initialise();
-#endif
-#ifdef LINUX
-    FcInit();
-#endif 
-
-    XMLPlatformUtils::Initialize();
-    /*
-    string urn_config_file = "index.urn";
-    char *buffer = getenv( "H3D_URN_CONFIG_FILE" );
-    if( buffer ) urn_config_file = buffer;
-    else if( buffer = getenv( "H3D_ROOT" ) ) {
-      urn_config_file = buffer;
-      urn_config_file += "/index.urn";
-    }
-    ResourceResolver::setURNResolver( new URNResolver( urn_config_file ) );*/
-#ifdef HAVE_LIBCURL
-      curl_global_init( CURL_GLOBAL_ALL );
-      ResourceResolver::addResolver( new LibCurlResolver );
-#endif
+    initializeH3D();
   }
   void __attribute__((destructor)) finiAPI( void ) {
-    XERCES_CPP_NAMESPACE_USE
-#ifdef HAVE_FREEIMAGE
-    FreeImage_DeInitialise();
-#endif
-#ifdef HAVE_LIBCURL
-    curl_global_cleanup();
-#endif
-    XMLPlatformUtils::Terminate();
+    deinitializeH3D();
   }
 #ifdef __cplusplus
 }

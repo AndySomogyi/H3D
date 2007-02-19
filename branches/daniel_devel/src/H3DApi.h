@@ -76,6 +76,9 @@
 /// ImageTexture nodes will not be able to read image files.
 #define HAVE_FREEIMAGE
 
+// Define this if you are linking Freeimage as a static library
+//#define FREEIMAGE_LIB
+
 /// Undef if you do not have libcurl(http://sourceforge.net/projects/curl/)
 /// installed. URLs using protocols like http and ftp will then not be 
 /// supported. Only local filenames can be used. 
@@ -87,6 +90,13 @@
 #define HAVE_DSHOW
 #endif
 
+#define XML_USE_WIN32_TRANSCODER
+#define XML_USE_INMEM_MESSAGELOADER
+#define XML_USE_NETACCESSOR_WINSOCK
+
+// define this if you are linking Xerces as a static library
+//#define XML_LIBRARY
+
 // The following ifdef block is the standard way of creating macros
 // which make exporting from a DLL simpler. All files within this DLL
 // are compiled with the H3DAPI_EXPORTS symbol defined on the command
@@ -97,6 +107,11 @@
 // exported.
 #if defined(WIN32) || defined(__WIN32__)
 #include <windows.h>
+
+#ifdef H3DAPI_LIB
+#define H3DAPI_API
+#else
+
 #ifdef H3DAPI_EXPORTS
 #define H3DAPI_API __declspec(dllexport)
 #else
@@ -105,9 +120,11 @@
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 // disable dll-interface warnings for stl-exports
 #pragma warning( disable: 4251 )
+//#pragma warning( disable: 4275 )
+
 #endif
 
-
+#endif
 #endif
 
 // Borland uses strnicmp.
@@ -130,6 +147,12 @@
 #endif
 
 namespace H3D {
+  /// Initialize H3D API(only needed if using H3D API as a static library). 
+  void initializeH3D();
+
+  /// Deinitialize H3D API(only needed if using H3D API as a static library). 
+  void deinitializeH3D();
+
   /// Function for determining if the machine we are running on is uses
   /// little endian byte order or not.
   inline bool isLittleEndian() {
