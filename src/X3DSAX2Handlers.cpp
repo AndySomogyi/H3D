@@ -2,10 +2,6 @@
 //    All Rights Reserved
 //
 
-#include <xercesc/sax2/Attributes.hpp>
-#include <xercesc/sax/SAXParseException.hpp>
-#include <xercesc/sax/SAXException.hpp>
-#include <xercesc/util/XMLUniDefs.hpp>
 #include "X3DSAX2Handlers.h"
 #include "FieldTemplates.h"
 #include <iostream>
@@ -17,6 +13,11 @@
 #include "X3DTypeFunctions.h"
 #include "Inline.h"
 #include "H3DExports.h"
+
+#include <xercesc/sax2/Attributes.hpp>
+#include <xercesc/sax/SAXParseException.hpp>
+#include <xercesc/sax/SAXException.hpp>
+#include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace std;
 using namespace H3D;

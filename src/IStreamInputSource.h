@@ -28,6 +28,8 @@
 #ifndef __ISTREAMINPUTSOURCE_H__
 #define __ISTREAMINPUTSOURCE_H__
 
+#include <H3DApi.h>
+
 #include <xercesc/sax/InputSource.hpp>
 #include <iostream>
 

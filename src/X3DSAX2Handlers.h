@@ -29,9 +29,7 @@
 #ifndef __X3DSAX2HANDLERS_H__
 #define __X3DSAX2HANDLERS_H__
 
-#include <xercesc/sax2/Attributes.hpp>
-#include <xercesc/sax2/DefaultHandler.hpp>
-#include <xercesc/sax/Locator.hpp>
+
 #include <stack>
 #include <list>
 #include "Field.h"
@@ -42,6 +40,10 @@
 #include "ProtoDeclaration.h"
 #include "AutoPtrVector.h"
 #include "X3D.h"
+
+#include <xercesc/sax2/Attributes.hpp>
+#include <xercesc/sax2/DefaultHandler.hpp>
+#include <xercesc/sax/Locator.hpp>
 
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 #pragma comment( lib, "xerces-c_2.lib" )
