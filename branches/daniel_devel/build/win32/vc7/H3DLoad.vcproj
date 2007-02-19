@@ -12,14 +12,15 @@
 	</Platforms>
 	<Configurations>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release\obj"
+			Name="Release using DLL|Win32"
+			OutputDirectory="..\..\..\lib"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="2"
 				InlineFunctionExpansion="2"
 				ImproveFloatingPointConsistency="TRUE"
 				OptimizeForProcessor="0"
@@ -41,10 +42,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="H3DAPI.lib HAPI.lib"
+				AdditionalDependencies="H3DAPI.lib HAPI.lib H3DUtil.lib"
 				OutputFile="$(OutDir)/H3DLoad.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\H3D\H3DUtil\build\win32\vc7\release;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\build\win32\vc7\Release;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\H3DUtil\lib;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\lib;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="1"/>
 			<Tool
@@ -72,9 +73,9 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug\obj"
+			Name="Debug using DLL|Win32"
+			OutputDirectory="..\..\..\lib"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
@@ -100,13 +101,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="H3DAPI.lib HAPI.lib"
-				OutputFile="$(OutDir)/H3DLoad.exe"
+				AdditionalDependencies="H3DAPI.lib HAPI.lib H3DUtil.lib"
+				OutputFile="$(OutDir)/H3DLoad_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\H3D\H3DUtil\build\win32\vc7\Debug;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\build\win32\vc7\release;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
-				DelayLoadDLLs="OpenHapticsRenderer.dll"
+				AdditionalLibraryDirectories="..\..\..\..\H3DUtil\lib;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\lib;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
+				DelayLoadDLLs=""
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				ProgramDatabaseFile="$(OutDir)/H3DLoad_d.pdb"
 				SubSystem="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -120,6 +121,130 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="Debug using Static|Win32"
+			OutputDirectory="..\..\..\lib"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				ImproveFloatingPointConsistency="TRUE"
+				OptimizeForProcessor="0"
+				AdditionalIncludeDirectories="C:\H3D\H3DUtil\src;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Include&quot;;..\..\..\src;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;"
+				PreprocessorDefinitions="_DEBUG;_CONSOLE;WIN32;_WINDOWS;PLATFORM_WIN32;;HAPI_LIB;H3DUTIL_LIB;H3DAPI_LIB"
+				RuntimeLibrary="2"
+				DisableLanguageExtensions="FALSE"
+				RuntimeTypeInfo="TRUE"
+				PrecompiledHeaderFile=""
+				AssemblerListingLocation=""
+				ObjectFile="$(IntDir)/"
+				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
+				WarningLevel="3"
+				DebugInformationFormat="4"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386 /INCLUDE:?database@Shape@H3D@@2UH3DNodeDatabase@2@A"
+				AdditionalDependencies="hd.lib wsock32.lib"
+				OutputFile="$(OutDir)/H3DLoad_static_d.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(H3D_PYTHON_ROOT)\libs&quot;;..\..\..\..\H3DUtil\lib;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\lib;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;"
+				DelayLoadDLLs="OpenHapticsRenderer_sd.dll"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/H3DLoad_static_d.pdb"
+				SubSystem="1"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\..\..\..\..\..\Build\Win32\VC7\Debug/SAX2Count.tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="Release using Static|Win32"
+			OutputDirectory="..\..\..\lib"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="2"
+				ImproveFloatingPointConsistency="TRUE"
+				OptimizeForProcessor="0"
+				AdditionalIncludeDirectories="C:\H3D\H3DUtil\src;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Include&quot;;..\..\..\src;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;"
+				PreprocessorDefinitions="NDEBUG;_CONSOLE;WIN32;_WINDOWS;PLATFORM_WIN32;HAPI_LIB;H3DUTIL_LIB;H3DAPI_LIB"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="TRUE"
+				DisableLanguageExtensions="FALSE"
+				RuntimeTypeInfo="TRUE"
+				PrecompiledHeaderFile=""
+				AssemblerListingLocation=""
+				ObjectFile="$(IntDir)/"
+				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
+				WarningLevel="3"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies="hd.lib"
+				OutputFile="$(OutDir)/H3DLoad_static.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(H3D_PYTHON_ROOT)\libs&quot;;..\..\..\..\H3DUtil\lib;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\lib;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;"
+				DelayLoadDLLs="OpenHapticsRenderer_s.dll"
+				ProgramDatabaseFile="$(OutDir)/H3DLoad_static.pdb"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\..\..\..\..\..\Build\Win32\VC7\Release/SAX2Count.tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
