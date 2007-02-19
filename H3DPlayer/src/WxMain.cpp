@@ -34,6 +34,8 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #endif
 
+#include <wx/cmdline.h>
+
 // ---------------------------------------------------------------------------
 //  Required classes and definitions
 // ---------------------------------------------------------------------------
@@ -52,16 +54,33 @@ class QuitAPIField: public AutoUpdate< SFString > {
   }
 };
 
+const wxCmdLineEntryDesc gCmdLineDesc[] = 
+  {
+    { wxCMD_LINE_PARAM, NULL, NULL, wxT("File to load"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL}, 
+    { wxCMD_LINE_NONE, NULL, NULL, NULL, wxCMD_LINE_VAL_NONE, 0} };
 
 // Define a new application type
 class MyApp: public wxApp
 {
 public:
-    bool OnInit();
+  virtual bool OnInit();
 
-    void OnIdle(wxIdleEvent& event);
-    bool OnExceptionInMainLoop();
+  virtual void OnIdle(wxIdleEvent& event);
+  virtual bool OnExceptionInMainLoop();
+  virtual void OnInitCmdLine(wxCmdLineParser& parser) {
+    parser.SetDesc (gCmdLineDesc); 
+  }
+
+  virtual bool OnCmdLineParsed(wxCmdLineParser& parser) {
+    for (int i = 0; i < parser.GetParamCount(); i++) {
+      cmd_line_filename = parser.GetParam(i);
+    }
+
+    return true;
+  }
 protected:
+  wxString cmd_line_filename;
+
   DECLARE_EVENT_TABLE()
 };
 
@@ -98,6 +117,10 @@ bool MyApp::OnExceptionInMainLoop() {
 
 bool MyApp::OnInit()
 {
+  // call default behaviour (mandatory)
+  if (!wxApp::OnInit())
+    return false;
+
   SetVendorName(_T("SenseGraphics AB"));
   SetAppName(_T("H3D Player"));
   // create a window to display
@@ -105,6 +128,8 @@ bool MyApp::OnInit()
 	//glwindow constructed in the frame constructor.  Next line redundant.
 	//theWxFrame->glwindow = new H3DWxWidgetsWindow(theWxFrame);
 	theWxFrame->Show(true);
+
+  if( cmd_line_filename != "" ) theWxFrame->loadFile( string(cmd_line_filename) );
   //This next line is used to set the icon file h3d.ico, when created.
 	//theWxframe->SetIcon(wxIcon(_T("h3d_icn")));
 
