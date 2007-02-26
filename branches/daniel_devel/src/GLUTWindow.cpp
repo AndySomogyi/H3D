@@ -28,6 +28,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "GLUTWindow.h"
+
 #include <GL/glew.h>
 #ifdef MACOSX
 #include <GLUT/glut.h>
@@ -36,18 +38,16 @@
 #endif
 #ifdef FREEGLUT
 #include <GL/freeglut.h>
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+#pragma comment( lib, "freeglut.lib" )
+#endif
+#endif
 
-#include "GLUTWindow.h"
 #if !( defined(FREEGLUT) && defined(WIN32) )
 #include "X3DKeyDeviceSensorNode.h"
 #endif
 #ifndef WIN32
 #include "MouseSensor.h"
-#endif
-
-#if defined(_MSC_VER) || defined(__BORLANDC__)
-#pragma comment( lib, "freeglut.lib" )
-#endif
 #endif
 
 using namespace H3D;
