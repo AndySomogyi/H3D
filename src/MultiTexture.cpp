@@ -96,7 +96,7 @@ void MultiTexture::render() {
   GLint saved_texture;
   glGetIntegerv( GL_ACTIVE_TEXTURE_ARB, &saved_texture );
     
-  int nr_textures_supported;
+  GLint nr_textures_supported;
   glGetIntegerv( GL_MAX_TEXTURE_UNITS_ARB, &nr_textures_supported );
 
   for( unsigned int i = 0; i < texture->size(); i++ ) {

@@ -25,12 +25,6 @@
 #include "ResourceResolver.h"
 #include "PythonScript.h"
 
-#ifdef MACOSX
-#include "FreeImage.h"
-#include <xercesc/util/PlatformUtils.hpp>
-#endif
-
-
 using namespace std;
 using namespace H3D;
 
@@ -140,9 +134,9 @@ int main(int argc, char* argv[]) {
   initializeH3D();
 #endif
 
-
+#ifdef HAVE_PYTHON
   PythonScript::setargv( argc, argv );
-  
+#endif
   // Settings and command line arguments ---
   
   // Help message

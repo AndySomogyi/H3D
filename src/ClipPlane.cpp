@@ -48,7 +48,7 @@ namespace ClipPlaneInternals {
 }
 
 int ClipPlane::nr_active_clip_planes = 0;
-int ClipPlane::max_nr_clip_planes = -1;
+GLint ClipPlane::max_nr_clip_planes = -1;
 
 ClipPlane::ClipPlane( Inst< SFNode  >  _metadata,
                       Inst< SFBool  >  _enabled,
