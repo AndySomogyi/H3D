@@ -29,11 +29,6 @@
 #include "ResourceResolver.h"
 #include "PythonScript.h"
 
-#ifdef MACOSX
-#include "FreeImage.h"
-#include <xercesc/util/PlatformUtils.hpp>
-#endif
-
 #include <wx/cmdline.h>
 
 // ---------------------------------------------------------------------------
@@ -108,8 +103,7 @@ bool MyApp::OnExceptionInMainLoop() {
     return false;
   }
   catch (const Exception::H3DException &e) {
-    MessageBox(HWND_DESKTOP, e.message.c_str(), 
-                             "Error", MB_OK | MB_ICONEXCLAMATION);
+     wxMessageBox(e.message.c_str(), "Error", wxOK | wxICON_EXCLAMATION);
     return false;
   }
   wxApp::OnExceptionInMainLoop();  
@@ -123,6 +117,9 @@ bool MyApp::OnInit()
 
   SetVendorName(_T("SenseGraphics AB"));
   SetAppName(_T("H3D Player"));
+
+  initializeH3D();
+
   // create a window to display
   H3DWxFrame *theWxFrame = new H3DWxFrame(NULL, wxID_ANY, "H3D Player", wxDefaultPosition, wxSize(800, 600));
 	//glwindow constructed in the frame constructor.  Next line redundant.

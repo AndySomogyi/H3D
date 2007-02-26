@@ -55,14 +55,17 @@ wxDialog (parent, id, title, pos, size, style)
 
 	topsizer->SetSizeHints( this );   // set size hints to honour minimum size
 
+#ifndef MACOSX
+	//TODO: console does not work on Mac
   std::streambuf *sbOld = std::cerr.rdbuf();
 	std::cerr.rdbuf(logText);
 	ostream *t = new ostream(logText);
   H3DUtil::Console.setOutputStream( *t );
 	
   std::cerr.rdbuf(sbOld); 
-  std::cerr << "TESTS" << endl;
+  //  std::cerr << "TESTS" << endl;
 	//*logText << 123.456 << " some text\n";
+#endif
 }
 
 /*******************Event Table*********************/
