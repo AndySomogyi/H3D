@@ -60,13 +60,18 @@ H3DWxWidgetsWindow::H3DWxWidgetsWindow( wxWindow *_theParent,
   int attribList[8];
   attribList[0] = WX_GL_RGBA;
   attribList[1] = WX_GL_DOUBLEBUFFER;
-  attribList[2] = WX_GL_STEREO;
-  attribList[3] = WX_GL_DEPTH_SIZE;
-  attribList[4] = 24;
-  attribList[5] = WX_GL_STENCIL_SIZE;
-  attribList[6] = 8;
+  attribList[2] = WX_GL_DEPTH_SIZE;
+  attribList[3] = 24;
+  attribList[4] = WX_GL_STENCIL_SIZE;
+  attribList[5] = 8;
+#ifdef MACOSX
+  // TODO: stereo mode does not work with mac
+  attribList[6] = 0;
+#else
+  attribList[6] = WX_GL_STEREO;
   attribList[7] = 0;
-  
+#endif
+ 
   if( !theWindow ) {
      theWindow = new wxFrame( NULL, wxID_ANY, "H3DwxFrame", wxDefaultPosition,
                               wxSize( width->getValue(), height->getValue() ));
@@ -95,9 +100,12 @@ void H3DWxWidgetsWindow::initWindow() {
 void H3DWxWidgetsWindow::setFullscreen( bool fullscreen ) {
   if( last_fullscreen != fullscreen ) {
     wxTopLevelWindow * tlw = dynamic_cast< wxTopLevelWindow * >(theWindow);
+#ifndef MACOSX
+    //TODO: fullscreen does not work well on macosx
     if( tlw )
       tlw->ShowFullScreen(fullscreen);
-	last_fullscreen = fullscreen;
+#endif
+    last_fullscreen = fullscreen;
   }
 }
 

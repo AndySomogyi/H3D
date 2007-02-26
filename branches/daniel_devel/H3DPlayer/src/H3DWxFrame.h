@@ -13,9 +13,9 @@
 #include "Scene.h"
 #include "KeySensor.h"
 #include "MouseSensor.h"
-#ifndef MACOSX
+
 #include "SpaceWareSensor.h"
-#endif
+
 //#include "DEFNodes.h"
 //#include "Viewpoint.h"
 #include "DeviceInfo.h"
@@ -25,11 +25,6 @@
 #include "Console.h"
 
 #include "NavigationInfo.h"
-
-#ifdef MACOSX
-#include "FreeImage.h"
-#include <xercesc/util/PlatformUtils.hpp>
-#endif
 
 
 #include "consoleDialog.h"
@@ -232,7 +227,7 @@ private:
 	int selection;
 	int viewpointCount;
 	int navTypeCount;
-  int deviceCount;
+	int deviceCount;
 	X3DViewpointNode::ViewpointList VPlist;
 	NavigationInfo *mynav;
 	DeviceInfo *mydevice;

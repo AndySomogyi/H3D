@@ -39,11 +39,6 @@
 //#include "PythonScript.h"
 #include "Console.h"
 
-#ifdef MACOSX
-#include "FreeImage.h"
-#include <xercesc/util/PlatformUtils.hpp>
-#endif
-
 #include <GraphicsCachingOptions.h>
 #include <DebugOptions.h>
 #include <HapticsOptions.h>
@@ -85,11 +80,11 @@ H3DWxFrame::H3DWxFrame( wxWindow *_parent, wxWindowID _id,
                         const wxString& _title, const wxPoint& _pos,
                         const wxSize& _size, long _style,
                         const wxString& _name ):
+  viewpointCount(0),
+  navTypeCount(0),
+  deviceCount(0),
 wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 {
-  theConsole.reset( new consoleDialog(this, wxID_ANY, "Console", wxDefaultPosition, 
-                                     wxDefaultSize, wxDEFAULT_DIALOG_STYLE) );
-
   wxAcceleratorEntry entries[1];
   entries[0].Set(wxACCEL_NORMAL, (int) WXK_ESCAPE, FRAME_RESTORE);
   wxAcceleratorTable accel(1, entries);
@@ -124,6 +119,9 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 
 	//scene->window->push_back( glwindow );
 
+  wxString console_string = "Console";
+  theConsole.reset( new consoleDialog(this, wxID_ANY, console_string, wxDefaultPosition, 
+                                     wxDefaultSize, wxDEFAULT_DIALOG_STYLE) );
 
   //H3DWxWidgetsWindow *glwindow = new H3DWxWidgetsWindow(theWxFrame);
   //Main Menu Bar
@@ -383,7 +381,11 @@ void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
 
 bool H3DWxFrame::loadFile( const string &filename) {
   clearData();
-  string h3d_root = getenv( "H3D_ROOT" );
+  
+  char *r = getenv( "H3D_ROOT" );
+
+  string h3d_root = r ? r : ""; 
+  
   INIFile ini_file( h3d_root + "/settings/h3dload.ini" );
   
   //Clear existing data
@@ -624,8 +626,7 @@ bool H3DWxFrame::loadFile( const string &filename) {
     scene->sceneRoot->setValue( g.get() );
   }
   catch (const Exception::H3DException &e) {
-    MessageBox(HWND_DESKTOP, e.message.c_str(), 
-                             "Error", MB_OK | MB_ICONEXCLAMATION);
+    wxMessageBox(e.message.c_str(), "Error", wxOK | wxICON_EXCLAMATION);
     return false;
   }
   return true;
@@ -666,7 +667,7 @@ void H3DWxFrame::OnOpenFileURL(wxCommandEvent & event) {
 													   GetCurrentPath(),
 													   "") );
    if( text_dialog->ShowModal() == wxID_OK ) {
-     string s = text_dialog->GetValue();
+     string s(text_dialog->GetValue());
      loadFile( s );
    }
 }
@@ -687,10 +688,14 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
 	  SetCurrentPath(openFileDialog->GetDirectory());
     SetStatusText(GetCurrentFilename(), 0);
     SetStatusText(openFileDialog->GetDirectory(),1);
-    
-    string filename =  currentPath += "\\" + currentFilename;
+#ifdef WIN32
+    wxString wx_filename = currentPath + "\\" + currentFilename;
+#else
+    wxString wx_filename = currentPath + "/" + currentFilename;
+#endif
+    string filename(wx_filename);
     loadFile( filename );
-    recentFiles->AddFileToHistory ( filename );
+    recentFiles->AddFileToHistory ( wx_filename );
   }
 }
 
@@ -1091,7 +1096,7 @@ void H3DWxFrame::buildNavMenu () {
     allTypes.push_back("NONE");
     int j = 0;
     for (vector<string>::iterator allList = allTypes.begin(); allList != allTypes.end(); allList++) {
-      navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, (*allList), "Select a navigation mode");
+      navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, (*allList).c_str(), "Select a navigation mode");
 		  Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT, wxMenuEventHandler(H3DWxFrame::GetSelection));
 			Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
 			j++;
@@ -1468,7 +1473,7 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent,
     max_distance_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Max distance:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     wxTextCtrl* max_distance_text = new wxTextCtrl(panel, ID_MAX_DISTANCE, wxEmptyString, wxDefaultPosition,
         wxSize(40, wxDefaultCoord)); 
-    max_distance_text->SetValue( max_distance );
+    max_distance_text->SetValue( max_distance.c_str() );
     max_distance_sizer->Add(max_distance_text, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     haptics_box_sizer->Add(max_distance_sizer, 0, wxGROW|wxALL, 5);
 
@@ -1476,7 +1481,7 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent,
     look_ahead_sizer->Add(new wxStaticText(panel, wxID_ANY, _("&Look ahead factor:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     wxTextCtrl* look_ahead_text = new wxTextCtrl(panel, ID_LOOK_AHEAD_FACTOR, wxEmptyString, wxDefaultPosition,
         wxSize(40, wxDefaultCoord) );
-    look_ahead_text->SetValue( look_ahead_factor );
+    look_ahead_text->SetValue( look_ahead_factor.c_str());
     look_ahead_sizer->Add(look_ahead_text, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     haptics_box_sizer->Add(look_ahead_sizer, 0, wxGROW|wxALL, 5);
 
