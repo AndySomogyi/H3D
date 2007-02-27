@@ -84,13 +84,17 @@ void MouseNavigation::CalculateMouseMoveInfo::update( ) {
       the_owner->rel_rot *= Rotation( perp.x, perp.y, 0, motion.length() * 0.01f );
       the_owner->move_dir = Vec3f();
     }
-    else if( nav_type == "WALK" || nav_type == "FLY" ) {
+    else if( nav_type == "WALK" ) {
       H3DFloat abs_x = H3DAbs( motion.x );
       if( abs_x > Constants::f_epsilon ) {
         the_owner->rel_rot *= Rotation( 0, -motion.x / abs_x, 0, abs_x * 0.01f );
       }
       else
         the_owner->rel_rot *= Rotation();
+      the_owner->move_dir = Vec3f();
+    }
+    else if( nav_type == "FLY" ) {
+      the_owner->rel_rot *= Rotation( perp.x, perp.y, 0, motion.length() * 0.01f );
       the_owner->move_dir = Vec3f();
     }
     else {
