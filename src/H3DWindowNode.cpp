@@ -137,6 +137,7 @@ H3DWindowNode::H3DWindowNode(
   default_avatar.push_back( 0.75f );
   default_speed = 1;
   default_collision = true;
+  H3DNavigationDevices::setNavTypeForAll( default_nav );
 }
 
 H3DWindowNode::~H3DWindowNode() {
@@ -946,6 +947,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
                                  default_collision,
                                  default_avatar,
                                  default_speed );
+    H3DNavigationDevices::setNavTypeForAll( default_nav );
   }
 }
 
