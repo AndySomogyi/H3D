@@ -34,6 +34,7 @@
 #include <OpenHapticsRenderer.h>
 #include <GodObjectRenderer.h>
 #include <RuspiniRenderer.h>
+#include "X3DViewpointNode.h"
 using namespace H3D;
 
 H3DNodeDatabase H3DHapticsDevice::database( "H3DHapticsDevice", 
@@ -63,6 +64,7 @@ namespace H3DHapticsDeviceInternals {
   FIELDDB_ELEMENT( H3DHapticsDevice, stylus, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, hapticsRenderer, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, proxyPositions, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( H3DHapticsDevice, followViewpoint, INPUT_OUTPUT );
 }
 
 
@@ -87,7 +89,8 @@ H3DHapticsDevice::H3DHapticsDevice(
                Inst< SFInt32         > _hapticsRate            ,
                Inst< SFNode          > _stylus                 ,
                Inst< SFHapticsRendererNode > _hapticsRenderer,
-               Inst< MFVec3f         > _proxyPositions  ):
+               Inst< MFVec3f         > _proxyPositions,
+               Inst< SFBool          > _followViewpoint ):
   devicePosition( _devicePosition ),
   deviceOrientation( _deviceOrientation ),
   trackerPosition( _trackerPosition ),
@@ -104,16 +107,21 @@ H3DHapticsDevice::H3DHapticsDevice(
   torque( _torque ),
   inputDOF( _inputDOF ),
   outputDOF( _outputDOF ),
+  followViewpoint( _followViewpoint ),
   hapticsRate( _hapticsRate ),
   stylus( _stylus ),
   initialized( new SFBool ),
   hapticsRenderer( _hapticsRenderer ),
   proxyPositions( _proxyPositions ),
   set_enabled( new SetEnabled ),
-  enabled( new SFBool ) {
+  enabled( new SFBool ),
+  adjustedPositionCalibration( new PosCalibration ),
+  adjustedOrnCalibration( new OrnCalibration ){
 
   type_name = "H3DHapticsDevice";  
   database.initFields( this );
+
+  followViewpoint->setValue( true );
 
   initialized->setValue( false, id );
   enabled->setValue( false, id );
@@ -132,6 +140,8 @@ H3DHapticsDevice::H3DHapticsDevice(
 
   buttons->route( mainButton, id );
   buttons->route( secondaryButton, id );
+
+  vp_initialized = false;
 }
 
 H3DHapticsDevice::ErrorCode H3DHapticsDevice::enableDevice() {
@@ -232,8 +242,69 @@ void H3DHapticsDevice::updateDeviceValues() {
     force->setValue( (Vec3f)dv.force, id);
     torque->setValue( (Vec3f)dv.torque, id);
     buttons->setValue( dv.button_status, id );
-    hapi_device->setPositionCalibration( positionCalibration->rt_pos_calibration );
-    hapi_device->setOrientationCalibration( orientationCalibration->rt_orn_calibration );
+
+    // get a default_vp_pos if there is none.
+    if( !vp_initialized ) {
+      X3DViewpointNode *vp = X3DViewpointNode::getActive();
+      if( vp ) {
+        default_vp_pos = vp->accForwardMatrix->getValue() *
+          ( vp->position->getValue() + vp->rel_pos );
+        vp_initialized = true;
+      }
+    }
+    
+    if( followViewpoint->getValue() ) {
+      // Haptic device should follow the viewpoint.
+      X3DViewpointNode *vp = X3DViewpointNode::getActive();
+
+      const Matrix4f vp_accFrw = vp->accForwardMatrix->getValue();
+
+      // Get the position of the haptic device in world coordinates with the
+      // default calibration. Calculate the new position for the haptics device
+      // and transform it according to viewpoint orientation.
+      Vec3f old_pos = positionCalibration->getValue() *
+        devicePosition->getValue();
+      Vec3f vp_full_pos = vp_accFrw * (vp->position->getValue() + vp->rel_pos);
+      Vec3f result_pos = old_pos + vp_full_pos - default_vp_pos;
+      result_pos = ( Rotation( vp_accFrw.getRotationPart() ) *
+                     ( vp->orientation->getValue() * vp->rel_orientation) )
+                   * ( result_pos - vp_full_pos ) + vp_full_pos;
+      
+      // Calculate the relative movement and create a positionCalibrationMatrix
+      // from this.
+      Vec3f rel_pos = result_pos - old_pos;
+      if( rel_pos.lengthSqr() <= Constants::f_epsilon )
+        rel_pos = Vec3f();
+
+      Matrix4d adjustingMatrix;
+      adjustingMatrix[0][3] = rel_pos.x;
+      adjustingMatrix[1][3] = rel_pos.y;
+      adjustingMatrix[2][3] = rel_pos.z;
+      adjustedPositionCalibration->setValue(
+        (Matrix4f)( adjustingMatrix * positionCalibration->getValue() ) );
+
+      // To millimeters of the position
+      adjustingMatrix[0][3] = adjustingMatrix[0][3] * 1000;
+      adjustingMatrix[1][3] = adjustingMatrix[1][3] * 1000;
+      adjustingMatrix[2][3] = adjustingMatrix[2][3] * 1000;
+      hapi_device->setPositionCalibration(
+        (Matrix4f)( adjustingMatrix *
+                    positionCalibration->rt_pos_calibration ) );
+      
+      // Create adjusted OrnCalibration and send to HAPI
+      adjustedOrnCalibration->setValue(
+        ( Rotation( vp_accFrw.getRotationPart() ) *
+          ( vp->orientation->getValue() * vp->rel_orientation ) ) *
+        orientationCalibration->getValue() );
+      hapi_device->
+        setOrientationCalibration(adjustedOrnCalibration->rt_orn_calibration );
+    }
+    else {
+      hapi_device->
+        setPositionCalibration( positionCalibration->rt_pos_calibration );
+      hapi_device->setOrientationCalibration(
+        orientationCalibration->rt_orn_calibration );
+    }
     //cerr << deviceOrientation->getValue() << endl;
     //cerr << trackerOrientation->getValue() << endl;
 

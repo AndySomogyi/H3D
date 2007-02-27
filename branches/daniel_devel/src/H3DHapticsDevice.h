@@ -134,8 +134,14 @@ namespace H3D {
       
       /// value = position_calibration * device_position.
       virtual void update() {
-        const Matrix4f &m  = 
-          static_cast< SFMatrix4f * >( routes_in[0] )->getValue();
+        H3DHapticsDevice *hd = static_cast< H3DHapticsDevice *>(owner);
+        Matrix4f &m = Matrix4f();
+        if( hd->followViewpoint->getValue() ) {
+          m = hd->adjustedPositionCalibration->getValue();
+        }
+        else {
+          m = static_cast< SFMatrix4f * >( routes_in[0] )->getValue();
+        }
         const Vec3f &d_pos = 
           static_cast< SFVec3f * >( routes_in[1] )->getValue();
         value = m * d_pos;
@@ -153,8 +159,16 @@ namespace H3D {
       public TypedField< SFRotation, Types< SFRotation, SFRotation > > {
 
       virtual void update() {
-        const Rotation &cal  = 
+        H3DHapticsDevice *hd = static_cast< H3DHapticsDevice *>(owner);
+        Rotation &cal = Rotation();
+        if( hd->followViewpoint->getValue() ) {
+          cal = hd->adjustedOrnCalibration->getValue();
+        }
+        else {
+          cal  = 
           static_cast< SFRotation * >( routes_in[0] )->getValue();
+        }
+
         const Rotation &d_orn = 
           static_cast< SFRotation * >( routes_in[1] )->getValue();
         value = cal * d_orn;
@@ -266,7 +280,8 @@ namespace H3D {
                       Inst< SFInt32         > _hapticsRate            = 0,
                       Inst< SFNode          > _stylus                 = 0,
                       Inst< SFHapticsRendererNode > _hapticsRenderer  = 0,
-                      Inst< MFVec3f         > _proxyPositions         = 0 );
+                      Inst< MFVec3f         > _proxyPositions         = 0,
+                      Inst< SFBool          > _followViewpoint        = 0 );
 
     /// Destuctor.
     virtual ~H3DHapticsDevice() {
@@ -375,6 +390,15 @@ namespace H3D {
     /// 
     /// \dotfile H3DHapticsDevice_positionCalibration.dot
     auto_ptr< PosCalibration > positionCalibration;
+    
+    /// The calibration matrix between devicePosition and trackerPosition
+    /// adjusted with the movement of the viewpoint.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> Unit matrix \n
+    /// 
+    /// \dotfile H3DHapticsDevice_adjustedPositionCalibration.dot
+    auto_ptr< PosCalibration > adjustedPositionCalibration;
 
     /// The calibration rotation between deviceOrientation and 
     /// trackerOrientation.
@@ -384,6 +408,15 @@ namespace H3D {
     /// 
     /// \dotfile H3DHapticsDevice_orientationCalibration.dot
     auto_ptr< OrnCalibration > orientationCalibration;
+
+    /// The calibration rotation between deviceOrientation and 
+    /// trackerOrientation adjusted with the movement of the viewpoint.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> Rotation( 1, 0, 0, 0 ) \n
+    /// 
+    /// \dotfile H3DHapticsDevice_orientationCalibration.dot
+    auto_ptr< OrnCalibration > adjustedOrnCalibration;
 
     /// The position of the proxy used in the haptic rendering(layer 0). 
     ///
@@ -524,11 +557,27 @@ namespace H3D {
     /// 
     /// \dotfile H3DHapticsDevice_enabled.dot
     auto_ptr< SFBool > enabled;
+
+    /// true if the device should follow the viewpoint.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> true \n
+    /// 
+    /// \dotfile H3DHapticsDevice_followViewpoint.dot
+    auto_ptr< SFBool > followViewpoint;
     
     /// Node database entry
     static H3DNodeDatabase database;
   protected:
     Vec3f previuos_proxy_pos;
+
+    // true if we have a default_vp_pos
+    bool vp_initialized;
+
+    // the position in global coordinates of the viewpoint which should
+    // be used as default reference if the haptic device should follow
+    // viewpoint movement.
+    Vec3f default_vp_pos;
 
     unsigned int nr_haptics_loops;
 

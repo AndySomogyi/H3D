@@ -288,6 +288,12 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
+
+    string default_nav;
+    vector< H3DFloat > default_avatar;
+    H3DFloat default_speed;
+    bool default_collision;
+
   protected:
 #ifdef WIN32
     HGLRC rendering_context;
@@ -334,6 +340,7 @@ namespace H3D {
     unsigned int stencil_mask_height;
     unsigned int stencil_mask_width;
     bool last_loop_mirrored;
+
   };
 }
 
