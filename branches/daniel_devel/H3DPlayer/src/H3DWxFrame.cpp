@@ -145,11 +145,9 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 
   //readSettingsFromINIFile( "H3DPlayer.ini", global_settings.get() );
 
-  settings.reset( new SettingsDialog(this, global_settings.get() ) );
-
   //File History
   recentFiles = (wxFileHistory *) NULL;
-  recentList = (wxConfigBase *) NULL;
+  h3dConfig = (wxConfigBase *) NULL;
 
   //sub menus
   renderoptionsMenu = (wxMenu *) NULL;
@@ -172,18 +170,13 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   recentFiles->UseMenu(fileMenu);
 
   //Initialize config object
-  wxConfigBase *recentList = wxConfigBase::Get();
+  wxConfigBase *h3dConfig = wxConfigBase::Get();
 
-  //Load file history from previous sessions
-  recentList->SetPath(_T("/Recent/Count"));
-  int count = recentList->Read(_T("Count"), 9);
-  recentList->SetPath(_T("/Recent/List"));
-  for (int i = 0; i < count; i++) {
-    wxString entry = wxString("") << i;
-    if (recentList->Exists(entry)) {
-      recentFiles->AddFileToHistory (recentList->Read(entry));
-    }
-  }
+  //Load file history and settings from previous session(s)
+  LoadSession();
+
+  //Create settings dialog
+  settings.reset( new SettingsDialog(this, global_settings.get() ) );
 
   //Render Options submenu
   renderoptionsMenu = new wxMenu;
@@ -663,8 +656,8 @@ void H3DWxFrame::clearData () {
 //Open a file
 void H3DWxFrame::OnOpenFileURL(wxCommandEvent & event) {
    auto_ptr< wxTextEntryDialog > text_dialog( new wxTextEntryDialog ( this,
-													   "Open URL",
-													   GetCurrentPath(),
+													   "Enter the location of the file here",
+													   "Open file from URL",
 													   "") );
    if( text_dialog->ShowModal() == wxID_OK ) {
      string s(text_dialog->GetValue());
@@ -954,6 +947,7 @@ void H3DWxFrame::GetSelection (wxMenuEvent & event)
 void H3DWxFrame::OnExit (wxCommandEvent & event)
 {
   SaveMRU();
+  SaveSettings();
   delete wxConfigBase::Set((wxConfigBase *) NULL);
 	Close(TRUE); 
 }
@@ -985,16 +979,191 @@ void H3DWxFrame::SetCurrentPath(wxString n)
 
 ////Save file history for next initialization
 void H3DWxFrame::SaveMRU () {
+  h3dConfig = wxConfigBase::Get();
+
   //Store number of files in history
-  recentList = wxConfigBase::Get();
-  recentList->SetPath(_T("/Recent/Count"));
-  recentList->Write(_T("Count"), (long) recentFiles->GetCount());
+  h3dConfig->SetPath(_T("/Recent/Count"));
+  h3dConfig->Write(_T("Count"), (long) recentFiles->GetCount());
 
   //Store each individual file info
-  recentList->SetPath(_T("/Recent/List"));
+  h3dConfig->SetPath(_T("/Recent/List"));
   for (int i = 0; i < recentFiles->GetCount(); i++) {
     wxString entry = wxString ("") << i;
-    recentList->Write(entry, recentFiles->GetHistoryFile(i));
+    h3dConfig->Write(entry, recentFiles->GetHistoryFile(i));
+  }
+}
+
+///Save settings for next initialization
+void H3DWxFrame::SaveSettings () {
+  h3dConfig = wxConfigBase::Get();
+
+  //Save debug options
+  DebugOptions *dgo = NULL;
+  global_settings->getOptionNode( dgo );
+  if (dgo) {
+    h3dConfig->SetPath(_T("/Settings/Debug"));
+    h3dConfig->Write(_T("draw_bound"), dgo->drawBound->getValue());
+    h3dConfig->Write(_T("draw_tree"), dgo->drawBoundTree->getValue());
+    //h3dConfig->Write(_T("tree_depth"), tree_depth);
+    h3dConfig->Write(_T("draw_triangles"), dgo->drawHapticTriangles->getValue());
+  }
+
+  //Save graphics caching options
+  GraphicsCachingOptions *gco = NULL;
+  global_settings->getOptionNode (gco);
+  if (gco) {
+    h3dConfig->SetPath(_T("/Settings/GraphicsCaching"));
+    h3dConfig->Write(_T("useCaching"), (bool) gco->useCaching->getValue());
+    h3dConfig->Write(_T("cacheOnlyGeometries"), (bool) gco->cacheOnlyGeometries->getValue());
+    h3dConfig->Write(_T("cachingDelay"), (int) gco->cachingDelay->getValue());
+  }
+
+  //Save haptics options
+  HapticsOptions *ho = NULL;
+  global_settings->getOptionNode (ho);
+  if (ho) {
+    h3dConfig->SetPath(_T("/Settings/Haptics"));
+    h3dConfig->Write(_T("touchableFace"), ho->touchableFace->getValue());
+    h3dConfig->Write(_T("maxDistance"), ho->maxDistance->getValue());
+    h3dConfig->Write(_T("lookAheadFactor"), ho->lookAheadFactor->getValue());
+    h3dConfig->Write(_T("useBoundTree"), (bool) ho->useBoundTree->getValue());
+  }
+
+  //Save openhaptics options
+  OpenHapticsOptions *oho = NULL;
+  global_settings->getOptionNode (oho);
+  if (oho) {
+    h3dConfig->SetPath(_T("/Settings/OpenHaptics"));
+    h3dConfig->Write(_T("useAdaptiveViewport"), oho->useAdaptiveViewport->getValue());
+    h3dConfig->Write(_T("useHapticCameraView"), oho->useHapticCameraView->getValue());
+    h3dConfig->Write(_T("GLShape"), oho->GLShape->getValue());
+    h3dConfig->Write(_T("forceFullGeometryRender"), oho->forceFullGeometryRender->getValue());
+  }
+
+  //Save geometry bound tree options
+  GeometryBoundTreeOptions *gbto = NULL;
+  global_settings->getOptionNode (gbto);
+  if (gbto) {
+    h3dConfig->SetPath(_T("/Settings/GeometryBoundTree"));
+    h3dConfig->Write(_T("boundType"), gbto->boundType->getValue());
+    h3dConfig->Write(_T("maxTrianglesInLeaf"), gbto->maxTrianglesInLeaf->getValue());
+  }
+}
+
+void H3DWxFrame::LoadSession () {
+  h3dConfig = wxConfigBase::Get();
+
+  //Load file history from previous sessions
+  h3dConfig->SetPath(_T("/Recent/Count"));
+  int count = h3dConfig->Read(_T("Count"), 9);
+  h3dConfig->SetPath(_T("/Recent/List"));
+  for (int i = 0; i < count; i++) {
+    wxString entry = wxString("") << i;
+    if (h3dConfig->Exists(entry)) {
+      recentFiles->AddFileToHistory (h3dConfig->Read(entry));
+    }
+  }
+
+  //Load settings from previous sessions
+  //Debug options
+  if (h3dConfig->Exists("/Settings/Debug")) {
+    h3dConfig->SetPath(_T("/Settings/Debug"));
+    DebugOptions *dgo = NULL;
+    global_settings->getOptionNode(dgo);
+
+/*    if (h3dConfig->Read("draw_bound", &draw_bound )) {
+      h3dConfig->Read("draw_bound", &draw_bound);
+      if (draw_bound) {
+      Console (3) << "True" << endl;
+      }
+      else {
+        Console (3) << "False" << endl;
+      }
+    } */
+
+    if (dgo) {
+      bool draw_bound;
+      bool draw_triangles;
+      int draw_tree;
+      h3dConfig->Read("draw_bound", &draw_bound);
+      h3dConfig->Read("draw_triangles", &draw_triangles);
+      h3dConfig->Read("draw_tree", &draw_tree);
+      dgo->drawBound->setValue(draw_bound);
+      dgo->drawHapticTriangles->setValue(draw_triangles);
+      dgo->drawBoundTree->setValue(draw_tree);
+    }
+  }
+
+  //Graphics caching options
+  if (h3dConfig->Exists("/Settings/GraphicsCaching")) {
+    h3dConfig->SetPath(_T("/Settings/GraphicsCaching"));
+    GraphicsCachingOptions *gco = NULL;
+    global_settings->getOptionNode(gco);
+    if (gco) {
+      bool useCaching;
+      bool cacheOnlyGeometries;
+      int cachingDelay;
+      h3dConfig->Read("useCaching", &useCaching);
+      h3dConfig->Read("cacheOnlyGeometries", &cacheOnlyGeometries);
+      h3dConfig->Read("cachingDelay", &cachingDelay);
+      gco->useCaching->setValue(useCaching);
+      gco->cacheOnlyGeometries->setValue(cacheOnlyGeometries);
+      gco->cachingDelay->setValue(cachingDelay);
+    }
+  }
+
+  //Haptics options
+  if (h3dConfig->Exists("/Settings/Haptics")) {
+    h3dConfig->SetPath(_T("/Settings/Haptics"));
+    HapticsOptions *ho = NULL;
+    global_settings->getOptionNode(ho);
+    if (ho) {
+      bool useBoundTree;
+      //int touchableFace;
+      wxString touchableFace;
+      h3dConfig->Read("useBoundTree", &useBoundTree);
+      h3dConfig->Read("touchableFace", &touchableFace);
+      ho->touchableFace->setValue(touchableFace.c_str());
+      /* if( touchableFace == 0 ) ho->touchableFace->setValue( "AS_GRAPHICS" );
+      else if( touchableFace == 1 ) ho->touchableFace->setValue( "FRONT_AND_BACK" );
+      else if( touchableFace == 2 ) ho->touchableFace->setValue( "FRONT" );
+      else if( touchableFace == 3 ) ho->touchableFace->setValue( "BACK" ); */
+      ho->maxDistance->setValueFromString(h3dConfig->Read("maxDistance").c_str());
+      ho->lookAheadFactor->setValueFromString(h3dConfig->Read("lookAheadFactor").c_str());
+      ho->useBoundTree->setValue(useBoundTree);
+    }
+  }
+
+  //OpenHaptics options
+/*  if (h3dConfig->Exists("/Settings/OpenHaptics")) {
+    h3dConfig->SetPath(_T("/Settings/OpenHaptics"));
+    OpenHapticsOptions *oho = NULL;
+    global_settings->getOptionNode(oho);
+    if (oho) {
+      oho->useAdaptiveViewport->setValue(h3dConfig->Read("useAdaptiveViewport"));
+      oho->useHapticCameraView->setValue(h3dConfig->Read("useHapticCameraView"));
+      oho->GLShape->setValue((h3dConfig->Read("GLShape")).c_str());
+      oho->forceFullGeometryRender->setValue(h3dConfig->Read("forceFullGeometryRender"));
+    }
+  } */
+
+  //Geometry bound tree options
+  if (h3dConfig->Exists("/Settings/GeometryBoundTree")) {
+    h3dConfig->SetPath(_T("/Settings/GeometryBoundTree"));
+    GeometryBoundTreeOptions *gbto = NULL;
+    global_settings->getOptionNode( gbto );
+    if (gbto) {
+      //int boundType;
+      wxString boundType;
+      int maxTrianglesinLeaf;
+      h3dConfig->Read("boundType", &boundType);
+      h3dConfig->Read("maxTrianglesinLeaf", &maxTrianglesinLeaf);
+      gbto->boundType->setValue(boundType.c_str());
+      /*if( boundType == 0 ) gbto->boundType->setValue( "OBB" );
+      else if( boundType == 1 ) gbto->boundType->setValue( "AABB" );
+      else if( boundType == 2 ) gbto->boundType->setValue( "SPHERE" ); */
+      gbto->maxTrianglesInLeaf->setValue(maxTrianglesinLeaf);
+    }
   }
 }
 
@@ -1094,6 +1263,7 @@ void H3DWxFrame::buildNavMenu () {
     allTypes.push_back("WALK");
     allTypes.push_back("LOOKAT");
     allTypes.push_back("NONE");
+    navTypeCount = 5;
     int j = 0;
     for (vector<string>::iterator allList = allTypes.begin(); allList != allTypes.end(); allList++) {
       navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, (*allList).c_str(), "Select a navigation mode");
@@ -1215,7 +1385,6 @@ wxPanel* SettingsDialog::CreateDebugSettingsPage(wxWindow* parent,
       draw_bound = debug->drawBound->getValue();
       int d = debug->drawBoundTree->getValue();
       if( d != -1 ) {
-        draw_tree = true;
         draw_tree_depth = d;
       }
       draw_triangles = debug->drawHapticTriangles->getValue();
@@ -1629,4 +1798,3 @@ void H3DWxFrame::readSettingsFromINIFile( const string &filename,
 
   global_settings->options->push_back( oho );
 }
-

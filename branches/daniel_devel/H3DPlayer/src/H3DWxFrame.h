@@ -184,7 +184,7 @@ public:
 
 
   //Config object to save information (settings, file history etc...)
-  wxConfigBase *recentList;
+  wxConfigBase *h3dConfig;
 
   bool loadFile( const string &file );
   void clearData();
@@ -216,6 +216,8 @@ public:
   wxString GetCurrentPath();
   bool validateNavType(string);
   void SaveMRU ();
+  void SaveSettings ();
+  void LoadSession ();
   void buildNavMenu();
   void readSettingsFromINIFile( const string &filename,GlobalSettings *gs );
 
