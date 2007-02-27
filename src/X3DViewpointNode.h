@@ -279,6 +279,25 @@ namespace H3D {
     /// Remove the bindable node from the stack.
     virtual void removeFromStack();
 
+    /// Function for rotating the viewpoint around rotation_center
+    /// without changing the position or orientation fields.
+    virtual void rotateAround( Rotation rotation, bool collision,
+                               Vec3f rotation_center );
+
+    // Function for rotating the viewpoint around rotation_center = position
+    /// without changing the position or orientation fields.
+    virtual void rotateAroundSelf( Rotation rotation );
+
+    /// Function for translating the viewpoint with direction
+    /// without changing the position or orientation fields.
+    virtual void translate( Vec3f direction, bool collision,
+                            const vector< H3DFloat > &avatar_size,
+                            X3DChildNode * topNode );
+
+    /// Function for moving the viewpoint to the new_pos
+    /// without changing the position or orientation fields.
+    virtual void moveTo( Vec3f new_pos );
+
     typedef list< X3DViewpointNode * > ViewpointList;
     
     /// Returns a list of all current X3DViewpointNode instances.

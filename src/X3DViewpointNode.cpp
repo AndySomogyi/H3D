@@ -188,3 +188,58 @@ X3DViewpointNode::ViewpointList X3DViewpointNode::getViewpointHierarchy() {
 
   return vps;
 }
+
+void X3DViewpointNode::rotateAround( Rotation rotation, bool collision,
+                                     Vec3f center_of_rot ) {
+  Vec3f vp_pos = position->getValue();
+  Vec3f vp_full_pos = vp_pos + rel_pos;
+  Rotation vp_orientation = orientation->getValue();
+  Rotation vp_full_orientation = vp_orientation * rel_orientation;
+
+  rotation = Rotation( vp_full_orientation * rotation.axis, rotation.angle );
+  Vec3f new_pos = Matrix3f( rotation ) *
+    ( vp_full_pos - center_of_rot ) +
+    center_of_rot;
+  bool no_collision = true;
+
+  if( no_collision ) {
+    rel_pos = new_pos - vp_pos;
+    Rotation new_rotation = rotation * vp_full_orientation;
+    rel_orientation = -vp_orientation * new_rotation;
+  }
+}
+
+void X3DViewpointNode::rotateAroundSelf( Rotation rotation ) {
+  Rotation vp_orientation = orientation->getValue();
+  Rotation vp_full_orientation = vp_orientation * rel_orientation;
+  rotation = Rotation( vp_full_orientation * rotation.axis, rotation.angle );
+  Rotation new_rotation = rotation * vp_full_orientation;
+  rel_orientation = -vp_orientation * new_rotation;
+}
+
+void X3DViewpointNode::translate( Vec3f direction, bool collision,
+                                  const vector< H3DFloat > &avatar_size,
+                                  X3DChildNode * topNode ) {
+  Vec3f vp_pos = position->getValue();
+  Vec3f vp_full_pos = vp_pos + rel_pos;
+  Rotation vp_full_orientation = orientation->getValue() * rel_orientation;
+  const Matrix4f &acc_fr_mt = accForwardMatrix->getValue();
+  Vec3f scaling = acc_fr_mt.getScalePart();
+  direction = vp_full_orientation * direction;
+  direction = direction * scaling.x;
+  Vec3f new_pos = vp_full_pos + direction;
+  bool no_collision = true;
+
+  if( collision && !avatar_size.empty() && 
+    topNode->movingSphereIntersect( avatar_size[0],
+    acc_fr_mt * vp_full_pos,
+    acc_fr_mt * new_pos ) )
+    no_collision = false;
+
+  if( no_collision )
+    rel_pos = new_pos - vp_pos;
+}
+
+void X3DViewpointNode::moveTo( Vec3f new_pos ) {
+  rel_pos = new_pos - position->getValue();
+}

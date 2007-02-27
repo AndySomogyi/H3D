@@ -54,6 +54,8 @@
 #include "X3DKeyDeviceSensorNode.h"
 #include "MouseSensor.h"
 
+#include "H3DNavigation.h"
+
 using namespace H3D;
 
 
@@ -127,12 +129,21 @@ H3DWindowNode::H3DWindowNode(
 #endif
 
   windows.insert( this );
+
+
+  default_nav = "EXAMINE";
+  default_avatar.push_back( 0.25f );
+  default_avatar.push_back( 1.6f );
+  default_avatar.push_back( 0.75f );
+  default_speed = 1;
+  default_collision = true;
 }
 
 H3DWindowNode::~H3DWindowNode() {
   if( stencil_mask )
     free( stencil_mask );
   windows.erase( this );
+  H3DNavigation::destroy();
 }
 
 void H3DWindowNode::shareRenderingContext( H3DWindowNode *w ) {
@@ -552,9 +563,6 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     vp_ref.reset( static_cast<Viewpoint *>(vp) );
   }
 
-  if( nav_info )
-    nav_info->detectCollision( vp, child_to_render );
-
   RenderMode::Mode stereo_mode = renderMode->getRenderMode();
 
   Vec3f vp_position = vp->position->getValue() + vp->rel_pos;
@@ -929,6 +937,16 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     swapBuffers();
   }
   glPopAttrib();
+
+  if( nav_info )
+    nav_info->doNavigation( vp, child_to_render );
+  else {
+    H3DNavigation::doNavigation( default_nav,
+                                 vp, child_to_render,
+                                 default_collision,
+                                 default_avatar,
+                                 default_speed );
+  }
 }
 
 void H3DWindowNode::reshape( int w, int h ) {

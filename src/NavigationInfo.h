@@ -30,8 +30,6 @@
 #define __NAVIGATIONINFO_H__
 
 #include "X3DViewpointNode.h"
-#include "KeySensor.h"
-#include "MouseSensor.h"
 #include "MFFloat.h"
 #include "MFString.h"
 
@@ -241,37 +239,6 @@ namespace H3D {
   class H3DAPI_API NavigationInfo : public X3DBindableNode {
   public:
 
-    /// The MoveAvatar class is specialize to take care of navigation
-    /// from keyInput
-    class MoveAvatar : public TypedField< SFBool,
-                                          Types< SFInt32,
-                                                 SFBool,
-                                                 SFVec2f > > {
-    public:
-      virtual void update();
-      
-      void ifExamine( X3DViewpointNode * vp,
-                      bool button_pressed,
-                      Vec2f motion );
-      
-      void ifFlyOrWalk( X3DViewpointNode * vp,
-                        bool button_pressed,
-                        Vec2f motion );
-      
-      void ifLookAt( X3DViewpointNode * vp,
-                     Vec2f mouse_position );
-      
-      void ifAny( X3DViewpointNode * vp,
-                  bool button_pressed,
-                  Vec2f motion );
-
-      Vec3f move_dir;
-      Rotation rotate_dir;
-    };
-#ifdef __BORLANDC__
-    friend class MoveAvatar;
-#endif
-
     /// Constructor.
     NavigationInfo( Inst< SFSetBind > _set_bind         = 0,
                     Inst< SFNode    > _metadata         = 0,
@@ -297,13 +264,7 @@ namespace H3D {
       return static_cast< NavigationInfo * >( X3DBindableNode::getActive( "NavigationInfo" ) );
     }
 
-    void detectCollision( X3DViewpointNode * vp, X3DChildNode *topNode );
-
-    /// Move this instance to the stack top. 
-    virtual void toStackTop();
-
-    /// Remove the bindable node from the stack.
-    virtual void removeFromStack();
+    void doNavigation( X3DViewpointNode * vp, X3DChildNode *topNode );
 
     inline void setNavType( string type ) { nav_type = type; }
 
@@ -378,7 +339,7 @@ namespace H3D {
     /// <b>Access type:</b> outputOnly \n
     auto_ptr< SFBool > transitionComplete;
 
-    auto_ptr< MoveAvatar > moveAvatar;
+    //auto_ptr< MoveAvatar > moveAvatar;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
@@ -396,13 +357,8 @@ namespace H3D {
 
     string nav_type;
 
-    KeySensor *keySensor;
-    MouseSensor *mouseSensor;
-
-    X3DChildNode * the_root;
-
     H3DTime last_time;
-    static NavigationInfoList navigationInfos; 
+    static NavigationInfoList navigationInfos;
   };
 }
 
