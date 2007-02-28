@@ -243,58 +243,66 @@ void H3DHapticsDevice::updateDeviceValues() {
     torque->setValue( (Vec3f)dv.torque, id);
     buttons->setValue( dv.button_status, id );
 
-    // get a default_vp_pos if there is none.
-    if( !vp_initialized ) {
-      X3DViewpointNode *vp = X3DViewpointNode::getActive();
-      if( vp ) {
-        default_vp_pos = vp->accForwardMatrix->getValue() *
-          ( vp->position->getValue() + vp->rel_pos );
-        vp_initialized = true;
-      }
-    }
-    
     if( followViewpoint->getValue() ) {
       // Haptic device should follow the viewpoint.
       X3DViewpointNode *vp = X3DViewpointNode::getActive();
 
       const Matrix4f vp_accFrw = vp->accForwardMatrix->getValue();
 
-      // Get the position of the haptic device in world coordinates with the
-      // default calibration. Calculate the new position for the haptics device
-      // and transform it according to viewpoint orientation.
-      Vec3f old_pos = positionCalibration->getValue() *
-        devicePosition->getValue();
+      if( !vp_initialized ) {
+        // Store default matrices for viewpoint following.
+        X3DViewpointNode *vp = X3DViewpointNode::getActive();
+        if( vp ) {
+          Vec3f default_vp_pos = vp_accFrw *
+            ( vp->position->getValue() + vp->rel_pos );
+          default_vp_pos_mtx[0][3] = default_vp_pos.x;
+          default_vp_pos_mtx[1][3] = default_vp_pos.y;
+          default_vp_pos_mtx[2][3] = default_vp_pos.z;
+          // Convert to millimeters
+          default_vp_pos_mtx_mm[0][3] = default_vp_pos.x * 1e3f;
+          default_vp_pos_mtx_mm[1][3] = default_vp_pos.y * 1e3f;
+          default_vp_pos_mtx_mm[2][3] = default_vp_pos.z * 1e3f;
+          
+          default_vp_orn_mtx = vp_accFrw *
+            Matrix4f( vp->orientation->getValue() * vp->rel_orientation );
+          vp_initialized = true;
+        }
+      }
+
+      // create matrix for new point
       Vec3f vp_full_pos = vp_accFrw * (vp->position->getValue() + vp->rel_pos);
-      Vec3f result_pos = old_pos + vp_full_pos - default_vp_pos;
-      result_pos = ( Rotation( vp_accFrw.getRotationPart() ) *
-                     ( vp->orientation->getValue() * vp->rel_orientation) )
-                   * ( result_pos - vp_full_pos ) + vp_full_pos;
-      
-      // Calculate the relative movement and create a positionCalibrationMatrix
-      // from this.
-      Vec3f rel_pos = result_pos - old_pos;
-      if( rel_pos.lengthSqr() <= Constants::f_epsilon )
-        rel_pos = Vec3f();
+      Matrix4f translation_matrix_new;
+      translation_matrix_new[0][3] = vp_full_pos.x;
+      translation_matrix_new[1][3] = vp_full_pos.y;
+      translation_matrix_new[2][3] = vp_full_pos.z;
 
-      Matrix4d adjustingMatrix;
-      adjustingMatrix[0][3] = rel_pos.x;
-      adjustingMatrix[1][3] = rel_pos.y;
-      adjustingMatrix[2][3] = rel_pos.z;
-      adjustedPositionCalibration->setValue(
-        (Matrix4f)( adjustingMatrix * positionCalibration->getValue() ) );
+      // create rotation matrix.
+      Matrix4f vp_full_orn_mtx = vp_accFrw *
+        Matrix4f( vp->orientation->getValue() * vp->rel_orientation );
+      Matrix4f rotation_matrix = vp_full_orn_mtx * -default_vp_orn_mtx;
 
-      // To millimeters of the position
-      adjustingMatrix[0][3] = adjustingMatrix[0][3] * 1000;
-      adjustingMatrix[1][3] = adjustingMatrix[1][3] * 1000;
-      adjustingMatrix[2][3] = adjustingMatrix[2][3] * 1000;
+      // create the matrix used to adjust the positionCalibration
+      Matrix4f adjust_matrix = translation_matrix_new *
+        ( rotation_matrix * default_vp_pos_mtx.inverse() );
+
+      adjustedPositionCalibration->
+        setValue( adjust_matrix * positionCalibration->getValue() );
+
+      // Convert to millimeters
+      translation_matrix_new[0][3] = translation_matrix_new[0][3] * 1e3f;
+      translation_matrix_new[1][3] = translation_matrix_new[1][3] * 1e3f;
+      translation_matrix_new[2][3] = translation_matrix_new[2][3] * 1e3f;
+
+      // create the matrix used to adjust the positionCalibration
+      adjust_matrix = translation_matrix_new *
+        (rotation_matrix * default_vp_pos_mtx_mm.inverse());
+
       hapi_device->setPositionCalibration(
-        (Matrix4f)( adjustingMatrix *
-                    positionCalibration->rt_pos_calibration ) );
+        adjust_matrix * positionCalibration->rt_pos_calibration );
       
       // Create adjusted OrnCalibration and send to HAPI
       adjustedOrnCalibration->setValue(
-        ( Rotation( vp_accFrw.getRotationPart() ) *
-          ( vp->orientation->getValue() * vp->rel_orientation ) ) *
+        Rotation( vp_full_orn_mtx.getScaleRotationPart() ) *
         orientationCalibration->getValue() );
       hapi_device->
         setOrientationCalibration(adjustedOrnCalibration->rt_orn_calibration );
