@@ -577,7 +577,14 @@ namespace H3D {
     // the position in global coordinates of the viewpoint which should
     // be used as default reference if the haptic device should follow
     // viewpoint movement.
+    Matrix4f default_vp_pos_mtx;
+    Matrix4f default_vp_pos_mtx_mm;
     Vec3f default_vp_pos;
+
+    // the orientation in global coordinates of the viewpoint which should
+    // be used as default reference if the haptic device should follow
+    // viewpoint movement.
+    Matrix4f default_vp_orn_mtx;
 
     unsigned int nr_haptics_loops;
 
