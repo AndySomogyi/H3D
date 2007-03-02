@@ -108,13 +108,15 @@ namespace H3D {
     /// The weighting of f between the key pair is set in w.
     int lookupKey( H3DFloat f, H3DFloat &w ) {
       vector<H3DFloat> keys = key->getValue();
-      if ( f <= keys[0] ) {
+      if( keys.size() == 0 ) return -1;
+
+      if ( keys.size() == 1 || f <= keys[0] ) {
         w = 0;
         return 0;
       }
       if ( f >= keys[keys.size()-1] ) {
         w = 1;
-        return keys.size() - 1;
+        return keys.size() - 2;
       }
       for( int i = keys.size()-1; i >= 0; i--) {
         if ( f > keys[i] ) {

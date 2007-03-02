@@ -109,12 +109,11 @@ void ColorInterpolator::SFValue::update() {
   H3DFloat weight;
   int key_index = interpolator->lookupKey( fraction, 
                                            weight );
-  
-  if( key_size > 0 && key_index >= 0 ) {
+  if( key_index >= 0 && key_index + 1 < key_values.size() ) {
     if (weight<=0) 
-      value = key_values.front();
+      value = key_values[key_index];
     else if (weight>=1)
-      value = key_values.back();
+      value = key_values[key_index+1];
     else {
       RGB a = key_values[ key_index ];
       RGB b = key_values[ key_index+1 ];
