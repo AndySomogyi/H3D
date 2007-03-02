@@ -78,18 +78,19 @@ void CoordinateInterpolator2D::MFValue::update() {
   int value_size = key_values.size() / key_size;
   value.resize( value_size );
 
-  if ( key_size > 0 && key_index >= 0 ) {
+  if ( key_index >= 0 && 
+       (key_index + 2)* value_size - 1 < key_values.size() ) {
     if (weight<=0) 
       for (int x = 0; x < value_size; x++ )
-        value[x] = key_values[ x ];
+	value[x] = key_values[ key_index*value_size + x ];
     else if (weight>=1)
       for (int x = 0; x < value_size; x++ )
-        value[x] = key_values[ (key_size-1)*value_size + x];
+	value[x] = key_values[ (key_index+1)*value_size + x];
     else { // else, interpolate linearly
       for (int x = 0; x < value_size; x++ ) {
-        Vec2f a = key_values[ key_index*value_size + x ];
-        Vec2f b = key_values[ (key_index+1)*value_size + x  ];
-        value[ x ] = (1-weight)*a + (weight)*b;
+	Vec2f a = key_values[ key_index*value_size + x ];
+	Vec2f b = key_values[ (key_index+1)*value_size + x  ];
+	value[ x ] = (1-weight)*a + (weight)*b;
       }
     }
   }
