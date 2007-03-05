@@ -38,7 +38,8 @@ H3DNavigation * H3DNavigation::instance = 0;
 
 H3DNavigation::H3DNavigation() : mouse_nav( new MouseNavigation() ),
                                  keyboard_nav( new KeyboardNavigation() ),
-                                 haptic_device_nav( 0 ) {
+                                 haptic_device_nav( 0 ),
+                                 sws_navigation( 0 ) {
 }
 
 void H3DNavigation::doNavigation(
@@ -151,6 +152,9 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
     bool use_center;
     if( H3DNavigationDevices::getMoveInfo(
           translation_delta, rotation_value, center_of_rot, use_center ) ) {
+
+      // TODO: maybe change this to allow for other devices to specify what
+      // to look at ( for example by supply a point and direction ).
       GLint viewport[4];
       GLdouble mvmatrix[16], projmatrix[16];
       GLdouble wx, wy, wz;
@@ -246,6 +250,7 @@ void H3DNavigation::disableDevice( int device ) {
         instance->mouse_nav.reset(0);
         instance->keyboard_nav.reset(0);
         instance->haptic_device_nav.reset(0);
+        instance->sws_navigation.reset( 0 );
         break;
       }
       case MOUSE: {
@@ -258,6 +263,11 @@ void H3DNavigation::disableDevice( int device ) {
       }
       case HAPTICSDEVICE: {
         instance->haptic_device_nav.reset( 0 );
+        break;
+      }
+      case SWS: {
+        instance->sws_navigation.reset( 0 );
+        break;
       }
       default: {}
     }
@@ -275,6 +285,8 @@ void H3DNavigation::enableDevice( int device ) {
           instance->keyboard_nav.reset( new KeyboardNavigation() );
         if( !instance->keyboard_nav.get() )
           instance->haptic_device_nav.reset( new HapticDeviceNavigation() );
+        if( !instance->sws_navigation.get() )
+          instance->sws_navigation.reset( new SWSNavigation() );
         break;
       }
       case MOUSE: {
@@ -288,8 +300,13 @@ void H3DNavigation::enableDevice( int device ) {
         break;
       }
       case HAPTICSDEVICE: {
-         if( !instance->keyboard_nav.get() )
+        if( !instance->keyboard_nav.get() )
           instance->haptic_device_nav.reset( new HapticDeviceNavigation() );
+        break;
+      }
+      case SWS: {
+        if( !instance->sws_navigation.get() )
+          instance->sws_navigation.reset( new SWSNavigation() );
         break;
       }
       default: {}

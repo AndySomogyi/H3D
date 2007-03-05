@@ -64,6 +64,7 @@ extern "C" {
 #endif // __linux
 
 using namespace H3D;
+SpaceWareSensor * SpaceWareSensor::sws_instance = 0;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase SpaceWareSensor::database( 
@@ -535,6 +536,8 @@ SpaceWareSensor::SpaceWareSensor(
              << endl;
 #endif
 #endif
+  if( !sws_instance )
+    sws_instance = this;
 }
 
 void SpaceWareSensor::traverseSG( TraverseInfo &ti ) {

@@ -30,6 +30,7 @@
 
 #include "H3DNavigationDevices.h"
 #include "DeviceInfo.h"
+#include "SpaceWareSensor.h"
 
 using namespace H3D;
 
@@ -44,6 +45,7 @@ H3DNavigationDevices::H3DNavigationDevices() : shouldGetInfo( new SFBool ) {
 void H3DNavigationDevices::resetAll() {
   move_dir = Vec3f();
   rel_rot = Rotation();
+  use_center = false;
 }
 
 MouseNavigation::MouseNavigation() :
@@ -260,13 +262,11 @@ void HapticDeviceNavigation::resetAll() {
 }
 
 void HapticDeviceNavigation::CalculateHapticDeviceMoveInfo::update( ) {
-  /*if( event.ptr == routes_in[0] ) {
-  }*/
   DeviceInfo *di = DeviceInfo::getActive();
   H3DHapticsDevice *hd =
     static_cast< H3DHapticsDevice * >(di->device->getValueByIndex( 0 ) );
   Vec3f hd_pos = hd->weightedProxyPosition->getValue();
-  bool tmp_button_pressed = hd->mainButton->getValue();
+  bool tmp_button_pressed = static_cast< SFBool * >(routes_in[0])->getValue();
   if( tmp_button_pressed != button_pressed ) {
     button_pressed = tmp_button_pressed;
     if( button_pressed ) {
@@ -288,7 +288,6 @@ void HapticDeviceNavigation::CalculateHapticDeviceMoveInfo::update( ) {
       the_owner->use_center = true;
     }
     else if( nav_type == "WALK" ) {
-      the_owner->rel_rot = Rotation();
       Vec3f dist_change = hd->devicePosition->getValue() - last_pos;
       dist_change.y = 0;
       dist_change.normalizeSafe();
@@ -357,4 +356,58 @@ void HapticDeviceNavigation::CalculateHapticDeviceMoveInfo::update( ) {
     return;
   }
   value = false;
+}
+
+SWSNavigation::SWSNavigation() :
+  calculateSWSMoveInfo( new CalculateSWSMoveInfo ) {
+  calculateSWSMoveInfo->the_owner = this;
+  calculateSWSMoveInfo->setValue( false );
+
+  SpaceWareSensor *sws = SpaceWareSensor::sws_instance;
+  if( sws ) {
+    sws->instantTranslation->route( calculateSWSMoveInfo );
+    sws->instantRotation->route( calculateSWSMoveInfo );
+    sws->instantPitch->route( calculateSWSMoveInfo );
+    calculateSWSMoveInfo->route( shouldGetInfo );
+  }
+}
+
+void SWSNavigation::resetAll() {
+  H3DNavigationDevices::resetAll();
+  calculateSWSMoveInfo->setValue( false );
+}
+
+void SWSNavigation::CalculateSWSMoveInfo::update( ) {
+  string nav_type = the_owner->getNavType();
+  if( event.ptr == routes_in[0] ) {
+    if( nav_type == "WALK" ) {
+      Vec3f direction = static_cast< SFVec3f * >( routes_in[0] )->getValue();
+      direction.y = 0.0f;
+      direction.normalizeSafe();
+      the_owner->move_dir = direction;
+      value = true;
+    }
+    else if( nav_type == "FLY" ) {
+      Vec3f direction = static_cast< SFVec3f * >( routes_in[0] )->getValue();
+      direction.normalizeSafe();
+      the_owner->move_dir = direction;
+      value = true;
+    }
+  }
+  else if( event.ptr == routes_in[1] ) {
+    if( nav_type == "EXAMINE" || nav_type == "FLY" ) {
+      the_owner->rel_rot =
+        static_cast< SFRotation * >( routes_in[1] )->getValue();
+      value = true;
+    }
+  }
+  else if( event.ptr == routes_in[2] ) {
+    if( nav_type == "WALK" ) {
+      the_owner->rel_rot =
+        static_cast< SFRotation * >( routes_in[2] )->getValue();
+      value = true;
+    }
+  }
+  else
+    value = false;
 }
