@@ -263,7 +263,7 @@ void H3DHapticsDevice::updateDeviceValues() {
           default_vp_pos_mtx_mm[1][3] = default_vp_pos.y * 1e3f;
           default_vp_pos_mtx_mm[2][3] = default_vp_pos.z * 1e3f;
           
-          default_vp_orn_mtx = vp_accFrw;
+          default_vp_orn_mtx = vp_accFrw.inverse();
           vp_initialized = true;
         }
       }
@@ -278,7 +278,7 @@ void H3DHapticsDevice::updateDeviceValues() {
       // create rotation matrix.
       Matrix4f vp_full_orn_mtx = vp_accFrw *
         Matrix4f( vp->orientation->getValue() * vp->rel_orientation );
-      Matrix4f rotation_matrix = vp_full_orn_mtx * -default_vp_orn_mtx;
+      Matrix4f rotation_matrix = vp_full_orn_mtx * default_vp_orn_mtx;
 
       // create the matrix used to adjust the positionCalibration
       Matrix4f adjust_matrix = translation_matrix_new *
