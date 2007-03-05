@@ -42,10 +42,13 @@ namespace H3D {
     /// Constructor.
     H3DNavigationDevices();
 
+    /// Destructor
     virtual ~H3DNavigationDevices() {
       h3dnavigations.remove( this );
     }
 
+    /// Call this function to sum up movement changes from all devices
+    /// returns true if there are changes.
     static bool getMoveInfo( Vec3f &translationSum, Rotation &rotationSum,
                              Vec3f &center_of_rot_sum, bool &use_center_sum ) {
       bool somethingmoved = false;
@@ -70,8 +73,10 @@ namespace H3D {
       return somethingmoved;
     }
 
+    /// reset values of movement variables
     virtual void resetAll();
     
+    /// sets type of navigation for all devices
     static void setNavTypeForAll( string &_nav_type ) {
       for( list< H3DNavigationDevices * >::iterator i = h3dnavigations.begin();
            i != h3dnavigations.end(); i++ ) {
@@ -79,14 +84,17 @@ namespace H3D {
       }
     }
 
+    /// Set type of navigation
     void setNavType( string &_nav_type ) {
       nav_type = _nav_type;
     }
 
+    /// Get the current type of navigation
     string getNavType( ) {
       return nav_type;
     }
 
+    /// needs to be public so field in sub-classes can set directly.
     Vec3f move_dir;
     Rotation rel_rot;
     Vec3f center_of_rot;
@@ -123,6 +131,7 @@ namespace H3D {
     auto_ptr< MouseSensor > mouseSensor;
   };
 
+  /// Takes care of navigation using keyboard.
   class H3DAPI_API KeyboardNavigation : public H3DNavigationDevices {
   public:
 
@@ -155,6 +164,7 @@ namespace H3D {
     auto_ptr< KeySensor > keySensor;
   };
 
+  /// Takes care of navigation using a haptics device.
   class H3DAPI_API HapticDeviceNavigation : public H3DNavigationDevices {
   public:
 
@@ -186,6 +196,36 @@ namespace H3D {
 
   protected:
     auto_ptr< CalculateHapticDeviceMoveInfo > calculateHapticDeviceMoveInfo;
+  };
+
+  /// Takes care of navigation with SpaceWareSensor.
+  /// The first created SpaceWareSensor is used.
+  class H3DAPI_API SWSNavigation : public H3DNavigationDevices {
+  public:
+
+    class CalculateSWSMoveInfo :
+      public AutoUpdate< TypedField< SFBool, Types< SFVec3f, SFRotation, SFRotation > > > {
+
+    public:
+      CalculateSWSMoveInfo() {
+      }
+
+      virtual void update();
+
+      SWSNavigation *the_owner;
+    protected:
+    };
+#ifdef __BORLANDC__
+    friend class CalculateSWSMoveInfo;
+#endif
+
+    /// Constructor.
+    SWSNavigation();
+
+    virtual void resetAll();
+
+  protected:
+    auto_ptr< CalculateSWSMoveInfo > calculateSWSMoveInfo;
   };
 }
 

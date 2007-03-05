@@ -233,6 +233,11 @@ namespace H3D {
           Inst< ResetAccumulatedRotation > _resetAccumulatedRotation = 0
                     );
 
+    ~SpaceWareSensor() {
+      if( this == sws_instance )
+        sws_instance = 0;
+    }
+
     /// Contains the current translation as reported by the device.
     ///
     /// <b>Access type: </b> outputOnly \n
@@ -434,6 +439,10 @@ namespace H3D {
     Vec3f thread_translation;
    /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
+    // instance of the first SpaceWareSensor created
+    // used if the spacewaresensor should be used to navigate the scene
+    static SpaceWareSensor *sws_instance;
 
   private:
 #ifdef HAVE_3DXWARE

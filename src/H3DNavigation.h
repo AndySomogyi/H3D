@@ -44,7 +44,8 @@ namespace H3D {
       ALL = 1,
       MOUSE = 2,
       KEYBOARD = 3,
-      HAPTICSDEVICE = 4
+      HAPTICSDEVICE = 4,
+      SWS = 5
     } NavigationDevices;
 
     /// destroy the instance when not needed anymore
@@ -79,10 +80,10 @@ namespace H3D {
     ~H3DNavigation() {}
 
     /// Devices which it is possible to use for navigation.
-    /// Maybe change this to contain pointers to H3DNavigationDevices
     auto_ptr< MouseNavigation > mouse_nav;
     auto_ptr< KeyboardNavigation > keyboard_nav;
     auto_ptr< HapticDeviceNavigation > haptic_device_nav;
+    auto_ptr< SWSNavigation > sws_navigation;
 
     H3DTime last_time;
   };
