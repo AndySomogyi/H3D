@@ -226,7 +226,7 @@ void X3DViewpointNode::translate( Vec3f direction, bool collision,
   const Matrix4f &acc_fr_mt = accForwardMatrix->getValue();
   Vec3f scaling = acc_fr_mt.getScalePart();
   direction = vp_full_orientation * direction;
-  direction = direction * scaling.x;
+  //direction = direction * scaling.x;
   Vec3f new_pos = vp_full_pos + direction;
   bool no_collision = true;
 

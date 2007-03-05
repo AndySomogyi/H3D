@@ -31,6 +31,8 @@
 
 #include "MouseSensor.h"
 #include "KeySensor.h"
+#include "SFVec3f.h"
+#include "SFRotation.h"
 
 namespace H3D {
   
@@ -44,17 +46,27 @@ namespace H3D {
       h3dnavigations.remove( this );
     }
 
-    static bool getMoveInfo( Vec3f &translationSum, Rotation &rotationSum ) {
+    static bool getMoveInfo( Vec3f &translationSum, Rotation &rotationSum,
+                             Vec3f &center_of_rot_sum, bool &use_center_sum ) {
       bool somethingmoved = false;
+      int centerCounter = 0;
+      use_center_sum = false;
       for( list< H3DNavigationDevices * >::iterator i = h3dnavigations.begin();
            i != h3dnavigations.end(); i++ ) {
         if( (*i)->shouldGetInfo->getValue() ) {
           translationSum += (*i)->move_dir;
           rotationSum = rotationSum * (*i)->rel_rot;
+          if( (*i)->use_center ) {
+            use_center_sum = true;
+            centerCounter++;
+            center_of_rot_sum += (*i)->center_of_rot;
+          }
           (*i)->resetAll();
           somethingmoved = true;
         }
       }
+      if( use_center_sum )
+        center_of_rot_sum /= centerCounter;
       return somethingmoved;
     }
 
@@ -77,6 +89,8 @@ namespace H3D {
 
     Vec3f move_dir;
     Rotation rel_rot;
+    Vec3f center_of_rot;
+    bool use_center;
 
   protected:
     auto_ptr< SFBool > shouldGetInfo;
@@ -89,7 +103,8 @@ namespace H3D {
   class H3DAPI_API MouseNavigation : public H3DNavigationDevices {
   public:
 
-    class CalculateMouseMoveInfo : public AutoUpdate< TypedField< SFBool, Types< SFBool, SFVec2f > > > {
+    class CalculateMouseMoveInfo :
+      public AutoUpdate< TypedField< SFBool, Types< SFBool, SFVec2f > > > {
     public:
       virtual void update();
       MouseNavigation *the_owner;
@@ -111,7 +126,8 @@ namespace H3D {
   class H3DAPI_API KeyboardNavigation : public H3DNavigationDevices {
   public:
 
-    class CalculateKeyboardMoveInfo : public AutoUpdate< TypedField< SFBool, Types< SFInt32, SFInt32 > > > {
+    class CalculateKeyboardMoveInfo :
+      public AutoUpdate< TypedField< SFBool, Types< SFInt32, SFInt32 > > > {
     public:
       CalculateKeyboardMoveInfo() {
         upPressed = downPressed = leftPressed = rightPressed = false;
@@ -137,6 +153,39 @@ namespace H3D {
   protected:
     auto_ptr< CalculateKeyboardMoveInfo > calculateKeyboardMoveInfo;
     auto_ptr< KeySensor > keySensor;
+  };
+
+  class H3DAPI_API HapticDeviceNavigation : public H3DNavigationDevices {
+  public:
+
+    class CalculateHapticDeviceMoveInfo :
+      public AutoUpdate< TypedField< SFBool, Types< SFBool > > > {
+
+    public:
+      CalculateHapticDeviceMoveInfo() {
+        button_pressed = false;
+      }
+
+      virtual void update();
+
+      HapticDeviceNavigation *the_owner;
+    protected:
+      bool button_pressed;
+      Rotation last_orn;
+      Vec3f last_pos;
+      Vec3f last_weight_pos;
+    };
+#ifdef __BORLANDC__
+    friend class CalculateHapticDeviceMoveInfo;
+#endif
+
+    /// Constructor.
+    HapticDeviceNavigation();
+
+    virtual void resetAll();
+
+  protected:
+    auto_ptr< CalculateHapticDeviceMoveInfo > calculateHapticDeviceMoveInfo;
   };
 }
 
