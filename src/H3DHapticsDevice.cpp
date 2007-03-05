@@ -263,8 +263,7 @@ void H3DHapticsDevice::updateDeviceValues() {
           default_vp_pos_mtx_mm[1][3] = default_vp_pos.y * 1e3f;
           default_vp_pos_mtx_mm[2][3] = default_vp_pos.z * 1e3f;
           
-          default_vp_orn_mtx = vp_accFrw *
-            Matrix4f( vp->orientation->getValue() * vp->rel_orientation );
+          default_vp_orn_mtx = vp_accFrw;
           vp_initialized = true;
         }
       }
