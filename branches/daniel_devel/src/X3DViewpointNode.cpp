@@ -111,13 +111,13 @@ void X3DViewpointNode::removeFromStack() {
 
           new_vp->rel_pos = vp_acc_inv_mtx *
                             ( old_vp_acc_frw_mtx *
-                              ( position->getValue() + rel_pos ) )
+                              getFullPos() )
                             - new_vp->position->getValue();
 
-          new_vp->rel_orientation = -new_vp->orientation->getValue() * 
+          new_vp->rel_orn = -new_vp->orientation->getValue() * 
             ( Rotation( vp_acc_inv_mtx.getScaleRotationPart() ) *
-              ( Rotation(old_vp_acc_frw_mtx.getScaleRotationPart() ) *
-                ( orientation->getValue() * rel_orientation ) ) );
+              ( Rotation( old_vp_acc_frw_mtx.getScaleRotationPart() ) *
+                getFullOrn() ) );
         }
       }
     }
@@ -132,7 +132,7 @@ void X3DViewpointNode::toStackTop() {
     if( jump->getValue() ) {
       if( !retainUserOffsets->getValue() ) {
         rel_pos = Vec3f( 0, 0, 0 );
-        rel_orientation = Rotation( 0, 0, 0, 0 );
+        rel_orn = Rotation( 0, 0, 0, 0 );
       }
     }
     else {
@@ -144,13 +144,13 @@ void X3DViewpointNode::toStackTop() {
 
         rel_pos = vp_acc_inv_mtx *
                   ( old_vp_acc_frw_mtx *
-                    ( old_vp->position->getValue() + old_vp->rel_pos ) )
+                    old_vp->getFullPos() )
                     - position->getValue();
 
-        rel_orientation = -orientation->getValue() * 
+        rel_orn = -orientation->getValue() * 
         ( Rotation( vp_acc_inv_mtx.getScaleRotationPart() ) *
           ( Rotation(old_vp_acc_frw_mtx.getScaleRotationPart() ) *
-            ( old_vp->orientation->getValue() * old_vp->rel_orientation ) ) );
+          old_vp->getFullOrn() ) );
       }
     }
     X3DBindableNode::toStackTop();
@@ -194,7 +194,7 @@ void X3DViewpointNode::rotateAround( Rotation rotation, bool collision,
   Vec3f vp_pos = position->getValue();
   Vec3f vp_full_pos = vp_pos + rel_pos;
   Rotation vp_orientation = orientation->getValue();
-  Rotation vp_full_orientation = vp_orientation * rel_orientation;
+  Rotation vp_full_orientation = vp_orientation * rel_orn;
 
   rotation = Rotation( vp_full_orientation * rotation.axis, rotation.angle );
   Vec3f new_pos = Matrix3f( rotation ) *
@@ -205,16 +205,16 @@ void X3DViewpointNode::rotateAround( Rotation rotation, bool collision,
   if( no_collision ) {
     rel_pos = new_pos - vp_pos;
     Rotation new_rotation = rotation * vp_full_orientation;
-    rel_orientation = -vp_orientation * new_rotation;
+    rel_orn = -vp_orientation * new_rotation;
   }
 }
 
 void X3DViewpointNode::rotateAroundSelf( Rotation rotation ) {
   Rotation vp_orientation = orientation->getValue();
-  Rotation vp_full_orientation = vp_orientation * rel_orientation;
+  Rotation vp_full_orientation = vp_orientation * rel_orn;
   rotation = Rotation( vp_full_orientation * rotation.axis, rotation.angle );
   Rotation new_rotation = rotation * vp_full_orientation;
-  rel_orientation = -vp_orientation * new_rotation;
+  rel_orn = -vp_orientation * new_rotation;
 }
 
 void X3DViewpointNode::translate( Vec3f direction, bool collision,
@@ -222,7 +222,7 @@ void X3DViewpointNode::translate( Vec3f direction, bool collision,
                                   X3DChildNode * topNode ) {
   Vec3f vp_pos = position->getValue();
   Vec3f vp_full_pos = vp_pos + rel_pos;
-  Rotation vp_full_orientation = orientation->getValue() * rel_orientation;
+  Rotation vp_full_orientation = orientation->getValue() * rel_orn;
   const Matrix4f &acc_fr_mt = accForwardMatrix->getValue();
   Vec3f scaling = acc_fr_mt.getScalePart();
   direction = vp_full_orientation * direction;

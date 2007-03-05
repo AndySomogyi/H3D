@@ -72,10 +72,8 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
                               const vector< H3DFloat > &avatar_size, 
                               H3DFloat speed ) {
   const Matrix4f &acc_fr_mt = vp->accForwardMatrix->getValue();
-  Vec3f vp_pos = vp->position->getValue();
-  Vec3f vp_full_pos = vp_pos + vp->rel_pos;
-  Rotation vp_orientation = vp->orientation->getValue();
-  Rotation vp_full_orientation = vp_orientation * vp->rel_orientation;
+  Vec3f vp_full_pos = vp->getFullPos();
+  Rotation vp_full_orientation = vp->getFullOrn();
   H3DTime current_time = Scene::time->getValue();
   H3DTime delta_time = current_time - last_time;
   last_time = current_time;

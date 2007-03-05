@@ -137,10 +137,10 @@ void Billboard::traverseSG( TraverseInfo &ti ) {
     ti.getAccInverseMatrix() *
     vp->accForwardMatrix->getValue();
   
-  Vec3f vp_pos = vp_to_local * vp->position->getValue();
+  Vec3f vp_pos = vp_to_local * vp->getFullPos();
   Vec3f vp_y_axis = 
     vp_to_local.getScaleRotationPart() * 
-    (vp->orientation->getValue() *  Vec3f( 0, 1, 0 ) );
+    (vp->getFullOrn() *  Vec3f( 0, 1, 0 ) );
   vp_y_axis.normalizeSafe();
   // set the vpPosition and vpUp fields if the value has changed.
   if( vp_pos != vpPosition->getValue() )

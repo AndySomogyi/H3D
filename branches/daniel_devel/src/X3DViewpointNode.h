@@ -305,6 +305,14 @@ namespace H3D {
       return viewpoints;
     }
 
+    Vec3f getFullPos() {
+      return position->getValue() + rel_pos;
+    }
+
+    Rotation getFullOrn() {
+      return orientation->getValue() * rel_orn;
+    }
+
     /// Get the all X3DViewpointNode instances with the X3DViewpointNode
     /// that are in ViewpointGroup only present in the group and not 
     /// by them self in the list.
@@ -380,9 +388,10 @@ namespace H3D {
     static H3DNodeDatabase database;
 
     Vec3f rel_pos;
-    Rotation rel_orientation;
+    Rotation rel_orn;
+
   protected:
-    static ViewpointList viewpoints; 
+    static ViewpointList viewpoints;
   };
 }
 
