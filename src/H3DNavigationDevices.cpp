@@ -29,6 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "H3DNavigationDevices.h"
+#include "DeviceInfo.h"
 
 using namespace H3D;
 
@@ -37,6 +38,7 @@ list<H3DNavigationDevices *> H3DNavigationDevices::h3dnavigations;
 H3DNavigationDevices::H3DNavigationDevices() : shouldGetInfo( new SFBool ) {
   shouldGetInfo->setValue( false );
   h3dnavigations.push_back( this );
+  use_center = false;
 }
 
 void H3DNavigationDevices::resetAll() {
@@ -44,7 +46,10 @@ void H3DNavigationDevices::resetAll() {
   rel_rot = Rotation();
 }
 
-MouseNavigation::MouseNavigation() : calculateMouseMoveInfo( new CalculateMouseMoveInfo ), mouseSensor( new MouseSensor() ) {
+MouseNavigation::MouseNavigation() :
+  calculateMouseMoveInfo( new CalculateMouseMoveInfo ),
+  mouseSensor( new MouseSensor() ) {
+
   calculateMouseMoveInfo->the_owner = this;
   calculateMouseMoveInfo->setValue( false );
   mouseSensor->leftButton->routeNoEvent( calculateMouseMoveInfo );
@@ -68,12 +73,15 @@ void MouseNavigation::CalculateMouseMoveInfo::update( ) {
       if( button_pressed ) {
          Vec2f temp_pos = the_owner->mouseSensor->position->getValue();
          the_owner->move_dir = Vec3f( temp_pos.x, temp_pos.y, 0 );
+         the_owner->rel_rot = Rotation();
+         the_owner->center_of_rot = Vec3f();
          value = true;
       }
     }
     else {
       the_owner->move_dir = Vec3f();
       the_owner->rel_rot = Rotation();
+      the_owner->center_of_rot = Vec3f();
       value = false;
     }
   }
@@ -81,25 +89,32 @@ void MouseNavigation::CalculateMouseMoveInfo::update( ) {
     Vec2f perp = Vec2f( -motion.y, -motion.x );
     perp.normalize();
     if( nav_type == "EXAMINE" ) {
-      the_owner->rel_rot *= Rotation( perp.x, perp.y, 0, motion.length() * 0.01f );
+      the_owner->rel_rot *=
+        Rotation( perp.x, perp.y, 0, motion.length() * 0.01f );
       the_owner->move_dir = Vec3f();
+      the_owner->center_of_rot = Vec3f();
     }
     else if( nav_type == "WALK" ) {
       H3DFloat abs_x = H3DAbs( motion.x );
       if( abs_x > Constants::f_epsilon ) {
-        the_owner->rel_rot *= Rotation( 0, -motion.x / abs_x, 0, abs_x * 0.01f );
+        the_owner->rel_rot *=
+          Rotation( 0, -motion.x / abs_x, 0, abs_x * 0.01f );
       }
       else
         the_owner->rel_rot *= Rotation();
       the_owner->move_dir = Vec3f();
+      the_owner->center_of_rot = Vec3f();
     }
     else if( nav_type == "FLY" ) {
-      the_owner->rel_rot *= Rotation( perp.x, perp.y, 0, motion.length() * 0.01f );
+      the_owner->rel_rot *=
+        Rotation( perp.x, perp.y, 0, motion.length() * 0.01f );
       the_owner->move_dir = Vec3f();
+      the_owner->center_of_rot = Vec3f();
     }
     else {
       the_owner->rel_rot = Rotation();
       the_owner->move_dir = Vec3f();
+      the_owner->center_of_rot = Vec3f();
     }
     value = true;
   }
@@ -107,12 +122,16 @@ void MouseNavigation::CalculateMouseMoveInfo::update( ) {
     if( nav_type != "LOOKAT" ) {
       the_owner->move_dir = Vec3f();
       the_owner->rel_rot = Rotation();
+      the_owner->center_of_rot = Vec3f();
       value = false;
     }
   }
 }
 
-KeyboardNavigation::KeyboardNavigation() : calculateKeyboardMoveInfo( new CalculateKeyboardMoveInfo ), keySensor( new KeySensor() ) {
+KeyboardNavigation::KeyboardNavigation() :
+  calculateKeyboardMoveInfo( new CalculateKeyboardMoveInfo ),
+  keySensor( new KeySensor() ) {
+
   calculateKeyboardMoveInfo->the_owner = this;
   calculateKeyboardMoveInfo->setValue( false );
   keySensor->actionKeyPress->route( calculateKeyboardMoveInfo );
@@ -218,5 +237,124 @@ void KeyboardNavigation::CalculateKeyboardMoveInfo::update( ) {
   }
   the_owner->move_dir = temp_move_dir;
   the_owner->rel_rot = temp_rel_rot;
+  the_owner->center_of_rot = Vec3f();
   value = temp_value;
+}
+
+HapticDeviceNavigation::HapticDeviceNavigation() :
+  calculateHapticDeviceMoveInfo( new CalculateHapticDeviceMoveInfo ) {
+
+  calculateHapticDeviceMoveInfo->the_owner = this;
+  calculateHapticDeviceMoveInfo->setValue( false );
+  DeviceInfo *di = DeviceInfo::getActive();
+  if( !di->device->empty() ) {
+    H3DHapticsDevice *hd =
+      static_cast< H3DHapticsDevice * >(di->device->getValueByIndex( 0 ) );
+    hd->mainButton->route( calculateHapticDeviceMoveInfo );
+    calculateHapticDeviceMoveInfo->route( shouldGetInfo );
+  }
+}
+
+void HapticDeviceNavigation::resetAll() {
+  move_dir = Vec3f();
+}
+
+void HapticDeviceNavigation::CalculateHapticDeviceMoveInfo::update( ) {
+  /*if( event.ptr == routes_in[0] ) {
+  }*/
+  DeviceInfo *di = DeviceInfo::getActive();
+  H3DHapticsDevice *hd =
+    static_cast< H3DHapticsDevice * >(di->device->getValueByIndex( 0 ) );
+  Vec3f hd_pos = hd->weightedProxyPosition->getValue();
+  bool tmp_button_pressed = hd->mainButton->getValue();
+  if( tmp_button_pressed != button_pressed ) {
+    button_pressed = tmp_button_pressed;
+    if( button_pressed ) {
+      last_orn = hd->deviceOrientation->getValue();
+      last_pos = hd->devicePosition->getValue();
+      last_weight_pos = hd->weightedProxyPosition->getValue();
+    }
+  }
+  
+  if( button_pressed ) {
+    string nav_type = the_owner->getNavType();
+    if( nav_type == "EXAMINE" ) {
+      Rotation this_orn = hd->deviceOrientation->getValue();
+      the_owner->rel_rot = -(this_orn * -last_orn);
+      last_orn = this_orn;
+      the_owner->move_dir = 2*(last_pos - hd->devicePosition->getValue());
+      last_pos = hd->devicePosition->getValue();
+      the_owner->center_of_rot = hd->weightedProxyPosition->getValue();
+      the_owner->use_center = true;
+    }
+    else if( nav_type == "WALK" ) {
+      the_owner->rel_rot = Rotation();
+      Vec3f dist_change = hd->devicePosition->getValue() - last_pos;
+      dist_change.y = 0;
+      dist_change.normalizeSafe();
+      Rotation this_orn = hd->deviceOrientation->getValue();
+      last_orn = this_orn;
+      Rotation rel_rot = Rotation();
+      try {
+        Vec3f point = this_orn * Vec3f( 0, 0, 1 );
+        point.y = 0.0f;
+        point.normalize();
+        rel_rot = Rotation( Vec3f( 0, 0, 1 ), point );
+        if( rel_rot.angle < 0.02 )
+          rel_rot.angle = 0.0f;
+        else
+          rel_rot.angle = 0.01f * rel_rot.angle;
+      }
+      catch( const Exception::H3DException &e ) {
+      }
+      the_owner->move_dir = dist_change;
+      the_owner->rel_rot = rel_rot;
+      the_owner->center_of_rot = Vec3f();
+      the_owner->use_center = false;
+    }
+    else if( nav_type == "FLY" ) {
+      the_owner->rel_rot = Rotation();
+      Vec3f dist_change = hd->devicePosition->getValue() - last_pos;
+      dist_change.y = 0;
+      dist_change.normalizeSafe();
+      Rotation this_orn = hd->deviceOrientation->getValue();
+      last_orn = this_orn;
+      Rotation rel_rot = Rotation();
+      try {
+        Vec3f point1 = this_orn * Vec3f( 0, 0, 1 );
+        Vec3f point2 = point1;
+        point1.y = 0.0f;
+        point1.normalize();
+        rel_rot = Rotation( Vec3f( 0, 0, 1 ), point1 );
+        
+        if( rel_rot.angle < 0.02 )
+          rel_rot.angle = 0.0f;
+        else
+          rel_rot.angle = 0.01f * rel_rot.angle;
+        try {
+          point2.x = 0.0f;
+          point2.normalize();
+          Rotation rel_rot2 = Rotation( Vec3f( 0, 0, 1 ), point2 );
+          if( rel_rot2.angle < 0.02 )
+            rel_rot2.angle = 0.0f;
+          else
+            rel_rot2.angle = 0.01f * rel_rot2.angle;
+          rel_rot = rel_rot * rel_rot2;
+        }
+        catch( const Exception::H3DException &e ) {
+        }
+      }
+      catch( const Exception::H3DException &e ) {
+      }
+      the_owner->move_dir = dist_change;
+      the_owner->rel_rot = rel_rot;
+      the_owner->center_of_rot = Vec3f();
+      the_owner->use_center = false;
+    }
+    else if( nav_type == "LOOKAT" ) {
+    }
+    value = true;
+    return;
+  }
+  value = false;
 }

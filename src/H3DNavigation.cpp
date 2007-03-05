@@ -37,7 +37,8 @@ using namespace H3D;
 H3DNavigation * H3DNavigation::instance = 0;
 
 H3DNavigation::H3DNavigation() : mouse_nav( new MouseNavigation() ),
-                                 keyboard_nav( new KeyboardNavigation() ) {
+                                 keyboard_nav( new KeyboardNavigation() ),
+                                 haptic_device_nav( 0 ) {
 }
 
 void H3DNavigation::doNavigation(
@@ -81,17 +82,28 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
   if( navigation_type == "EXAMINE" || navigation_type == "ANY" ) {
     Vec3f translation_delta;
     Rotation rotation_value;
+    Vec3f center_of_rot;
+    bool use_center;
     if( H3DNavigationDevices::getMoveInfo(
-        translation_delta, rotation_value ) ) {
-      vp->rotateAround( rotation_value, false,
-                        vp->centerOfRotation->getValue() );
+        translation_delta, rotation_value, center_of_rot, use_center ) ) {
+      if( use_center ) {
+        vp->translate( translation_delta, false, avatar_size, topNode );
+        vp->rotateAround( rotation_value, false,
+                  vp->accInverseMatrix->getValue() * center_of_rot );
+      }
+      else {
+        vp->rotateAround( rotation_value, false,
+                          vp->centerOfRotation->getValue() );
+      }
     }
   }
   else if( navigation_type == "WALK" ) {
     Vec3f translation_delta;
     Rotation rotation_value;
+    Vec3f center_of_rot;
+    bool use_center;
     if( H3DNavigationDevices::getMoveInfo(
-          translation_delta, rotation_value ) ) {
+          translation_delta, rotation_value, center_of_rot, use_center ) ) {
       vp->rotateAroundSelf( rotation_value );
 
       Vec3f scaling = vp->accForwardMatrix->getValue().getScalePart();
@@ -112,8 +124,10 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
   else if( navigation_type == "FLY" ) {
     Vec3f translation_delta;
     Rotation rotation_value;
+    Vec3f center_of_rot;
+    bool use_center;
     if( H3DNavigationDevices::getMoveInfo(
-          translation_delta, rotation_value ) ) {
+          translation_delta, rotation_value, center_of_rot, use_center ) ) {
       vp->rotateAroundSelf( rotation_value );
       Vec3f scaling = vp->accForwardMatrix->getValue().getScalePart();
       if( H3DAbs( scaling.x - scaling.y ) < Constants::f_epsilon
@@ -133,8 +147,10 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
   else if( navigation_type == "LOOKAT" ) {
     Vec3f translation_delta;
     Rotation rotation_value;
+    Vec3f center_of_rot;
+    bool use_center;
     if( H3DNavigationDevices::getMoveInfo(
-          translation_delta, rotation_value ) ) {
+          translation_delta, rotation_value, center_of_rot, use_center ) ) {
       GLint viewport[4];
       GLdouble mvmatrix[16], projmatrix[16];
       GLdouble wx, wy, wz;
@@ -229,6 +245,7 @@ void H3DNavigation::disableDevice( int device ) {
       case ALL: {
         instance->mouse_nav.reset(0);
         instance->keyboard_nav.reset(0);
+        instance->haptic_device_nav.reset(0);
         break;
       }
       case MOUSE: {
@@ -238,6 +255,9 @@ void H3DNavigation::disableDevice( int device ) {
       case KEYBOARD: {
         instance->keyboard_nav.reset( 0 );
         break;
+      }
+      case HAPTICSDEVICE: {
+        instance->haptic_device_nav.reset( 0 );
       }
       default: {}
     }
@@ -253,6 +273,8 @@ void H3DNavigation::enableDevice( int device ) {
           instance->mouse_nav.reset( new MouseNavigation() );
         if( !instance->keyboard_nav.get() )
           instance->keyboard_nav.reset( new KeyboardNavigation() );
+        if( !instance->keyboard_nav.get() )
+          instance->haptic_device_nav.reset( new HapticDeviceNavigation() );
         break;
       }
       case MOUSE: {
@@ -263,6 +285,11 @@ void H3DNavigation::enableDevice( int device ) {
       case KEYBOARD: {
         if( !instance->keyboard_nav.get() )
           instance->keyboard_nav.reset( new KeyboardNavigation() );
+        break;
+      }
+      case HAPTICSDEVICE: {
+         if( !instance->keyboard_nav.get() )
+          instance->haptic_device_nav.reset( new HapticDeviceNavigation() );
         break;
       }
       default: {}
