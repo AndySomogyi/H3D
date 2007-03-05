@@ -101,9 +101,8 @@ NavigationInfo::NavigationInfo( Inst< SFSetBind > _set_bind,
 
   old_vp.reset( X3DViewpointNode::getActive() );
   if( old_vp.get() ) {
-    old_vp_pos = old_vp->position->getValue() + old_vp->rel_pos;
-    old_vp_orientation = old_vp->orientation->getValue() *
-                         old_vp->rel_orientation;
+    old_vp_pos = old_vp->getFullPos();
+    old_vp_orientation = old_vp->getFullOrn();
   }
 
   last_time = TimeStamp();
@@ -117,7 +116,7 @@ void NavigationInfo::doNavigation( X3DViewpointNode * vp,
   Vec3f vp_pos = vp->position->getValue();
   Vec3f vp_full_pos = vp_pos + vp->rel_pos;
   Rotation vp_orientation = vp->orientation->getValue();
-  Rotation vp_full_orientation = vp_orientation * vp->rel_orientation;
+  Rotation vp_full_orientation = vp_orientation * vp->rel_orn;
   H3DTime current_time = Scene::time->getValue();
   last_time = current_time;
   string navigation_type = getUsedNavType();
@@ -128,7 +127,7 @@ void NavigationInfo::doNavigation( X3DViewpointNode * vp,
     if( linear_interpolate ) {
       if( !old_vp->retainUserOffsets->getValue() ) {
         old_vp->rel_pos = goal_position;
-        old_vp->rel_orientation = goal_orientation;
+        old_vp->rel_orn = goal_orientation;
       }
       linear_interpolate = false;
     }
@@ -159,7 +158,7 @@ void NavigationInfo::doNavigation( X3DViewpointNode * vp,
           ( (Rotation)old_vp_acc_frw_mtx.getScaleRotationPart()
           * old_vp_orientation ) );
 
-        goal_orientation = vp->rel_orientation;
+        goal_orientation = vp->rel_orn;
 
         start_position = vp_acc_inv_mtx * 
           (old_vp_acc_frw_mtx * old_vp_pos) - vp_pos;
@@ -180,7 +179,7 @@ void NavigationInfo::doNavigation( X3DViewpointNode * vp,
       H3DDouble interpolation = elapsed_time / total_time;
       vp->rel_pos =  start_position +
         move_direction * interpolation;
-      vp->rel_orientation = start_orientation.slerp( goal_orientation,
+      vp->rel_orn = start_orientation.slerp( goal_orientation,
         (H3DFloat)interpolation );
     }
     else {
@@ -188,7 +187,7 @@ void NavigationInfo::doNavigation( X3DViewpointNode * vp,
       transitionComplete->setValue( true, id );
       vp->rel_pos = goal_position;
       vp_full_pos = vp_pos + goal_position;
-      vp->rel_orientation = goal_orientation;
+      vp->rel_orn = goal_orientation;
       vp_full_orientation = vp_orientation * goal_orientation;
     }
   }

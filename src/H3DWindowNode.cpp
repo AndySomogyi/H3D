@@ -394,9 +394,8 @@ bool H3DWindowNode::calculateFarAndNearPlane( H3DFloat &clip_far,
     
   BoxBound *bound =  dynamic_cast< BoxBound * >( total_bound.get() );
   if( bound ) {
-    Vec3f vp_position = vp->position->getValue() + vp->rel_pos;
-    Rotation vp_orientation = vp->orientation->getValue()
-                              * vp->rel_orientation;
+    Vec3f vp_position = vp->getFullPos();
+    Rotation vp_orientation = vp->getFullOrn();
     const Matrix4f &vp_frw_m = vp->accForwardMatrix->getValue();
 
     const Vec3f &bb_center = bound->center->getValue();
@@ -566,9 +565,8 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
 
   RenderMode::Mode stereo_mode = renderMode->getRenderMode();
 
-  Vec3f vp_position = vp->position->getValue() + vp->rel_pos;
-  Rotation vp_orientation = vp->orientation->getValue() *
-                            vp->rel_orientation;
+  Vec3f vp_position = vp->getFullPos();
+  Rotation vp_orientation = vp->getFullOrn();
   const Matrix4f &vp_inv_m = vp->accInverseMatrix->getValue();
   Rotation vp_inv_rot = (Rotation)vp_inv_m.getRotationPart();
   //const Matrix4f &vp_frw_m = vp->accForwardMatrix->getValue();
