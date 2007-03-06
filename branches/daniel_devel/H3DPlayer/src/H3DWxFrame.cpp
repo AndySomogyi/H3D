@@ -149,10 +149,6 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   recentFiles = (wxFileHistory *) NULL;
   h3dConfig = (wxConfigBase *) NULL;
 
-  //sub menus
-  renderoptionsMenu = (wxMenu *) NULL;
-//  devicecontrolMenu = (wxMenu *) NULL;
-
   //Status Bar
   CreateStatusBar(2);
 
@@ -173,16 +169,11 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   wxConfigBase *h3dConfig = wxConfigBase::Get();
 
   //Load file history and settings from previous session(s)
-  LoadSession();
+  LoadMRU();
+  LoadSettings();
 
   //Create settings dialog
   settings.reset( new SettingsDialog(this, global_settings.get() ) );
-
-  //Render Options submenu
-  renderoptionsMenu = new wxMenu;
-  renderoptionsMenu->AppendCheckItem(BASIC_WIREFRAME, "Wireframe", "Wireframe");
-  renderoptionsMenu->AppendCheckItem(BASIC_NOTEXTURES, "No Textures", "No Textures");
-  renderoptionsMenu->AppendCheckItem(BASIC_SMOOTHSHADING, "Smooth Shading", "Smooth Shading");
 
   //Renderer Menu
   rendererMenu = new wxMenu;
@@ -191,8 +182,6 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   rendererMenu->AppendSeparator();
   rendererMenu->Append(FRAME_CHOOSERENDERER, "Choose Haptics Renderer", "Select a haptics renderer");
   rendererMenu->Append(FRAME_RENDERMODE, "Render Mode...", "Graphical Renderer Options");
-  rendererMenu->AppendSeparator();
-  rendererMenu->Append(BASIC_PREFRENDERER, "Rendering Options...", renderoptionsMenu, "Scenegraph rendering options");
   rendererMenu->AppendSeparator();
   rendererMenu->Append(FRAME_SETTINGS, "Settings...", "Scenegraph rendering options");
 
@@ -254,6 +243,7 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
   EVT_MENU (FRAME_DEVICECONTROL, H3DWxFrame::ToggleHaptics)
 	EVT_MENU (FRAME_ABOUT, H3DWxFrame::OnAbout)
 	EVT_MENU (FRAME_HELP, H3DWxFrame::OnHelp)
+  EVT_CLOSE(H3DWxFrame::OnWindowExit)
 END_EVENT_TABLE()
 
 
@@ -269,8 +259,14 @@ void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
     else if( id == ID_DRAW_TRIANGLES ) 
       dgo->drawHapticTriangles->setValue( event.IsChecked() );
     else if( id == ID_DRAW_BOUND_TREE ) {
-      if( event.IsChecked() ) dgo->drawBoundTree->setValue( 1 );
-      else dgo->drawBoundTree->setValue( -1 );
+      if( event.IsChecked() ) {
+        dgo->drawBoundTree->setValue( treeDepth );
+        boundTree = true;
+      }
+      else {
+        dgo->drawBoundTree->setValue( -1 );
+        boundTree = false;
+      }
     } else if( id == ID_DRAW_TREE_DEPTH ) {
       dgo->drawBoundTree->setValue( event.GetInt() );
     }
@@ -345,10 +341,10 @@ void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
   global_settings->getOptionNode( dgo );
   int id = event.GetId(); 
   if( dgo ) {
-    if( id == ID_DRAW_TREE_DEPTH ) {
+    if( (id == ID_DRAW_TREE_DEPTH) && (boundTree) ) {
       dgo->drawBoundTree->setValue( event.GetInt() );
-    }
-      
+    } 
+    treeDepth = event.GetInt();
     H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();    
   }
 
@@ -934,7 +930,12 @@ void H3DWxFrame::ChangeViewpoint (wxCommandEvent & event)
 //Change Navigation
 void H3DWxFrame::ChangeNavigation (wxCommandEvent & event)
 {
-	mynav->setNavType ((navigationMenu->GetLabel(selection)).c_str());
+  if (mynav) {
+    mynav->setNavType ((navigationMenu->GetLabel(selection)).c_str());
+  }
+  else {
+    glwindow->default_nav = (navigationMenu->GetLabel(selection)).c_str();
+  }
 }
 
 //Gets Menu Selections
@@ -943,13 +944,22 @@ void H3DWxFrame::GetSelection (wxMenuEvent & event)
 	selection = event.GetMenuId();
 }
 
-//Exit event
+//Exit via menu
 void H3DWxFrame::OnExit (wxCommandEvent & event)
 {
   SaveMRU();
   SaveSettings();
-  delete wxConfigBase::Set((wxConfigBase *) NULL);
 	Close(TRUE); 
+  delete wxConfigBase::Set((wxConfigBase *) NULL);
+}
+
+//Exit via window manager
+void H3DWxFrame::OnWindowExit (wxCloseEvent & event) 
+{
+  SaveMRU();
+  SaveSettings();
+  Close(TRUE);
+  delete wxConfigBase::Set((wxConfigBase *) NULL);
 }
 
 /*******************Standard trivial functions*********************/
@@ -1050,7 +1060,7 @@ void H3DWxFrame::SaveSettings () {
   }
 }
 
-void H3DWxFrame::LoadSession () {
+void H3DWxFrame::LoadMRU () {
   h3dConfig = wxConfigBase::Get();
 
   //Load file history from previous sessions
@@ -1063,6 +1073,10 @@ void H3DWxFrame::LoadSession () {
       recentFiles->AddFileToHistory (h3dConfig->Read(entry));
     }
   }
+}
+
+void H3DWxFrame::LoadSettings () {
+  h3dConfig = wxConfigBase::Get();
 
   //Load settings from previous sessions
   //Debug options
@@ -1070,17 +1084,6 @@ void H3DWxFrame::LoadSession () {
     h3dConfig->SetPath(_T("/Settings/Debug"));
     DebugOptions *dgo = NULL;
     global_settings->getOptionNode(dgo);
-
-/*    if (h3dConfig->Read("draw_bound", &draw_bound )) {
-      h3dConfig->Read("draw_bound", &draw_bound);
-      if (draw_bound) {
-      Console (3) << "True" << endl;
-      }
-      else {
-        Console (3) << "False" << endl;
-      }
-    } */
-
     if (dgo) {
       bool draw_bound;
       bool draw_triangles;
@@ -1088,9 +1091,11 @@ void H3DWxFrame::LoadSession () {
       h3dConfig->Read("draw_bound", &draw_bound);
       h3dConfig->Read("draw_triangles", &draw_triangles);
       h3dConfig->Read("draw_tree", &draw_tree);
+      Console (3) << "old draw_tree" << draw_tree << endl;
       dgo->drawBound->setValue(draw_bound);
       dgo->drawHapticTriangles->setValue(draw_triangles);
       dgo->drawBoundTree->setValue(draw_tree);
+      Console (3) << "new draw_tree" << dgo->drawBoundTree->getValue() << endl;
     }
   }
 
@@ -1124,10 +1129,6 @@ void H3DWxFrame::LoadSession () {
       h3dConfig->Read("useBoundTree", &useBoundTree);
       h3dConfig->Read("touchableFace", &touchableFace);
       ho->touchableFace->setValue(touchableFace.c_str());
-      /* if( touchableFace == 0 ) ho->touchableFace->setValue( "AS_GRAPHICS" );
-      else if( touchableFace == 1 ) ho->touchableFace->setValue( "FRONT_AND_BACK" );
-      else if( touchableFace == 2 ) ho->touchableFace->setValue( "FRONT" );
-      else if( touchableFace == 3 ) ho->touchableFace->setValue( "BACK" ); */
       ho->maxDistance->setValueFromString(h3dConfig->Read("maxDistance").c_str());
       ho->lookAheadFactor->setValueFromString(h3dConfig->Read("lookAheadFactor").c_str());
       ho->useBoundTree->setValue(useBoundTree);
@@ -1159,9 +1160,6 @@ void H3DWxFrame::LoadSession () {
       h3dConfig->Read("boundType", &boundType);
       h3dConfig->Read("maxTrianglesinLeaf", &maxTrianglesinLeaf);
       gbto->boundType->setValue(boundType.c_str());
-      /*if( boundType == 0 ) gbto->boundType->setValue( "OBB" );
-      else if( boundType == 1 ) gbto->boundType->setValue( "AABB" );
-      else if( boundType == 2 ) gbto->boundType->setValue( "SPHERE" ); */
       gbto->maxTrianglesInLeaf->setValue(maxTrianglesinLeaf);
     }
   }
@@ -1257,6 +1255,7 @@ void H3DWxFrame::buildNavMenu () {
   }
   else {
     mynav = new NavigationInfo;
+    //mynav = 0;
     vector<string> allTypes;
     allTypes.push_back("EXAMINE");
     allTypes.push_back("FLY");
@@ -1271,7 +1270,8 @@ void H3DWxFrame::buildNavMenu () {
 			Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
 			j++;
     }
-    mynav->setNavType ("EXAMINE");
+    //mynav->setNavType("EXAMINE");
+    glwindow->default_nav = "EXAMINE";
   }
 }
 
@@ -1287,7 +1287,7 @@ bool H3DWxFrame::validateNavType (string a) {
 
 
 void H3DWxFrame::OnSettings (wxCommandEvent & event) {
- 
+  settings.reset( new SettingsDialog(this, global_settings.get() ) );
   settings->Show();
 }
 
@@ -1321,8 +1321,10 @@ BEGIN_EVENT_TABLE(SettingsDialog, wxPropertySheetDialog)
   EVT_SPINCTRL (ID_MAX_TRIANGLES, SettingsDialog::handleSpinEvent)
   EVT_CHOICE( ID_BOUND_TYPE, SettingsDialog::handleSettingsChange )
 
-END_EVENT_TABLE()
+  EVT_BUTTON (wxID_OK, SettingsDialog::OnOk)
+  EVT_BUTTON (wxID_CANCEL, SettingsDialog::OnCancel)
 
+END_EVENT_TABLE()
 
 SettingsDialog::SettingsDialog(wxWindow* win, GlobalSettings *gs )
 {
@@ -1343,7 +1345,7 @@ SettingsDialog::SettingsDialog(wxWindow* win, GlobalSettings *gs )
     // If using a toolbook, also follow Mac style and don't create buttons
     CreateButtons(wxOK | wxCANCEL |
                         (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, wxHELP)
-    );
+    ); 
 
     wxBookCtrlBase* notebook = GetBookCtrl();
     notebook->SetImageList(m_imageList);
@@ -1355,6 +1357,37 @@ SettingsDialog::SettingsDialog(wxWindow* win, GlobalSettings *gs )
     notebook->AddPage(generalSettings, _("General"), true, tabImage1);
     notebook->AddPage(openhaptics_settings, _("OpenHaptics"), false, tabImage2);
     notebook->AddPage(debug_settings, _("Debug"), false, tabImage3);
+
+/*    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *items = new wxBoxSizer ( wxVERTICAL );
+    wxBoxSizer *buttonSizer = new wxBoxSizer( wxHORIZONTAL );
+
+    wxButton* closeButton = new wxButton (this, wxID_CLOSE, "&Close");
+    wxButton* resetButton = new wxButton (this, wxID_REFRESH, "&Defaults");
+
+    topSizer->Add(generalSettings, 1, wxEXPAND|wxALL, 10);
+    topSizer->Add(openhaptics_settings, 1, wxEXPAND|wxALL, 10);
+    topSizer->Add(debug_settings, 1, wxEXPAND|wxALL, 10);
+
+    buttonSizer->Add(closeButton, 0, wxALL, 10);
+    buttonSizer->Add(resetButton, 0, wxALL, 10);
+
+    topSizer->SetMinSize(300, 400);
+
+    topSizer->Add(buttonSizer, 0, wxALIGN_CENTER );
+
+    generalSettings->SetSizer( items );
+    openhaptics_settings->SetSizer(items);
+    debug_settings->SetSizer(items);
+
+    //topSizer->SetSizeHints( this );
+    items->Fit( generalSettings );
+    items->Fit( openhaptics_settings );
+    items->Fit( debug_settings );
+
+    topSizer->Add(items, 0, wxALIGN_CENTER );
+
+    topSizer->Fit(this); */
 
     LayoutDialog();
 }
@@ -1386,8 +1419,12 @@ wxPanel* SettingsDialog::CreateDebugSettingsPage(wxWindow* parent,
       int d = debug->drawBoundTree->getValue();
       if( d != -1 ) {
         draw_tree_depth = d;
+        treeDepth = d;
       }
       draw_triangles = debug->drawHapticTriangles->getValue();
+      if( draw_tree_depth >= 1 ) {
+        draw_tree = true;
+      }
     }
   }
 
@@ -1419,6 +1456,8 @@ wxPanel* SettingsDialog::CreateDebugSettingsPage(wxWindow* parent,
     depth_spin->SetValue( draw_tree_depth );
     depth_sizer->Add(depth_spin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add( depth_sizer );
+
+    //Store
   
     topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
 
@@ -1797,4 +1836,19 @@ void H3DWxFrame::readSettingsFromINIFile( const string &filename,
                                                                  "force_full_geometry_render" ) );
 
   global_settings->options->push_back( oho );
+}
+
+void SettingsDialog::OnOk (wxCommandEvent & event) {
+  Console (3) << "OK Pressed!" << endl;
+  static_cast< H3DWxFrame* >(this->GetParent())->SaveSettings();
+  //SettingsDialog->GetParent();
+  this->Show(false);
+}
+
+void SettingsDialog::OnCancel (wxCommandEvent & event) {
+  Console (3) << "Cancel Pressed!" << endl;
+  static_cast< H3DWxFrame* >(this->GetParent())->LoadSettings();
+  //SettingsDialog->GetParent();
+  H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+  this->Show(false);
 }
