@@ -113,6 +113,8 @@ public:
 
   void handleSettingsChange (wxCommandEvent & event);
   void handleSpinEvent (wxSpinEvent & event);
+  void OnOk (wxCommandEvent & event);
+  void OnCancel (wxCommandEvent & event);
 
     wxPanel* CreateGeneralSettingsPage(wxWindow* parent, GlobalSettings *gs );
     wxPanel* CreateOpenHapticsSettingsPage(wxWindow* parent, GlobalSettings *gs);
@@ -153,6 +155,8 @@ protected:
     };
 
     wxImageList*    m_imageList;
+    bool boundTree;
+    int treeDepth;
 
 DECLARE_EVENT_TABLE()
 };
@@ -179,9 +183,6 @@ public:
   wxMenu     *fileMenu, *rendererMenu, *deviceMenu, *viewpointMenu, *navigationMenu, *advancedMenu, *helpMenu;
   //File History Menu
   wxFileHistory *recentFiles;
-  //Submenus
-  wxMenu *renderoptionsMenu;
-
 
   //Config object to save information (settings, file history etc...)
   wxConfigBase *h3dConfig;
@@ -195,6 +196,7 @@ public:
   void OnOpenFileURL	(wxCommandEvent & event);
   void OnCloseFile	(wxCommandEvent & event);
   void OnExit     	(wxCommandEvent & event);
+  void OnWindowExit (wxCloseEvent & event);
   void OnAbout		(wxCommandEvent & event);
   void OnHelp		(wxCommandEvent & event);
   void OnFullscreen	(wxCommandEvent & event);
@@ -217,7 +219,8 @@ public:
   bool validateNavType(string);
   void SaveMRU ();
   void SaveSettings ();
-  void LoadSession ();
+  void LoadMRU();
+  void LoadSettings ();
   void buildNavMenu();
   void readSettingsFromINIFile( const string &filename,GlobalSettings *gs );
 

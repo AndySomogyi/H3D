@@ -118,7 +118,7 @@ bool MyApp::OnInit()
   SetVendorName(_T("SenseGraphics AB"));
   SetAppName(_T("H3D Player"));
 
-  initializeH3D();
+  //initializeH3D();
 
   // create a window to display
   H3DWxFrame *theWxFrame = new H3DWxFrame(NULL, wxID_ANY, "H3D Player", wxDefaultPosition, wxSize(800, 600));
