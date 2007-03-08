@@ -265,7 +265,6 @@ void HapticDeviceNavigation::CalculateHapticDeviceMoveInfo::update( ) {
   DeviceInfo *di = DeviceInfo::getActive();
   H3DHapticsDevice *hd =
     static_cast< H3DHapticsDevice * >(di->device->getValueByIndex( 0 ) );
-  Vec3f hd_pos = hd->weightedProxyPosition->getValue();
   bool tmp_button_pressed = static_cast< SFBool * >(routes_in[0])->getValue();
   if( tmp_button_pressed != button_pressed ) {
     button_pressed = tmp_button_pressed;
@@ -282,7 +281,7 @@ void HapticDeviceNavigation::CalculateHapticDeviceMoveInfo::update( ) {
       Rotation this_orn = hd->deviceOrientation->getValue();
       the_owner->rel_rot = -(this_orn * -last_orn);
       last_orn = this_orn;
-      the_owner->move_dir = 2*(last_pos - hd->devicePosition->getValue());
+      the_owner->move_dir = 2*( last_pos - hd->devicePosition->getValue() );
       last_pos = hd->devicePosition->getValue();
       the_owner->center_of_rot = hd->weightedProxyPosition->getValue();
       the_owner->use_center = true;
