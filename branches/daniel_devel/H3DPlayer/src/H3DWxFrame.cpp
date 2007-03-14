@@ -46,6 +46,7 @@
 #include <OpenHapticsOptions.h>
 
 #include "HapticsRenderers.h"
+#include "HAPIHapticsRenderer.h"
 //#include "OpenHapticsRenderer.h"
 
 using namespace std;
@@ -136,6 +137,10 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   advancedMenu = (wxMenu *) NULL;
   helpMenu = (wxMenu *)	NULL;
 
+  //Submenus
+  hapticsRenderer = (wxMenu *) NULL;
+  renderMode = (wxMenu *) NULL;
+
   global_settings.reset( new GlobalSettings );
   global_settings->options->push_back( new DebugOptions );
   global_settings->options->push_back( new GraphicsCachingOptions );
@@ -175,13 +180,34 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   //Create settings dialog
   settings.reset( new SettingsDialog(this, global_settings.get() ) );
 
+  //Submenus for Renderer Menu
+  //hapticsRenderer
+  hapticsRenderer = new wxMenu;
+  hapticsRenderer->AppendRadioItem(FRAME_OPENHAPTICS, "Openhaptics", "Openhaptics Renderer");
+  hapticsRenderer->AppendRadioItem(FRAME_CHAI3D, "CHAI3D", "CHAI3D Renderer");
+  hapticsRenderer->AppendRadioItem(FRAME_GODOBJECT, "GodObject", "GodObject Renderer");
+  hapticsRenderer->AppendRadioItem(FRAME_RUSPINI, "Ruspini", "Ruspini Renderer");
+
+  //renderMode
+  renderMode = new wxMenu;
+  renderMode->AppendRadioItem(FRAME_MONO, "No Stereo", "Disable stereo display");
+  renderMode->AppendRadioItem(FRAME_QUADBUFFERED, "Quad Buffered Stereo", "Quad Buffered Stereo");
+  renderMode->AppendRadioItem(FRAME_HORZSPLIT, "Horizontal Split", "Horizontal Split");
+  renderMode->AppendRadioItem(FRAME_VERTSPLIT, "Vertical Split", "Vertical Split");
+  renderMode->AppendRadioItem(FRAME_HORZINTERLACED, "Horizontal Interlaced", "Horizontal Interlaced");
+  renderMode->AppendRadioItem(FRAME_VERTINTERLACED, "Vertical Interlaced", "Vertical Interlaced");
+  renderMode->AppendRadioItem(FRAME_SHARPDISPLAY, "Sharp Display", "Optimized for Sharp display systems");
+  renderMode->AppendRadioItem(FRAME_REDBLUE, "Red-Blue Stereo", "Red-Blue Stereo mode");
+  renderMode->AppendRadioItem(FRAME_REDCYAN, "Red-Cyan Stereo", "Red-Cyan Stereo mode");
+
   //Renderer Menu
   rendererMenu = new wxMenu;
   rendererMenu->AppendCheckItem(FRAME_FULLSCREEN, "Fullscreen Mode", "View in fullscreen");
   rendererMenu->AppendCheckItem(FRAME_MIRROR, "Mirror in Y", "Mirror Scene in Y");
   rendererMenu->AppendSeparator();
-  rendererMenu->Append(FRAME_CHOOSERENDERER, "Choose Haptics Renderer", "Select a haptics renderer");
-  rendererMenu->Append(FRAME_RENDERMODE, "Render Mode...", "Graphical Renderer Options");
+  rendererMenu->Append(FRAME_CHOOSERENDERER, "Choose Haptics Renderer", hapticsRenderer, "Select a haptics renderer");
+  //rendererMenu->Append(FRAME_CHOOSERENDERER, "Choose Haptics Renderer", "Select a haptics renderer");
+  rendererMenu->Append(FRAME_RENDERMODE, "Select Render Mode", renderMode, "Graphical Renderer Options");
   rendererMenu->AppendSeparator();
   rendererMenu->Append(FRAME_SETTINGS, "Settings...", "Scenegraph rendering options");
 
@@ -217,9 +243,14 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   SetMenuBar(menuBar);
 
   //Disable some menus initially
+  //Top menu items
   menuBar->EnableTop(2, false);
   menuBar->EnableTop(3, false);
   menuBar->EnableTop(4, false);
+
+  //Certain options in rendererMenu
+  rendererMenu->Enable(FRAME_CHOOSERENDERER, false);
+  rendererMenu->Enable(FRAME_RENDERMODE, false);
 
 }
 
@@ -234,12 +265,14 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
 	EVT_MENU (FRAME_SETTINGS, H3DWxFrame::OnSettings)
   EVT_MENU (FRAME_RESTORE, H3DWxFrame::RestoreWindow)
 	EVT_MENU (FRAME_MIRROR, H3DWxFrame::MirrorScene)
-	EVT_MENU (FRAME_RENDERMODE, H3DWxFrame::RenderMode)
+	//EVT_MENU (FRAME_RENDERMODE, H3DWxFrame::RenderMode)
+  EVT_MENU_RANGE (FRAME_MONO, FRAME_REDCYAN, H3DWxFrame::RenderMode)
 	EVT_MENU (FRAME_CONSOLE, H3DWxFrame::ShowConsole)
 	EVT_MENU_HIGHLIGHT (FRAME_SELECTION, H3DWxFrame::GetSelection)
 	EVT_MENU (FRAME_VIEWPOINT, H3DWxFrame::ChangeViewpoint)
 	EVT_MENU (FRAME_NAVIGATION, H3DWxFrame::ChangeNavigation)
-  EVT_MENU (FRAME_CHOOSERENDERER, H3DWxFrame::ChangeRenderer)
+  //EVT_MENU (FRAME_CHOOSERENDERER, H3DWxFrame::ChangeRenderer)
+  EVT_MENU_RANGE (FRAME_OPENHAPTICS, FRAME_RUSPINI, H3DWxFrame::ChangeRenderer)
   EVT_MENU (FRAME_DEVICECONTROL, H3DWxFrame::ToggleHaptics)
 	EVT_MENU (FRAME_ABOUT, H3DWxFrame::OnAbout)
 	EVT_MENU (FRAME_HELP, H3DWxFrame::OnHelp)
@@ -484,7 +517,6 @@ bool H3DWxFrame::loadFile( const string &filename) {
       else
         t->children->push_back( X3D::createX3DFromURL( filename, 
                                                        &dn ) );
-  
 
 	/****************************Intialize Viewpoints****************************/
 	//Enable Viewpoints Menu
@@ -504,7 +536,6 @@ bool H3DWxFrame::loadFile( const string &filename) {
 	  VPlist = X3DViewpointNode::getViewpointHierarchy();
 	  //Store number of viewpoints for processing later
 	  viewpointCount = VPlist.size();
-    Console (3) << "Viewpoint Count is " << viewpointCount << endl;
 	  //Create Viewpoints menu using list
 	  //If no viewpoints are specified in the file
     if (viewpointCount <= 1) {
@@ -534,15 +565,38 @@ bool H3DWxFrame::loadFile( const string &filename) {
 //	H3DWxFrame::buildNavMenu();
 	buildNavMenu();
 
+  //Enable graphical rendering options in rendererMenu
+  rendererMenu->Enable(FRAME_RENDERMODE, true);
+
 	/****************************Device Info****************************/
 	//Enable Device Menu
 	menuBar->EnableTop(2, true);
   if (DeviceInfo::getActive()) {
+    rendererMenu->Enable(FRAME_CHOOSERENDERER, true);
     mydevice = DeviceInfo::getActive();
     //myH3Ddevice = mydevice->device->getValue();
     allDevices = mydevice->device->getValue();
     NodeVector::const_iterator nv = allDevices.begin();
   }
+
+  //Get and select appropriate renderer from menu
+  //Enable haptic renderer selection in rendererMenu
+  rendererMenu->Enable(FRAME_CHOOSERENDERER, true);
+
+  myH3Ddevice = mydevice->device->getValueByIndex(0);
+
+  HAPI::HAPIHapticsRenderer* currentRenderer = (HAPI::HAPIHapticsRenderer *) NULL;
+  currentRenderer = myH3Ddevice->hapticsRenderer->getValue()->getHapticsRenderer(0);
+  if (dynamic_cast<OpenHapticsRenderer *>(currentRenderer)) {
+    rendererMenu->Check(FRAME_OPENHAPTICS, true);
+  } //else if (dynamic_cast<CHAI3DRenderer *>(currentRenderer)) {
+    //rendererMenu->Check(FRAME_CHAI3D, true);
+  /*}*/ else if (dynamic_cast<GodObjectRenderer *>(currentRenderer)) {
+    rendererMenu->Check(FRAME_GODOBJECT, true);
+  } else if (dynamic_cast<RuspiniRenderer *>(currentRenderer)) {
+    rendererMenu->Check(FRAME_RUSPINI, true);
+  }
+
 
   //int i = 0;
   //for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
@@ -644,7 +698,7 @@ void H3DWxFrame::clearData () {
   //Delete items from device menu
   for (int k = 0; k <= deviceCount; k++) {
   	deviceMenu->Destroy(FRAME_DEVICE + k);
-} 
+  }
 
 }
 
@@ -705,7 +759,7 @@ void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
 	//Viewpoint::set_bind(false);
 	//viewpoint.get()->set_bind->setValue(false);
 	viewpoint.reset (NULL);
-	device_info.reset (NULL);
+	//device_info.reset (NULL);
 	//kr->setValue( Rotation(1, 0, 0, 0 ) );
 
 	//Delete items from viewpoint menu & disconnect events
@@ -726,6 +780,10 @@ void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
   menuBar->EnableTop(2, false);
 	menuBar->EnableTop(3, false);
 	menuBar->EnableTop(4, false);
+
+  //Disable items in rendererMenu again
+  rendererMenu->Enable(FRAME_CHOOSERENDERER, false);
+  rendererMenu->Enable(FRAME_RENDERMODE, false);
 }
 
 
@@ -780,104 +838,71 @@ void H3DWxFrame::MirrorScene(wxCommandEvent & event)
 //Render Mode
 void H3DWxFrame::RenderMode(wxCommandEvent & event)
 {
-	const wxString rendermodes[] = { _T("No Stereo"), 
-									 _T("Quad Buffered Stereo"),
-									 _T("Horizontal Split"),
-									 _T("Vertical Split"),
-									 _T("Horizontal Interlaced"),
-									 _T("Vertical Interlaced"),
-									 _T("Sharp Display"),
-									 _T("Red-Blue Stereo"),
-									 _T("Red-Cyan Stereo") } ;
-
-	wxSingleChoiceDialog selectMode(this,
-                                _T("Please select a graphical rendering mode"),
-                                _T("Render Modes"),
-                                WXSIZEOF(rendermodes), rendermodes);
-
-	if (selectMode.ShowModal() == wxID_OK)
-    {
-		switch ( selectMode.GetSelection() ) {
-			case 0:
-				renderMode = "MONO";
-				break;
-			case 1:
-				renderMode = "QUAD_BUFFERED_STEREO";
-				break;
-			case 2:
-				renderMode = "HORIZONTAL_SPLIT";
-				break;
-			case 3:
-				renderMode = "VERTICAL_SPLIT";
-				break;
-			case 4:
-				renderMode = "HORIZONTAL_INTERLACED";
-				break;
-			case 5:
-				renderMode = "VERTICAL_INTERLACED";
-				break;
-			case 6:
-				renderMode = "VERTICAL_INTERLACED_GREEN_SHIFT";
-				break;
-			case 7:
-				renderMode = "RED_BLUE_STEREO";
-				break;
-			case 8:
-				renderMode = "RED_CYAN_STEREO";
-				break;
-		}
-		glwindow->renderMode->setValue( renderMode.c_str());
-    }
+  wxString renderMode;
+  switch ( event.GetId() ) {
+    case FRAME_MONO:
+      renderMode = "MONO";
+      break;
+		case FRAME_QUADBUFFERED:
+			renderMode = "QUAD_BUFFERED_STEREO";
+			break;
+		case FRAME_HORZSPLIT:
+  		renderMode = "HORIZONTAL_SPLIT";
+			break;
+		case FRAME_VERTSPLIT:
+			renderMode = "VERTICAL_SPLIT";
+			break;
+		case FRAME_HORZINTERLACED:
+			renderMode = "HORIZONTAL_INTERLACED";
+			break;
+		case FRAME_VERTINTERLACED:
+			renderMode = "VERTICAL_INTERLACED";
+			break;
+		case FRAME_SHARPDISPLAY:
+			renderMode = "VERTICAL_INTERLACED_GREEN_SHIFT";
+			break;
+		case FRAME_REDBLUE:
+			renderMode = "RED_BLUE_STEREO";
+			break;
+		case FRAME_REDCYAN:
+			renderMode = "RED_CYAN_STEREO";
+			break;
+	}
+	glwindow->renderMode->setValue( renderMode.c_str());
 }
 
 //Choose Haptics Renderer
 void H3DWxFrame::ChangeRenderer(wxCommandEvent & event)
 {
-  const wxString hapticrenderers[] = { _T("OpenHaptics"), 
-									 _T("CHAI3D"),
-									 _T("God Object"),
-									 _T("Ruspini") } ;
-
-	wxSingleChoiceDialog selectHapticRenderer(this,
-                                _T("Please select a haptic renderer"),
-                                _T("Haptic Renderers"),
-                                WXSIZEOF(hapticrenderers), hapticrenderers);
-
-	if (selectHapticRenderer.ShowModal() == wxID_OK) {
-		switch ( selectHapticRenderer.GetSelection() ) {
-			case 0:
-				renderMode = "OpenHaptics";
-        myH3Ddevice = mydevice->device->getValueByIndex(0);
-        myH3Ddevice->hapticsRenderer->setValue(new OpenHapticsRenderer());
+  switch ( event.GetId() ) {
+    case FRAME_OPENHAPTICS:
+      myH3Ddevice = mydevice->device->getValueByIndex(0);
+      myH3Ddevice->hapticsRenderer->setValue(new OpenHapticsRenderer());
 //        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
 //          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new OpenHapticsRenderer);
 //        }
-				break;
-			case 1:
-//				renderMode = "CHAI3D";
+      break;
+    case FRAME_CHAI3D:
 #ifdef HAVE_CHAI3D
 //        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
 //          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new CHAI3DRenderer);
 //        }
 #endif
-				break;
-			case 2:
-				renderMode = "God Object";
-        myH3Ddevice = mydevice->device->getValueByIndex(0);
-        myH3Ddevice->hapticsRenderer->setValue(new GodObjectRenderer);
-//        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
+			break;
+    case FRAME_GODOBJECT:
+      myH3Ddevice = mydevice->device->getValueByIndex(0);
+      myH3Ddevice->hapticsRenderer->setValue(new GodObjectRenderer);
+//      for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
 //          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new GodObjectRenderer);
 //        }
-				break;
-			case 3:
-				renderMode = "Ruspini";
-        myH3Ddevice = mydevice->device->getValueByIndex(0);
-        myH3Ddevice->hapticsRenderer->setValue(new RuspiniRenderer);
+			break;
+    case FRAME_RUSPINI:
+      myH3Ddevice = mydevice->device->getValueByIndex(0);
+      myH3Ddevice->hapticsRenderer->setValue(new RuspiniRenderer);
 /*        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
           static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new RuspiniRenderer);
         } */
-				break;
-    }
+			break;
   }
 }
 
@@ -909,11 +934,6 @@ void H3DWxFrame::ChangeViewpoint (wxCommandEvent & event)
 		}
 		//Enable that viewpoint
 		(*vp)->set_bind->setValue(true);
-    //Console (3) << "Index is " << index << endl;
-//    wxString t = wxString ("") << index;
-//    wxMessageDialog aboutDialog ( this, t, ABOUT, wxOK);
-//    aboutDialog.ShowModal();
-    //cerr << index;
     int i = 0;
     for (vp = VPlist.begin(); vp != VPlist.end(); vp++) {
       if ((*vp) == Viewpoint::getActive()) {
@@ -947,18 +967,15 @@ void H3DWxFrame::GetSelection (wxMenuEvent & event)
 //Exit via menu
 void H3DWxFrame::OnExit (wxCommandEvent & event)
 {
-  SaveMRU();
-  SaveSettings();
-	Close(TRUE); 
-  delete wxConfigBase::Set((wxConfigBase *) NULL);
+	Close(true);
 }
 
 //Exit via window manager
 void H3DWxFrame::OnWindowExit (wxCloseEvent & event) 
 {
+  Destroy();
   SaveMRU();
   SaveSettings();
-  Close(TRUE);
   delete wxConfigBase::Set((wxConfigBase *) NULL);
 }
 
@@ -1091,11 +1108,9 @@ void H3DWxFrame::LoadSettings () {
       h3dConfig->Read("draw_bound", &draw_bound);
       h3dConfig->Read("draw_triangles", &draw_triangles);
       h3dConfig->Read("draw_tree", &draw_tree);
-      Console (3) << "old draw_tree" << draw_tree << endl;
       dgo->drawBound->setValue(draw_bound);
       dgo->drawHapticTriangles->setValue(draw_triangles);
       dgo->drawBoundTree->setValue(draw_tree);
-      Console (3) << "new draw_tree" << dgo->drawBoundTree->getValue() << endl;
     }
   }
 
@@ -1124,7 +1139,6 @@ void H3DWxFrame::LoadSettings () {
     global_settings->getOptionNode(ho);
     if (ho) {
       bool useBoundTree;
-      //int touchableFace;
       wxString touchableFace;
       h3dConfig->Read("useBoundTree", &useBoundTree);
       h3dConfig->Read("touchableFace", &touchableFace);
@@ -1154,7 +1168,6 @@ void H3DWxFrame::LoadSettings () {
     GeometryBoundTreeOptions *gbto = NULL;
     global_settings->getOptionNode( gbto );
     if (gbto) {
-      //int boundType;
       wxString boundType;
       int maxTrianglesinLeaf;
       h3dConfig->Read("boundType", &boundType);
@@ -1839,16 +1852,12 @@ void H3DWxFrame::readSettingsFromINIFile( const string &filename,
 }
 
 void SettingsDialog::OnOk (wxCommandEvent & event) {
-  Console (3) << "OK Pressed!" << endl;
   static_cast< H3DWxFrame* >(this->GetParent())->SaveSettings();
-  //SettingsDialog->GetParent();
   this->Show(false);
 }
 
 void SettingsDialog::OnCancel (wxCommandEvent & event) {
-  Console (3) << "Cancel Pressed!" << endl;
   static_cast< H3DWxFrame* >(this->GetParent())->LoadSettings();
-  //SettingsDialog->GetParent();
   H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
   this->Show(false);
 }
