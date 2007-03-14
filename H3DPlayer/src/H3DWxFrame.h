@@ -181,6 +181,8 @@ public:
   wxMenuBar  *menuBar;
   //Menu Bar Items
   wxMenu     *fileMenu, *rendererMenu, *deviceMenu, *viewpointMenu, *navigationMenu, *advancedMenu, *helpMenu;
+  //Submenu items
+  wxMenu     *hapticsRenderer, *renderMode;
   //File History Menu
   wxFileHistory *recentFiles;
 
@@ -228,7 +230,7 @@ private:
 	wxString currentFilename;
 	wxString currentPath;
 	bool lastmirror;
-	wxString renderMode;
+	//wxString renderModeSelection;
 	int selection;
 	int viewpointCount;
 	int navTypeCount;
@@ -284,7 +286,20 @@ enum
   FRAME_NAVIGATION = 6500,
   FRAME_DEVICE = 6550,
   FRAME_CHOOSERENDERER = 6600,
+  FRAME_OPENHAPTICS,
+  FRAME_CHAI3D,
+  FRAME_GODOBJECT,
+  FRAME_RUSPINI,
   FRAME_RENDERMODE,
+  FRAME_MONO,
+  FRAME_QUADBUFFERED,
+  FRAME_HORZSPLIT,
+  FRAME_VERTSPLIT,
+  FRAME_HORZINTERLACED,
+  FRAME_VERTINTERLACED,
+  FRAME_SHARPDISPLAY,
+  FRAME_REDBLUE,
+  FRAME_REDCYAN,
   FRAME_DEVICECONTROL,
   BASIC_PREFRENDERER,
   BASIC_WIREFRAME,
