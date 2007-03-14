@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\H3D\chai3d\include;C:\H3D\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS;"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -73,7 +73,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="C:\H3D\chai3d\include;C:\H3D\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -127,7 +127,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\H3D\chai3d\include;C:\H3D\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;HAPI_LIB;H3DUTIL_LIB;H3DAPI_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -170,7 +170,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\H3D\chai3d\include;C:\H3D\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;HAPI_LIB;H3DUTIL_LIB;H3DAPI_LIB"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
@@ -434,6 +434,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\H3DImageLoaderNode.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\H3DNavigation.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\H3DNavigationDevices.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\H3DNodeDatabase.cpp">
