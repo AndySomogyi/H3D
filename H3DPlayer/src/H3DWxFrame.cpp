@@ -121,8 +121,8 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 	//scene->window->push_back( glwindow );
 
   wxString console_string = "Console";
-  theConsole.reset( new consoleDialog(this, wxID_ANY, console_string, wxDefaultPosition, 
-                                     wxDefaultSize, wxDEFAULT_DIALOG_STYLE) );
+  theConsole = new consoleDialog(this, wxID_ANY, console_string, wxDefaultPosition, 
+                                     wxDefaultSize, wxDEFAULT_DIALOG_STYLE);
 
   //H3DWxWidgetsWindow *glwindow = new H3DWxWidgetsWindow(theWxFrame);
   //Main Menu Bar
@@ -178,7 +178,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   LoadSettings();
 
   //Create settings dialog
-  settings.reset( new SettingsDialog(this, global_settings.get() ) );
+  settings = new SettingsDialog(this, global_settings.get() );
 
   //Submenus for Renderer Menu
   //hapticsRenderer
@@ -929,12 +929,13 @@ void H3DWxFrame::ChangeViewpoint (wxCommandEvent & event)
 		int index = selection - FRAME_VIEWPOINT;
 		//Get to that index in the viewpoint list
 		X3DViewpointNode::ViewpointList::iterator vp = VPlist.begin();
-		for (int i = 0; i < index; i++) {
+		int i = 0;
+		for (i = 0; i < index; i++) {
 			vp++;
 		}
 		//Enable that viewpoint
 		(*vp)->set_bind->setValue(true);
-    int i = 0;
+    i = 0;
     for (vp = VPlist.begin(); vp != VPlist.end(); vp++) {
       if ((*vp) == Viewpoint::getActive()) {
           Console (3) << i << endl;
@@ -1300,7 +1301,7 @@ bool H3DWxFrame::validateNavType (string a) {
 
 
 void H3DWxFrame::OnSettings (wxCommandEvent & event) {
-  settings.reset( new SettingsDialog(this, global_settings.get() ) );
+  settings = new SettingsDialog(this, global_settings.get() );
   settings->Show();
 }
 
