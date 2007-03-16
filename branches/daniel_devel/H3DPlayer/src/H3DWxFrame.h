@@ -262,8 +262,8 @@ private:
 	AutoRef< Node > default_stylus;
 	AutoRef< Group > g;
 
-	auto_ptr< consoleDialog > theConsole;
-  auto_ptr< SettingsDialog > settings;
+	consoleDialog *  theConsole;
+	SettingsDialog * settings;
 
 protected:
   DECLARE_EVENT_TABLE()
