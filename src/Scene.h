@@ -130,7 +130,7 @@ namespace H3D {
 
     
   protected:
-    static HAPI::MutexLock callback_lock;
+    static H3DUtil::MutexLock callback_lock;
 
     typedef std::list< std::pair< CallbackFunc, void * > > CallbackList;
     // A list of the callback functions to run.

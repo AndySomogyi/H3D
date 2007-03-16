@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\..\..\HAPI\src;C:\Markus\daniel_devel\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\HAPI\src;..\..\..\..\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;..\..\..\src"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;NDEBUG;_CONSOLE;WIN32;_WINDOWS;PLATFORM_WIN32"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -72,10 +72,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="H3DAPI.lib HAPI.lib"
+				AdditionalDependencies="H3DAPI.lib HAPI.lib H3DUtil.lib"
 				OutputFile="$(OutDir)/H3DLoad.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\Markus\HAPI\build\win32\vc8\Release;C:\Markus\daniel_devel\H3DUtil\build\win32\vc8\Release;$(OutDir);$(H3D_EXTERNAL_ROOT)\lib"
+				AdditionalLibraryDirectories="..\..\..\..\HAPI\build\win32\vc8\Release;..\..\..\..\H3DUtil\build\win32\vc8\Release;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="1"
@@ -133,8 +133,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\HAPI\src;C:\Markus\daniel_devel\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;..\..\..\src;$(NOINHERIT)"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;WIN32;_WINDOWS;PLATFORM_WIN32"
+				AdditionalIncludeDirectories="..\..\..\..\HAPI\src;..\..\..\..\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;..\..\..\src;$(NOINHERIT)"
+				PreprocessorDefinitions="_CRTDBG_MAP_ALLOC ;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;WIN32;_WINDOWS;PLATFORM_WIN32"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				DisableLanguageExtensions="false"
@@ -161,11 +161,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
+				AdditionalOptions="/MACHINE:I386 /NODEFAULTLIB:msvcrt"
 				AdditionalDependencies="H3DAPI.lib HAPI.lib"
 				OutputFile="$(OutDir)/H3DLoad.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\Markus\HAPI\build\win32\vc8\Debug;C:\Markus\daniel_devel\H3DUtil\build\win32\vc8\Debug;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\HAPI\build\win32\vc8\Debug;..\..\..\..\H3DUtil\build\win32\vc8\Debug;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"

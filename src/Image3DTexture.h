@@ -156,7 +156,7 @@ namespace H3D {
   protected:
     /// The thread used for downloading images when 
     /// load_images_in_separate_thread is true.
-    auto_ptr< HAPI::SimpleThread > load_thread;
+    auto_ptr< H3DUtil::SimpleThread > load_thread;
   };
 }
 

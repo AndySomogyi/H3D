@@ -447,7 +447,7 @@ namespace H3D {
   private:
 #ifdef HAVE_3DXWARE
     // the handle of the communication thread.
-    auto_ptr< HAPI::SimpleThread > thread_handle;
+    auto_ptr< H3DUtil::SimpleThread > thread_handle;
 #endif
   };
 }

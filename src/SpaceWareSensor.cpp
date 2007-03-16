@@ -523,7 +523,7 @@ SpaceWareSensor::SpaceWareSensor(
 
 #ifdef HAVE_3DXWARE
   thread_handle.reset( 
-    new HAPI::SimpleThread( SpaceWareSensorInternal::spaceWareThread, 
+    new H3DUtil::SimpleThread( SpaceWareSensorInternal::spaceWareThread, 
                        this ) );
 #endif 
 
