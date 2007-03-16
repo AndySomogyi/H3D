@@ -196,6 +196,7 @@ HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_s
 
   if( type == 1 ) {
     return new HAPI::HLDepthBufferShape( this,
+		                                 this,
                                          _surface,
                                          _transform,
                                          touchable_face,
@@ -203,6 +204,7 @@ HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape( H3DSurfaceNode *_s
                                          adaptive_viewport );
   } else {
     return new HAPI::HLFeedbackShape( this,
+		                              this,
                                       _surface,
                                       _transform,
                                       _nr_vertices,
@@ -549,7 +551,8 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
               type = HAPI::OpenHapticsRenderer::OpenHapticsOptions::FEEDBACK_BUFFER;
               Console(4) << "Warning: Invalid OpenHaptics GLShape type: "
                          << shape 
-                         << ". Must be \"FEEDBACK_BUFFER\" or \"DEPTH_BUFFER\" "
+                         << ". Must be \"FEEDBACK_BUFFER\", \"DEPTH_BUFFER\" "
+                         << "or \"CUSTOM\""
                          << "(in \"" << getName() << "\")" << endl;
             }
         
