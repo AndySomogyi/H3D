@@ -144,7 +144,7 @@ void Image3DTexture::SFImage::update() {
     thread_data.urls = urls->getValue();
     thread_data.image_loaders = image_loaders->getValue();
 
-    texture->load_thread.reset( new HAPI::SimpleThread( &loadImageThreadFunc, 
+    texture->load_thread.reset( new H3DUtil::SimpleThread( &loadImageThreadFunc, 
                                                    (void *)&thread_data ) );
   } else {
     value = loadImage( texture, urls->getValue(), image_loaders->getValue() );

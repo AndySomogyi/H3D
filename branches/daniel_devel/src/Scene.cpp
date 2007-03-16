@@ -51,7 +51,7 @@ using namespace H3D;
 // Initialize static members
 //
 
-HAPI::MutexLock Scene::callback_lock;
+H3DUtil::MutexLock Scene::callback_lock;
 Scene::CallbackList Scene::callbacks;
 
 // Add this node to the H3DNodeDatabase system.

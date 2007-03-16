@@ -314,7 +314,7 @@ namespace H3D {
     virtual ErrorCode disableDevice();
 
     /// Get the thread that is used to run this haptics device.
-    inline HAPI::PeriodicThreadBase *getThread() { 
+    inline H3DUtil::PeriodicThreadBase *getThread() { 
       if( hapi_device.get() ) {
         return hapi_device->getThread();
       } else {
@@ -600,10 +600,10 @@ namespace H3D {
 
     /// Callcack function to transfer the force effect vector to the 
     /// haptics loop.
-    static HAPI::PeriodicThread::CallbackCode changeForceEffects( void *_data ); 
+    static H3DUtil::PeriodicThread::CallbackCode changeForceEffects( void *_data ); 
     /// Callcack function to transfer the shapes vector for the 
     /// haptics loop.
-    static HAPI::PeriodicThread::CallbackCode changeHapticShapes( void *_data ); 
+    static H3DUtil::PeriodicThread::CallbackCode changeHapticShapes( void *_data ); 
 
     // TODO
     HAPI::HAPIHapticsRenderer::Contacts last_contacts;
