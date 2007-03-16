@@ -33,7 +33,7 @@
 #include <DeviceInfo.h>
 #include <OpenHapticsRenderer.h>
 #include <GodObjectRenderer.h>
-#include <RuspiniRenderer.h>
+#include <HAPIHapticsRenderer.h>
 #include "X3DViewpointNode.h"
 using namespace H3D;
 
@@ -220,7 +220,6 @@ void H3DHapticsDevice::renderShapes(
                                   h3d_renderer->getHapticsRenderer( layer ), layer );
       }
     }
-    
     hapi_device->setShapes( shapes, layer );
     hapi_device->transferObjects();
   }
@@ -348,17 +347,17 @@ void H3DHapticsDevice::updateDeviceValues() {
     }
     assert( device_index != -1 );
 
-    HAPI::RuspiniRenderer::Contacts all_contacts;
+    HAPI::HAPIHapticsRenderer::Contacts all_contacts;
 
     for( unsigned int layer = 0; layer < hapi_device->nrLayers(); layer++ ) {
       HAPI::HAPIHapticsRenderer *renderer = 
         hapi_device->getHapticsRenderer( layer );
-      HAPI::RuspiniRenderer::Contacts contacts;
+      HAPI::HAPIHapticsRenderer::Contacts contacts;
       if( renderer ) {
         contacts = renderer->getContacts();
         all_contacts.insert( all_contacts.end(), contacts.begin(), contacts.end() );
       }
-      for( HAPI::RuspiniRenderer::Contacts::iterator i = contacts.begin();
+      for( HAPI::HAPIHapticsRenderer::Contacts::iterator i = contacts.begin();
            i != contacts.end(); i++ ) {
         X3DGeometryNode *geom = static_cast< X3DGeometryNode * >((*i).first->userdata );
       
@@ -405,10 +404,10 @@ void H3DHapticsDevice::updateDeviceValues() {
       }
     }
 
-    for( HAPI::RuspiniRenderer::Contacts::iterator j = last_contacts.begin();
+    for( HAPI::HAPIHapticsRenderer::Contacts::iterator j = last_contacts.begin();
          j != last_contacts.end(); j++ ) {
       bool still_in_contact = false;
-      for( HAPI::RuspiniRenderer::Contacts::iterator i = all_contacts.begin();
+      for( HAPI::HAPIHapticsRenderer::Contacts::iterator i = all_contacts.begin();
            i != all_contacts.end(); i++ ) {
         if( (*i).first->userdata == (*j).first->userdata ) {
           still_in_contact = true;
