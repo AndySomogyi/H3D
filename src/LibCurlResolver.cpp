@@ -43,12 +43,20 @@ string LibCurlResolver::resolveURLAsTmpFile( const string &url ) {
     curl_easy_setopt( handle, CURLOPT_WRITEDATA, &os );
     CURLcode return_code = curl_easy_perform( handle );
     os.close();
-    if( return_code != 0 ) {
+    if( return_code != CURLE_OK ) {
       remove( tmp_file );
       return "";
     } else {
-      temp_files.push_back( tmp_file );
-      return tmp_file;
+      long response_code;
+      return_code = 
+        curl_easy_getinfo( handle, CURLINFO_RESPONSE_CODE, &response_code );
+      if( return_code == CURLE_OK && response_code != 404 ) {
+        temp_files.push_back( tmp_file );
+        return tmp_file;
+      } else {
+        remove( tmp_file );
+        return "";
+      }
     }
   }
   return "";
