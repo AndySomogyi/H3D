@@ -696,7 +696,17 @@ void X3DSAX2Handlers::protoStartElement( const XMLCh* const uri,
         stringstream s;
         s << "<" << localname << " ";
         for( unsigned int i = 0; i < attrs.getLength(); i++ ) {
-          s << attrs.getQName( i ) << "=\"" << attrs.getValue( i ) << "\" ";
+          // make sure that MFString are correct. All attribute values
+          // are enclosed in "..", unless the string itself starts with "
+          // then they are inclosed in '..'
+          const XMLCh *v = attrs.getValue( i );
+          char quote = '"';
+          if( v ) {
+            unsigned int ci = 0;
+            while( v[ci] != '\0' && isspace( v[ci] ) ) ci++;
+            if( v[ci] == '"' ) quote = '\'';
+          }
+          s << attrs.getQName( i ) << "=" << quote << v << quote << " ";
         }
         s << ">" << endl;
         proto_declaration->setProtoBody( proto_declaration->getProtoBody() + 
@@ -1220,7 +1230,7 @@ void X3DSAX2Handlers::endElement (const XMLCh *const uri,
   }
   
 
-  if( localname_string == "IS" ) {
+  if( localname_string == "IS" && defining_proto_connections ) {
     defining_proto_connections = false;
     return;
   }
@@ -1229,6 +1239,7 @@ void X3DSAX2Handlers::endElement (const XMLCh *const uri,
   Node *new_node = new_node_element.getNode();
 
   node_stack.pop();
+
   Node *parent = NULL;
   if( node_stack.size() > 0 ) 
     parent = node_stack.top().getNode();
