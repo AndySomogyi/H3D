@@ -39,6 +39,7 @@ X3DBindableNode< DeviceInfo >::StackType X3DBindableNode< DeviceInfo >::stack =
 X3DBindableNode< DeviceInfo >::StackType();
 #endif
 
+list<DeviceInfo *> DeviceInfo::deviceinfos;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase DeviceInfo::database( "DeviceInfo", 
@@ -64,6 +65,7 @@ DeviceInfo::DeviceInfo(
   database.initFields( this );
 
   toStackTop();
+  deviceinfos.push_back( this );
 }
 
 void DeviceInfo::renderStyli() {

@@ -148,7 +148,7 @@ H3DHapticsDevice::ErrorCode H3DHapticsDevice::enableDevice() {
   if( hapi_device.get() ) {
     HAPI::HAPIHapticsDevice::ErrorCode e =
       hapi_device->enableDevice();
-    if( e == HAPI::HAPIHapticsDevice::SUCCESS && enabled->getValue() ) {
+    if( e == HAPI::HAPIHapticsDevice::SUCCESS && !enabled->getValue() ) {
       enabled->setValue( true, id );
     }
     return e;
@@ -160,7 +160,7 @@ H3DHapticsDevice::ErrorCode H3DHapticsDevice::disableDevice() {
   if( hapi_device.get() ) {
     HAPI::HAPIHapticsDevice::ErrorCode e =
       hapi_device->disableDevice();
-    if( e == HAPI::HAPIHapticsDevice::SUCCESS && !enabled->getValue() ) {
+    if( e == HAPI::HAPIHapticsDevice::SUCCESS && enabled->getValue() ) {
       enabled->setValue( false, id );
     }
     return e;
