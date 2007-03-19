@@ -159,7 +159,7 @@ void SensAbleDevice::updateDeviceValues() {
   if( pd ) {
     bool b = pd->needsCalibration();
     if( needsCalibration->getValue() != b ) {
-      needsCalibration->setValue( b );
+      needsCalibration->setValue( b, id );
     }
     gimbalAngles->setValue( (Vec3f)pd->getGimbalAngles(), id );
     jointAngles->setValue( (Vec3f) pd->getJointAngles(), id );
