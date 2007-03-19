@@ -230,6 +230,7 @@ private:
 	wxString currentFilename;
 	wxString currentPath;
 	bool lastmirror;
+  bool lastDeviceStatus;
 	//wxString renderModeSelection;
 	int selection;
 	int viewpointCount;
@@ -301,6 +302,7 @@ enum
   FRAME_REDBLUE,
   FRAME_REDCYAN,
   FRAME_DEVICECONTROL,
+  FRAME_HAPTICSCONTROL,
   BASIC_PREFRENDERER,
   BASIC_WIREFRAME,
   BASIC_NOTEXTURES,
