@@ -73,7 +73,17 @@ namespace H3D {
     /// <b>Access type: </b> inputOutput \n
     auto_ptr< MFDevice >  device;
 
+    typedef list< DeviceInfo * > DeviceInfoList;
+    
+    /// Returns a list of all current DeviceInfo instances.
+    static const DeviceInfoList &getAllDeviceInfos() {
+      return deviceinfos;
+    }
+
     static H3DNodeDatabase database;
+
+  protected:
+    static DeviceInfoList deviceinfos;
   };
 }
 
