@@ -59,11 +59,8 @@ namespace H3D {
         bool isActive = static_cast< SFBool * >( routes_in[0] )->getValue();
         X3DTouchSensorNode *ts = 
             static_cast< X3DTouchSensorNode * >( getOwner() );
-        if( isActive ) {
-          ts->start_time = TimeStamp();
-        }
-        else if( ts->isOver->getValue() ) {
-          ts->touchTime->setValue( TimeStamp() - ts->start_time, ts->id );
+        if( !isActive && ts->isOver->getValue() ) {
+          ts->touchTime->setValue( event.time_stamp, ts->id );
         }
       }
     };
