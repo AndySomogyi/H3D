@@ -168,6 +168,8 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   fileMenu->Append(FRAME_OPEN_URL, "&Open file from URL...", "Open a file from URL" );
   fileMenu->Append(FRAME_CLOSE, "&Close file","Close file");
   fileMenu->AppendSeparator();
+  fileMenu->Append(FRAME_CHOOSEDIR, "Change Working Directory", "Change working directory...");
+  fileMenu->AppendSeparator();
   fileMenu->Append(FRAME_EXIT,"E&xit\tCtrl+X", "Exit");
 
   //File History
@@ -266,6 +268,7 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
   EVT_MENU_RANGE (wxID_FILE1, wxID_FILE9, H3DWxFrame::OnMRUFile)
   EVT_MENU (FRAME_OPEN_URL, H3DWxFrame::OnOpenFileURL)
 	EVT_MENU (FRAME_CLOSE, H3DWxFrame::OnCloseFile)
+  EVT_MENU (FRAME_CHOOSEDIR, H3DWxFrame::OnChooseDir)
 	EVT_MENU (FRAME_FULLSCREEN, H3DWxFrame::OnFullscreen)
 	EVT_MENU (FRAME_SETTINGS, H3DWxFrame::OnSettings)
   EVT_MENU (FRAME_RESTORE, H3DWxFrame::RestoreWindow)
@@ -783,6 +786,17 @@ void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
   rendererMenu->Enable(FRAME_RENDERMODE, false);
 }
 
+void H3DWxFrame::OnChooseDir(wxCommandEvent & event) {
+  wxDirDialog *d = new wxDirDialog (this, 
+                                    "Choose a directory", 
+                                    GetCurrentPath(), 
+                                    0, 
+                                    wxDefaultPosition);
+  if (d->ShowModal() == wxID_OK)
+  {
+    SetCurrentPath(d->GetPath());
+  }
+}
 
 //About dialog
 void H3DWxFrame::OnAbout(wxCommandEvent & event)
