@@ -197,6 +197,7 @@ public:
   void OnMRUFile  (wxCommandEvent & event);
   void OnOpenFileURL	(wxCommandEvent & event);
   void OnCloseFile	(wxCommandEvent & event);
+  void OnChooseDir  (wxCommandEvent & event);
   void OnExit     	(wxCommandEvent & event);
   void OnWindowExit (wxCloseEvent & event);
   void OnAbout		(wxCommandEvent & event);
@@ -278,6 +279,7 @@ enum
   FRAME_OPEN,
   FRAME_OPEN_URL,
   FRAME_CLOSE,
+  FRAME_CHOOSEDIR,
   FRAME_FULLSCREEN,
   FRAME_RESTORE,
   FRAME_MIRROR,
