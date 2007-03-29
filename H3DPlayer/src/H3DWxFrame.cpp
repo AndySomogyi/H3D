@@ -73,6 +73,7 @@ static const wxChar *TITLE     = _T("H3D Player ");
 static const wxChar *AUTHOR    = _T("\nRamkumar Shankar\n\nCopyright 2006-2007.  All Rights Reserved.");
 static const wxChar *ABOUT     = _T("About");
 static const wxChar *FILETYPES = _T( "x3d files|*.x3d|"
+                                     "vrml files|*.wrl|"
                                      "All files|*.*"
                                    );
 
