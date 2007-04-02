@@ -78,17 +78,35 @@ namespace H3D {
       Inst< SFBool  >  _closed		= FALSE,
       Inst< SFBool  >  _normalizeVelocity = FALSE);
 
-    /// The values to interpolate between
+    /// The values to interpolate between.
+    /// 
     /// 
     /// <b>Access type:</b> inputOutput
-    /// 
     /// \dotfile SplinePositionInterpolator2D_keyValue.dot
     auto_ptr< MFVec2f > keyValue;
-
+    
+    /// KeyVelocity values, if left empty they are calculated using the keyValues.
+    ///
+    /// <b>Access type:</b> inputOutput
+    ///
+    /// \dotfile SplinePositionInterpolator2D_keyVelocity.dot
     auto_ptr< MFVec2f > keyVelocity;
-
+   
+    /// Specifies if the loop is Open or Closed.
+    ///
+    /// <b>Access type:</b> inputOutput
+    ///
+    /// \dotfile SplinePositionInterpolator2D_closed.dot
     auto_ptr< SFBool > closed;
+    /// <b>Default value:</b> FALSE \n
+
+    /// Specifies if the Velocity should be normalized.
+    ///
+    /// <b>Access type:</b> inputOutput
+    ///
+    /// \dotfile SplinePositionInterpolator2D_normalizeVelocity.dot
     auto_ptr< SFBool > normalizeVelocity;
+    /// <b>Default value:</b> FALSE \n
 
     /// The interpolated result value.
     /// 
@@ -96,6 +114,7 @@ namespace H3D {
     /// 
     /// \dotfile SplinePositionInterpolator2D_value_changed.dot
     auto_ptr< SFValue > value_changed;
+
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
