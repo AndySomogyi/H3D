@@ -93,7 +93,7 @@ void SplinePositionInterpolator2D::SFValue::update() {
     static_cast<MFVec2f*>(routes_in[3])->getValue();
   H3DFloat weight;
 
-  //Retunerar det lägsta indexet[i] =key-index, + weight(s) 
+  // Return the lowest of the index i the value is between plus the weight
   int key_index = interpolator->lookupKey( fraction, 
     weight );
 
@@ -198,7 +198,7 @@ void SplinePositionInterpolator2D::SFValue::update() {
         F2.push_back(2*((key[i+1] - key[i])/(key[i+1] - key[i-1])));
       }
       if((key_index>0) && (key_index <key_size-2)){
-        T0 = (T[key_index]*F1[key_index-1]); //eftersom i borjar på 1 ska jag ha F1-1
+        T0 = (T[key_index]*F1[key_index-1]); 
         T1 = (F2[key_index]*T[key_index+1]);
       }
       else if(specified && (key_index ==0)){
@@ -237,9 +237,7 @@ void SplinePositionInterpolator2D::SFValue::update() {
       T0 = (F1[key_index]*T[key_index]);
       T1 = (F2[key_index+1]*T[key_index +1]); 
     }
-    Vec2f vi = (key_value[key_index]);
-    Vec2f vi1 = (key_value[key_index+1]);
-    // Creating a 4x4 matrix to be able to multiply with the H Matrix.
+
    vector < Vec2f > C;
    C.push_back(key_value[key_index]);
    C.push_back(key_value[key_index+1]);
@@ -259,19 +257,9 @@ void SplinePositionInterpolator2D::SFValue::update() {
     HC.push_back(HC1);
     HC.push_back(HC2);
     HC.push_back(HC3);
-    //cerr << " HC.size()  = " << HC.size() <<"                                    ***************            ";  
-    //cerr << " HC = " << " HC[0] " << HC[0]<< " HC[1] " << HC[1]<< " HC[2] " << HC[2]<< " HC[3] " << HC[3];
-    
+
     H3DFloat HCS0 = (HC[0][0]*S[0]+ HC[1][0]*S[1] + HC[2][0]*S[2] + HC[3][0]*S[3]);
     H3DFloat HCS1 = (HC[0][1]*S[0]+ HC[1][1]*S[1] + HC[2][1]*S[2] + HC[3][1]*S[3]);
-    //cerr << " HCS0 =  " << HCS0;
-    //cerr << " HCS1 =  " << HCS1;
-
-    //Vec2f HCS = Vec2f(HCS0,HCS1);
-    //cerr <<" HCS  = " << HCS << "  ********   ";
-    //value =S*(H*C);
-             
-    //Vec4f ulrika = Vec4f(C*(H*S));
 
     value = Vec2f(HCS0,HCS1);
   
