@@ -35,10 +35,10 @@
 
 namespace H3D {
   
+  /// H3DNavigation is a Singleton class used for navigation in H3DAPI.
+  /// By default navigation can be done with mouse and keyboard.
   class H3DAPI_API H3DNavigation {
   public:
-    /// H3DNavigation is a Singleton class used for navigation in H3DAPI.
-    /// By default navigation can be done with mouse and keyboard.
 
     typedef enum {
       ALL = 1,
