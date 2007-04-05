@@ -28,46 +28,6 @@
 using namespace std;
 using namespace H3D;
 
-class KeyRotation : public TypedField< SFRotation, 
-                                       Types< SFInt32,
-                                              SFBool,
-                                              SFVec2f,
-                                              SFRotation> > {
-  virtual void update() {
-    bool button_pressed = static_cast< SFBool * >(routes_in[1])->getValue();
-    Vec2f motion = static_cast< SFVec2f * >(routes_in[2])->getValue();
-    motion.y = -motion.y;
-
-    if( button_pressed && motion * motion > Constants::f_epsilon ) {
-      Vec2f perp = Vec2f( -motion.y, motion.x );
-      perp.normalize();
-      value = Rotation( perp.x, perp.y, 0, motion.length() * 0.01f ) * value;
-    }
-    
-    else if( event.ptr == routes_in[0] ) {
-      int key = static_cast< SFInt32 * >(routes_in[0])->getValue();
-      if( key == KeySensor::UP ) {
-        value = Rotation( 1,0,0,-0.1f ) * value;
-      }
-      if( key == KeySensor::DOWN ) {
-        value = Rotation( 1,0,0,0.1f ) * value;
-      }
-      if( key == KeySensor::LEFT ) {
-        value = Rotation( 0,1,0,-0.1f ) * value;
-      }
-      if( key == KeySensor::RIGHT ) {
-        value = Rotation( 0,1,0,0.1f ) * value;
-      }
-    }
-    else if( routes_in.size() > 3 ) {
-      if( event.ptr == routes_in[3] ) {
-        Rotation r = static_cast< SFRotation * >(routes_in[3])->getValue();
-        value = r * value;
-      }
-    }
-  }
-};
-
 H3D_API_EXCEPTION( QuitAPIException );
 
 class QuitAPIField: public AutoUpdate< SFString > {
@@ -364,7 +324,6 @@ int main(int argc, char* argv[]) {
     if( use_space_mouse ) ss.reset( new SpaceWareSensor );
 #endif
     X3D::DEFNodes dn;
-    KeyRotation *kr = new KeyRotation;
     QuitAPIField *quit_api = new QuitAPIField;
     AutoRef< Transform > t( new Transform );
     AutoRef< Node > device_info;
@@ -412,18 +371,7 @@ int main(int argc, char* argv[]) {
                                                        &dn ) );
     }
     
-    
-    
-    // set up routes to rotate the model
     ks->keyPress->route( quit_api );
-    ks->actionKeyPress->route( kr );
-    ms->leftButton->route( kr );
-    ms->motion->route( kr );
-#ifndef MACOSX
-    if( use_space_mouse )
-      ss->instantRotation->route( kr );
-#endif
-    kr->route( t->rotation );
 
     AutoRef< Group > g( new Group );
 #ifndef MACOSX
