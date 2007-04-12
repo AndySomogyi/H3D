@@ -133,7 +133,10 @@ namespace H3D {
 
     /// The range field specifies the ideal 
     /// distances at which to switch between 
-    /// the levels.
+    /// the levels. 
+    ///
+    /// Each value in the range field shall 
+    /// be greater than the previous value.
     ///
     /// <b>Default value:</b> MFFloat = [] \n
     /// 
