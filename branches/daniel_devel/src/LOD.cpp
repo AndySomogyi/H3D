@@ -72,7 +72,6 @@ MatrixTransform( _addChildren, _removeChildren, _children,
 
 
 void LOD::traverseSG( TraverseInfo &ti ){
-
   X3DViewpointNode *vp = X3DViewpointNode::getActive();
   // goes from the viewports local coordinates to the global
   // then from global to LOD local coordinates 
@@ -87,11 +86,19 @@ void LOD::traverseSG( TraverseInfo &ti ){
   //calculates the distance (d) from the vp position to centre
   H3DFloat d = (vp_pos_LOD - center->getValue()).length();
   H3DFloat n = range->size();
+  int noOfChildren = children->size();
+  // if there are too few children the last fields in the 
+  // range will be ignored and the last range level will
+  // be used for the lowest levels of details.
+  if (noOfChildren<n+1){
+    n= (noOfChildren-1);
+  }
+  
   vector< H3DFloat > range_vector=(range->getValue());
-
+  
   if(forceTransitions->getValue()){
-    // if forceTransitions is true the LOD should always change 
-    // to the one closest, comparing d to the range_vector[i]
+    // if forceTransitions is TRUE the LOD should always change 
+    // to the closest LOD, comparing d to the range_vector[i]
     for(int i=0; i<n-1; i++){
       if( d < range_vector[0]){
         if(display_index->getValue() !=0){
@@ -111,10 +118,15 @@ void LOD::traverseSG( TraverseInfo &ti ){
     }
   }
   else{
-    // if forceTransitions is false the distance between 
-    // the range values are compared (range_d) and if the distance 
-    // is lager than min_distance(=0.5) the LOD will change otherwise 
-    // only the first level will be shown
+    // if forceTransitions is FALSE the distance between the 
+    // range values are compared (range_d). If the range_d 
+    // is LARGER than min_distance(=0.5) the LOD will change 
+    // level i.e work in the same way as if forceTransitions 
+    // = true. If range_d is SMALLER than min_distance the 
+    // precious LOD will be shown (the dispay_index will not 
+    // be changed) until a level on a larger distance occurs.
+    //
+    // ### WARNING min_distance is hardcoded to 0.5... ###
 
     vector <H3DFloat> range_d;
     H3DFloat min_distance = 0.5;
@@ -145,7 +157,6 @@ void LOD::traverseSG( TraverseInfo &ti ){
 
 
 void LOD::render(){ 
-
   H3DDisplayListObject *c = dynamic_cast< H3DDisplayListObject* >
     ( children->getValueByIndex(display_index->getValue()) );
   if ( c ) {
