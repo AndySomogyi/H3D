@@ -95,18 +95,20 @@ namespace H3D {
     /// Specifies if the loop is Open or Closed.
     ///
     /// <b>Access type:</b> inputOutput
+    /// <b>Default value:</b> FALSE \n
     ///
     /// \dotfile SplinePositionInterpolator_closed.dot
     auto_ptr< SFBool > closed;
-    /// <b>Default value:</b> FALSE \n
+
     
     /// Specifies if the Velocity should be normalized.
     ///
     /// <b>Access type:</b> inputOutput
+    /// <b>Default value:</b> FALSE \n
     ///
     /// \dotfile SplinePositionInterpolator_normalizeVelocity.dot
     auto_ptr< SFBool > normalizeVelocity;
-    /// <b>Default value:</b> FALSE \n
+    
 
     /// The interpolated result value.
     /// 
