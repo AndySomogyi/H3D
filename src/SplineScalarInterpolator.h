@@ -75,16 +75,36 @@ namespace H3D {
 						            Inst< SFBool  >  _closed		= FALSE,
 						            Inst< SFBool  >  _normalizeVelocity = FALSE);
 
-    /// The values to interpolate between
+    /// keyValues are the values to interpolate between
     /// 
     /// <b>Access type:</b> inputOutput
     /// 
     /// \dotfile SplineScalarInterpolator_keyValue.dot
     auto_ptr< MFFloat > keyValue;
 
+    /// KeyVelocity, if left empty they are calculated using the keyValues.
+    /// 
+    /// <b>Access type:</b> inputOutput
+    /// 
+    /// \dotfile SplineScalarInterpolator_keyVelocity.dot
     auto_ptr< MFFloat > keyVelocity;
 
+    /// Closed is a boolean that specifies if the loop 
+    /// is open or closed
+    /// 
+    /// <b>Default value:</b> SFBool = FALSE \n
+    /// <b>Access type:</b> inputOutput
+    /// 
+    /// \dotfile SplineScalarInterpolator_closed.dot
     auto_ptr< SFBool > closed;
+
+    /// NormalizeVelocity is a boolean that specifies 
+    /// if the keyVelocities should be normalized
+    /// 
+    /// <b>Default value:</b> SFBool = FALSE \n
+    /// <b>Access type:</b> inputOutput
+    /// 
+    /// \dotfile SplineScalarInterpolator_closed.dot
     auto_ptr< SFBool > normalizeVelocity;
 
     /// The interpolated result value.
