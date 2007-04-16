@@ -44,22 +44,83 @@ namespace H3D {
   /// 
   class H3DAPI_API X3DEnvironmentalSensorNode : public X3DSensorNode {
   public:
+
+	/// The CheckVolume class is specialize to check whether any 
+    /// value of the size is zeor or not, if any it disables the 
+    /// node .
+    class H3DAPI_API CheckVolume: public AutoUpdate< SFVec3f > {
+    public:
+      virtual void setValue( const Vec3f &b, int id = 0 ) {
+		  SFVec3f::setValue( b );
+        X3DEnvironmentalSensorNode *esn = 
+          static_cast< X3DEnvironmentalSensorNode * >( getOwner() );
+		if(  value.x <= 0.0 ||
+			 value.y <= 0.0 ||
+			 value.z <= 0.0 )
+			 esn->enabled->setValue( false, esn->id );
+        else esn->enabled->setValue( true, esn->id );
+      }
+    protected:
+      virtual void update() {
+        SFVec3f::update();
+        X3DEnvironmentalSensorNode *esn = 
+          static_cast< X3DEnvironmentalSensorNode * >( getOwner() );
+        if(  value.x <= 0.0 ||
+			 value.y <= 0.0 ||
+			 value.z <= 0.0 )
+			 esn->enabled->setValue( false, esn->id );
+        else esn->enabled->setValue( true, esn->id );
+      }
+    };
     
     /// Constructor.
-    X3DEnvironmentalSensorNode( Inst< SFNode > _metadata = 0,
-								Inst< SFVec3f > _center = 0,
-								Inst< SFBool > _enabled = 0,
-								Inst< SFVec3f > _size = 0,
-								Inst< SFTime > _enterTime = 0,
-								Inst< SFTime > _exitTime = 0,
-								Inst< SFBool > _isActive = 0 );
+    X3DEnvironmentalSensorNode( 
+                Inst< SFNode >  _metadata   = 0,
+								Inst< SFVec3f > _center     = 0,
+								Inst< SFBool >  _enabled    = 0,
+								Inst< SFVec3f > _size       = 0,
+								Inst< SFTime >  _enterTime  = 0,
+								Inst< SFTime >  _exitTime   = 0,
+								Inst< SFBool >  _isActive   = 0 );
 
 
     // Fields
+    /// Center gives the space location of the box
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> SFVec3f = 0,0,0 \n
+    /// 
+    /// \dotfile X3DEnvironmentalSensorNode_center.dot
     auto_ptr< SFVec3f >  center;
+
+    /// Size gives the size of the box (width=x, height=y, depth=z) 
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> SFVec3f = 0,0,0 \n
+    /// 
+    /// \dotfile X3DEnvironmentalSensorNode_size.dot
     auto_ptr< SFVec3f >  size;
-	auto_ptr< SFTime >  enterTime;
-	auto_ptr< SFTime >  exitTime;
+
+    /// enterTime
+    /// <b>Access type:</b> OutputOnly \n
+    /// <b>Default value:</b> SFTime \n
+    /// 
+    /// \dotfile X3DEnvironmentalSensorNode_enterTime.dot
+	  auto_ptr< SFTime >  enterTime;
+    
+    /// exitTime
+    /// <b>Access type:</b> OutputOnly \n
+    /// <b>Default value:</b> SFTime \n
+    /// 
+    /// \dotfile X3DEnvironmentalSensorNode_exitTime.dot
+	  auto_ptr< SFTime >  exitTime;
+
+	/// The field checking the size
+    /// 
+    /// <b>Access type:</b> inputOnly \n
+    /// 
+    /// \dotfile X3DEnvironmentalSensorNode_checkVolume.dot
+
+  	  auto_ptr< CheckVolume >  checkVolume;
+
 
 
     /// The H3DNodeDatabase for this node.

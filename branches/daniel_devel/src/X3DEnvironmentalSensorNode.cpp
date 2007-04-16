@@ -47,7 +47,7 @@ namespace X3DSensorEnvironmentalNodeInternals {
 
 }
 
-X3DEnvironmentalSensorNode::X3DEnvironmentalSensorNode(	Inst< SFNode > _metadata ,
+X3DEnvironmentalSensorNode::X3DEnvironmentalSensorNode(	Inst< SFNode > _metadata,
 								Inst< SFVec3f > _center ,
 								Inst< SFBool > _enabled ,
 								Inst< SFVec3f > _size ,
@@ -55,20 +55,25 @@ X3DEnvironmentalSensorNode::X3DEnvironmentalSensorNode(	Inst< SFNode > _metadata
 								Inst< SFTime > _exitTime ,
 								Inst< SFBool > _isActive ) :					
 
+								X3DSensorNode( _enabled, _metadata, _isActive),
 								center( _center),
-								X3DSensorNode( 0, _metadata ),
 								size( _size ),
 								enterTime( _enterTime ),
-								exitTime( _exitTime ){
+								exitTime( _exitTime ),
+								checkVolume( new CheckVolume ){
 
   type_name = "X3DEnvironmentalSensorNode";
   database.initFields( this );
+
+  checkVolume->setOwner( this );
 
   center->setValue( Vec3f( 0, 0, 0) );
   size->setValue( Vec3f( 0, 0, 0) );
 
   enterTime->setValue( 0.0, id );
   exitTime->setValue( 0.0, id );
+
+  size->route( checkVolume );
   
 }
 
