@@ -59,23 +59,23 @@ namespace H3D {
     /// Set the value of the field. 
     inline virtual void setValue( const typename BaseField::value_type &v,
                                   int id = 0 ) {
-      if( HAPI::HapticThread::inHapticThread() ) {
+      if( H3DUtil::HapticThread::inHapticThread() ) {
         rt_value = v;
         rt_value_changed = true;
       } else {
-        assert( HAPI::ThreadBase::inMainThread() );
+        assert( H3DUtil::ThreadBase::inMainThread() );
         PeriodicUpdate< BaseField >::setValue( v, id );;
         void * param[] = { &this->value, &rt_value };
-        HAPI::HapticThread::synchronousHapticCB( transferValue, param );
+        H3DUtil::HapticThread::synchronousHapticCB( transferValue, param );
       }
     }
 
     /// Get the value of the field.
     inline virtual const typename BaseField::value_type &getValue( int id = 0 ) {
-      if( HAPI::HapticThread::inHapticThread() ) {
+      if( H3DUtil::HapticThread::inHapticThread() ) {
         return rt_value;
       } else {
-        assert( HAPI::ThreadBase::inMainThread() );
+        assert( H3DUtil::ThreadBase::inMainThread() );
         return PeriodicUpdate< BaseField >::getValue( id );
       }
     }
@@ -83,11 +83,11 @@ namespace H3D {
     /// Make sure that the field is up-to-date. upToDate() is specialized to 
     /// transfer the rt_value to the field if it has been changed.
     virtual void upToDate() {
-      assert( HAPI::ThreadBase::inMainThread() );
+      assert( H3DUtil::ThreadBase::inMainThread() );
       
       if( rt_value_changed ) {
         void * param[] = { &rt_value, &this->value };
-        HAPI::HapticThread::synchronousHapticCB( transferValue, param );
+        H3DUtil::HapticThread::synchronousHapticCB( transferValue, param );
         this->startEvent();
       } else {
         PeriodicUpdate< BaseField >::upToDate();
@@ -97,24 +97,24 @@ namespace H3D {
   protected:
     /// Callback function to transfer copy a value between two
     /// pointers of the same type.
-    static HAPI::PeriodicThread::CallbackCode transferValue( void * _data ) {
+    static H3DUtil::PeriodicThread::CallbackCode transferValue( void * _data ) {
       void * * data = static_cast< void * * >( _data );
       typename BaseField::value_type *new_value = 
         static_cast< typename BaseField::value_type * >( data[0] );
       typename BaseField::value_type *rt_value = 
         static_cast< typename BaseField::value_type * >( data[1] );
       *rt_value = *new_value;
-      return HAPI::PeriodicThread::CALLBACK_DONE;
+      return H3DUtil::PeriodicThread::CALLBACK_DONE;
     }
 
     /// The update function is specialized to synchronize with the
     /// haptics threads and copy the new value of the field to the
     /// rt_value member in a thread safe way.
     inline virtual void update() {
-      assert( HAPI::ThreadBase::inMainThread() );
+      assert( H3DUtil::ThreadBase::inMainThread() );
       PeriodicUpdate< BaseField >::update();;
       void * param[] = { &this->value, &rt_value };
-      HAPI::HapticThread::synchronousHapticCB( transferValue, param );
+      H3DUtil::HapticThread::synchronousHapticCB( transferValue, param );
     }
     
     /// The copy of the field value to be used in the haptics threads.
@@ -186,14 +186,14 @@ namespace H3D {
     }
 
   protected:
-    static HAPI::PeriodicThread::CallbackCode transferValue( void * _data ) {
+    static H3DUtil::PeriodicThread::CallbackCode transferValue( void * _data ) {
       void * * data = static_cast< void * * >( _data );
       typename BaseField::value_type new_value = 
         static_cast< typename BaseField::value_type >( data[0] );
       AutoRef< typename BaseField::class_type > *rt_value = 
         static_cast< AutoRef< typename BaseField::class_type> * >( data[1] );
       rt_value->reset( new_value );
-      return HAPI::PeriodicThread::CALLBACK_DONE;
+      return H3DUtil::PeriodicThread::CALLBACK_DONE;
   }
 
     /// onAdd is extended to change the rt_image value in a thread safe way.
@@ -460,14 +460,14 @@ namespace H3D {
   protected:
     /// Callback function to transfer copy a value between two
     /// pointers of the same type.
-    static HAPI::PeriodicThread::CallbackCode transferValue( void * _data ) {
+    static H3DUtil::PeriodicThread::CallbackCode transferValue( void * _data ) {
       void * * data = static_cast< void * * >( _data );
       typename BaseField::vector_type *new_value = 
         static_cast< typename BaseField::vector_type * >( data[0] );
       typename BaseField::vector_type *rt_value = 
         static_cast< typename BaseField::vector_type * >( data[1] );
       *rt_value = *new_value;
-      return HAPI::PeriodicThread::CALLBACK_DONE;
+      return H3DUtil::PeriodicThread::CALLBACK_DONE;
     }
 
     /// The update function is specialized to synchronize with the
