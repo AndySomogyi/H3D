@@ -1,0 +1,385 @@
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2004, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+/// \file ProfilesAndComponents.cpp
+/// \brief CPP file for ProfilesAndComponents, X3D scene-graph node
+///
+//
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#include "ProfilesAndComponents.h"
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+
+using namespace H3D;
+using namespace std;
+
+ProfilesAndComponents * ProfilesAndComponents::instance = 0;
+
+//const ProfilesAndComponents * getInstance() {
+//  return instance;
+//}
+namespace ProfilesAndComponentsInternal {
+  SAX2XMLReader* getNewXMLParser() {
+    SAX2XMLReader::ValSchemes    valScheme    = SAX2XMLReader::Val_Never;
+    bool                         doNamespaces = true;
+    bool                         doSchema = false;
+    bool                         schemaFullChecking = false;
+    //bool                         doList = false;
+    //bool                         errorOccurred = false;
+    bool                         namespacePrefixes = false;
+    //bool                         recognizeNEL = false;
+    char                         localeStr[64];
+    memset(localeStr, 0, sizeof localeStr);
+    SAX2XMLReader* parser = XMLReaderFactory::createXMLReader();
+    parser->setFeature(XMLUni::fgSAX2CoreNameSpaces, doNamespaces);
+    parser->setFeature(XMLUni::fgXercesSchema, doSchema);
+    parser->setFeature(XMLUni::fgXercesSchemaFullChecking, 
+      schemaFullChecking);
+    parser->setFeature(XMLUni::fgSAX2CoreNameSpacePrefixes, 
+      namespacePrefixes);
+    if (valScheme == SAX2XMLReader::Val_Auto) {
+      parser->setFeature(XMLUni::fgSAX2CoreValidation, true);
+      parser->setFeature(XMLUni::fgXercesDynamic, true);
+    }
+    if (valScheme == SAX2XMLReader::Val_Never) {
+      parser->setFeature(XMLUni::fgSAX2CoreValidation, false);
+    }
+    if (valScheme == SAX2XMLReader::Val_Always) {
+      parser->setFeature(XMLUni::fgSAX2CoreValidation, true);
+      parser->setFeature(XMLUni::fgXercesDynamic, false);
+    }
+    return parser;
+  }
+}
+
+ProfilesAndComponents::ProfilesAndComponents(): main_profile_set( false ) {
+  profiles_supported.push_back("Core");
+  profiles_supported.push_back("Interchange");
+  // TODO: verify that immersive is supported since it is not yet supported when coding this.
+  profiles_supported.push_back("Immersive");
+  profiles_supported.push_back("Interactive");
+
+  components_supported["3.0"]["Core"] = 2;
+  components_supported["3.0"]["DIS"] = 0;
+  components_supported["3.0"]["EnvironmentalEffects"] = 3;
+  components_supported["3.0"]["EnvironmentalSensor"] = 0;
+  components_supported["3.0"]["EventUtilities"] = 1;
+  components_supported["3.0"]["Geometry2D"] = 2;
+  components_supported["3.0"]["Geometry3D"] = 4;
+  components_supported["3.0"]["Geospatial"] = 0;
+  components_supported["3.0"]["Grouping"] = 2;
+  components_supported["3.0"]["H3DAPI"] = 1;
+  components_supported["3.0"]["H-Anim"] = 0;
+  components_supported["3.0"]["Interpolation"] = 3;
+  components_supported["3.0"]["KeyDeviceSensor"] = 1;
+  components_supported["3.0"]["Lighting"] = 3;
+  components_supported["3.0"]["Navigation"] = 1;
+  components_supported["3.0"]["Networking"] = 1;
+  components_supported["3.0"]["NURBS"] = 0;
+  components_supported["3.0"]["PointingDeviceSensor"] = 1;
+  components_supported["3.0"]["Rendering"] = 5;
+  components_supported["3.0"]["Scripting"] = 1;
+  components_supported["3.0"]["Shape"] = 4;
+  components_supported["3.0"]["Sound"] = 1;
+  components_supported["3.0"]["Text"] = 1;
+  components_supported["3.0"]["Texturing"] = 3;
+  components_supported["3.0"]["Time"] = 2;
+
+  components_supported["3.1"]["CADGeometry"] = 0;
+  components_supported["3.1"]["Core"] = 2;
+  components_supported["3.1"]["CubeMapTexturing"] = 1;
+  components_supported["3.1"]["DIS"] = 0;
+  components_supported["3.1"]["EnvironmentalEffects"] = 3;
+  components_supported["3.1"]["EnvironmentalSensor"] = 0;
+  components_supported["3.1"]["EventUtilities"] = 1;
+  components_supported["3.1"]["Geometry2D"] = 2;
+  components_supported["3.1"]["Geometry3D"] = 4;
+  components_supported["3.1"]["Geospatial"] = 0;
+  components_supported["3.1"]["Grouping"] = 2;
+  components_supported["3.1"]["H3DAPI"] = 1;
+  components_supported["3.1"]["H-Anim"] = 0;
+  components_supported["3.1"]["Interpolation"] = 3;
+  components_supported["3.1"]["KeyDeviceSensor"] = 1;
+  components_supported["3.1"]["Lighting"] = 3;
+  components_supported["3.1"]["Navigation"] = 1;
+  components_supported["3.1"]["Networking"] = 1;
+  components_supported["3.1"]["NURBS"] = 0;
+  components_supported["3.1"]["PointingDeviceSensor"] = 1;
+  components_supported["3.1"]["Rendering"] = 5;
+  components_supported["3.1"]["Scripting"] = 1;
+  components_supported["3.1"]["Shaders"] = 1;
+  components_supported["3.1"]["Shape"] = 4;
+  components_supported["3.1"]["Sound"] = 1;
+  components_supported["3.1"]["Text"] = 1;
+  components_supported["3.1"]["Texturing"] = 3;
+  components_supported["3.1"]["Texturing3D"] = 2;
+  components_supported["3.1"]["Time"] = 2;
+
+  components_supported["3.2"]["CADGeometry"] = 0;
+  components_supported["3.2"]["Core"] = 2;
+  components_supported["3.2"]["CubeMapTexturing"] = 1;
+  components_supported["3.2"]["DIS"] = 0;
+  components_supported["3.2"]["EnvironmentalEffects"] = 3;
+  components_supported["3.2"]["EnvironmentalSensor"] = 0;
+  components_supported["3.2"]["EventUtilities"] = 1;
+  components_supported["3.2"]["Followers"] = 0;
+  components_supported["3.2"]["Geometry2D"] = 2;
+  components_supported["3.2"]["Geometry3D"] = 4;
+  components_supported["3.2"]["Geospatial"] = 0;
+  components_supported["3.2"]["Grouping"] = 2;
+  components_supported["3.2"]["H-Anim"] = 0;
+  components_supported["3.2"]["H3DAPI"] = 1;
+  components_supported["3.2"]["Interpolation"] = 3;
+  components_supported["3.2"]["KeyDeviceSensor"] = 1;
+  components_supported["3.2"]["Layering"] = 0;
+  components_supported["3.2"]["Layout"] = 0;
+  components_supported["3.2"]["Lighting"] = 3;
+  components_supported["3.2"]["Navigation"] = 1;
+  components_supported["3.2"]["Networking"] = 1;
+  components_supported["3.2"]["NURBS"] = 0;
+  components_supported["3.2"]["ParticleSystems"] = 0;
+  components_supported["3.2"]["PickingSensor"] = 0;
+  components_supported["3.2"]["PointingDeviceSensor"] = 1;
+  components_supported["3.2"]["Rendering"] = 5;
+  components_supported["3.2"]["RigidBodyPhysics"] = 0;
+  components_supported["3.2"]["Scripting"] = 1;
+  components_supported["3.2"]["Shaders"] = 1;
+  components_supported["3.2"]["Shape"] = 4;
+  components_supported["3.2"]["Sound"] = 1;
+  components_supported["3.2"]["Text"] = 1;
+  components_supported["3.2"]["Texturing"] = 3;
+  components_supported["3.2"]["Texturing3D"] = 2;
+  components_supported["3.2"]["Time"] = 2;
+}
+
+void ProfilesAndComponents::destroy() {
+  if( instance )
+  {
+    delete instance;
+    instance = 0;
+  }
+}
+
+string ProfilesAndComponents::getProfile() {
+  //cerr << "profile: " << instance->used_profile.name  << " version " << instance->version << endl;
+  return instance->used_profile.name;
+}
+
+bool ProfilesAndComponents::setProfile( string profile, string &err_msg,
+                                        string _version ) {
+
+  if( !instance ) {
+    instance = new ProfilesAndComponents();
+  }
+
+  return instance->setProfileInternal( profile, err_msg, _version );
+}
+
+bool ProfilesAndComponents::setProfileInternal( string profile,
+                                                string &err_msg,
+                                                string _version) {
+  if( _version != "3.0" &&
+      _version != "3.1" &&
+      _version != "3.2" ) {
+    err_msg = "The version number " + _version + " does not exist, " +
+              "the profile file will not be found for profile" + profile +"\n";
+    return false;
+  }
+  auto_ptr< SAX2XMLReader > parser( ProfilesAndComponentsInternal::getNewXMLParser() );
+
+  if( !main_profile_set ) {
+    if( find( profiles_supported.begin(),
+      profiles_supported.end(),
+      profile ) != profiles_supported.end() ) {
+        ProfileSAX2Handlers handler;
+        parser->setContentHandler(&handler);
+        parser->setErrorHandler(&handler);
+        char *r = getenv( "H3D_ROOT" );
+        string h3d_root = r ? r : "";
+        string profile_path = h3d_root + "/Conformance/" + _version +"/Profiles/" + profile + ".xml";
+        ifstream profile_file( profile_path.c_str() );
+        profile_file.close();
+        if( !profile_file.fail() ) {
+          parser->parse( profile_path.c_str() );
+          //cerr << profile_path << endl;
+          ProfileSAX2Handlers::myX3DProfileVector parsed_profile =
+            handler.getProfileVector();
+          //used_profile = profile;
+          used_profile = parsed_profile.front();
+          for( map< string, int >::iterator i = used_profile.component_names.begin();
+               i != used_profile.component_names.end();
+               i++ ) {
+            string component_path = h3d_root + "/Conformance/" + _version +"/Components/" + (*i).first + ".xml";
+            ifstream component_file( component_path.c_str() );
+            component_file.close();
+            if( !component_file.fail() ) {
+              //cerr << component_path << endl;
+              parser->parse( component_path.c_str() );
+            }
+            else {
+              err_msg = "File with component definition could not be found. " +
+                    string( "Path used is:\n" ) + component_path + "\n";
+              return false;
+            }
+          }
+          components_used = handler.getComponentVector();
+          for( int i = 0; i < (int)components_used.size(); i++ ) {
+            components_used[i].conformance_level = components_supported[_version][ components_used[i].name ];
+            components_used[i].used_level = used_profile.component_names[ components_used[i].name ];
+          }
+          version = _version;
+          return true;
+        }
+        else {
+          err_msg = "File with profile definition could not be found. " +
+                    string( "Path used is:\n" ) + profile_path + "\n";
+          return false;
+        }
+    }
+    err_msg = "Profile " + profile +
+      " is currently not supported by H3DAPI.\n";
+    return false;
+  }
+  else {
+    // TODO:
+    // check components against already included components
+    // if any of the components does not exist or
+    // any of the components in the new profile have a higher
+    // level than the components already defined then print error message
+    // and return false, else just return true;
+    err_msg = "Profile is already set to " + used_profile.name + "\n";
+    return true;
+  }
+}
+
+bool ProfilesAndComponents::addComponent( std::string component, int level,
+                                          string &err_msg ) {
+  if( !instance ) {
+    instance = new ProfilesAndComponents();
+  }
+
+  return instance->addComponentInternal( component, level, err_msg );
+}
+
+bool ProfilesAndComponents::addComponentInternal( std::string component,
+                                                  int level,
+                                                  string &err_msg ) {
+  if( !main_profile_set ) {
+    if( components_supported[version].find( component ) != components_supported[version].end() ) {
+      if( level <= components_supported[version][ component ] ) {
+        //cerr << component << " " << level << endl;
+        int place = -1;
+        if( findComponent( components_used, component, place ) ) {
+          if( components_used[ place ].used_level < level )
+            components_used[ place ].used_level = level;
+        }
+        else {
+          auto_ptr< SAX2XMLReader > parser( ProfilesAndComponentsInternal::getNewXMLParser() );
+          ProfileSAX2Handlers handler;
+          parser->setContentHandler(&handler);
+          parser->setErrorHandler(&handler);
+          char *r = getenv( "H3D_ROOT" );
+          string h3d_root = r ? r : "";
+          string component_path = h3d_root + "/Conformance/" + version +"/Components/" + component + ".xml";
+          ifstream component_file( component_path.c_str() );
+          component_file.close();
+          if( !component_file.fail() ) {
+            //cerr << component_path << endl;
+            parser->parse( component_path.c_str() );
+          }
+          else {
+            err_msg = "File with component definition could not be found. " +
+              string( "Path used is:\n" ) + component_path + "\n";
+            return false;
+          }
+
+          ProfileSAX2Handlers::myX3DComponent temp_comp = handler.getComponentVector().front();
+          temp_comp.conformance_level = components_supported[version][component];
+          temp_comp.used_level = level;
+          components_used.push_back( temp_comp );
+        }
+        return true;
+      }
+      else {
+        stringstream stm, stm2;
+        stm << level;
+        stm2 << components_supported[version][ component ];
+        err_msg = "Component " + component + " at level " + stm.str() +
+          " is not supported by H3DAPI. " +
+          "The maximum level for this component supported by H3DAPI is "
+          + stm2.str() + ".\n";
+        return false;
+      }
+    }
+    err_msg = "Component " + component + " is not defined for version "
+      + version + " of the X3D specification.\n";
+    return false;
+  } else {
+    int place = -1;
+    if( !findComponent( components_used, component, place ) ) {
+      stringstream stm;
+      stm << level;
+      err_msg = "Component " + component + " at level "
+        + stm.str()
+        + " was not defined in the first profile definition \n";
+      return false;
+    }
+    else if( components_used[ place ].used_level < level ) {
+      stringstream stm, stm2;
+      stm << level;
+      stm2 << components_used[ place ].used_level;
+      err_msg = "The level of component " + component +
+        " is higher than when the component was first defined. The level is "
+        + stm.str() + " but should not be higher than " +
+        stm2.str() + "  \n";
+      return false;
+    }
+    return true;
+  }
+}
+
+void ProfilesAndComponents::setMainProfileDone( bool _main_profile_set ) {
+  if( !instance->main_profile_set ) {
+    //cerr << "setting main_profile_set" << endl;
+    instance->main_profile_set = _main_profile_set;
+    /*cerr << "The components: " << endl;
+    for( int i = 0; i < (int)instance->components_used.size(); i++ ) {
+      cerr << instance->components_used[i].name << " " << instance->components_used[i].conformance_level << " " << instance->components_used[i].used_level << endl;
+    }*/
+  }
+}
+
+bool ProfilesAndComponents::findComponent( ProfileSAX2Handlers::myX3DComponentVector &component_vector,
+                    string name, int &place ) {
+    for( int i = 0; i < (int)component_vector.size(); i++ ) {
+    if( component_vector[i].name == name ) {
+      place = i;
+      return true;
+    }
+  }
+  return false;
+}

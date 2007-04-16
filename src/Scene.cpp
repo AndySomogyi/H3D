@@ -42,6 +42,7 @@
 #include "X3DShapeNode.h"
 
 #include "X3DPointingDeviceSensorNode.h"
+#include "ProfilesAndComponents.h"
 
 using namespace H3D;
 
@@ -225,6 +226,8 @@ Scene::~Scene() {
 
   if( last_traverseinfo )
     delete last_traverseinfo;
+
+  ProfilesAndComponents::destroy();
 }
 
 void Scene::mainLoop() {
