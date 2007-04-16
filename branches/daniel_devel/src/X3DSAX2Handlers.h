@@ -82,7 +82,10 @@ namespace H3D {
         DEF_map( dn ),
         exported_nodes( _exported_nodes ),
         proto_declarations( _proto_declarations ),
-        locator( NULL ){
+        locator( NULL ),
+        profile_set( false ),
+        meta_set( false ),
+        inside_head(false){
         if( !DEF_map ) {
           DEF_map = new DEFNodes();
         }
@@ -339,6 +342,14 @@ namespace H3D {
       /// the location of any document handler event in the XML source 
       /// document.
       Locator *locator;
+
+      /// Set after a profile is found
+      /// (either in the X3D tag or in a PROFILE statement)
+      bool profile_set;
+
+      /// Set after a META is set
+      bool meta_set;
+      bool inside_head;
         
     };
   } 
