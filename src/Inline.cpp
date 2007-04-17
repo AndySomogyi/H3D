@@ -101,6 +101,11 @@ void Inline::traverseSG( TraverseInfo &ti ) {
 void Inline::LoadedScene::update() {
   Inline *inline_node = static_cast< Inline * >( getOwner() );
   value.clear();
+  
+  // should be temporary fix, when creating and deleting a Inline node without
+  // doing anything with it there is a problem with calling clear() 
+  // ( the call to map< const string, Node * >::begin() in DEFNodes.h
+  // is the problem.
   if( !inline_node->exported_nodes.empty() )
     inline_node->exported_nodes.clear();
   bool load = static_cast< SFBool * >( routes_in[0] )->getValue();
