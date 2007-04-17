@@ -113,6 +113,9 @@ namespace H3D {
 
   protected:
     OggVorbis_File ogg_file;
+    // used to know if ov_clear should be called
+    // there was a problem when creating and destroying OggFileReader
+    // without using it.
     bool should_clear;
     vorbis_info* info;
     vorbis_comment *comment;
