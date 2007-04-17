@@ -107,6 +107,10 @@ namespace H3D {
 	map< const string, Node * >::clear();
       }
 
+      bool empty() {
+        return map< const string, Node * >::empty();
+      }
+
       /// Get the node by its DEF name.
       /// \param def_name The DEF name of the node as specified in the 
       /// X3D input.

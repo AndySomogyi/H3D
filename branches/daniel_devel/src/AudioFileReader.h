@@ -51,11 +51,14 @@ namespace H3D {
   public:
 
     /// Constructor.
-    AudioFileReader() {}
+    AudioFileReader() {
+      file = NULL;
+    }
 
     /// Destructor.
     ~AudioFileReader() {
-      afCloseFile( file );
+      if( file )
+        afCloseFile( file );
     }
 
     /// Load a sound file from the given url that will be used to
