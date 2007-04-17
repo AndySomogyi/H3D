@@ -86,7 +86,7 @@ ProfilesAndComponents::ProfilesAndComponents(): main_profile_set( false ) {
   components_supported["3.0"]["Core"] = 2;
   components_supported["3.0"]["DIS"] = 0;
   components_supported["3.0"]["EnvironmentalEffects"] = 3;
-  components_supported["3.0"]["EnvironmentalSensor"] = 0;
+  components_supported["3.0"]["EnvironmentalSensor"] = 2;
   components_supported["3.0"]["EventUtilities"] = 1;
   components_supported["3.0"]["Geometry2D"] = 2;
   components_supported["3.0"]["Geometry3D"] = 4;
@@ -95,15 +95,15 @@ ProfilesAndComponents::ProfilesAndComponents(): main_profile_set( false ) {
   components_supported["3.0"]["H3DAPI"] = 1;
   components_supported["3.0"]["H-Anim"] = 0;
   components_supported["3.0"]["Interpolation"] = 3;
-  components_supported["3.0"]["KeyDeviceSensor"] = 1;
+  components_supported["3.0"]["KeyDeviceSensor"] = 2;
   components_supported["3.0"]["Lighting"] = 3;
-  components_supported["3.0"]["Navigation"] = 1;
+  components_supported["3.0"]["Navigation"] = 2;
   components_supported["3.0"]["Networking"] = 1;
   components_supported["3.0"]["NURBS"] = 0;
   components_supported["3.0"]["PointingDeviceSensor"] = 1;
-  components_supported["3.0"]["Rendering"] = 5;
+  components_supported["3.0"]["Rendering"] = 4;
   components_supported["3.0"]["Scripting"] = 1;
-  components_supported["3.0"]["Shape"] = 4;
+  components_supported["3.0"]["Shape"] = 3;
   components_supported["3.0"]["Sound"] = 1;
   components_supported["3.0"]["Text"] = 1;
   components_supported["3.0"]["Texturing"] = 3;
@@ -114,7 +114,7 @@ ProfilesAndComponents::ProfilesAndComponents(): main_profile_set( false ) {
   components_supported["3.1"]["CubeMapTexturing"] = 1;
   components_supported["3.1"]["DIS"] = 0;
   components_supported["3.1"]["EnvironmentalEffects"] = 3;
-  components_supported["3.1"]["EnvironmentalSensor"] = 0;
+  components_supported["3.1"]["EnvironmentalSensor"] = 2;
   components_supported["3.1"]["EventUtilities"] = 1;
   components_supported["3.1"]["Geometry2D"] = 2;
   components_supported["3.1"]["Geometry3D"] = 4;
@@ -123,16 +123,16 @@ ProfilesAndComponents::ProfilesAndComponents(): main_profile_set( false ) {
   components_supported["3.1"]["H3DAPI"] = 1;
   components_supported["3.1"]["H-Anim"] = 0;
   components_supported["3.1"]["Interpolation"] = 3;
-  components_supported["3.1"]["KeyDeviceSensor"] = 1;
+  components_supported["3.1"]["KeyDeviceSensor"] = 2;
   components_supported["3.1"]["Lighting"] = 3;
-  components_supported["3.1"]["Navigation"] = 1;
+  components_supported["3.1"]["Navigation"] = 2;
   components_supported["3.1"]["Networking"] = 1;
   components_supported["3.1"]["NURBS"] = 0;
   components_supported["3.1"]["PointingDeviceSensor"] = 1;
-  components_supported["3.1"]["Rendering"] = 5;
+  components_supported["3.1"]["Rendering"] = 4;
   components_supported["3.1"]["Scripting"] = 1;
   components_supported["3.1"]["Shaders"] = 1;
-  components_supported["3.1"]["Shape"] = 4;
+  components_supported["3.1"]["Shape"] = 3;
   components_supported["3.1"]["Sound"] = 1;
   components_supported["3.1"]["Text"] = 1;
   components_supported["3.1"]["Texturing"] = 3;
@@ -144,7 +144,7 @@ ProfilesAndComponents::ProfilesAndComponents(): main_profile_set( false ) {
   components_supported["3.2"]["CubeMapTexturing"] = 1;
   components_supported["3.2"]["DIS"] = 0;
   components_supported["3.2"]["EnvironmentalEffects"] = 3;
-  components_supported["3.2"]["EnvironmentalSensor"] = 0;
+  components_supported["3.2"]["EnvironmentalSensor"] = 2;
   components_supported["3.2"]["EventUtilities"] = 1;
   components_supported["3.2"]["Followers"] = 0;
   components_supported["3.2"]["Geometry2D"] = 2;
@@ -154,11 +154,11 @@ ProfilesAndComponents::ProfilesAndComponents(): main_profile_set( false ) {
   components_supported["3.2"]["H-Anim"] = 0;
   components_supported["3.2"]["H3DAPI"] = 1;
   components_supported["3.2"]["Interpolation"] = 3;
-  components_supported["3.2"]["KeyDeviceSensor"] = 1;
+  components_supported["3.2"]["KeyDeviceSensor"] = 2;
   components_supported["3.2"]["Layering"] = 0;
   components_supported["3.2"]["Layout"] = 0;
   components_supported["3.2"]["Lighting"] = 3;
-  components_supported["3.2"]["Navigation"] = 1;
+  components_supported["3.2"]["Navigation"] = 3;
   components_supported["3.2"]["Networking"] = 1;
   components_supported["3.2"]["NURBS"] = 0;
   components_supported["3.2"]["ParticleSystems"] = 0;
@@ -211,40 +211,41 @@ bool ProfilesAndComponents::setProfileInternal( string profile,
   }
   auto_ptr< SAX2XMLReader > parser( ProfilesAndComponentsInternal::getNewXMLParser() );
 
-  if( !main_profile_set ) {
-    if( find( profiles_supported.begin(),
-      profiles_supported.end(),
-      profile ) != profiles_supported.end() ) {
-        ProfileSAX2Handlers handler;
-        parser->setContentHandler(&handler);
-        parser->setErrorHandler(&handler);
-        char *r = getenv( "H3D_ROOT" );
-        string h3d_root = r ? r : "";
-        string profile_path = h3d_root + "/Conformance/" + _version +"/Profiles/" + profile + ".xml";
-        ifstream profile_file( profile_path.c_str() );
-        profile_file.close();
-        if( !profile_file.fail() ) {
-          parser->parse( profile_path.c_str() );
-          //cerr << profile_path << endl;
-          ProfileSAX2Handlers::myX3DProfileVector parsed_profile =
-            handler.getProfileVector();
-          //used_profile = profile;
-          used_profile = parsed_profile.front();
+  if( find( profiles_supported.begin(),
+    profiles_supported.end(),
+    profile ) != profiles_supported.end() ) {
+      ProfileSAX2Handlers handler;
+      parser->setContentHandler(&handler);
+      parser->setErrorHandler(&handler);
+      char *r = getenv( "H3D_ROOT" );
+      string h3d_root = r ? r : "";
+      string profile_path = h3d_root + "/Conformance/" + _version +"/Profiles/" + profile + ".xml";
+      ifstream profile_file( profile_path.c_str() );
+      profile_file.close();
+      if( !profile_file.fail() ) {
+        parser->parse( profile_path.c_str() );
+        //cerr << profile_path << endl;
+        ProfileSAX2Handlers::myX3DProfileVector parsed_profile =
+          handler.getProfileVector();
+        //used_profile = profile;
+        ProfileSAX2Handlers::myX3DProfile temp_profile = parsed_profile.front();
+        if( !main_profile_set ) {
+          used_profile = temp_profile;
           for( map< string, int >::iterator i = used_profile.component_names.begin();
-               i != used_profile.component_names.end();
-               i++ ) {
-            string component_path = h3d_root + "/Conformance/" + _version +"/Components/" + (*i).first + ".xml";
-            ifstream component_file( component_path.c_str() );
-            component_file.close();
-            if( !component_file.fail() ) {
-              //cerr << component_path << endl;
-              parser->parse( component_path.c_str() );
-            }
-            else {
-              err_msg = "File with component definition could not be found. " +
-                    string( "Path used is:\n" ) + component_path + "\n";
-              return false;
-            }
+            i != used_profile.component_names.end();
+            i++ ) {
+              string component_path = h3d_root + "/Conformance/" + _version +"/Components/" + (*i).first + ".xml";
+              ifstream component_file( component_path.c_str() );
+              component_file.close();
+              if( !component_file.fail() ) {
+                //cerr << component_path << endl;
+                parser->parse( component_path.c_str() );
+              }
+              else {
+                err_msg = "File with component definition could not be found. " +
+                  string( "Path used is:\n" ) + component_path + "\n";
+                return false;
+              }
           }
           components_used = handler.getComponentVector();
           for( int i = 0; i < (int)components_used.size(); i++ ) {
@@ -255,25 +256,40 @@ bool ProfilesAndComponents::setProfileInternal( string profile,
           return true;
         }
         else {
-          err_msg = "File with profile definition could not be found. " +
-                    string( "Path used is:\n" ) + profile_path + "\n";
-          return false;
+          for( map< string, int >::iterator i = temp_profile.component_names.begin();
+               i != temp_profile.component_names.end();
+               i++ ) {
+            int place;
+            if( findComponent( components_used, (*i).first, place ) ) {
+              stringstream stm;
+              stm << (*i).second;
+              if( components_used[ place ].conformance_level < (*i).second ) {
+                err_msg = "Profile " + profile + " for version " + _version +
+                  " contains a component named "
+                  + (*i).first + " with level " + stm.str() +
+             " which is higher than in the the original profile definition.\n";
+              return false;
+              }              
+            }
+            else {
+              err_msg = "Profile " + profile + 
+                        " contains a component which is not in the original" +
+                        string(" profile definition.\n");
+              return false;
+            }
+          }
+          return true;
         }
-    }
-    err_msg = "Profile " + profile +
-      " is currently not supported by H3DAPI.\n";
-    return false;
+      }
+      else {
+        err_msg = "File with profile definition could not be found. " +
+          string( "Path used is:\n" ) + profile_path + "\n";
+        return false;
+      }
   }
-  else {
-    // TODO:
-    // check components against already included components
-    // if any of the components does not exist or
-    // any of the components in the new profile have a higher
-    // level than the components already defined then print error message
-    // and return false, else just return true;
-    err_msg = "Profile is already set to " + used_profile.name + "\n";
-    return true;
-  }
+  err_msg = "Profile " + profile +
+    " is currently not supported by H3DAPI.\n";
+  return false;
 }
 
 bool ProfilesAndComponents::addComponent( std::string component, int level,
