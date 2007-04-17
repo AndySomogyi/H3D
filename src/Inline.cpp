@@ -101,7 +101,8 @@ void Inline::traverseSG( TraverseInfo &ti ) {
 void Inline::LoadedScene::update() {
   Inline *inline_node = static_cast< Inline * >( getOwner() );
   value.clear();
-  inline_node->exported_nodes.clear();
+  if( !inline_node->exported_nodes.empty() )
+    inline_node->exported_nodes.clear();
   bool load = static_cast< SFBool * >( routes_in[0] )->getValue();
   if( load ) {
     MFString *urls = static_cast< MFString * >( routes_in[1] );

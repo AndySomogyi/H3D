@@ -75,7 +75,9 @@ void CoordinateInterpolator2D::MFValue::update() {
     static_cast<CoordinateInterpolator2D*>(owner)->lookupKey( fraction,
                                                               weight );
   vector< Vec2f > key_values = static_cast<MFVec2f*>(routes_in[2])->getValue();
-  int value_size = key_values.size() / key_size;
+  int value_size = 0;
+  if( key_size != 0 )
+   value_size = key_values.size() / key_size;
   value.resize( value_size );
 
   if ( key_index >= 0 && 

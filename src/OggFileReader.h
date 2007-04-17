@@ -49,11 +49,14 @@ namespace H3D {
   public:
 
     /// Constructor.
-    OggFileReader() {}
+    OggFileReader() {
+      should_clear = false;
+    }
 
     /// Destructor.
     ~OggFileReader() {
-      ov_clear( &ogg_file );
+      if( should_clear )
+        ov_clear( &ogg_file );
     }
 
     /// Load a sound file from the given url that will be used to
@@ -110,6 +113,7 @@ namespace H3D {
 
   protected:
     OggVorbis_File ogg_file;
+    bool should_clear;
     vorbis_info* info;
     vorbis_comment *comment;
     string url;
