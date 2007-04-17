@@ -35,7 +35,7 @@ using namespace H3D;
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase X3DShaderNode::database( 
                                    "X3DShaderNode", 
-                                   &(newInstance<X3DShaderNode>), 
+                                   NULL, 
                                    typeid( X3DShaderNode ),
                                    &X3DAppearanceChildNode::database );
 
