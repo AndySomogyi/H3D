@@ -95,6 +95,8 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
                           vp->centerOfRotation->getValue() );
       }
     }
+    else if( detect_collision )
+      vp->detectCollision( avatar_size, topNode );
   }
   else if( navigation_type == "WALK" ) {
     Vec3f translation_delta;
@@ -119,6 +121,8 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
           << "Avatar is undefined ";
       }
     }
+    else if( detect_collision )
+      vp->detectCollision( avatar_size, topNode );
   }
   else if( navigation_type == "FLY" ) {
     Vec3f translation_delta;
@@ -142,6 +146,8 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
           << "Avatar is undefined ";
       }
     }
+    else if( detect_collision )
+      vp->detectCollision( avatar_size, topNode );
   }
   else if( navigation_type == "LOOKAT" ) {
     Vec3f translation_delta;
@@ -235,8 +241,12 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
           // where fly and walk would detect collision.
       }
     }
+    else if( detect_collision )
+      vp->detectCollision( avatar_size, topNode );
   }
   else if( navigation_type == "NONE" ) {
+    if( detect_collision )
+      vp->detectCollision( avatar_size, topNode );
   }
 }
 
