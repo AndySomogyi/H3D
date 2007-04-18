@@ -260,10 +260,10 @@ bool ProfilesAndComponents::setProfileInternal( string profile,
                i != temp_profile.component_names.end();
                i++ ) {
             int place;
-            if( !findComponent( components_used, (*i).first, place ) ) {
+            if( findComponent( components_used, (*i).first, place ) ) {
               stringstream stm;
               stm << (*i).second;
-              if( components_used[ place ].conformance_level < (*i).second ) {
+              if( components_used[ place ].used_level < (*i).second ) {
                 err_msg = "Profile " + profile + " for version " + _version +
                   " contains a component named "
                   + (*i).first + " with level " + stm.str() +
