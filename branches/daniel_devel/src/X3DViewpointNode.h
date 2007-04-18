@@ -298,6 +298,10 @@ namespace H3D {
     /// without changing the position or orientation fields.
     virtual void moveTo( Vec3f new_pos );
 
+    /// Function for detecting collision between avatar and objects
+    virtual bool detectCollision( const vector< H3DFloat > &avatar_size,
+                                  X3DChildNode * topNode );
+
     typedef list< X3DViewpointNode * > ViewpointList;
     
     /// Returns a list of all current X3DViewpointNode instances.

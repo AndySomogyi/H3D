@@ -243,3 +243,12 @@ void X3DViewpointNode::translate( Vec3f direction, bool collision,
 void X3DViewpointNode::moveTo( Vec3f new_pos ) {
   rel_pos = new_pos - position->getValue();
 }
+bool X3DViewpointNode::detectCollision( const vector< H3DFloat > &avatar_size,
+                                        X3DChildNode * topNode ) {
+  Vec3f vp_full_pos =
+    accForwardMatrix->getValue() *  (position->getValue() + rel_pos );
+  return topNode->movingSphereIntersect( avatar_size[0],
+                                         vp_full_pos,
+                                         vp_full_pos );
+}
+
