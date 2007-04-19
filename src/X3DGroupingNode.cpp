@@ -32,6 +32,7 @@
 #include "H3DRenderStateObject.h"
 #include "MatrixTransform.h"
 #include "X3DPointingDeviceSensorNode.h"
+#include "X3DShapeNode.h"
 
 using namespace H3D;
 
@@ -181,6 +182,19 @@ bool X3DGroupingNode::lineIntersect(
                                             current_matrix,
                                             geometry_transforms ) ) {
           intersect = true;
+      }
+    }
+  }
+  else {
+    // ugly ugly solution, somehow change this, the problem is that
+    // when optimizing the collision detection by first colliding against
+    // bounding box the system for keeping track of geometries per pointing
+    // device sensor gets screwed up.
+    const NodeVector &children_nodes = children->getValue();
+    for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
+      X3DShapeNode * temp_shape = dynamic_cast< X3DShapeNode * >(children_nodes[i]);
+      if( temp_shape ) {
+        temp_shape->geometry->getValue()->increaseCurrentGeometry();
       }
     }
   }

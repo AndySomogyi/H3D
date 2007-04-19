@@ -106,7 +106,11 @@ namespace H3D {
   /// pointer will be eligible for activation.
   ///
   // TODO: Allowing for 3D pointing device. 
-  // ( which could be a haptics device perhaps)
+  // (which could be a haptics device perhaps)
+  // Maybe change behaviour for 
+  // the case when several sensors are defined under eachother
+  // read behaviour of multisensor.x3d ( in X3Ds conformance test and test)
+  // to understand.
 
   class H3DAPI_API X3DPointingDeviceSensorNode : 
     public X3DSensorNode {
@@ -131,38 +135,8 @@ namespace H3D {
         SFBool::setValue( b, id );
       }
     protected:
-      virtual void update() {
-        SFBool::update();
-        X3DPointingDeviceSensorNode *ts = 
-              static_cast< X3DPointingDeviceSensorNode * >( getOwner() );
-        if( ts->is_enabled ) {
-          bool itIsActive = false;
-          bool leftButton = 
-            static_cast< SFBool * >( routes_in[0] )->getValue();
-          bool isOver = static_cast< SFBool * >( routes_in[1] )->getValue();
-          if( leftButton ) {
-            if( !left_mouse_miss && 
-                ( isOver || ts->isActive->getValue() ) )
-              itIsActive = true;
-            else
-              left_mouse_miss = true;
-          }
-          else {
-            itIsActive = false;
-            left_mouse_miss = false;
-          }
+      virtual void update();
 
-          if( itIsActive != ts->isActive->getValue() ) {
-            ts->isActive->setValue( itIsActive, ts->id );
-            if( itIsActive ) {
-              number_of_active++;
-            }
-            else {
-              number_of_active--;
-            }
-          }
-        }
-      }
       bool left_mouse_miss;
     };
 #ifdef __BORLANDC__

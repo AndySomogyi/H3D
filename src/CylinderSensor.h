@@ -142,6 +142,7 @@ namespace H3D {
       Set_CylinderEvents() {
         new_cylinder = true;
         y_axis = Vec3f( 0, 1, 0 );
+        plane_d = 0.0f;
       }
 
       virtual void setValue( const bool &b, int id = 0 ) {
