@@ -59,21 +59,16 @@ X3DEnvironmentalSensorNode::X3DEnvironmentalSensorNode(	Inst< SFNode > _metadata
 								center( _center),
 								size( _size ),
 								enterTime( _enterTime ),
-								exitTime( _exitTime ),
-								checkVolume( new CheckVolume ){
+								exitTime( _exitTime ){
 
   type_name = "X3DEnvironmentalSensorNode";
   database.initFields( this );
-
-  checkVolume->setOwner( this );
 
   center->setValue( Vec3f( 0, 0, 0) );
   size->setValue( Vec3f( 0, 0, 0) );
 
   enterTime->setValue( 0.0, id );
   exitTime->setValue( 0.0, id );
-
-  size->route( checkVolume );
   
 }
 

@@ -127,12 +127,10 @@ namespace H3D {
       /// Sets either the exitTime or enterTime field depending
       /// on the new value.
       virtual void setValue( const bool &b, int id = 0 ) {
-        //cerr<<"autoupdate"<<endl;
-		SFBool::setValue( b , id );
+      	SFBool::setValue( b , id );
         ProximitySensor *ps = 
           static_cast< ProximitySensor * >( getOwner() );
-		//cerr<< value << endl;
-        if( value )
+	    if( value )
 			ps->enterTime->setValue( TimeStamp() , ps->id ); 
         else 
             ps->exitTime->setValue( TimeStamp() , ps->id ); 
@@ -142,23 +140,13 @@ namespace H3D {
       /// on the new value.
       virtual void update() {
         SFBool::update();
-        //cerr<<"update"<<endl;
-		ProximitySensor *ps = 
+    	ProximitySensor *ps = 
           static_cast< ProximitySensor * >( getOwner() );
-
 		if( value )
-		{
 			ps->enterTime->setValue( TimeStamp() , ps->id );
-			cerr<<"The object enters the scene"<<endl;
-			//cerr<<TimeStamp::getCurrentTime()<< endl;
-		}
-        else 
-		{
+	    else 
 			ps->exitTime->setValue( TimeStamp(), ps->id ); 
-			cerr<<"The object exits the scene"<<endl;
-		    //cerr<<ps->exitTime->getValue()<< endl;
-		}
-      }
+	  }
 	};
 
     /// Constructor.
@@ -209,18 +197,14 @@ namespace H3D {
     /// \dotfile ProximitySensor_setTime.dot
 	auto_ptr< SetTime > setTime;
 
-	// Internal Vectors for previous values of center and size of
-	// proximitysensor
-	Vec3f prev_center;
-	Vec3f prev_size;
-
-	// Internal Vectors for previous position, orientation and
-	// center of rotation of viewpoint
+	int prevTravInfoAdr;
+	
+	
+	// Internal Vectors for previous position of viewpoint
 	Vec3f prev_vp_pos;
-	Rotation prev_vp_orn;
-	Matrix4f prevAccForwMatrix;
-	Vec3f prev_vp_cor;
-		
+	Vec3f can_prev_vp_pos;
+
+	
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   };

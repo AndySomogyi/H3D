@@ -45,34 +45,6 @@ namespace H3D {
   class H3DAPI_API X3DEnvironmentalSensorNode : public X3DSensorNode {
   public:
 
-	/// The CheckVolume class is specialize to check whether any 
-    /// value of the size is zeor or not, if any it disables the 
-    /// node .
-    class H3DAPI_API CheckVolume: public AutoUpdate< SFVec3f > {
-    public:
-      virtual void setValue( const Vec3f &b, int id = 0 ) {
-		  SFVec3f::setValue( b );
-        X3DEnvironmentalSensorNode *esn = 
-          static_cast< X3DEnvironmentalSensorNode * >( getOwner() );
-		if(  value.x <= 0.0 ||
-			 value.y <= 0.0 ||
-			 value.z <= 0.0 )
-			 esn->enabled->setValue( false, esn->id );
-        else esn->enabled->setValue( true, esn->id );
-      }
-    protected:
-      virtual void update() {
-        SFVec3f::update();
-        X3DEnvironmentalSensorNode *esn = 
-          static_cast< X3DEnvironmentalSensorNode * >( getOwner() );
-        if(  value.x <= 0.0 ||
-			 value.y <= 0.0 ||
-			 value.z <= 0.0 )
-			 esn->enabled->setValue( false, esn->id );
-        else esn->enabled->setValue( true, esn->id );
-      }
-    };
-    
     /// Constructor.
     X3DEnvironmentalSensorNode( 
                 Inst< SFNode >  _metadata   = 0,
@@ -113,17 +85,7 @@ namespace H3D {
     /// \dotfile X3DEnvironmentalSensorNode_exitTime.dot
 	  auto_ptr< SFTime >  exitTime;
 
-	/// The field checking the size
-    /// 
-    /// <b>Access type:</b> inputOnly \n
-    /// 
-    /// \dotfile X3DEnvironmentalSensorNode_checkVolume.dot
-
-  	  auto_ptr< CheckVolume >  checkVolume;
-
-
-
-    /// The H3DNodeDatabase for this node.
+	/// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   };
 }
