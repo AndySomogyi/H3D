@@ -32,6 +32,8 @@
 #include "X3DEnvironmentalSensorNode.h"
 #include "SFVec3f.h"
 #include "X3DViewpointNode.h"
+//#include "hash_map.h"
+
 
 namespace H3D {
 
@@ -97,8 +99,6 @@ namespace H3D {
       Inst< SFTime >  _exitTime   = 0,
       Inst< SFBool >  _enabled    = 0,
       Inst< SFBool >  _isActive   = 0);
-
-
     
     /// The SetTime class is specialize to set the value of either
     /// the inputTrue or inputFalse field in the BooleanFilter node
@@ -112,12 +112,11 @@ namespace H3D {
         SFBool::setValue( b , id );
         VisibilitySensor *vs = 
           static_cast< VisibilitySensor * >( getOwner() );
-        //cerr<< value << endl;
         if( value )
           vs->enterTime->setValue( TimeStamp() , vs->id ); 
         else 
           vs->exitTime->setValue( TimeStamp() , vs->id ); 
-      }
+	  }
     protected:
       /// Sets either the inputTrue or inputFalse field depending
       /// on the new value.
@@ -126,19 +125,12 @@ namespace H3D {
         VisibilitySensor *vs = 
           static_cast< VisibilitySensor * >( getOwner() );
         if( value )
-        {
-          vs->enterTime->setValue( TimeStamp::now() , vs->id );
-		  //cout<<"The object enters the scene"<<endl;
-          //cerr<<TimeStamp::getCurrentTime()<< endl;
-        }
-        else 
-        {
-          vs->exitTime->setValue( TimeStamp::now(), vs->id ); 
-		  //cout<<"The object exits the scene"<<endl;
-          //cerr<<ps->exitTime->getValue()<< endl;
-        }
-      }
-    }; 
+          vs->enterTime->setValue( TimeStamp() , vs->id );
+		else 
+          vs->exitTime->setValue( TimeStamp(), vs->id ); 
+		}
+	};
+ 
 
     // travese func.
     virtual void traverseSG( TraverseInfo &ti ); 
@@ -153,16 +145,24 @@ namespace H3D {
     /// \dotfile ProximitySensor_setTime.dot
 	auto_ptr< SetTime > setTime;
 
-    // Internal Vectors for previous values of center and size of
-	// visibilitysensor
-	Vec3f prev_center;
-	Vec3f prev_size;
-	
-	
-	// Internal Vectors for previous position and orientation of
-	// viewpoint
-	Vec3f prev_vp_glob_pos;
-	Rotation prev_vp_glob_rot;
+   	// Adress of traverseInfo 
+	int prevTravInfoAdr;
+
+	//  Number of Instances(DEF/USE) cases in the previous traverseSG
+	int prevMaxNoInstances;
+	//  The variable keeping the instance no in a traverseSG
+	int NoInstance;
+
+	//  List of NoInstances of visible instances
+	vector < int > list;
+	//  The threshold : an object is considered as visible if the no of
+	//  visible pixels exceeds the threshold value
+	int visib_pix_no_threshold;
+
+	// Internal Vectors for previous position, orientation and
+	// center of rotation of viewpoint
+	Vec3f prev_vp_pos;
+	Vec3f can_prev_vp_pos;
     
    /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
