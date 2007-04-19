@@ -29,6 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "X3DPointingDeviceSensorNode.h"
+#include "H3DNavigation.h"
 
 using namespace H3D;
 
@@ -217,4 +218,40 @@ int X3DPointingDeviceSensorNode::
     }
   }
   return -1;
+}
+
+void X3DPointingDeviceSensorNode::SetIsActive::update() {
+  SFBool::update();
+  X3DPointingDeviceSensorNode *ts = 
+    static_cast< X3DPointingDeviceSensorNode * >( getOwner() );
+  if( ts->is_enabled ) {
+    bool itIsActive = false;
+    bool leftButton = 
+      static_cast< SFBool * >( routes_in[0] )->getValue();
+    bool isOver = static_cast< SFBool * >( routes_in[1] )->getValue();
+    if( leftButton ) {
+      if( !left_mouse_miss && 
+        ( isOver || ts->isActive->getValue() ) )
+        itIsActive = true;
+      else
+        left_mouse_miss = true;
+    }
+    else {
+      itIsActive = false;
+      left_mouse_miss = false;
+    }
+
+    if( itIsActive != ts->isActive->getValue() ) {
+      ts->isActive->setValue( itIsActive, ts->id );
+      if( itIsActive ) {
+        number_of_active++;
+        H3DNavigation::disableDevice( H3DNavigation::MOUSE );
+      }
+      else {
+        number_of_active--;
+        if( number_of_active == 0 )
+          H3DNavigation::enableDevice( H3DNavigation::MOUSE );
+      }
+    }
+  }
 }

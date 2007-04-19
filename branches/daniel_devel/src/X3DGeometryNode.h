@@ -247,7 +247,13 @@ namespace H3D {
       }
     }
 
+    /// Resets things for x3dpointingdevicesensors.
     void resetPtDevIndication( bool clear );
+
+    /// increases the counter which keeps track of the current geometry
+    /// instance for DEF/USE
+    // TODO: change this system somehow
+    void increaseCurrentGeometry();
 
     /// Tells if a HapticsDevice has been in contact with the geometry
     /// in the last scenegraph loop. The field contains a boolean for 

@@ -733,3 +733,8 @@ bool X3DGeometryNode::movingSphereIntersect( H3DFloat radius,
                                                        from * 1000.0f,
                                                        to * 1000.0f );
 }
+
+void X3DGeometryNode::increaseCurrentGeometry() {
+  if( !pt_dev_geometry_id.empty() )
+    current_geometry_id++;
+}
