@@ -44,10 +44,10 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase IndexedTriangleSet::database( 
-                                             "IndexedTriangleSet", 
-                                             &(newInstance<IndexedTriangleSet>),
-                                             typeid( IndexedTriangleSet ),
-                                             &X3DComposedGeometryNode::database );
+  "IndexedTriangleSet", 
+  &(newInstance<IndexedTriangleSet>),
+  typeid( IndexedTriangleSet ),
+  &X3DComposedGeometryNode::database );
 
 namespace IndexedTriangleSetInternals {
   FIELDDB_ELEMENT( IndexedTriangleSet, set_index, INPUT_ONLY );
@@ -57,48 +57,49 @@ namespace IndexedTriangleSetInternals {
 
 
 IndexedTriangleSet::IndexedTriangleSet( 
-                              Inst< SFNode                  > _metadata,
-                              Inst< SFBound                 > _bound,
-                              Inst< DisplayList             > _displayList,         
-                              Inst< SFColorNode             > _color,
-                              Inst< SFCoordinateNode        > _coord,
-                              Inst< SFNormalNode            > _normal,
-                              Inst< SFTextureCoordinateNode > _texCoord,
-                              Inst< SFBool                  > _ccw,
-                              Inst< SFBool                  > _colorPerVertex,
-                              Inst< SFBool                  > _normalPerVertex,
-                              Inst< SFBool                  > _solid,
-                              Inst< MFVertexAttributeNode   > _attrib,
-                              Inst< AutoNormal              > _autoNormal,
-                              Inst< MFInt32                 > _set_index,
-                              Inst< MFInt32                 > _index ) :
-  X3DComposedGeometryNode( _metadata, _bound, _displayList, 
-                           _color, _coord, _normal, _texCoord, 
-                           _ccw, _colorPerVertex, _normalPerVertex,
-                           _solid, _attrib ),
-  autoNormal( _autoNormal ),   
-  set_index( _set_index ),
-  index( _index ),
-  depth( new SFInt32 ) {
+                                       Inst< SFNode                  > _metadata,
+                                       Inst< SFBound                 > _bound,
+                                       Inst< DisplayList             > _displayList,         
+                                       Inst< SFColorNode             > _color,
+                                       Inst< SFCoordinateNode        > _coord,
+                                       Inst< SFNormalNode            > _normal,
+                                       Inst< SFTextureCoordinateNode > _texCoord,
+                                       Inst< SFBool                  > _ccw,
+                                       Inst< SFBool                  > _colorPerVertex,
+                                       Inst< SFBool                  > _normalPerVertex,
+                                       Inst< SFBool                  > _solid,
+                                       Inst< MFVertexAttributeNode   > _attrib,
+                                       Inst< AutoNormal              > _autoNormal,
+                                       Inst< MFInt32                 > _set_index,
+                                       Inst< MFInt32                 > _index,
+                                       Inst< SFFogCoordinate         > _fogCoord ) :
+X3DComposedGeometryNode( _metadata, _bound, _displayList, 
+                        _color, _coord, _normal, _texCoord, 
+                        _ccw, _colorPerVertex, _normalPerVertex,
+                        _solid, _attrib, _fogCoord ),
+                        autoNormal( _autoNormal ),   
+                        set_index( _set_index ),
+                        index( _index ),
+                        depth( new SFInt32 ) {
 
-  type_name = "IndexedTriangleSet";
-  database.initFields( this );
-  
-  autoNormal->setName( "autoNormal" );
-  autoNormal->setOwner( this );
+                          type_name = "IndexedTriangleSet";
+                          database.initFields( this );
 
-  index->route( displayList );
-  set_index->route( index, id );
+                          autoNormal->setName( "autoNormal" );
+                          autoNormal->setOwner( this );
 
-  normalPerVertex->route( autoNormal );
-  coord->route( autoNormal );
-  index->route( autoNormal );
-  ccw->route( autoNormal );
+                          index->route( displayList );
+                          set_index->route( index, id );
 
-  coord->route( bound );
+                          normalPerVertex->route( autoNormal );
+                          coord->route( autoNormal );
+                          index->route( autoNormal );
+                          ccw->route( autoNormal );
 
-  depth->setValue( 0 );
-  depth->route( displayList );
+                          coord->route( bound );
+
+                          depth->setValue( 0 );
+                          depth->route( displayList );
 }
 
 void IndexedTriangleSet::render() {
@@ -118,24 +119,24 @@ void IndexedTriangleSet::render() {
     tex_coord_node && tex_coord_node->supportsExplicitTexCoords();
 
   const vector< int > &indices  = index->getValue();
- 
+
   if( coordinate_node && !indices.empty() ) {
-    
+
     // no X3DTextureCoordinateNode, so we generate texture coordinates
     // based on the bounding box according to the X3D specification.
     if( tex_coord_gen ) {
       startTexGen( tex_coord_node );
     } 
-    
+
     if( tex_coords_per_vertex &&
-        coordinate_node->nrAvailableCoords() > 
-               tex_coord_node->nrAvailableTexCoords() ) {
-      stringstream s;
-      s << "Must contain at least as many elements as coord (" 
-        << coordinate_node->nrAvailableCoords() << ") in \"" 
-        << getName() << "\" node. ";
-      throw NotEnoughTextureCoordinates( tex_coord_node->nrAvailableTexCoords(),
-                                         s.str(), H3D_FULL_LOCATION );
+      coordinate_node->nrAvailableCoords() > 
+      tex_coord_node->nrAvailableTexCoords() ) {
+        stringstream s;
+        s << "Must contain at least as many elements as coord (" 
+          << coordinate_node->nrAvailableCoords() << ") in \"" 
+          << getName() << "\" node. ";
+        throw NotEnoughTextureCoordinates( tex_coord_node->nrAvailableTexCoords(),
+          s.str(), H3D_FULL_LOCATION );
     }
 
     // if we have a color node we use the color from that instead
@@ -143,13 +144,13 @@ void IndexedTriangleSet::render() {
     if( color_node ) {
       // Make sure we have enough colors      
       if( coordinate_node->nrAvailableCoords() > 
-          color_node->nrAvailableColors() ) {
-        stringstream s;
-        s << "Must contain at least as many elements as coord (" 
-          << coordinate_node->nrAvailableCoords() << ") in \"" 
-          << getName() << "\" node. ";
-        throw NotEnoughColors( color_node->nrAvailableColors(),
-                               s.str(), H3D_FULL_LOCATION );
+        color_node->nrAvailableColors() ) {
+          stringstream s;
+          s << "Must contain at least as many elements as coord (" 
+            << coordinate_node->nrAvailableCoords() << ") in \"" 
+            << getName() << "\" node. ";
+          throw NotEnoughColors( color_node->nrAvailableColors(),
+            s.str(), H3D_FULL_LOCATION );
       }
       glEnable( GL_COLOR_MATERIAL );
     }
@@ -164,7 +165,7 @@ void IndexedTriangleSet::render() {
           if( attr ) {
             GLint loc = 
               glGetAttribLocationARB( shader_program, 
-                                      attr->name->getValue().c_str()); 
+              attr->name->getValue().c_str()); 
             attr->setAttribIndex( loc );
           }
         }
@@ -180,27 +181,29 @@ void IndexedTriangleSet::render() {
       normal_node->renderArray();
       if( color_node ) color_node->renderArray();
       if( tex_coords_per_vertex ) renderTexCoordArray( tex_coord_node );
+      if( fogCoord->getValue()) fogCoord->getValue()->renderArray();
       for( unsigned int attrib_index = 0;
-           attrib_index < attrib->size(); attrib_index++ ) {
-        X3DVertexAttributeNode *attr = 
-          attrib->getValueByIndex( attrib_index );
-        if( attr ) attr->renderArray();
+        attrib_index < attrib->size(); attrib_index++ ) {
+          X3DVertexAttributeNode *attr = 
+            attrib->getValueByIndex( attrib_index );
+          if( attr ) attr->renderArray();
       }
-      
+      cerr << "I indextrianglset "<< endl;
       glDrawElements( GL_TRIANGLES, 
-                      3*nr_triangles, 
-                      GL_UNSIGNED_INT,
-                      &(*(indices.begin()) ) );
-      
+        3*nr_triangles, 
+        GL_UNSIGNED_INT,
+        &(*(indices.begin()) ) );
+
       coordinate_node->disableArray();
       normal_node->disableArray();
       if( color_node ) color_node->disableArray();
       if( tex_coords_per_vertex ) disableTexCoordArray( tex_coord_node );
-       for( unsigned int attrib_index = 0;
-           attrib_index < attrib->size(); attrib_index++ ) {
-        X3DVertexAttributeNode *attr = 
-          attrib->getValueByIndex( attrib_index );
-        if( attr ) attr->disableArray();
+      if( fogCoord->getValue()) fogCoord->getValue()->disableArray();
+      for( unsigned int attrib_index = 0;
+        attrib_index < attrib->size(); attrib_index++ ) {
+          X3DVertexAttributeNode *attr = 
+            attrib->getValueByIndex( attrib_index );
+          if( attr ) attr->disableArray();
       }      
     } else {
       // we cannot use arrays to render when normal_per_vertex is false
@@ -213,36 +216,39 @@ void IndexedTriangleSet::render() {
         // vertex 1
         if( color_node ) color_node->render( indices[v] );
         if( tex_coords_per_vertex ) renderTexCoord( indices[v],
-                                                    tex_coord_node );
+          tex_coord_node );
+        if( fogCoord->getValue()) fogCoord->getValue()->render(indices[v]);
         for( unsigned int attrib_index = 0;
-             attrib_index < attrib->size(); attrib_index++ ) {
-          X3DVertexAttributeNode *attr = 
-            attrib->getValueByIndex( attrib_index );
-          if( attr ) attr->render( indices[v] );
+          attrib_index < attrib->size(); attrib_index++ ) {
+            X3DVertexAttributeNode *attr = 
+              attrib->getValueByIndex( attrib_index );
+            if( attr ) attr->render( indices[v] );
         }
         coordinate_node->render( indices[v] );
 
         // vertex 2
         if( color_node ) color_node->render( indices[v+1] );
         if( tex_coords_per_vertex ) renderTexCoord( indices[v+1],
-                                                    tex_coord_node );
+          tex_coord_node );
+        if( fogCoord->getValue()) fogCoord->getValue()->render(indices[v+1]);
         for( unsigned int attrib_index = 0;
-             attrib_index < attrib->size(); attrib_index++ ) {
-          X3DVertexAttributeNode *attr = 
-            attrib->getValueByIndex( attrib_index );
-          if( attr ) attr->render( indices[v+1] );
+          attrib_index < attrib->size(); attrib_index++ ) {
+            X3DVertexAttributeNode *attr = 
+              attrib->getValueByIndex( attrib_index );
+            if( attr ) attr->render( indices[v+1] );
         }
         coordinate_node->render( indices[v+1] );
 
         // vertex 3
         if( color_node ) color_node->render( indices[v+2] );
         if( tex_coords_per_vertex ) renderTexCoord( indices[v+2],
-                                                    tex_coord_node );
+          tex_coord_node );
+        if( fogCoord->getValue()) fogCoord->getValue()->render(indices[v+2]);
         for( unsigned int attrib_index = 0;
-             attrib_index < attrib->size(); attrib_index++ ) {
-          X3DVertexAttributeNode *attr = 
-            attrib->getValueByIndex( attrib_index );
-          if( attr ) attr->render( indices[v+2] );
+          attrib_index < attrib->size(); attrib_index++ ) {
+            X3DVertexAttributeNode *attr = 
+              attrib->getValueByIndex( attrib_index );
+            if( attr ) attr->render( indices[v+2] );
         }
         coordinate_node->render( indices[v+2] );
       }
@@ -271,7 +277,7 @@ void IndexedTriangleSet::AutoNormal::update() {
     static_cast< SFBool * >( routes_in[0] )->getValue();
   X3DCoordinateNode *coord = 
     static_cast< X3DCoordinateNode * >( static_cast< SFCoordinateNode * >
-                                        ( routes_in[1] )->getValue() );
+    ( routes_in[1] )->getValue() );
   const vector<int> &index = 
     static_cast< MFInt32 * >( routes_in[2] )->getValue();
   bool ccw = static_cast< SFBool * >( routes_in[3] )->getValue();
@@ -283,83 +289,83 @@ void IndexedTriangleSet::AutoNormal::update() {
 }
 
 X3DNormalNode *IndexedTriangleSet::AutoNormal::generateNormalsPerVertex( 
-                                   X3DCoordinateNode *coord,
-                                   const vector< int > &index,
-                                   bool ccw ) {
-  Normal *normal = new Normal;
-  if( coord ) {
-    vector< Vec3f > normals( coord->nrAvailableCoords(), 
-                             Vec3f( 0, 0, 0 ) );
-    for( unsigned int j = 0; j < index.size(); j+=3 ) {
-      Vec3f norm, A, B, C, AB, BC;
-      // make sure we have a valid face. If not use a dummy normal. 
-      if( j+2 >= index.size() ) {
-        norm =  Vec3f( 1, 0, 0 );
-      } else {  
-        // calculate a normal 
-        A = coord->getCoord( index[ j ] );
-        B = coord->getCoord( index[ j+1 ] );
-        C = coord->getCoord( index[ j+2 ] );
-        
-        AB = B - A;
-        BC = C - B;
-        
-        norm = AB % BC;
-      }
-      norm.normalizeSafe();
-      if( !ccw ) 
-        norm = -norm;
-      normals[index[ j ]] += norm;
-      normals[index[ j+1 ]] += norm;
-      normals[index[ j+2 ]] += norm;
-    }
+  X3DCoordinateNode *coord,
+  const vector< int > &index,
+  bool ccw ) {
+    Normal *normal = new Normal;
+    if( coord ) {
+      vector< Vec3f > normals( coord->nrAvailableCoords(), 
+        Vec3f( 0, 0, 0 ) );
+      for( unsigned int j = 0; j < index.size(); j+=3 ) {
+        Vec3f norm, A, B, C, AB, BC;
+        // make sure we have a valid face. If not use a dummy normal. 
+        if( j+2 >= index.size() ) {
+          norm =  Vec3f( 1, 0, 0 );
+        } else {  
+          // calculate a normal 
+          A = coord->getCoord( index[ j ] );
+          B = coord->getCoord( index[ j+1 ] );
+          C = coord->getCoord( index[ j+2 ] );
 
-    for( vector<Vec3f>::iterator i = normals.begin(); 
-         i != normals.end(); 
-         i++ ) {
-      (*i).normalizeSafe();
+          AB = B - A;
+          BC = C - B;
+
+          norm = AB % BC;
+        }
+        norm.normalizeSafe();
+        if( !ccw ) 
+          norm = -norm;
+        normals[index[ j ]] += norm;
+        normals[index[ j+1 ]] += norm;
+        normals[index[ j+2 ]] += norm;
+      }
+
+      for( vector<Vec3f>::iterator i = normals.begin(); 
+        i != normals.end(); 
+        i++ ) {
+          (*i).normalizeSafe();
+      }
+      normal->vector->setValue( normals );
     }
-    normal->vector->setValue( normals );
-  }
-  return normal;
+    return normal;
 }
 
 X3DNormalNode *IndexedTriangleSet::AutoNormal::generateNormalsPerFace( 
-                                             X3DCoordinateNode *coord,
-                                             const vector< int > &index,
-                                             bool ccw ) {
-  Normal *normal = new Normal;
-  if( coord ) {
-    vector< Vec3f > normals;
-    for( size_t j = 0; j < index.size(); j+=3 ) {
-      Vec3f norm, A, B, C, AB, BC;
-      // make sure we have a valid face. If not use a dummy normal. 
-      if( j+2 >= index.size() ) {
-        norm =  Vec3f( 1, 0, 0 );
-      } else {  
-        // calculate a normal for the triangle
-        A = coord->getCoord( index[ j ] );
-        B = coord->getCoord( index[ j + 1 ] );
-        C = coord->getCoord( index[ j + 2 ] );
-        
-        AB = B - A;
-        BC = C - B;
-        
-        norm = AB % BC;
+  X3DCoordinateNode *coord,
+  const vector< int > &index,
+  bool ccw ) {
+    Normal *normal = new Normal;
+    if( coord ) {
+      vector< Vec3f > normals;
+      for( size_t j = 0; j < index.size(); j+=3 ) {
+        Vec3f norm, A, B, C, AB, BC;
+        // make sure we have a valid face. If not use a dummy normal. 
+        if( j+2 >= index.size() ) {
+          norm =  Vec3f( 1, 0, 0 );
+        } else {  
+          // calculate a normal for the triangle
+          A = coord->getCoord( index[ j ] );
+          B = coord->getCoord( index[ j + 1 ] );
+          C = coord->getCoord( index[ j + 2 ] );
+
+          AB = B - A;
+          BC = C - B;
+
+          norm = AB % BC;
+        }
+
+        try {
+          norm.normalize();
+        } catch ( const ArithmeticTypes::Vec3f::Vec3fNormalizeError & ) {
+          norm = Vec3f( 1, 0, 0 );
+        }
+
+        if( !ccw ) 
+          norm = -norm;
+
+        normals.push_back( norm );
       }
-      
-      try {
-        norm.normalize();
-      } catch ( const ArithmeticTypes::Vec3f::Vec3fNormalizeError & ) {
-        norm = Vec3f( 1, 0, 0 );
-      }
-      
-      if( !ccw ) 
-        norm = -norm;
-      
-      normals.push_back( norm );
+      normal->vector->setValue( normals );
     }
-    normal->vector->setValue( normals );
-  }
-  return normal;
+    return normal;
 }

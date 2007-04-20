@@ -53,11 +53,12 @@ TriangleSet::TriangleSet(
                          Inst< SFBool                  > _normalPerVertex,
                          Inst< SFBool                  > _solid,
                          Inst< MFVertexAttributeNode   > _attrib,
-                         Inst< AutoNormal              > _autoNormal ):
+                         Inst< AutoNormal              > _autoNormal,
+                         Inst< SFFogCoordinate         > _fogCoord ):
   X3DComposedGeometryNode( _metadata, _bound, _displayList,
                            _color, _coord, _normal, _texCoord, 
                            _ccw, _colorPerVertex, _normalPerVertex,
-                           _solid, _attrib ),
+                           _solid, _attrib, _fogCoord ),
   autoNormal( _autoNormal ) {
 
   type_name = "TriangleSet";
@@ -142,6 +143,7 @@ void TriangleSet::render() {
     // use arrays to render the geometry
     coordinate_node->renderArray();
     normal_node->renderArray();
+    if( fogCoord->getValue()) fogCoord->getValue()->renderArray();
     if( color_node ) color_node->renderArray();
     if( tex_coords_per_vertex ) renderTexCoordArray( tex_coord_node );
     // Set up shader vertex attributes.
@@ -159,6 +161,7 @@ void TriangleSet::render() {
     normal_node->disableArray();
     if( color_node ) color_node->disableArray();
     if( tex_coords_per_vertex ) disableTexCoordArray( tex_coord_node );
+    if( fogCoord->getValue()) fogCoord->getValue()->disableArray();
     for( unsigned int attrib_index = 0;
          attrib_index < attrib->size(); attrib_index++ ) {
       X3DVertexAttributeNode *attr = 

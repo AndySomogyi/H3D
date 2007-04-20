@@ -34,6 +34,7 @@
 #include "X3DCoordinateNode.h"
 #include "X3DColorNode.h"
 #include "CoordBoundField.h"
+#include "FogCoordinate.h"
 
 namespace H3D {
 
@@ -85,6 +86,15 @@ namespace H3D {
                                        &X3DColorNode::propertyChanged > > 
     SFColorNode;
 
+    /// The SFFogCoordinate is dependent on the propertyChanged
+    /// field of the contained FogCoordinate.
+    typedef DependentSFNode< 
+                FogCoordinate,
+                FieldRef< X3DGeometricPropertyNode,
+                          Field,
+                          &FogCoordinate::propertyChanged > > 
+    SFFogCoordinate; 
+
     /// The bound field for PointSet is a CoordBoundField.
     typedef CoordBoundField SFBound;
 
@@ -93,7 +103,8 @@ namespace H3D {
               Inst< SFBound          > _bound          = 0,
               Inst< DisplayList      > _displayList    = 0,
               Inst< SFColorNode      > _color          = 0,
-              Inst< SFCoordinateNode > _coord          = 0 );
+              Inst< SFCoordinateNode > _coord          = 0,
+              Inst< SFFogCoordinate  > _fogCoord        =0);
 
     /// Render the LineSet with OpenGL
     virtual void render();
@@ -128,6 +139,15 @@ namespace H3D {
     ///
     /// \dotfile PointSet_coord.dot 
     auto_ptr< SFCoordinateNode >  coord;
+
+    
+    /// If the fogCoord field is not empty, it shall contain a list 
+    /// of per-vertex depth values for calculating fog depth.
+    /// 
+    /// <b>Access type:</b> inputOutput \n
+    ///
+    /// \dotfile FogCoordinate_fogCoord.dot 
+    auto_ptr< SFFogCoordinate > fogCoord;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

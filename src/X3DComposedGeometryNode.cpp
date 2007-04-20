@@ -51,6 +51,7 @@ namespace X3DComposedGeometryNodeInternals {
   FIELDDB_ELEMENT( X3DComposedGeometryNode, normalPerVertex, INPUT_OUTPUT );
   FIELDDB_ELEMENT( X3DComposedGeometryNode, solid, INPUT_OUTPUT );
   FIELDDB_ELEMENT( X3DComposedGeometryNode, attrib, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( X3DComposedGeometryNode, fogCoord, INPUT_OUTPUT );
 }
 
 X3DComposedGeometryNode::X3DComposedGeometryNode( 
@@ -65,7 +66,8 @@ X3DComposedGeometryNode::X3DComposedGeometryNode(
                               Inst< SFBool                  > _colorPerVertex,
                               Inst< SFBool                  > _normalPerVertex,
                               Inst< SFBool                  > _solid,
-			      Inst< MFVertexAttributeNode   > _attrib ) :
+			                        Inst< MFVertexAttributeNode   > _attrib, 
+                              Inst< SFFogCoordinate           > _fogCoord ) :
   X3DGeometryNode( _metadata, _bound, _displayList ),
   color          ( _color            ),
   coord          ( _coord            ),
@@ -75,7 +77,8 @@ X3DComposedGeometryNode::X3DComposedGeometryNode(
   colorPerVertex ( _colorPerVertex   ),
   normalPerVertex( _normalPerVertex  ),
   solid          ( _solid            ),
-  attrib         ( _attrib           ) {
+  attrib         ( _attrib           ),
+  fogCoord         ( _fogCoord           ){
 
   type_name = "X3DComposedGeometryNode";
 
@@ -95,6 +98,7 @@ X3DComposedGeometryNode::X3DComposedGeometryNode(
   normalPerVertex->route( displayList );
   solid->route( displayList );
   attrib->route( displayList );
+  fogCoord->route( displayList );
 }
 
 

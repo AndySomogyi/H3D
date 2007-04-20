@@ -154,9 +154,10 @@ namespace H3D {
                     Inst< SFBool           > _colorPerVertex  = 0,
                     Inst< SFBool           > _normalPerVertex = 0,
                     Inst< SFBool           > _solid           = 0,
-		    Inst< MFVertexAttributeNode > _attrib     = 0,
+		                Inst< MFVertexAttributeNode > _attrib     = 0,
                     Inst< AutoNormal       > _autoNormal      = 0,
-                    Inst< MFInt32          > _fanCount      = 0 );
+                    Inst< MFInt32          > _fanCount        = 0,
+                    Inst< SFFogCoordinate  > _fogCoord        =0);
 
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.

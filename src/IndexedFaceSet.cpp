@@ -65,7 +65,7 @@ IndexedFaceSet::IndexedFaceSet(
                     Inst< SFBool       > _colorPerVertex,
                     Inst< SFBool       >  _normalPerVertex,
                     Inst< SFBool       > _solid,
-		    Inst< MFVertexAttributeNode > _attrib,
+		                Inst< MFVertexAttributeNode > _attrib,
                     Inst< AutoNormal   > _autoNormal,
                     Inst< SFBool       > _convex,
                     Inst< SFFloat      > _creaseAngle,
@@ -76,10 +76,11 @@ IndexedFaceSet::IndexedFaceSet(
                     Inst< MFInt32      > _colorIndex,
                     Inst< MFInt32      > _coordIndex,
                     Inst< MFInt32      > _normalIndex,
-                    Inst< MFInt32      > _texCoordIndex ): 
+                    Inst< MFInt32      > _texCoordIndex,
+                    Inst< SFFogCoordinate         > _fogCoord ): 
   X3DComposedGeometryNode( _metadata, _bound, _displayList, _color, _coord,  _normal, 
                            _texCoord, _ccw, _colorPerVertex, 
-                           _normalPerVertex, _solid, _attrib ),
+                           _normalPerVertex, _solid, _attrib, _fogCoord ),
   set_colorIndex   ( _set_colorIndex    ),
   set_coordIndex   ( _set_coordIndex    ),
   set_normalIndex  ( _set_normalIndex   ),
@@ -306,7 +307,11 @@ void IndexedFaceSet::render() {
             }
           }
         }
-        
+        // Set up fogCoordinates
+        if(fogCoord->getValue()){
+           fogCoord->getValue()->render(coord_index[i]);
+        }
+
         // Render the vertices.
         coords->render( coord_index[ i ] );
         vertex_count++;

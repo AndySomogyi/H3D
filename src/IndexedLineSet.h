@@ -36,6 +36,7 @@
 #include "CoordBoundField.h"
 #include "IndexedLineSet.h"
 #include "MFInt32.h"
+#include "FogCoordinate.h"
 
 namespace H3D {
 
@@ -128,6 +129,15 @@ namespace H3D {
                                        Field,
                                        &X3DColorNode::propertyChanged > > 
     SFColorNode;
+
+    /// The SFFogCoordinate is dependent on the propertyChanged
+    /// field of the contained FogCoordinate.
+    typedef DependentSFNode< 
+                FogCoordinate,
+                FieldRef< X3DGeometricPropertyNode,
+                          Field,
+                          &FogCoordinate::propertyChanged > > 
+    SFFogCoordinate; 
     
     /// Constructor.
     IndexedLineSet( Inst< SFNode           > _metadata       = 0,
@@ -139,7 +149,8 @@ namespace H3D {
                     Inst< SFCoordinateNode > _coord          = 0,
                     Inst< MFInt32          > _colorIndex     = 0,
                     Inst< SFBool           > _colorPerVertex = 0,
-                    Inst< MFInt32          > _coordIndex     = 0 );
+                    Inst< MFInt32          > _coordIndex     = 0, 
+                    Inst< SFFogCoordinate  > _fogCoord       = 0);
 
     /// The number of lines rendered by this geometry.
     virtual int nrLines() {
@@ -209,6 +220,14 @@ namespace H3D {
     ///
     /// \dotfile IndexedLineSet_coordIndex.dot 
     auto_ptr< MFInt32 >  coordIndex;
+
+    /// If the fogCoord field is not empty, it shall contain a list 
+    /// of per-vertex depth values for calculating fog depth.
+    /// 
+    /// <b>Access type:</b> inputOutput \n
+    ///
+    /// \dotfile FogCoordinate_fogCoord.dot 
+    auto_ptr< SFFogCoordinate > fogCoord;
 
     /// The H3DNodeDatabase instance for this node.
     static H3DNodeDatabase database;

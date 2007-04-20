@@ -38,6 +38,7 @@
 #include "DependentNodeFields.h"
 #include "SFInt32.h"
 #include "SFFloat.h"
+#include "FogCoordinate.h"
 
 namespace H3D {
 
@@ -143,7 +144,16 @@ namespace H3D {
                 FieldRef< X3DGeometricPropertyNode,
                           Field,
                           &X3DVertexAttributeNode::propertyChanged > > 
-    MFVertexAttributeNode;    
+    MFVertexAttributeNode;
+    
+    /// The SFFogCoordinate is dependent on the propertyChanged
+    /// field of the contained FogCoordinate.
+    typedef DependentSFNode< 
+                FogCoordinate,
+                FieldRef< X3DGeometricPropertyNode,
+                          Field,
+                          &FogCoordinate::propertyChanged > > 
+    SFFogCoordinate;
 
     /// Specialized field for automatically generating normals from
     /// coordinates.
@@ -282,7 +292,8 @@ namespace H3D {
                    Inst< SFInt32          > _zDimension      = 0,
                    Inst< SFFloat          > _xSpacing        = 0,
                    Inst< SFFloat          > _zSpacing        = 0,
-                   Inst< MFFloat          > _height          = 0 );
+                   Inst< MFFloat          > _height          = 0,
+                   Inst< SFFogCoordinate  > _fogCoord        = 0 );
 
     /// Contains an X3DColorNode whose colors are applied to the
     /// ElevationGrid. If the color field is NULL, the
@@ -437,6 +448,15 @@ namespace H3D {
     ///
     /// \dotfile ElevationGrid_autoNormal.dot 
     auto_ptr< AutoNormal  >  autoNormal;
+
+    /// If the fogCoord field is not empty, it shall contain a list 
+    /// of per-vertex depth values for calculating fog depth.
+    /// 
+    /// <b>Access type:</b> inputOutput \n
+    ///
+    /// \dotfile FogCoordinate_fogCoord.dot 
+    auto_ptr< SFFogCoordinate > fogCoord;
+
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

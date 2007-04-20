@@ -83,7 +83,7 @@ namespace H3D {
       Vec3f scaled_v = m * Vec3f( 0, 0, 1 );
       scale_local_to_global = scaled_v.length();
     }
-
+   
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   protected:

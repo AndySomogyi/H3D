@@ -36,6 +36,8 @@
 #include "X3DNormalNode.h"
 #include "X3DVertexAttributeNode.h"
 #include "DependentNodeFields.h"
+#include "FogCoordinate.h"
+
 
 namespace H3D {
 
@@ -82,6 +84,9 @@ namespace H3D {
   /// If the attrib field is not empty it shall contain a list of
   /// X3DVertexAttributeNode instances with per-vertex attribute
   /// information for programmable shaders.
+  ///
+  /// If the fogCoord field is not empty, it shall contain a list 
+  /// of per-vertex depth values for calculating fog depth.
   /// 
   /// \par Internal routes:
   /// \dotfile X3DComposedGeometryNode.dot 
@@ -128,6 +133,16 @@ namespace H3D {
                           Field,
                           &X3DVertexAttributeNode::propertyChanged > > 
     MFVertexAttributeNode;    
+
+    
+   /// The SFFogCoordinate is dependent on the propertyChanged
+    /// field of the contained FogCoordinate.
+    typedef DependentSFNode< 
+                FogCoordinate,
+                FieldRef< X3DGeometricPropertyNode,
+                          Field,
+                          &FogCoordinate::propertyChanged > > 
+    SFFogCoordinate;   
 
     /// Display list is extended in order to set front sidedness of 
     /// triangles outside the display list. This is due to that the 
@@ -180,7 +195,8 @@ namespace H3D {
                              Inst< SFBool           > _colorPerVertex  = 0,
                              Inst< SFBool           > _normalPerVertex = 0,
                              Inst< SFBool           > _solid           = 0,
-			     Inst< MFVertexAttributeNode > _attrib     = 0 );
+			                       Inst< MFVertexAttributeNode > _attrib     = 0,
+                             Inst< SFFogCoordinate     > _fogCoord     =0 );
 
     /// Contains an X3DColorNode whose colors are applied to the
     /// X3DComposedGeometryNode. If the color field is NULL, the
@@ -277,6 +293,14 @@ namespace H3D {
     ///
     /// \dotfile X3DComposedGeometryNode_attrib.dot 
     auto_ptr< MFVertexAttributeNode > attrib;
+
+    /// If the fogCoord field is not empty, it shall contain a list 
+    /// of per-vertex depth values for calculating fog depth.
+    /// 
+    /// <b>Access type:</b> inputOutput \n
+    ///
+    /// \dotfile FogCoordinate_fogCoord.dot 
+    auto_ptr< SFFogCoordinate > fogCoord;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

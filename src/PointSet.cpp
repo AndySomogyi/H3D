@@ -44,13 +44,15 @@ H3DNodeDatabase PointSet::database(
 namespace PointSetInternals {
   FIELDDB_ELEMENT( PointSet, color, INPUT_OUTPUT );
   FIELDDB_ELEMENT( PointSet, coord, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( PointSet, fogCoord, INPUT_OUTPUT );
 }
 
 PointSet::PointSet(  Inst< SFNode           > _metadata,
                      Inst< SFBound          > _bound,
                      Inst< DisplayList      > _displayList,
                      Inst< SFColorNode      > _color,
-                     Inst< SFCoordinateNode > _coord ):
+                     Inst< SFCoordinateNode > _coord,
+                     Inst< SFFogCoordinate  > _fogCoord  ):
   X3DGeometryNode( _metadata, _bound, _displayList ),
   color   ( _color    ),
   coord   ( _coord    ) {
@@ -60,6 +62,7 @@ PointSet::PointSet(  Inst< SFNode           > _metadata,
 
   color->route( displayList );
   coord->route( displayList );
+  fogCoord->route( displayList );
 
   coord->route( bound );
 
@@ -107,6 +110,7 @@ void PointSet::render() {
       }
       // Render the vertices.
       coordinate_node->render( i );
+       if( fogCoord->getValue()) fogCoord->getValue()->render(i);
     }
     // end GL_POLY_LINE
     glEnd();
