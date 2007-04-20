@@ -45,6 +45,8 @@ namespace LineSetInternals {
   FIELDDB_ELEMENT( LineSet, color, INPUT_OUTPUT );
   FIELDDB_ELEMENT( LineSet, coord, INPUT_OUTPUT );
   FIELDDB_ELEMENT( LineSet, vertexCount, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( LineSet, fogCoord, INPUT_OUTPUT );
+
 }
 
 
@@ -53,11 +55,13 @@ LineSet::LineSet( Inst< SFNode           > _metadata,
                   Inst< DisplayList      > _displayList,
                   Inst< SFColorNode      > _color,
                   Inst< SFCoordinateNode > _coord,
-                  Inst< MFInt32          > _vertexCount ) :
+                  Inst< MFInt32          > _vertexCount, 
+                  Inst< SFFogCoordinate  > _fogCoord  ) :
   X3DGeometryNode( _metadata, _bound, _displayList ),
   color          ( _color       ),
   coord          ( _coord       ),
-  vertexCount    ( _vertexCount ) {
+  vertexCount    ( _vertexCount ),
+  fogCoord       ( _fogCoord    ){
 
   type_name = "LineSet";
   database.initFields( this );
@@ -65,6 +69,7 @@ LineSet::LineSet( Inst< SFNode           > _metadata,
   color->route( displayList );
   coord->route( displayList );
   vertexCount->route( displayList );
+  fogCoord->route( displayList );
 
   coord->route( bound );
 }
@@ -122,6 +127,9 @@ void LineSet::render() {
           
         // Render the vertices.
         coordinate_node->render( vertex_counter );
+        if( fogCoord->getValue()){
+          fogCoord->getValue()->render(vertex_counter);
+        }
       }
       // end GL_POLY_LINE
       glEnd();

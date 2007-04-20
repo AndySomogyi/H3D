@@ -282,7 +282,8 @@ namespace H3D {
                     Inst< MFInt32      > _colorIndex         = 0,
                     Inst< MFInt32      > _coordIndex         = 0,
                     Inst< MFInt32      > _normalIndex        = 0,
-                    Inst< MFInt32      > _texCoordIndex      = 0 );
+                    Inst< MFInt32      > _texCoordIndex      = 0, 
+                    Inst< SFFogCoordinate > _fogCoord        = 0);
 
     virtual X3DCoordinateNode *getCoord() {
       return static_cast< X3DCoordinateNode * >( coord->getValue() );

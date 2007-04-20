@@ -116,8 +116,9 @@ namespace H3D {
                  Inst< SFBool           > _colorPerVertex  = 0,
                  Inst< SFBool           > _normalPerVertex = 0,
                  Inst< SFBool           > _solid           = 0,
-		 Inst< MFVertexAttributeNode > _attrib     = 0,
-                 Inst< AutoNormal       > _autoNormal      = 0 );
+		             Inst< MFVertexAttributeNode > _attrib     = 0,
+                 Inst< AutoNormal       > _autoNormal      = 0,
+                 Inst< SFFogCoordinate  > _fogCoord        = 0 );
 
     ///  Renders the TriangleSet with OpenGL.
     virtual void render();

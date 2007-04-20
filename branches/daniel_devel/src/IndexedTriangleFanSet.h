@@ -156,7 +156,8 @@ namespace H3D {
 			   Inst< MFVertexAttributeNode > _attrib     = 0,
 			   Inst< AutoNormal       > _autoNormal      = 0,
 			   Inst< MFInt32          > _set_index       = 0,
-			   Inst< MFInt32          > _index           = 0 );
+			   Inst< MFInt32          > _index           = 0,
+         Inst< SFFogCoordinate  > _fogCoord        =0 );
 
     /// Traverse the scenegraph. A HLFeedbackShape is added for haptic
     /// rendering if haptics is enabled.

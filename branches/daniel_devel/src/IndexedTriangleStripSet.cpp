@@ -61,11 +61,12 @@ IndexedTriangleStripSet::IndexedTriangleStripSet(
                               Inst< MFVertexAttributeNode   > _attrib,
                               Inst< AutoNormal              > _autoNormal,
                               Inst< MFInt32                 > _set_index,
-                              Inst< MFInt32                 > _index ) :
+                              Inst< MFInt32                 > _index, 
+                              Inst< SFFogCoordinate         > _fogCoord ) :
   X3DComposedGeometryNode( _metadata, _bound, _displayList, 
                            _color, _coord, _normal, _texCoord, 
                            _ccw, _colorPerVertex, _normalPerVertex, 
-                           _solid, _attrib ),
+                           _solid, _attrib, _fogCoord ),
   autoNormal( _autoNormal ),
   set_index( _set_index ),
   index( _index ) {
@@ -160,6 +161,7 @@ void IndexedTriangleStripSet::render() {
       normal_node->renderArray();
       if( color_node ) color_node->renderArray();
       if( tex_coords_per_vertex ) renderTexCoordArray( tex_coord_node );
+      if( fogCoord->getValue()) fogCoord->getValue()->renderArray();
       // Set up shader vertex attributes.
       for( unsigned int attrib_index = 0;
            attrib_index < attrib->size(); attrib_index++ ) {
@@ -187,6 +189,7 @@ void IndexedTriangleStripSet::render() {
       normal_node->disableArray();
       if( color_node ) color_node->disableArray();
       if( tex_coords_per_vertex ) disableTexCoordArray( tex_coord_node );
+      if( fogCoord->getValue()) fogCoord->getValue()->disableArray();
       for( unsigned int attrib_index = 0;
            attrib_index < attrib->size(); attrib_index++ ) {
         X3DVertexAttributeNode *attr = 
@@ -218,6 +221,8 @@ void IndexedTriangleStripSet::render() {
               if( color_node ) color_node->render( indices[i] );
               if( tex_coords_per_vertex ) renderTexCoord( indices[i], 
                                                           tex_coord_node );
+              if( fogCoord->getValue()) fogCoord->getValue()->
+                                                  render(indices[i]);
               for( unsigned int attrib_index = 0;
                    attrib_index < attrib->size(); attrib_index++ ) {
                 X3DVertexAttributeNode *attr = 
@@ -230,6 +235,8 @@ void IndexedTriangleStripSet::render() {
               if( color_node ) color_node->render( indices[i+1] );
               if( tex_coords_per_vertex ) renderTexCoord( indices[i+1],
                                                           tex_coord_node );
+              if( fogCoord->getValue()) fogCoord->getValue()->
+                                                      render(indices[i+1]);
               for( unsigned int attrib_index = 0;
                    attrib_index < attrib->size(); attrib_index++ ) {
                 X3DVertexAttributeNode *attr = 
@@ -242,6 +249,8 @@ void IndexedTriangleStripSet::render() {
               if( color_node ) color_node->render( indices[i+2] );
               if( tex_coords_per_vertex ) renderTexCoord( indices[i+2],
                                                           tex_coord_node );
+              if( fogCoord->getValue()) fogCoord->getValue()->
+                                                  render(indices[i+2]);
               for( unsigned int attrib_index = 0;
                    attrib_index < attrib->size(); attrib_index++ ) {
                 X3DVertexAttributeNode *attr = 

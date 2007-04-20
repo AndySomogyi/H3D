@@ -48,6 +48,7 @@ namespace IndexedLineSetInternals {
   FIELDDB_ELEMENT( IndexedLineSet, colorIndex, INPUT_OUTPUT );
   FIELDDB_ELEMENT( IndexedLineSet, colorPerVertex, INPUT_OUTPUT );
   FIELDDB_ELEMENT( IndexedLineSet, coordIndex, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( IndexedLineSet, fogCoord, INPUT_OUTPUT );
 }
 
 IndexedLineSet::IndexedLineSet( Inst< SFNode           > _metadata,
@@ -59,7 +60,8 @@ IndexedLineSet::IndexedLineSet( Inst< SFNode           > _metadata,
                                 Inst< SFCoordinateNode  >  _coord,
                                 Inst< MFInt32 >  _colorIndex,
                                 Inst< SFBool  >  _colorPerVertex,
-                                Inst< MFInt32 >  _coordIndex ) :
+                                Inst< MFInt32 >  _coordIndex, 
+                                Inst< SFFogCoordinate > _fogCoord  ) :
   X3DGeometryNode( _metadata, _bound, _displayList ),
   set_colorIndex ( _set_colorIndex ),
   set_coordIndex ( _set_coordIndex ),
@@ -67,7 +69,8 @@ IndexedLineSet::IndexedLineSet( Inst< SFNode           > _metadata,
   coord          ( _coord          ),
   colorIndex     ( _colorIndex     ),
   colorPerVertex ( _colorPerVertex ),
-  coordIndex     ( _coordIndex     ) {
+  coordIndex     ( _coordIndex     ),
+  fogCoord       ( _fogCoord       ){
 
   type_name = "IndexedLineSet";
   database.initFields( this );
@@ -79,6 +82,7 @@ IndexedLineSet::IndexedLineSet( Inst< SFNode           > _metadata,
   colorIndex->route( displayList );
   colorPerVertex->route( displayList );
   coordIndex->route( displayList );
+  fogCoord->route( displayList );
 
   set_colorIndex->route( colorIndex, id );
   set_coordIndex->route( coordIndex, id );
@@ -150,7 +154,7 @@ void IndexedLineSet::render() {
         }
         color_node->render( ci );
       }
-    
+
       // render all vertices for this polyline.
       for(; i < coord_index.size() && coord_index[i] != -1;  i ++ ) {
         // Set up colors if colors are specified per vertex.
@@ -175,6 +179,11 @@ void IndexedLineSet::render() {
       
         // Render the vertices.
         coordinate_node->render( coord_index[ i ] );
+        if( fogCoord->getValue()){
+          cerr<< " fogCoord = true " << endl;
+          fogCoord->getValue()->render(coord_index[ i ]);
+        }
+
       }
       // end GL_POLY_LINE
       glEnd();
