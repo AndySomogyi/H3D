@@ -171,12 +171,11 @@ bool X3DShapeNode::lineIntersect(
                            const Vec3f &from,
                            const Vec3f &to,
                            vector< HAPI::Bounds::IntersectionInfo > &result,
-                           vector< X3DGeometryNode * > &theGeometry,
-                           vector< H3DInt32 > &theGeometryIndex,
+               vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
                            const Matrix4f &current_matrix,
                            vector< Matrix4f > &geometry_transforms ) {
   return geometry->getValue()->lineIntersect( from, to, result,
-                                              theGeometry, theGeometryIndex,
+                                              theGeometries,
                                               current_matrix,
                                               geometry_transforms );
 }

@@ -122,14 +122,11 @@ using namespace std;
 
       struct myX3DComponent {
         myX3DComponent() {
-          already_checked = false;
           conformance_level = 0;
         }
         map< int, myX3DNodeVector > nodes_per_level;
-        map< int, vector< string > > nodes_missing_for_conformance;
         string name;
         map< int, vector< pair< string, int > > > prerequisites;
-        bool already_checked;
         int conformance_level;
         int used_level;
         int max_level;
@@ -138,13 +135,8 @@ using namespace std;
       typedef vector< myX3DComponent > myX3DComponentVector;
 
       struct myX3DProfile {
-        myX3DProfile() {
-          is_supported = false;
-        }
         string name;
         map< string, int > component_names;
-        map< string, int > component_to_low;
-        bool is_supported;
       };
 
       typedef vector< myX3DProfile > myX3DProfileVector;

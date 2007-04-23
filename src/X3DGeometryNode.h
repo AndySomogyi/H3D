@@ -100,19 +100,14 @@ namespace H3D {
     /// \param to The end of the line segment.
     /// \param result Contains info about the closest intersection for every
     /// object that intersects the line
-    /// \param theGeometry is a vector of pointers to each geometry
-    /// that intersects. May contain the same pointer twice due to the 
-    /// DEF/USE feature of X3D.
-    /// \param theGeometryIndex is a vector with a specific index for each
-    /// time a Geometry is used in the Scene. Needed because of the DEF/USE
-    /// feature of X3D to be able to separate the different local coordinate
-    /// systems for X3DPointingDeviceSensors.
+    /// \param theGeometries is a vector of pairs of pointers and an index to
+    /// differ between different places in the scene graph for the same Node.
+    /// This can happen due to the DEF/USE feature of X3D.
     virtual bool lineIntersect( 
       const Vec3f &from,
       const Vec3f &to,    
       vector< HAPI::Bounds::IntersectionInfo > &result,
-      vector< X3DGeometryNode * > &theGeometry,
-      vector< H3DInt32 > &theGeometryIndex,
+      vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
       const Matrix4f &current_matrix,
       vector< Matrix4f > &geometry_transforms );
 
@@ -248,7 +243,7 @@ namespace H3D {
     }
 
     /// Resets things for x3dpointingdevicesensors.
-    void resetPtDevIndication( bool clear );
+    void resetGeometryId( bool clear );
 
     /// increases the counter which keeps track of the current geometry
     /// instance for DEF/USE
@@ -314,8 +309,12 @@ namespace H3D {
     /// identifiers for the shapes geometry.
     vector< int > haptic_shape_ids;
 
-    vector< H3DInt32 > pt_dev_geometry_id;
-    H3DInt32 current_geometry_id;
+    // only interested in adress, what it points to will be invalid
+    TraverseInfo * last_ti_ptr;
+    // id for the number of times its traverseSG is called per scene graph loop
+    H3DInt32 current_geom_id;
+    // flag for setting if the geometry is affected by a pointing device sensor
+    bool affected_by_ptdvs;
 
     bool use_culling, allow_culling;
     bool draw_debug_options;

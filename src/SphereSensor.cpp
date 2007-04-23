@@ -72,13 +72,13 @@ SphereSensor::SphereSensor(
 
 void SphereSensor::onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
-                           int geometryIndex ) {
+                           int pt_id ) {
   if( is_enabled && ( isActive->getValue() || number_of_active == 0 ) ) {
     X3DPointingDeviceSensorNode::onIsOver( newValue,
                                            result,
-                                           geometryIndex );
+                                           pt_id );
     if( newValue ) {
-      intersection_matrix = geometry_matrices[geometryIndex];
+      intersection_matrix = pt_matrices[pt_id];
       original_intersection = intersection_matrix * Vec3f( result.point );
     }
   }

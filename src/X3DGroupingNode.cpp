@@ -122,17 +122,19 @@ void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
   // matrix for the sensors. ( This is done here since MatrixTransform
   // calls X3DGroupingNodes traverseSG function.
   vector< X3DPointingDeviceSensorNode * > old_pt_dev_sens_nodes;
-  if( !pt_dev_sens_nodes.empty() ) {
+  if( !pt_dev_sensors.empty() ) {
     old_pt_dev_sens_nodes = ti.current_pt_dev_sensors;
     bool cleared = false;
-    for( unsigned int i = 0; i < pt_dev_sens_nodes.size(); i++ ) {
-      if( !cleared && pt_dev_sens_nodes[i]->enabled->getValue() ) {
+    for( unsigned int i = 0; i < pt_dev_sensors.size(); i++ ) {
+      if( !cleared && pt_dev_sensors[i]->enabled->getValue() ) {
         cleared = true;
         ti.current_pt_dev_sensors.clear();
       }
+      int pt_index = pt_dev_sensors[i]->increaseIndex( ti );
+      pt_dev_sens_index[ pt_dev_sensors[i] ] = pt_index;
+      pt_dev_sensors[i]->setCurrentMatrix( ti.getAccInverseMatrix() );
       if( cleared ) {
-        pt_dev_sens_nodes[i]->setCurrentMatrix( ti.getAccInverseMatrix() );
-        ti.current_pt_dev_sensors.push_back( pt_dev_sens_nodes[i] );
+        ti.current_pt_dev_sensors.push_back( pt_dev_sensors[i] );
       }
     }
   }
@@ -146,11 +148,8 @@ void X3DGroupingNode::traverseSG( TraverseInfo &ti ) {
   }
 
   // reset the current_pt_dev_sensors vector to the previous value
-  if( !pt_dev_sens_nodes.empty() ) {
+  if( !pt_dev_sensors.empty() ) {
     ti.current_pt_dev_sensors = old_pt_dev_sens_nodes;
-    for( unsigned int i = 0; i < pt_dev_sens_nodes.size(); i++ ) {
-      pt_dev_sens_nodes[i]->setCurrentMatrix( Matrix4f() );
-    }
   }
 
   for( MFNode::const_reverse_iterator i = children->rbegin();
@@ -166,8 +165,7 @@ bool X3DGroupingNode::lineIntersect(
                   const Vec3f &from, 
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
-                  vector< X3DGeometryNode * > &theGeometry,
-                  vector< H3DInt32 > &theGeometryIndex,
+                 vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
                   const Matrix4f &current_matrix,
                   vector< Matrix4f > &geometry_transforms ) {
   bool intersect = false;
@@ -178,7 +176,7 @@ bool X3DGroupingNode::lineIntersect(
     const NodeVector &children_nodes = children->getValue();
     for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
       if( children_nodes[i]->lineIntersect( from, to, result,
-                                            theGeometry, theGeometryIndex,
+                                            theGeometries,
                                             current_matrix,
                                             geometry_transforms ) ) {
           intersect = true;
@@ -241,8 +239,10 @@ void X3DGroupingNode::MFChild::onAdd( Node *n ) {
     // vector.
     X3DPointingDeviceSensorNode * pdsn = 
       dynamic_cast< X3DPointingDeviceSensorNode * >( n );
-    if( pdsn )
-      o->pt_dev_sens_nodes.push_back( pdsn );
+    if( pdsn ) {
+      o->pt_dev_sensors.push_back( pdsn );
+      o->pt_dev_sens_index[ pdsn ] = -1;
+    }
   }
 }
 
@@ -266,20 +266,23 @@ void X3DGroupingNode::MFChild::onRemove( Node *n ) {
 
     // Remove eventual X3DPointingDeviceSensorNodes from the
     // separate vector.
-    if( !o->pt_dev_sens_nodes.empty() ) {
+    if( !o->pt_dev_sensors.empty() ) {
       X3DPointingDeviceSensorNode * pdsn = 
         dynamic_cast< X3DPointingDeviceSensorNode * >( n );
       if( pdsn ) {
         vector< X3DPointingDeviceSensorNode * >::iterator i;
         bool found = false;
-        for( i = o->pt_dev_sens_nodes.begin();
-             i < o->pt_dev_sens_nodes.end(); i++ )
-          if( *i == n ) {
-            found = true;
-            break;
-          }
-          if( found )
-            o->pt_dev_sens_nodes.erase( i );
+        for( i = o->pt_dev_sensors.begin();
+          i < o->pt_dev_sensors.end(); i++ ) {
+            if( *i == n ) {
+              found = true;
+              break;
+            }
+        }
+        if( found ) {
+          o->pt_dev_sensors.erase( i );
+          o->pt_dev_sens_index.erase( pdsn );
+        }
       }
     }
   }

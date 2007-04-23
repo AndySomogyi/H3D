@@ -88,13 +88,13 @@ CylinderSensor::~CylinderSensor() {
 
 void CylinderSensor::onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
-                           int geometryIndex ) {
+                           int pt_id ) {
   if( is_enabled && ( isActive->getValue() || number_of_active == 0 ) ) {
     X3DPointingDeviceSensorNode::onIsOver( newValue,
                                            result,
-                                           geometryIndex );
+                                           pt_id );
     if( newValue ) {
-      intersection_matrix = geometry_matrices[geometryIndex];
+      intersection_matrix = pt_matrices[pt_id];
       intersection_point = intersection_matrix * Vec3f( result.point );
     }
   }
@@ -218,8 +218,8 @@ void CylinderSensor::Set_CylinderEvents::update() {
           // enough to intersect the segment.
           H3DFloat theMaxValue = H3DMax( H3DAbs( nearPlaneTransformed.y ),
                                          H3DAbs( farPlaneTransformed.y ) );
-          ca = Vec3f( 0.0f, -theMaxValue, 0.0f );
-          cb = Vec3f( 0.0f, theMaxValue, 0.0f );
+          ca = Vec3f( 0.0f, -theMaxValue - 1.0f, 0.0f );
+          cb = Vec3f( 0.0f, theMaxValue + 1.0f, 0.0f );
           // sometimes the nearplane and farplane is outside the radius of the
           // cylinder and in that case there will be no intersection. So
           // we move the nearplane and farplane to allow for correct
@@ -250,22 +250,24 @@ void CylinderSensor::Set_CylinderEvents::update() {
           // product return a value slightly above 1 or below -1 which means
           // that H3DAcos returns an undefined value.
           if( (original_intersection % intersectionPoint).y < 0.0f ) {
-            angle = (H3DFloat)(2*Constants::pi) - 
-              H3DAcos( cs->Clamp( original_intersection * intersectionPoint,
-                                  -1, 1 ) );
+            angle = -H3DAcos( cs->Clamp( original_intersection *
+                                         intersectionPoint, -1, 1 ) );
           }
           else {
             angle = H3DAcos( cs->Clamp( original_intersection * 
                                         intersectionPoint, -1, 1 ) );
           }
 
+          original_intersection = intersectionPoint;
+
           H3DFloat minAngle = cs->minAngle->getValue();
           H3DFloat maxAngle = cs->maxAngle->getValue();
+          
+          angle += cs->rotation_changed->getValue().angle;
           if( minAngle <= maxAngle )
             angle = cs->Clamp( angle, minAngle, maxAngle );
 
-          cs->rotation_changed->setValue( Rotation( y_axis, angle + 
-                                                    cs->offset->getValue() ),
+          cs->rotation_changed->setValue( Rotation( y_axis, angle ),
                                           cs->id );
         } else {
           // X3D specification states that in the case of no Cylinder(or plane)

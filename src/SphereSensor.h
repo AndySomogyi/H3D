@@ -167,7 +167,7 @@ namespace H3D {
     // if they should be generated.
     virtual void onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
-                           int geometryIndex );
+                           int pt_id );
 
     auto_ptr< Set_SphereEvents > set_SphereEvents;
     Vec3f original_intersection;
