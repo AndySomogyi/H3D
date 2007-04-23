@@ -131,6 +131,7 @@ namespace H3D {
       Vec3f originalIntersection, planeNormal;;
       H3DInt32 originalGeometry;
       H3DFloat planeD;
+      Matrix4f active_matrix;
       // If true a new plane will be defined.
       bool newPlane;
     };
@@ -201,10 +202,10 @@ namespace H3D {
     // if they should be generated.
     virtual void onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
-                           int geometryIndex );
+                           int pt_id );
 
     Vec3f intersection_point;
-    int intersection_geometry;
+    Matrix4f intersection_matrix;
   };
 }
 

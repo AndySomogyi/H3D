@@ -178,22 +178,20 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
         Vec3f( (H3DFloat)wx, (H3DFloat)wy, (H3DFloat)wz );
 
       vector< HAPI::Bounds::IntersectionInfo > result;
-      vector< X3DGeometryNode * > theGeometry;
-      vector< H3DInt32 > theGeometryIndex;
+      vector< pair< X3DGeometryNode *, H3DInt32 > > theGeometries;
       Matrix4f temp_matrix;
       vector< Matrix4f > transform_matrices;
       if( topNode->lineIntersect( near_plane_pos, 
         far_plane_pos,
         result,
-        theGeometry,
-        theGeometryIndex,
+        theGeometries,
         temp_matrix,
         transform_matrices ) ) {
           int closest = 0;
-          if( theGeometry.size() > 1 ) {
+          if( theGeometries.size() > 1 ) {
             H3DFloat closestDistance = 
               (H3DFloat)(result[closest].point - near_plane_pos).lengthSqr();
-            for( unsigned int kl = 1; kl < theGeometry.size(); kl++ ) {
+            for( unsigned int kl = 1; kl < theGeometries.size(); kl++ ) {
               H3DFloat tempClose = 
                 (H3DFloat)(result[kl].point - near_plane_pos).lengthSqr();
               if( tempClose < closestDistance ) {
@@ -206,7 +204,7 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
           Vec3f approx_center;
           H3DFloat viewing_distance;
           BoxBound *box_bound = dynamic_cast< BoxBound * >(
-            theGeometry[closest]->bound->getValue() );
+            theGeometries[closest].first->bound->getValue() );
           const Matrix4f &vp_acc_inv_mtx = vp->accInverseMatrix->getValue();
 
           if( box_bound ) {

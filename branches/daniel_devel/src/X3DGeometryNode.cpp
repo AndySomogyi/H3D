@@ -86,7 +86,10 @@ X3DGeometryNode::X3DGeometryNode(
   use_culling( false ),
   allow_culling( true ),
   draw_debug_options( true ),
-  cull_face( GL_BACK ) {
+  cull_face( GL_BACK ),
+  last_ti_ptr( 0 ),
+  current_geom_id( -1 ),
+  affected_by_ptdvs( false ) {
 
   type_name = "X3DGeometryNode";
   
@@ -98,7 +101,7 @@ X3DGeometryNode::X3DGeometryNode(
 
   displayList->route( boundTree );
 
-  current_geometry_id = -1;
+  current_geom_id = -1;
 }
 
 
@@ -351,15 +354,15 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
   // if there exist a X3DPointingDeviceSensor add this node to its
   // geometry vector.
   if( !ti.current_pt_dev_sensors.empty() ) {
-    bool newIndex = true;
-    int theIndex = -1;
-    for( unsigned int i = 0; i < ti.current_pt_dev_sensors.size(); i++ ) {
-      theIndex = ti.current_pt_dev_sensors[i]->addGeometryNode( this, newIndex );
-      if( newIndex && theIndex != -1 ) 
-        newIndex = false;
+    affected_by_ptdvs = true;
+    if( last_ti_ptr != &ti ) {
+      current_geom_id = -1;
+      last_ti_ptr = &ti;
     }
-    current_geometry_id++;
-    pt_dev_geometry_id.push_back( theIndex );
+    current_geom_id++;
+    for( unsigned int i = 0; i < ti.current_pt_dev_sensors.size(); i++ ) {
+      ti.current_pt_dev_sensors[i]->addGeometryNode( this, current_geom_id );
+    }
   }
   
   if( ti.hapticsEnabled() && ti.getCurrentSurface() ) {
@@ -683,12 +686,11 @@ bool X3DGeometryNode::lineIntersect(
                   const Vec3f &from, 
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
-                  vector< X3DGeometryNode * > &theGeometry,
-                  vector< H3DInt32 > &theGeometryIndex,
+                  vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
                   const Matrix4f &current_matrix,
                   vector< Matrix4f > &geometry_transforms ) {
-  if( !pt_dev_geometry_id.empty() )
-    current_geometry_id++;
+  if( affected_by_ptdvs )
+    current_geom_id++;
   HAPI::Bounds::IntersectionInfo tempresult;
   bool returnValue =
     boundTree->getValue()->lineIntersect( 1000*from, 1000*to, tempresult );
@@ -696,12 +698,8 @@ bool X3DGeometryNode::lineIntersect(
     tempresult.point = tempresult.point / 1000;
     tempresult.normal = tempresult.normal / 1000;
     result.push_back( tempresult );
-    theGeometry.push_back( this );
+    theGeometries.push_back( make_pair( this, current_geom_id ) );
     geometry_transforms.push_back( current_matrix );
-    if( !pt_dev_geometry_id.empty() )
-      theGeometryIndex.push_back( pt_dev_geometry_id[current_geometry_id] );
-    else
-      theGeometryIndex.push_back( -1 );
   }
   return returnValue;
 }
@@ -720,10 +718,10 @@ void X3DGeometryNode::closestPoint(
 }
 
 
-void X3DGeometryNode::resetPtDevIndication( bool clear ) {
-  current_geometry_id = -1;
+void X3DGeometryNode::resetGeometryId( bool clear ) {
   if( clear )
-    pt_dev_geometry_id.clear();
+    affected_by_ptdvs = false;
+  current_geom_id = -1;
 }
 
 bool X3DGeometryNode::movingSphereIntersect( H3DFloat radius,
@@ -735,6 +733,6 @@ bool X3DGeometryNode::movingSphereIntersect( H3DFloat radius,
 }
 
 void X3DGeometryNode::increaseCurrentGeometry() {
-  if( !pt_dev_geometry_id.empty() )
-    current_geometry_id++;
+  if( affected_by_ptdvs )
+    current_geom_id++;
 }

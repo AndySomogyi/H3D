@@ -137,19 +137,14 @@ namespace H3D {
     /// \param to The end of the line segment.
     /// \param result Contains info about the closest intersection for every
     /// object that intersects the line
-    /// \param theGeometry is a vector of pointers to each geometry
-    /// that intersects. May contain the same pointer twice due to the 
-    /// DEF/USE feature of X3D.
-    /// \param theGeometryIndex is a vector with a specific index for each
-    /// time a Geometry is used in the Scene. Needed because of the DEF/USE
-    /// feature of X3D to be able to separate the different local coordinate
-    /// systems for X3DPointingDeviceSensors.
+    /// \param theGeometries is a vector of pairs of pointers and an index to
+    /// differ between different places in the scene graph for the same Node.
+    /// This can happen due to the DEF/USE feature of X3D.
     virtual bool lineIntersect( 
       const Vec3f &from, 
       const Vec3f &to,    
       vector< HAPI::Bounds::IntersectionInfo > &result,
-      vector< X3DGeometryNode * > &theGeometry,
-      vector< H3DInt32 > &theGeometryIndex,
+      vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
       const Matrix4f &current_matrix,
       vector< Matrix4f > &geometry_transforms );
 

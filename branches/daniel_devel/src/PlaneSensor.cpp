@@ -85,15 +85,14 @@ PlaneSensor::~PlaneSensor() {
 
 void PlaneSensor::onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
-                           int geometryIndex ) {
+                           int pt_id ) {
   if( is_enabled && ( isActive->getValue() || number_of_active == 0 ) ) {
     X3DPointingDeviceSensorNode::onIsOver( newValue,
                                            result,
-                                           geometryIndex );
+                                           pt_id );
     if( newValue ) {
-      intersection_point =
-        geometry_matrices[geometryIndex] * Vec3f( result.point );
-      intersection_geometry = geometryIndex;
+      intersection_matrix = pt_matrices[pt_id];
+      intersection_point = intersection_matrix * Vec3f( result.point );
     }
   }
 }
@@ -124,7 +123,7 @@ void PlaneSensor::Set_PlaneEvents::update() {
     if( isActive ) {
       if( newPlane ) {
         originalIntersection = ps->intersection_point;
-        originalGeometry = ps->intersection_geometry;
+        active_matrix = ps->intersection_matrix;
         newPlane = false;
         planeD = planeNormal * originalIntersection;
         ps->trackPoint_changed->setValue( originalIntersection, ps->id );
@@ -134,10 +133,8 @@ void PlaneSensor::Set_PlaneEvents::update() {
       else {
         H3DFloat t;
         Vec3f intersectionPoint;
-        Matrix4f geometryMatrix = 
-          ps->geometry_matrices[ps->intersection_geometry];
-        if( intersectSegmentPlane( geometryMatrix * near_plane_pos,
-                                   geometryMatrix * far_plane_pos, t,
+        if( intersectSegmentPlane( active_matrix * near_plane_pos,
+                                   active_matrix * far_plane_pos, t,
                                    intersectionPoint ) ) {
           Vec3f translation_changed = intersectionPoint - originalIntersection
                                       + ps->offset->getValue();

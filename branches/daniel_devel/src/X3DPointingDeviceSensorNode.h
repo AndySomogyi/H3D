@@ -227,16 +227,18 @@ namespace H3D {
 
     /// Add the geometryNode to the vector of geometryNodes.
     /// Called in traverseSG function of X3DGeometryNode.
-    int addGeometryNode( X3DGeometryNode * n, bool newIndex );
+    void addGeometryNode( X3DGeometryNode * n, H3DInt32 geom_index );
 
-    /// Returns the index of the geometryNode if it does exist.
-    /// Otherwise return -1
-    int findGeometry( X3DGeometryNode * n, H3DInt32 index );
+    /// Returns the index of the pt_dev_sensor in which the geometry
+    /// with the correct index exist.
+    int findGeometry( pair< X3DGeometryNode * , H3DInt32 > &geom );
 
     /// Sets the current_matrix to m
     void setCurrentMatrix( Matrix4f m ) {
-      current_matrix = m;
+      pt_matrices[ current_pt_id ] = m;
     }
+
+    H3DInt32 increaseIndex( TraverseInfo &ti );
 
     static void updateX3DPointingDeviceSensors( Node * n );
     static void clearGeometryNodes();
@@ -249,7 +251,7 @@ namespace H3D {
     /// Called to generate isOver events if they should be
     /// generated.
     virtual void onIsOver( bool newValue, 
-      HAPI::Bounds::IntersectionInfo &result, int geometryIndex ) {
+      HAPI::Bounds::IntersectionInfo &result, int pt_id ) {
       if( is_enabled && ( isActive->getValue() || number_of_active == 0 ) ) {
         if( newValue != isOver->getValue() )
           isOver->setValue( newValue, id );
@@ -277,12 +279,16 @@ namespace H3D {
     auto_ptr< SetIsEnabled > setIsEnabled;
     auto_ptr< SetIsActive > setIsActive;
 
+    typedef map< H3DInt32, vector< pair< X3DGeometryNode *, H3DInt32 > > >
+      PtIdGeomIdMap;
     // Vectors for geometries and the corresponding local transformation
     // matrix of the X3DPointingDeviceSensor for that geometry.
-    map< H3DInt32, X3DGeometryNode * > geometry_nodes;
-    map< H3DInt32, Matrix4f > geometry_matrices;
-    Matrix4f current_matrix;
-    static H3DInt32 geometry_index;
+    
+    PtIdGeomIdMap geometry_nodes;
+    map< H3DInt32, Matrix4f > pt_matrices;
+
+    H3DInt32 current_pt_id;
+    TraverseInfo * last_ti_ptr;
     
   private:
     // The instances of X3DPointingDeviceSensorNode that has been created.
