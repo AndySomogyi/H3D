@@ -63,17 +63,13 @@ ProximitySensor::ProximitySensor( Inst< SFNode > _metadata ,
 									_isActive),
 								orientation_changed( _orientation_changed ),
 								position_changed( _position_changed ),
-								setTime( new SetTime ){
+								set_time( new SetTime ){
 
   type_name = "ProximitySensor";
   database.initFields( this );
 
-  setTime->setOwner( this );
-  isActive->route( setTime );
-
-  centerOfRotation_changed->setValue( Vec3f( 0, 0, 0 ), id );
-  orientation_changed->setValue( Rotation( Vec3f( 0, 0, 0 ) ) , id );
-  position_changed->setValue( Vec3f( 0, 0, 0 ) , id );
+  set_time->setOwner( this );
+  isActive->route( set_time );
   
 }
 void ProximitySensor::traverseSG( TraverseInfo &ti ) {
@@ -85,7 +81,7 @@ void ProximitySensor::traverseSG( TraverseInfo &ti ) {
 	{
 
 		// First instance of the DEF/USE ProximitySensors in the scene
-		if( prevTravInfoAdr != (int)&ti)
+		if( prev_travinfoadr != (int)&ti)
 			prev_vp_pos = can_prev_vp_pos;
 
 		// Active viewpoint
@@ -165,7 +161,7 @@ void ProximitySensor::traverseSG( TraverseInfo &ti ) {
 								containLookat = true;
 					}
 					if( containLookat )
-						centerOfRotation_changed->setValue( Vec3f( vp_cor_wrt_pr
+						centerOfRotation_changed->setValue(Vec3f( vp_cor_wrt_pr
 												- center->getValue() ), id );
 				}
 			
@@ -185,7 +181,7 @@ void ProximitySensor::traverseSG( TraverseInfo &ti ) {
 		}
 	
 		can_prev_vp_pos = glob_vp_pos;
-		prevTravInfoAdr = (int)&ti;
+		prev_travinfoadr = (int)&ti;
 	}
 }
 

@@ -32,7 +32,6 @@
 #include "X3DEnvironmentalSensorNode.h"
 #include "SFVec3f.h"
 #include "X3DViewpointNode.h"
-//#include "hash_map.h"
 
 
 namespace H3D {
@@ -108,7 +107,6 @@ namespace H3D {
       /// Sets either the inputTrue or inputFalse field depending
       /// on the new value.
       virtual void setValue( const bool &b, int id = 0 ) {
-        cerr<<"autoupdate"<<endl;
         SFBool::setValue( b , id );
         VisibilitySensor *vs = 
           static_cast< VisibilitySensor * >( getOwner() );
@@ -143,15 +141,15 @@ namespace H3D {
     /// <b>Access type:</b> inputOnly \n
     /// 
     /// \dotfile ProximitySensor_setTime.dot
-	auto_ptr< SetTime > setTime;
+	auto_ptr< SetTime > set_time;
 
    	// Adress of traverseInfo 
-	int prevTravInfoAdr;
+	int prev_travinfoadr;
 
 	//  Number of Instances(DEF/USE) cases in the previous traverseSG
-	int prevMaxNoInstances;
+	int prev_maxnoinstances;
 	//  The variable keeping the instance no in a traverseSG
-	int NoInstance;
+	int no_instance;
 
 	//  List of NoInstances of visible instances
 	vector < int > list;

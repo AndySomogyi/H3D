@@ -47,7 +47,8 @@ namespace X3DSensorEnvironmentalNodeInternals {
 
 }
 
-X3DEnvironmentalSensorNode::X3DEnvironmentalSensorNode(	Inst< SFNode > _metadata,
+X3DEnvironmentalSensorNode::X3DEnvironmentalSensorNode(	
+								Inst< SFNode > _metadata,
 								Inst< SFVec3f > _center ,
 								Inst< SFBool > _enabled ,
 								Inst< SFVec3f > _size ,

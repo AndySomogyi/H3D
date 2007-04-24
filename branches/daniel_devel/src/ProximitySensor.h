@@ -195,9 +195,9 @@ namespace H3D {
     /// <b>Access type:</b> inputOnly \n
     /// 
     /// \dotfile ProximitySensor_setTime.dot
-	auto_ptr< SetTime > setTime;
+	auto_ptr< SetTime > set_time;
 
-	int prevTravInfoAdr;
+	int prev_travinfoadr;
 	
 	
 	// Internal Vectors for previous position of viewpoint

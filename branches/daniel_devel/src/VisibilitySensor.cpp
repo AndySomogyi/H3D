@@ -53,13 +53,13 @@ VisibilitySensor::VisibilitySensor( Inst< SFNode > _metadata ,
                                             _enterTime,
                                             _exitTime,
                                             _isActive ),
-								setTime( new SetTime ){
+								set_time( new SetTime ){
 
   type_name = "VisibilitySensor";
   database.initFields( this );
 
-  setTime->setOwner( this );
-  isActive->route( setTime );
+  set_time->setOwner( this );
+  isActive->route( set_time );
   visib_pix_no_threshold = 10;
   
 }
@@ -71,18 +71,18 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
 	    size->getValue().z >= 0.0 ))
 	{
 		
-		if( prevTravInfoAdr != (int)&ti)
+		if( prev_travinfoadr != (int)&ti)
 		{
 			// First Instance DEF/USE of traveseSG
-			prevMaxNoInstances = NoInstance;
+			prev_maxnoinstances = no_instance;
 			vector<int>::iterator p;
 			for( p = list.begin(); p != list.end(); p++ ) {
-				if( *p > NoInstance)
+				if( *p > no_instance)
 					p=list.erase( p );
 			}
-			NoInstance = 0;
+			no_instance = 0;
 		}
-		NoInstance++;
+		no_instance++;
 			
 		const Matrix4f &vs_frw_m = ti.getAccForwardMatrix();
 
@@ -119,7 +119,8 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
 		GLint bitsSupported;
 
 		// check to make sure functionality is supported
-		glGetQueryiv(GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS_ARB, &bitsSupported);
+		glGetQueryiv(GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS_ARB, 
+			&bitsSupported);
 		if (bitsSupported == 0) {
 		     cout<<"query check is not supported"<<endl;
 			
@@ -207,22 +208,24 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
 	
 		if( sampleCount > visib_pix_no_threshold )
 		{
-			vector<int>::iterator p = find(list.begin(), list.end(), NoInstance );
+			vector<int>::iterator p = find(list.begin(), list.end(), 
+				no_instance );
 			if ( p == list.end() ) {
 				if( list.size() == 0 ) isActive->setValue( true, id );
-	        	list.push_back( NoInstance );
+	        	list.push_back( no_instance );
 			}
 		}
 		else
 		{
-			vector<int>::iterator p = find(list.begin(), list.end(), NoInstance );
+			vector<int>::iterator p = find(list.begin(), list.end(), 
+				no_instance );
 			if ( p != list.end() ) {
 	    			list.erase( p );
 					if( list.size() == 0 ) isActive->setValue( false, id );
 			}
 		}
 
-		prevTravInfoAdr = (int)&ti;
+		prev_travinfoadr = (int)&ti;
 	
 	}
 }
