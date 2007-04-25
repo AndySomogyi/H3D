@@ -188,7 +188,6 @@ void IndexedTriangleSet::render() {
             attrib->getValueByIndex( attrib_index );
           if( attr ) attr->renderArray();
       }
-      cerr << "I indextrianglset "<< endl;
       glDrawElements( GL_TRIANGLES, 
         3*nr_triangles, 
         GL_UNSIGNED_INT,

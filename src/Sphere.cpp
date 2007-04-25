@@ -147,3 +147,13 @@ void Sphere::traverseSG( TraverseInfo &ti ) {
   else useBackFaceCulling( false );
   
 }
+
+bool Sphere::movingSphereIntersect( H3DFloat _radius,
+                                    const Vec3f &from, 
+                                    const Vec3f &to ) {
+  HAPI::Bounds::Sphere temp_sphere( Vec3f( 0.0f, 0.0f, 0.0f ),
+                                    radius->getValue() * 1000.0f );
+  return temp_sphere.movingSphereIntersect( _radius * 1000.0f,
+                                            from * 1000.0f,
+                                            to * 1000.0f );
+}
