@@ -148,6 +148,45 @@ void Sphere::traverseSG( TraverseInfo &ti ) {
   
 }
 
+bool Sphere::lineIntersect(
+                  const Vec3f &from, 
+                  const Vec3f &to,    
+                  vector< HAPI::Bounds::IntersectionInfo > &result,
+                  vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+                  const Matrix4f &current_matrix,
+                  vector< Matrix4f > &geometry_transforms ) {
+  if( affected_by_ptdvs )
+    current_geom_id++;
+  HAPI::Bounds::IntersectionInfo tempresult;
+  HAPI::Bounds::Sphere temp_sphere( Vec3f( 0.0f, 0.0f, 0.0f ),
+                                    radius->getValue() * 1000.0f );
+  bool returnValue =
+    temp_sphere.lineIntersect( 1000*from, 1000*to, tempresult );
+  if( returnValue ) {
+    tempresult.point = tempresult.point / 1000;
+    tempresult.normal = tempresult.normal / 1000;
+    result.push_back( tempresult );
+    theGeometries.push_back( make_pair( this, current_geom_id ) );
+    geometry_transforms.push_back( current_matrix );
+  }
+  return returnValue;
+}
+
+void Sphere::closestPoint(
+                  const Vec3f &p,
+                  vector< Vec3f > &closest_point,
+                  vector< Vec3f > &normal,
+                  vector< Vec3f > &tex_coord ) {
+  Vec3d temp_closest_point, temp_normal, temp_tex_coord;
+  HAPI::Bounds::Sphere temp_sphere( Vec3f( 0.0f, 0.0f, 0.0f ),
+                                    radius->getValue() * 1000.0f );
+  temp_sphere.closestPoint( p * 1000, temp_closest_point, 
+                            temp_normal, temp_tex_coord );
+  closest_point.push_back( (Vec3f)temp_closest_point / 1000 );
+  normal.push_back( (Vec3f)temp_normal / 1000 );
+  tex_coord.push_back( (Vec3f)temp_tex_coord );
+}
+
 bool Sphere::movingSphereIntersect( H3DFloat _radius,
                                     const Vec3f &from, 
                                     const Vec3f &to ) {
