@@ -90,6 +90,33 @@ namespace H3D {
     /// Traverse the scenegraph. Adds a HapticSphere if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );
 
+    /// Detect intersection between a line segment and the sphere.
+    /// \param from The start of the line segment.
+    /// \param to The end of the line segment.
+    /// \param result Contains info about the closest intersection for every
+    /// object that intersects the line
+    /// \param theGeometries is a vector of pairs of pointers and an index to
+    /// differ between different places in the scene graph for the same Node.
+    /// This can happen due to the DEF/USE feature of X3D.
+    virtual bool lineIntersect( 
+      const Vec3f &from,
+      const Vec3f &to,    
+      vector< HAPI::Bounds::IntersectionInfo > &result,
+      vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+      const Matrix4f &current_matrix,
+      vector< Matrix4f > &geometry_transforms );
+
+    /// Find closest point on the sphere to point p.
+    /// \param p The point to find the closest point to.
+    /// \param closest_point Return parameter for each closest point
+    /// \param normal Return parameter for normal at each closest point.
+    /// \param tex_coord Return paramater for each texture coordinate at
+    /// closest point
+    virtual void closestPoint( const Vec3f &p,
+                               vector< Vec3f > &closest_point,
+                               vector< Vec3f > &normal,
+                               vector< Vec3f > &tex_coord );
+
     /// Detect collision between a moving sphere and this sphere.
     /// \param The radius of the sphere
     /// \param from The start position of the sphere
