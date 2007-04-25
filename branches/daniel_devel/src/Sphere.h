@@ -90,6 +90,15 @@ namespace H3D {
     /// Traverse the scenegraph. Adds a HapticSphere if haptics is enabled.
     virtual void traverseSG( TraverseInfo &ti );
 
+    /// Detect collision between a moving sphere and this sphere.
+    /// \param The radius of the sphere
+    /// \param from The start position of the sphere
+    /// \param to The end position of the sphere.
+    /// \returns true if intersected, false otherwise.
+    virtual bool movingSphereIntersect( H3DFloat radius,
+                                        const Vec3f &from, 
+                                        const Vec3f &to );
+
     /// The radius of the Sphere in metres.
     ///
     /// <b>Access type:</b> inputOutput \n
