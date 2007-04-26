@@ -136,6 +136,22 @@ namespace H3D {
       return -1;
     }
 
+    /// Detect intersection between a line segment and the texts bounding box.
+    /// \param from The start of the line segment.
+    /// \param to The end of the line segment.
+    /// \param result Contains info about the closest intersection for every
+    /// object that intersects the line
+    /// \param theGeometries is a vector of pairs of pointers and an index to
+    /// differ between different places in the scene graph for the same Node.
+    /// This can happen due to the DEF/USE feature of X3D.
+    virtual bool lineIntersect( 
+      const Vec3f &from,
+      const Vec3f &to,    
+      vector< HAPI::Bounds::IntersectionInfo > &result,
+      vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+      const Matrix4f &current_matrix,
+      vector< Matrix4f > &geometry_transforms );
+
     /// The style the text should be rendered with. See X3DFontStyleNode.
     ///
     /// <b>Access type:</b> inputOutput \n

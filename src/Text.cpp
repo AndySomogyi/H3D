@@ -461,3 +461,29 @@ void Text::SFBound::update() {
     value = bb;
   }
 }
+
+bool Text::lineIntersect(
+                  const Vec3f &from, 
+                  const Vec3f &to,    
+                  vector< HAPI::Bounds::IntersectionInfo > &result,
+                  vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+                  const Matrix4f &current_matrix,
+                  vector< Matrix4f > &geometry_transforms ) {
+  if( affected_by_ptdvs )
+    current_geom_id++;
+  HAPI::Bounds::IntersectionInfo tempresult;
+
+  bool returnValue = false;
+  Bound * the_bound = bound->getValue();
+  if( the_bound ) {
+      returnValue = the_bound->lineSegmentIntersect( from, to );
+      if( returnValue ) {
+        tempresult.point = Vec3f( 0, 0, 0 );
+        tempresult.normal = Vec3f( 0, 0, 1 );
+        result.push_back( tempresult );
+        theGeometries.push_back( make_pair( this, current_geom_id ) );
+        geometry_transforms.push_back( current_matrix );
+      }
+  }
+  return returnValue;
+}
