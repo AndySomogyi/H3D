@@ -242,9 +242,9 @@ void H3DHapticsDevice::updateDeviceValues() {
     torque->setValue( (Vec3f)dv.torque, id);
     buttons->setValue( dv.button_status, id );
 
-    if( followViewpoint->getValue() ) {
+    X3DViewpointNode *vp = X3DViewpointNode::getActive();
+    if( followViewpoint->getValue() && vp ) {
       // Haptic device should follow the viewpoint.
-      X3DViewpointNode *vp = X3DViewpointNode::getActive();
 
       const Matrix4f vp_accFrw = vp->accForwardMatrix->getValue();
 
