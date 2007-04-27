@@ -41,6 +41,7 @@ Rotation NavigationInfo::goal_orientation = Rotation();
 Vec3f NavigationInfo::old_vp_pos = Vec3f();
 Rotation NavigationInfo::old_vp_orientation = Rotation();
 list<NavigationInfo *> NavigationInfo::navigationInfos;
+bool NavigationInfo::force_jump = false;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase NavigationInfo::database( 
@@ -99,12 +100,6 @@ NavigationInfo::NavigationInfo( Inst< SFSetBind > _set_bind,
   type->push_back( "ANY" );
   visibilityLimit->setValue( 0 );
 
-  old_vp.reset( X3DViewpointNode::getActive() );
-  if( old_vp.get() ) {
-    old_vp_pos = old_vp->getFullPos();
-    old_vp_orientation = old_vp->getFullOrn();
-  }
-
   last_time = TimeStamp();
   nav_type = "";
 
@@ -132,10 +127,11 @@ void NavigationInfo::doNavigation( X3DViewpointNode * vp,
       linear_interpolate = false;
     }
 
-    if( vp->jump->getValue() ) {
+    if( vp->jump->getValue() || force_jump ) {
+      force_jump = false;
 
       string transition = "LINEAR";
-      //TODO: allow for run-time choices of transitionType somehow.
+
       // checking which values are allowed. (transitionType is a MFString).
       if( !transitionType->empty() )
         transition = transitionType->getValueByIndex( 0 );
@@ -168,6 +164,11 @@ void NavigationInfo::doNavigation( X3DViewpointNode * vp,
       }
     }
     old_vp.reset( vp );
+  }
+  else if( !old_vp.get() ) {
+    old_vp.reset( vp );
+    old_vp_pos = old_vp->getFullPos();
+    old_vp_orientation = old_vp->getFullOrn();
   }
 
   // When a transition takes place navigationinfo negates external

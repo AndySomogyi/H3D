@@ -76,6 +76,12 @@ namespace H3D {
     /// reset values of movement variables
     virtual void resetAll();
     
+    /// virtual function to remove routes for this device.
+    virtual void disableDevice() {};
+
+    /// virtual function to enable routes for this device.
+    virtual void enableDevice() {};
+    
     /// sets type of navigation for all devices
     static void setNavTypeForAll( string &_nav_type ) {
       for( list< H3DNavigationDevices * >::iterator i = h3dnavigations.begin();
@@ -125,6 +131,12 @@ namespace H3D {
     MouseNavigation();
 
     virtual void resetAll();
+
+    /// virtual function to remove routes for this device.
+    virtual void disableDevice();
+
+    /// virtual function to enable routes for this device.
+    virtual void enableDevice();
 
   protected:
     auto_ptr< CalculateMouseMoveInfo > calculateMouseMoveInfo;

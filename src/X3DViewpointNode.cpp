@@ -30,6 +30,7 @@
 
 #include "X3DViewpointNode.h"
 #include "ViewpointGroup.h"
+#include "NavigationInfo.h"
 
 using namespace H3D;
 
@@ -103,7 +104,9 @@ void X3DViewpointNode::removeFromStack() {
       if( s.size() > 0 ) {
         X3DViewpointNode * new_vp =
           static_cast<X3DViewpointNode * >(s.front());
-        if( !new_vp->jump->getValue() ) {
+        bool local_jump =
+          NavigationInfo::force_jump ? true : new_vp->jump->getValue();
+        if( !local_jump ) {
 
           const Matrix4f &vp_acc_inv_mtx =
             new_vp->accInverseMatrix->getValue();
@@ -129,7 +132,8 @@ void X3DViewpointNode::toStackTop() {
   X3DBindableNode *active = NULL;
   if( s.size() > 0 ) active = s.front();
   if ( active != this ) {
-    if( jump->getValue() ) {
+    bool local_jump = NavigationInfo::force_jump ? true : jump->getValue();
+    if( local_jump ) {
       if( !retainUserOffsets->getValue() ) {
         rel_pos = Vec3f( 0, 0, 0 );
         rel_orn = Rotation( 0, 0, 0, 0 );

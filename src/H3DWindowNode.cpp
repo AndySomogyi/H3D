@@ -563,6 +563,17 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     vp_ref.reset( static_cast<Viewpoint *>(vp) );
   }
 
+  if( nav_info )
+    nav_info->doNavigation( vp, child_to_render );
+  else {
+    H3DNavigation::doNavigation( default_nav,
+                                 vp, child_to_render,
+                                 default_collision,
+                                 default_avatar,
+                                 default_speed );
+    H3DNavigationDevices::setNavTypeForAll( default_nav );
+  }
+  
   RenderMode::Mode stereo_mode = renderMode->getRenderMode();
 
   Vec3f vp_position = vp->getFullPos();
@@ -936,17 +947,6 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     swapBuffers();
   }
   glPopAttrib();
-
-  if( nav_info )
-    nav_info->doNavigation( vp, child_to_render );
-  else {
-    H3DNavigation::doNavigation( default_nav,
-                                 vp, child_to_render,
-                                 default_collision,
-                                 default_avatar,
-                                 default_speed );
-    H3DNavigationDevices::setNavTypeForAll( default_nav );
-  }
 }
 
 void H3DWindowNode::reshape( int w, int h ) {
