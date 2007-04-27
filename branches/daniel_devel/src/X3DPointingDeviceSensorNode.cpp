@@ -96,6 +96,7 @@ X3DPointingDeviceSensorNode::~X3DPointingDeviceSensorNode() {
   if( instances.empty() ) {
     delete mouse_sensor;
     mouse_sensor = NULL;
+    number_of_active = 0;
   }
 }
 

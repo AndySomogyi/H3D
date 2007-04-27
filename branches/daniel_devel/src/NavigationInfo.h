@@ -277,6 +277,10 @@ namespace H3D {
       return navigationInfos;
     }
 
+    // set when a node forces the jump regardless of value in the
+    // current viewpoints jump field. Set by Anchor for example.
+    static bool force_jump;
+
     /// The avatarSize field specifies the user's physical dimensions 
     /// in the world for the purpose of collision detection and terrain
     /// following.

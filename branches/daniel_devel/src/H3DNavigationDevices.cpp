@@ -64,6 +64,16 @@ void MouseNavigation::resetAll() {
   calculateMouseMoveInfo->setValue( false );
 }
 
+void MouseNavigation::disableDevice() {
+  mouseSensor->leftButton->unroute( calculateMouseMoveInfo );
+  mouseSensor->motion->unroute( calculateMouseMoveInfo );
+}
+
+void MouseNavigation::enableDevice() {
+  mouseSensor->leftButton->routeNoEvent( calculateMouseMoveInfo );
+  mouseSensor->motion->routeNoEvent( calculateMouseMoveInfo );
+}
+
 void MouseNavigation::CalculateMouseMoveInfo::update( ) {
   bool button_pressed = static_cast< SFBool * >(routes_in[0])->getValue();
   Vec2f motion = static_cast< SFVec2f * >(routes_in[1])->getValue();

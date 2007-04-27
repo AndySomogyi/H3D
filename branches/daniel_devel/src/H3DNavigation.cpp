@@ -253,14 +253,16 @@ void H3DNavigation::disableDevice( int device ) {
   {
     switch( device ) {
       case ALL: {
-        instance->mouse_nav.reset(0);
+        if( instance->mouse_nav.get() )
+          instance->mouse_nav->disableDevice();
         instance->keyboard_nav.reset(0);
         instance->haptic_device_nav.reset(0);
         instance->sws_navigation.reset( 0 );
         break;
       }
       case MOUSE: {
-        instance->mouse_nav.reset( 0 );
+        if( instance->mouse_nav.get() )
+          instance->mouse_nav->disableDevice();
         break;
       }
       case KEYBOARD: {
@@ -285,19 +287,27 @@ void H3DNavigation::enableDevice( int device ) {
   {
     switch( device ) {
       case ALL: {
-        if( !instance->mouse_nav.get() )
+        if( instance->mouse_nav.get() ) {
+          instance->mouse_nav->enableDevice();
+        }
+        else {
           instance->mouse_nav.reset( new MouseNavigation() );
+        }
         if( !instance->keyboard_nav.get() )
           instance->keyboard_nav.reset( new KeyboardNavigation() );
-        if( !instance->keyboard_nav.get() )
+        if( !instance->haptic_device_nav.get() )
           instance->haptic_device_nav.reset( new HapticDeviceNavigation() );
         if( !instance->sws_navigation.get() )
           instance->sws_navigation.reset( new SWSNavigation() );
         break;
       }
       case MOUSE: {
-        if( !instance->mouse_nav.get() )
+        if( instance->mouse_nav.get() ) {
+          instance->mouse_nav->enableDevice();
+        }
+        else {
           instance->mouse_nav.reset( new MouseNavigation() );
+        }
         break;
       }
       case KEYBOARD: {
@@ -306,7 +316,7 @@ void H3DNavigation::enableDevice( int device ) {
         break;
       }
       case HAPTICSDEVICE: {
-        if( !instance->keyboard_nav.get() )
+        if( !instance->haptic_device_nav.get() )
           instance->haptic_device_nav.reset( new HapticDeviceNavigation() );
         break;
       }
