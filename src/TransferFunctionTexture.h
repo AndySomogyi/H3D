@@ -46,7 +46,7 @@ namespace H3D {
   /// 
   /// If a function is not specified for a component the function will be
   /// F(x) = x for that component.
-  class TransferFunctionTexture : public X3DTexture2DNode {
+  class H3DAPI_API TransferFunctionTexture : public X3DTexture2DNode {
   public:
     
    typedef H3D::DependentSFNode< 
@@ -56,7 +56,8 @@ namespace H3D {
    SFFunctionNode;
 
     /// SFImage is overridden to update the value from the functions.
-    class SFImage: public H3D::TypedField< H3D::X3DTexture2DNode::SFImage,
+    class H3DAPI_API SFImage: 
+      public H3D::TypedField< H3D::X3DTexture2DNode::SFImage,
                    H3D::Types< SFFunctionNode, SFFunctionNode, 
                    SFFunctionNode, SFFunctionNode > > {
       /// Creates an image to be used as color table.
