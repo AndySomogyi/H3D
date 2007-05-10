@@ -34,6 +34,7 @@ using namespace H3D;
 
 list< MouseSensor * > MouseSensor::instances = 
 list< MouseSensor * >();
+bool MouseSensor::invalid_instance_ptr = false;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase MouseSensor::database( 
@@ -89,6 +90,7 @@ MouseSensor::MouseSensor( Inst< SFBool>  _enabled,
 
 MouseSensor::~MouseSensor() {
   instances.remove( this );
+  invalid_instance_ptr = true;
 }
 
 void MouseSensor::mouseMotionAction( int x, int y ) {
@@ -130,10 +132,20 @@ void MouseSensor::mouseWheelAction( int direction ) {
 }
 
 void MouseSensor::buttonCallback( int button, int state ) {
+  invalid_instance_ptr = false;
+  list< MouseSensor * >::iterator end_iterator = instances.end();
   for( list< MouseSensor * >::iterator i = instances.begin();
-       i != instances.end();
+       i != end_iterator;
        i++ ) {
     (*i)->mouseButtonAction( button, state );
+    if( invalid_instance_ptr ) {
+      if( instances.empty() ) {
+        break;
+      }
+      i = instances.begin();
+      end_iterator = instances.end();
+      invalid_instance_ptr = false;
+    }
   }
 }
     

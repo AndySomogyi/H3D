@@ -159,7 +159,7 @@ namespace H3D {
       // intersection between the segment from a to b and the plane defined
       // by planeD and planeNormal (see below). Results are stored in
       // t and q.
-      int intersectSegmentPlane( Vec3f a, Vec3f b, float &t, Vec3f &q );
+      int intersectLinePlane( Vec3f a, Vec3f b, float &t, Vec3f &q );
 
       Vec3f original_intersection, ca, cb, y_axis;
       H3DFloat radius, plane_d;

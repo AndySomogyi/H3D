@@ -151,20 +151,14 @@ int CylinderSensor::Set_CylinderEvents::intersectSegmentCylinder(
   return 1;
 }
 
-int CylinderSensor::Set_CylinderEvents::intersectSegmentPlane(
+int CylinderSensor::Set_CylinderEvents::intersectLinePlane(
   Vec3f a, Vec3f b, float &t, Vec3f &q ) {
   // Compute the t value for the directed line ab intersecting the plane
   Vec3f ab = b - a;
   t = (plane_d - y_axis * a ) / ( y_axis * ab );
 
-  // If t in [0..1] compute and return intersection point
-  if( t >= 0.0f && t <= 1.0f ) {
-    q = a + t * ab;
-    return 1;
-  }
-
-  // Else no intersection
-  return 0;
+  q = a + t * ab;
+  return 1;
 }
 
 void CylinderSensor::Set_CylinderEvents::update() {
@@ -202,7 +196,7 @@ void CylinderSensor::Set_CylinderEvents::update() {
         Vec3f intersectionPoint;
         bool intersected = false;
         if( use_caps && 
-            intersectSegmentPlane( 
+            intersectLinePlane( 
               original_transform_matrix * near_plane_pos,
               original_transform_matrix * far_plane_pos,
               t, intersectionPoint ) ) {

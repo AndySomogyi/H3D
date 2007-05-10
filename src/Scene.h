@@ -83,6 +83,10 @@ namespace H3D {
     /// Before this function is called at least one instance
     /// of Scene must have created and be active. 
     static void mainLoop();
+
+    /// Static function to replace a scene with another scene
+    static void replaceWorld( AutoRef< Node > new_world,
+                              X3DViewpointNode * new_vp );
     
     /// The scene graph to render in this scene.
     ///

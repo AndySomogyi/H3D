@@ -30,7 +30,6 @@
 #define __X3DPOINTINGDEVICESENSORNODE_H__
 
 #include "MouseSensor.h"
-#include "X3DGroupingNode.h"
 #include "X3DGeometryNode.h"
 #include "SFString.h"
 
@@ -227,11 +226,11 @@ namespace H3D {
 
     /// Add the geometryNode to the vector of geometryNodes.
     /// Called in traverseSG function of X3DGeometryNode.
-    void addGeometryNode( X3DGeometryNode * n, H3DInt32 geom_index );
+    void addGeometryNode( Node * n, H3DInt32 geom_index );
 
     /// Returns the index of the pt_dev_sensor in which the geometry
     /// with the correct index exist.
-    int findGeometry( pair< X3DGeometryNode * , H3DInt32 > &geom );
+    int findGeometry( pair< Node * , H3DInt32 > &geom );
 
     /// Sets the current_matrix to m
     void setCurrentMatrix( Matrix4f m ) {
@@ -279,7 +278,7 @@ namespace H3D {
     auto_ptr< SetIsEnabled > setIsEnabled;
     auto_ptr< SetIsActive > setIsActive;
 
-    typedef map< H3DInt32, vector< pair< X3DGeometryNode *, H3DInt32 > > >
+    typedef map< H3DInt32, vector< pair< Node *, H3DInt32 > > >
       PtIdGeomIdMap;
     // Vectors for geometries and the corresponding local transformation
     // matrix of the X3DPointingDeviceSensor for that geometry.

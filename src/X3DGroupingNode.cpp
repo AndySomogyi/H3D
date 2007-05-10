@@ -165,36 +165,35 @@ bool X3DGroupingNode::lineIntersect(
                   const Vec3f &from, 
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
-                 vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+                 vector< pair< Node *, H3DInt32 > > &theNodes,
                   const Matrix4f &current_matrix,
-                  vector< Matrix4f > &geometry_transforms ) {
+                  vector< Matrix4f > &geometry_transforms,
+                  bool pt_device_affect ) {
   bool intersect = false;
   bool traverse_children = false;
   Bound * the_bound = bound->getValue();
+  if( !pt_device_affect ) {
+    for( unsigned int i = 0; i < pt_dev_sensors.size(); i++ ) {
+      if( pt_dev_sensors[i]->enabled->getValue() ) {
+        pt_device_affect = true;
+      }
+    }
+  }
   if( !the_bound ||
       the_bound->lineSegmentIntersect( from, to ) ) {
     const NodeVector &children_nodes = children->getValue();
     for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
       if( children_nodes[i]->lineIntersect( from, to, result,
-                                            theGeometries,
+                                            theNodes,
                                             current_matrix,
-                                            geometry_transforms ) ) {
+                                            geometry_transforms,
+                                            pt_device_affect ) ) {
           intersect = true;
       }
     }
   }
   else {
-    // ugly ugly solution, somehow change this, the problem is that
-    // when optimizing the collision detection by first colliding against
-    // bounding box the system for keeping track of geometries per pointing
-    // device sensor gets screwed up.
-    const NodeVector &children_nodes = children->getValue();
-    for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
-      X3DShapeNode * temp_shape = dynamic_cast< X3DShapeNode * >(children_nodes[i]);
-      if( temp_shape ) {
-        temp_shape->geometry->getValue()->increaseCurrentGeometry();
-      }
-    }
+    incrNodeDefUseId( pt_device_affect );
   }
   return intersect;
 }
@@ -299,4 +298,25 @@ bool X3DGroupingNode::movingSphereIntersect( H3DFloat radius,
       return true;
   }
   return false;
+}
+
+void X3DGroupingNode::incrNodeDefUseId( bool pt_device_affect ) {
+  if( !pt_device_affect ) {
+    for( unsigned int i = 0; i < pt_dev_sensors.size(); i++ ) {
+      if( pt_dev_sensors[i]->enabled->getValue() ) {
+        pt_device_affect = true;
+      }
+    }
+  }
+  const NodeVector &children_nodes = children->getValue();
+  for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
+    children_nodes[i]->incrNodeDefUseId( pt_device_affect );
+  }
+}
+
+void X3DGroupingNode::resetNodeDefUseId() {
+  const NodeVector &children_nodes = children->getValue();
+  for( unsigned int i = 0; i < children_nodes.size(); i++ ) {
+    children_nodes[i]->resetNodeDefUseId();
+  }
 }
