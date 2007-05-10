@@ -162,6 +162,17 @@ namespace H3D {
     /// Render the IndexedLineSet with OpenGL
     virtual void render();
 
+    /// Detect collision between a moving sphere and the geometry.
+    /// \param The radius of the sphere
+    /// \param from The start position of the sphere
+    /// \param to The end position of the sphere.
+    /// \returns true if intersected, false otherwise.
+    virtual bool movingSphereIntersect( H3DFloat radius,
+                                        const Vec3f &from, 
+                                        const Vec3f &to ) {
+      return false;
+    }
+
     /// Field for setting the value of the colorIndex field.
     /// <b>Access type:</b> inputOnly 
     ///
