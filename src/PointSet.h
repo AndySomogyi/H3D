@@ -119,6 +119,17 @@ namespace H3D {
       return 0;
     }
 
+    /// Detect collision between a moving sphere and the geometry.
+    /// \param The radius of the sphere
+    /// \param from The start position of the sphere
+    /// \param to The end position of the sphere.
+    /// \returns true if intersected, false otherwise.
+    virtual bool movingSphereIntersect( H3DFloat radius,
+                                        const Vec3f &from, 
+                                        const Vec3f &to ) {
+      return false;
+    }
+
     /// If the color field is not NULL, it shall specify a Color node that
     /// contains at least the number of points contained in the coord
     /// node. Colours  are applied to each point in order.   
