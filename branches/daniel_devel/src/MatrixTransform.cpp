@@ -143,9 +143,10 @@ bool MatrixTransform::lineIntersect(
                              const Vec3f &from, 
                              const Vec3f &to,    
                              vector< HAPI::Bounds::IntersectionInfo > &result,
-                             vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+                             vector< pair< Node *, H3DInt32 > > &theNodes,
                              const Matrix4f &current_matrix,
-                             vector< Matrix4f > &geometry_transforms ) {
+                             vector< Matrix4f > &geometry_transforms,
+                             bool pt_device_affect ) {
   Matrix4f theMatrix = matrix->getValue();
   Matrix4f theMatrixInverse = theMatrix.inverse();
 
@@ -153,8 +154,8 @@ bool MatrixTransform::lineIntersect(
   Vec3f local_to = theMatrixInverse * to;
   H3DInt32 sizeBefore = result.size();
   bool intersection = X3DGroupingNode::lineIntersect( 
-    local_from, local_to, result, theGeometries,
-    accumulatedForward->getValue(), geometry_transforms );
+    local_from, local_to, result, theNodes,
+    accumulatedForward->getValue(), geometry_transforms, pt_device_affect );
   if( intersection ) {
     for( unsigned int i = sizeBefore; i < result.size(); i++ ) {
       result[i].point = theMatrix * result[i].point;

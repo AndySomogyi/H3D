@@ -157,7 +157,6 @@ int main(int argc, char* argv[]) {
   Console.setOutputStream(*console_ostream);
   
   // Graphics, devices, models and such
-  
   string settings_path = 
     GET_ENV_INI_DEFAULT( "H3D_DISPLAY",
                          h3d_root + "/settings/display/",
@@ -318,14 +317,12 @@ int main(int argc, char* argv[]) {
   
   try {
     AutoRef< KeySensor > ks( new KeySensor );
-    AutoRef< MouseSensor > ms( new MouseSensor );
 #ifndef MACOSX
     AutoRef< SpaceWareSensor > ss;
     if( use_space_mouse ) ss.reset( new SpaceWareSensor );
 #endif
     X3D::DEFNodes dn;
     QuitAPIField *quit_api = new QuitAPIField;
-    AutoRef< Transform > t( new Transform );
     AutoRef< Node > device_info;
     AutoRef< Node > viewpoint;
     AutoRef< Scene > scene( new Scene );
@@ -359,21 +356,21 @@ int main(int argc, char* argv[]) {
       }
     }
     
+    AutoRef< Group > g( new Group );
     for( vector<string>::iterator file = xml_files.begin() ;
          file != xml_files.end() ; file++ ){
       Console(3) << "Loading " << *file << endl;
       if ( file->size() > 4 && 
            file->find( ".wrl", file->size()-5 ) != string::npos )
-        t->children->push_back( X3D::createVRMLFromURL( *file, 
+        g->children->push_back( X3D::createVRMLFromURL( *file, 
                                                         &dn ) );
       else
-        t->children->push_back( X3D::createX3DFromURL( *file, 
+        g->children->push_back( X3D::createX3DFromURL( *file, 
                                                        &dn ) );
     }
     
     ks->keyPress->route( quit_api );
 
-    AutoRef< Group > g( new Group );
 #ifndef MACOSX
     if( use_space_mouse )
       g->children->push_back(ss.get());
@@ -393,8 +390,7 @@ int main(int argc, char* argv[]) {
       device_info.reset( NULL );
     }
 
-    g->children->push_back( t.get() );
-
+    dn.clear();
     
     // create a window to display
     GLUTWindow *glwindow = new GLUTWindow;

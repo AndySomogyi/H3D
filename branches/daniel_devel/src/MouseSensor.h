@@ -136,7 +136,8 @@ namespace H3D {
     static H3DNodeDatabase database;
 
   private:
-    static list< MouseSensor * > instances;  
+    static list< MouseSensor * > instances;
+    static bool invalid_instance_ptr;
   };
 }
 

@@ -78,19 +78,22 @@ bool Collision::lineIntersect(
                   const Vec3f &from, 
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
-                  vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+                  vector< pair< Node *, H3DInt32 > > &theNodes,
                   const Matrix4f &current_matrix,
-                  vector< Matrix4f > &geometry_transforms ) {
+                  vector< Matrix4f > &geometry_transforms,
+                  bool pt_device_affect ) {
   if( enabled->getValue() ) {
     X3DChildNode * temp_proxy = proxy->getValue();
     if( temp_proxy )
-      return temp_proxy->lineIntersect( from, to, result, theGeometries,
+      return temp_proxy->lineIntersect( from, to, result, theNodes,
                                         current_matrix,
-                                        geometry_transforms );
+                                        geometry_transforms,
+                                        pt_device_affect );
     else
-      return X3DGroupingNode::lineIntersect(  from, to, result, theGeometries,
+      return X3DGroupingNode::lineIntersect(  from, to, result, theNodes,
                                               current_matrix,
-                                              geometry_transforms );
+                                              geometry_transforms,
+                                              pt_device_affect );
   }
   return false;
 }

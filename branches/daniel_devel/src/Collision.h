@@ -135,16 +135,27 @@ namespace H3D {
     /// \param to The end of the line segment.
     /// \param result Contains info about the closest intersection for every
     /// object that intersects the line
-    /// \param theGeometries is a vector of pairs of pointers and an index to
+    /// \param theNodes A vector of pairs of pointer and index to
     /// differ between different places in the scene graph for the same Node.
     /// This can happen due to the DEF/USE feature of X3D.
+    /// \param current_matrix The current matrix that transforms from the local
+    /// coordinate space where this Node resides in the scenegraph to 
+    /// global space.
+    /// \param geometry_transforms A vector of matrices from the local
+    /// coordinate space to global space for each node that the
+    /// line intersects.
+    /// \param pt_device_affect Flag telling a node if it is affected by a
+    /// X3DPointingDeviceSensorNode. Needed to allow for correct behaviour
+    /// when using the DEF/USE feature of X3D.
+    /// \returns true if intersected, false otherwise.
     virtual bool lineIntersect(
       const Vec3f &from, 
       const Vec3f &to,    
       vector< HAPI::Bounds::IntersectionInfo > &result,
-      vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+      vector< pair< Node *, H3DInt32 > > &theNodes,
       const Matrix4f &current_matrix,
-      vector< Matrix4f > &geometry_transforms );
+      vector< Matrix4f > &geometry_transforms,
+      bool pt_device_affect = false );
 
     /// Find closest point on Node to p. Calls closestPoint for
     /// all children if the node is enabled.

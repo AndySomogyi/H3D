@@ -152,10 +152,11 @@ bool Sphere::lineIntersect(
                   const Vec3f &from, 
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
-                  vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+                  vector< pair< Node *, H3DInt32 > > &theNodes,
                   const Matrix4f &current_matrix,
-                  vector< Matrix4f > &geometry_transforms ) {
-  if( affected_by_ptdvs )
+                  vector< Matrix4f > &geometry_transforms,
+                  bool pt_device_affect ) {
+  if( pt_device_affect )
     current_geom_id++;
   HAPI::Bounds::IntersectionInfo tempresult;
   HAPI::Bounds::Sphere temp_sphere( Vec3f( 0.0f, 0.0f, 0.0f ),
@@ -166,7 +167,7 @@ bool Sphere::lineIntersect(
     tempresult.point = tempresult.point / 1000;
     tempresult.normal = tempresult.normal / 1000;
     result.push_back( tempresult );
-    theGeometries.push_back( make_pair( this, current_geom_id ) );
+    theNodes.push_back( make_pair( this, current_geom_id ) );
     geometry_transforms.push_back( current_matrix );
   }
   return returnValue;

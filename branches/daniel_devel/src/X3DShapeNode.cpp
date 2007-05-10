@@ -171,13 +171,15 @@ bool X3DShapeNode::lineIntersect(
                            const Vec3f &from,
                            const Vec3f &to,
                            vector< HAPI::Bounds::IntersectionInfo > &result,
-               vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+                           vector< pair< Node *, H3DInt32 > > &theNodes,
                            const Matrix4f &current_matrix,
-                           vector< Matrix4f > &geometry_transforms ) {
+                           vector< Matrix4f > &geometry_transforms,
+                           bool pt_device_affect ) {
   return geometry->getValue()->lineIntersect( from, to, result,
-                                              theGeometries,
+                                              theNodes,
                                               current_matrix,
-                                              geometry_transforms );
+                                              geometry_transforms,
+                                              pt_device_affect );
 }
 
 void X3DShapeNode::closestPoint(
@@ -192,4 +194,12 @@ bool X3DShapeNode::movingSphereIntersect( H3DFloat radius,
                                           const Vec3f &from, 
                                           const Vec3f &to ) {
   return geometry->getValue()->movingSphereIntersect( radius, from, to );
+}
+
+void X3DShapeNode::resetNodeDefUseId() {
+  geometry->getValue()->resetNodeDefUseId();
+}
+
+void X3DShapeNode::incrNodeDefUseId( bool pt_device_affect ) {
+  geometry->getValue()->incrNodeDefUseId( pt_device_affect );
 }

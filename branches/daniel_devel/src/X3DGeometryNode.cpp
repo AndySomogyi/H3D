@@ -88,8 +88,7 @@ X3DGeometryNode::X3DGeometryNode(
   draw_debug_options( true ),
   cull_face( GL_BACK ),
   last_ti_ptr( 0 ),
-  current_geom_id( -1 ),
-  affected_by_ptdvs( false ) {
+  current_geom_id( -1 ) {
 
   type_name = "X3DGeometryNode";
   
@@ -100,8 +99,6 @@ X3DGeometryNode::X3DGeometryNode(
   database.initFields( this );
 
   displayList->route( boundTree );
-
-  current_geom_id = -1;
 }
 
 
@@ -354,7 +351,6 @@ void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
   // if there exist a X3DPointingDeviceSensor add this node to its
   // geometry vector.
   if( !ti.current_pt_dev_sensors.empty() ) {
-    affected_by_ptdvs = true;
     if( last_ti_ptr != &ti ) {
       current_geom_id = -1;
       last_ti_ptr = &ti;
@@ -686,10 +682,11 @@ bool X3DGeometryNode::lineIntersect(
                   const Vec3f &from, 
                   const Vec3f &to,    
                   vector< HAPI::Bounds::IntersectionInfo > &result,
-                  vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+                  vector< pair< Node *, H3DInt32 > > &theNodes,
                   const Matrix4f &current_matrix,
-                  vector< Matrix4f > &geometry_transforms ) {
-  if( affected_by_ptdvs )
+                  vector< Matrix4f > &geometry_transforms,
+                  bool pt_device_affect ) {
+  if( pt_device_affect )
     current_geom_id++;
   HAPI::Bounds::IntersectionInfo tempresult;
   bool returnValue =
@@ -698,7 +695,7 @@ bool X3DGeometryNode::lineIntersect(
     tempresult.point = tempresult.point / 1000;
     tempresult.normal = tempresult.normal / 1000;
     result.push_back( tempresult );
-    theGeometries.push_back( make_pair( this, current_geom_id ) );
+    theNodes.push_back( make_pair( this, current_geom_id ) );
     geometry_transforms.push_back( current_matrix );
   }
   return returnValue;
@@ -718,9 +715,7 @@ void X3DGeometryNode::closestPoint(
 }
 
 
-void X3DGeometryNode::resetGeometryId( bool clear ) {
-  if( clear )
-    affected_by_ptdvs = false;
+void X3DGeometryNode::resetNodeDefUseId() {
   current_geom_id = -1;
 }
 
@@ -732,7 +727,7 @@ bool X3DGeometryNode::movingSphereIntersect( H3DFloat radius,
                                                        to * 1000.0f );
 }
 
-void X3DGeometryNode::increaseCurrentGeometry() {
-  if( affected_by_ptdvs )
+void X3DGeometryNode::incrNodeDefUseId( bool pt_device_affect ) {
+  if( pt_device_affect )
     current_geom_id++;
 }

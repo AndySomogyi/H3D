@@ -100,16 +100,27 @@ namespace H3D {
     /// \param to The end of the line segment.
     /// \param result Contains info about the closest intersection for every
     /// object that intersects the line
-    /// \param theGeometries is a vector of pairs of pointers and an index to
+    /// \param theNodes A vector of pairs of pointer and index to
     /// differ between different places in the scene graph for the same Node.
     /// This can happen due to the DEF/USE feature of X3D.
+    /// \param current_matrix The current matrix that transforms from the local
+    /// coordinate space where this Node resides in the scenegraph to 
+    /// global space.
+    /// \param geometry_transforms A vector of matrices from the local
+    /// coordinate space to global space for each node that the
+    /// line intersects.
+    /// \param pt_device_affect Flag telling a node if it is affected by a
+    /// X3DPointingDeviceSensorNode. Needed to allow for correct behaviour
+    /// when using the DEF/USE feature of X3D.
+    /// \returns true if intersected, false otherwise.
     virtual bool lineIntersect( 
       const Vec3f &from,
       const Vec3f &to,    
       vector< HAPI::Bounds::IntersectionInfo > &result,
-      vector< pair< X3DGeometryNode *, H3DInt32 > > &theGeometries,
+      vector< pair< Node *, H3DInt32 > > &theNodes,
       const Matrix4f &current_matrix,
-      vector< Matrix4f > &geometry_transforms );
+      vector< Matrix4f > &geometry_transforms,
+      bool pt_device_affect = false );
 
     /// Find closest point on this geometry to point p.
     /// \param p The point to find the closest point to.
@@ -242,13 +253,15 @@ namespace H3D {
       }
     }
 
-    /// Resets things for x3dpointingdevicesensors.
-    void resetGeometryId( bool clear );
+    /// Resets flags used to get correct behaviour for lineIntersect
+    /// when using the DEF/USE feature and X3DPointingDeviceSensorNode.
+    virtual void resetNodeDefUseId();
 
-    /// increases the counter which keeps track of the current geometry
-    /// instance for DEF/USE
-    // TODO: change this system somehow
-    void increaseCurrentGeometry();
+    /// Increase an integer used to get correct behaviour for lineIntersect
+    /// when using the DEF/USE feature and X3DPointingDeviceSensorNode.
+    /// \param pt_device_affect A flag which is true if the node is affected
+    /// by a X3DPointingDeviceSensorNode.
+    virtual void incrNodeDefUseId( bool pt_device_affect );
 
     /// Tells if a HapticsDevice has been in contact with the geometry
     /// in the last scenegraph loop. The field contains a boolean for 
@@ -313,8 +326,6 @@ namespace H3D {
     TraverseInfo * last_ti_ptr;
     // id for the number of times its traverseSG is called per scene graph loop
     H3DInt32 current_geom_id;
-    // flag for setting if the geometry is affected by a pointing device sensor
-    bool affected_by_ptdvs;
 
     bool use_culling, allow_culling;
     bool draw_debug_options;
