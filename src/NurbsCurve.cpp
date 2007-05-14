@@ -29,6 +29,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "NurbsCurve.h"
+#include "Coordinate.h"
+
 
 using namespace H3D;
 
@@ -47,122 +49,102 @@ namespace NurbsCurveInternals {
   FIELDDB_ELEMENT( NurbsCurve, controlPoint, INPUT_OUTPUT );
 }
 
-NurbsCurve::NurbsCurve(Inst< SFNode	 > _metadata,
+NurbsCurve::NurbsCurve(  Inst< SFNode >  _metadata,
+                       Inst< SFBound           > _bound,
+                       Inst< DisplayList       > _displayList,
+                       Inst< MFBool            > _isTouched,
+                       Inst< MFVec3f           > _force,
+                       Inst< MFVec3f           > _contactPoint,
+                       Inst< MFVec3f           > _contactNormal,
                        Inst< SFCoordinateNode  > _controlPoint,
-                       Inst< SFInt32	 > _tessellation,
-                       Inst< MFDouble > _weight,
-                       Inst< MFDouble > _knot,
-                       Inst< SFInt32	 > _order,
-                       Inst< SFBool	 > _closed ):
-X3DParametricGeometryNode( _metadata),
-controlPoint (_controlPoint ),
-tessellation( _tessellation ),
-weight( _weight ),
-knot( _knot ),
-order( _order ),
-closed( _closed ),
-theNurb( NULL ){
+                       Inst< SFInt32	         > _tessellation,
+                       Inst< MFDouble          > _weight,
+                       Inst< MFDouble          > _knot,
+                       Inst< SFInt32	         > _order,
+                       Inst< SFBool	           > _closed):
+X3DParametricGeometryNode( _metadata, _bound, _displayList,
+ _isTouched,_force, _contactPoint, _contactNormal),
+ controlPoint (_controlPoint ),
+ tessellation( _tessellation ),
+ weight( _weight ),
+ knot( _knot ),
+ order( _order ),
+ closed( _closed ),
+ theNurb( NULL ){
+ 
   type_name = "NurbsCurve";
   database.initFields( this );
+  displayList->setOwner( this );
 
   tessellation->setValue( 0 );
   order->setValue( 3 );
   closed->setValue( false );
+  controlPoint->route(bound); 
+}
 
+
+void NurbsCurve::SFBound::update() {
+  X3DCoordinateNode *coord_node =  (static_cast< TypedSFNode
+    < X3DCoordinateNode> * >( routes_in[0] )->getValue() );
+  
+  Coordinate *c = 
+    dynamic_cast< Coordinate * >(coord_node);
+  H3DInt32 no_of_control_points =coord_node->nrAvailableCoords();
+  
+  BoxBound *bound = new BoxBound();
+  if ( c ){
+    bound->fitAroundPoints( c->point->begin(), c->point->end() );
+  value = bound;
+  }
 }
 
 void NurbsCurve::render( ) {
-  H3DInt32 local_order = order->getValue();
+  bool valid_order = true;
   bool valid_weight = true;
   bool valid_controlPoints = true;
-  bool valid_order = true;
+
   X3DCoordinateNode *coord_node = controlPoint->getValue();
-  H3DInt32 no_of_weights = weight->getValue().size();
+
+  H3DInt32 local_order = order->getValue();
   H3DInt32 no_of_control_points =coord_node->nrAvailableCoords();
-  H3DInt32 no_of_knots = no_of_control_points + local_order;
-  
-  // creates a float pointer to knots values, which are doubles from
-  // the X3D-specification, by creating a new arrays of floats.
-  const vector< H3DDouble > &k = knot->getValue();
-  GLfloat *k_float = new GLfloat [k.size()];
-  if(k.size() !=no_of_knots){
-    for( int i = 0; i < no_of_knots; i++ ){
-      k_float[i] = (GLfloat)( (H3DDouble)i / ( no_of_knots - 1 ) );
-    }
-  }
-  else{    
-    for ( int i = 0; i<no_of_knots; i++){
-      k_float[i]= k[i];
-    }
-  }
-  
-  const vector< H3DDouble > &w = weight->getValue();
-  GLfloat *weight_float = new GLfloat [w.size()];
-  for ( int j = 0; j<w.size(); j++){
-    weight_float[j]= w[j];
-  }
+  H3DInt32 no_of_knots = (no_of_control_points + local_order-1);
 
-  // Tessellation is not implemented yet
-  if( tessellation->getValue() !=0 ) {
-    Console(3)<<"Warning: Tessellation is not implemented yet in H3D API"<<endl;
-    return;
-  }
+  H3DInt32 no_of_weights = weight->getValue().size();
+  GLfloat *weight_float = new GLfloat [no_of_control_points];
 
-
-  // Order has to be 2 or greater to define the nurbsCurve
-  if( local_order < 2 ) {
-    Console(3) << "Warning: order is less than 2 in " << getTypeName()
-      << " node( "	<< getName() 
-      << "). Node will not be rendered. " << endl;
-    valid_order =false;
-    return;
-  }
-
-
-  // the number of controlPoints should be equal to 
-  // or greater than the order
-  if( no_of_control_points < local_order )  {
-    Console(3) << "Warning: The size of controlPoint does not match "
-      << "order in " << getTypeName() << " node( "
-      << getName() << "). Node will not be rendered. " << endl;
-    valid_controlPoints = false;
-    return;
-  }
-
-  // If the number of weight value is not identical to the number of
-  // ControlPoints all weight values shall be ignored and a value of 
-  // 1.0 shall be used.
-  if( no_of_weights != no_of_control_points ) {
-    Console(3) << "Warning: The number of weight values is not the same as "
-      << "the number of control points in " << getTypeName() << " node( "
-      << getName() << "). Default weight 1.0 is assumed." << endl;
-    valid_weight = false;
-  }
-
+  // the knots values are doubles from the X3D-specification, but the
+  // gluNurbsCurve can only take a float pointer to the knots values.
+  // Therefore, a float pointer is created and then a new array of the
+  // knots values converted to floats.
+  const vector< H3DDouble > &knots_double = knot->getValue();
+  GLfloat *knots_float = new GLfloat [no_of_knots];
 
   // check the knot-vectors. If they are not according to standard
   // default uniform knot vectors will be generated.
   bool generate_uniform = true;
   vector< H3DFloat > knots;
-  if( no_of_knots == (no_of_control_points + local_order))  {
+  if(knots_double.size() == no_of_knots){
+    for ( int i = 0; i<no_of_knots; i++){
+      knots_float[i]= knots_double[i];
+    }
     generate_uniform = false;
     H3DInt32 consecutiveKnots = 0;
     for( int i = 0; i < no_of_knots; i++ ) {
-      knots.push_back(k_float[i]);
+      knots.push_back(knots_float[i]);
       if( i > 0 ) {
         if( knots[i] == knots[ i - 1 ] ){
           consecutiveKnots++;
           if( consecutiveKnots > (local_order - 1) ){
-            generate_uniform = true;
+            if (!generate_uniform) generate_uniform = true;
             Console(3) << "Warning: There are more consecutive knots than"
-            << " the order -1 in " << getTypeName() << " node( " << getName()
-            << "). Default knots are calculated." << endl;
+              << " the order -1 in " << getTypeName() << " node( " << getName()
+              << "). Default knots are calculated." << endl;
           }
           if( knots[ i - 1 ] > knots[i] ){
-            generate_uniform = true;
+            if (!generate_uniform) generate_uniform = true;
             Console(3) << "Warning: Change the order of the values of knots so "
-            << "they are non-decreasing in " << getTypeName() << " node( "
-            << getName() << ") or default knot values are used." << endl;
+              << "they are non-decreasing in " << getTypeName() << " node( "
+              << getName() << ") or default knot values are used." << endl;
           }
         }
         else{
@@ -171,11 +153,52 @@ void NurbsCurve::render( ) {
       }
     }
   }
-
-  if (generate_uniform){
+  else if(generate_uniform || (knots_double.size() != no_of_knots )){
     for( int i = 0; i < no_of_knots; i++ ){
-      k_float[i] = (GLfloat)( (H3DDouble)i / ( no_of_knots - 1 ) );
+      knots_float[i] = (GLfloat)( (H3DDouble)i / ( no_of_knots - 1 ) );
     }
+  }
+
+  // If the number of weight value is not identical to the number of
+  // ControlPoints all weight values shall be ignored and a value of 
+  // 1.0 shall be used.
+  if(no_of_weights == no_of_control_points){
+    const vector< H3DDouble > &w = weight->getValue();
+    if(!valid_weight) valid_weight = true;
+    for ( int j = 0; j<w.size(); j++){
+      weight_float[j]= w[j];
+    }
+  } 
+  else{
+    Console(3) << "Warning: The number of weight values is not the same as "
+    << "the number of control points. Default weight 1.0 is assumed." << endl;
+    if( valid_weight ) valid_weight = false;
+  }
+
+  // Tessellation is not implemented yet
+  if( tessellation->getValue() !=0 ) {
+    Console(3)<<"Warning: Tessellation is not yet implemented in H3D API"<<endl;
+    return;
+  } 
+
+
+  // Order has to be 2 or greater to define the nurbsCurve
+  if( local_order < 2 ) {
+    Console(3) << "Warning: order is less than 2 in " << getTypeName()
+      << " node( "	<< getName() 
+      << "). Node will not be rendered. " << endl;
+    if (valid_order) valid_order=false;
+    return;
+  }
+
+  // the number of controlPoints should be equal to 
+  // or greater than the order
+  if( no_of_control_points < local_order )  {
+    Console(3) << "Warning: The size of controlPoint does not match "
+      << "order in " << getTypeName() << " node( "
+      << getName() << "). Node will not be rendered. " << endl;
+    if (valid_controlPoints) valid_controlPoints = false;
+    return;
   }
 
   // create a new NurbsRendererer
@@ -192,7 +215,8 @@ void NurbsCurve::render( ) {
         control_point_f[i*4+1]= p.y;
         control_point_f[i*4+2]= p.z;
         if (valid_weight){
-          control_point_f[i*4+3]= weight_float[i];        }
+          control_point_f[i*4+3]= weight_float[i];
+        }
         else{
           control_point_f[i*4+3]= 1;}
       }
@@ -200,7 +224,7 @@ void NurbsCurve::render( ) {
 
       gluNurbsCurve(theNurb, 
         no_of_knots, 
-        k_float,
+        knots_float,
         4,
         control_point_f,
         local_order,
@@ -210,12 +234,8 @@ void NurbsCurve::render( ) {
       gluEndCurve( theNurb);
     }
   }
-
-  //delete [] weight_float;
-  //cerr << " weight_float borta" << endl;
-  //delete [] k_float;
-  //cerr << " k_float borta" << endl;
-
+   delete [] weight_float;
+   delete [] knots_float;
 }
 
 
