@@ -131,6 +131,23 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
   string old_base = ResourceResolver::getBaseURL();
 
   string resolved_url = ResourceResolver::resolveURLAsFile( url );
+
+#ifdef WIN32
+  // needed when running H3DAPI as a plugin to a web-browser
+  // and if url points to a local file.
+  // Needed for plugin for IE
+  string remove_string = "file:///";
+  if( path.find( remove_string ) == 0 ) {
+    path = path.substr( remove_string.size(), pos + 1 );
+  }
+
+  // Needed for plugin for Netscape ( tested on Opera )
+  remove_string = "file://localhost/";
+  if( path.find( remove_string ) == 0 ) {
+    path = path.substr( remove_string.size(), pos + 1 );
+  }
+#endif
+
   ResourceResolver::setBaseURL( path ); 
 
   if( resolved_url == "" )
