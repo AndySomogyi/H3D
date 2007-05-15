@@ -63,38 +63,38 @@ NurbsCurve::NurbsCurve(  Inst< SFNode >  _metadata,
                        Inst< SFInt32	         > _order,
                        Inst< SFBool	           > _closed):
 X3DParametricGeometryNode( _metadata, _bound, _displayList,
- _isTouched,_force, _contactPoint, _contactNormal),
- controlPoint (_controlPoint ),
- tessellation( _tessellation ),
- weight( _weight ),
- knot( _knot ),
- order( _order ),
- closed( _closed ),
- theNurb( NULL ){
- 
-  type_name = "NurbsCurve";
-  database.initFields( this );
-  displayList->setOwner( this );
+                          _isTouched,_force, _contactPoint, _contactNormal),
+                          controlPoint (_controlPoint ),
+                          tessellation( _tessellation ),
+                          weight( _weight ),
+                          knot( _knot ),
+                          order( _order ),
+                          closed( _closed ),
+                          theNurb( NULL ){
 
-  tessellation->setValue( 0 );
-  order->setValue( 3 );
-  closed->setValue( false );
-  controlPoint->route(bound); 
+                            type_name = "NurbsCurve";
+                            database.initFields( this );
+                            displayList->setOwner( this );
+
+                            tessellation->setValue( 0 );
+                            order->setValue( 3 );
+                            closed->setValue( false );
+                            controlPoint->route(bound); 
 }
 
 
 void NurbsCurve::SFBound::update() {
   X3DCoordinateNode *coord_node =  (static_cast< TypedSFNode
     < X3DCoordinateNode> * >( routes_in[0] )->getValue() );
-  
+
   Coordinate *c = 
     dynamic_cast< Coordinate * >(coord_node);
   H3DInt32 no_of_control_points =coord_node->nrAvailableCoords();
-  
+
   BoxBound *bound = new BoxBound();
   if ( c ){
     bound->fitAroundPoints( c->point->begin(), c->point->end() );
-  value = bound;
+    value = bound;
   }
 }
 
@@ -171,15 +171,9 @@ void NurbsCurve::render( ) {
   } 
   else{
     Console(3) << "Warning: The number of weight values is not the same as "
-    << "the number of control points. Default weight 1.0 is assumed." << endl;
+      << "the number of control points. Default weight 1.0 is assumed." << endl;
     if( valid_weight ) valid_weight = false;
   }
-
-  // Tessellation is not implemented yet
-  if( tessellation->getValue() !=0 ) {
-    Console(3)<<"Warning: Tessellation is not yet implemented in H3D API"<<endl;
-    return;
-  } 
 
 
   // Order has to be 2 or greater to define the nurbsCurve
@@ -205,6 +199,31 @@ void NurbsCurve::render( ) {
   if( !theNurb ){
     theNurb = gluNewNurbsRenderer();
   }
+
+  // setting the gluNurbsProperty after the value of tessellation   
+  H3DInt32 tess_val = tessellation->getValue();
+  int tess_step;
+
+  if(tess_val>0){
+    tess_step= (tess_val+1);
+    gluNurbsProperty(theNurb, GLU_U_STEP , tess_step);
+  }
+  else if(tess_val<0){
+    tess_step = (((-tess_val)*no_of_control_points)+1);
+    gluNurbsProperty(theNurb, GLU_U_STEP , tess_step);
+
+  }
+  else if(tess_val==0){
+    H3DInt32 tess_step = ((2*no_of_control_points)+1);
+    gluNurbsProperty(theNurb, GLU_U_STEP , tess_step);
+  }
+
+  // gluNurbsProperty definition
+  //void gluNurbsProperty( GLUnurbsObj *nurbsObj, 
+  // GLenum property, 
+  // GLfloat value );
+
+  gluNurbsProperty(theNurb, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
 
   if(valid_controlPoints && valid_order){
     if(coord_node){
@@ -234,8 +253,8 @@ void NurbsCurve::render( ) {
       gluEndCurve( theNurb);
     }
   }
-   delete [] weight_float;
-   delete [] knots_float;
+  delete [] weight_float;
+  delete [] knots_float;
 }
 
 
