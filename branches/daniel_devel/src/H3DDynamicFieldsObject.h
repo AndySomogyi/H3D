@@ -85,6 +85,12 @@ namespace H3D {
       return dynamic_fields.end();
     }
 
+    /// Remove all dynamic fields that have been previously added.
+    inline void clearFields() {
+      database->clearDynamicFields();
+      dynamic_fields.clear();
+    }
+
     /// Remove a field from the Node.
     /// \param name The name of the field to remove.
     /// \returns true on success false otherwise.
