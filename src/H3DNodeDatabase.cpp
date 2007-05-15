@@ -207,3 +207,16 @@ H3DNodeDatabase::FieldDBConstIterator::FieldDBConstIterator(
     }
   }
 }
+
+
+void H3DNodeDatabase::clearDynamicFields() {
+  for( FieldDBType::iterator i = fields.begin(); i != fields.end();  ) {
+    DynamicFieldDBElement *fdb = 
+      dynamic_cast< DynamicFieldDBElement * >( (*i).second );
+    FieldDBType::iterator to_erase = i;
+    i++;
+    if( fdb ) {
+      fields.erase( to_erase );
+    } 
+  }
+}

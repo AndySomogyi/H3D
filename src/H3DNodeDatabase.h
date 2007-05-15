@@ -303,6 +303,9 @@ namespace H3D {
 	  /// initialise the given Node using the contents of the database - 
     /// initialise field names, field owner pointers and access restrictors.
     void initFields( Node* ) const;
+
+    /// Remove all DynamicFieldDBElements from the database
+    void clearDynamicFields();
     
 	private:
     /// Help function for getField.
