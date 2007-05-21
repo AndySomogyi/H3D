@@ -56,6 +56,10 @@ namespace H3D {
 
     static void setMainProfileDone( bool _main_profile_set );
 
+    // set to false before starting an application ( or loading a file )
+    // to not do any profile and component checking.
+    static bool check_profiles_components;
+
   private:
     bool setProfileInternal( std::string profile, std::string &err_msg,
                              std::string _version );

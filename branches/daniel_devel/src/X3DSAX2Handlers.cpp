@@ -999,7 +999,6 @@ void X3DSAX2Handlers::startElement(const XMLCh* const uri,
         if( ProfilesAndComponents::setProfile( profile_name,
           tmp_err_msg,
           version ) ) {
-            ProfilesAndComponents::getProfile();
             profile_set = true;
         }
         else {

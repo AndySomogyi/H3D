@@ -38,10 +38,8 @@ using namespace H3D;
 using namespace std;
 
 ProfilesAndComponents * ProfilesAndComponents::instance = 0;
+bool ProfilesAndComponents::check_profiles_components = true;
 
-//const ProfilesAndComponents * getInstance() {
-//  return instance;
-//}
 namespace ProfilesAndComponentsInternal {
   SAX2XMLReader* getNewXMLParser() {
     SAX2XMLReader::ValSchemes    valScheme    = SAX2XMLReader::Val_Never;
@@ -185,18 +183,22 @@ void ProfilesAndComponents::destroy() {
 }
 
 string ProfilesAndComponents::getProfile() {
-  //cerr << "profile: " << instance->used_profile.name  << " version " << instance->version << endl;
-  return instance->used_profile.name;
+  if( instance )
+    return instance->used_profile.name;
+  else
+    return "";
 }
 
 bool ProfilesAndComponents::setProfile( string profile, string &err_msg,
                                         string _version ) {
+  if( check_profiles_components ) {
+    if( !instance ) {
+      instance = new ProfilesAndComponents();
+    }
 
-  if( !instance ) {
-    instance = new ProfilesAndComponents();
+    return instance->setProfileInternal( profile, err_msg, _version );
   }
-
-  return instance->setProfileInternal( profile, err_msg, _version );
+  return true;
 }
 
 bool ProfilesAndComponents::setProfileInternal( string profile,
@@ -294,11 +296,14 @@ bool ProfilesAndComponents::setProfileInternal( string profile,
 
 bool ProfilesAndComponents::addComponent( std::string component, int level,
                                           string &err_msg ) {
-  if( !instance ) {
-    instance = new ProfilesAndComponents();
-  }
+  if( check_profiles_components ) {
+    if( !instance ) {
+      instance = new ProfilesAndComponents();
+    }
 
-  return instance->addComponentInternal( component, level, err_msg );
+    return instance->addComponentInternal( component, level, err_msg );
+  }
+  return true;
 }
 
 bool ProfilesAndComponents::addComponentInternal( std::string component,
@@ -379,13 +384,10 @@ bool ProfilesAndComponents::addComponentInternal( std::string component,
 }
 
 void ProfilesAndComponents::setMainProfileDone( bool _main_profile_set ) {
-  if( !instance->main_profile_set ) {
-    //cerr << "setting main_profile_set" << endl;
-    instance->main_profile_set = _main_profile_set;
-    /*cerr << "The components: " << endl;
-    for( int i = 0; i < (int)instance->components_used.size(); i++ ) {
-      cerr << instance->components_used[i].name << " " << instance->components_used[i].conformance_level << " " << instance->components_used[i].used_level << endl;
-    }*/
+  if( check_profiles_components ) {
+    if( !instance->main_profile_set ) {
+      instance->main_profile_set = _main_profile_set;
+    }
   }
 }
 
