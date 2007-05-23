@@ -1291,8 +1291,7 @@ void H3DWxFrame::buildNavMenu () {
     }
   }
   else {
-    mynav = new NavigationInfo;
-    //mynav = 0;
+    mynav = 0;
     vector<string> allTypes;
     allTypes.push_back("EXAMINE");
     allTypes.push_back("FLY");
