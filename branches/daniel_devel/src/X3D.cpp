@@ -130,7 +130,9 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
   string path = urn.substr( 0, pos + 1 );
   string old_base = ResourceResolver::getBaseURL();
 
-  string resolved_url = ResourceResolver::resolveURLAsFile( url );
+  bool is_tmp_file;
+  string resolved_url = ResourceResolver::resolveURLAsFile( url, 
+                                                            &is_tmp_file );
 
 #ifdef WIN32
   // needed when running H3DAPI as a plugin to a web-browser
@@ -166,14 +168,11 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
 
     // then unpack it
     if( file_exists && magic_nr == ZIP_MAGIC_NR ) {
-      char tmp_file[ L_tmpnam ];
-      if( tmpnam( tmp_file ) ) { 
+      string tmp_file = ResourceResolver::getTmpFileName();
+      if( tmp_file != "" ) { 
         gzFile in  = gzopen( resolved_url.c_str(),"rb");
-        ofstream ofs( tmp_file, ios::binary );
+        ofstream ofs( tmp_file.c_str(), ios::binary );
         if( in && ofs.good() ) {
-          resolved_url = tmp_file;
-          delete_file = true;
-          bool status = true;
           char buf[ 16384 ];	
           int len = 0;
           while( (len = gzread( in, buf, sizeof(buf))) != 0 ) {
@@ -181,6 +180,10 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
           }
           gzclose(in);
           ofs.close();
+          if( is_tmp_file ) 
+            ResourceResolver::releaseTmpFileName( resolved_url );
+          resolved_url = tmp_file;
+          is_tmp_file = true;
         }
       }
     }
@@ -189,8 +192,12 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
   
     XERCES_CPP_NAMESPACE_USE
     ifstream istest( resolved_url.c_str() );
-    if ( isVRML( istest ) )
-      return createVRMLNodeFromURL( resolved_url, dn );
+    if ( isVRML( istest ) ) {
+      AutoRef< Node > n = createVRMLNodeFromURL( resolved_url, dn );
+      if( is_tmp_file ) 
+        ResourceResolver::releaseTmpFileName( resolved_url );
+      return n;
+    }
     // else...
     ifstream is( resolved_url.c_str() );
     XMLCh *url_ch = new XMLCh[ url.size() + 1 ];
@@ -201,8 +208,10 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
     parser->parse( IStreamInputSource( is, url_ch ) );
     delete url_ch;
     is.close();
-    if( delete_file ) remove( resolved_url.c_str() );
+   
   }
+  if( is_tmp_file ) 
+   ResourceResolver::releaseTmpFileName( resolved_url );
   ResourceResolver::setBaseURL( old_base );
   return handler.getResultingNode();
 }

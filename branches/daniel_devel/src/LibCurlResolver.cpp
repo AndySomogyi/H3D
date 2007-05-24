@@ -35,26 +35,26 @@ using namespace H3D;
 
 string LibCurlResolver::resolveURLAsTmpFile( const string &url ) {
   CURL *handle = curl_easy_init();
-  char tmp_file[ L_tmpnam ];
-  if( tmpnam( tmp_file ) ) {
-    ofstream os( tmp_file, ios::binary );
+  
+  string tmp_file = ResourceResolver::getTmpFileName();
+  if( tmp_file != "" ) {
+    ofstream os( tmp_file.c_str(), ios::binary );
     curl_easy_setopt( handle, CURLOPT_URL, url.c_str() );
     curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writeToStream );
     curl_easy_setopt( handle, CURLOPT_WRITEDATA, &os );
     CURLcode return_code = curl_easy_perform( handle );
     os.close();
     if( return_code != CURLE_OK ) {
-      remove( tmp_file );
+      ResourceResolver::releaseTmpFileName( tmp_file );
       return "";
     } else {
       long response_code;
       return_code = 
         curl_easy_getinfo( handle, CURLINFO_RESPONSE_CODE, &response_code );
       if( return_code == CURLE_OK && response_code != 404 ) {
-        temp_files.push_back( tmp_file );
         return tmp_file;
       } else {
-        remove( tmp_file );
+        ResourceResolver::releaseTmpFileName( tmp_file );
         return "";
       }
     }
