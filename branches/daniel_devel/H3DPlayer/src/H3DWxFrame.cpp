@@ -70,7 +70,7 @@ class QuitAPIField: public AutoUpdate< SFString > {
 
 /*******************Global Constants*********************/
 static const wxChar *TITLE     = _T("H3D Player ");
-static const wxChar *AUTHOR    = _T("\nRamkumar Shankar\n\nCopyright 2006-2007.  All Rights Reserved.");
+static const wxChar *AUTHOR    = _T("\nSenseGraphics AB\n\nCopyright 2006-2007.  All Rights Reserved.");
 static const wxChar *ABOUT     = _T("About");
 static const wxChar *FILETYPES = _T( "x3d files|*.x3d|"
                                      "vrml files|*.wrl|"
@@ -678,7 +678,7 @@ bool H3DWxFrame::loadFile( const string &filename) {
     glwindow2->renderMode->setValue( render_mode );
     glwindow2->width->setValue(width);
     glwindow2->height->setValue(height);*/
-    scene->window->push_back( glwindow );
+    //scene->window->push_back( glwindow );
     //scene->window->push_back( glwindow2 );
     scene->sceneRoot->setValue( g.get() );
   }
