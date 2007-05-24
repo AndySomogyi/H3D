@@ -151,9 +151,6 @@ namespace H3D {
                   Inst< DisplayList      > _displayList    = 0
                   );
 
-     ~X3DShapeNode() {
-      cerr << "FDA" << endl;
-    }
     /// Sets up the bound field using the bboxCenter and bboxSize fields.
     /// If bboxSize is (-1, -1, -1) the bound will be the bound of the
     /// geometry field. Otherwise it will be a BoxBound with center
