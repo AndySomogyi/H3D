@@ -55,15 +55,6 @@ namespace H3D {
     /// Constructor.       
     LibCurlResolver() {}
 
-    /// Destuctor. Removes all temp files that was used by the 
-    /// resolver.
-    virtual ~LibCurlResolver() {
-      for( list< string >::iterator i = temp_files.begin();
-           i != temp_files.end(); i++ ) {
-        remove( (*i).c_str() );
-      }
-    }
-
     /// Resolve a URL and download it to a tmp-file. The tmp-file
     /// name is returned. If the URL could not be downloaded "" is
     /// returned.
@@ -77,7 +68,6 @@ namespace H3D {
       return size * nmemb;
     }
 
-    list< string > temp_files;
   };
 }
 

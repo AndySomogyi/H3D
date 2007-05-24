@@ -29,6 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Image3DTexture.h"
+#include "ResourceResolver.h"
 
 using namespace H3D;
 
@@ -77,9 +78,11 @@ Image* Image3DTexture::SFImage::loadImage( Image3DTexture *texture,
       for( NodeVector::const_iterator il = image_loaders.begin();
            il != image_loaders.end();
            il++ ) {
-        string url = texture->resolveURLAsFile( *i );
+        bool is_tmp_file;
+        string url = texture->resolveURLAsFile( *i, &is_tmp_file );
         Image *image = 
           static_cast< H3DImageLoaderNode * >(*il)->loadImage( url );
+        if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
         if( image ) {
           texture->setURLUsed( *i );
           return image;
@@ -90,12 +93,16 @@ Image* Image3DTexture::SFImage::loadImage( Image3DTexture *texture,
   
   for( vector<string>::const_iterator i = urls.begin(); 
        i != urls.end(); ++i ) {
-    string url = texture->resolveURLAsFile( *i );
+    bool is_tmp_file;
+    string url = texture->resolveURLAsFile( *i, &is_tmp_file );
 	  H3DImageLoaderNode *il = H3DImageLoaderNode::getSupportedFileReader( url );
     if( il ) {
       texture->setURLUsed( *i );
-      return il->loadImage( url );
+      Image *image = il->loadImage( url );
+      if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
+      return image;
     }
+    if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
   }
 
   Console(4) << "Warning: None of the urls in Image3DTexture with url [";

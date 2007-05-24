@@ -36,6 +36,7 @@
 #include "X3DSAX2Handlers.h"
 #include "MFNode.h"
 #include "PythonMethods.h"
+#include "ResourceResolver.h"
 
 #ifdef HAVE_PYTHON
 
@@ -129,6 +130,8 @@ PythonScript::PythonScript( Inst< MFString > _url,
   type_name = "PythonScript";
   database.initFields( this );
 
+  addInlinePrefix( "python" );
+
   // Py_Initialize really should be done in the DLL loader function:
   if ( !Py_IsInitialized() ) {
     Py_Initialize();  
@@ -195,11 +198,14 @@ void PythonScript::loadScript( const string &script ) {
   FILE *f = fopen( script.c_str(), "r" );
   if ( f ) {
     PyErr_Clear();
-    PyObject *r = PyRun_File( f, script.c_str(), Py_file_input,
-                              static_cast< PyObject * >(module_dict), 
-                              static_cast< PyObject * >(module_dict) );
+    PyObject *r = PyRun_FileEx( f, script.c_str(), Py_file_input,
+                                static_cast< PyObject * >(module_dict), 
+                                static_cast< PyObject * >(module_dict),
+                                true );
     if ( r == NULL )
       PyErr_Print();
+
+    
   }
   
 #endif
@@ -234,9 +240,11 @@ void PythonScript::initialize() {
   module_dict = PyModule_GetDict( static_cast< PyObject * >( module ) );
   bool script_loaded = false;
   for( MFString::const_iterator i = url->begin(); i != url->end(); ++i ) {
-    string url = resolveURLAsFile( *i );
+    bool is_tmp_file;
+    string url = resolveURLAsFile( *i, &is_tmp_file );
     if( url != "" ) {
       loadScript( url );
+      if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
       script_loaded = true;
       break;
     }

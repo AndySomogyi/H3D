@@ -31,6 +31,7 @@
 #include "Inline.h"
 #include "X3D.h"
 #include "X3DSAX2Handlers.h"
+#include "ResourceResolver.h"
 
 using namespace H3D;
 
@@ -112,10 +113,13 @@ void Inline::LoadedScene::update() {
   if( load ) {
     MFString *urls = static_cast< MFString * >( routes_in[1] );
     for( MFString::const_iterator i = urls->begin(); i != urls->end(); ++i ) {
-      string url = inline_node->resolveURLAsFile( *i );
+      bool is_tmp_file;
+      string url = inline_node->resolveURLAsFile( *i, &is_tmp_file );
       if( url != "" ) {
         try {
-          Group *g = X3D::createX3DFromURL( url, NULL, &inline_node->exported_nodes );
+          Group *g = X3D::createX3DFromURL( url, NULL, 
+                                            &inline_node->exported_nodes );
+          if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
           value.push_back( g );
           inline_node->setURLUsed( *i );
         } catch( const X3D::XMLParseError &e ) {
