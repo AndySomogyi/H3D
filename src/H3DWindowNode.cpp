@@ -936,6 +936,10 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     swapBuffers();
   }
   glPopAttrib();
+
+  // TODO: This should only be done once per scene.
+  // two windows in the same scene will probably
+  // give some strange results.
   if( nav_info )
     nav_info->doNavigation( vp, child_to_render );
   else {
