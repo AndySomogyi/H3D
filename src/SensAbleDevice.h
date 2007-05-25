@@ -77,6 +77,10 @@ namespace H3D {
     /// H3DHapticsDevice, and possible vice versa.
     virtual void updateDeviceValues();
 
+    /// Creates a PhantomHapticsDevice in the hapi_device
+    /// with name deviceName
+    virtual void initialize();
+
     /// The name of the device, as specified in Phantom Configuration
     /// utility. If set to "", the default device will be used. 
     ///

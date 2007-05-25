@@ -104,6 +104,12 @@ void Scene::idle() {
       if( hd->initialized->getValue() ) { 
         hd->preRender();
         hd->updateDeviceValues();
+      } else {
+        hd->initDevice();
+        if( hd->initialized->getValue() ) {
+          hd->preRender();
+          hd->updateDeviceValues();
+        }
       }
       hds.push_back( hd );
     }
