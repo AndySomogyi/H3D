@@ -192,7 +192,7 @@ void PythonScript::loadScript( const string &script ) {
       Console( 3 ) << "In file \"" << script << "\":" << endl;
       PyErr_Print();
     }
-    delete buffer;
+    delete[] buffer;
   }
 #else
   FILE *f = fopen( script.c_str(), "r" );

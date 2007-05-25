@@ -96,7 +96,7 @@ void Matrix3VertexAttribute::renderArray() {
 			      GL_FALSE,
 			      0,
 			      data );
-    delete data;
+    delete[] data;
     // TODO: bind name
   }
 }

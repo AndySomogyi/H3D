@@ -280,6 +280,7 @@ namespace H3D {
     /// instead act as base classes for other nodes.
 	  H3DNodeDatabase( const type_info &_ti,
                      H3DNodeDatabase *_parent = 0 );
+    ~H3DNodeDatabase(void);
     
     /// Search the node database for an entry with a matching type_info structure
     static H3DNodeDatabase *lookupTypeId( const type_info &t );

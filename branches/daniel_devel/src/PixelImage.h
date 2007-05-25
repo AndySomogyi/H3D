@@ -59,13 +59,14 @@ namespace H3D {
         image_data = new unsigned char[ size ];
         memcpy( image_data, data, size );
       }
-      else 
+      else{ 
         image_data = data;
+      }
     }
 
     ~PixelImage() {
       if( image_data )
-        delete image_data;
+        delete[] image_data;
     }
 
     /// Returns the width of the image in pixels.

@@ -65,6 +65,18 @@ parent( _parent ) {
   }
 }
 
+// Ulrika Added after Penny's comments**
+H3DNodeDatabase::~H3DNodeDatabase(void){
+  if(initialized = true){
+    delete database;
+    database = 0;
+  }
+  for(FieldDBType::const_iterator i = fields.begin(); i !=fields.end(); i++){
+    delete (*i).second; // MATT added this to fix some memory leaks
+  }
+}
+//***
+
 
 Node *H3DNodeDatabase::createNode( const string &name ) {
   H3DNodeDatabaseType::iterator pos = database->find( name );

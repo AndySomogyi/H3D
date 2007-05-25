@@ -258,7 +258,7 @@ void X3DNurbsSurfaceGeometryNode::render( ) {
 			Console(3) << "Warning: The uKnot array is not according to standard in "
 				<< getTypeName() << " node( "
 				<< getName() << "). A default uKnot array will be generated. " << endl;
-			delete u_knots;
+			delete[] u_knots;
 			u_knots = new GLfloat[ uSizeToUse ];
 			for( int i = 0; i < uSizeToUse; i++ )
 				u_knots[i] = (GLfloat)( (H3DDouble)i / ( uSizeToUse - 1 ) );
@@ -290,7 +290,7 @@ void X3DNurbsSurfaceGeometryNode::render( ) {
 			Console(3) << "Warning: The vKnot array is not according to standard in "
 				<< getTypeName() << " node( "
 				<< getName() << "). A default vKnot array will be generated. " << endl;
-			delete v_knots;
+			delete[] v_knots;
 			v_knots = new GLfloat[ vSizeToUse ];
 			for( int i = 0; i < vSizeToUse; i++ )
 				v_knots[i] = (GLfloat)( (H3DDouble)i / ( vSizeToUse - 1 ) );

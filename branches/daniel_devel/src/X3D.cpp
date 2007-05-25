@@ -206,7 +206,7 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
     }
     url_ch[ url.size() ] = '\0'; 
     parser->parse( IStreamInputSource( is, url_ch ) );
-    delete url_ch;
+    delete[] url_ch;
     is.close();
    
   }
