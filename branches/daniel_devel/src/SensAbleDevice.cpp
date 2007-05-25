@@ -106,7 +106,8 @@ SensAbleDevice::SensAbleDevice(
   type_name = "SensAbleDevice";  
   database.initFields( this );
 #ifdef HAVE_OPENHAPTICS
-  hapi_device.reset( new HAPI::PhantomHapticsDevice );
+  //hapi_device.reset( new HAPI::PhantomHapticsDevice );
+  hapi_device.reset(0);
 #else
   Console(4) << "Cannot use SensAbleDevice. HAPI compiled without"
 	     << " OpenHaptics support. Recompile HAPI with "
@@ -122,6 +123,16 @@ SensAbleDevice::SensAbleDevice(
   needsCalibration->setValue( false, id );
 }
 
+void SensAbleDevice::initialize() {
+#ifdef HAVE_OPENHAPTICS
+  hapi_device.reset( new HAPI::PhantomHapticsDevice( deviceName->getValue() ) );
+#else
+  Console(4) << "Cannot use SensAbleDevice. HAPI compiled without"
+	     << " OpenHaptics support. Recompile HAPI with "
+	     << "HAVE_OPENHAPTICS defined"
+	     << " in order to use it." << endl;
+#endif
+}
 
 H3DHapticsDevice::ErrorCode SensAbleDevice::initDevice() {
   HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::initDevice();

@@ -209,7 +209,7 @@ namespace H3D {
           static_cast< H3DHapticsRendererNode * >( n );
         H3DHapticsDevice *device = 
           static_cast< H3DHapticsDevice * >( getOwner() );
-        if( renderer ) {
+        if( renderer && device->hapi_device.get() ) {
           for( unsigned int i = 0; i < device->hapi_device->nrLayers(); i++ )
             device->hapi_device->setHapticsRenderer( 
                                      renderer->getHapticsRenderer( i ) );
