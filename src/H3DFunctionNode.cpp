@@ -68,6 +68,6 @@ void H3DFunctionNode::Value::update() {
       inp[i] = input[i];
     }
     value = function->evaluate( inp );
-    delete inp;
+    delete[] inp;
   }
 }

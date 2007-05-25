@@ -272,7 +272,7 @@ HRESULT DirectShowDecoder::CFrameGrabber::DoRenderSample( IMediaSample * pSample
     
     unsigned int bytes_to_copy = decoder->getFrameSize();
     if( decoder->data_size < bytes_to_copy ) {
-      if( decoder->data ) delete decoder->data;
+      if( decoder->data ) delete[] decoder->data;
       decoder->data = new unsigned char[ bytes_to_copy ];
       decoder->data_size = bytes_to_copy;
     }

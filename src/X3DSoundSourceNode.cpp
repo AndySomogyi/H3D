@@ -91,7 +91,7 @@ void X3DSoundSourceNode::initALBuffers( bool stream ) {
     alBufferData( al_buffers[0], al_format, 
                   buffer, reader->totalDataSize(), 
                   reader->samplesPerSecond() );
-    delete buffer;
+    delete[] buffer;
     for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
          i != parent_sound_nodes.end(); i++ ) {
       if( loop->getValue() )
@@ -110,7 +110,7 @@ void X3DSoundSourceNode::initALBuffers( bool stream ) {
                     buffer, bytes_read, 
                     reader->samplesPerSecond() );
     }
-    delete buffer;
+    delete[] buffer;
     
     for( list< X3DSoundNode * >::iterator i = parent_sound_nodes.begin();
          i != parent_sound_nodes.end(); i++ ) {
