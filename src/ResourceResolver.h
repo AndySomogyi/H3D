@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,11 +30,11 @@
 #ifndef __RESOURCERESOLVER_H__
 #define __RESOURCERESOLVER_H__
 
-#include "H3DApi.h"
+#include <H3DApi.h>
 #include <string>
 #include <list>
 using namespace std;
-#include "URNResolver.h"
+#include <URNResolver.h>
 #include <AutoPtrVector.h>
 
 

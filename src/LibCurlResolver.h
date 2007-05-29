@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,7 +29,7 @@
 #ifndef __LIBCURLRESOLVER_H__
 #define __LIBCURLRESOLVER_H__
 
-#include "H3DApi.h"
+#include <H3DApi.h>
 
 #ifdef HAVE_LIBCURL
 #include <string>
@@ -37,7 +37,7 @@
 #include <fstream>
 #include <list>
 #include <curl/curl.h>
-#include "ResourceResolver.h"
+#include <ResourceResolver.h>
 
 using namespace std;
 

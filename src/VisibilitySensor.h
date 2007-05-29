@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __VISIBILITYSENSOR_H__
 #define __VISIBILITYSENSOR_H__
 
-#include "X3DEnvironmentalSensorNode.h"
-#include "SFVec3f.h"
-#include "X3DViewpointNode.h"
+#include <X3DEnvironmentalSensorNode.h>
+#include <SFVec3f.h>
+#include <X3DViewpointNode.h>
 
 
 namespace H3D {

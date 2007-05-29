@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,12 +29,12 @@
 #ifndef __MAGNETICGEOMETRYEFFECT_H__
 #define __MAGNETICGEOMETRYEFFECT_H__
 
-#include "H3DForceEffect.h" 
-#include "SFVec3f.h"
-#include "SFBool.h"
-#include "SFInt32.h"
-#include "SFFloat.h"
-#include "X3DGeometryNode.h"
+#include <H3DForceEffect.h> 
+#include <SFVec3f.h>
+#include <SFBool.h>
+#include <SFInt32.h>
+#include <SFFloat.h>
+#include <X3DGeometryNode.h>
 
 namespace H3D {
   /// \ingroup H3DNodes 

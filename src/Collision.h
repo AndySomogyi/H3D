@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __COLLISION_H__
 #define __COLLISION_H__
 
-#include "X3DGroupingNode.h"
-#include "X3DSensorNode.h"
+#include <X3DGroupingNode.h>
+#include <X3DSensorNode.h>
 
 namespace H3D {
   /// \ingroup X3DNodes

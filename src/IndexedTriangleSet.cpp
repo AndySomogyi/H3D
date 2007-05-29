@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,13 +28,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "IndexedTriangleSet.h"
-#include "Normal.h"
-#include "HapticTriangleTree.h"
-#include "H3DHapticsDevice.h"
-#include "HapticTriangle.h"
-#include "DeviceInfo.h"
-#include "H3DSurfaceNode.h"
+#include <IndexedTriangleSet.h>
+#include <Normal.h>
+#include <HapticTriangleTree.h>
+#include <H3DHapticsDevice.h>
+#include <HapticTriangle.h>
+#include <DeviceInfo.h>
+#include <H3DSurfaceNode.h>
 
 
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,8 +30,8 @@
 #ifndef __COORDINATEINTERPOLATOR_H__
 #define __COORDINATEINTERPOLATOR_H__
 
-#include "X3DInterpolatorNode.h"
-#include "MFVec3f.h"
+#include <X3DInterpolatorNode.h>
+#include <MFVec3f.h>
 
 namespace H3D {
 

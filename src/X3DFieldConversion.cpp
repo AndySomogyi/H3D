@@ -8,7 +8,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#include "X3DFieldConversion.h"
+#include <X3DFieldConversion.h>
 
 using namespace H3D;
 using namespace X3D;
@@ -175,7 +175,7 @@ unsigned char * X3D::Convert::readImageData( const char *s,
         try {
           pixel = getValue< int >( t1, t2 );
         } catch( const X3DFieldConversionError & ) {
-          delete[] data;
+          delete data;
           stringstream s;
           s << "SFImage. Con't convert pixel ("
             << x << ", " << y << ", " << z << ") to int";
@@ -186,7 +186,7 @@ unsigned char * X3D::Convert::readImageData( const char *s,
         case 1: {
           // Make sure the value is between 0-255
           if( pixel & 0xFFFFFF00 ) {
-            delete[] data;
+            delete data;
             stringstream s;
             s << "SFImage. Single component pixel value of pixel ("
               << x << ", " << y << ", " << z << ") is " 
@@ -201,7 +201,7 @@ unsigned char * X3D::Convert::readImageData( const char *s,
         case 2: {
           // Make sure the value is between 0x0000 and 0xFFFF
           if( pixel & 0xFFFF0000 ) {
-            delete[] data;
+            delete data;
             stringstream s;
             s << "SFImage. Two component pixel value of pixel ("
               << x << ", " << y << ", " << z << ") is " 
@@ -218,7 +218,7 @@ unsigned char * X3D::Convert::readImageData( const char *s,
         case 3: {
           // Make sure the value is between 0x000000 and 0xFFFFFF
           if( pixel & 0xFF000000 ) {
-            delete[] data;
+            delete data;
             stringstream s;
             s << "SFImage. Three component pixel value of pixel "
               << x << ", " << y << ", " << z << ") is " 
@@ -246,7 +246,7 @@ unsigned char * X3D::Convert::readImageData( const char *s,
           break;
         }
         default: 
-          delete[] data;
+          delete data;
           stringstream s;
           s << "SFImage. Component value is "
             << nr_components << ". Must be 1, 2, 3 or 4. ";
@@ -257,13 +257,13 @@ unsigned char * X3D::Convert::readImageData( const char *s,
   // y has been counted down so we have to compensate for that
   int pixels_processed = x * (y + height + 1) * z;
   if( pixels_processed != nr_pixels ) {
-    delete[] data;
+    delete data;
     stringstream s;
     s << "SFImage.  Only " << pixels_processed << " pixels. " 
       << "Expecting " << nr_pixels << " pixels.";
     throw X3DFieldConversionError( s.str() );
   } else if( t1[0] != '\0' ) {
-    delete[] data;
+    delete data;
     stringstream s;
     s << "SFImage.  More than " << nr_pixels << " pixels. " 
       << "Expecting " << nr_pixels << " pixels.";

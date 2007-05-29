@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __H3DVIDEOTEXTURENODE_H__
 #define __H3DVIDEOTEXTURENODE_H__
 
-#include "X3DTexture2DNode.h"
-#include "H3DVideoClipDecoderNode.h"
+#include <X3DTexture2DNode.h>
+#include <H3DVideoClipDecoderNode.h>
 
 namespace H3D {
   /// \ingroup AbstractNodes 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,9 +28,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "LineSet.h"
-#include "X3DTextureNode.h"
-#include "HLFeedbackShape.h"
+#include <LineSet.h>
+#include <X3DTextureNode.h>
+#include <HLFeedbackShape.h>
 
 using namespace H3D;
 

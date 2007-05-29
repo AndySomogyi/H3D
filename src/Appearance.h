@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,15 +29,15 @@
 #ifndef __APPEARANCE_H__
 #define __APPEARANCE_H__
 
-#include "X3DAppearanceNode.h"
-#include "FillProperties.h"
-#include "LineProperties.h"
-#include "RenderProperties.h"
-#include "X3DMaterialNode.h"
-#include "X3DTextureNode.h"
-#include "X3DTextureTransformNode.h"
-#include "X3DShaderNode.h"
-#include "DependentNodeFields.h"
+#include <X3DAppearanceNode.h>
+#include <FillProperties.h>
+#include <LineProperties.h>
+#include <RenderProperties.h>
+#include <X3DMaterialNode.h>
+#include <X3DTextureNode.h>
+#include <X3DTextureTransformNode.h>
+#include <X3DShaderNode.h>
+#include <DependentNodeFields.h>
 
 namespace H3D {
 

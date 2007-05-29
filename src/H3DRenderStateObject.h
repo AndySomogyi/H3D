@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,7 +29,7 @@
 #ifndef __H3DRENDERSTATEOBJECT_H__
 #define __H3DRENDERSTATEOBJECT_H__
 
-#include "H3DApi.h"
+#include <H3DApi.h>
 
 namespace H3D {
   /// \ingroup AbstractInterface

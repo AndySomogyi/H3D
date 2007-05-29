@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __PYTHONSCRIPT_H__
 #define __PYTHONSCRIPT_H__
 
-#include "Exception.h"
-#include "H3DScriptNode.h"
-#include "MFNode.h"
+#include <Exception.h>
+#include <H3DScriptNode.h>
+#include <MFNode.h>
 
 #ifdef HAVE_PYTHON
 

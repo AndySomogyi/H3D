@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __FORCEFIELD_H__
 #define __FORCEFIELD_H__
 
-#include "H3DForceEffect.h" 
-#include "HapticForceField.h"
-#include "SFVec3f.h"
+#include <H3DForceEffect.h> 
+#include <HapticForceField.h>
+#include <SFVec3f.h>
 
 namespace H3D {
   /// \ingroup H3DNodes 

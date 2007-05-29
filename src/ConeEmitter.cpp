@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,8 +28,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "ConeEmitter.h"
-#include "ParticleSystem.h"
+#include <ConeEmitter.h>
+#include <ParticleSystem.h>
 
 using namespace H3D;
 

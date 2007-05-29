@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,8 +28,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "TriangleSet.h"
-#include "Normal.h"
+#include <TriangleSet.h>
+#include <Normal.h>
 
 using namespace H3D;
 

@@ -1,6 +1,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,13 +30,13 @@
 #ifndef __H3DBOUND_H__
 #define __H3DBOUND_H__
 
-#include "H3DApi.h"
-#include "FieldTemplates.h"
-#include "RefCountedClass.h"
-#include "RefCountSField.h"
-#include "Exception.h"
-#include "SFVec3f.h"
-#include "SFMatrix4f.h"
+#include <H3DApi.h>
+#include <FieldTemplates.h>
+#include <RefCountedClass.h>
+#include <RefCountSField.h>
+#include <Exception.h>
+#include <SFVec3f.h>
+#include <SFMatrix4f.h>
 
 namespace H3D {
   /// The Bound class is the abstract base class for all classes specifying

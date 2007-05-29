@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __RECTANGLE2D_H__
 #define __RECTANGLE2D_H__
 
-#include "X3DGeometryNode.h"
-#include "SFVec2f.h"
+#include <X3DGeometryNode.h>
+#include <SFVec2f.h>
 
 namespace H3D {
 

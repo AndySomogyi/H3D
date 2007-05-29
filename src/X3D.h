@@ -15,11 +15,11 @@
 #include <mem.h>
 #endif
 
-#include "H3DApi.h"
-#include "Group.h"
-#include "DEFNodes.h"
-#include "AutoRef.h"
-#include "PrototypeVector.h"
+#include <H3DApi.h>
+#include <Group.h>
+#include <DEFNodes.h>
+#include <AutoRef.h>
+#include <PrototypeVector.h>
 
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 #include <xercesc/sax2/SAX2XMLReader.hpp>

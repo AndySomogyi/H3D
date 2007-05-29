@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,10 +28,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "X3DTextureCoordinateNode.h"
+#include <X3DTextureCoordinateNode.h>
 #include "GL/glew.h"
-#include "MultiTexture.h"
-#include "X3DTextureNode.h"
+#include <MultiTexture.h>
+#include <X3DTextureNode.h>
 
 using namespace H3D;
 

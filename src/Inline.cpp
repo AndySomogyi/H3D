@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,9 +28,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "Inline.h"
-#include "X3D.h"
-#include "X3DSAX2Handlers.h"
+#include <Inline.h>
+#include <X3D.h>
+#include <X3DSAX2Handlers.h>
 #include "ResourceResolver.h"
 
 using namespace H3D;

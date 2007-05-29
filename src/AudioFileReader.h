@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,7 +29,7 @@
 #ifndef __AUDIOFILEREADER_H__
 #define __AUDIOFILEREADER_H__
 
-#include "H3DSoundFileNode.h"
+#include <H3DSoundFileNode.h>
 
 #ifdef HAVE_LIBAUDIOFILE
 #if defined(_MSC_VER) || defined(__BORLANDC__)

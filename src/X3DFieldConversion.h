@@ -11,9 +11,9 @@
 #define __X3DFIELDCONVERSION_H__
 
 #include <sstream>
-#include "Exception.h"
-#include "H3DTypes.h"
-#include "PixelImage.h"
+#include <Exception.h>
+#include <H3DTypes.h>
+#include <PixelImage.h>
 
 using namespace std;
 
@@ -89,7 +89,7 @@ namespace H3D {
         strncpy( new_s, &s[1], i-1 );
         new_s[i-1] = '\0';
         string ret( new_s );
-        delete[] new_s;
+        delete new_s;
         rest = &s[ i + 1 ];
         return ret;
       }

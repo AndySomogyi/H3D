@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -26,8 +26,8 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-#include "H3DApi.h"
-#include "SmoothSurface.h"
+#include <H3DApi.h>
+#include <SmoothSurface.h>
 
 using namespace H3D;
 

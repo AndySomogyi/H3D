@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,13 +30,13 @@
 #define __SPACEWARESENSOR_H__
 
 
-#include "X3DSensorNode.h"
+#include <X3DSensorNode.h>
 #include <list>
-#include "SFVec3f.h"
-#include "SFFloat.h"
-#include "SFInt32.h"
-#include "SFRotation.h"
-#include "Threads.h"
+#include <SFVec3f.h>
+#include <SFFloat.h>
+#include <SFInt32.h>
+#include <SFRotation.h>
+#include <Threads.h>
 
 namespace H3D {
 

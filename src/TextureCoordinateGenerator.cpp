@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,7 +28,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "TextureCoordinateGenerator.h"
+#include <TextureCoordinateGenerator.h>
 #include "GL/glew.h"
 
 using namespace H3D;
@@ -67,7 +67,8 @@ void TextureCoordinateGenerator::startTexGen() {
   const string &gen_mode = mode->getValue();
   const vector< H3DFloat > &params = parameter->getValue();
 
-  if( gen_mode == "GL_SPHERE" ) {
+  if( gen_mode == "GL_SPHERE" ||
+      gen_mode == "SPHERE" ) {
     glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
     glTexGend( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
     glEnable( GL_TEXTURE_GEN_S );

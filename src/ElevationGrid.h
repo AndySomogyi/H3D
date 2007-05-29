@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,16 +29,16 @@
 #ifndef __ELEVATIONGRID_H__
 #define __ELEVATIONGRID_H__
 
-#include "X3DGeometryNode.h"
-#include "X3DCoordinateNode.h"
-#include "TextureCoordinateGenerator.h"
-#include "X3DColorNode.h"
-#include "X3DNormalNode.h"
-#include "X3DVertexAttributeNode.h"
-#include "DependentNodeFields.h"
-#include "SFInt32.h"
-#include "SFFloat.h"
-#include "FogCoordinate.h"
+#include <X3DGeometryNode.h>
+#include <X3DCoordinateNode.h>
+#include <TextureCoordinateGenerator.h>
+#include <X3DColorNode.h>
+#include <X3DNormalNode.h>
+#include <X3DVertexAttributeNode.h>
+#include <DependentNodeFields.h>
+#include <SFInt32.h>
+#include <SFFloat.h>
+#include <FogCoordinate.h>
 
 namespace H3D {
 

@@ -2,28 +2,28 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include <fstream>
-#include "X3D.h"
+#include <X3D.h>
 #include <string.h>
 
 #include <iostream>
 
-#include "VrmlParser.h"
-#include "X3DSAX2Handlers.h"
-#include "GLUTWindow.h"
-#include "Group.h"
-#include "Transform.h"
-#include "Scene.h"
-#include "KeySensor.h"
-#include "MouseSensor.h"
+#include <VrmlParser.h>
+#include <X3DSAX2Handlers.h>
+#include <GLUTWindow.h>
+#include <Group.h>
+#include <Transform.h>
+#include <Scene.h>
+#include <KeySensor.h>
+#include <MouseSensor.h>
 #ifndef MACOSX
-#include "SpaceWareSensor.h"
+#include <SpaceWareSensor.h>
 #endif
-#include "DEFNodes.h"
-#include "Viewpoint.h"
-#include "DeviceInfo.h"
-#include "INIFile.h"
-#include "ResourceResolver.h"
-#include "PythonScript.h"
+#include <DEFNodes.h>
+#include <Viewpoint.h>
+#include <DeviceInfo.h>
+#include <INIFile.h>
+#include <ResourceResolver.h>
+#include <PythonScript.h>
 
 using namespace std;
 using namespace H3D;

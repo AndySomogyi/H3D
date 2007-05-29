@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -31,7 +31,7 @@
 
 // H3DApi includes
 #include <H3DApi.h>
-#include "Node.h"
+#include <Node.h>
 
 // HAPI includes
 #include <HAPIHapticsRenderer.h>

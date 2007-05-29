@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -27,15 +27,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "PythonScript.h"
-#include "X3DTypes.h"
-#include "X3DFieldConversion.h"
-#include "PythonTypes.h"
-#include "Scene.h"
-#include "X3D.h"
-#include "X3DSAX2Handlers.h"
-#include "MFNode.h"
-#include "PythonMethods.h"
+#include <PythonScript.h>
+#include <X3DTypes.h>
+#include <X3DFieldConversion.h>
+#include <PythonTypes.h>
+#include <Scene.h>
+#include <X3D.h>
+#include <X3DSAX2Handlers.h>
+#include <MFNode.h>
+#include <PythonMethods.h>
 #include "ResourceResolver.h"
 
 #ifdef HAVE_PYTHON

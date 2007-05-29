@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,10 +29,10 @@
 #ifndef __X3DENVIRONMENTALSENSORNODE_H__
 #define __X3DENVIRONMENTALSENSORNODE_H__
 
-#include "X3DSensorNode.h"
-#include "SFBool.h"
-#include "SFVec3f.h"
-#include "SFTime.h"
+#include <X3DSensorNode.h>
+#include <SFBool.h>
+#include <SFVec3f.h>
+#include <SFTime.h>
 
 
 namespace H3D {

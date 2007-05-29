@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,11 +28,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "ParticleSystem.h"
+#include <ParticleSystem.h>
 
-#include "X3DViewpointNode.h"
+#include <X3DViewpointNode.h>
 
 using namespace H3D;
+
+list<ParticleSystem *> ParticleSystem::particlesystems;
 
 H3DNodeDatabase ParticleSystem::database( 
         "ParticleSystem", 
@@ -113,6 +115,7 @@ ParticleSystem::ParticleSystem(
   geometryType->setValue( "QUAD" );
 
   last_time = TimeStamp();
+  particlesystems.push_back( this );
 }
 
 
@@ -216,7 +219,6 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
   }
   
   // generate new particles
-
   
   TimeStamp current_time;
   H3DTime dt = current_time - last_time;
@@ -366,7 +368,7 @@ ParticleSystem::getCurrentParticleType() {
   const string &geom_type = geometryType->getValue();
   if( geom_type == "LINE" ) 
     return X3DParticleEmitterNode::Particle::LINE;
-  else if( geom_type == "POINT" ) 
+  else if( geom_type == "POINT" )
     return X3DParticleEmitterNode::Particle::POINT;
   else if( geom_type == "QUAD" ) 
     return X3DParticleEmitterNode::Particle::QUAD;

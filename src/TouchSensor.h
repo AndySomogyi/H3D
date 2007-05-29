@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,7 +29,7 @@
 #ifndef __TOUCHSENSOR_H__
 #define __TOUCHSENSOR_H__
 
-#include "X3DTouchSensorNode.h"
+#include <X3DTouchSensorNode.h>
 
 namespace H3D {
 

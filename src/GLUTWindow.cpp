@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,7 +28,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "GLUTWindow.h"
+#include <GLUTWindow.h>
 
 #include <GL/glew.h>
 #ifdef MACOSX
@@ -44,10 +44,10 @@
 #endif
 
 #if !( defined(FREEGLUT) && defined(WIN32) )
-#include "X3DKeyDeviceSensorNode.h"
+#include <X3DKeyDeviceSensorNode.h>
 #endif
 #ifndef WIN32
-#include "MouseSensor.h"
+#include <MouseSensor.h>
 #endif
 
 using namespace H3D;

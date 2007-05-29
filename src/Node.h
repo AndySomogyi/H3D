@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,11 +29,11 @@
 #ifndef __NODE_H__
 #define __NODE_H__
 
-#include "Instantiate.h"
+#include <Instantiate.h>
 #include <H3DNodeDatabase.h>
-#include "RefCountedClass.h"
-#include "TraverseInfo.h"
-#include "Console.h"
+#include <RefCountedClass.h>
+#include <TraverseInfo.h>
+#include <Console.h>
 
 //#include "FieldTemplates.h"
 

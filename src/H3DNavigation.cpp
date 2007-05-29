@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,9 +28,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "H3DNavigation.h"
-#include "X3DGeometryNode.h"
-#include "Scene.h"
+#include <H3DNavigation.h>
+#include <X3DGeometryNode.h>
+#include <Scene.h>
 
 using namespace H3D;
 

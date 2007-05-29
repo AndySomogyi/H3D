@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,10 +29,10 @@
 #ifndef __OPENHAPTICSOPTIONS_H__
 #define __OPENHAPTICSOPTIONS_H__
 
-#include "H3DOptionNode.h"
-#include "SFString.h"
-#include "SFBool.h"
-#include "SFFloat.h"
+#include <H3DOptionNode.h>
+#include <SFString.h>
+#include <SFBool.h>
+#include <SFFloat.h>
 
 namespace H3D {
 

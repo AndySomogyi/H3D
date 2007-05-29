@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,22 +28,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "PythonMethods.h"
-#include "DeviceInfo.h"
-#include "X3DViewpointNode.h"
-#include "NavigationInfo.h"
-#include "StereoInfo.h"
-#include "Fog.h"
-#include "GlobalSettings.h"
-#include "X3DSAX2Handlers.h"
-#include "X3DBackgroundNode.h" 
-#include "X3DTypeFunctions.h"
-#include "PythonTypes.h"
-#include "MFNode.h"
-#include "X3D.h"
-#include "VrmlParser.h"
-#include "Scene.h"
-#include "ResourceResolver.h"
+#include <PythonMethods.h>
+#include <DeviceInfo.h>
+#include <X3DViewpointNode.h>
+#include <NavigationInfo.h>
+#include <StereoInfo.h>
+#include <Fog.h>
+#include <GlobalSettings.h>
+#include <X3DSAX2Handlers.h>
+#include <X3DBackgroundNode.h> 
+#include <X3DTypeFunctions.h>
+#include <PythonTypes.h>
+#include <MFNode.h>
+#include <X3D.h>
+#include <VrmlParser.h>
+#include <Scene.h>
+#include <ResourceResolver.h>
 #include <sstream>
 #include <cctype>
 

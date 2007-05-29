@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __LOD_H__
 #define __LOD_H__
 
-#include "MatrixTransform.h"
-#include "SFInt32.h"
-#include "MFFloat.h"
+#include <MatrixTransform.h>
+#include <SFInt32.h>
+#include <MFFloat.h>
 
 
 namespace H3D {

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __X3DURLOBJECT_H__
 #define __X3DURLOBJECT_H__
 
-#include "Node.h"
-#include "FieldTemplates.h"
-#include "MFString.h"
+#include <Node.h>
+#include <FieldTemplates.h>
+#include <MFString.h>
 
 namespace H3D {
   /// \ingroup AbstractInterface

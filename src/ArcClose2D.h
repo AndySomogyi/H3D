@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __ARCCLOSE2D_H__
 #define __ARCCLOSE2D_H__
 
-#include "X3DGeometryNode.h"
-#include "SFFloat.h"
-#include "SFString.h"
+#include <X3DGeometryNode.h>
+#include <SFFloat.h>
+#include <SFString.h>
 
 namespace H3D {
 

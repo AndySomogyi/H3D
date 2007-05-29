@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __X3DTIMEDEPENDENTNODE_H__
 #define __X3DTIMEDEPENDENTNODE_H__
 
-#include "X3DChildNode.h"
-#include "SFTime.h"
-#include "SFBool.h"
+#include <X3DChildNode.h>
+#include <SFTime.h>
+#include <SFBool.h>
 
 namespace H3D {
 

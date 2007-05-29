@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,14 +29,14 @@
 #ifndef __ORTHOVIEWPOINT_H__
 #define __ORTHOVIEWPOINT_H__
 
-#include "X3DViewpointNode.h"
-#include "FieldTemplates.h"
-#include "Exception.h"
-#include "SFVec3f.h"
-#include "SFString.h"
-#include "MFFloat.h"
-#include "SFRotation.h"
-#include "SFMatrix4f.h"
+#include <X3DViewpointNode.h>
+#include <FieldTemplates.h>
+#include <Exception.h>
+#include <SFVec3f.h>
+#include <SFString.h>
+#include <MFFloat.h>
+#include <SFRotation.h>
+#include <SFMatrix4f.h>
 
 namespace H3D {
   /// \ingroup X3DNodes

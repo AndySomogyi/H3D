@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,11 +29,11 @@
 #ifndef __PROXIMITYSENSOR_H__
 #define __PROXIMITYSENSOR_H__
 
-#include "X3DEnvironmentalSensorNode.h"
-#include "SFVec3f.h"
-#include "SFRotation.h"
-#include "X3DViewpointNode.h"
-#include "NavigationInfo.h"
+#include <X3DEnvironmentalSensorNode.h>
+#include <SFVec3f.h>
+#include <SFRotation.h>
+#include <X3DViewpointNode.h>
+#include <NavigationInfo.h>
 
 
 

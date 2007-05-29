@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __TRIANGLESET2D_H__
 #define __TRIANGLESET2D_H__
 
-#include "X3DGeometryNode.h"
-#include "MFVec2f.h"
+#include <X3DGeometryNode.h>
+#include <MFVec2f.h>
 
 namespace H3D {
 

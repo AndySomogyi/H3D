@@ -2,18 +2,18 @@
 //    All Rights Reserved
 //
 
-#include "X3DSAX2Handlers.h"
-#include "FieldTemplates.h"
+#include <X3DSAX2Handlers.h>
+#include <FieldTemplates.h>
 #include <iostream>
 #include <sstream>
 #include <H3DNodeDatabase.h>
-#include "MFNode.h"
-#include "Group.h"
-#include "H3DDynamicFieldsObject.h"
-#include "X3DTypeFunctions.h"
-#include "Inline.h"
-#include "H3DExports.h"
-#include "ProfilesAndComponents.h"
+#include <MFNode.h>
+#include <Group.h>
+#include <H3DDynamicFieldsObject.h>
+#include <X3DTypeFunctions.h>
+#include <Inline.h>
+#include <H3DExports.h>
+#include <ProfilesAndComponents.h>
 
 #include <xercesc/sax2/Attributes.hpp>
 #include <xercesc/sax/SAXParseException.hpp>

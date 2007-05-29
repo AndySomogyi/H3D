@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -26,9 +26,9 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-#include "ViscosityEffect.h" 
-#include "H3DHapticsDevice.h"
-#include "HapticViscosity.h"
+#include <ViscosityEffect.h> 
+#include <H3DHapticsDevice.h>
+#include <HapticViscosity.h>
 
 using namespace H3D;
 

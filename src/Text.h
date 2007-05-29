@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,11 +29,11 @@
 #ifndef __TEXT_H__
 #define __TEXT_H__
 
-#include "X3DGeometryNode.h"
-#include "X3DFontStyleNode.h"
-#include "MFFloat.h"
-#include "SFFloat.h"
-#include "MFString.h"
+#include <X3DGeometryNode.h>
+#include <X3DFontStyleNode.h>
+#include <MFFloat.h>
+#include <SFFloat.h>
+#include <MFString.h>
 
 namespace H3D {
 

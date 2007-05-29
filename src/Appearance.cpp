@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,15 +28,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "Appearance.h"
+#include <Appearance.h>
 #include "GL/glew.h"
-#include "X3DTextureTransformNode.h"
-#include "X3DTextureNode.h"
-#include "X3DMaterialNode.h"
-#include "LineProperties.h"
-#include "MultiTexture.h"
-#include "Console.h"
-#include "X3DShapeNode.h"
+#include <X3DTextureTransformNode.h>
+#include <X3DTextureNode.h>
+#include <X3DMaterialNode.h>
+#include <LineProperties.h>
+#include <MultiTexture.h>
+#include <Console.h>
+#include <X3DShapeNode.h>
 
 using namespace H3D;
 

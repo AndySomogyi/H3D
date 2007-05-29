@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -27,14 +27,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "H3DHapticsDevice.h"
+#include <H3DHapticsDevice.h>
 #include <PhantomHapticsDevice.h>
 #include <X3DGeometryNode.h>
 #include <DeviceInfo.h>
 #include <OpenHapticsRenderer.h>
 #include <GodObjectRenderer.h>
 #include <HAPIHapticsRenderer.h>
-#include "X3DViewpointNode.h"
+#include <X3DViewpointNode.h>
 using namespace H3D;
 
 H3DNodeDatabase H3DHapticsDevice::database( "H3DHapticsDevice", 

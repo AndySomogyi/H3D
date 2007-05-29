@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -26,11 +26,11 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-#include "MagneticGeometryEffect.h" 
-#include "H3DHapticsDevice.h"
-#include "HapticShapeConstraint.h"
-#include "HapticsOptions.h"
-#include "HapticTriangleSet.h"
+#include <MagneticGeometryEffect.h> 
+#include <H3DHapticsDevice.h>
+#include <HapticShapeConstraint.h>
+#include <HapticsOptions.h>
+#include <HapticTriangleSet.h>
 
 using namespace H3D;
 using namespace HAPI;
