@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __FOG_H__
 #define __FOG_H__
 
-#include "X3DBindableNode.h"
-#include "X3DFogObject.h"
+#include <X3DBindableNode.h>
+#include <X3DFogObject.h>
 
 namespace H3D {
   /// \ingroup X3DNodes

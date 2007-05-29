@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,24 +28,24 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "X3DGeometryNode.h"
-#include "H3DSurfaceNode.h"
-#include "GlobalSettings.h"
-#include "GeometryBoundTreeOptions.h"
+#include <X3DGeometryNode.h>
+#include <H3DSurfaceNode.h>
+#include <GlobalSettings.h>
+#include <GeometryBoundTreeOptions.h>
 
-#include "OpenHapticsOptions.h"
-#include "HapticsOptions.h"
+#include <OpenHapticsOptions.h>
+#include <HapticsOptions.h>
 #include <HAPIHapticShape.h>
-#include "DeviceInfo.h"
+#include <DeviceInfo.h>
 #include <HapticTriangleSet.h>
-#include "HLDepthBufferShape.h"
-#include "HLFeedbackShape.h"
+#include <HLDepthBufferShape.h>
+#include <HLFeedbackShape.h>
 
-#include "DebugOptions.h"
+#include <DebugOptions.h>
 
 #include <FeedbackBufferCollector.h>
 
-#include "X3DPointingDeviceSensorNode.h"
+#include <X3DPointingDeviceSensorNode.h>
 #include <HapticLineSet.h>
 #include <HapticPointSet.h>
 

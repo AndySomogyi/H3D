@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __TEXTURECOORDINATE_H__
 #define __TEXTURECOORDINATE_H__
 
-#include "X3DTextureCoordinateNode.h"
+#include <X3DTextureCoordinateNode.h>
 #include <GL/glew.h>
-#include "MFVec2f.h"
+#include <MFVec2f.h>
 
 namespace H3D {
 

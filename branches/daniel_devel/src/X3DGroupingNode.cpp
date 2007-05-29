@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,11 +28,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "X3DGroupingNode.h"
-#include "H3DRenderStateObject.h"
-#include "MatrixTransform.h"
-#include "X3DPointingDeviceSensorNode.h"
-#include "X3DShapeNode.h"
+#include <X3DGroupingNode.h>
+#include <H3DRenderStateObject.h>
+#include <MatrixTransform.h>
+#include <X3DPointingDeviceSensorNode.h>
+#include <X3DShapeNode.h>
 
 using namespace H3D;
 

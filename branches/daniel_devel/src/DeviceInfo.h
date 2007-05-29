@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __DEVICEINFO_H__
 #define __DEVICEINFO_H__
 
-#include "X3DBindableNode.h"
-#include "H3DHapticsDevice.h"
-#include "MFNode.h"
+#include <X3DBindableNode.h>
+#include <H3DHapticsDevice.h>
+#include <MFNode.h>
 
 namespace H3D {
   /// \ingroup H3DNodes

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __H3DDYNAMICFIELDSOBJECT_H__
 #define __H3DDYNAMICFIELDSOBJECT_H__
 
-#include "H3DNodeDatabase.h"
-#include "AutoPtrVector.h"
-#include "Node.h"
+#include <H3DNodeDatabase.h>
+#include <AutoPtrVector.h>
+#include <Node.h>
 
 namespace H3D {
   /// \ingroup AbstractInterface

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __IMAGE_H__
 #define __IMAGE_H__
 
-#include "H3DApi.h"
-#include "H3DTypes.h"
-#include "RefCountedClass.h"
+#include <H3DApi.h>
+#include <H3DTypes.h>
+#include <RefCountedClass.h>
 #include <assert.h>
 
 /// H3D API namespace

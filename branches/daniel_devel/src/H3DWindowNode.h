@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,10 +29,10 @@
 #ifndef __H3DWINDOWNODE_H__
 #define __H3DWINDOWNODE_H__
 
-#include "X3DViewpointNode.h"
-#include "MFNode.h"
-#include "SFInt32.h"
-#include "DefaultAppearance.h"
+#include <X3DViewpointNode.h>
+#include <MFNode.h>
+#include <SFInt32.h>
+#include <DefaultAppearance.h>
 
 namespace H3D {
 

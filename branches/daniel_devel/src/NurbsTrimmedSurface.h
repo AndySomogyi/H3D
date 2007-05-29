@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __NURBSTRIMMEDSURFACE_H__
 #define __NURBSTRIMMEDSURFACE_H__
 
-#include "X3DNurbsSurfaceGeometryNode.h"
-#include "Contour2D.h"
+#include <X3DNurbsSurfaceGeometryNode.h>
+#include <Contour2D.h>
 
 namespace H3D {
 

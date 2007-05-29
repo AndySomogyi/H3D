@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,8 +30,8 @@
 #ifndef __H3DIMAGELOADERNODE_H__
 #define __H3DIMAGELOADERNODE_H__
 
-#include "Image.h"
-#include "Node.h"
+#include <Image.h>
+#include <Node.h>
 #include <list>
 
 namespace H3D {

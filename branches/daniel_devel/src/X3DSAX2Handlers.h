@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -32,14 +32,14 @@
 
 #include <stack>
 #include <list>
-#include "Field.h"
-#include "Node.h"
-#include "Exception.h"
-#include "DEFNodes.h"
-#include "AutoRef.h"
-#include "ProtoDeclaration.h"
-#include "AutoPtrVector.h"
-#include "X3D.h"
+#include <Field.h>
+#include <Node.h>
+#include <Exception.h>
+#include <DEFNodes.h>
+#include <AutoRef.h>
+#include <ProtoDeclaration.h>
+#include <AutoPtrVector.h>
+#include <X3D.h>
 
 #include <xercesc/sax2/Attributes.hpp>
 #include <xercesc/sax2/DefaultHandler.hpp>

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,11 +28,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "X3DParticleEmitterNode.h"
-#include "X3DViewpointNode.h"
-#include "X3DTextureNode.h"
-#include "ParticleSystem.h"
-#include "MultiTexture.h"
+#include <X3DParticleEmitterNode.h>
+#include <X3DViewpointNode.h>
+#include <X3DTextureNode.h>
+#include <ParticleSystem.h>
+#include <MultiTexture.h>
 
 using namespace H3D;
 

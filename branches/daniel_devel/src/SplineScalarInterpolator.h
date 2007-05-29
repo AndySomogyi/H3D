@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,10 +29,10 @@
 #ifndef __SPLINESCALARINTERPOLATOR_H__
 #define __SPLINESCALARINTORPOLATOR_H__
 
-#include "X3DInterpolatorNode.h"
-#include "SFVec2f.h"
-#include "SFBool.h"
-#include "H3DMath.h"
+#include <X3DInterpolatorNode.h>
+#include <SFVec2f.h>
+#include <SFBool.h>
+#include <H3DMath.h>
 
 namespace H3D {
 

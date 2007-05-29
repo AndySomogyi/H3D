@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,13 +29,13 @@
 #ifndef __SMOOTHSURFACE_H__
 #define __SMOOTHSURFACE_H__
 
-#include "H3DSurfaceNode.h"
+#include <H3DSurfaceNode.h>
 #include <HAPISurfaceObject.h>
 #include <OpenHapticsRenderer.h>
 #ifdef HAVE_CHAI3D
 #include <Chai3DRenderer.h>
 #endif
-#include "SFFloat.h"
+#include <SFFloat.h>
 
 namespace H3D {
 

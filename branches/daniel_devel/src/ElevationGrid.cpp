@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,10 +28,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "ElevationGrid.h"
-#include "MultiTexture.h"
-#include "MultiTextureCoordinate.h"
-#include "Normal.h"
+#include <ElevationGrid.h>
+#include <MultiTexture.h>
+#include <MultiTextureCoordinate.h>
+#include <Normal.h>
 
 using namespace H3D;
 

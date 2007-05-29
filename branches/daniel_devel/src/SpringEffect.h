@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,12 +29,12 @@
 #ifndef __SPRINGEFFECT_H__
 #define __SPRINGEFFECT_H__
 
-#include "H3DForceEffect.h" 
-#include "HapticSpring.h"
-#include "SFVec3f.h"
-#include "SFBool.h"
-#include "SFFloat.h"
-#include "SFInt32.h"
+#include <H3DForceEffect.h> 
+#include <HapticSpring.h>
+#include <SFVec3f.h>
+#include <SFBool.h>
+#include <SFFloat.h>
+#include <SFInt32.h>
 
 namespace H3D {
   /// \ingroup H3DNodes 

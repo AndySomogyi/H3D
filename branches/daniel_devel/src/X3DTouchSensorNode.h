@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __X3DTOUCHSENSORNODE_H__
 #define __X3DTOUCHSENSORNODE_H__
 
-#include "X3DPointingDeviceSensorNode.h"
-#include "SFTime.h"
+#include <X3DPointingDeviceSensorNode.h>
+#include <SFTime.h>
 
 namespace H3D {
 

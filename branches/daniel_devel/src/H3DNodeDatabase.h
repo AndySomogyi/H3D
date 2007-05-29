@@ -1,6 +1,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -31,8 +31,8 @@
 #ifndef __H3DNODEDATABSE_H__
 #define __H3DNODEDATABSE_H__
 
-#include "H3DApi.h"
-#include "Field.h"
+#include <H3DApi.h>
+#include <Field.h>
 #include <iostream>
 #include <string>
 #include <map>

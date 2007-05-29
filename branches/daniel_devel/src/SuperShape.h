@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __SUPERSHAPE_H__
 #define __SUPERSHAPE_H__
 
-#include "X3DGeometryNode.h"
-#include "SFFloat.h"
-#include "SFInt32.h"
+#include <X3DGeometryNode.h>
+#include <SFFloat.h>
+#include <SFInt32.h>
 
 /// H3D API namespace
 namespace H3D {

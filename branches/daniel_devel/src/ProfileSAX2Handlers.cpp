@@ -2,7 +2,7 @@
 //    All Rights Reserved
 //
 #include <stdlib.h>
-#include "ProfileSAX2Handlers.h"
+#include <ProfileSAX2Handlers.h>
 #include <iostream>
 #include <sstream>
 #include <H3DNodeDatabase.h>

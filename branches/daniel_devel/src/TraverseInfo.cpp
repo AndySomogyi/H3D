@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,10 +28,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "H3DSurfaceNode.h"
-#include "X3DGeometryNode.h"
-#include "H3DHapticsDevice.h"
-#include "TraverseInfo.h"
+#include <H3DSurfaceNode.h>
+#include <X3DGeometryNode.h>
+#include <H3DHapticsDevice.h>
+#include <TraverseInfo.h>
 
 using namespace H3D;
 

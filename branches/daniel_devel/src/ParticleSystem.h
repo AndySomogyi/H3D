@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -381,11 +381,20 @@ namespace H3D {
     static H3DNodeDatabase database;
 
     typedef std::list< X3DParticleEmitterNode::Particle > Particles;
+
+    typedef list< ParticleSystem * > ParticleSystemList;
+
+    /// Returns a list of all current ParticleSystem instances.
+    static const ParticleSystemList &getAllParticleSystems() {
+      return particlesystems;
+    }
+
   protected:
     H3DTime particle_system_time;
     H3DTime last_time;
     Particles particles;
     bool update_bound;
+    static ParticleSystemList particlesystems;
   };
 }
 

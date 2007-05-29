@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __X3DAPPEARANCENODE_H__
 #define __X3DAPPEARANCENODE_H__
 
-#include "X3DNode.h"
-#include "H3DDisplayListObject.h"
-#include "H3DSurfaceNode.h"
+#include <X3DNode.h>
+#include <H3DDisplayListObject.h>
+#include <H3DSurfaceNode.h>
 
 namespace H3D {
 

@@ -1,6 +1,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "IndexedTriangleFanSet.h"
-#include "Normal.h"
+#include <IndexedTriangleFanSet.h>
+#include <Normal.h>
 
 using namespace H3D;
 

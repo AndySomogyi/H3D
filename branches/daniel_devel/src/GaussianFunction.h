@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __GAUSSIANFUNCTION_H__
 #define __GAUSSIANFUNCTION_H__
 
-#include "H3DFunctionNode.h"
-#include "SFFloat.h"
+#include <H3DFunctionNode.h>
+#include <SFFloat.h>
 
 namespace H3D {
   /// \ingroup H3DNodes

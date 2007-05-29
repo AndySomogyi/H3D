@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __FREEIMAGEIMAGE_H__
 #define __FREEIMAGEIMAGE_H__
 
-#include "H3DApi.h"
-#include "Image.h"
-#include "Exception.h"
+#include <H3DApi.h>
+#include <Image.h>
+#include <Exception.h>
 
 #ifdef HAVE_FREEIMAGE
 #if defined(_MSC_VER) || defined(__BORLANDC__)

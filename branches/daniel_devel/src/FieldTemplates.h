@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -31,9 +31,9 @@
 #include <set>
 #include <vector>
 
-#include "SField.h"
-#include "MField.h"
-#include "TypedField.h"
+#include <SField.h>
+#include <MField.h>
+#include <TypedField.h>
 
 using namespace std;
 

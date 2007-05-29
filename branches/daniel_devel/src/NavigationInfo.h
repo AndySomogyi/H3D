@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __NAVIGATIONINFO_H__
 #define __NAVIGATIONINFO_H__
 
-#include "X3DViewpointNode.h"
-#include "MFFloat.h"
-#include "MFString.h"
+#include <X3DViewpointNode.h>
+#include <MFFloat.h>
+#include <MFString.h>
 
 namespace H3D {
   /// \ingroup X3DNodes

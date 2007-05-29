@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,9 +29,9 @@
 #ifndef __PIXEL3DTEXTURE_H__
 #define __PIXEL3DTEXTURE_H__
 
-#include "X3DTexture3DNode.h"
-#include "DependentNodeFields.h"
-#include "X3DTexture2DNode.h"
+#include <X3DTexture3DNode.h>
+#include <DependentNodeFields.h>
+#include <X3DTexture2DNode.h>
 
 namespace H3D {
   /// \ingroup X3DNodes 

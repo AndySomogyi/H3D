@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,13 +29,13 @@
 #ifndef __INDEXEDTRIANGLESET_H__
 #define __INDEXEDTRIANGLESET_H__
 
-#include "X3DComposedGeometryNode.h"
-#include "DependentNodeFields.h"
-#include "X3DCoordinateNode.h"
-#include "X3DColorNode.h"
-#include "CoordBoundField.h"
-#include "MFInt32.h"
-#include "SFInt32.h"
+#include <X3DComposedGeometryNode.h>
+#include <DependentNodeFields.h>
+#include <X3DCoordinateNode.h>
+#include <X3DColorNode.h>
+#include <CoordBoundField.h>
+#include <MFInt32.h>
+#include <SFInt32.h>
 #include <HapticTriangleTree.h>
 
 namespace H3D {

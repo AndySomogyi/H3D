@@ -9,8 +9,8 @@
 #ifndef __DEFNODES_H__
 #define __DEFNODES_H__
 
-#include "Exception.h"
-#include "Node.h"
+#include <Exception.h>
+#include <Node.h>
 #include <map>
 #include <string>
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,12 +29,12 @@
 #ifndef __X3DSHAPENODE_H__
 #define __X3DSHAPENODE_H__
 
-#include "X3DChildNode.h"
-#include "X3DBoundedObject.h"
-#include "X3DAppearanceNode.h"
-#include "X3DGeometryNode.h"
-#include "DependentNodeFields.h"
-#include "H3DDisplayListObject.h"
+#include <X3DChildNode.h>
+#include <X3DBoundedObject.h>
+#include <X3DAppearanceNode.h>
+#include <X3DGeometryNode.h>
+#include <DependentNodeFields.h>
+#include <H3DDisplayListObject.h>
 
 namespace H3D {
   /// \ingroup AbstractNodes

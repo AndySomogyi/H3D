@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,11 +29,11 @@
 #ifndef __EXTRUSION_H__
 #define __EXTRUSION_H__
 
-#include "X3DGeometryNode.h"
-#include "SFInt32.h"
-#include "SFFloat.h"
-#include "MFRotation.h"
-#include "MFVec2f.h"
+#include <X3DGeometryNode.h>
+#include <SFInt32.h>
+#include <SFFloat.h>
+#include <MFRotation.h>
+#include <MFVec2f.h>
 
 namespace H3D {
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,23 +28,23 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "Scene.h"
-#include "TimeStamp.h"
-#include "DeviceInfo.h"
+#include <Scene.h>
+#include <TimeStamp.h>
+#include <DeviceInfo.h>
 #include <GL/glew.h>
 #ifdef MACOSX
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
 #endif
-#include "PeriodicUpdate.h"
-#include "GLUTWindow.h"
-#include "X3DShapeNode.h"
+#include <PeriodicUpdate.h>
+#include <GLUTWindow.h>
+#include <X3DShapeNode.h>
 
-#include "X3DPointingDeviceSensorNode.h"
-#include "X3DGroupingNode.h"
-#include "ProfilesAndComponents.h"
-#include "H3DNavigation.h"
+#include <X3DPointingDeviceSensorNode.h>
+#include <X3DGroupingNode.h>
+#include <ProfilesAndComponents.h>
+#include <H3DNavigation.h>
 
 using namespace H3D;
 
@@ -104,12 +104,6 @@ void Scene::idle() {
       if( hd->initialized->getValue() ) { 
         hd->preRender();
         hd->updateDeviceValues();
-      } else {
-        hd->initDevice();
-        if( hd->initialized->getValue() ) {
-          hd->preRender();
-          hd->updateDeviceValues();
-        }
       }
       hds.push_back( hd );
     }

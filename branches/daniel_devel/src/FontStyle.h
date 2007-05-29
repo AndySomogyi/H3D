@@ -1,6 +1,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,11 +30,11 @@
 #ifndef __FONTSTYLE_H__
 #define __FONTSTYLE_H__
 
-#include "X3DFontStyleNode.h"
-#include "SFString.h"
-#include "MFString.h"
-#include "SFBool.h"
-#include "SFFloat.h"
+#include <X3DFontStyleNode.h>
+#include <SFString.h>
+#include <MFString.h>
+#include <SFBool.h>
+#include <SFFloat.h>
 
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
 #if defined(_MSC_VER) || defined(__BORLANDC__)

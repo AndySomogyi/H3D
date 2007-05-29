@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -24,22 +24,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "H3DApi.h"
+#include <H3DApi.h>
 #ifdef HAVE_FREEIMAGE
 #include <FreeImage.h>
 #endif
 #include <xercesc/util/PlatformUtils.hpp>
-#include "Exception.h"
+#include <Exception.h>
 #ifdef LINUX
 #include <fontconfig/fontconfig.h>
 #endif
 
 #ifdef HAVE_LIBCURL
 #include <curl/curl.h>
-#include "LibCurlResolver.h"
+#include <LibCurlResolver.h>
 #endif
 
-#include "ResourceResolver.h"
+#include <ResourceResolver.h>
 
 #ifdef HAVE_FREEIMAGE
 #if defined(_MSC_VER) || defined(__BORLANDC__)
@@ -103,7 +103,7 @@ BOOL APIENTRY DllMain( HANDLE hModule,
   case DLL_THREAD_DETACH:
     break;
   case DLL_PROCESS_DETACH:
-    deinitializeH3D();
+    //deinitializeH3D();
     break;
   }
   return TRUE;

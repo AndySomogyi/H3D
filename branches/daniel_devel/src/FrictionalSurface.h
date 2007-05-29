@@ -1,6 +1,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,7 +30,7 @@
 #ifndef __FRICTIONALSURFACE_H__
 #define __FRICTIONALSURFACE_H__
 
-#include "SmoothSurface.h"
+#include <SmoothSurface.h>
 
 namespace H3D {
 

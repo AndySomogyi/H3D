@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,14 +29,14 @@
 #ifndef __INDEXEDLINESET_H__
 #define __INDEXEDLINESET_H__
 
-#include "X3DGeometryNode.h"
-#include "DependentNodeFields.h"
-#include "X3DCoordinateNode.h"
-#include "X3DColorNode.h"
-#include "CoordBoundField.h"
-#include "IndexedLineSet.h"
-#include "MFInt32.h"
-#include "FogCoordinate.h"
+#include <X3DGeometryNode.h>
+#include <DependentNodeFields.h>
+#include <X3DCoordinateNode.h>
+#include <X3DColorNode.h>
+#include <CoordBoundField.h>
+#include <IndexedLineSet.h>
+#include <MFInt32.h>
+#include <FogCoordinate.h>
 
 namespace H3D {
 

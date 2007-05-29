@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,12 +29,12 @@
 #ifndef __INLINE_H__
 #define __INLINE_H__
 
-#include "X3DChildNode.h"
-#include "X3DUrlObject.h"
-#include "X3DBoundedObject.h"
-#include "H3DDisplayListObject.h"
-#include "Group.h"
-#include "DEFNodes.h"
+#include <X3DChildNode.h>
+#include <X3DUrlObject.h>
+#include <X3DBoundedObject.h>
+#include <H3DDisplayListObject.h>
+#include <Group.h>
+#include <DEFNodes.h>
 
 namespace H3D {
 

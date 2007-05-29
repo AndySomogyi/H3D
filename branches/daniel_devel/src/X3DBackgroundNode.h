@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,11 +29,11 @@
 #ifndef __X3DBACKGROUNDNODE_H__
 #define __X3DBACKGROUNDNODE_H__
 
-#include "X3DBindableNode.h"
-#include "H3DDisplayListObject.h"
-#include "MFFloat.h"
-#include "MFColor.h"
-#include "SFMatrix4f.h"
+#include <X3DBindableNode.h>
+#include <H3DDisplayListObject.h>
+#include <MFFloat.h>
+#include <MFColor.h>
+#include <SFMatrix4f.h>
 
 namespace H3D {
 

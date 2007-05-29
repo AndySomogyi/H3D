@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,10 +29,10 @@
 #ifndef __DEFORMABLESHAPE_H__
 #define __DEFORMABLESHAPE_H__
 
-#include "X3DShapeNode.h"
-#include "Coordinate.h"
-#include "X3DComposedGeometryNode.h"
-#include "H3DCoordinateDeformerNode.h"
+#include <X3DShapeNode.h>
+#include <Coordinate.h>
+#include <X3DComposedGeometryNode.h>
+#include <H3DCoordinateDeformerNode.h>
 
 namespace H3D {
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,7 +28,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "SpaceWareSensor.h"
+#include <SpaceWareSensor.h>
 
 #ifdef WIN32
 
@@ -59,7 +59,7 @@ extern "C" {
 #include <X11/keysym.h>
 #define IBM
 extern "C" {
-#include "xdrvlib.h"
+#include <xdrvlib.h>
 }
 #endif // __linux
 

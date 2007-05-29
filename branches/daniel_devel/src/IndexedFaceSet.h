@@ -1,6 +1,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,10 +30,10 @@
 #ifndef __INDEXEDFACESET_H__
 #define __INDEXEDFACESET_H__
 
-#include "X3DComposedGeometryNode.h"
-#include "CoordBoundField.h"
-#include "MFInt32.h"
-#include "SFFloat.h"
+#include <X3DComposedGeometryNode.h>
+#include <CoordBoundField.h>
+#include <MFInt32.h>
+#include <SFFloat.h>
 
 namespace H3D {
 

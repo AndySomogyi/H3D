@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -29,8 +29,8 @@
 #ifndef __HAPTIKHAPTICSDEVICE_H__
 #define __HAPTIKHAPTICSDEVICE_H__
 
-#include "H3DThreadedHapticsDevice.h"
-#include "MFString.h"
+#include <H3DThreadedHapticsDevice.h>
+#include <MFString.h>
 #ifdef HAVE_HAPTIK
 #include <RSLib/Haptik.hpp>
 #endif 

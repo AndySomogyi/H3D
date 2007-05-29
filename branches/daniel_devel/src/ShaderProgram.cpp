@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2004-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,10 +28,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "ShaderProgram.h"
-#include "X3DTexture2DNode.h"
-#include "X3DTexture3DNode.h"
-#include "ShaderFunctions.h"
+#include <ShaderProgram.h>
+#include <X3DTexture2DNode.h>
+#include <X3DTexture3DNode.h>
+#include <ShaderFunctions.h>
 #include "ResourceResolver.h"
 
 using namespace H3D;
