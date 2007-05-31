@@ -33,8 +33,9 @@
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
-list< H3DSoundFileNode::FileReaderRegistration > 
-*H3DSoundFileNode::registered_file_readers; 
+H3DSoundFileNode::local_auto_ptr<list< H3DSoundFileNode::FileReaderRegistration
+> >H3DSoundFileNode::registered_file_readers; 
+
 
 bool H3DSoundFileNode::initialized = false; 
 
