@@ -41,15 +41,21 @@ namespace H3D {
   ///
   /// It can define e.g. stiffnesses and friction.
   ///
-  class H3DAPI_API H3DSurfaceNode: public Node, public HAPI::HAPISurfaceObject {
+  class H3DAPI_API H3DSurfaceNode: public Node {
   public:
 
     /// Constructor.
-    H3DSurfaceNode() {}
+    H3DSurfaceNode() : hapi_surface( 0 ) {}
   
     virtual string defaultXMLContainerField() {
       return "surface";
     }
+
+    HAPI::HAPISurfaceObject *getSurface(){
+      return hapi_surface.get();
+    }
+  protected:
+    auto_ptr< HAPI::HAPISurfaceObject > hapi_surface;
   };
 }
 

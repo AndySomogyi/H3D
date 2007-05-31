@@ -31,8 +31,8 @@
 
 #include <H3DSurfaceNode.h>
 #include <OpenHapticsRenderer.h>
-#include <SFFloat.h>
 #include <SFBool.h>
+#include <SFFloat.h>
 
 #ifdef HAVE_OPENHAPTICS
 
@@ -42,9 +42,37 @@ namespace H3D {
   /// \class OpenHapticsSurface
   /// \brief Surface type for setting OpenHaptics surface parameters directly.
   /// Only works when using the OpenHapticsRenderer.
-  class H3DAPI_API OpenHapticsSurface: public H3DSurfaceNode, 
-                                       public HAPI::OpenHapticsRenderer::HLSurface {
+  class H3DAPI_API OpenHapticsSurface: public H3DSurfaceNode {
   public:
+
+#ifdef HAVE_OPENHAPTICS
+    // temporary class until HAPI has a MagneticSurface
+    class H3DAPI_API FrictionalHLSurface: public HAPI::HAPISurfaceObject,
+      public HAPI::OpenHapticsRenderer::HLSurface
+    {
+    public:
+      FrictionalHLSurface( H3DDouble _stiffness,
+                           H3DDouble _damping,
+                           H3DDouble _static_friction,
+                           H3DDouble _dynamic_friction,
+                           H3DDouble _magnetic,
+                           H3DDouble _snap_distance ):
+        stiffness( _stiffness ),
+        damping( _damping ),
+        static_friction( _static_friction ),
+        dynamic_friction( _dynamic_friction ),
+        magnetic( _magnetic ),
+        snap_distance( _snap_distance )
+      {
+      }
+      /// Renders the surface using hlMaterialf calls
+      virtual void hlRender();
+
+    protected:
+      H3DDouble stiffness, damping, static_friction,
+                dynamic_friction, magnetic, snap_distance;
+    };
+#endif
 
     /// Constructor.
     OpenHapticsSurface( Inst< SFFloat > _stiffness = 0,
@@ -54,10 +82,7 @@ namespace H3D {
                         Inst< SFBool  > _magnetic  = 0,
                         Inst< SFFloat > _snapDistance = 0 );
   
-    /// Renders the surface using hlMaterialf calls
-    virtual void hlRender();
-
-    virtual void onContact( ContactInfo &contact );
+    void initialize();
 
     /// The stiffness of the surface. Should be a value between 0 and 1
     /// where 1 is the maximum stiffness the haptics device can handle.

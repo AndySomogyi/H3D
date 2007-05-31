@@ -49,16 +49,6 @@ namespace OpenHapticsSurfaceInternals {
   FIELDDB_ELEMENT( OpenHapticsSurface, magnetic, INPUT_OUTPUT );
 }
 
-void OpenHapticsSurface::hlRender() {
-  HAPI::OpenHapticsRenderer::hlRenderRelative( 
-                                       stiffness->getValue(),
-                                       damping->getValue(),
-                                       staticFriction->getValue(),
-                                       dynamicFriction->getValue(), 
-                                       magnetic->getValue(),
-                                       1000 * snapDistance->getValue() );  
-}
-
 /// Constructor.
 OpenHapticsSurface::OpenHapticsSurface( Inst< SFFloat > _stiffness,
                                         Inst< SFFloat > _damping,
@@ -83,9 +73,24 @@ OpenHapticsSurface::OpenHapticsSurface( Inst< SFFloat > _stiffness,
   snapDistance->setValue( (H3DFloat) 0.01 );
 }
 
-void OpenHapticsSurface::onContact( ContactInfo &contact ) {
-  //contact.setLocalForce( -local_probe/1000 * stiffness->getValue() * 700 );
-  //contact.proxy_movement_local = Vec2d( local_probe.x, local_probe.z );
+void OpenHapticsSurface::initialize() {
+  hapi_surface.reset(
+    new FrictionalHLSurface( stiffness->getValue(),
+                             damping->getValue(),
+                             staticFriction->getValue(),
+                             dynamicFriction->getValue(),
+                             magnetic->getValue(),
+                             snapDistance->getValue() * 1000 ) );
+}
+
+void OpenHapticsSurface::FrictionalHLSurface::hlRender() {
+  HAPI::OpenHapticsRenderer::hlRenderRelative( 
+                                  stiffness,
+                                  damping,
+                                  static_friction,
+                                  dynamic_friction, 
+                                  magnetic,
+                                  snap_distance );
 }
 
 #endif

@@ -40,24 +40,39 @@ namespace H3D {
   class H3DAPI_API FrictionalSurface: public SmoothSurface {
   public:
 
+    /// Specialized field which sets the static_friction variable in
+    /// FrictionSurface when the staticFriction field of FrictionalSurface
+    /// is changed.
+		///
+    /// routes_in[0] is the staticFriction field
+    class H3DAPI_API UpdateStaticFriction: public AutoUpdate< SFFloat > {
+    public:
+      virtual void setValue( const H3DFloat &f, int id = 0 );
+
+    protected:
+      virtual void update();
+    };
+
+    /// Specialized field which sets the dynamic_friction variable in
+    /// FrictionSurface when the dynamicFriction field of FrictionalSurface
+    /// is changed.
+		///
+    /// routes_in[0] is the dynamicFriction field
+    class H3DAPI_API UpdateDynamicFriction: public AutoUpdate< SFFloat > {
+    public:
+      virtual void setValue( const H3DFloat &f, int id = 0 );
+
+    protected:
+      virtual void update();
+    };
+
     /// Constructor.
-    FrictionalSurface( Inst< SFFloat >  _stiffness = 0,
-                       Inst< SFFloat >  _damping   = 0,
-                       Inst< SFFloat >  _staticFriction = 0,
-                       Inst< SFFloat >  _dynamicFriction = 0 );
-  
-#ifdef HAVE_OPENHAPTICS
-    /// Renders the surface using hlMaterialf calls
-    virtual void hlRender();
-#endif
+    FrictionalSurface( Inst< UpdateStiffness >  _stiffness = 0,
+                       Inst< UpdateDamping >  _damping   = 0,
+                       Inst< UpdateStaticFriction >  _staticFriction = 0,
+                       Inst< UpdateDynamicFriction >  _dynamicFriction = 0 );
 
-#ifdef HAVE_CHAI3D
-    /// Sets a Chai3D cMaterial describing the haptic properties for the 
-    /// surface.
-    virtual void chai3dMaterial( cMaterial &m );
-#endif
-
-    virtual void onContact( ContactInfo &contact );
+    void initialize();
 
     /// The friction that is experienced upon initial movement when resting on 
     /// the surface.
@@ -65,7 +80,7 @@ namespace H3D {
     /// <b>Access type: </b> inputOutput \n
     /// <b>Default value: </b> 0.1 \n
     /// <b>Value range: </b> [0-1]
-    auto_ptr< SFFloat > staticFriction;
+    auto_ptr< UpdateStaticFriction > staticFriction;
 
     /// The friction that is experienced when moving along the surface 
     /// the surface.
@@ -73,7 +88,7 @@ namespace H3D {
     /// <b>Access type: </b> inputOutput \n
     /// <b>Default value: </b> 0.4 \n
     /// <b>Value range: </b> [0-1]
-    auto_ptr< SFFloat > dynamicFriction;
+    auto_ptr< UpdateDynamicFriction > dynamicFriction;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
