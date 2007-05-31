@@ -51,13 +51,14 @@ namespace H3D {
    SFFunctionNode;
 
     /// SFImage is overridden to update the image from the field values
-    /// routes_in[0] is the function field.
-    /// routes_in[1] is the backgroundColor field.
-    /// routes_in[2] is the plotColor field.
-    /// routes_in[3] is the xRange field.
-    /// routes_in[4] is the yRange field.
-    /// routes_in[5] is the xResolution field.
-    /// routes_in[6] is the yResolution field.
+    ///
+    /// - routes_in[0] is the function field.
+    /// - routes_in[1] is the backgroundColor field.
+    /// - routes_in[2] is the plotColor field.
+    /// - routes_in[3] is the xRange field.
+    /// - routes_in[4] is the yRange field.
+    /// - routes_in[5] is the xResolution field.
+    /// - routes_in[6] is the yResolution field.
     ///
     class H3DAPI_API SFImage: public TypedField< X3DTexture2DNode::SFImage,
                                                  Types< SFFunctionNode,
