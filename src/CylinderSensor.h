@@ -57,7 +57,7 @@ namespace H3D {
   ///
   /// A CylinderSensor node generates events when the pointing device is
   /// activated while the pointer is indicating any descendent geometry nodes
-  /// of the sensor's parent group. See 20.2.3 Activating and manipulating
+  /// of the sensor's parent group. Activating and manipulating
   /// pointing device sensors, for more details on using the pointing device
   /// to activate the CylinderSensor.
   ///
@@ -133,6 +133,7 @@ namespace H3D {
     /// rotation_changed, and offset events when they should be sent.
     ///
     /// routes_in[0] is the position field of a MouseSensor
+    ///
     /// routes_in[1] is the isActive field.
     class H3DAPI_API Set_CylinderEvents: 
       public AutoUpdate< TypedField < SFBool, Types< SFVec2f, SFBool > > > {
