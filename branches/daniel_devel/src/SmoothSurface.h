@@ -30,12 +30,8 @@
 #define __SMOOTHSURFACE_H__
 
 #include <H3DSurfaceNode.h>
-#include <HAPISurfaceObject.h>
-#include <OpenHapticsRenderer.h>
-#ifdef HAVE_CHAI3D
-#include <Chai3DRenderer.h>
-#endif
 #include <SFFloat.h>
+#include <FieldTemplates.h>
 
 namespace H3D {
 
@@ -45,33 +41,40 @@ namespace H3D {
   /// can be specified. The stiffness is specified as a value between 0 and 1
   /// where 1 is the maximum stiffness the device can handle.
   ///
-  class H3DAPI_API SmoothSurface: public H3DSurfaceNode
-#ifdef HAVE_OPENHAPTICS
-    , public HAPI::OpenHapticsRenderer::HLSurface
-#endif
-#ifdef HAVE_CHAI3D
-    , public HAPI::Chai3DRenderer::Chai3DSurface 
-#endif
-  {
+  class H3DAPI_API SmoothSurface: public H3DSurfaceNode {
   public:
 
+    /// Specialized field which sets the stiffness variable in
+    /// FrictionSurface when the stiffness field of SmoothSurface
+    /// is changed.
+		///
+    /// routes_in[0] is the stiffness field
+    class H3DAPI_API UpdateStiffness: public AutoUpdate< SFFloat > {
+    public:
+      virtual void setValue( const H3DFloat &f, int id = 0 );
+
+    protected:
+      virtual void update();
+    };
+
+    /// Specialized field which sets the damping variable in
+    /// FrictionSurface when the damping field of SmoothSurface
+    /// is changed.
+		///
+    /// routes_in[0] is the damping field
+    class H3DAPI_API UpdateDamping: public AutoUpdate< SFFloat > {
+    public:
+      virtual void setValue( const H3DFloat &f, int id = 0 );
+
+    protected:
+      virtual void update();
+    };
+
     /// Constructor.
-    SmoothSurface( Inst< SFFloat >  _stiffness = 0,
-                   Inst< SFFloat >  _damping   = 0 );
-  
-#ifdef HAVE_OPENHAPTICS
-    /// Renders the surface using hlMaterialf calls
-    virtual void hlRender();
-#endif
+    SmoothSurface( Inst< UpdateStiffness > _stiffness = 0,
+                   Inst< UpdateDamping >   _damping   = 0 );
 
-
-#ifdef HAVE_CHAI3D
-    /// Sets a Chai3D cMaterial describing the haptic properties for the 
-    /// surface.
-    virtual void chai3dMaterial( cMaterial &m );
-#endif
-
-    virtual void onContact( ContactInfo &contact );
+    void initialize();
 
     /// The stiffness of the surface. Should be a value between 0 and 1
     /// where 1 is the maximum stiffness the haptics device can handle.
@@ -79,7 +82,7 @@ namespace H3D {
     /// <b>Access type: </b> inputOutput \n
     /// <b>Default value: </b> 0.5 \n
     /// <b>Value range: </b> [0-1]
-    auto_ptr< SFFloat > stiffness;
+    auto_ptr< UpdateStiffness > stiffness;
 
     /// The velocity based damping of the surface. Should be a value between
     /// 0 and 1 where 1 is the maximum damping the haptics device can handle.
@@ -87,10 +90,11 @@ namespace H3D {
     /// <b>Access type: </b> inputOutput \n
     /// <b>Default value: </b> 0 \n
     /// <b>Value range: </b> [0-1]
-    auto_ptr< SFFloat > damping;
+    auto_ptr< UpdateDamping > damping;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
+
   };
 }
 

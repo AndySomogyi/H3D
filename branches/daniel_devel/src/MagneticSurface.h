@@ -30,6 +30,7 @@
 #define __MAGNETICSURFACE_H__
 
 #include <FrictionalSurface.h>
+#include <OpenHapticsRenderer.h>
 
 namespace H3D {
 
@@ -53,9 +54,35 @@ namespace H3D {
                      Inst< SFFloat > _dynamicFriction = 0,
                      Inst< SFFloat > _snapDistance    = 0 );
 
-#ifdef HAVE_OPENHAPTICS  
-    /// Renders the surface using hlMaterialf calls
-    virtual void hlRender();
+    void initialize();
+
+#ifdef HAVE_OPENHAPTICS
+    // temporary class until HAPI has a MagneticSurface
+    class H3DAPI_API FrictionalHLSurface: public HAPI::HAPISurfaceObject,
+      public HAPI::OpenHapticsRenderer::HLSurface
+    {
+    public:
+      FrictionalHLSurface( H3DDouble _stiffness,
+                           H3DDouble _damping,
+                           H3DDouble _static_friction,
+                           H3DDouble _dynamic_friction,
+                           H3DDouble _magnetic,
+                           H3DDouble _snap_distance ):
+        stiffness( _stiffness ),
+        damping( _damping ),
+        static_friction( _static_friction ),
+        dynamic_friction( _dynamic_friction ),
+        magnetic( _magnetic ),
+        snap_distance( _snap_distance )
+      {
+      }
+      /// Renders the surface using hlMaterialf calls
+      virtual void hlRender();
+
+    protected:
+      H3DDouble stiffness, damping, static_friction,
+                dynamic_friction, magnetic, snap_distance;
+    };
 #endif
 
     /// The distance from the surface within which forces are generated

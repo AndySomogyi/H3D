@@ -28,6 +28,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <H3DApi.h>
 #include <SmoothSurface.h>
+#include <FrictionSurface.h>
 
 using namespace H3D;
 
@@ -43,26 +44,9 @@ namespace SmoothSurfaceInternals {
   FIELDDB_ELEMENT( SmoothSurface, damping, INPUT_OUTPUT );
 }
 
-#ifdef HAVE_OPENHAPTICS
-void SmoothSurface::hlRender() {
-  HAPI::OpenHapticsRenderer::hlRenderRelative( stiffness->getValue(),
-                                               damping->getValue(),
-                                               0,
-                                               0, 
-                                               false,
-                                               0 );
-}
-#endif
-
-#ifdef HAVE_CHAI3D
-void SmoothSurface::chai3dMaterial( cMaterial &m ) {
-  m.setStiffness( stiffness->getValue() * 700 / 1000 );
-}
-#endif
-
 /// Constructor.
-SmoothSurface::SmoothSurface( Inst< SFFloat >  _stiffness,
-                              Inst< SFFloat >  _damping ):
+SmoothSurface::SmoothSurface( Inst< UpdateStiffness >  _stiffness,
+                              Inst< UpdateDamping >  _damping ):
   stiffness( _stiffness ),
   damping( _damping ) {
   type_name = "SmoothSurface";
@@ -72,12 +56,52 @@ SmoothSurface::SmoothSurface( Inst< SFFloat >  _stiffness,
   damping->setValue( 0 );
 }
 
-void SmoothSurface::onContact( ContactInfo &contact ) {
-  Vec3d local_probe = contact.localProbePosition();
-  // TODO: fix realtime field access
-  //contact.setLocalForce( Vec3d( 0, -local_probe.y/1000 * stiffness->getValue() * 700, 0 ) );
-  contact.setLocalForce( -local_probe/1000 * stiffness->getValue() * 700 );
-  contact.proxy_movement_local = Vec2d( local_probe.x, local_probe.z );
+void SmoothSurface::initialize() {
+  hapi_surface.reset(
+    new HAPI::FrictionSurface( stiffness->getValue() * 700,
+                               damping->getValue() * 700 ) );
 }
 
+void SmoothSurface::UpdateStiffness::setValue( const H3DFloat &f, int id ){
+  SFFloat::setValue( f, id );
+  SmoothSurface *ss = 
+    static_cast< SmoothSurface * >( getOwner() );
+  if( ss->hapi_surface.get() ) {
+    static_cast< HAPI::FrictionSurface * >( ss->hapi_surface.get() )
+      ->stiffness = f * 700;
+  }
+}
 
+void SmoothSurface::UpdateStiffness::update() {
+  SFFloat::update();
+  SmoothSurface *ss = 
+    static_cast< SmoothSurface * >( getOwner() );
+  if( ss->hapi_surface.get() ) {
+    H3DFloat stiffness =
+    static_cast< SFFloat * >( event.ptr )->getValue() * 700;
+    static_cast< HAPI::FrictionSurface * >( ss->hapi_surface.get() )
+      ->stiffness = stiffness;
+  }
+}
+
+void SmoothSurface::UpdateDamping::setValue( const H3DFloat &f, int id ){
+  SFFloat::setValue( f, id );
+  SmoothSurface *ss = 
+    static_cast< SmoothSurface * >( getOwner() );
+  if( ss->hapi_surface.get() ) {
+    static_cast< HAPI::FrictionSurface * >( ss->hapi_surface.get() )
+      ->damping = f * 700;
+  }
+}
+
+void SmoothSurface::UpdateDamping::update() {
+  SFFloat::update();
+  SmoothSurface *ss = 
+    static_cast< SmoothSurface * >( getOwner() );
+  if( ss->hapi_surface.get() ) {
+    H3DFloat damping =
+    static_cast< SFFloat * >( event.ptr )->getValue() * 700;
+    static_cast< HAPI::FrictionSurface * >( ss->hapi_surface.get() )
+      ->damping = damping;
+  }
+}

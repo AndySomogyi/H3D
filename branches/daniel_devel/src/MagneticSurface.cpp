@@ -44,14 +44,14 @@ namespace MagneticSurfaceInternals {
 }
 
 #ifdef HAVE_OPENHAPTICS
-void MagneticSurface::hlRender() {
+void MagneticSurface::FrictionalHLSurface::hlRender() {
   HAPI::OpenHapticsRenderer::hlRenderRelative( 
-                                  stiffness->getValue(),
-                                  damping->getValue(),
-                                  staticFriction->getValue(),
-                                  dynamicFriction->getValue(), 
-                                  true,
-                                  1000 * snapDistance->getValue() );
+                                  stiffness,
+                                  damping,
+                                  static_friction,
+                                  dynamic_friction, 
+                                  magnetic,
+                                  1000 * snap_distance );
 }
 #endif
 
@@ -68,4 +68,14 @@ MagneticSurface::MagneticSurface( Inst< SFFloat >  _stiffness,
   database.initFields( this );
   
   snapDistance->setValue( (H3DFloat)0.01 );
+}
+
+void MagneticSurface::initialize() {
+  hapi_surface.reset(
+    new FrictionalHLSurface( stiffness->getValue(),
+                             damping->getValue(),
+                             staticFriction->getValue(),
+                             dynamicFriction->getValue(),
+                             true,
+                             snapDistance->getValue() ) );
 }

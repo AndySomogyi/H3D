@@ -28,6 +28,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <H3DApi.h>
 #include <FrictionalSurface.h>
+#include <FrictionSurface.h>
 
 using namespace H3D;
 
@@ -44,28 +45,11 @@ namespace FritionalSurfaceInternals {
   FIELDDB_ELEMENT( FrictionalSurface, dynamicFriction, INPUT_OUTPUT );
 }
 
-#ifdef HAVE_OPENHAPTICS  
-void FrictionalSurface::hlRender() {
-  HAPI::OpenHapticsRenderer::hlRenderRelative( stiffness->getValue(),
-                                               damping->getValue(),
-                                               staticFriction->getValue(),
-                                               dynamicFriction->getValue(), 
-                                               false,
-                                               0 );
-}
-#endif
-
-#ifdef HAVE_CHAI3D
-void FrictionalSurface::chai3dMaterial( cMaterial &m ) {
-  m.setStaticFriction( staticFriction->getValue() );
-  m.setDynamicFriction( dynamicFriction->getValue() );
-}
-#endif
-
-FrictionalSurface::FrictionalSurface( Inst< SFFloat >  _stiffness,
-                                      Inst< SFFloat >  _damping,
-                                      Inst< SFFloat >  _staticFriction,
-                                      Inst< SFFloat >  _dynamicFriction ):
+FrictionalSurface::FrictionalSurface( 
+        Inst< UpdateStiffness > _stiffness,
+        Inst< UpdateDamping > _damping,
+        Inst< UpdateStaticFriction > _staticFriction,
+        Inst< UpdateDynamicFriction > _dynamicFriction ):
   SmoothSurface( _stiffness, _damping ),
   staticFriction( _staticFriction ),
   dynamicFriction( _dynamicFriction ),
@@ -77,42 +61,56 @@ FrictionalSurface::FrictionalSurface( Inst< SFFloat >  _stiffness,
   dynamicFriction->setValue( 0.4f );
 }
 
-void FrictionalSurface::onContact( ContactInfo &contact ) {
-  Vec3d local_probe = contact.localProbePosition();
-  Vec3d force = local_probe * -stiffness->getValue();
-  Vec2d force_t( force.x, force.z );
+void FrictionalSurface::initialize() {
+  hapi_surface.reset(
+    new HAPI::FrictionSurface( stiffness->getValue() * 700,
+                               damping->getValue() * 700,
+                               staticFriction->getValue(),
+                               dynamicFriction->getValue() ) );
+}
 
-  if( in_static_contact ) {
-   
-    if( force_t.length() <= staticFriction->getValue() *  force.y ) {
-      contact.setLocalForce( force );
-      contact.proxy_movement_local = Vec2d( 0, 0 );
-    } else {
-      in_static_contact = false;
-    }
-  } 
-
-  if( !in_static_contact ) {
-    H3DDouble b = 1;
-    H3DDouble dt = 1e-3;
-    H3DDouble velocity = 
-      ( force_t.length() - dynamicFriction->getValue() * force.y ) / b;
-
-    contact.setLocalForce( force );
-    if( velocity < Constants::f_epsilon ) {
-      in_static_contact = true;
-      velocity = 0;
-      contact.proxy_movement_local = Vec2d( 0, 0 ); 
-    } else {
-      H3DDouble max_movement = velocity * 1e-3;
-      Vec2d proxy_movement = Vec2d( local_probe.x, local_probe.z );
-      H3DDouble l = proxy_movement.length();
-      if( l > max_movement ) {
-        proxy_movement *= max_movement / l; 
-      }
-      contact.proxy_movement_local = proxy_movement;
-    }
+void FrictionalSurface::UpdateStaticFriction::
+      setValue( const H3DFloat &f, int id ) {
+  SFFloat::setValue( f, id );
+  FrictionalSurface *fs = 
+    static_cast< FrictionalSurface * >( getOwner() );
+  if( fs->hapi_surface.get() ) {
+    static_cast< HAPI::FrictionSurface * >( fs->hapi_surface.get() )
+      ->static_friction = f;
   }
 }
 
+void FrictionalSurface::UpdateStaticFriction::update() {
+  SFFloat::update();
+  FrictionalSurface *fs = 
+    static_cast< FrictionalSurface * >( getOwner() );
+  if( fs->hapi_surface.get() ) {
+    H3DFloat static_friction =
+    static_cast< SFFloat * >( event.ptr )->getValue();
+    static_cast< HAPI::FrictionSurface * >( fs->hapi_surface.get() )
+      ->static_friction = static_friction;
+  }
+}
 
+void FrictionalSurface::UpdateDynamicFriction::
+    setValue( const H3DFloat &f, int id ) {
+  SFFloat::setValue( f, id );
+  FrictionalSurface *fs = 
+    static_cast< FrictionalSurface * >( getOwner() );
+  if( fs->hapi_surface.get() ) {
+    static_cast< HAPI::FrictionSurface * >( fs->hapi_surface.get() )
+      ->dynamic_friction = f;
+  }
+}
+
+void FrictionalSurface::UpdateDynamicFriction::update() {
+  SFFloat::update();
+  FrictionalSurface *fs = 
+    static_cast< FrictionalSurface * >( getOwner() );
+  if( fs->hapi_surface.get() ) {
+    H3DFloat dynamic_friction =
+    static_cast< SFFloat * >( event.ptr )->getValue();
+    static_cast< HAPI::FrictionSurface * >( fs->hapi_surface.get() )
+      ->dynamic_friction = dynamic_friction;
+  }
+}
