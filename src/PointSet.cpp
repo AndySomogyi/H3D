@@ -55,7 +55,8 @@ PointSet::PointSet(  Inst< SFNode           > _metadata,
                      Inst< SFFogCoordinate  > _fogCoord  ):
   X3DGeometryNode( _metadata, _bound, _displayList ),
   color   ( _color    ),
-  coord   ( _coord    ) {
+  coord   ( _coord    ),
+  fogCoord( _fogCoord ){
 
   type_name = "PointSet";
   database.initFields( this );
