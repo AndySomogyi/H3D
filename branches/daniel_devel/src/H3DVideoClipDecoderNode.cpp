@@ -33,8 +33,11 @@
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
-list< H3DVideoClipDecoderNode::DecoderRegistration > 
-*H3DVideoClipDecoderNode::registered_decoders; 
+H3DVideoClipDecoderNode::local_auto_ptr<list< H3DVideoClipDecoderNode::
+DecoderRegistration> >H3DVideoClipDecoderNode::registered_decoders; 
+
+//list< H3DVideoClipDecoderNode::DecoderRegistration > 
+//*H3DVideoClipDecoderNode::registered_decoders; 
 
 bool H3DVideoClipDecoderNode::initialized = false; 
 
