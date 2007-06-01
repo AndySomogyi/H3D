@@ -126,8 +126,8 @@ namespace H3D {
     /// and position_calibration fields. 
     /// TrackerPosition = positionCalibration * devicePosition 
     ///
-    /// routes_in[0] is the positionCalibration field
-    /// routes_in[1] is the devicePosition field
+    /// - routes_in[0] is the positionCalibration field
+    /// - routes_in[1] is the devicePosition field
     ///
     class H3DAPI_API TrackerPosition: 
       public TypedField< SFVec3f, Types< SFMatrix4f, SFVec3f > > {
