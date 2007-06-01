@@ -56,10 +56,10 @@ void MagneticSurface::FrictionalHLSurface::hlRender() {
 #endif
 
 /// Constructor.
-MagneticSurface::MagneticSurface( Inst< SFFloat >  _stiffness,
-                                  Inst< SFFloat >  _damping,
-                                  Inst< SFFloat >  _staticFriction,
-                                  Inst< SFFloat >  _dynamicFriction,
+MagneticSurface::MagneticSurface( Inst< UpdateStiffness >  _stiffness,
+                                  Inst< UpdateDamping >  _damping,
+                                 Inst< UpdateStaticFriction >  _staticFriction,
+                               Inst< UpdateDynamicFriction >  _dynamicFriction,
                                   Inst< SFFloat > _snapDistance ):
   FrictionalSurface( _stiffness, _damping, 
                      _staticFriction, _dynamicFriction ),
