@@ -237,6 +237,7 @@ namespace H3D {
     /// immediately remove all particles. 
     /// 
     /// <b>Access type:</b> inputOutput
+    ///
     /// <b>Default value:</b> TRUE
     /// 
     /// \dotfile ParticleSystem_createParticles.dot
@@ -252,6 +253,7 @@ namespace H3D {
     /// set to FALSE. 
     /// 
     /// <b>Access type:</b> inputOutput
+    ///
     /// <b>Default value:</b> TRUE
     /// 
     /// \dotfile ParticleSystem_enabled.dot
@@ -277,7 +279,7 @@ namespace H3D {
     /// \dotfile ParticleSystem_maxParticles.dot
     auto_ptr< SFInt32 > maxParticles;
 
-    /// The particleLifetime field controls the lifetime of a particle
+    /// \brief The particleLifetime field controls the lifetime of a particle
     /// i.e. the time in seconds the particle exists from the point
     /// it is being emitted. See also the lifetimeVariation field.
     /// 
@@ -352,7 +354,7 @@ namespace H3D {
     /// \dotfile ParticleSystem_geometryType.dot
     auto_ptr< SFString > geometryType;
 
-    /// The physics field contains the physics models that should affect
+    /// \brief The physics field contains the physics models that should affect
     /// the particles after they have been created, e.g. gravity and wind
     /// effects.
     /// 

@@ -42,7 +42,7 @@ namespace H3D {
   /// \ingroup X3DNode
   /// \class NurbsCurve
   /// \brief The NurbsCurve node is a geometry node defining a parametric
-  ///  curve in 3D space
+  ///  curve in 3D space.
   ///
   ///  The tessellation field gives a hint to the curve tessellator by
   ///  setting an absolute number of subdivision steps. These values shall
@@ -53,23 +53,21 @@ namespace H3D {
   ///  For an implementation subdividing the surface into an equal number
   ///  of subdivision steps, tessellation values are interpreted as follows:
   ///  
-  ///  if a tessellation value is greater than 0, the number of tessellation
+  ///  - if a tessellation value is greater than 0, the number of tessellation
   ///  points is:
   ///  tessellation+1;
   /// 
-  ///  if a tessellation value is smaller than 0, the number of tessellation
+  ///  - if a tessellation value is smaller than 0, the number of tessellation
   ///  points is:
   ///   -tessellation *(number of control points)+1;
   ///
-  ///  if a tessellation value is 0, the number of tessellation points is:
+  ///  - if a tessellation value is 0, the number of tessellation points is:
   ///  (2 * (number of control points)+1. 
   /// 
   ///  For implementations doing tessellations based on chord length, 
   ///  tessellation values less than zero are interpreted as the maximum 
   ///  chord length deviation in pixels. Implementations doing fully automatic
   ///  tessellation may ignore the tessellation hint parameters.
-
-
   /// 
   /// \par Internal routes:
   /// \dotfile NurbsCurve.dot
@@ -134,13 +132,13 @@ namespace H3D {
     /// than or equal to the Order field.
     /// The tessellation values are interpreted as follows:
     ///    
-    /// if a tessellation valie is greater than 0, the number of tessellation
+    /// - if a tessellation valie is greater than 0, the number of tessellation
     /// points is: tessellation+1;
     ///
-    /// if a tessellation value is smaller than 0, the number of tessellation    
+    /// - if a tessellation value is smaller than 0, the number of tessellation    
     /// points is: -tessellation * (number of control points)+1;    
     ///    
-    /// if a tessellation value is 0, the number of tessellation points is:
+    /// - if a tessellation value is 0, the number of tessellation points is:
     /// 2 *(number of control points)+1..    
     ///
     /// <b>Access type:</b> inputOutput \n
@@ -163,13 +161,15 @@ namespace H3D {
     /// \dotfile NurbsCurve_weight.dot
     auto_ptr< MFDouble >  weight;
 
+    /// Specifies the knots of the curve
+    /// 
     /// <b>Access type:</b> inputOutput \n
     /// 
     /// \dotfile NurbsCurve_knot.dot
     auto_ptr< MFDouble >  knot;
 
     /// Defines the order of curve. From a mathematical point of view, the 
-    /// curve is defined by a polynomial of the degree order?1. The value
+    /// curve is defined by a polynomial of the degree order=1. The value
     /// of order shall be greater than or equal to 2. An implementation may
     /// limit order to a certain number. If it does so, then a warning shall
     /// be generated and the surface not displayed. An implementation shall at
