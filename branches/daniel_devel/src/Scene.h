@@ -106,7 +106,8 @@ namespace H3D {
     /// Current time within the simulation, updated during each graphic loop.
     ///
     /// <b>Access type: </b> outputOnly
-    static SFTime *time;
+    static auto_ptr< SFTime > time;
+    //static SFTime *time;
   
     /// All instances of Scene that has been created.
     static set< Scene* > scenes;
@@ -147,13 +148,18 @@ namespace H3D {
     public:
       /// Constructor.
       EventSink() {
-        setName( "Scene::eventSink" );
+        setName( "Scene::eventSink" ); 
       }
+      ~EventSink(){
+      //cerr << " ~EventSink  " << endl;
+    }  
     protected:
       virtual void update();
     };
+   
   public:
-    static EventSink *eventSink;
+    static auto_ptr<EventSink> eventSink;
+    //static EventSink *eventSink;
 
   private:
     bool active;

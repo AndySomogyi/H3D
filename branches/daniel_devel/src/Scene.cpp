@@ -71,8 +71,11 @@ namespace SceneInternals {
 
 
 set< Scene* > Scene::scenes;
-SFTime *Scene::time = new SFTime( TimeStamp() );
-Scene::EventSink *Scene::eventSink = new EventSink;
+auto_ptr< SFTime > Scene::time(new SFTime( TimeStamp() ) );
+auto_ptr< Scene::EventSink > Scene::eventSink(new EventSink);
+
+//SFTime *Scene::time = new SFTime( TimeStamp() );
+//Scene::EventSink *Scene::eventSink = new EventSink;
 
 namespace SceneInternal {
   void idle() {
