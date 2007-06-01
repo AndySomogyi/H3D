@@ -152,7 +152,6 @@ namespace H3D {
       // destructor
       ~local_auto_ptr() throw(){
         delete ap;
-        //cerr << " ~local_auto_ptr() = ap deleted " << endl;
       }
 
       // value access
