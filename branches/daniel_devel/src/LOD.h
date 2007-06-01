@@ -87,7 +87,7 @@ namespace H3D {
                Inst< SFVec3f             > _bboxCenter       = 0,
                Inst< SFVec3f             > _bboxSize         = 0,
                Inst< SFVec3f             > _center           = 0,    
-               Inst< SFBool              > _forceTransitions = FALSE, 
+               Inst< SFBool              > _forceTransitions = 0, 
                Inst< MFFloat             > _range            = 0 );
     
     virtual void render();
@@ -100,7 +100,7 @@ namespace H3D {
 
     /// The LOD node generates a level_changed 
     /// event with value i where the value of i
-    /// identifies which value of L was activated 
+    /// identifies which level was activated 
     /// for display
     /// 
     /// <b>Access type:</b> outputOnly \n
@@ -111,7 +111,7 @@ namespace H3D {
 
     auto_ptr <SFInt32> display_index; 
 
-     /// The center field is a translation
+    ///  The center field is a translation
     ///  offset in the local coordinate system 
     ///  that specifies the centre of the LOD
     ///  node for distance calculations.
@@ -137,8 +137,6 @@ namespace H3D {
     ///
     /// Each value in the range field shall 
     /// be greater than the previous value.
-    ///
-    /// <b>Default value:</b> MFFloat = [] \n
     /// 
     /// \dotfile LOD_range.dot
     auto_ptr< MFFloat > range;
