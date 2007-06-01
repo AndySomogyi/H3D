@@ -101,8 +101,8 @@ namespace H3D {
     /// The Set_Events field takes care of sending trackPoint_changed,
     /// translation_changed, and offset events when they should be sent.
     ///
-    /// routes_in[0] is the position field of a MouseSensor
-    /// routes_in[1] is the isActive field.
+    /// - routes_in[0] is the position field of a MouseSensor
+    /// - routes_in[1] is the isActive field.
     class H3DAPI_API Set_PlaneEvents: 
       public AutoUpdate< TypedField < SFBool, Types< SFVec2f, SFBool > > > {
     public:
