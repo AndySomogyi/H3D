@@ -40,8 +40,8 @@ namespace H3D {
   /// \ingroup H3DNodes
   /// \class SensAbleDevice
   /// \brief A SensAbleDevice is a node for handling communication
-  /// with a haptics device from SensAble, such as the Omega and
-  /// Delta haptics devices.
+  /// with a haptics device from SensAble, such as the Phantom Omni and
+  /// the Phantom Desktop haptics devices.
   class H3DAPI_API SensAbleDevice: public H3DHapticsDevice {
   public:
 
@@ -123,7 +123,7 @@ namespace H3D {
     /// <b>Access type: outputOnly</b> 
     auto_ptr< SFString > deviceSerialNumber;
 
-    /// The maximum workspace dimensions of the device, i.e. the
+    /// \brief The maximum workspace dimensions of the device, i.e. the
     /// mechanical limits of the device. Undefined if
     /// device not initialized. Contains two values where the first
     /// value is the minimum values and the second the maximum values
@@ -132,7 +132,7 @@ namespace H3D {
     /// <b>Access type: outputOnly</b> 
     auto_ptr< MFVec3f > maxWorkspaceDimensions;
 
-    /// the usable workspace dimensions of the device, i.e. the 
+    /// \brief the usable workspace dimensions of the device, i.e. the 
     /// workspace in which forces are guaranteed to be reliably render.
     /// Undefined if device not initialized. Contains two values where the
     /// first value is the minimum values and the second the maximum values
@@ -154,8 +154,8 @@ namespace H3D {
     /// <b>Access type: outputOnly</b> 
     auto_ptr< SFFloat > maxForce;
 
-    /// The maximum continuous force, i.e. the amount of force that the
-    /// device can sustain through a period of time.
+    /// \brief The maximum continuous force, i.e. the amount of
+    /// force that the device can sustain through a period of time.
     /// Undefined if device not initialized.
     /// 
     /// <b>Access type: outputOnly</b> 
@@ -163,17 +163,17 @@ namespace H3D {
 
     /// Current gimbal angles for the device (in radians).
     /// From neutral position:
-    /// x - Right     = +
-    /// y - Up        = -
-    /// z - Clockwise = +
+    ///  - x - Right     = +
+    /// - y - Up        = -
+    /// - z - Clockwise = +
     /// 
     /// <b>Access type: outputOnly</b> 
     auto_ptr< SFVec3f > gimbalAngles;
 
     /// Current joint angles for the device (in radians).
-    /// x - turret, + = left
-    /// y - thigh,  + = up
-    /// z - shin,   + = up
+    /// - x - turret, + = left
+    /// - y - thigh,  + = up
+    /// - z - shin,   + = up
     /// 
     /// <b>Access type: outputOnly</b> 
     auto_ptr< SFVec3f > jointAngles;

@@ -55,9 +55,7 @@ namespace H3D {
   ///
   /// The SphereSensor node generates events when the pointing device is
   /// activated while the pointer is indicating any descendent geometry nodes
-  /// of the sensor's parent group. See 20.2.3 Activating and manipulating
-  /// pointing device sensors, for details on using the pointing device to
-  /// activate the SphereSensor.
+  /// of the sensor's parent group. 
   ///
   /// Upon activation of the pointing device (e.g., mouse button down) over
   /// the sensor's geometry, an isActive TRUE event is sent. The vector defined
@@ -92,13 +90,13 @@ namespace H3D {
     /// The Set_Events field takes care of sending trackPoint_changed,
     /// rotation_changed, and offset events when they should be sent.
     ///
-    /// routes_in[0] is the position field of a MouseSensor
-    /// routes_in[1] is the isActive field.
+    /// - routes_in[0] is the position field of a MouseSensor
+    /// - routes_in[1] is the isActive field.
     class H3DAPI_API Set_SphereEvents: 
       public AutoUpdate< TypedField < SFBool, Types< SFVec2f, SFBool > > > {
     public:
 
-      // Constructor
+      /// Constructor
       Set_SphereEvents() {
         new_radius = true;
         center = Vec3f( 0, 0, 0 );
@@ -108,18 +106,18 @@ namespace H3D {
         SFBool::setValue( b, id );
       }
     protected:
-      // update the value of this field and set the fields mentioned above
+      /// update the value of this field and set the fields mentioned above
       virtual void update();
 
-      // Intersects segment s = a1 + t(a2-a1) with sphere defined by center
-      // and radius (see below), if intersecting, returns t value of
-      // intersection and intersection point q.
+      /// Intersects segment s = a1 + t(a2-a1) with sphere defined by center
+      /// and radius (see below), if intersecting, returns t value of
+      /// intersection and intersection point q.
       int intersectSegmentSphere( Vec3f a1, Vec3f a2, H3DFloat & t, Vec3f &q );
 
       H3DFloat radius;
       Vec3f original_intersection, center;
       Matrix4f original_transform_matrix;
-      // If true a new radius will be defined.
+      /// If true a new radius will be defined.
       bool new_radius;
     };
 #ifdef __BORLANDC__
@@ -142,20 +140,18 @@ namespace H3D {
     /// offset is set to the last rotation_changed value.
     ///
     /// <b>Access type:</b> inputOutput \n
-    ///
     /// <b>Default value:</b> 0 1 0 0 \n
     ///
     /// \dotfile SphereSensor_offset.dot
     auto_ptr< SFRotation > offset;
 
-    // fields
+   
     /// For each position of the bearing when isActive is true,
     /// a rotation_changed event is sent which corresponds to the sum of
     /// the relative rotation from the original intersection point plus
     /// the offset value.
     ///
     /// <b>Access type:</b> outputOnly \n
-    ///
     /// \dotfile SphereSensor_rotation_changed.dot
     auto_ptr< SFRotation > rotation_changed;
 
@@ -164,7 +160,7 @@ namespace H3D {
 
   protected:
     /// Called to generate isOver events and other events (dependent on isOver)
-    // if they should be generated.
+    /// if they should be generated.
     virtual void onIsOver( bool newValue,
                            HAPI::Bounds::IntersectionInfo &result,
                            int pt_id );
