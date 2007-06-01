@@ -38,8 +38,7 @@ namespace H3D {
 
   /// \ingroup H3DNodes
   /// \class HapticsOptions
-  /// \brief Specifies parameters to use for when rendering an object
-  /// with haptics.
+  /// \brief Specifies parameters to use when rendering an object with haptics.
   ///
   class H3DAPI_API HapticsOptions : public H3DOptionNode {
   public:
