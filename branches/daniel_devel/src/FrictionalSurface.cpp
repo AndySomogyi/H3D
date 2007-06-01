@@ -63,8 +63,8 @@ FrictionalSurface::FrictionalSurface(
 
 void FrictionalSurface::initialize() {
   hapi_surface.reset(
-    new HAPI::FrictionSurface( stiffness->getValue() * 700,
-                               damping->getValue() * 700,
+    new HAPI::FrictionSurface( stiffness->getValue() * conversion_to_HAPI,
+                               damping->getValue() * conversion_to_HAPI,
                                staticFriction->getValue(),
                                dynamicFriction->getValue() ) );
 }
