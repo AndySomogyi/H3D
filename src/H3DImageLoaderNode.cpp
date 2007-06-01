@@ -33,8 +33,8 @@
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
-list< H3DImageLoaderNode::FileReaderRegistration > 
-*H3DImageLoaderNode::registered_file_readers; 
+H3DImageLoaderNode::local_auto_ptr<list< H3DImageLoaderNode::
+FileReaderRegistration> >H3DImageLoaderNode::registered_file_readers; 
 
 bool H3DImageLoaderNode::initialized = false; 
 
