@@ -554,11 +554,13 @@ if( check_func( value ) ) {                                         \
 
       if ( PythonInternals::H3DInterface_dict == NULL )
         PyErr_Print();
-      PyObject *time = (PyObject*)fieldAsPythonObject( Scene::time, false );
+      PyObject *time = (PyObject*)fieldAsPythonObject( Scene::time.get(), false );
+      //PyObject *time = (PyObject*)fieldAsPythonObject( Scene::time, false );
       PyDict_SetItem( PythonInternals::H3DInterface_dict, 
                       PyString_FromString( "time" ), 
                       time );
-      PyObject *event_sink = (PyObject*)fieldAsPythonObject( Scene::eventSink, false );
+      PyObject *event_sink = (PyObject*)fieldAsPythonObject( Scene::eventSink.get(), false );
+      //PyObject *event_sink = (PyObject*)fieldAsPythonObject( Scene::eventSink, false );
       PyDict_SetItem( PythonInternals::H3DInterface_dict, 
                       PyString_FromString( "eventSink" ), 
                       event_sink );
