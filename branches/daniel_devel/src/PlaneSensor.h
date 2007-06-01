@@ -55,9 +55,7 @@ namespace H3D {
   ///
   /// The PlaneSensor node generates events when the pointing device is
   /// activated while the pointer is indicating any descendent geometry nodes
-  /// of the sensor's parent group. See 20.2.3 Activating and manipulating
-  /// pointing device sensors, for details on using the pointing device to
-  /// activate the PlaneSensor.
+  /// of the sensor's parent group.
   ///
   /// Upon activation of the pointing device (e.g., mouse button down) while
   /// indicating the sensor's geometry, an isActive TRUE event is sent. Pointer

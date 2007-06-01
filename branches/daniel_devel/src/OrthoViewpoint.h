@@ -57,9 +57,7 @@ namespace H3D {
   /// A browser with a rectangular viewing projection has the following
   /// relationship:
   ///
-  /// display width    (maximum_x - minimum_x)
-  /// -------------- = -----------------------
-  /// display height   (maximum_y - minimum_y)
+  /// (display width) / (display height) = (maximum_x - minimum_x) / (maximum_y - minimum_y)
 
   class H3DAPI_API OrthoViewpoint : public X3DViewpointNode {
   public:
