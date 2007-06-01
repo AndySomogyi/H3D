@@ -48,10 +48,10 @@ namespace H3D {
   public:
 
     /// Constructor.
-    MagneticSurface( Inst< SFFloat > _stiffness       = 0,
-                     Inst< SFFloat > _damping         = 0,
-                     Inst< SFFloat > _staticFriction  = 0,
-                     Inst< SFFloat > _dynamicFriction = 0,
+    MagneticSurface( Inst< UpdateStiffness > _stiffness       = 0,
+                     Inst< UpdateDamping > _damping         = 0,
+                     Inst< UpdateStaticFriction > _staticFriction  = 0,
+                     Inst< UpdateDynamicFriction > _dynamicFriction = 0,
                      Inst< SFFloat > _snapDistance    = 0 );
 
     void initialize();
