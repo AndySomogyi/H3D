@@ -1,3 +1,32 @@
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2007, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+/// \file H3DWxFrame.h
+/// \brief Header file for H3DWxFrame
+///
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #include <wx/wx.h>
 #include <wx/propdlg.h> 
 #include <wx/bookctrl.h>
@@ -5,39 +34,31 @@
 #include <wx/spinctrl.h>
 #include <wx/config.h>
 #include <wx/confbase.h>
-#include "H3DWxWidgetsWindow.h"
-#include "GlobalSettings.h"
+#include <H3DWxWidgetsWindow.h>
+#include <GlobalSettings.h>
 
-#include "Box.h"
-#include "Cone.h"
-#include "Cylinder.h"
-#include "Sphere.h"
+#include <Box.h>
+#include <Cone.h>
+#include <Cylinder.h>
+#include <Sphere.h>
 
-#include "Group.h"
-#include "Transform.h"
-#include "Scene.h"
-#include "KeySensor.h"
-#include "MouseSensor.h"
+#include <Group.h>
+#include <Transform.h>
+#include <Scene.h>
+#include <KeySensor.h>
+#include <MouseSensor.h>
 
-#include "SpaceWareSensor.h"
+#include <SpaceWareSensor.h>
 
-//#include "DEFNodes.h"
-//#include "Viewpoint.h"
-#include "DeviceInfo.h"
-#include "INIFile.h"
-#include "ResourceResolver.h"
-//#include "PythonScript.h"
-#include "Console.h"
-#include "ParticleSystem.h"
-
-#include "NavigationInfo.h"
-
-
-#include "consoleDialog.h"
-#include "emittersettings.h"
-#include "physicsmodels.h"
-//Particle System Specific
-
+#include <DeviceInfo.h>
+#include <INIFile.h>
+#include <ResourceResolver.h>
+#include <Console.h>
+#include <ParticleSystem.h>
+#include <NavigationInfo.h>
+#include <consoleDialog.h>
+#include <emittersettings.h>
+#include <physicsmodels.h>
 
 using namespace std;
 using namespace H3D;
@@ -86,6 +107,7 @@ public:
   void VolumeEmitterSettingsDialog (wxCommandEvent & event);
   void ConeEmitterSettingsDialog (wxCommandEvent & event);
   void ExplosionEmitterSettingsDialog (wxCommandEvent & event);
+  void SurfaceEmitterSettingsDialog (wxCommandEvent & event);
   void BoundedPhysicsModelSettingsDialog (wxCommandEvent & event);
   void WindPhysicsModelSettingsDialog (wxCommandEvent & event);
   void GravityPhysicsModelSettingsDialog (wxCommandEvent & event);
@@ -106,6 +128,8 @@ private:
 	wxString currentPath;
   //ConeEmitter * coneEmitter;
   //PointEmitter * pointEmitter;
+  DeviceInfo *di;
+  H3DHapticsDevice *hdev;
   ParticleSystem *PS;
 
 	int selection;
@@ -139,6 +163,7 @@ private:
   PolylineEmitterDialog * polylineEmitterSettings;
   VolumeEmitterDialog * volumeEmitterSettings;
   ExplosionEmitterDialog * explosionEmitterSettings;
+  SurfaceEmitterDialog * surfaceEmitterSettings;
 
   //Physics models
   BoundedPhysicsModelDialog * boundedPhysicsModelSettings;
@@ -201,6 +226,7 @@ enum
   FRAME_POLYLINEEMITTER,
   FRAME_VOLUMEEMITTER,
   FRAME_EXPLOSIONEMITTER,
+  FRAME_SURFACEEMITTER,
   FRAME_BOUNDEDPHYSICSMODEL,
   FRAME_GRAVITYPHYSICSMODEL,
   FRAME_WINDPHYSICSMODEL,

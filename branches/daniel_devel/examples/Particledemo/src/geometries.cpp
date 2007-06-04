@@ -1,4 +1,4 @@
-#include "geometries.h"
+#include <geometries.h>
 
 using namespace std;
 using namespace H3D;

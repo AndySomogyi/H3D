@@ -1,3 +1,32 @@
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2007, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+/// \file emittersettings.h
+/// \brief Header file for emittersettings
+///
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #include <wx/wx.h>
 #include <wx/propdlg.h> 
 #include <wx/bookctrl.h>
@@ -7,15 +36,12 @@
 #include <wx/confbase.h>
 #include <wx/tokenzr.h>
 
-//#include <SFVec3f.h>
-
-#include "PointEmitter.h"
-#include "ConeEmitter.h"
-#include "ExplosionEmitter.h"
-//#include "PolylineEmitter.h"
-//#include "VolumeEmitter.h"
-#include "ParticleSystem.h"
-#include "SurfaceEmitter.h"
+#include <PointEmitter.h>
+#include <ConeEmitter.h>
+#include <ExplosionEmitter.h>
+#include <DeviceInfo.h>
+#include <ParticleSystem.h>
+#include <SurfaceEmitter.h>
 
 using namespace std;
 using namespace H3D;
@@ -34,6 +60,7 @@ public:
 
   void setParticleSystem (ParticleSystem * PS);
   void setEmitter (X3DParticleEmitterNode * emitter);
+  void setDevice (H3DHapticsDevice * hdev);
 
 protected:
     enum {
@@ -47,6 +74,7 @@ protected:
 
     wxImageList*    m_imageList;
     ParticleSystem * ePS;
+    H3DHapticsDevice * ehdev;
 
 DECLARE_EVENT_TABLE()
 };
@@ -59,7 +87,8 @@ class PointEmitterDialog: public EmitterDialog
 {
 DECLARE_CLASS(PointEmitterDialog);
 public:
-  PointEmitterDialog(wxWindow* parent, ParticleSystem* PS);
+  PointEmitterDialog(wxWindow* parent, ParticleSystem* PS,
+                     H3DHapticsDevice* hdev);
   ~PointEmitterDialog();
 
   void handleSettingsChange (wxCommandEvent & event);
@@ -85,7 +114,8 @@ class PolylineEmitterDialog: public EmitterDialog
 {
 DECLARE_CLASS(PolylineEmitterDialog)
 public:
-    PolylineEmitterDialog(wxWindow* parent, ParticleSystem* PS);
+    PolylineEmitterDialog(wxWindow* parent, ParticleSystem* PS,
+                          H3DHapticsDevice* hdev);
     ~PolylineEmitterDialog();
 
   /*void handleSettingsChange (wxCommandEvent & event);
@@ -116,7 +146,8 @@ class VolumeEmitterDialog: public EmitterDialog
 {
 DECLARE_CLASS(VolumeEmitterDialog)
 public:
-    VolumeEmitterDialog(wxWindow* parent, ParticleSystem* PS);
+    VolumeEmitterDialog(wxWindow* parent, ParticleSystem* PS,
+                        H3DHapticsDevice* hdev);
     ~VolumeEmitterDialog();
 
   /*void handleSettingsChange (wxCommandEvent & event);
@@ -147,7 +178,8 @@ class ConeEmitterDialog: public EmitterDialog
 {
 DECLARE_CLASS(ConeEmitterDialog);
 public:
-  ConeEmitterDialog(wxWindow* parent, ParticleSystem* PS);
+  ConeEmitterDialog(wxWindow* parent, ParticleSystem* PS, 
+                    H3DHapticsDevice * hdev);
   ~ConeEmitterDialog();
 
   void handleSettingsChange (wxCommandEvent & event);
@@ -173,7 +205,8 @@ class ExplosionEmitterDialog: public EmitterDialog
 {
 DECLARE_CLASS(ExplosionEmitterDialog);
 public:
-  ExplosionEmitterDialog(wxWindow* parent, ParticleSystem* PS);
+  ExplosionEmitterDialog(wxWindow* parent, ParticleSystem* PS,
+                         H3DHapticsDevice* hdev);
   ~ExplosionEmitterDialog();
 
   void handleSettingsChange (wxCommandEvent & event);
@@ -198,7 +231,8 @@ class SurfaceEmitterDialog: public EmitterDialog
 {
 DECLARE_CLASS(SurfaceEmitterDialog);
 public:
-  SurfaceEmitterDialog(wxWindow* parent, ParticleSystem* PS);
+  SurfaceEmitterDialog(wxWindow* parent, ParticleSystem* PS,
+                       H3DHapticsDevice* hdev);
   ~SurfaceEmitterDialog();
 
   void handleSettingsChange (wxCommandEvent & event);
