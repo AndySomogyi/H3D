@@ -90,7 +90,7 @@
 				AdditionalDependencies="H3DUtil10_vc7_r.lib"
 				OutputFile="$(OutDir)/H3DApi20_vc7_r.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\test\chai3d\lib\msvc7;..\..\..\..\H3DUtil\lib;..\..\..\..\HAPI\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
+				AdditionalLibraryDirectories="C:\test\chai3d\lib\msvc7;..\..\..\..\bin;..\..\..\..\lib;..\..\..\..\H3DUtil\lib;..\..\..\..\HAPI\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
 				DelayLoadDLLs="OpenHapticsRenderer.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/H3DApi20_vc7_r.pdb"
