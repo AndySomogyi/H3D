@@ -85,10 +85,8 @@ void FrictionalSurface::UpdateStaticFriction::update() {
   FrictionalSurface *fs = 
     static_cast< FrictionalSurface * >( getOwner() );
   if( fs->hapi_surface.get() ) {
-    H3DFloat static_friction =
-    static_cast< SFFloat * >( event.ptr )->getValue();
     static_cast< HAPI::FrictionSurface * >( fs->hapi_surface.get() )
-      ->static_friction = static_friction;
+      ->static_friction = value;
   }
 }
 
@@ -108,9 +106,7 @@ void FrictionalSurface::UpdateDynamicFriction::update() {
   FrictionalSurface *fs = 
     static_cast< FrictionalSurface * >( getOwner() );
   if( fs->hapi_surface.get() ) {
-    H3DFloat dynamic_friction =
-    static_cast< SFFloat * >( event.ptr )->getValue();
     static_cast< HAPI::FrictionSurface * >( fs->hapi_surface.get() )
-      ->dynamic_friction = dynamic_friction;
+      ->dynamic_friction = value;
   }
 }
