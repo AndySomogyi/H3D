@@ -29,10 +29,8 @@
 #ifndef __OPENHAPTICSSURFACE_H__
 #define __OPENHAPTICSSURFACE_H__
 
-#include <H3DSurfaceNode.h>
-#include <OpenHapticsRenderer.h>
+#include <MagneticSurface.h>
 #include <SFBool.h>
-#include <SFFloat.h>
 
 #ifdef HAVE_OPENHAPTICS
 
@@ -42,94 +40,37 @@ namespace H3D {
   /// \class OpenHapticsSurface
   /// \brief Surface type for setting OpenHaptics surface parameters directly.
   /// Only works when using the OpenHapticsRenderer.
-  class H3DAPI_API OpenHapticsSurface: public H3DSurfaceNode {
+  class H3DAPI_API OpenHapticsSurface: public MagneticSurface {
   public:
 
-#ifdef HAVE_OPENHAPTICS
-    // temporary class until HAPI has a MagneticSurface
-    class H3DAPI_API FrictionalHLSurface: public HAPI::HAPISurfaceObject,
-      public HAPI::OpenHapticsRenderer::HLSurface
-    {
+    /// Specialized field which sets the magnetic variable in
+    /// HAPI::OpenHapticsRenderer::OpenHapticsSurface when the magnetic
+    /// field of OpenHapticsSurface is changed.
+		///
+    /// routes_in[0] is the magnetic field
+    class H3DAPI_API UpdateMagnetic: public AutoUpdate< SFBool > {
     public:
-      FrictionalHLSurface( H3DDouble _stiffness,
-                           H3DDouble _damping,
-                           H3DDouble _static_friction,
-                           H3DDouble _dynamic_friction,
-                           H3DDouble _magnetic,
-                           H3DDouble _snap_distance ):
-        stiffness( _stiffness ),
-        damping( _damping ),
-        static_friction( _static_friction ),
-        dynamic_friction( _dynamic_friction ),
-        magnetic( _magnetic ),
-        snap_distance( _snap_distance )
-      {
-      }
-      /// Renders the surface using hlMaterialf calls
-      virtual void hlRender();
+      virtual void setValue( const bool &b, int id = 0 );
 
     protected:
-      H3DDouble stiffness, damping, static_friction,
-                dynamic_friction, magnetic, snap_distance;
+      virtual void update();
     };
-#endif
 
     /// Constructor.
-    OpenHapticsSurface( Inst< SFFloat > _stiffness = 0,
-                        Inst< SFFloat > _damping   = 0,
-                        Inst< SFFloat > _staticFriction  = 0,
-                        Inst< SFFloat > _dynamicFriction = 0,
-                        Inst< SFBool  > _magnetic  = 0,
-                        Inst< SFFloat > _snapDistance = 0 );
+    OpenHapticsSurface( Inst< UpdateStiffness > _stiffness = 0,
+                        Inst< UpdateDamping > _damping   = 0,
+                        Inst< UpdateStaticFriction > _staticFriction  = 0,
+                        Inst< UpdateDynamicFriction > _dynamicFriction = 0,
+                        Inst< UpdateMagnetic  > _magnetic  = 0,
+                        Inst< UpdateSnapDistance > _snapDistance = 0 );
   
     void initialize();
-
-    /// The stiffness of the surface. Should be a value between 0 and 1
-    /// where 1 is the maximum stiffness the haptics device can handle.
-    ///
-    /// <b>Access type: </b> inputOutput \n
-    /// <b>Default value: </b> 0.5 \n
-    /// <b>Value range: </b> [0-1]
-    auto_ptr< SFFloat > stiffness;
-
-    /// The velocity based damping of the surface. Should be a value between
-    /// 0 and 1 where 1 is the maximum damping the haptics device can handle.
-    ///
-    /// <b>Access type: </b> inputOutput \n
-    /// <b>Default value: </b> 0 \n
-    /// <b>Value range: </b> [0-1]
-    auto_ptr< SFFloat > damping;
-
-    /// The friction that is experienced upon initial movement when resting on 
-    /// the surface.
-    ///
-    /// <b>Access type: </b> inputOutput \n
-    /// <b>Default value: </b> 0.1 \n
-    /// <b>Value range: </b> [0-1]
-    auto_ptr< SFFloat > staticFriction;
-
-    /// The friction that is experienced when moving along the surface 
-    /// the surface.
-    ///
-    /// <b>Access type: </b> inputOutput \n
-    /// <b>Default value: </b> 0.4 \n
-    /// <b>Value range: </b> [0-1]
-    auto_ptr< SFFloat > dynamicFriction;
 
     /// Specifies if the surface should be magnetic or not.
     ///
     /// <b>Access type: </b> inputOutput \n
     /// <b>Default value: </b> false \n
-    auto_ptr< SFBool > magnetic;
-
-    /// The distance from the surface within which forces are generated
-    /// to pull the proxy towards the surface. If the device is pulled
-    /// outside this distance from the surface it will be freed from the
-    /// magnetic attraction.
-    ///
-    /// <b>Access type: </b> inputOutput \n
-    /// <b>Default value: </b> 0.01 \n
-    auto_ptr< SFFloat > snapDistance;
+    auto_ptr< UpdateMagnetic > magnetic;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

@@ -30,6 +30,7 @@
 #include <OpenHapticsSurface.h>
 
 #ifdef HAVE_OPENHAPTICS
+#include <OpenHapticsRenderer.h>
 
 using namespace H3D;
 
@@ -38,59 +39,59 @@ H3DNodeDatabase OpenHapticsSurface::database(
                                         "OpenHapticsSurface", 
                                         &(newInstance<OpenHapticsSurface>), 
                                         typeid( OpenHapticsSurface ),
-                                        &H3DSurfaceNode::database );
+                                        &MagneticSurface::database );
 
 namespace OpenHapticsSurfaceInternals {
-  FIELDDB_ELEMENT( OpenHapticsSurface, stiffness, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( OpenHapticsSurface, damping, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( OpenHapticsSurface, staticFriction, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( OpenHapticsSurface, dynamicFriction, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( OpenHapticsSurface, snapDistance, INPUT_OUTPUT );
   FIELDDB_ELEMENT( OpenHapticsSurface, magnetic, INPUT_OUTPUT );
 }
 
 /// Constructor.
-OpenHapticsSurface::OpenHapticsSurface( Inst< SFFloat > _stiffness,
-                                        Inst< SFFloat > _damping,
-                                        Inst< SFFloat > _staticFriction ,
-                                        Inst< SFFloat > _dynamicFriction,
-                                        Inst< SFBool  > _magnetic ,
-                                        Inst< SFFloat > _snapDistance ) :
-  stiffness( _stiffness ),
-  damping( _damping ),
-  staticFriction( _staticFriction ),
-  dynamicFriction( _dynamicFriction ),
-  magnetic( _magnetic ),
-  snapDistance( _snapDistance ) {
+OpenHapticsSurface::OpenHapticsSurface(
+              Inst< UpdateStiffness > _stiffness,
+              Inst< UpdateDamping > _damping,
+              Inst< UpdateStaticFriction > _staticFriction ,
+              Inst< UpdateDynamicFriction > _dynamicFriction,
+              Inst< UpdateMagnetic  > _magnetic ,
+              Inst< UpdateSnapDistance > _snapDistance ) :
+  MagneticSurface( _stiffness, _damping, _staticFriction,
+                   _dynamicFriction, _snapDistance ),
+  magnetic( _magnetic ) {
   type_name = "OpenHapticsSurface";
   database.initFields( this );
   
-  stiffness->setValue( (H3DFloat)0.5 );
-  damping->setValue( 0 );
-  staticFriction->setValue( (H3DFloat)0.1 );
-  dynamicFriction->setValue( (H3DFloat)0.4 );
   magnetic->setValue( false );
-  snapDistance->setValue( (H3DFloat) 0.01 );
 }
 
 void OpenHapticsSurface::initialize() {
   hapi_surface.reset(
-    new FrictionalHLSurface( stiffness->getValue(),
-                             damping->getValue(),
-                             staticFriction->getValue(),
-                             dynamicFriction->getValue(),
-                             magnetic->getValue(),
-                             snapDistance->getValue() * 1000 ) );
+    new HAPI::OpenHapticsRenderer::OpenHapticsSurface(
+                                          stiffness->getValue(),
+                                          damping->getValue(),
+                                          staticFriction->getValue(),
+                                          dynamicFriction->getValue(),
+                                          magnetic->getValue(),
+                                          snapDistance->getValue() * 1000 ) );
 }
 
-void OpenHapticsSurface::FrictionalHLSurface::hlRender() {
-  HAPI::OpenHapticsRenderer::hlRenderRelative( 
-                                  stiffness,
-                                  damping,
-                                  static_friction,
-                                  dynamic_friction, 
-                                  magnetic,
-                                  snap_distance );
+void OpenHapticsSurface::UpdateMagnetic::
+    setValue( const bool &b, int id ) {
+  SFBool::setValue( b, id );
+  OpenHapticsSurface *ohs = 
+    static_cast< OpenHapticsSurface * >( getOwner() );
+  if( ohs->hapi_surface.get() ) {
+    static_cast< HAPI::OpenHapticsRenderer::OpenHapticsSurface * >
+      ( ohs->hapi_surface.get() )->snap_distance = b;
+  }
+}
+
+void OpenHapticsSurface::UpdateMagnetic::update() {
+  SFBool::update();
+  OpenHapticsSurface *ohs = 
+    static_cast< OpenHapticsSurface * >( getOwner() );
+  if( ohs->hapi_surface.get() ) {
+    static_cast< HAPI::OpenHapticsRenderer::OpenHapticsSurface * >
+      ( ohs->hapi_surface.get() )->snap_distance = value;
+  }
 }
 
 #endif
