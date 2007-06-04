@@ -1,43 +1,63 @@
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2007, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+/// \file H3DWxFrame.cpp
+/// \brief Implementation file for H3DWxFrame
+///
+//
+//////////////////////////////////////////////////////////////////////////////
+
 // ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
 
-#include "H3DWxFrame.h"
-#include "consoleDialog.h"
+#include <H3DWxFrame.h>
+#include <consoleDialog.h>
 #include <vector>
-#include "H3DWxWidgetsWindow.h"
+#include <H3DWxWidgetsWindow.h>
 
 #include <wx/wx.h>
-#include "envini.h"
+#include <envini.h>
 
 // ---------------------------------------------------------------------------
 //  Includes (to open X3D files)
 // ---------------------------------------------------------------------------
-//#include <fstream>
-//#include "X3D.h"
-//#include <string.h>
 
-//#include <iostream>
-
-#include "VrmlParser.h"
-//#include "X3DSAX2Handlers.h"
-//#include "GLUTWindow.h"
-#include "Group.h"
-#include "Transform.h"
-#include "Scene.h"
-#include "KeySensor.h"
-#include "MouseSensor.h"
+#include <VrmlParser.h>
+#include <Group.h>
+#include <Transform.h>
+#include <Scene.h>
+#include <KeySensor.h>
+#include <MouseSensor.h>
 #ifndef MACOSX
-#include "SpaceWareSensor.h"
+#include <SpaceWareSensor.h>
 #endif
-//#include "DEFNodes.h"
-#include "Viewpoint.h"
-#include "X3DViewpointNode.h"
-#include "DeviceInfo.h"
-#include "INIFile.h"
-#include "ResourceResolver.h"
-//#include "PythonScript.h"
-#include "Console.h"
+#include <Viewpoint.h>
+#include <X3DViewpointNode.h>
+#include <DeviceInfo.h>
+#include <INIFile.h>
+#include <ResourceResolver.h>
+#include <Console.h>
 
 #include <GraphicsCachingOptions.h>
 #include <DebugOptions.h>
@@ -45,9 +65,8 @@
 #include <GeometryBoundTreeOptions.h>
 #include <OpenHapticsOptions.h>
 
-#include "HapticsRenderers.h"
-#include "HAPIHapticsRenderer.h"
-//#include "OpenHapticsRenderer.h"
+#include <HapticsRenderers.h>
+#include <HAPIHapticsRenderer.h>
 
 using namespace std;
 using namespace H3D;
@@ -168,6 +187,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   emitterMenu->Append(FRAME_POINTEMITTER,"Point","Select Point Emitter");
   emitterMenu->Append(FRAME_POLYLINEEMITTER, "Polyline", "Select Polyline Emitter");
   emitterMenu->Append(FRAME_VOLUMEEMITTER, "Volume", "Select Volume Emitter");
+  emitterMenu->Append(FRAME_SURFACEEMITTER, "Surface", "Select Surface Emitter");
 
   //Advanced Menu
   advancedMenu = new wxMenu;
@@ -208,6 +228,7 @@ BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
   EVT_MENU (FRAME_VOLUMEEMITTER, H3DWxFrame::VolumeEmitterSettingsDialog)
   EVT_MENU (FRAME_CONEEMITTER, H3DWxFrame::ConeEmitterSettingsDialog)
   EVT_MENU (FRAME_EXPLOSIONEMITTER, H3DWxFrame::ExplosionEmitterSettingsDialog)
+  EVT_MENU (FRAME_SURFACEEMITTER, H3DWxFrame::SurfaceEmitterSettingsDialog)
   EVT_MENU (FRAME_BOUNDEDPHYSICSMODEL, H3DWxFrame::BoundedPhysicsModelSettingsDialog)
   EVT_MENU (FRAME_GRAVITYPHYSICSMODEL, H3DWxFrame::GravityPhysicsModelSettingsDialog)
   EVT_MENU (FRAME_WINDPHYSICSMODEL, H3DWxFrame::WindPhysicsModelSettingsDialog)
@@ -309,7 +330,13 @@ bool H3DWxFrame::loadFile( const string &filename) {
       }
     }
 
-    DeviceInfo *di = DeviceInfo::getActive();
+    di = DeviceInfo::getActive();
+    hdev = (H3DHapticsDevice *) NULL;
+
+    if( di && !(di->device->empty())) {
+      hdev = di->device->getValueByIndex(0);
+    }
+
     if( di && stylus_file.size() ) {
       try {
         default_stylus = X3D::createX3DNodeFromURL( stylus_file );
@@ -365,6 +392,13 @@ bool H3DWxFrame::loadFile( const string &filename) {
       PSnotfound.ShowModal();
       menuBar->EnableTop(1, false);
     }
+
+    pointEmitterSettings = new PointEmitterDialog(this, PS, hdev);
+    polylineEmitterSettings = new PolylineEmitterDialog(this, PS, hdev);
+    volumeEmitterSettings = new VolumeEmitterDialog(this, PS, hdev);
+    coneEmitterSettings = new ConeEmitterDialog(this, PS, hdev);
+    explosionEmitterSettings = new ExplosionEmitterDialog(this, PS, hdev);
+    surfaceEmitterSettings =  new SurfaceEmitterDialog(this, PS, hdev);
     //}
 
 	/****************************Device Info****************************/
@@ -535,39 +569,37 @@ void H3DWxFrame::PointEmitterSettingsDialog(wxCommandEvent & event)
   /*pointEmitter = (PointEmitter *) NULL;
   pointEmitter = new PointEmitter;
   PS->emitter->setValue(pointEmitter);*/
-  pointEmitterSettings = new PointEmitterDialog(this, PS);
   pointEmitterSettings->Show();
 }
 
 //Polyline Emitter settings
 void H3DWxFrame::PolylineEmitterSettingsDialog(wxCommandEvent & event)
 {
-  polylineEmitterSettings = new PolylineEmitterDialog(this, PS);
   polylineEmitterSettings->Show();
 }
 
 //Volume Emitter settings
 void H3DWxFrame::VolumeEmitterSettingsDialog(wxCommandEvent & event)
 {
-  volumeEmitterSettings = new VolumeEmitterDialog(this, PS);
   volumeEmitterSettings->Show();
 }
 
 //Cone Emitter settings
 void H3DWxFrame::ConeEmitterSettingsDialog(wxCommandEvent & event)
 {
-  /*coneEmitter = (ConeEmitter *) NULL;
-  coneEmitter = new ConeEmitter;
-  PS->emitter->setValue(coneEmitter);*/
-  coneEmitterSettings = new ConeEmitterDialog(this, PS);
   coneEmitterSettings->Show();
 }
 
 //Explosion Emitter settings
 void H3DWxFrame::ExplosionEmitterSettingsDialog(wxCommandEvent & event)
 {
-  explosionEmitterSettings = new ExplosionEmitterDialog(this, PS);
   explosionEmitterSettings->Show();
+}
+
+//Surface Emitter settings
+void H3DWxFrame::SurfaceEmitterSettingsDialog(wxCommandEvent & event)
+{
+  surfaceEmitterSettings->Show();
 }
 
 //Bounded Physics Model settings

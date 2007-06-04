@@ -1,4 +1,33 @@
-#include "emittersettings.h"
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2007, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+/// \file emittersettings.cpp
+/// \brief Implementation file for emittersettings
+///
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#include <emittersettings.h>
 
 using namespace std;
 using namespace H3D;
@@ -28,6 +57,11 @@ void EmitterDialog::setParticleSystem(ParticleSystem *PS)
   ePS = PS;
 }
 
+void EmitterDialog::setDevice(H3DHapticsDevice *hdev)
+{
+  ehdev = hdev;
+}
+
 // ---------------------------------------------------------------------------
 //  PointEmitterDialog Definition
 // ---------------------------------------------------------------------------
@@ -44,7 +78,8 @@ BEGIN_EVENT_TABLE(PointEmitterDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
 
-PointEmitterDialog::PointEmitterDialog(wxWindow* win, ParticleSystem* PS)
+PointEmitterDialog::PointEmitterDialog(wxWindow* win, ParticleSystem* PS,
+                                       H3DHapticsDevice* hdev)
 {
     SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -80,6 +115,7 @@ PointEmitterDialog::PointEmitterDialog(wxWindow* win, ParticleSystem* PS)
     //Make ePS point to frame ParticleSystem
     //PS->emitter->setValue(pointEmitter);
     setParticleSystem (PS);
+    setDevice (hdev);
     //PS->emitter->setValue(pointEmitter);
 }
 
@@ -150,9 +186,13 @@ wxPanel* PointEmitterDialog::CreatePointEmitterSettingsPage(wxWindow* parent)
 }
 
 void PointEmitterDialog::handleSettingsChange (wxCommandEvent & event) {
+  int id = event.GetId();
   pointEmitter = dynamic_cast<PointEmitter *> (ePS->emitter->getValue());
-
-  int id = event.GetId(); 
+  if (!pointEmitter) {
+    pointEmitter = new PointEmitter;
+    ePS->emitter->setValue(pointEmitter);
+    ehdev->trackerPosition->route(pointEmitter->position);
+  }
 
   if ( id == ID_SPEED )
     pointEmitter->speed->setValue( atof( event.GetString() ) );
@@ -251,7 +291,8 @@ BEGIN_EVENT_TABLE(PolylineEmitterDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
 
-PolylineEmitterDialog::PolylineEmitterDialog(wxWindow* win, ParticleSystem* PS)
+PolylineEmitterDialog::PolylineEmitterDialog(wxWindow* win, ParticleSystem* PS,
+                                             H3DHapticsDevice* hdev)
 {
     SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -285,7 +326,8 @@ PolylineEmitterDialog::PolylineEmitterDialog(wxWindow* win, ParticleSystem* PS)
 //    polylineEmitter = (PolylineEmitter *) NULL;
 //    polylineEmitter = new PolylineEmitter;
     //Make ePS point to frame ParticleSystem
-    ePS = PS;
+    setParticleSystem (PS);
+    setDevice (hdev);
 
 }
 
@@ -352,7 +394,9 @@ BEGIN_EVENT_TABLE(VolumeEmitterDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
 
-VolumeEmitterDialog::VolumeEmitterDialog(wxWindow* win, ParticleSystem* PS)
+VolumeEmitterDialog::VolumeEmitterDialog(wxWindow* win, ParticleSystem* PS,
+                                         H3DHapticsDevice* hdev)
+                                         
 {
     SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -382,11 +426,8 @@ VolumeEmitterDialog::VolumeEmitterDialog(wxWindow* win, ParticleSystem* PS)
 
     LayoutDialog();
 
-    //Set volumeEmitter pointer to NULL initally
-//    volumeEmitter = (VolumeEmitter *) NULL;
-//    volumeEmitter = new VolumeEmitter;
-    //Make ePS point to frame ParticleSystem
-    ePS = PS;
+    setParticleSystem (PS);
+    setDevice (hdev);
 
 }
 
@@ -458,7 +499,8 @@ BEGIN_EVENT_TABLE(ConeEmitterDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
 
-ConeEmitterDialog::ConeEmitterDialog(wxWindow* win, ParticleSystem* PS)
+ConeEmitterDialog::ConeEmitterDialog(wxWindow* win, ParticleSystem* PS,
+                                     H3DHapticsDevice* hdev)
 {
     SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -488,12 +530,13 @@ ConeEmitterDialog::ConeEmitterDialog(wxWindow* win, ParticleSystem* PS)
 
     LayoutDialog();
 
+
     //Set coneEmitter pointer to NULL initally
     coneEmitter = (ConeEmitter *) NULL;
-    coneEmitter = new ConeEmitter;
+    //coneEmitter = new ConeEmitter;
     //Make ePS point to frame ParticleSystem
     setParticleSystem (PS);
-    //ePS = PS;
+    setDevice (hdev);
 }
 
 ConeEmitterDialog::~ConeEmitterDialog()
@@ -511,8 +554,12 @@ wxPanel* ConeEmitterDialog::CreateConeEmitterSettingsPage(wxWindow* parent)
     //// SPEED
 
     wxBoxSizer* speedSizer = new wxBoxSizer( wxHORIZONTAL );
-    speedSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Speed            :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* coneEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    speedSizer->Add(new wxStaticText(panel, wxID_ANY, 
+      _("&Speed            :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    //wxString item = wxString ("") << coneEmitter->speed->getValue();
+    //coneEmitterSpeed << item;
+    wxTextCtrl* coneEmitterSpeed = new wxTextCtrl (panel, ID_SPEED,
+      wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
     speedSizer->Add(coneEmitterSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(speedSizer, 0, wxGROW|wxALL, 0);
 
@@ -565,6 +612,11 @@ wxPanel* ConeEmitterDialog::CreateConeEmitterSettingsPage(wxWindow* parent)
 void ConeEmitterDialog::handleSettingsChange (wxCommandEvent & event) {
   int id = event.GetId();
   coneEmitter = dynamic_cast<ConeEmitter *> (ePS->emitter->getValue());
+  if (!coneEmitter) {
+    coneEmitter = new ConeEmitter;
+    ePS->emitter->setValue(coneEmitter);
+    ehdev->trackerPosition->route(coneEmitter->position);
+  }
   if ( id == ID_SPEED )
     coneEmitter->speed->setValue( atof( event.GetString() ) );
   else if (id == ID_VARIATION)
@@ -666,7 +718,9 @@ BEGIN_EVENT_TABLE(ExplosionEmitterDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
 
-ExplosionEmitterDialog::ExplosionEmitterDialog(wxWindow* win, ParticleSystem* PS)
+ExplosionEmitterDialog::ExplosionEmitterDialog(wxWindow* win, 
+                                               ParticleSystem* PS,
+                                               H3DHapticsDevice* hdev)
 {
     SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -701,7 +755,7 @@ ExplosionEmitterDialog::ExplosionEmitterDialog(wxWindow* win, ParticleSystem* PS
     explosionEmitter = new ExplosionEmitter;
     //Make ePS point to frame ParticleSystem
     setParticleSystem (PS);
-    //ePS = PS;
+    setDevice (hdev);
 }
 
 ExplosionEmitterDialog::~ExplosionEmitterDialog()
@@ -765,7 +819,14 @@ wxPanel* ExplosionEmitterDialog::CreateExplosionEmitterSettingsPage(wxWindow* pa
 
 void ExplosionEmitterDialog::handleSettingsChange (wxCommandEvent & event) {
   int id = event.GetId();
-  explosionEmitter = dynamic_cast<ExplosionEmitter *> (ePS->emitter->getValue());
+  explosionEmitter = 
+    dynamic_cast<ExplosionEmitter *> (ePS->emitter->getValue());
+  if (!explosionEmitter) {
+    explosionEmitter = new ExplosionEmitter;
+    ePS->emitter->setValue(explosionEmitter);
+    ehdev->trackerPosition->route(explosionEmitter->position);
+  }
+
   if ( id == ID_SPEED )
     explosionEmitter->speed->setValue( atof( event.GetString() ) );
   else if (id == ID_VARIATION)
@@ -830,7 +891,8 @@ BEGIN_EVENT_TABLE(SurfaceEmitterDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
 
-SurfaceEmitterDialog::SurfaceEmitterDialog(wxWindow* win, ParticleSystem* PS)
+SurfaceEmitterDialog::SurfaceEmitterDialog(wxWindow* win, ParticleSystem* PS,
+                                           H3DHapticsDevice* hdev)
 {
     SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -865,6 +927,7 @@ SurfaceEmitterDialog::SurfaceEmitterDialog(wxWindow* win, ParticleSystem* PS)
     surfaceEmitter = new SurfaceEmitter;
     //Make ePS point to frame ParticleSystem
     setParticleSystem (PS);
+    setDevice (hdev);
     //ePS = PS;
 }
 
@@ -931,6 +994,12 @@ wxPanel* SurfaceEmitterDialog::CreateSurfaceEmitterSettingsPage(wxWindow* parent
 void SurfaceEmitterDialog::handleSettingsChange (wxCommandEvent & event) {
   int id = event.GetId();
   surfaceEmitter = dynamic_cast<SurfaceEmitter *> (ePS->emitter->getValue());
+  if (!surfaceEmitter) {
+    surfaceEmitter = new SurfaceEmitter;
+    ePS->emitter->setValue(surfaceEmitter);
+    //ehdev->trackerPosition->route(explosionEmitter->position);
+  }
+
   if ( id == ID_SPEED )
     surfaceEmitter->speed->setValue( atof( event.GetString() ) );
   else if (id == ID_VARIATION)

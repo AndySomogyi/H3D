@@ -1,4 +1,33 @@
-#include "physicsmodels.h"
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2007, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+/// \file physicsmodels.cpp
+/// \brief Implementation file for physicsmodels
+///
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#include <physicsmodels.h>
 
 using namespace std;
 using namespace H3D;
@@ -51,6 +80,7 @@ BoundedPhysicsModelDialog::BoundedPhysicsModelDialog(wxWindow* win, ParticleSyst
   //PS->emitter->setValue(pointEmitter);
   //setParticleSystem (PS);
   ePS = PS;
+  getIndex();
   //PS->emitter->setValue(pointEmitter);
 }
 
@@ -81,12 +111,27 @@ wxPanel* BoundedPhysicsModelDialog::CreateBoundedPhysicsModelSettingsPage(wxWind
 }
 
 void BoundedPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
-  boundedPhysicsModel = dynamic_cast<BoundedPhysicsModel *> (ePS->physics->getValueByIndex(0));
+  boundedPhysicsModel = 
+    dynamic_cast<BoundedPhysicsModel *> (ePS->physics->getValueByIndex(index));
 
   int id = event.GetId(); 
 
   if ( id == ID_ENABLED )
     boundedPhysicsModel->enabled->setValue( event.IsChecked() );
+}
+
+void BoundedPhysicsModelDialog::getIndex () {
+  int count = 0;
+  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = ePS->physics->begin();
+       i != ePS->physics->end(); i++ ) {
+    boundedPhysicsModel = 
+      dynamic_cast<BoundedPhysicsModel *> (*i);
+    if (boundedPhysicsModel) {
+        index = count;
+        break;
+    }
+    count++;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -137,6 +182,7 @@ GravityPhysicsModelDialog::GravityPhysicsModelDialog(wxWindow* win, ParticleSyst
   //PS->emitter->setValue(pointEmitter);
   //setParticleSystem (PS);
   ePS = PS;
+  getIndex();
   //PS->emitter->setValue(pointEmitter);
 }
 
@@ -174,7 +220,7 @@ wxPanel* GravityPhysicsModelDialog::CreateGravityPhysicsModelSettingsPage(wxWind
 }
 
 void GravityPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
-  gravityPhysicsModel = dynamic_cast<GravityPhysicsModel *> (ePS->physics->getValueByIndex(0));
+  gravityPhysicsModel = dynamic_cast<GravityPhysicsModel *> (ePS->physics->getValueByIndex(index));
 
   if (gravityPhysicsModel) {
 
@@ -223,6 +269,19 @@ void GravityPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
   }
 }
 
+void GravityPhysicsModelDialog::getIndex () {
+  int count = 0;
+  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = ePS->physics->begin();
+       i != ePS->physics->end(); i++ ) {
+    gravityPhysicsModel = 
+      dynamic_cast<GravityPhysicsModel *> (*i);
+    if (gravityPhysicsModel) {
+        index = count;
+        break;
+    }
+    count++;
+  }
+}
 
 
 // ---------------------------------------------------------------------------
@@ -276,6 +335,7 @@ WindPhysicsModelDialog::WindPhysicsModelDialog(wxWindow* win, ParticleSystem* PS
     //PS->emitter->setValue(pointEmitter);
     //setParticleSystem (PS);
     ePS = PS;
+    getIndex();
     //PS->emitter->setValue(pointEmitter);
 
 }
@@ -335,7 +395,7 @@ wxPanel* WindPhysicsModelDialog::CreateWindPhysicsModelSettingsPage(wxWindow *pa
 }
 
 void WindPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
-  windPhysicsModel = dynamic_cast<WindPhysicsModel *> (ePS->physics->getValueByIndex(0));
+  windPhysicsModel = dynamic_cast<WindPhysicsModel *> (ePS->physics->getValueByIndex(index));
 
   int id = event.GetId();
 
@@ -386,9 +446,24 @@ void WindPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
     windPhysicsModel->direction->setValue(Vec3f(x, y, z));
   }
   Console (3) << "WIND PHYSICS MODEL STATS" << endl;
+  Console (3) << index << endl;
   Console (3) << "Enabled: " << windPhysicsModel->enabled->getValue() << endl;
   Console (3) << "Speed: " << windPhysicsModel->speed->getValue() << endl;
   Console (3) << "Gustiness: " << windPhysicsModel->gustiness->getValue() << endl;
   Console (3) << "Turbulence: " << windPhysicsModel->turbulence->getValue() << endl;
   Console (3) << "Direction: " << windPhysicsModel->direction->getValue() << endl;
+}
+
+void WindPhysicsModelDialog::getIndex () {
+  int count = 0;
+  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = ePS->physics->begin();
+       i != ePS->physics->end(); i++ ) {
+    windPhysicsModel = 
+      dynamic_cast<WindPhysicsModel *> (*i);
+    if (windPhysicsModel) {
+        index = count;
+        break;
+    }
+    count++;
+  }
 }

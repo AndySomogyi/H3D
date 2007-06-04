@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2006-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -28,10 +28,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "H3DWxWidgetsWindow.h"
+#include <H3DWxWidgetsWindow.h>
 #ifndef WIN32
-#include "X3DKeyDeviceSensorNode.h"
-#include "MouseSensor.h"
+#include <X3DKeyDeviceSensorNode.h>
+#include <MouseSensor.h>
 #endif
 
 

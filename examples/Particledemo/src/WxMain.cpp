@@ -1,10 +1,39 @@
+//////////////////////////////////////////////////////////////////////////////
+//    Copyright 2006-2007, SenseGraphics AB
+//
+//    This file is part of H3D API.
+//
+//    H3D API is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    H3D API is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with H3D API; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    A commercial license is also available. Please contact us at 
+//    www.sensegraphics.com for more information.
+//
+//
+/// \file WxMain.cpp
+/// \brief CPP file for ParticleDemo
+///
+//
+//////////////////////////////////////////////////////////////////////////////
+
 // ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
 //#pragma once
 //#include "header.h"
-#include "H3DWxFrame.h"
-#include "H3DWxWidgetsWindow.h"
+#include <H3DWxFrame.h>
+#include <H3DWxWidgetsWindow.h>
 //#include <fstream>
 //#include "X3D.h"
 //#include <string.h>
@@ -13,21 +42,21 @@
 
 //#include "X3DSAX2Handlers.h"
 //#include "GLUTWindow.h"
-#include "VrmlParser.h"
-#include "Group.h"
-#include "Transform.h"
-#include "Scene.h"
-#include "KeySensor.h"
-#include "MouseSensor.h"
+#include <VrmlParser.h>
+#include <Group.h>
+#include <Transform.h>
+#include <Scene.h>
+#include <KeySensor.h>
+#include <MouseSensor.h>
 #ifndef MACOSX
-#include "SpaceWareSensor.h"
+#include <SpaceWareSensor.h>
 #endif
 //#include "DEFNodes.h"
 //#include "Viewpoint.h"
-#include "DeviceInfo.h"
-#include "INIFile.h"
-#include "ResourceResolver.h"
-#include "PythonScript.h"
+#include <DeviceInfo.h>
+#include <INIFile.h>
+#include <ResourceResolver.h>
+#include <PythonScript.h>
 
 #include <wx/cmdline.h>
 

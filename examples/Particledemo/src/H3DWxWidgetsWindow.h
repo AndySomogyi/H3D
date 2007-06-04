@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004, SenseGraphics AB
+//    Copyright 2006-2007, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -30,7 +30,7 @@
 #define __H3DWXWIDGETSWINDOW_H__
 
 #include "wx/wx.h"
-#include "H3DWindowNode.h"
+#include <H3DWindowNode.h>
 //#include "Scene.h"
 #include "wx/glcanvas.h"
 
