@@ -184,8 +184,8 @@ void X3DTexture3DNode::glTexImage( Image *i, GLenum texture_target,
 
   TextureProperties *texture_properties = textureProperties->getValue();
   
-  if( 0 ) { /*&& texture_properties && texture_properties->generateMipMaps->getValue() ) {
-  // TODO: 3d mipmap.. glu1.3 nod available per default in Window
+  if( texture_properties && texture_properties->generateMipMaps->getValue() ) {
+#if( GLU_VERSION_1_3 )
     gluBuild3DMipmaps(  texture_target, 
                         glInternalFormat( i ),
                         width,
@@ -193,7 +193,8 @@ void X3DTexture3DNode::glTexImage( Image *i, GLenum texture_target,
                         depth,
                         glPixelFormat( i ),
                         glPixelComponentType( i ),
-                        image_data );*/
+                        image_data );
+#endif
   } else {
     H3DInt32 border_width = 
       texture_properties ? 
