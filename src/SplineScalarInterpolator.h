@@ -40,8 +40,8 @@ namespace H3D {
   /// \class SplineScalarInterpolator
   /// \brief The SplineScalarInterpolator node non-linearly interpolates 
   ///  among a list of floats to produce an SFFloat value_changed event. 
-  ///  The keyValue, keyVelocity, and key fields shall each have the same number of values.
-  ///
+  ///  
+  ///The keyValue, keyVelocity, and key fields shall each have the same number of values.
   /// 
 
   class H3DAPI_API SplineScalarInterpolator : public X3DInterpolatorNode {
@@ -50,10 +50,10 @@ namespace H3D {
     /// The SFValue field updates the interpolated value from the fields
     /// routed to it.
     ///
-    /// routes_in[0] is the fraction_changed field
-    /// routes_in[1] is the key field
-	  /// routes_in[2] is the keyValue field
-    /// routes_in[3] is the keyVelocity field
+    /// - routes_in[0] is the fraction_changed field
+    /// - routes_in[1] is the key field
+    /// - routes_in[2] is the keyValue field
+    /// - routes_in[3] is the keyVelocity field
     struct H3DAPI_API SFValue : TypedField< SFFloat, 
                                             Types< SFFloat, 
                                                    MFFloat, 

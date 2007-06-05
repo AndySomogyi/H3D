@@ -121,8 +121,8 @@ namespace H3D {
     /// primary pointing device button is released if it was previously 
     /// pressed.
     ///
-    /// routes_in[0] is the isOver field
-    /// routes_in[1] is the leftButton field of a MouseSensor
+    /// - routes_in[0] is the isOver field
+    /// - routes_in[1] is the leftButton field of a MouseSensor
     class H3DAPI_API SetIsActive: 
       public AutoUpdate< TypedField < SFBool, Types< SFBool, SFBool > > > {
     public:
@@ -149,8 +149,8 @@ namespace H3D {
     /// Also if the enabled field is false and isActive is true then isActive
     /// is set to false.
     ///
-    /// routes_in[0] is the enabled field of X3DPointingDeviceSensorNode
-    /// routes_in[1] is the leftButton field of MouseSensor
+    /// - routes_in[0] is the enabled field of X3DPointingDeviceSensorNode
+    /// - routes_in[1] is the leftButton field of MouseSensor
     class H3DAPI_API SetIsEnabled: 
       public AutoUpdate< TypedField < SFBool, Types< SFBool, SFBool > > > {
     public:
@@ -257,7 +257,7 @@ namespace H3D {
       }
     }
 
-    /// Used to find out if the 2D pointing device ( e.g. the mouse )
+    /// \brief Used to find out if the 2D pointing device ( e.g. the mouse )
     /// has moved. In that case collision with all geometries need to be done.
     static bool has2DPointingDeviceMoved( Vec2f & pos );
 

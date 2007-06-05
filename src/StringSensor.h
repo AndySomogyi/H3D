@@ -51,15 +51,14 @@ namespace H3D {
   ///  keyboards and different implementations. 
   /// 
   ///  If a deletionAllowed has value TRUE, the previously entered character
-  ///  in the enteredText is removed when the browser-recognized value for
-  ///  deleting the preceding character of a string is entered.In H3D this is 
-  ///  the backspace key. If deletionAllowed has value FALSE, characters 
+  ///  in the enteredText is removed when the backspace key is entered.
+  ///  If deletionAllowed has value FALSE, characters 
   ///  may only be added to the string; deletion of characters shall not 
   ///  be allowed. Should the browser-recognized value for deleting the 
   ///  preceding character is entered, it shall be ignored.
   ///
   ///  The finalText event is generated whenever the browser-recognized
-  ///  value for terminating a string is entered. In H3D this is the enter key.
+  ///  value for terminating a string is entered; in H3D this is the enter key.
   ///  When this recognition occurs, the finalText field generates an event 
   ///  with value equal to that of enteredText. After the finalText field 
   ///  event has been generated, the enteredText field is set to the empty
@@ -92,7 +91,9 @@ namespace H3D {
     virtual void keyboardUp( int key, bool special_key ){
     }
 
-    /// deletionAllowed 
+    ///  If a deletionAllowed has value TRUE, the previously entered character
+    ///  in the enteredText is removed when the backspace key is entered.
+    ///  
     ///
     /// <b>Access type:</b> inputOutput
     /// <b>Default value:</b> SFBool = TRUE \n

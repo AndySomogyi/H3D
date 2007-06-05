@@ -164,8 +164,8 @@ namespace H3D {
     /// Current gimbal angles for the device (in radians).
     /// From neutral position:
     ///  - x - Right     = +
-    /// - y - Up        = -
-    /// - z - Clockwise = +
+    ///  - y - Up        = -
+    ///  - z - Clockwise = +
     /// 
     /// <b>Access type: outputOnly</b> 
     auto_ptr< SFVec3f > gimbalAngles;
