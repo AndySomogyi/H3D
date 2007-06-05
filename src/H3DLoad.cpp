@@ -24,6 +24,7 @@
 #include <INIFile.h>
 #include <ResourceResolver.h>
 #include <PythonScript.h>
+#include <NavigationInfo.h>
 
 using namespace std;
 using namespace H3D;
@@ -39,7 +40,7 @@ class QuitAPIField: public AutoUpdate< SFString > {
   }
 };
 
-// ###############
+
 class ChangeViewport : public AutoUpdate< SFInt32> { 
   virtual void update() {
     int key = static_cast< SFInt32 * >(routes_in[0])->getValue();
@@ -51,7 +52,7 @@ class ChangeViewport : public AutoUpdate< SFInt32> {
     if( key == KeySensor::HOME ) {
       // Goes to the initial viewpoint
       (*vp_list.begin())->set_bind->setValue(true);
-
+      cerr << "home " << endl;
     }
     if( key == KeySensor::END ) {
       //Goes to the final viewpoint 
@@ -91,7 +92,68 @@ class ChangeViewport : public AutoUpdate< SFInt32> {
     }
   }
 };
-//############################
+
+    // create a window to display
+    GLUTWindow *glwindow = new GLUTWindow;
+    
+class ChangeNavType : public AutoUpdate< SFString > { 
+  virtual void update() {
+    NavigationInfo *mynav =0;
+    if(NavigationInfo::getActive()){
+      mynav = NavigationInfo::getActive();
+    }
+    string s = static_cast< SFString * >(routes_in[0])->getValue();
+    if( s[0] == 119) {
+      // Set navigation type to WALK
+      if(mynav){
+        mynav->setNavType("WALK");
+      }
+      else{
+        glwindow->default_nav = "WALK"; 
+      }
+    }
+    if( s[0] == 102 ) {
+      // Set navigation type to FLY
+      if(mynav){
+        mynav->setNavType("FLY");
+      }
+      else{
+        glwindow->default_nav = "FLY"; 
+      }
+    }
+    if( s[0] == 101 ) {
+      // Set navigation type to EXAMINE
+      if(mynav){
+        mynav->setNavType("EXAMINE");
+      }
+      else{
+        glwindow->default_nav = "EXAMINE"; 
+      }
+    }
+    if( s[0] == 108 ) {
+      // Set navigation type to LOOKAT
+      if(mynav){
+        mynav->setNavType("LOOKAT");
+      }
+      else{
+        glwindow->default_nav = "LOOKAT"; 
+      }
+    }
+    if( s[0] == 110 ) {
+      // Set navigation type to NONE
+      if(mynav){
+        mynav->setNavType("NONE");
+        cerr << "finns en mynav" << endl;
+      }
+      else{
+        glwindow->default_nav = "NONE"; 
+        cerr << "finns ingen mynav" << endl;
+      }
+    cerr << " Set navigation type to NONE " <<endl;
+    }
+  }
+};
+
 #define GET4(ENV,GROUP,VAR,DEFAULT) \
   ( getenv(ENV) ?                     \
   string(getenv(ENV)) :             \
@@ -376,6 +438,7 @@ int main(int argc, char* argv[]) {
     X3D::DEFNodes dn;
     QuitAPIField *quit_api = new QuitAPIField;
     ChangeViewport *change_viewpoint = new ChangeViewport;  // ###############
+    ChangeNavType *change_nav_type = new ChangeNavType;  // ###############
     AutoRef< Node > device_info;
     AutoRef< Node > viewpoint;
     AutoRef< Scene > scene( new Scene );
@@ -424,6 +487,7 @@ int main(int argc, char* argv[]) {
 
     ks->keyPress->route( quit_api );
     ks->actionKeyPress->route( change_viewpoint );  //###########
+    ks->keyPress->route( change_nav_type );  //###########
 
 #ifndef MACOSX
     if( use_space_mouse )
@@ -445,9 +509,6 @@ int main(int argc, char* argv[]) {
     }
 
     dn.clear();
-
-    // create a window to display
-    GLUTWindow *glwindow = new GLUTWindow;
 
     glwindow->fullscreen->setValue( fullscreen );
     glwindow->mirrored->setValue( mirrored );
