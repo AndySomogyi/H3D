@@ -46,7 +46,7 @@ namespace H3D {
     /// The SetTouchTime class is specialize field to generate a touchTime
     /// event.
     ///
-    /// routes_in[0] is the isActive field
+    /// - routes_in[0] is the isActive field
     class H3DAPI_API SetTouchTime: 
       public AutoUpdate< TypedField < SFBool, SFBool > > {
     public:
@@ -77,13 +77,13 @@ namespace H3D {
                         Inst< SFTime > _touchTime = 0 );
 
     // Fields
-    /// The field touchTime is generated when all three of the following
+    /// \brief The field touchTime is generated when all three of the following
     /// conditions are true:
-    /// The pointing device was pointing towards the geometry when it was
+    /// - The pointing device was pointing towards the geometry when it was
     /// initially activated (isActive is TRUE).
-    /// The pointing device is currently pointing towards the geometry
+    /// - The pointing device is currently pointing towards the geometry
     /// (isOver is TRUE). 
-    /// The pointing device is deactivated (isActive FALSE event is also
+    /// - The pointing device is deactivated (isActive FALSE event is also
     /// generated).
     /// 
     /// <b>Access type:</b> outputOnly \n

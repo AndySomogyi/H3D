@@ -41,7 +41,7 @@ namespace H3D {
 
   /// \ingroup AbstractNodes
   /// \class ProximitySensor
-  /// \ brief The ProximitySensor node generates events when the viewer enters,
+  /// \brief The ProximitySensor node generates events when the viewer enters,
   /// exits, and moves within a region in space (defined by a box). A 
   /// proximity sensor is enabled or disabled by sending it an enabled event
   /// with a value of TRUE or FALSE. A disabled sensor does not send events.
@@ -68,8 +68,7 @@ namespace H3D {
   /// the user changes the center of rotation through the browser's user 
   /// interface, or from changes to the ProximitySensor node's coordinate 
   /// system. centerOfRotation_changed events are only generated when the 
-  /// currently bound NavigationInfo node includes LOOKAT navigation. For more
-  /// information, see 23.3.1 X3DViewpointNode and 23.4.4. NavigationInfo.
+  /// currently bound NavigationInfo node includes LOOKAT navigation. 
   ///
   /// The position_changed and orientation_changed fields send events whenever
   /// the user is contained within the proximity region and the position and
@@ -124,8 +123,8 @@ namespace H3D {
     /// it resides in, depending on the value that is is given.
     class H3DAPI_API SetTime: public AutoUpdate< SFBool > {
     public:
-      /// Sets either the exitTime or enterTime field depending
-      /// on the new value.
+      // Sets either the exitTime or enterTime field depending
+      // on the new value.
       virtual void setValue( const bool &b, int id = 0 ) {
       	SFBool::setValue( b , id );
         ProximitySensor *ps = 
@@ -136,8 +135,8 @@ namespace H3D {
             ps->exitTime->setValue( TimeStamp() , ps->id ); 
       }
     protected:
-      /// Sets either the exitTime or enterTime field depending
-      /// on the new value.
+      // Sets either the exitTime or enterTime field depending
+      // on the new value.
       virtual void update() {
         SFBool::update();
     	ProximitySensor *ps = 
@@ -162,39 +161,42 @@ namespace H3D {
 								Inst< SFVec3f > _position_changed = 0);
 
 
-	/// Ttravese function
+	/// Traverse function
 	virtual void traverseSG( TraverseInfo &ti ); 
 	
 
-    // Fields
-	/// centerOfRotation_changed gives the location of the center
+  // Fields
+
+  /// centerOfRotation_changed gives the location of the center
 	/// of rotation of the active viewpoint with respect to 
-	/// center of proximitySensor
-    /// <b>Access type:</b> =Output \n
-    /// <b>Default value:</b> SFVec3f = 0,0,0 \n
-    /// 
-    /// \dotfile ProximitySensor_centerOfRotation_changed.dot
-    auto_ptr< SFVec3f >  centerOfRotation_changed;
+	/// center of proximitySensor.
+  ///
+  /// <b>Access type:</b> =OutputOnly \n
+  /// <b>Default value:</b> SFVec3f = 0,0,0 \n
+  /// 
+  /// \dotfile ProximitySensor_centerOfRotation_changed.dot
+  auto_ptr< SFVec3f >  centerOfRotation_changed;
 
 	
 	auto_ptr< SFRotation >  orientation_changed;
 	
 	/// position_changed gives the position
 	/// of the active viewpoint with respect to 
-	/// center of proximitySensor
-    /// <b>Access type:</b> =Output \n
-    /// <b>Default value:</b> SFVec3f = 0,0,0 \n
-    /// 
-    /// \dotfile ProximitySensor_position_changed.dot
-    auto_ptr< SFVec3f >  position_changed;
+	/// center of proximitySensor.
+  ///
+  /// <b>Access type:</b> =OutputOnly \n
+  /// <b>Default value:</b> SFVec3f = 0,0,0 \n
+  /// 
+  /// \dotfile ProximitySensor_position_changed.dot
+  auto_ptr< SFVec3f >  position_changed;
 
 
-	/// Sets enterTime if the set_boolean value is set to
-    /// TRUE. Else sets exitTime
-    /// 
-    /// <b>Access type:</b> inputOnly \n
-    /// 
-    /// \dotfile ProximitySensor_setTime.dot
+	/// Sets enterTime if the set_boolean value is set 
+  /// to TRUE else sets exitTime.
+  /// 
+  /// <b>Access type:</b> inputOnly \n
+  /// 
+  /// \dotfile ProximitySensor_setTime.dot
 	auto_ptr< SetTime > set_time;
 
 	int prev_travinfoadr;

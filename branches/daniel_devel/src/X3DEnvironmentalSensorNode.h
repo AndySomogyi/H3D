@@ -58,6 +58,7 @@ namespace H3D {
 
     // Fields
     /// Center gives the space location of the box
+    ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> SFVec3f = 0,0,0 \n
     /// 
@@ -65,6 +66,7 @@ namespace H3D {
     auto_ptr< SFVec3f >  center;
 
     /// Size gives the size of the box (width=x, height=y, depth=z) 
+    ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> SFVec3f = 0,0,0 \n
     /// 
@@ -72,6 +74,7 @@ namespace H3D {
     auto_ptr< SFVec3f >  size;
 
     /// enterTime
+    ///
     /// <b>Access type:</b> OutputOnly \n
     /// <b>Default value:</b> SFTime \n
     /// 
@@ -79,6 +82,7 @@ namespace H3D {
 	  auto_ptr< SFTime >  enterTime;
     
     /// exitTime
+    ///
     /// <b>Access type:</b> OutputOnly \n
     /// <b>Default value:</b> SFTime \n
     /// 
