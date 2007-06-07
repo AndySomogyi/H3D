@@ -38,6 +38,7 @@
 #include <H3DOptionNode.h>
 #include <MFNode.h>
 #include <X3DTextureCoordinateNode.h>
+#include <OpenHapticsOptions.h>
 
 // HAPI includes
 #include <HAPIGLShape.h>
@@ -318,6 +319,11 @@ namespace H3D {
     inline void renderTexCoordForActiveTexture( const Vec3f &tc ) {
       X3DTextureCoordinateNode::renderTexCoordForActiveTexture( tc );
     }
+
+    void createAndAddHapticShapes( TraverseInfo &ti,
+                                   H3DHapticsDevice *hd,
+                                   H3DInt32 hd_index,
+                                   OpenHapticsOptions *openhaptics_options );
 
     /// identifiers for the shapes geometry.
     vector< int > haptic_shape_ids;
