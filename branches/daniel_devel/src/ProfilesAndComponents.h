@@ -39,49 +39,72 @@ namespace H3D {
   
   /// ProfilesAndComponents is a Singleton class used for taking care of
   /// profile and component conformance in H3DAPI
+  /// At the moment no checking is done when creating nodes that this node
+  /// exists in the given profile. This file currently only checks whether some
+  /// definitions for profile, version and components is correct.
+  /// Used by x3d-parser (X3DSAX2Handlers.cpp). Vrml is not yet supported.
   class H3DAPI_API ProfilesAndComponents {
   public:
 
     /// destroy the instance when not needed anymore
     static void destroy();
 
-    //static const ProfilesAndComponents * getInstance();
-
+    /// Called from the (x3d-)parser when a profile name is found.
+    /// Create instance of itself if not already created then
+    /// call setProfileInternal. Store error messages in err_msg
+    /// if something goes wrong.
     static bool setProfile( std::string profile, std::string &err_msg,
                             std::string _version );
+
+    /// Called from the (x3d-)parser when a component name is found.
+    /// Create instance of itself if not already created then
+    /// call addComponentInternal. Store error messages in err_msg
+    /// if something goes wrong.
     static bool addComponent( std::string component,
                               int level, std::string &err_msg );
 
+    /// returns a string containing the currently selected profile.
+    /// used for debug purposes.
     static std::string getProfile();
 
+    /// Called by (x3d-)parser when the first file with a profile
+    /// and component definition is set.
     static void setMainProfileDone( bool _main_profile_set );
 
-    // set to false before starting an application ( or loading a file )
-    // to not do any profile and component checking.
+    /// Set to false before starting an application ( or loading a file )
+    /// to not do any profile and component checking.
     static bool check_profiles_components;
 
   private:
+    /// If the profile name and version is valid
+    /// store it as the profile to use. If main_profile_set is true
+    /// the given profile string and version is compared
+    /// to already set profile and component and checks if something is not
+    /// correct. Store error messages in err_msg if something goes wrong.
     bool setProfileInternal( std::string profile, std::string &err_msg,
                              std::string _version );
+
+    /// If the component exists add it to components_used vector unless
+    /// it violates some rules from the x3d-spec. Store error messages in
+    /// err_msg if something goes wrong.
     bool addComponentInternal( std::string component,
                                int level, std::string &err_msg );
 
+    /// Find a component named name in the given component_vector.
     bool findComponent( ProfileSAX2Handlers::myX3DComponentVector &component_vector,
                     string name, int &place );
 
-    /// Temporary solution to know which profiles H3DAPI supports.
+    // Temporary solution to know which profiles H3DAPI supports.
     std::vector< std::string > profiles_supported;
-    //std::string used_profile;
     ProfileSAX2Handlers::myX3DProfile used_profile;
     std::string version;
     bool main_profile_set;
     map< std::string, std::map< std::string, int > > components_supported;
-    //std::map< std::string, int > components_used;
     ProfileSAX2Handlers::myX3DComponentVector components_used;
 
     static ProfilesAndComponents * instance;
 
-    /// Private declarations of constructors for singleton class.
+    // Private declarations of constructor for singleton class.
     ProfilesAndComponents();
     ProfilesAndComponents(const ProfilesAndComponents&) {}
     ProfilesAndComponents& operator =

@@ -46,10 +46,7 @@ namespace ProfilesAndComponentsInternal {
     bool                         doNamespaces = true;
     bool                         doSchema = false;
     bool                         schemaFullChecking = false;
-    //bool                         doList = false;
-    //bool                         errorOccurred = false;
     bool                         namespacePrefixes = false;
-    //bool                         recognizeNEL = false;
     char                         localeStr[64];
     memset(localeStr, 0, sizeof localeStr);
     SAX2XMLReader* parser = XMLReaderFactory::createXMLReader();
@@ -75,9 +72,12 @@ namespace ProfilesAndComponentsInternal {
 }
 
 ProfilesAndComponents::ProfilesAndComponents(): main_profile_set( false ) {
+  // Hard coded which profiles and components that are supported
+  // by H3DAPI.
   profiles_supported.push_back("Core");
   profiles_supported.push_back("Interchange");
-  // TODO: verify that immersive is supported since it is not yet supported when coding this.
+  // TODO: verify that immersive is supported since it is not yet
+  // supported when coding this.
   profiles_supported.push_back("Immersive");
   profiles_supported.push_back("Interactive");
 
@@ -211,8 +211,11 @@ bool ProfilesAndComponents::setProfileInternal( string profile,
               "the profile file will not be found for profile" + profile +"\n";
     return false;
   }
-  auto_ptr< SAX2XMLReader > parser( ProfilesAndComponentsInternal::getNewXMLParser() );
+  auto_ptr< SAX2XMLReader >
+    parser( ProfilesAndComponentsInternal::getNewXMLParser() );
 
+  // Try to find the profile file definition in list of 
+  // supported profiles.
   if( find( profiles_supported.begin(),
     profiles_supported.end(),
     profile ) != profiles_supported.end() ) {
@@ -221,44 +224,54 @@ bool ProfilesAndComponents::setProfileInternal( string profile,
       parser->setErrorHandler(&handler);
       char *r = getenv( "H3D_ROOT" );
       string h3d_root = r ? r : "";
-      string profile_path = h3d_root + "/Conformance/" + _version +"/Profiles/" + profile + ".xml";
+      string profile_path = h3d_root + "/Conformance/" + 
+        _version +"/Profiles/" + profile + ".xml";
       ifstream profile_file( profile_path.c_str() );
       profile_file.close();
       if( !profile_file.fail() ) {
         parser->parse( profile_path.c_str() );
-        //cerr << profile_path << endl;
         ProfileSAX2Handlers::myX3DProfileVector parsed_profile =
           handler.getProfileVector();
-        //used_profile = profile;
-        ProfileSAX2Handlers::myX3DProfile temp_profile = parsed_profile.front();
+        ProfileSAX2Handlers::myX3DProfile temp_profile
+          = parsed_profile.front();
+
+        // Treating a found profile in two ways. If there is no
+        // profile and component definition set for the scene
+        // set this one if it is a good one. Otherwise compare to
+        // the one already set.
         if( !main_profile_set ) {
           used_profile = temp_profile;
-          for( map< string, int >::iterator i = used_profile.component_names.begin();
+          for( map< string, int >::iterator i =
+            used_profile.component_names.begin();
             i != used_profile.component_names.end();
             i++ ) {
-              string component_path = h3d_root + "/Conformance/" + _version +"/Components/" + (*i).first + ".xml";
+              string component_path = h3d_root + "/Conformance/" +
+                _version +"/Components/" + (*i).first + ".xml";
               ifstream component_file( component_path.c_str() );
               component_file.close();
               if( !component_file.fail() ) {
-                //cerr << component_path << endl;
                 parser->parse( component_path.c_str() );
               }
               else {
-                err_msg = "File with component definition could not be found. " +
+                err_msg =
+                  "File with component definition could not be found. " +
                   string( "Path used is:\n" ) + component_path + "\n";
                 return false;
               }
           }
           components_used = handler.getComponentVector();
           for( int i = 0; i < (int)components_used.size(); i++ ) {
-            components_used[i].conformance_level = components_supported[_version][ components_used[i].name ];
-            components_used[i].used_level = used_profile.component_names[ components_used[i].name ];
+            components_used[i].conformance_level =
+              components_supported[_version][ components_used[i].name ];
+            components_used[i].used_level =
+              used_profile.component_names[ components_used[i].name ];
           }
           version = _version;
           return true;
         }
         else {
-          for( map< string, int >::iterator i = temp_profile.component_names.begin();
+          for( map< string, int >::iterator i =
+               temp_profile.component_names.begin();
                i != temp_profile.component_names.end();
                i++ ) {
             int place;
@@ -309,27 +322,31 @@ bool ProfilesAndComponents::addComponent( std::string component, int level,
 bool ProfilesAndComponents::addComponentInternal( std::string component,
                                                   int level,
                                                   string &err_msg ) {
+  // If a profile definition is already set, compare components to those
+  // already defined. If no profile definition is set, add this component
+  // to used component list
   if( !main_profile_set ) {
-    if( components_supported[version].find( component ) != components_supported[version].end() ) {
+    if( components_supported[version].find( component ) !=
+        components_supported[version].end() ) {
       if( level <= components_supported[version][ component ] ) {
-        //cerr << component << " " << level << endl;
         int place = -1;
         if( findComponent( components_used, component, place ) ) {
           if( components_used[ place ].used_level < level )
             components_used[ place ].used_level = level;
         }
         else {
-          auto_ptr< SAX2XMLReader > parser( ProfilesAndComponentsInternal::getNewXMLParser() );
+          auto_ptr< SAX2XMLReader >
+            parser( ProfilesAndComponentsInternal::getNewXMLParser() );
           ProfileSAX2Handlers handler;
           parser->setContentHandler(&handler);
           parser->setErrorHandler(&handler);
           char *r = getenv( "H3D_ROOT" );
           string h3d_root = r ? r : "";
-          string component_path = h3d_root + "/Conformance/" + version +"/Components/" + component + ".xml";
+          string component_path = h3d_root + "/Conformance/" +
+            version +"/Components/" + component + ".xml";
           ifstream component_file( component_path.c_str() );
           component_file.close();
           if( !component_file.fail() ) {
-            //cerr << component_path << endl;
             parser->parse( component_path.c_str() );
           }
           else {
@@ -338,8 +355,10 @@ bool ProfilesAndComponents::addComponentInternal( std::string component,
             return false;
           }
 
-          ProfileSAX2Handlers::myX3DComponent temp_comp = handler.getComponentVector().front();
-          temp_comp.conformance_level = components_supported[version][component];
+          ProfileSAX2Handlers::myX3DComponent temp_comp =
+            handler.getComponentVector().front();
+          temp_comp.conformance_level =
+            components_supported[version][component];
           temp_comp.used_level = level;
           components_used.push_back( temp_comp );
         }
@@ -391,9 +410,11 @@ void ProfilesAndComponents::setMainProfileDone( bool _main_profile_set ) {
   }
 }
 
-bool ProfilesAndComponents::findComponent( ProfileSAX2Handlers::myX3DComponentVector &component_vector,
-                    string name, int &place ) {
-    for( int i = 0; i < (int)component_vector.size(); i++ ) {
+bool ProfilesAndComponents::findComponent(
+    ProfileSAX2Handlers::myX3DComponentVector &component_vector,
+    string name,
+    int &place ) {
+  for( int i = 0; i < (int)component_vector.size(); i++ ) {
     if( component_vector[i].name == name ) {
       place = i;
       return true;
