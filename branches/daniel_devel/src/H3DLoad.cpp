@@ -143,13 +143,11 @@ class ChangeNavType : public AutoUpdate< SFString > {
       // Set navigation type to NONE
       if(mynav){
         mynav->setNavType("NONE");
-        cerr << "finns en mynav" << endl;
       }
       else{
         glwindow->default_nav = "NONE"; 
         cerr << "finns ingen mynav" << endl;
       }
-    cerr << " Set navigation type to NONE " <<endl;
     }
   }
 };
@@ -236,6 +234,21 @@ int main(int argc, char* argv[]) {
   help_message += "\n";
   help_message += " -h --help              This help message\n";
   help_message += "\n";
+  help_message += " When the scene is running the following keyBindings can ";
+  help_message += " be used to navigate. \n";
+  help_message += " To set active viewpoint: \n";
+  help_message += " home                   Navigates to the initial viewpoint\n";
+  help_message += " end                    Navigates to the final viewpoint\n";
+  help_message += " pgup                   Navigates to the previous viewpoint\n";
+  help_message += " pgdn                   Navigates to the next viewpoint. \n";
+  help_message += "To set navitationType: \n";
+  help_message += " w                      Set navigationType to WALK\n";
+  help_message += " f                      Set navigationType to FLY\n";
+  help_message += " l                      Set navigationType to LOOTAT\n";
+  help_message += " e                      Set navigationType to EXAMINE\n";
+  help_message += " n                      Set navigationType to NONE\n";
+  help_message += "\n";
+  
 
   // H3D root, XML file and setup file
 
