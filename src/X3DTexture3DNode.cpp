@@ -117,17 +117,11 @@ void X3DTexture3DNode::glTexImage( Image *i, GLenum texture_target,
   unsigned int height = i->height();
   unsigned int depth = i->depth();
 
+  auto_ptr< PixelImage > pi;
+
   // flag to determine if the image_data pointer should be deallocated
   // at the end of the function or not.
   bool free_image_data = false;
-
-    // if width < 4 we have to pad the data in order for it to be 4 byte 
-  // aligned as required by the glTexImage3D function.
-  if( width < 4 ) {
-    image_data = padTo4ByteAlignment( image_data, width, height, depth, 
-                                      i->bitsPerPixel() );
-    free_image_data = true;
-  }
 
   if( scale_to_power_of_two && !GLEW_ARB_texture_non_power_of_two ) {
     bool needs_scaling = false;
@@ -150,36 +144,20 @@ void X3DTexture3DNode::glTexImage( Image *i, GLenum texture_target,
     } 
 
     if( needs_scaling ) {
-      Console( 3 ) << "Warning: Scaling not supported yet for 3D-textures " 
-                   << endl;
-      /*
-      unsigned int bytes_per_pixel = i->bitsPerPixel();
-      bytes_per_pixel = 
-        bytes_per_pixel % 8 ? 
-        bytes_per_pixel / 8 : bytes_per_pixel - 8 + 1;
-      
-      void *new_data = malloc( new_width*new_height*bytes_per_pixel );
-      gluScaleImage3D( glPixelFormat( i ), 
-                     width,
-                     height,
-                     glPixelComponentType( i ),
-                     image_data,
-                     new_width,
-                     new_height,
-                     glPixelComponentType( i ),
-                     new_data );
+      pi.reset( new PixelImage( i, new_width, new_height, new_depth ) );
       width = new_width;
       height = new_height;
       depth = new_depth;
-
-      if( free_image_data ) {
-        free( image_data );
-      } else {
-        free_image_data = true;
-      }
-      image_data = new_data;
-      */
+      image_data = pi->getImageData();
     }
+  }
+
+  // if width < 4 we have to pad the data in order for it to be 4 byte 
+  // aligned as required by the glTexImage3D function.
+  if( width < 4 ) {
+    image_data = padTo4ByteAlignment( image_data, width, height, depth, 
+                                      i->bitsPerPixel() );
+    free_image_data = true;
   }
 
   TextureProperties *texture_properties = textureProperties->getValue();
