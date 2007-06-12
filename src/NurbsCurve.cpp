@@ -125,7 +125,7 @@ void NurbsCurve::render( ) {
   vector< H3DFloat > knots;
   if(knots_double.size() == no_of_knots){
     for ( int i = 0; i<no_of_knots; i++){
-      knots_float[i]= knots_double[i];
+      knots_float[i]= (GLfloat)knots_double[i];
     }
     generate_uniform = false;
     H3DInt32 consecutiveKnots = 0;
@@ -166,7 +166,7 @@ void NurbsCurve::render( ) {
     const vector< H3DDouble > &w = weight->getValue();
     if(!valid_weight) valid_weight = true;
     for ( int j = 0; j<w.size(); j++){
-      weight_float[j]= w[j];
+      weight_float[j]= (GLfloat)w[j];
     }
   } 
   else{

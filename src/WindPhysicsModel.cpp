@@ -159,7 +159,7 @@ void WindPhysicsModel::updateParticleValues(
 
   // from X3D spec.
   H3DFloat pressure = 
-    H3DPow( (H3DFloat) 10, 2 * H3DLog( wind_speed ) ) * 0.64615;
+    H3DPow( (H3DFloat) 10.0f, 2.0f * H3DLog( wind_speed ) ) * 0.64615f;
   
   H3DFloat force = particle.surface_area * pressure;
   H3DFloat acceleration = force / particle.mass;
