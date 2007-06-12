@@ -38,9 +38,9 @@ void Image::getSample( void *value,
                        H3DFloat y, 
                        H3DFloat z ) {
 
-  H3DFloat px = x * width() - 0.5;
-  H3DFloat py = y * height()- 0.5;
-  H3DFloat pz = z * depth() - 0.5;
+  H3DFloat px = x * width() - 0.5f;
+  H3DFloat py = y * height()- 0.5f;
+  H3DFloat pz = z * depth() - 0.5f;
 
   if( px < 0 ) px = 0;
   if( py < 0 ) py = 0;
@@ -103,7 +103,7 @@ namespace ImageInternals {
     memcpy( &v,
             i,
             bytes_to_read );
-    return v / (H3DFloat) (H3DPow( 2, bytes_to_read * 8 ) - 1);
+    return v / (H3DFloat) (H3DPow( 2.0, (int)bytes_to_read * 8 ) - 1);
 	}
 
 	inline H3DFloat getRationalValueAsFloat( void *i, 
@@ -121,7 +121,7 @@ namespace ImageInternals {
 	inline void writeFloatAsSignedValue( H3DFloat r,
                                        void *i, 
                                        unsigned int bytes_to_write ) {
-	  long v = (long)(r * (H3DPow( 2, bytes_to_write * 8 - 1 ) - 1));
+	  long v = (long)(r * (H3DPow( 2.0, (int)bytes_to_write * 8 - 1 ) - 1));
     memcpy( i,
             (&v) + sizeof( long ) - bytes_to_write,
             bytes_to_write );
@@ -130,7 +130,7 @@ namespace ImageInternals {
 	inline void writeFloatAsUnsignedValue( H3DFloat r,
                                        void *i, 
                                        unsigned int bytes_to_write ) {
-	  unsigned long v = (unsigned long) (r * (H3DPow( 2, bytes_to_write * 8 ) - 1) );
+	  unsigned long v = (unsigned long) (r * (H3DPow( 2.0, (int)bytes_to_write * 8 ) - 1) );
     memcpy( i,
             &v,
             bytes_to_write );
