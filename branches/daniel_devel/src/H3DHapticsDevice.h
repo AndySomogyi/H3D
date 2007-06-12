@@ -218,7 +218,7 @@ namespace H3D {
       virtual void onRemove( Node *n ) {
         H3DHapticsRendererNode *renderer = static_cast< H3DHapticsRendererNode * >( n );
         H3DHapticsDevice *device = static_cast< H3DHapticsDevice * >( getOwner() );
-        if( renderer ) {
+        if( renderer && device->hapi_device.get() ) {
           for( unsigned int i = 0; i < device->hapi_device->nrLayers(); i++ )
             device->hapi_device->setHapticsRenderer( NULL, i );
         }
@@ -585,8 +585,6 @@ namespace H3D {
     // be used as default reference if the haptic device should follow
     // viewpoint movement.
     Matrix4f default_vp_orn_mtx;
-
-    unsigned int nr_haptics_loops;
 
     // The time of the last call to updateDeviceValues.
     TimeStamp last_update_values;

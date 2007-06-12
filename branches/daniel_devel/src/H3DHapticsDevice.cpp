@@ -230,11 +230,12 @@ void H3DHapticsDevice::updateDeviceValues() {
   TimeStamp now = TimeStamp();
   TimeStamp dt = now - last_update_values;
   last_update_values = now;
-  H3DInt32 hr = (H3DInt32)( nr_haptics_loops / dt );
-  nr_haptics_loops = 0;
-  hapticsRate->setValue( hr, id );
+
   if( hapi_device.get() ) {
-    HAPI::HAPIHapticsDevice::DeviceValues dv = hapi_device->getRawDeviceValues();
+    H3DInt32 hr = hapi_device->getHapticsRate();
+    hapticsRate->setValue( hr, id );
+    HAPI::HAPIHapticsDevice::DeviceValues dv = 
+      hapi_device->getRawDeviceValues();
     // convert to metres
     devicePosition->setValue( (Vec3f)dv.position * 1e-3, id);
     deviceOrientation->setValue( dv.orientation, id);
