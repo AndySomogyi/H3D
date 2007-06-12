@@ -1,0 +1,6 @@
+<DeviceInfo>
+  <QuanserDevice positionCalibration="1 0 0 0 0 1 0 0 0 0
+  1 0 0 0 0 1" >
+	<RuspiniRenderer/>
+  </QuanserDevice>
+</DeviceInfo>
