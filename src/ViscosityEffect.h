@@ -85,6 +85,7 @@ namespace H3D {
     /// <b>Default value:</b> 0 \n
     auto_ptr< SFInt32 > deviceIndex;
 
+    ///  dampingFactor
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 0.5 \n

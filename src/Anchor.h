@@ -64,21 +64,21 @@ namespace H3D {
   /// of a "target" for a link to display a link in another part of an HTML
   /// document. The parameter field is then:
   ///
-  /// Anchor {
-  ///  parameter [ "target=name_of_frame" ];
-  ///  ...
-  /// }
+  /// Anchor { \n
+  ///  parameter [ "target=name_of_frame" ]; \n
+  ///  ... \n
+  /// }\n
   ///
   /// An Anchor node may be used to bind the initial Viewpoint node in a world
   /// by specifying a URL ending with "#ViewpointName" where "ViewpointName" is
   /// the DEF name of a viewpoint defined in the X3D file.
   ///
-  /// EXAMPLE
+  /// EXAMPLE \n
   ///
-  /// Anchor {
-  ///   url "http://www.school.edu/X3D/someScene.wrl#OverView";
-  ///     children  Shape { geometry Box {} };
-  /// }
+  /// Anchor { \n
+  ///   url "http://www.school.edu/X3D/someScene.wrl#OverView";\n
+  ///     children  Shape { geometry Box {} };\n
+  /// }\n
   ///
   /// specifies an anchor that loads the X3D file "someScene.wrl" and binds the
   /// initial user view to the Viewpoint node named "OverView" when the Anchor
@@ -95,16 +95,13 @@ namespace H3D {
   /// name scope or is part of more than one run-time name scope.
   /// ( RUN-TIME scope not implemented, if the name exist the first created
   /// X3DViewpoint with the correct name will be used )
-  /// See 4.4.7 Run-time name scope for a description of run-time name scopes
-  /// (this might not work perfectly in H3DAPI yet).
-  /// See 23.3.5 Viewpoint, for the Viewpoint transition rules that specify how
-  /// browsers shall interpret the transition from the old Viewpoint node to
-  /// the new one. For example:
+  ///  
+  /// For example:
   ///
-  /// Anchor {
-  ///   url "#Doorway";
-  ///   children Shape { geometry Sphere {} };
-  /// }
+  /// Anchor { \n
+  ///   url "#Doorway"; \n
+  ///   children Shape { geometry Sphere {} }; \n
+  /// } \n
   ///
   /// binds the viewer to the viewpoint defined by the "Doorway" viewpoint in
   /// the current world when the sphere is activated. In this case, if the
