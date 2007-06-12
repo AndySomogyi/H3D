@@ -307,9 +307,6 @@ void X3DGeometryNode::SFBoundTree::update() {
   if( options ) {
     const string &type = options->boundType->getValue();
     H3DInt32 max_triangles = options->maxTrianglesInLeaf->getValue();
-    if( lines.size() > 0 ) {
-      cerr << "NOO!" <<endl;
-    }
     if( type == "AABB" ) {
       value = new HAPI::Bounds::AABBTree( triangles,
                                           lines,
@@ -456,9 +453,9 @@ void X3DGeometryNode::createAndAddHapticShapes(
   Matrix4f to_local = ti.getAccInverseMatrix();
   if( use_bound_tree )
     to_local = Matrix4f( 1e3, 0, 0, 0,
-    0, 1e3, 0, 0,
-    0, 0, 1e3, 0,
-    0, 0, 0, 1 ) * to_local;
+                         0, 1e3, 0, 0,
+                         0, 0, 1e3, 0,
+                         0, 0, 0, 1 ) * to_local;
   Vec3f local_proxy =  to_local * hd->proxyPosition->getValue();
   Vec3f local_last_proxy = to_local * hd->getPreviousProxyPosition();
   Vec3f movement = local_proxy - local_last_proxy;
@@ -478,14 +475,14 @@ void X3DGeometryNode::createAndAddHapticShapes(
   } else {
     if( radius < 0 ) {
       HAPI::FeedbackBufferCollector::collectPrimitives( 
-        this, 
-        Matrix4f( 1e3f, 0, 0, 0,
-        0, 1e3f, 0, 0,
-        0, 0, 1e3f, 0,
-        0, 0, 0, 1 ),
-        tris, 
-        lines, 
-        points );
+                                  this, 
+                                  Matrix4f( 1e3f, 0, 0, 0,
+                                            0, 1e3f, 0, 0,
+                                            0, 0, 1e3f, 0,
+                                            0, 0, 0, 1 ),
+                                  tris, 
+                                  lines, 
+                                  points );
     } else {
       int nr_values = nrFeedbackBufferValues();
       if( nr_values < 0 ) nr_values = 200000;
@@ -499,17 +496,17 @@ void X3DGeometryNode::createAndAddHapticShapes(
       glScalef( 1e3f, 1e3f, 1e3f );
       while( !done ) {
         HAPI::FeedbackBufferCollector::startCollecting( nr_values, 
-          center * 1e3f, 
-          (full_movement + 
-          Vec3f( d, d, d ) *  H3DMax( scale.x, 
-          H3DMax( scale.y, 
-          scale.z ) ) 
-          * 1e3f  ) );
+                                center * 1e3f, 
+                                (full_movement + 
+                                Vec3f( d, d, d ) *  H3DMax( scale.x,
+                                H3DMax( scale.y, 
+                                scale.z ) ) 
+                                * 1e3f  ) );
         glRender();
         HAPI::FeedbackBufferCollector::ErrorType e = 
           HAPI::FeedbackBufferCollector::endCollecting( tris,
-          lines,
-          points );
+                                                        lines,
+                                                        points );
         if( e != HAPI::FeedbackBufferCollector::
           NOT_ENOUGH_MEMORY_ALLOCATED  )
           done = true;
@@ -530,16 +527,16 @@ void X3DGeometryNode::createAndAddHapticShapes(
       this,
       ti.getCurrentSurface()->getSurface(),
       Matrix4f( 1e3, 0, 0, 0,
-      0, 1e3, 0, 0,
-      0, 0, 1e3, 0,
-      0, 0, 0, 1 ) *
+                0, 1e3, 0, 0,
+                0, 0, 1e3, 0,
+                0, 0, 0, 1 ) *
       (ti.getAccForwardMatrix() *
       Matrix4f( 1e-3, 0, 0, 0,
-      0, 1e-3, 0, 0,
-      0, 0, 1e-3, 0,
-      0, 0, 0, 1 )),
+                0, 1e-3, 0, 0,
+                0, 0, 1e-3, 0,
+                0, 0, 0, 1 )),
       -1,
-      touchable_face);
+      touchable_face );
 
 
 #ifdef HAVE_OPENHAPTICS
@@ -584,16 +581,16 @@ void X3DGeometryNode::createAndAddHapticShapes(
       this,
       ti.getCurrentSurface()->getSurface(),
       Matrix4f( 1e3, 0, 0, 0,
-      0, 1e3, 0, 0,
-      0, 0, 1e3, 0,
-      0, 0, 0, 1 ) *
+                0, 1e3, 0, 0,
+                0, 0, 1e3, 0,
+                0, 0, 0, 1 ) *
       (ti.getAccForwardMatrix() *
       Matrix4f( 1e-3, 0, 0, 0,
-      0, 1e-3, 0, 0,
-      0, 0, 1e-3, 0,
-      0, 0, 0, 1 )),
+                0, 1e-3, 0, 0,
+                0, 0, 1e-3, 0,
+                0, 0, 0, 1 )),
       -1,
-      touchable_face);
+      touchable_face );
 
 
 #ifdef HAVE_OPENHAPTICS
@@ -638,14 +635,14 @@ void X3DGeometryNode::createAndAddHapticShapes(
       this,
       ti.getCurrentSurface()->getSurface(),
       Matrix4f( 1e3, 0, 0, 0,
-      0, 1e3, 0, 0,
-      0, 0, 1e3, 0,
-      0, 0, 0, 1 ) *
+                0, 1e3, 0, 0,
+                0, 0, 1e3, 0,
+                0, 0, 0, 1 ) *
       (ti.getAccForwardMatrix() *
       Matrix4f( 1e-3, 0, 0, 0,
-      0, 1e-3, 0, 0,
-      0, 0, 1e-3, 0,
-      0, 0, 0, 1 )),
+                0, 1e-3, 0, 0,
+                0, 0, 1e-3, 0,
+                0, 0, 0, 1 )),
       -1,
       touchable_face);
 

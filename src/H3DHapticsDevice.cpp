@@ -418,6 +418,7 @@ void H3DHapticsDevice::updateDeviceValues() {
         X3DGeometryNode *geom = 
           static_cast< X3DGeometryNode * >((*j).first->userdata );
         geom->isTouched->setValue( device_index, false, geom->id );
+        geom->force->setValue( device_index, Vec3f(), geom->id );
       }
     }
     last_contacts.swap( all_contacts );
