@@ -66,13 +66,13 @@ namespace H3D {
   class H3DAPI_API Box : public X3DGeometryNode {
   public:
 
-    /// SFBound is specialized update itself from the radius field 
+    /// SFBound is specialized update itself from the size field 
     /// of the Box node.
     ///
     /// routes_in[0] is the size field of the Box node.  
     ///
     class SFBound: public X3DGeometryNode::SFBound {
-      /// Update the bound from the radius field. 
+      /// Update the bound from the size field. 
       virtual void update() {
         Vec3f b = static_cast< SFVec3f * >( routes_in[0] )->getValue();
         BoxBound *bb = new BoxBound;
