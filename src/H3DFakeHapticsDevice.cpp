@@ -95,7 +95,8 @@ H3DFakeHapticsDevice::H3DFakeHapticsDevice(
   outputDOF->setValue( 0, id );
 }
 
-void H3DFakeHapticsDevice::FakeHapticsDevice::updateDeviceValues( DeviceValues &dv, HAPI::HAPITime dt ) {
+void H3DFakeHapticsDevice::FakeHapticsDevice::updateDeviceValues( 
+                DeviceValues &dv, HAPI::HAPITime dt ) {
   dv.position = owner->set_devicePosition->getValue();
   dv.orientation = owner->set_deviceOrientation->getValue();
   dv.button_status = owner->set_mainButton->getValue();

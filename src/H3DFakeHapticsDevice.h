@@ -47,7 +47,7 @@ namespace H3D {
   /// \dotfile H3DFakeHapticsDevice.dot
   class H3DAPI_API H3DFakeHapticsDevice: public H3DHapticsDevice {
   public:
-    class HAPI_API FakeHapticsDevice: public HAPI::HAPIHapticsDevice {
+    class H3DAPI_API FakeHapticsDevice: public HAPI::HAPIHapticsDevice {
     public:
       /// Implementation of updateDeviceValues using the set_... fields
       /// to specify values.
@@ -93,6 +93,12 @@ namespace H3D {
 			  Inst< ThreadSafeSField< SFVec3f > > _set_devicePosition     = 0,
 			  Inst< ThreadSafeSField< SFRotation > > _set_deviceOrientation  = 0,
 			  Inst< ThreadSafeSField< SFBool > > _set_mainButton         = 0 );
+
+    /// Destructor.
+    ~H3DFakeHapticsDevice() {
+      releaseDevice();
+      hapi_device.reset( NULL );
+    }
 
     /// Node database entry
     static H3DNodeDatabase database;
