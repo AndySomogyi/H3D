@@ -152,8 +152,8 @@ namespace H3D {
     /// and orientation_calibration fields. 
     /// TrackerOrientation = orientationCalibration * deviceOrientation 
     ///
-    /// routes_in[0] is the orientationCalibration
-    /// routes_in[1] is the deviceOrientaiton
+    /// - routes_in[0] is the orientationCalibration
+    /// - routes_in[1] is the deviceOrientaiton
     ///
     class H3DAPI_API TrackerOrientation: 
       public TypedField< SFRotation, Types< SFRotation, SFRotation > > {
@@ -181,9 +181,9 @@ namespace H3D {
     /// If the weightting factor is 1 if will be the proxy position, if 0 the
     /// tracker position. 
     /// 
-    /// routes_in[0] is the proxy position
-    /// routes_in[1] is the tracker position.
-    /// routes_in[2] is the weighting factor.
+    /// - routes_in[0] is the proxy position
+    /// - routes_in[1] is the tracker position.
+    /// - routes_in[2] is the weighting factor.
     ///
     class H3DAPI_API WeightedProxy:
       public TypedField< SFVec3f, Types< SFVec3f, SFVec3f, SFFloat > > {
