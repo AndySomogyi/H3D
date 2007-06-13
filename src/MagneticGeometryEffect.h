@@ -39,7 +39,12 @@
 namespace H3D {
   /// \ingroup H3DNodes 
   /// \class MagneticGeometryEffect
-  /// MagneticGeometryEffect is a localized haptic effect
+  /// MagneticGeometryEffect is a localized haptic effect that tries to
+  /// constrain the haptic device to the surface of the given geometry.
+  /// The effect is comparable to MagneticSurface. The given geometry
+  /// is not rendered visually in the scene.
+  /// The force is calculated as follows:
+  /// force = (closest_point_to_surface - device_position) * springConstant
   class H3DAPI_API MagneticGeometryEffect: public H3DForceEffect {
   public:
 
@@ -59,17 +64,6 @@ namespace H3D {
     /// Adds a forceeffect created from viscosity and radius.
     virtual void traverseSG( TraverseInfo &ti );
 
-
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0, 0, 0 \n
-    auto_ptr< SFVec3f > from;
-
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 1, 0, 0 \n
-    auto_ptr< SFVec3f > to;
-
     /// Enables or disables the force calculations.
     ///
     /// <b>Access type:</b> inputOutput \n
@@ -83,34 +77,36 @@ namespace H3D {
     /// <b>Default value:</b> 0 \n
     auto_ptr< SFInt32 > deviceIndex;
 
-    /// When the haptics device comes within this distance of the line
-    /// the line constraint is activated.
+    /// When the haptics device comes within this distance of the geometry
+    /// the constraint is activated.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 0.01 \n
     auto_ptr< SFFloat > startDistance;
 
     /// If the effect is active, the effect will be deactivated if the 
-    /// haptics device moves outside this distance.
+    /// haptics device moves outside this distance from the surface.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 0.01 \n
     auto_ptr< SFFloat > escapeDistance;
 
-    /// If the effect is active, the effect will be deactivated if the
-    /// haptics device moves outside this distance.
+    /// Tells whether the effect is active or not.
     ///
     /// <b>Access type:</b> outputOnly \n
     /// <b>Default value:</b> FALSE \n
     auto_ptr< SFBool > active;
 
     /// The spring constant of the spring. 
-    /// force = (closest_line_point - device_position) * springConstant
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 300 \n
     auto_ptr< SFFloat > springConstant;
 
+    /// The geometry whose surface to follow.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> NULL \n
     auto_ptr< SFGeometry > geometry;
 
     /// The H3DNodeDatabase for this node.
