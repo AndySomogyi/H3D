@@ -82,6 +82,7 @@ MagneticGeometryEffect::MagneticGeometryEffect(
   escapeDistance->setValue( 0.01f );
   active->setValue( false, id );
   springConstant->setValue( 100 );
+  geometry->setValue( 0 );
 }
 
 // TODO: remove counter when Sensable fixes the bug with invalid positions
@@ -101,66 +102,68 @@ void MagneticGeometryEffect::traverseSG( TraverseInfo &ti ) {
                            hd->trackerPosition->getValue();
         X3DGeometryNode * the_geometry = geometry->getValue();
 
-        the_geometry->closestPoint( pos, closest_point, temp, temp );
-        H3DFloat distance = (closest_point.front() - pos).length();
-        bool addForceEffect = false;
-        if( active->getValue() ) {
-          if( distance >= escapeDistance->getValue() ) {
-            active->setValue( false, id );
-          } else {
-            addForceEffect = true;
+        if( the_geometry ) {
+          the_geometry->closestPoint( pos, closest_point, temp, temp );
+          H3DFloat distance = (closest_point.front() - pos).length();
+          bool addForceEffect = false;
+          if( active->getValue() ) {
+            if( distance >= escapeDistance->getValue() ) {
+              active->setValue( false, id );
+            } else {
+              addForceEffect = true;
+            }
           }
-        }
-        else {
-          if( distance <= startDistance->getValue() )
-            addForceEffect = true;
-        }
+          else {
+            if( distance <= startDistance->getValue() )
+              addForceEffect = true;
+          }
 
-        if( addForceEffect ) {
-          H3DFloat lookahead_factor = 3;
-          HapticsOptions *haptics_options = NULL;
-          the_geometry->getOptionNode( haptics_options );
+          if( addForceEffect ) {
+            H3DFloat lookahead_factor = 3;
+            HapticsOptions *haptics_options = NULL;
+            the_geometry->getOptionNode( haptics_options );
 
-          if( haptics_options )
-            lookahead_factor = haptics_options->lookAheadFactor->getValue();
+            if( haptics_options )
+              lookahead_factor = haptics_options->lookAheadFactor->getValue();
 
-          vector< HAPI::Bounds::Triangle > tris;
-          tris.reserve( 200 );
-          Matrix4f to_local = ti.getAccInverseMatrix();
-          Vec3f scale = to_local.getScalePart();
-          to_local = Matrix4f( 1e3, 0, 0, 0,
-                               0, 1e3, 0, 0,
-                               0, 0, 1e3, 0,
-                               0, 0, 0, 1 ) * to_local;
-          Vec3f local_proxy =  to_local * hd->proxyPosition->getValue();
-          Vec3f local_last_proxy = to_local * hd->getPreviousProxyPosition();
-          Vec3f movement = local_proxy - local_last_proxy;
-          H3DFloat addDistance = 0.01f;
-          H3DFloat move_length = movement.length();
-          if( move_length > addDistance )
-            addDistance = move_length;
-          the_geometry->boundTree->getValue()
-            ->getTrianglesIntersectedByMovingSphere( 
-              ( distance + addDistance ) * 1e3 *
-              H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
-              local_proxy,
-              local_proxy + movement * lookahead_factor,
-              tris );
-          HapticTriangleSet *haptic_triangle_set =
-            new HapticTriangleSet( tris, 0, 0, Matrix4() );
-          ti.addForceEffect( device_index,
-            new HapticShapeConstraint( Matrix4f( 1e3, 0, 0, 0,
-                                                 0, 1e3, 0, 0,
-                                                 0, 0, 1e3, 0,
-                                                 0, 0, 0, 1 ) *
-                                      (ti.getAccForwardMatrix() *
-                                       Matrix4f( 1e-3, 0, 0, 0,
-                                                 0, 1e-3, 0, 0,
-                                                 0, 0, 1e-3, 0,
-                                                 0, 0, 0, 1 ) ),
-                                       false,
-                                       haptic_triangle_set,
-                                       springConstant->getValue() / 1000 ) );
+            vector< HAPI::Bounds::Triangle > tris;
+            tris.reserve( 200 );
+            Matrix4f to_local = ti.getAccInverseMatrix();
+            Vec3f scale = to_local.getScalePart();
+            to_local = Matrix4f( 1e3, 0, 0, 0,
+                                 0, 1e3, 0, 0,
+                                 0, 0, 1e3, 0,
+                                 0, 0, 0, 1 ) * to_local;
+            Vec3f local_proxy =  to_local * hd->proxyPosition->getValue();
+            Vec3f local_last_proxy = to_local * hd->getPreviousProxyPosition();
+            Vec3f movement = local_proxy - local_last_proxy;
+            H3DFloat addDistance = 0.01f;
+            H3DFloat move_length = movement.length();
+            if( move_length > addDistance )
+              addDistance = move_length;
+            the_geometry->boundTree->getValue()
+              ->getTrianglesIntersectedByMovingSphere( 
+                ( distance + addDistance ) * 1e3 *
+                H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
+                local_proxy,
+                local_proxy + movement * lookahead_factor,
+                tris );
+            HapticTriangleSet *haptic_triangle_set =
+              new HapticTriangleSet( tris, 0, 0, Matrix4() );
+            ti.addForceEffect( device_index,
+              new HapticShapeConstraint( Matrix4f( 1e3f, 0.0f, 0.0f, 0.0f,
+                                                   0.0f, 1e3f, 0.0f, 0.0f,
+                                                   0.0f, 0.0f, 1e3f, 0.0f,
+                                                   0.0f, 0.0f, 0.0f, 1.0f ) *
+                                        (ti.getAccForwardMatrix() *
+                                         Matrix4f( 1e-3f, 0.0f, 0.0f, 0.0f,
+                                                   0.0f, 1e-3f, 0.0f, 0.0f,
+                                                   0.0f, 0.0f, 1e-3f, 0.0f,
+                                                   0.0f, 0.0f, 0.0f, 1.0f ) ),
+                                         false,
+                                         haptic_triangle_set,
+                                         springConstant->getValue() / 1000 ) );
+          }
         }
       }
     }
