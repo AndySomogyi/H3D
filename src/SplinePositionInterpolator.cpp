@@ -123,7 +123,6 @@ void SplinePositionInterpolator::SFValue::update() {
     //Calculate  D = distance from keyValue[0]->keyValue[N-1]
     for(int i=0; i<key_size-1; i++){ //n=keys.size()
       D = D + ((key_value[i]-key_value[i+1]).length());
-      cerr << " D = " << D << "  *****  ";
     }
 
     // Calculate T for the different conditions
@@ -137,7 +136,6 @@ void SplinePositionInterpolator::SFValue::update() {
         for(int i=0; i<key_size; i++){
           a = key_velocity[i];
           T.push_back(key_velocity[i]*(D/a.length()) );
-          cerr << " a = " << a << "  *****  " << " a.length = " << a.length() << "  *****  " << " T["<<i<<"] = " << T[i] << "  *****  ";
         }
       }
       specified = "true";

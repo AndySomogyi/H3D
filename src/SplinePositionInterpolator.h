@@ -75,8 +75,8 @@ namespace H3D {
       Inst< MFVec3f >  _keyValue      = 0,
       Inst< MFVec3f >  _keyVelocity   = 0,
       Inst< SFValue >  _value_changed = 0,
-      Inst< SFBool  >  _closed		= FALSE,
-      Inst< SFBool  >  _normalizeVelocity = FALSE);
+      Inst< SFBool  >  _closed		= 0,
+      Inst< SFBool  >  _normalizeVelocity = 0 );
 
     /// The values to interpolate between.
     /// 
