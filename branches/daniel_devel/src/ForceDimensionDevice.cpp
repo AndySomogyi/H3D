@@ -30,7 +30,7 @@
 
 #include <ForceDimensionDevice.h>
 #ifdef HAVE_DHDAPI
-#include <DHDHapticsDevice.h>
+#include <ForceDimensionHapticsDevice.h>
 #endif
 
 using namespace H3D;
@@ -96,7 +96,7 @@ ForceDimensionDevice::ForceDimensionDevice(
   database.initFields( this );
 
 #ifdef HAVE_DHDAPI
-  hapi_device.reset( new HAPI::DHDHapticsDevice );
+  hapi_device.reset( new HAPI::ForceDimensionHapticsDevice );
 #else
   Console(4) << "Cannot use ForceDimensionDevice. HAPI compiled without"
 	     << " DHDAPI support. Recompile HAPI with HAVE_DHDAPI defined"
@@ -113,8 +113,8 @@ void ForceDimensionDevice::Reset::onNewValue( const bool &v ) {
 #ifdef HAVE_DHDAPI
   ForceDimensionDevice *fd = 
     static_cast< ForceDimensionDevice * >( getOwner() );
-  HAPI::DHDHapticsDevice * dhd = 
-    static_cast< HAPI::DHDHapticsDevice * >( fd->hapi_device.get() );
+  HAPI::ForceDimensionHapticsDevice * dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
   if( v ) dhd->reset();
 #endif
 }
@@ -123,8 +123,8 @@ void ForceDimensionDevice::WaitReset::onNewValue( const bool &v ) {
 #ifdef HAVE_DHDAPI
   ForceDimensionDevice *fd = 
     static_cast< ForceDimensionDevice * >( getOwner() );
-  HAPI::DHDHapticsDevice * dhd = 
-    static_cast< HAPI::DHDHapticsDevice * >( fd->hapi_device.get() );
+  HAPI::ForceDimensionHapticsDevice * dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
   if( v ) dhd->waitForReset();
 #endif
 }
@@ -133,8 +133,8 @@ void ForceDimensionDevice::GravityComp::onValueChange( const bool &v ) {
 #ifdef HAVE_DHDAPI
   ForceDimensionDevice *fd = 
     static_cast< ForceDimensionDevice * >( getOwner() );
-  HAPI::DHDHapticsDevice * dhd = 
-    static_cast< HAPI::DHDHapticsDevice * >( fd->hapi_device.get() );
+  HAPI::ForceDimensionHapticsDevice * dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
   dhd->useGravityCompensation( v );
 #endif
 }
@@ -143,8 +143,8 @@ void ForceDimensionDevice::EffectorMass::onValueChange( const H3DFloat &v ) {
 #ifdef HAVE_DHDAPI
   ForceDimensionDevice *fd = 
     static_cast< ForceDimensionDevice * >( getOwner() );
-  HAPI::DHDHapticsDevice * dhd = 
-    static_cast< HAPI::DHDHapticsDevice * >( fd->hapi_device.get() );
+  HAPI::ForceDimensionHapticsDevice * dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
   dhd->setEffectorMass( v );
 #endif
 }
@@ -153,8 +153,8 @@ void ForceDimensionDevice::Brakes::onValueChange( const bool &v ) {
 #ifdef HAVE_DHDAPI
   ForceDimensionDevice *fd = 
     static_cast< ForceDimensionDevice * >( getOwner() );
-  HAPI::DHDHapticsDevice * dhd = 
-    static_cast< HAPI::DHDHapticsDevice * >( fd->hapi_device.get() );
+  HAPI::ForceDimensionHapticsDevice * dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
   dhd->useBrakes( v );
 #endif
 }
@@ -163,8 +163,8 @@ void ForceDimensionDevice::Brakes::onValueChange( const bool &v ) {
 H3DHapticsDevice::ErrorCode ForceDimensionDevice::initDevice() {
   HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::initDevice();
 #ifdef HAVE_DHDAPI
-  HAPI::DHDHapticsDevice *dhd = 
-    static_cast< HAPI::DHDHapticsDevice * >( hapi_device.get() );
+  HAPI::ForceDimensionHapticsDevice *dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( hapi_device.get() );
   if( dhd )
     deviceType->setValue( dhd->getDeviceType(), id ); 
 
