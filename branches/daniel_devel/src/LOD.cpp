@@ -85,7 +85,7 @@ void LOD::traverseSG( TraverseInfo &ti ){
 
   //calculates the distance (d) from the vp position to centre
   H3DFloat d = (vp_pos_LOD - center->getValue()).length();
-  H3DFloat n = range->size();
+  int n = range->size();
   int noOfChildren = children->size();
   // if there are too few children the last fields in the 
   // range will be ignored and the last range level will
