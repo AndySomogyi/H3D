@@ -53,7 +53,6 @@ namespace H3D {
     /// Constructor
     MagneticGeometryEffect(
                      Inst< SFBool  > _enabled     = 0,
-                     Inst< SFInt32 > _deviceIndex = 0,
                      Inst< SFNode  >  _metadata   = 0,
                      Inst< SFFloat > _startDistance = 0,
                      Inst< SFFloat > _escapeDistance = 0,
@@ -69,13 +68,6 @@ namespace H3D {
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> TRUE \n
     auto_ptr< SFBool > enabled;
-    
-    /// The index of the haptics device that the effect is supposed to
-    /// be rendered on.
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0 \n
-    auto_ptr< SFInt32 > deviceIndex;
 
     /// When the haptics device comes within this distance of the geometry
     /// the constraint is activated.
