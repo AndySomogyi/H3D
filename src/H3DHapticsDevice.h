@@ -135,7 +135,7 @@ namespace H3D {
       /// value = position_calibration * device_position.
       virtual void update() {
         H3DHapticsDevice *hd = static_cast< H3DHapticsDevice *>(owner);
-        Matrix4f &m = Matrix4f();
+        Matrix4f m;
         if( hd->followViewpoint->getValue() ) {
           m = hd->adjustedPositionCalibration->getValue();
         }
@@ -160,7 +160,7 @@ namespace H3D {
 
       virtual void update() {
         H3DHapticsDevice *hd = static_cast< H3DHapticsDevice *>(owner);
-        Rotation &cal = Rotation();
+        Rotation cal;
         if( hd->followViewpoint->getValue() ) {
           cal = hd->adjustedOrnCalibration->getValue();
         }
