@@ -13,7 +13,7 @@
 	<Configurations>
 		<Configuration
 			Name="Release using DLL|Win32"
-			OutputDirectory="..\..\..\lib"
+			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
@@ -44,7 +44,7 @@
 				AdditionalOptions="/MACHINE:I386"
 				OutputFile="$(OutDir)/H3DLoad.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\H3DUtil\lib;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\lib;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="1"/>
 			<Tool
@@ -73,7 +73,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug using DLL|Win32"
-			OutputDirectory="..\..\..\lib"
+			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
@@ -102,7 +102,7 @@
 				AdditionalOptions="/MACHINE:I386"
 				OutputFile="$(OutDir)/H3DLoad_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\..\H3DUtil\lib;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\HAPI\lib;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\H3DUtil\lib;&quot;C:\Program Files\Siena Robotics and Systems Lab\Haptik Library\RSLib\Lib&quot;;..\..\..\..\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/H3DLoad_d.pdb"
@@ -133,7 +133,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug using Static|Win32"
-			OutputDirectory="..\..\..\lib"
+			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
@@ -196,7 +196,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release using Static|Win32"
-			OutputDirectory="..\..\..\lib"
+			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
