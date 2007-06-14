@@ -380,10 +380,10 @@ void H3DHapticsDevice::updateDeviceValues() {
         Matrix4d global_to_local = (*i).first->transform.inverse();
         Matrix3d global_vec_to_local = global_to_local.getRotationPart();
 
-        Vec3f cp( global_to_local * (ci.globalSurfaceContactPoint() *1e-3) );
+        Vec3f cp( ( global_to_local * ci.globalSurfaceContactPoint() )* 1e-3 );
 
-        if( geom->contactPoint->getValueByIndex( device_index ) != cp ) 
-          geom->contactPoint->setValue( device_index, cp, geom->id ); 
+        if( geom->contactPoint->getValueByIndex( device_index ) != cp )
+          geom->contactPoint->setValue( device_index, cp, geom->id );
 
         Vec3f n( global_vec_to_local * ci.y_axis );
 
