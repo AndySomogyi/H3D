@@ -146,7 +146,6 @@ class ChangeNavType : public AutoUpdate< SFString > {
       }
       else{
         glwindow->default_nav = "NONE"; 
-        cerr << "finns ingen mynav" << endl;
       }
     }
   }
