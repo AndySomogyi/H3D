@@ -29,7 +29,6 @@
 
 
 #include <QuanserDevice.h>
-#include <PhantomHapticsDevice.h>
 
 using namespace H3D;
 
