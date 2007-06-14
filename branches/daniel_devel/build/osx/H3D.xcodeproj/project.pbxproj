@@ -24,9 +24,44 @@
 		967A002C0B932F5F009CBE63 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967A002B0B932F5F009CBE63 /* Python.framework */; };
 		967A00470B9333F7009CBE63 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D7B1D9208A8ACCB008FFC05 /* libfreeimage.a */; };
 		967A00660B933D89009CBE63 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3D234C0A36FBE200B0573F /* libcurl.a */; };
+		96C7873E0C0451900046F1A2 /* NurbsCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96C99A510BF45052009CFA83 /* NurbsCurve.cpp */; };
+		96C99A520BF45052009CFA83 /* Anchor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96C99A500BF45052009CFA83 /* Anchor.cpp */; };
+		96C99A560BF4506E009CFA83 /* Anchor.h in Headers */ = {isa = PBXBuildFile; fileRef = 96C99A540BF4506E009CFA83 /* Anchor.h */; };
+		96C99A570BF4506E009CFA83 /* NurbsCurve.h in Headers */ = {isa = PBXBuildFile; fileRef = 96C99A550BF4506E009CFA83 /* NurbsCurve.h */; };
 		96CCB6180B9618B600DA703A /* H3DUtil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CCB6170B9618B600DA703A /* H3DUtil.framework */; };
 		96CCB61A0B9618C900DA703A /* HAPI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CCB6190B9618C900DA703A /* HAPI.framework */; };
 		96CCB61E0B961A7300DA703A /* H3DUtil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CCB6170B9618B600DA703A /* H3DUtil.framework */; };
+		96D455930BE0BFFA001E8F3F /* FogCoordinate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D455790BE0BFFA001E8F3F /* FogCoordinate.cpp */; };
+		96D455940BE0BFFA001E8F3F /* FogCoordinate.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D4557A0BE0BFFA001E8F3F /* FogCoordinate.h */; };
+		96D455950BE0BFFA001E8F3F /* H3DNavigation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D4557B0BE0BFFA001E8F3F /* H3DNavigation.cpp */; };
+		96D455960BE0BFFA001E8F3F /* H3DNavigation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D4557C0BE0BFFA001E8F3F /* H3DNavigation.h */; };
+		96D455970BE0BFFA001E8F3F /* H3DNavigationDevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D4557D0BE0BFFA001E8F3F /* H3DNavigationDevices.cpp */; };
+		96D455980BE0BFFA001E8F3F /* H3DNavigationDevices.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D4557E0BE0BFFA001E8F3F /* H3DNavigationDevices.h */; };
+		96D455990BE0BFFA001E8F3F /* LOD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D4557F0BE0BFFA001E8F3F /* LOD.cpp */; };
+		96D4559A0BE0BFFA001E8F3F /* LOD.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D455800BE0BFFA001E8F3F /* LOD.h */; };
+		96D4559B0BE0BFFA001E8F3F /* ProfilesAndComponents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D455810BE0BFFA001E8F3F /* ProfilesAndComponents.cpp */; };
+		96D4559C0BE0BFFA001E8F3F /* ProfilesAndComponents.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D455820BE0BFFA001E8F3F /* ProfilesAndComponents.h */; };
+		96D4559D0BE0BFFA001E8F3F /* ProfileSAX2Handlers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D455830BE0BFFA001E8F3F /* ProfileSAX2Handlers.cpp */; };
+		96D4559E0BE0BFFA001E8F3F /* ProfileSAX2Handlers.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D455840BE0BFFA001E8F3F /* ProfileSAX2Handlers.h */; };
+		96D4559F0BE0BFFA001E8F3F /* ProximitySensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D455850BE0BFFA001E8F3F /* ProximitySensor.cpp */; };
+		96D455A00BE0BFFA001E8F3F /* ProximitySensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D455860BE0BFFA001E8F3F /* ProximitySensor.h */; };
+		96D455A10BE0BFFA001E8F3F /* SplinePositionInterpolator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D455870BE0BFFA001E8F3F /* SplinePositionInterpolator.cpp */; };
+		96D455A20BE0BFFA001E8F3F /* SplinePositionInterpolator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D455880BE0BFFA001E8F3F /* SplinePositionInterpolator.h */; };
+		96D455A30BE0BFFA001E8F3F /* SplinePositionInterpolator2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D455890BE0BFFA001E8F3F /* SplinePositionInterpolator2D.cpp */; };
+		96D455A40BE0BFFA001E8F3F /* SplinePositionInterpolator2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D4558A0BE0BFFA001E8F3F /* SplinePositionInterpolator2D.h */; };
+		96D455A50BE0BFFA001E8F3F /* SplineScalarInterpolator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D4558B0BE0BFFA001E8F3F /* SplineScalarInterpolator.cpp */; };
+		96D455A60BE0BFFA001E8F3F /* SplineScalarInterpolator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D4558C0BE0BFFA001E8F3F /* SplineScalarInterpolator.h */; };
+		96D455A70BE0BFFA001E8F3F /* StringSensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D4558D0BE0BFFA001E8F3F /* StringSensor.cpp */; };
+		96D455A80BE0BFFA001E8F3F /* StringSensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D4558E0BE0BFFA001E8F3F /* StringSensor.h */; };
+		96D455A90BE0BFFA001E8F3F /* VisibilitySensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D4558F0BE0BFFA001E8F3F /* VisibilitySensor.cpp */; };
+		96D455AA0BE0BFFA001E8F3F /* VisibilitySensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D455900BE0BFFA001E8F3F /* VisibilitySensor.h */; };
+		96D455AB0BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96D455910BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.cpp */; };
+		96D455AC0BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 96D455920BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.h */; };
+		96DEE4170C1EBE6100879FC4 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96DEE4140C1EBE6100879FC4 /* Image.cpp */; };
+		96DEE4180C1EBE6100879FC4 /* PixelImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96DEE4150C1EBE6100879FC4 /* PixelImage.cpp */; };
+		96DEE4190C1EBE6100879FC4 /* QuanserDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96DEE4160C1EBE6100879FC4 /* QuanserDevice.cpp */; };
+		96DEE42E0C1EDB4A00879FC4 /* H3DFakeHapticsDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96DEE42D0C1EDB4A00879FC4 /* H3DFakeHapticsDevice.cpp */; };
+		96DEE4550C1EDD8B00879FC4 /* FakeHapticsDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96DEE4540C1EDD8B00879FC4 /* FakeHapticsDevice.cpp */; };
 		96E9DC330B8C6D7C00B4BE63 /* AnyDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DAD80B8C6D7C00B4BE63 /* AnyDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DC340B8C6D7C00B4BE63 /* Appearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DAD90B8C6D7C00B4BE63 /* Appearance.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DC350B8C6D7C00B4BE63 /* Arc2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DADA0B8C6D7C00B4BE63 /* Arc2D.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -151,7 +186,6 @@
 		96E9DCAD0B8C6D7C00B4BE63 /* LocalFog.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DB520B8C6D7C00B4BE63 /* LocalFog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DCAE0B8C6D7C00B4BE63 /* location.hh in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DB530B8C6D7C00B4BE63 /* location.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DCAF0B8C6D7C00B4BE63 /* MagneticGeometryEffect.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DB540B8C6D7C00B4BE63 /* MagneticGeometryEffect.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		96E9DCB00B8C6D7C00B4BE63 /* MagneticSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DB550B8C6D7C00B4BE63 /* MagneticSurface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DCB10B8C6D7C00B4BE63 /* Material.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DB560B8C6D7C00B4BE63 /* Material.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DCB20B8C6D7C00B4BE63 /* Matrix3VertexAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DB570B8C6D7C00B4BE63 /* Matrix3VertexAttribute.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DCB30B8C6D7C00B4BE63 /* Matrix4VertexAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DB580B8C6D7C00B4BE63 /* Matrix4VertexAttribute.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -478,7 +512,6 @@
 		96E9DF020B8C6DA900B4BE63 /* LoadSensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DDF70B8C6DA900B4BE63 /* LoadSensor.cpp */; };
 		96E9DF030B8C6DA900B4BE63 /* LocalFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DDF80B8C6DA900B4BE63 /* LocalFog.cpp */; };
 		96E9DF040B8C6DA900B4BE63 /* MagneticGeometryEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DDF90B8C6DA900B4BE63 /* MagneticGeometryEffect.cpp */; };
-		96E9DF050B8C6DA900B4BE63 /* MagneticSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DDFA0B8C6DA900B4BE63 /* MagneticSurface.cpp */; };
 		96E9DF060B8C6DA900B4BE63 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DDFB0B8C6DA900B4BE63 /* Material.cpp */; };
 		96E9DF070B8C6DA900B4BE63 /* Matrix3VertexAttribute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DDFC0B8C6DA900B4BE63 /* Matrix3VertexAttribute.cpp */; };
 		96E9DF080B8C6DA900B4BE63 /* Matrix4VertexAttribute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DDFD0B8C6DA900B4BE63 /* Matrix4VertexAttribute.cpp */; };
@@ -674,8 +707,43 @@
 		8D07F2C80486CC7A007CD1D0 /* H3D.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = H3D.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		967A00260B932EE8009CBE63 /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
 		967A002B0B932F5F009CBE63 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+		96C99A500BF45052009CFA83 /* Anchor.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Anchor.cpp; path = ../../src/Anchor.cpp; sourceTree = SOURCE_ROOT; };
+		96C99A510BF45052009CFA83 /* NurbsCurve.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = NurbsCurve.cpp; path = ../../src/NurbsCurve.cpp; sourceTree = SOURCE_ROOT; };
+		96C99A540BF4506E009CFA83 /* Anchor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Anchor.h; path = ../../src/Anchor.h; sourceTree = SOURCE_ROOT; };
+		96C99A550BF4506E009CFA83 /* NurbsCurve.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NurbsCurve.h; path = ../../src/NurbsCurve.h; sourceTree = SOURCE_ROOT; };
 		96CCB6170B9618B600DA703A /* H3DUtil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = H3DUtil.framework; path = ../../../../../Library/Frameworks/H3DUtil.framework; sourceTree = SOURCE_ROOT; };
 		96CCB6190B9618C900DA703A /* HAPI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HAPI.framework; path = ../../../../../Library/Frameworks/HAPI.framework; sourceTree = SOURCE_ROOT; };
+		96D455790BE0BFFA001E8F3F /* FogCoordinate.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = FogCoordinate.cpp; path = ../../src/FogCoordinate.cpp; sourceTree = SOURCE_ROOT; };
+		96D4557A0BE0BFFA001E8F3F /* FogCoordinate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FogCoordinate.h; path = ../../src/FogCoordinate.h; sourceTree = SOURCE_ROOT; };
+		96D4557B0BE0BFFA001E8F3F /* H3DNavigation.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = H3DNavigation.cpp; path = ../../src/H3DNavigation.cpp; sourceTree = SOURCE_ROOT; };
+		96D4557C0BE0BFFA001E8F3F /* H3DNavigation.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = H3DNavigation.h; path = ../../src/H3DNavigation.h; sourceTree = SOURCE_ROOT; };
+		96D4557D0BE0BFFA001E8F3F /* H3DNavigationDevices.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = H3DNavigationDevices.cpp; path = ../../src/H3DNavigationDevices.cpp; sourceTree = SOURCE_ROOT; };
+		96D4557E0BE0BFFA001E8F3F /* H3DNavigationDevices.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = H3DNavigationDevices.h; path = ../../src/H3DNavigationDevices.h; sourceTree = SOURCE_ROOT; };
+		96D4557F0BE0BFFA001E8F3F /* LOD.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = LOD.cpp; path = ../../src/LOD.cpp; sourceTree = SOURCE_ROOT; };
+		96D455800BE0BFFA001E8F3F /* LOD.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = LOD.h; path = ../../src/LOD.h; sourceTree = SOURCE_ROOT; };
+		96D455810BE0BFFA001E8F3F /* ProfilesAndComponents.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ProfilesAndComponents.cpp; path = ../../src/ProfilesAndComponents.cpp; sourceTree = SOURCE_ROOT; };
+		96D455820BE0BFFA001E8F3F /* ProfilesAndComponents.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProfilesAndComponents.h; path = ../../src/ProfilesAndComponents.h; sourceTree = SOURCE_ROOT; };
+		96D455830BE0BFFA001E8F3F /* ProfileSAX2Handlers.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ProfileSAX2Handlers.cpp; path = ../../src/ProfileSAX2Handlers.cpp; sourceTree = SOURCE_ROOT; };
+		96D455840BE0BFFA001E8F3F /* ProfileSAX2Handlers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProfileSAX2Handlers.h; path = ../../src/ProfileSAX2Handlers.h; sourceTree = SOURCE_ROOT; };
+		96D455850BE0BFFA001E8F3F /* ProximitySensor.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ProximitySensor.cpp; path = ../../src/ProximitySensor.cpp; sourceTree = SOURCE_ROOT; };
+		96D455860BE0BFFA001E8F3F /* ProximitySensor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProximitySensor.h; path = ../../src/ProximitySensor.h; sourceTree = SOURCE_ROOT; };
+		96D455870BE0BFFA001E8F3F /* SplinePositionInterpolator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SplinePositionInterpolator.cpp; path = ../../src/SplinePositionInterpolator.cpp; sourceTree = SOURCE_ROOT; };
+		96D455880BE0BFFA001E8F3F /* SplinePositionInterpolator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SplinePositionInterpolator.h; path = ../../src/SplinePositionInterpolator.h; sourceTree = SOURCE_ROOT; };
+		96D455890BE0BFFA001E8F3F /* SplinePositionInterpolator2D.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SplinePositionInterpolator2D.cpp; path = ../../src/SplinePositionInterpolator2D.cpp; sourceTree = SOURCE_ROOT; };
+		96D4558A0BE0BFFA001E8F3F /* SplinePositionInterpolator2D.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SplinePositionInterpolator2D.h; path = ../../src/SplinePositionInterpolator2D.h; sourceTree = SOURCE_ROOT; };
+		96D4558B0BE0BFFA001E8F3F /* SplineScalarInterpolator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SplineScalarInterpolator.cpp; path = ../../src/SplineScalarInterpolator.cpp; sourceTree = SOURCE_ROOT; };
+		96D4558C0BE0BFFA001E8F3F /* SplineScalarInterpolator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SplineScalarInterpolator.h; path = ../../src/SplineScalarInterpolator.h; sourceTree = SOURCE_ROOT; };
+		96D4558D0BE0BFFA001E8F3F /* StringSensor.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = StringSensor.cpp; path = ../../src/StringSensor.cpp; sourceTree = SOURCE_ROOT; };
+		96D4558E0BE0BFFA001E8F3F /* StringSensor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = StringSensor.h; path = ../../src/StringSensor.h; sourceTree = SOURCE_ROOT; };
+		96D4558F0BE0BFFA001E8F3F /* VisibilitySensor.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = VisibilitySensor.cpp; path = ../../src/VisibilitySensor.cpp; sourceTree = SOURCE_ROOT; };
+		96D455900BE0BFFA001E8F3F /* VisibilitySensor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VisibilitySensor.h; path = ../../src/VisibilitySensor.h; sourceTree = SOURCE_ROOT; };
+		96D455910BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = X3DEnvironmentalSensorNode.cpp; path = ../../src/X3DEnvironmentalSensorNode.cpp; sourceTree = SOURCE_ROOT; };
+		96D455920BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = X3DEnvironmentalSensorNode.h; path = ../../src/X3DEnvironmentalSensorNode.h; sourceTree = SOURCE_ROOT; };
+		96DEE4140C1EBE6100879FC4 /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Image.cpp; path = ../../src/Image.cpp; sourceTree = SOURCE_ROOT; };
+		96DEE4150C1EBE6100879FC4 /* PixelImage.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = PixelImage.cpp; path = ../../src/PixelImage.cpp; sourceTree = SOURCE_ROOT; };
+		96DEE4160C1EBE6100879FC4 /* QuanserDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = QuanserDevice.cpp; path = ../../src/QuanserDevice.cpp; sourceTree = SOURCE_ROOT; };
+		96DEE42D0C1EDB4A00879FC4 /* H3DFakeHapticsDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = H3DFakeHapticsDevice.cpp; path = ../../src/H3DFakeHapticsDevice.cpp; sourceTree = SOURCE_ROOT; };
+		96DEE4540C1EDD8B00879FC4 /* FakeHapticsDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = FakeHapticsDevice.cpp; path = ../../src/FakeHapticsDevice.cpp; sourceTree = SOURCE_ROOT; };
 		96E9DAD80B8C6D7C00B4BE63 /* AnyDevice.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = AnyDevice.h; path = ../../src/AnyDevice.h; sourceTree = SOURCE_ROOT; };
 		96E9DAD90B8C6D7C00B4BE63 /* Appearance.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = Appearance.h; path = ../../src/Appearance.h; sourceTree = SOURCE_ROOT; };
 		96E9DADA0B8C6D7C00B4BE63 /* Arc2D.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = Arc2D.h; path = ../../src/Arc2D.h; sourceTree = SOURCE_ROOT; };
@@ -1390,6 +1458,13 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				96DEE4540C1EDD8B00879FC4 /* FakeHapticsDevice.cpp */,
+				96DEE42D0C1EDB4A00879FC4 /* H3DFakeHapticsDevice.cpp */,
+				96DEE4140C1EBE6100879FC4 /* Image.cpp */,
+				96DEE4150C1EBE6100879FC4 /* PixelImage.cpp */,
+				96DEE4160C1EBE6100879FC4 /* QuanserDevice.cpp */,
+				96C99A500BF45052009CFA83 /* Anchor.cpp */,
+				96C99A510BF45052009CFA83 /* NurbsCurve.cpp */,
 				96E9E0490B8C853300B4BE63 /* H3DLoad.cpp */,
 				96E9DFA50B8C6DEC00B4BE63 /* lex.yy.cc */,
 				96E9DD8F0B8C6DA800B4BE63 /* AnyDevice.cpp */,
@@ -1434,6 +1509,32 @@
 				96E9DDB60B8C6DA900B4BE63 /* DirectionalLight.cpp */,
 				96E9DDB70B8C6DA900B4BE63 /* DirectShowDecoder.cpp */,
 				96E9DDB80B8C6DA900B4BE63 /* Disk2D.cpp */,
+				96D455790BE0BFFA001E8F3F /* FogCoordinate.cpp */,
+				96D4557A0BE0BFFA001E8F3F /* FogCoordinate.h */,
+				96D4557B0BE0BFFA001E8F3F /* H3DNavigation.cpp */,
+				96D4557C0BE0BFFA001E8F3F /* H3DNavigation.h */,
+				96D4557D0BE0BFFA001E8F3F /* H3DNavigationDevices.cpp */,
+				96D4557E0BE0BFFA001E8F3F /* H3DNavigationDevices.h */,
+				96D4557F0BE0BFFA001E8F3F /* LOD.cpp */,
+				96D455800BE0BFFA001E8F3F /* LOD.h */,
+				96D455810BE0BFFA001E8F3F /* ProfilesAndComponents.cpp */,
+				96D455820BE0BFFA001E8F3F /* ProfilesAndComponents.h */,
+				96D455830BE0BFFA001E8F3F /* ProfileSAX2Handlers.cpp */,
+				96D455840BE0BFFA001E8F3F /* ProfileSAX2Handlers.h */,
+				96D455850BE0BFFA001E8F3F /* ProximitySensor.cpp */,
+				96D455860BE0BFFA001E8F3F /* ProximitySensor.h */,
+				96D455870BE0BFFA001E8F3F /* SplinePositionInterpolator.cpp */,
+				96D455880BE0BFFA001E8F3F /* SplinePositionInterpolator.h */,
+				96D455890BE0BFFA001E8F3F /* SplinePositionInterpolator2D.cpp */,
+				96D4558A0BE0BFFA001E8F3F /* SplinePositionInterpolator2D.h */,
+				96D4558B0BE0BFFA001E8F3F /* SplineScalarInterpolator.cpp */,
+				96D4558C0BE0BFFA001E8F3F /* SplineScalarInterpolator.h */,
+				96D4558D0BE0BFFA001E8F3F /* StringSensor.cpp */,
+				96D4558E0BE0BFFA001E8F3F /* StringSensor.h */,
+				96D4558F0BE0BFFA001E8F3F /* VisibilitySensor.cpp */,
+				96D455900BE0BFFA001E8F3F /* VisibilitySensor.h */,
+				96D455910BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.cpp */,
+				96D455920BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.h */,
 				96E9DDB90B8C6DA900B4BE63 /* DynamicLibrary.cpp */,
 				96E9DDBA0B8C6DA900B4BE63 /* DynamicTransform.cpp */,
 				96E9DDBB0B8C6DA900B4BE63 /* ElevationGrid.cpp */,
@@ -1666,6 +1767,8 @@
 		4D0AFE9508A7975100A71D46 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				96C99A540BF4506E009CFA83 /* Anchor.h */,
+				96C99A550BF4506E009CFA83 /* NurbsCurve.h */,
 				96E9DAD80B8C6D7C00B4BE63 /* AnyDevice.h */,
 				96E9DAD90B8C6D7C00B4BE63 /* Appearance.h */,
 				96E9DADA0B8C6D7C00B4BE63 /* Arc2D.h */,
@@ -2156,7 +2259,6 @@
 				96E9DCAD0B8C6D7C00B4BE63 /* LocalFog.h in Headers */,
 				96E9DCAE0B8C6D7C00B4BE63 /* location.hh in Headers */,
 				96E9DCAF0B8C6D7C00B4BE63 /* MagneticGeometryEffect.h in Headers */,
-				96E9DCB00B8C6D7C00B4BE63 /* MagneticSurface.h in Headers */,
 				96E9DCB10B8C6D7C00B4BE63 /* Material.h in Headers */,
 				96E9DCB20B8C6D7C00B4BE63 /* Matrix3VertexAttribute.h in Headers */,
 				96E9DCB30B8C6D7C00B4BE63 /* Matrix4VertexAttribute.h in Headers */,
@@ -2378,6 +2480,21 @@
 				96E9DD8B0B8C6D7C00B4BE63 /* X3DUrlObject.h in Headers */,
 				96E9DD8C0B8C6D7C00B4BE63 /* X3DVertexAttributeNode.h in Headers */,
 				96E9DD8D0B8C6D7C00B4BE63 /* X3DViewpointNode.h in Headers */,
+				96D455940BE0BFFA001E8F3F /* FogCoordinate.h in Headers */,
+				96D455960BE0BFFA001E8F3F /* H3DNavigation.h in Headers */,
+				96D455980BE0BFFA001E8F3F /* H3DNavigationDevices.h in Headers */,
+				96D4559A0BE0BFFA001E8F3F /* LOD.h in Headers */,
+				96D4559C0BE0BFFA001E8F3F /* ProfilesAndComponents.h in Headers */,
+				96D4559E0BE0BFFA001E8F3F /* ProfileSAX2Handlers.h in Headers */,
+				96D455A00BE0BFFA001E8F3F /* ProximitySensor.h in Headers */,
+				96D455A20BE0BFFA001E8F3F /* SplinePositionInterpolator.h in Headers */,
+				96D455A40BE0BFFA001E8F3F /* SplinePositionInterpolator2D.h in Headers */,
+				96D455A60BE0BFFA001E8F3F /* SplineScalarInterpolator.h in Headers */,
+				96D455A80BE0BFFA001E8F3F /* StringSensor.h in Headers */,
+				96D455AA0BE0BFFA001E8F3F /* VisibilitySensor.h in Headers */,
+				96D455AC0BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.h in Headers */,
+				96C99A560BF4506E009CFA83 /* Anchor.h in Headers */,
+				96C99A570BF4506E009CFA83 /* NurbsCurve.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2593,7 +2710,6 @@
 				96E9DF020B8C6DA900B4BE63 /* LoadSensor.cpp in Sources */,
 				96E9DF030B8C6DA900B4BE63 /* LocalFog.cpp in Sources */,
 				96E9DF040B8C6DA900B4BE63 /* MagneticGeometryEffect.cpp in Sources */,
-				96E9DF050B8C6DA900B4BE63 /* MagneticSurface.cpp in Sources */,
 				96E9DF060B8C6DA900B4BE63 /* Material.cpp in Sources */,
 				96E9DF070B8C6DA900B4BE63 /* Matrix3VertexAttribute.cpp in Sources */,
 				96E9DF080B8C6DA900B4BE63 /* Matrix4VertexAttribute.cpp in Sources */,
@@ -2754,6 +2870,26 @@
 				96E9DFA30B8C6DA900B4BE63 /* X3DVertexAttributeNode.cpp in Sources */,
 				96E9DFA40B8C6DA900B4BE63 /* X3DViewpointNode.cpp in Sources */,
 				96E9DFA60B8C6DEC00B4BE63 /* lex.yy.cc in Sources */,
+				96D455930BE0BFFA001E8F3F /* FogCoordinate.cpp in Sources */,
+				96D455950BE0BFFA001E8F3F /* H3DNavigation.cpp in Sources */,
+				96D455970BE0BFFA001E8F3F /* H3DNavigationDevices.cpp in Sources */,
+				96D455990BE0BFFA001E8F3F /* LOD.cpp in Sources */,
+				96D4559B0BE0BFFA001E8F3F /* ProfilesAndComponents.cpp in Sources */,
+				96D4559D0BE0BFFA001E8F3F /* ProfileSAX2Handlers.cpp in Sources */,
+				96D4559F0BE0BFFA001E8F3F /* ProximitySensor.cpp in Sources */,
+				96D455A10BE0BFFA001E8F3F /* SplinePositionInterpolator.cpp in Sources */,
+				96D455A30BE0BFFA001E8F3F /* SplinePositionInterpolator2D.cpp in Sources */,
+				96D455A50BE0BFFA001E8F3F /* SplineScalarInterpolator.cpp in Sources */,
+				96D455A70BE0BFFA001E8F3F /* StringSensor.cpp in Sources */,
+				96D455A90BE0BFFA001E8F3F /* VisibilitySensor.cpp in Sources */,
+				96D455AB0BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.cpp in Sources */,
+				96C99A520BF45052009CFA83 /* Anchor.cpp in Sources */,
+				96C7873E0C0451900046F1A2 /* NurbsCurve.cpp in Sources */,
+				96DEE4170C1EBE6100879FC4 /* Image.cpp in Sources */,
+				96DEE4180C1EBE6100879FC4 /* PixelImage.cpp in Sources */,
+				96DEE4190C1EBE6100879FC4 /* QuanserDevice.cpp in Sources */,
+				96DEE42E0C1EDB4A00879FC4 /* H3DFakeHapticsDevice.cpp in Sources */,
+				96DEE4550C1EDD8B00879FC4 /* FakeHapticsDevice.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
