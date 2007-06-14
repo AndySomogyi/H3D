@@ -68,7 +68,6 @@ void ProfileSAX2Handlers::startElement(const XMLCh* const uri,
                                    const Attributes& attrs) {
   
   string localname_string = toString( localname );
-  //cerr << "local_name start: " << localname_string << endl;
 
   if( localname_string == "Component" ) {
     int nr_attrs = attrs.getLength();
@@ -117,7 +116,8 @@ void ProfileSAX2Handlers::startElement(const XMLCh* const uri,
       if( name == "name" ) {
         myX3DNode temp_node;
         temp_node.name = toString( attrs.getValue( i ) );
-        component_vector.back().nodes_per_level[ current_level ].push_back( temp_node );
+        component_vector.back().nodes_per_level[ current_level ].
+          push_back( temp_node );
       }
     }
   }
@@ -137,7 +137,8 @@ void ProfileSAX2Handlers::startElement(const XMLCh* const uri,
     }
   }
   else if( in_node ) {
-    component_vector.back().nodes_per_level[ current_level ].back().fields_per_level[ current_level ].push_back( localname_string );
+    component_vector.back().nodes_per_level[ current_level ].back().
+      fields_per_level[ current_level ].push_back( localname_string );
   }
   else if( in_prerequisites ) {
     int nr_attrs = attrs.getLength();
@@ -149,14 +150,9 @@ void ProfileSAX2Handlers::startElement(const XMLCh* const uri,
         break;
       }
     }
-    component_vector.back().prerequisites[ current_level ].push_back( make_pair( localname_string, the_level ) );
+    component_vector.back().prerequisites[ current_level ].
+      push_back( make_pair( localname_string, the_level ) );
   }
-
-  /*int nr_attrs = attrs.getLength();
-  for( int i = 0; i < nr_attrs; i++ ) {
-    string name = toString( attrs.getQName( i ) );
-    cerr << name << " " << attrs.getValue(i) << endl;
-  }*/
 }
 
 
@@ -177,12 +173,6 @@ void ProfileSAX2Handlers::endElement (const XMLCh *const uri,
     in_prerequisites = false;
   else if( localname_string == "Profile" )
     in_profile = false;
-  //cerr << "local_name end: " << localname << endl;
-
-  // skip special element X3D.
-  if( localname_string == "X3D" ) {
-    return;
-  }
 }
  
 //  ProfileSAX2Handlers: Overrides of the SAX ErrorHandler interface
