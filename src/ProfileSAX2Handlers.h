@@ -49,6 +49,10 @@
 XERCES_CPP_NAMESPACE_USE
 using namespace std;
 
+    /// This class implements the SAX2 ContentHandler and ErrorHandler 
+    /// interface in order to read profile and components information
+    /// from the files in the Conformance folder.
+    ///
     class ProfileSAX2Handlers : public DefaultHandler {
     public:
       ///  Constructor.
@@ -114,6 +118,8 @@ using namespace std;
       /// \exception X3D::XMLParseError
       void fatalError(const SAXParseException& exc);
 
+      /// contains information about a node and what conformance
+      /// levels fields should have.
       struct myX3DNode {
         map< int, vector< string > > fields_per_level;
         string name;
@@ -121,6 +127,8 @@ using namespace std;
 
       typedef vector< myX3DNode > myX3DNodeVector;
 
+      /// This is the definition of a component. What nodes belong in it
+      /// per conformance level.
       struct myX3DComponent {
         myX3DComponent() {
           conformance_level = 0;
@@ -135,6 +143,8 @@ using namespace std;
 
       typedef vector< myX3DComponent > myX3DComponentVector;
 
+      /// Contains information about what components at what level is
+      /// required to have support for this profile.
       struct myX3DProfile {
         string name;
         map< string, int > component_names;
@@ -152,9 +162,14 @@ using namespace std;
 
     protected:
 
+      /// All components read from files specified.
       vector< myX3DComponent > component_vector;
+
+      /// All profiles read from files specified.
       vector< myX3DProfile > profile_vector;
 
+      /// Help parameters to correctly parse xml-files with
+      /// profile and component information.
       int current_level;
       bool in_node;
       bool in_prerequisites;
