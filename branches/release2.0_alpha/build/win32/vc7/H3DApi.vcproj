@@ -38,7 +38,7 @@
 				OutputFile="$(OutDir)/H3DApi20_vc7_d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\bin;..\..\..\..\lib;C:\H3D\chai3d\lib\msvc7;..\..\..\..\H3DUtil\lib;..\..\..\..\HAPI\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
-				DelayLoadDLLs="OpenHapticsRenderer_d.dll;audiofile.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
+				DelayLoadDLLs="Chai3DRenderer10_vc7_d.dll;OpenHapticsRenderer10_vc7_d.dll;audiofile.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/H3DApi20_vc7_d.pdb"
 				SubSystem="2"
@@ -87,17 +87,17 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="H3DUtil10_vc7_r.lib"
-				OutputFile="$(OutDir)/H3DApi20_vc7_r.dll"
+				AdditionalDependencies="H3DUtil10_vc7.lib"
+				OutputFile="$(OutDir)/H3DApi20_vc7.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="C:\test\chai3d\lib\msvc7;..\..\..\..\bin;..\..\..\..\lib;..\..\..\..\H3DUtil\lib;..\..\..\..\HAPI\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
-				DelayLoadDLLs="OpenHapticsRenderer.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
+				DelayLoadDLLs="Chai3DRenderer10_vc7.dll;OpenHapticsRenderer10_vc7.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/H3DApi20_vc7_r.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="..\..\..\..\lib\H3DApi20_vc7_r.lib"
+				ImportLibrary="..\..\..\..\lib\H3DApi20_vc7.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -357,6 +357,12 @@
 				RelativePath="..\..\..\src\Extrusion.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\FakeHapticsDevice.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\FalconDevice.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\Field.cpp">
 			</File>
 			<File
@@ -429,6 +435,9 @@
 				RelativePath="..\..\..\src\H3DExports.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\H3DFakeHapticsDevice.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\H3DFunctionNode.cpp">
 			</File>
 			<File
@@ -436,6 +445,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\H3DImageLoaderNode.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\H3DLoad.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\H3DNavigation.cpp">
@@ -472,6 +484,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\HapticsRenderers.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\HaptikHapticsDevice.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Image.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Image3DTexture.cpp">
@@ -639,7 +657,13 @@
 				RelativePath="..\..\..\src\ParticleSystem.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\PhantomDevice.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\Pixel3DTexture.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\PixelImage.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\PixelTexture.cpp">
@@ -699,6 +723,9 @@
 				RelativePath="..\..\..\src\PythonTypes.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\QuanserDevice.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\RawImageLoader.cpp">
 			</File>
 			<File
@@ -721,9 +748,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\Script.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\SensAbleDevice.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\SFNode.cpp">
@@ -751,6 +775,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\SpaceballSensor.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\SpaceWareHapticsDevice.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\SpaceWareSensor.cpp">
@@ -1211,6 +1238,12 @@
 				RelativePath="..\..\..\src\Extrusion.h">
 			</File>
 			<File
+				RelativePath="..\..\..\src\FakeHapticsDevice.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\FalconDevice.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\Field.h">
 			</File>
 			<File
@@ -1301,6 +1334,9 @@
 				RelativePath="..\..\..\src\H3DExports.h">
 			</File>
 			<File
+				RelativePath="..\..\..\src\H3DFakeHapticsDevice.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\H3DForceEffect.h">
 			</File>
 			<File
@@ -1365,6 +1401,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\HapticsRenderers.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\HaptikHapticsDevice.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Image.h">
@@ -1589,6 +1628,9 @@
 				RelativePath="..\..\..\src\OpenHapticsOptions.h">
 			</File>
 			<File
+				RelativePath="..\..\..\src\OpenHapticsSurface.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\OrientationInterpolator.h">
 			</File>
 			<File
@@ -1602,6 +1644,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\PeriodicUpdate.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\PhantomDevice.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Pixel3DTexture.h">
@@ -1673,6 +1718,9 @@
 				RelativePath="..\..\..\src\PyTypeWrapper.h">
 			</File>
 			<File
+				RelativePath="..\..\..\src\QuanserDevice.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\RawImageLoader.h">
 			</File>
 			<File
@@ -1701,9 +1749,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\Script.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\SensAbleDevice.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\SFBool.h">
@@ -1794,6 +1839,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\SpaceballSensor.h">
+			</File>
+			<File
+				RelativePath="..\..\..\src\SpaceWareHapticsDevice.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\SpaceWareSensor.h">
