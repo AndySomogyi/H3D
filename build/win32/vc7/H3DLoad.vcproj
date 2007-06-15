@@ -45,7 +45,7 @@
 				OutputFile="$(OutDir)/H3DLoad.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
-				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				ProgramDatabaseFile="$(OutDir)/$(TargetName).pdb"
 				SubSystem="1"/>
 			<Tool
 				Name="VCMIDLTool"
