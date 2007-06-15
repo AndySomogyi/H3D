@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="H3DApi"
 	ProjectGUID="{71C03655-AF1F-426E-9F63-5C415390A8CA}"
 	RootNamespace="H3DApi"
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;..\..\..\src;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;"
-				PreprocessorDefinitions="_CRTDBG_MAP_ALLOC ;_CRT_SECURE_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;_USRDLL;H3DAPI_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -65,14 +65,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:msvcrt"
-				AdditionalDependencies="H3DUtil10_vc8_d.lib"
 				OutputFile="$(OutDir)/H3DApi20_vc8_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\..\lib;..\..\..\..\bin;..\..\..\..\H3DUtil\build\win32\vc8\Debug;..\..\..\..\HAPI\build\win32\vc8\Debug;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
 				IgnoreDefaultLibraryNames=""
-				DelayLoadDLLs="OpenHapticsRenderer.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
+				DelayLoadDLLs="OpenHapticsRenderer10_vc8_d;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				ProgramDatabaseFile="$(OutDir)/$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary="$(OutDir)\H3DApi20_vc8_d.lib"
 				TargetMachine="1"
@@ -507,10 +506,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\H3DLoad.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\H3DNavigation.cpp"
 				>
 			</File>
@@ -908,10 +903,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\Script.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\SensAbleDevice.cpp"
 				>
 			</File>
 			<File
@@ -2249,10 +2240,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\SensAbleDevice.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\SFBool.h"
 				>
 			</File>
@@ -2823,6 +2810,14 @@
 		</Filter>
 		<File
 			RelativePath="..\..\..\src\lex.yy.cc"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\src\location.hh"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\src\stack.hh"
 			>
 		</File>
 	</Files>
