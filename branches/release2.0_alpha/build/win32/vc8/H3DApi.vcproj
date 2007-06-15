@@ -147,11 +147,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="H3DUtil10_vc8.lib"
 				OutputFile="$(OutDir)/H3DApi20_vc8.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib;..\..\..\..\bin;..\..\..\..\H3DUtil\build\win32\vc8\Release;..\..\..\..\HAPI\build\win32\vc8\release;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
-				DelayLoadDLLs="cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
+				DelayLoadDLLs="OpenHapticsRenderer10_vc8;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="0"
