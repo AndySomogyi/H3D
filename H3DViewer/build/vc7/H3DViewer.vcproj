@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="WxLoad"
+	Name="H3DViewer"
 	ProjectGUID="{FB794093-CA26-4DBF-A7DF-1A62B7C872D5}"
 	RootNamespace="WxLoad">
 	<Platforms>
@@ -22,7 +22,7 @@
 				InlineFunctionExpansion="1"
 				ImproveFloatingPointConsistency="FALSE"
 				OptimizeForProcessor="0"
-				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;..\..\..\..\H3DUtil\src;C:\H3D\chai3d\include"
+				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\Chai3DRenderer;C:\H3D\chai3d\include"
 				PreprocessorDefinitions="_NDEBUG;_CONSOLE;WIN32;_WINDOWS;PLATFORM_WIN32;__WXMSW__"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="0"
@@ -42,9 +42,9 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies=" rpcrt4.lib comctl32.lib wxmsw28_adv.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib"
-				OutputFile="$(OutDir)/WxLoad10_vc7_r.exe"
+				OutputFile="$(OutDir)/H3DViewer10_vc7_r.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\H3D\chai3d\lib\msvc7;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(H3D_ROOT)\lib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;..\..\..\..\lib;..\..\..\..\H3DUtil\lib;..\..\..\..\HAPI\lib;"
+				AdditionalLibraryDirectories="&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(H3D_ROOT)\lib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;..\..\..\..\bin;..\..\..\..\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/WxLoad10_vc7_r.pdb"
 				SubSystem="2"/>
@@ -84,7 +84,7 @@
 				Optimization="0"
 				ImproveFloatingPointConsistency="TRUE"
 				OptimizeForProcessor="0"
-				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;..\..\..\..\H3DUtil\src;C:\H3D\chai3d\include"
+				AdditionalIncludeDirectories="&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\Chai3DRenderer"
 				PreprocessorDefinitions="WIN32;_CONSOLE;_WINDOWS;PLATFORM_WIN32;__WXMSW__;NOPCH"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
@@ -102,11 +102,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="rpcrt4.lib comctl32.lib wxmsw28_adv.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib"
-				OutputFile="$(OutDir)/WxLoad10_vc7_d.exe"
+				AdditionalDependencies="H3DApi20_vc7_d.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib wxmsw28_adv.lib HAPI10_vc7_d.lib OpenHapticsRenderer10_vc7_d.lib rpcrt4.lib comctl32.lib"
+				OutputFile="$(OutDir)/H3DViewer10_vc7_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="C:\H3D\chai3d\lib\msvc7;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(H3D_ROOT)\lib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;..\..\..\..\lib;..\..\..\..\H3DUtil\lib;..\..\..\..\HAPI\lib;"
+				AdditionalLibraryDirectories="..\..\..\..\lib;..\..\..\..\bin;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(H3D_ROOT)\lib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/WxLoad10_vc7_d.pdb"
@@ -267,28 +267,28 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\src\consoleDialog.cpp">
+			RelativePath="..\..\src\ConsoleDialog.cpp">
 		</File>
 		<File
-			RelativePath="..\..\src\consoleDialog.h">
+			RelativePath="..\..\src\ConsoleDialog.h">
 		</File>
 		<File
-			RelativePath="..\..\src\envini.h">
+			RelativePath="..\..\src\Envini.h">
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxFrame.cpp">
+			RelativePath="..\..\src\H3DViewer.cpp">
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxFrame.h">
+			RelativePath="..\..\src\WxFrame.cpp">
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxWidgetsWindow.cpp">
+			RelativePath="..\..\src\WxFrame.h">
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxWidgetsWindow.h">
+			RelativePath="..\..\src\WxWidgetsWindow.cpp">
 		</File>
 		<File
-			RelativePath="..\..\src\WxMain.cpp">
+			RelativePath="..\..\src\WxWidgetsWindow.h">
 		</File>
 	</Files>
 	<Globals>
