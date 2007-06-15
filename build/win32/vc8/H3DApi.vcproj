@@ -69,7 +69,7 @@
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
 				IgnoreDefaultLibraryNames=""
-				DelayLoadDLLs="OpenHapticsRenderer10_vc8_d;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
+				DelayLoadDLLs="OpenHapticsRenderer10_vc8_d.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(TargetName).pdb"
 				SubSystem="2"
@@ -148,9 +148,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/H3DApi20_vc8.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\lib;..\..\..\..\bin;..\..\..\..\H3DUtil\build\win32\vc8\Release;..\..\..\..\HAPI\build\win32\vc8\release;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;;&quot;$(H3D_PYTHON_ROOT)\libs&quot;"
-				DelayLoadDLLs="OpenHapticsRenderer10_vc8;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
+				DelayLoadDLLs="OpenHapticsRenderer10_vc8.dll;cg.dll;cgGL.dll;FreeImage.dll;ftgl_dynamic_MTD.dll;OpenAL32.dll;vorbisfile.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="0"
@@ -655,6 +655,14 @@
 			<File
 				RelativePath="..\..\..\src\MagneticSurface.cpp"
 				>
+				<FileConfiguration
+					Name="Release DLL|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\src\Material.cpp"
@@ -763,6 +771,14 @@
 			<File
 				RelativePath="..\..\..\src\OpenHapticsSurface.cpp"
 				>
+				<FileConfiguration
+					Name="Release DLL|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\src\OrientationInterpolator.cpp"
