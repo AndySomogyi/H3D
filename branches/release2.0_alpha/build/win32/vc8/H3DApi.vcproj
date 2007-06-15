@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="H3DApi"
 	ProjectGUID="{71C03655-AF1F-426E-9F63-5C415390A8CA}"
 	RootNamespace="H3DApi"
@@ -73,7 +73,7 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(TargetName).pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)\H3DApi20_vc8_d.lib"
+				ImportLibrary="..\..\..\..\lib\H3DApi20_vc8_d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
