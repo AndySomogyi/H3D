@@ -21,14 +21,14 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file H3DWxWidgetsWindow.cpp
-/// \brief CPP file for H3DWxWidgetsWindow.
+/// \file WxWidgetsWindow.cpp
+/// \brief CPP file for WxWidgetsWindow.
 ///
 //
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <H3DWxWidgetsWindow.h>
+#include <WxWidgetsWindow.h>
 #ifndef WIN32
 #include <X3DKeyDeviceSensorNode.h>
 #include <MouseSensor.h>
@@ -38,12 +38,12 @@
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
-H3DNodeDatabase H3DWxWidgetsWindow::database( "H3DWxWidgetsWindow", 
-                                      &(newInstance<H3DWxWidgetsWindow>), 
-                                      typeid( H3DWxWidgetsWindow ),
+H3DNodeDatabase WxWidgetsWindow::database( "WxWidgetsWindow", 
+                                      &(newInstance<WxWidgetsWindow>), 
+                                      typeid( WxWidgetsWindow ),
                                       &(H3DWindowNode::database) );
 
-H3DWxWidgetsWindow::H3DWxWidgetsWindow( wxWindow *_theParent,
+WxWidgetsWindow::WxWidgetsWindow( wxWindow *_theParent,
                                        Inst< SFInt32     > _width,
                         Inst< SFInt32     > _height,
                         Inst< SFBool      > _fullscreen,
@@ -54,7 +54,7 @@ H3DWxWidgetsWindow::H3DWxWidgetsWindow( wxWindow *_theParent,
   H3DWindowNode( _width, _height, _fullscreen, _mirrored, _renderMode,
                  _viewpoint, _time ),
   theWindow( _theParent ){
-  type_name = "H3DWxWidgetsWindow";
+  type_name = "WxWidgetsWindow";
   database.initFields( this );
   
   int attribList[8];
@@ -73,11 +73,11 @@ H3DWxWidgetsWindow::H3DWxWidgetsWindow( wxWindow *_theParent,
 #endif
  
   if( !theWindow ) {
-     theWindow = new wxFrame( NULL, wxID_ANY, "H3DwxFrame", wxDefaultPosition,
+     theWindow = new wxFrame( NULL, wxID_ANY, "WxFrame", wxDefaultPosition,
                               wxSize( width->getValue(), height->getValue() ));
   }
 
-  theWxGLCanvas = new H3DwxGLCanvas( this, theWindow, -1, wxDefaultPosition,
+  theWxGLCanvas = new MyWxGLCanvas( this, theWindow, -1, wxDefaultPosition,
               wxSize( width->getValue(), height->getValue() ), attribList );
 #ifdef WIN32
   hWnd = (HWND)(theWxGLCanvas->GetHandle());
@@ -87,7 +87,7 @@ H3DWxWidgetsWindow::H3DWxWidgetsWindow( wxWindow *_theParent,
 #endif
 }
 
-void H3DWxWidgetsWindow::initWindow() {
+void WxWidgetsWindow::initWindow() {
   last_fullscreen = !fullscreen->getValue();
   theWindow->Show();
   theWxGLCanvas->Show();
@@ -97,7 +97,7 @@ void H3DWxWidgetsWindow::initWindow() {
   glClear( GL_COLOR_BUFFER_BIT );
 }
 
-void H3DWxWidgetsWindow::setFullscreen( bool fullscreen ) {
+void WxWidgetsWindow::setFullscreen( bool fullscreen ) {
   if( last_fullscreen != fullscreen ) {
     wxTopLevelWindow * tlw = dynamic_cast< wxTopLevelWindow * >(theWindow);
 #ifndef MACOSX
@@ -109,38 +109,38 @@ void H3DWxWidgetsWindow::setFullscreen( bool fullscreen ) {
   }
 }
 
-void H3DWxWidgetsWindow::swapBuffers() {
+void WxWidgetsWindow::swapBuffers() {
    theWxGLCanvas->SwapBuffers();
 }
 
-void H3DWxWidgetsWindow::makeWindowActive() {
+void WxWidgetsWindow::makeWindowActive() {
   theWxGLCanvas->SetCurrent();
 }
 
-BEGIN_EVENT_TABLE(H3DWxWidgetsWindow::H3DwxGLCanvas, wxGLCanvas)
-  EVT_IDLE(H3DWxWidgetsWindow::H3DwxGLCanvas::OnIdle)
-  EVT_SIZE(H3DWxWidgetsWindow::H3DwxGLCanvas::OnSize)
-  EVT_PAINT(H3DWxWidgetsWindow::H3DwxGLCanvas::OnPaint)
-  EVT_ERASE_BACKGROUND(H3DWxWidgetsWindow::H3DwxGLCanvas::OnEraseBackground)
+BEGIN_EVENT_TABLE(WxWidgetsWindow::MyWxGLCanvas, wxGLCanvas)
+  EVT_IDLE(WxWidgetsWindow::MyWxGLCanvas::OnIdle)
+  EVT_SIZE(WxWidgetsWindow::MyWxGLCanvas::OnSize)
+  EVT_PAINT(WxWidgetsWindow::MyWxGLCanvas::OnPaint)
+  EVT_ERASE_BACKGROUND(WxWidgetsWindow::MyWxGLCanvas::OnEraseBackground)
 #ifndef WIN32
-  EVT_KEY_DOWN( H3DWxWidgetsWindow::H3DwxGLCanvas::OnKeyDown )
-  EVT_KEY_UP( H3DWxWidgetsWindow::H3DwxGLCanvas::OnKeyUp )
-  EVT_CHAR( H3DWxWidgetsWindow::H3DwxGLCanvas::OnCharDown )
-  EVT_LEFT_DOWN( H3DWxWidgetsWindow::H3DwxGLCanvas::onLeftMouseButtonDown )
-  EVT_LEFT_UP( H3DWxWidgetsWindow::H3DwxGLCanvas::onLeftMouseButtonUp )
-  EVT_LEFT_DCLICK( H3DWxWidgetsWindow::H3DwxGLCanvas::onLeftMouseButtonDown )
-  EVT_MIDDLE_DOWN( H3DWxWidgetsWindow::H3DwxGLCanvas::onMiddleMouseButtonDown )
-  EVT_MIDDLE_UP( H3DWxWidgetsWindow::H3DwxGLCanvas::onMiddleMouseButtonUp )
-EVT_MIDDLE_DCLICK( H3DWxWidgetsWindow::H3DwxGLCanvas::onMiddleMouseButtonDown )
-  EVT_RIGHT_DOWN( H3DWxWidgetsWindow::H3DwxGLCanvas::onRightMouseButtonDown )
-  EVT_RIGHT_UP( H3DWxWidgetsWindow::H3DwxGLCanvas::onRightMouseButtonUp )
-  EVT_RIGHT_DCLICK( H3DWxWidgetsWindow::H3DwxGLCanvas::onRightMouseButtonDown )
-  EVT_MOTION( H3DWxWidgetsWindow::H3DwxGLCanvas::onMouseMotion )
-  EVT_MOUSEWHEEL( H3DWxWidgetsWindow::H3DwxGLCanvas::onMouseWheelRotation )
+  EVT_KEY_DOWN( WxWidgetsWindow::MyWxGLCanvas::OnKeyDown )
+  EVT_KEY_UP( WxWidgetsWindow::MyWxGLCanvas::OnKeyUp )
+  EVT_CHAR( WxWidgetsWindow::MyWxGLCanvas::OnCharDown )
+  EVT_LEFT_DOWN( WxWidgetsWindow::MyWxGLCanvas::onLeftMouseButtonDown )
+  EVT_LEFT_UP( WxWidgetsWindow::MyWxGLCanvas::onLeftMouseButtonUp )
+  EVT_LEFT_DCLICK( WxWidgetsWindow::MyWxGLCanvas::onLeftMouseButtonDown )
+  EVT_MIDDLE_DOWN( WxWidgetsWindow::MyWxGLCanvas::onMiddleMouseButtonDown )
+  EVT_MIDDLE_UP( WxWidgetsWindow::MyWxGLCanvas::onMiddleMouseButtonUp )
+EVT_MIDDLE_DCLICK( WxWidgetsWindow::MyWxGLCanvas::onMiddleMouseButtonDown )
+  EVT_RIGHT_DOWN( WxWidgetsWindow::MyWxGLCanvas::onRightMouseButtonDown )
+  EVT_RIGHT_UP( WxWidgetsWindow::MyWxGLCanvas::onRightMouseButtonUp )
+  EVT_RIGHT_DCLICK( WxWidgetsWindow::MyWxGLCanvas::onRightMouseButtonDown )
+  EVT_MOTION( WxWidgetsWindow::MyWxGLCanvas::onMouseMotion )
+  EVT_MOUSEWHEEL( WxWidgetsWindow::MyWxGLCanvas::onMouseWheelRotation )
 #endif
 END_EVENT_TABLE()
 
-H3DWxWidgetsWindow::H3DwxGLCanvas::H3DwxGLCanvas( H3DWxWidgetsWindow *_myOwner,
+WxWidgetsWindow::MyWxGLCanvas::MyWxGLCanvas( WxWidgetsWindow *_myOwner,
                                                   wxWindow* _parent,
                                                   wxWindowID _id,
                                                   const wxPoint& _pos,
@@ -155,11 +155,11 @@ myOwner( _myOwner )
 {
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::OnIdle(wxIdleEvent& event) {
+void WxWidgetsWindow::MyWxGLCanvas::OnIdle(wxIdleEvent& event) {
   event.RequestMore();
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::OnSize( wxSizeEvent& event ) {
+void WxWidgetsWindow::MyWxGLCanvas::OnSize( wxSizeEvent& event ) {
   wxGLCanvas::OnSize(event);
   // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
   int w, h;
@@ -168,20 +168,20 @@ void H3DWxWidgetsWindow::H3DwxGLCanvas::OnSize( wxSizeEvent& event ) {
     myOwner->reshape( w, h );
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::OnPaint( wxPaintEvent& WXUNUSED(event))
+void WxWidgetsWindow::MyWxGLCanvas::OnPaint( wxPaintEvent& WXUNUSED(event))
 {
   wxPaintDC dc(this);  
   myOwner->display();
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::OnEraseBackground(
+void WxWidgetsWindow::MyWxGLCanvas::OnEraseBackground(
   wxEraseEvent& WXUNUSED(event))
 {
   // Do nothing, to avoid flashing.
 }
 
 #ifndef WIN32
-void H3DWxWidgetsWindow::H3DwxGLCanvas::OnKeyDown(wxKeyEvent& event)
+void WxWidgetsWindow::MyWxGLCanvas::OnKeyDown(wxKeyEvent& event)
 {
   switch( event.GetKeyCode() ) {
     case WXK_F1: myOwner->onKeyDown( X3DKeyDeviceSensorNode::F1, true ); break;
@@ -224,7 +224,7 @@ void H3DWxWidgetsWindow::H3DwxGLCanvas::OnKeyDown(wxKeyEvent& event)
   }
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::OnKeyUp(wxKeyEvent& event)
+void WxWidgetsWindow::MyWxGLCanvas::OnKeyUp(wxKeyEvent& event)
 {
   switch( event.GetKeyCode() ) {
     case WXK_F1: myOwner->onKeyUp( X3DKeyDeviceSensorNode::F1, true ); break;
@@ -264,46 +264,46 @@ void H3DWxWidgetsWindow::H3DwxGLCanvas::OnKeyUp(wxKeyEvent& event)
   }
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::OnCharDown(wxKeyEvent& event)
+void WxWidgetsWindow::MyWxGLCanvas::OnCharDown(wxKeyEvent& event)
 {
   myOwner->onKeyDown( event.GetKeyCode(), false );
   event.Skip();
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::onLeftMouseButtonDown(
+void WxWidgetsWindow::MyWxGLCanvas::onLeftMouseButtonDown(
   wxMouseEvent & event ) {
   myOwner->onMouseButtonAction( MouseSensor::LEFT_BUTTON, MouseSensor::DOWN );
   event.Skip();
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::onLeftMouseButtonUp(
+void WxWidgetsWindow::MyWxGLCanvas::onLeftMouseButtonUp(
   wxMouseEvent & event ) {
   myOwner->onMouseButtonAction( MouseSensor::LEFT_BUTTON, MouseSensor::UP );
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::onMiddleMouseButtonDown(
+void WxWidgetsWindow::MyWxGLCanvas::onMiddleMouseButtonDown(
   wxMouseEvent & event ) {
   myOwner->onMouseButtonAction( MouseSensor::MIDDLE_BUTTON, MouseSensor::DOWN );
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::onMiddleMouseButtonUp(
+void WxWidgetsWindow::MyWxGLCanvas::onMiddleMouseButtonUp(
   wxMouseEvent & event ) {
   myOwner->onMouseButtonAction( MouseSensor::MIDDLE_BUTTON, MouseSensor::UP );
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::onRightMouseButtonDown(
+void WxWidgetsWindow::MyWxGLCanvas::onRightMouseButtonDown(
   wxMouseEvent & event ) {
   myOwner->onMouseButtonAction( MouseSensor::RIGHT_BUTTON, MouseSensor::DOWN );
 }
 
-void H3DWxWidgetsWindow::H3DwxGLCanvas::onRightMouseButtonUp(
+void WxWidgetsWindow::MyWxGLCanvas::onRightMouseButtonUp(
   wxMouseEvent & event ) {
   myOwner->onMouseButtonAction( MouseSensor::RIGHT_BUTTON, MouseSensor::UP );
 }
-void H3DWxWidgetsWindow::H3DwxGLCanvas::onMouseMotion( wxMouseEvent & event ) {
+void WxWidgetsWindow::MyWxGLCanvas::onMouseMotion( wxMouseEvent & event ) {
   myOwner->onMouseMotionAction( event.GetX(), event.GetY() );
 }
-void H3DWxWidgetsWindow::H3DwxGLCanvas::onMouseWheelRotation(
+void WxWidgetsWindow::MyWxGLCanvas::onMouseWheelRotation(
   wxMouseEvent & event ) {
   myOwner->onMouseWheelAction(
     event.GetWheelRotation() > 0 ? MouseSensor::FROM : MouseSensor::TOWARDS );

@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="WxLoad"
+	Name="H3DViewer"
 	ProjectGUID="{FB794093-CA26-4DBF-A7DF-1A62B7C872D5}"
 	RootNamespace="WxLoad"
 	>
@@ -16,7 +16,7 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
+			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="Release\obj"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -72,11 +72,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="H3DApi20_vc8_r.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib wxmsw28_adv.lib HAPI10_vc8_r.lib OpenHapticsRenderer10_vc8_r.lib rpcrt4.lib comctl32.lib"
-				OutputFile="$(OutDir)/WxLoad.exe"
+				AdditionalOptions="/MACHINE:I386&#x0D;&#x0A;/FORCE:MULTIPLE"
+				AdditionalDependencies="H3DApi20_vc8.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib wxmsw28_adv.lib HAPI10_vc8.lib OpenHapticsRenderer10_vc8.lib rpcrt4.lib comctl32.lib"
+				OutputFile="$(OutDir)/H3DViewer.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;"
+				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
@@ -108,7 +109,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
+			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="Debug\obj"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -134,7 +135,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;..\..\..\..\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;"
+				AdditionalIncludeDirectories="..\..\src;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;..\..\..\..\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_WINDOWS;PLATFORM_WIN32;__WXMSW__;__WXDEBUG__;NOPCH"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -163,7 +164,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="H3DAPI20_vc8_d.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib HAPI10_vc8_d.lib OpenHapticsRenderer10_vc8_d.lib rpcrt4.lib comctl32.lib"
-				OutputFile="$(OutDir)/WxLoad.exe"
+				OutputFile="$(OutDir)/H3DViewer_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\lib;..\..\..\..\bin;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;"
@@ -203,35 +204,35 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\src\consoleDialog.cpp"
+			RelativePath="..\..\src\ConsoleDialog.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\consoleDialog.h"
+			RelativePath="..\..\src\ConsoleDialog.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\envini.h"
+			RelativePath="..\..\src\Envini.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxFrame.cpp"
+			RelativePath="..\..\src\H3DViewer.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxFrame.h"
+			RelativePath="..\..\src\WxFrame.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxWidgetsWindow.cpp"
+			RelativePath="..\..\src\WxFrame.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxWidgetsWindow.h"
+			RelativePath="..\..\src\WxWidgetsWindow.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\WxMain.cpp"
+			RelativePath="..\..\src\WxWidgetsWindow.h"
 			>
 		</File>
 	</Files>

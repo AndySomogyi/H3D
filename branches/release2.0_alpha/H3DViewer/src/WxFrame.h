@@ -36,7 +36,7 @@
 #include <wx/config.h>
 #include <wx/confbase.h>
 
-#include <H3DWxWidgetsWindow.h>
+#include <WxWidgetsWindow.h>
 #include <GlobalSettings.h>
 
 #include <Group.h>
@@ -51,7 +51,7 @@
 #include <Console.h>
 #include <NavigationInfo.h>
 
-#include <consoleDialog.h>
+#include <ConsoleDialog.h>
 
 using namespace std;
 using namespace H3D;
@@ -118,19 +118,19 @@ DECLARE_EVENT_TABLE()
 };
 
 // ---------------------------------------------------------------------------
-//  H3DWxFrame Definition
+//  WxFrame Definition
 // ---------------------------------------------------------------------------
 
-class H3DWxFrame: public wxFrame
+class WxFrame: public wxFrame
 {
 public:
-  H3DWxFrame( wxWindow *_parent, wxWindowID _id, const wxString& _title,
+  WxFrame( wxWindow *_parent, wxWindowID _id, const wxString& _title,
               const wxPoint& _pos, const wxSize& _size,
               long _style = wxDEFAULT_FRAME_STYLE,
               const wxString& name = "H3D Player" );
 
-  //Pointer to H3DWxWidgetsWindow
-  H3DWxWidgetsWindow *glwindow;
+  //Pointer to WxWidgetsWindow
+  WxWidgetsWindow *glwindow;
 
   /***************Interface Features*****************/
   //Main Menu Bar

@@ -32,10 +32,10 @@
 //  Includes
 // ---------------------------------------------------------------------------
 
-#include <H3DWxFrame.h>
-#include <consoleDialog.h>
+#include <WxFrame.h>
+#include <ConsoleDialog.h>
 #include <vector>
-#include <H3DWxWidgetsWindow.h>
+#include <WxWidgetsWindow.h>
 
 #include <wx/wx.h>
 #include <envini.h>
@@ -101,7 +101,7 @@ static const wxChar *FILETYPES = _T( "x3d files|*.x3d|"
                                    );
 
 /*******************Constructor*********************/
-H3DWxFrame::H3DWxFrame( wxWindow *_parent, wxWindowID _id,
+WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
                         const wxString& _title, const wxPoint& _pos,
                         const wxSize& _size, long _style,
                         const wxString& _name ):
@@ -127,7 +127,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 	device_info.reset (NULL);
 	g.reset ( new Group );
 
-	glwindow = new H3DWxWidgetsWindow(this);
+	glwindow = new WxWidgetsWindow(this);
 	int width, height;
 	GetClientSize(&width, &height);
 	glwindow->width->setValue(width);
@@ -253,9 +253,10 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 
   //Device Control Menu
   deviceMenu = new wxMenu;
-//  deviceMenu->Append(FRAME_DEVICECONTROL, "Enable/Disable Devices", "Start/Stop haptic devices");
-//  deviceMenu->AppendCheckItem(FRAME_HAPTICSCONTROL, "Toggle Haptics", "Start/Stop haptic devices");
-//  deviceMenu->AppendSeparator();
+  deviceMenu->Append(FRAME_DEVICECONTROL, "Start Device(s)", 
+                      "Start haptic devices");
+  deviceMenu->Append(FRAME_DEVICECONTROL, "Stop Device(s)",
+                      "Stop haptic devices");
 
   //Viewpoint Menu
   viewpointMenu = new wxMenu;
@@ -297,27 +298,27 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 }
 
 /*******************Event Table*********************/
-BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
-	EVT_MENU (FRAME_EXIT, H3DWxFrame::OnExit)
-	EVT_MENU (FRAME_OPEN, H3DWxFrame::OnOpenFile)
-  EVT_MENU_RANGE (wxID_FILE1, wxID_FILE9, H3DWxFrame::OnMRUFile)
-  EVT_MENU (FRAME_OPEN_URL, H3DWxFrame::OnOpenFileURL)
-	EVT_MENU (FRAME_CLOSE, H3DWxFrame::OnCloseFile)
-  EVT_MENU (FRAME_CHOOSEDIR, H3DWxFrame::OnChooseDir)
-	EVT_MENU (FRAME_FULLSCREEN, H3DWxFrame::OnFullscreen)
-	EVT_MENU (FRAME_SETTINGS, H3DWxFrame::OnSettings)
-  EVT_MENU (FRAME_RESTORE, H3DWxFrame::RestoreWindow)
-	EVT_MENU (FRAME_MIRROR, H3DWxFrame::MirrorScene)
-  EVT_MENU_RANGE (FRAME_MONO, FRAME_REDCYAN, H3DWxFrame::RenderMode)
-	EVT_MENU (FRAME_CONSOLE, H3DWxFrame::ShowConsole)
-	EVT_MENU_HIGHLIGHT (FRAME_SELECTION, H3DWxFrame::GetSelection)
-	EVT_MENU (FRAME_VIEWPOINT, H3DWxFrame::ChangeViewpoint)
-	EVT_MENU (FRAME_NAVIGATION, H3DWxFrame::ChangeNavigation)
-  EVT_MENU_RANGE (FRAME_OPENHAPTICS, FRAME_RUSPINI, H3DWxFrame::ChangeRenderer)
-  EVT_MENU (FRAME_DEVICECONTROL, H3DWxFrame::ToggleHaptics)
-	EVT_MENU (FRAME_ABOUT, H3DWxFrame::OnAbout)
-	EVT_MENU (FRAME_HELP, H3DWxFrame::OnHelp)
-  EVT_CLOSE(H3DWxFrame::OnWindowExit)
+BEGIN_EVENT_TABLE(WxFrame, wxFrame)
+	EVT_MENU (FRAME_EXIT, WxFrame::OnExit)
+	EVT_MENU (FRAME_OPEN, WxFrame::OnOpenFile)
+  EVT_MENU_RANGE (wxID_FILE1, wxID_FILE9, WxFrame::OnMRUFile)
+  EVT_MENU (FRAME_OPEN_URL, WxFrame::OnOpenFileURL)
+	EVT_MENU (FRAME_CLOSE, WxFrame::OnCloseFile)
+  EVT_MENU (FRAME_CHOOSEDIR, WxFrame::OnChooseDir)
+	EVT_MENU (FRAME_FULLSCREEN, WxFrame::OnFullscreen)
+	EVT_MENU (FRAME_SETTINGS, WxFrame::OnSettings)
+  EVT_MENU (FRAME_RESTORE, WxFrame::RestoreWindow)
+	EVT_MENU (FRAME_MIRROR, WxFrame::MirrorScene)
+  EVT_MENU_RANGE (FRAME_MONO, FRAME_REDCYAN, WxFrame::RenderMode)
+	EVT_MENU (FRAME_CONSOLE, WxFrame::ShowConsole)
+	EVT_MENU_HIGHLIGHT (FRAME_SELECTION, WxFrame::GetSelection)
+	EVT_MENU (FRAME_VIEWPOINT, WxFrame::ChangeViewpoint)
+	EVT_MENU (FRAME_NAVIGATION, WxFrame::ChangeNavigation)
+  EVT_MENU_RANGE (FRAME_OPENHAPTICS, FRAME_RUSPINI, WxFrame::ChangeRenderer)
+  EVT_MENU (FRAME_DEVICECONTROL, WxFrame::ToggleHaptics)
+	EVT_MENU (FRAME_ABOUT, WxFrame::OnAbout)
+	EVT_MENU (FRAME_HELP, WxFrame::OnHelp)
+  EVT_CLOSE(WxFrame::OnWindowExit)
 END_EVENT_TABLE()
 
 
@@ -442,7 +443,7 @@ void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
 
 /*******************Member Functions*********************/
 
-bool H3DWxFrame::loadFile( const string &filename) {
+bool WxFrame::loadFile( const string &filename) {
   
   char *r = getenv( "H3D_ROOT" );
 
@@ -589,9 +590,9 @@ bool H3DWxFrame::loadFile( const string &filename) {
         viewpointMenu->Check(FRAME_VIEWPOINT+i, true);
       }
 			Connect(FRAME_VIEWPOINT +i,wxEVT_MENU_HIGHLIGHT,
-              wxMenuEventHandler(H3DWxFrame::GetSelection));
+              wxMenuEventHandler(WxFrame::GetSelection));
 			Connect(FRAME_VIEWPOINT +i,wxEVT_COMMAND_MENU_SELECTED,
-              wxCommandEventHandler(H3DWxFrame::ChangeViewpoint));
+              wxCommandEventHandler(WxFrame::ChangeViewpoint));
       i++;
 		}
   }
@@ -609,44 +610,7 @@ bool H3DWxFrame::loadFile( const string &filename) {
   mydevice = DeviceInfo::getActive();
   if (mydevice && (mydevice->device->size() > 0) ) {
     menuBar->EnableTop(2, true);
-
-    /*******************TODO: Get all devices and change******************/
-    
-    myH3Ddevice = mydevice->device->getValueByIndex(0);
-    rendererMenu->Enable(FRAME_CHOOSERENDERER, true);
-    if (lastDeviceStatus) {
-      deviceMenu->Append(FRAME_DEVICECONTROL, "Disable devices",
-                          "Stop haptic devices");
-    }
-    else {
-      deviceMenu->Append(FRAME_DEVICECONTROL, "Enable devices",
-                         "Start haptic devices");
-    }
-//    myH3Ddevice = mydevice->device->getValue();
-//    allDevices = mydevice->device->getValue();
-//    NodeVector::const_iterator nv = allDevices.begin();
   }
-
-/*  HAPI::HAPIHapticsRenderer* currentRenderer = (HAPI::HAPIHapticsRenderer *) NULL;
-  currentRenderer = myH3Ddevice->hapticsRenderer->getValue()->getHapticsRenderer(0);
-  if (dynamic_cast<OpenHapticsRenderer *>(currentRenderer)) {
-    rendererMenu->Check(FRAME_OPENHAPTICS, true);
-  } //else if (dynamic_cast<CHAI3DRenderer *>(currentRenderer)) {
-    //rendererMenu->Check(FRAME_CHAI3D, true);
-  } else if (dynamic_cast<GodObjectRenderer *>(currentRenderer)) {
-    rendererMenu->Check(FRAME_GODOBJECT, true);
-  } else if (dynamic_cast<RuspiniRenderer *>(currentRenderer)) {
-    rendererMenu->Check(FRAME_RUSPINI, true);
-  } */
-
-
-  //int i = 0;
-  //for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
-  //  wxString item = wxString ("Device ") << i;
-		//deviceMenu->AppendRadioItem(FRAME_DEVICE + i, item, "Select haptic device");
-  //  i++;
-  //}
-//  deviceCount = i;
 
 /*
 #ifndef MACOSX
@@ -680,9 +644,9 @@ bool H3DWxFrame::loadFile( const string &filename) {
 	//theWxframe->SetIcon(wxIcon(_T("h3d_icn")));
   
   // Using this line instead of the two previous lines will make
-  // H3DWxWidgetsWindow create an instance of a wxframe with no menus and use
+  // WxWidgetsWindow create an instance of a wxframe with no menus and use
   // this as parent to the canvas.
-  // H3DWxWidgetsWindow *glwindow = new H3DWxWidgetsWindow();
+  // WxWidgetsWindow *glwindow = new WxWidgetsWindow();
 
 	this->glwindow->fullscreen->setValue( fullscreen );
   this->glwindow->mirrored->setValue( mirrored );
@@ -699,7 +663,7 @@ bool H3DWxFrame::loadFile( const string &filename) {
 }
 
 //Clear data when closing file
-void H3DWxFrame::clearData () {
+void WxFrame::clearData () {
   t->children->clear();
 	viewpoint.reset (NULL);
 
@@ -707,18 +671,18 @@ void H3DWxFrame::clearData () {
 	for (int i = 0; i <= viewpointCount; i++) {
 		viewpointMenu->Destroy(FRAME_VIEWPOINT + i);
 		Disconnect(FRAME_VIEWPOINT + i,wxEVT_MENU_HIGHLIGHT,
-               wxMenuEventHandler(H3DWxFrame::GetSelection));
+               wxMenuEventHandler(WxFrame::GetSelection));
 		Disconnect(FRAME_VIEWPOINT + i,wxEVT_COMMAND_MENU_SELECTED,
-               wxCommandEventHandler(H3DWxFrame::ChangeViewpoint));
+               wxCommandEventHandler(WxFrame::ChangeViewpoint));
 	}
 
 	//Delete items from navigation menu & disconnect events
 	for (int j = 0; j <= navTypeCount; j++) {
 		navigationMenu->Destroy(FRAME_NAVIGATION + j);
 		Disconnect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT,
-               wxMenuEventHandler(H3DWxFrame::GetSelection));
+               wxMenuEventHandler(WxFrame::GetSelection));
 		Disconnect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED,
-               wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
+               wxCommandEventHandler(WxFrame::ChangeNavigation));
 	}
 
   deviceMenu->Destroy(FRAME_DEVICECONTROL);
@@ -727,7 +691,7 @@ void H3DWxFrame::clearData () {
 
 
 //Open a file
-void H3DWxFrame::OnOpenFileURL(wxCommandEvent & event) {
+void WxFrame::OnOpenFileURL(wxCommandEvent & event) {
    auto_ptr< wxTextEntryDialog > text_dialog( new wxTextEntryDialog ( this,
 													   "Enter the location of the file here",
 													   "Open file from URL",
@@ -739,7 +703,7 @@ void H3DWxFrame::OnOpenFileURL(wxCommandEvent & event) {
    }
 }
 
-void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
+void WxFrame::OnOpenFile(wxCommandEvent & event)
 {
 	auto_ptr< wxFileDialog > openFileDialog( new wxFileDialog ( this,
 													   "Open file",
@@ -768,7 +732,7 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
 }
 
 //Open a file from file history
-void H3DWxFrame::OnMRUFile(wxCommandEvent & event)
+void WxFrame::OnMRUFile(wxCommandEvent & event)
 {
   wxString filename(recentFiles->GetHistoryFile(event.GetId() - wxID_FILE1));
   if (filename != "") {
@@ -778,7 +742,7 @@ void H3DWxFrame::OnMRUFile(wxCommandEvent & event)
 }
 
 //Close File
-void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
+void WxFrame::OnCloseFile(wxCommandEvent & event) {
   //clearData();
   t->children->clear();
 	SetStatusText("Open a file...", 0);
@@ -794,7 +758,7 @@ void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
   rendererMenu->Enable(FRAME_RENDERMODE, false);
 }
 
-void H3DWxFrame::OnChooseDir(wxCommandEvent & event) {
+void WxFrame::OnChooseDir(wxCommandEvent & event) {
   wxDirDialog *d = new wxDirDialog (this, 
                                     "Choose a directory", 
                                     GetCurrentPath(), 
@@ -807,7 +771,7 @@ void H3DWxFrame::OnChooseDir(wxCommandEvent & event) {
 }
 
 //About dialog
-void H3DWxFrame::OnAbout(wxCommandEvent & event)
+void WxFrame::OnAbout(wxCommandEvent & event)
 { wxString t = TITLE;
 
   t.append( AUTHOR );
@@ -817,15 +781,15 @@ void H3DWxFrame::OnAbout(wxCommandEvent & event)
 }
 
 //Help event
-void H3DWxFrame::OnHelp(wxCommandEvent & event)
+void WxFrame::OnHelp(wxCommandEvent & event)
 {
 
 }
 
 //Fullscreen mode
-void H3DWxFrame::OnFullscreen (wxCommandEvent & event)
+void WxFrame::OnFullscreen (wxCommandEvent & event)
 {
-	H3DWxFrame::ShowFullScreen(true, wxFULLSCREEN_NOMENUBAR | 
+	WxFrame::ShowFullScreen(true, wxFULLSCREEN_NOMENUBAR | 
                              wxFULLSCREEN_NOTOOLBAR | wxFULLSCREEN_NOBORDER | 
                              wxFULLSCREEN_NOCAPTION );
 	glwindow->fullscreen->setValue( true );
@@ -835,16 +799,16 @@ void H3DWxFrame::OnFullscreen (wxCommandEvent & event)
 }
 
 //Restore from fullscreen
-void H3DWxFrame::RestoreWindow(wxCommandEvent & event)
+void WxFrame::RestoreWindow(wxCommandEvent & event)
 {
-	H3DWxFrame::ShowFullScreen(false, wxFULLSCREEN_ALL);
+	WxFrame::ShowFullScreen(false, wxFULLSCREEN_ALL);
 	glwindow->fullscreen->setValue( false );
 	rendererMenu->Check(FRAME_FULLSCREEN, false);
 	SetStatusText(currentFilename, 0);
 	SetStatusText(currentPath, 1);
 }
 
-void H3DWxFrame::MirrorScene(wxCommandEvent & event)
+void WxFrame::MirrorScene(wxCommandEvent & event)
 {
 	lastmirror = glwindow->mirrored->getValue();
 	glwindow->mirrored->setValue(!lastmirror);
@@ -857,7 +821,7 @@ void H3DWxFrame::MirrorScene(wxCommandEvent & event)
 }
 
 //Render Mode
-void H3DWxFrame::RenderMode(wxCommandEvent & event)
+void WxFrame::RenderMode(wxCommandEvent & event)
 {
   wxString renderMode;
   switch ( event.GetId() ) {
@@ -893,73 +857,65 @@ void H3DWxFrame::RenderMode(wxCommandEvent & event)
 }
 
 //Choose Haptics Renderer
-void H3DWxFrame::ChangeRenderer(wxCommandEvent & event)
+void WxFrame::ChangeRenderer(wxCommandEvent & event)
 {
-  /*******************TODO: CHANGE FOR ALL DEVICES*******************/
   switch ( event.GetId() ) {
     case FRAME_OPENHAPTICS:
-      myH3Ddevice = mydevice->device->getValueByIndex(0);
-      myH3Ddevice->hapticsRenderer->setValue(new OpenHapticsRenderer());
-//      for (NodeVector::const_iterator nv = allDevices.begin(); 
-//            nv != allDevices.end(); nv++) {
-//        static_cast < H3DHapticsDevice *> 
-//            (*nv)->hapticsRenderer->setValue(new OpenHapticsRenderer);
-//       }
+      for (NodeVector::const_iterator nv = allDevices.begin(); 
+            nv != allDevices.end(); nv++) {
+        static_cast < H3DHapticsDevice *> 
+            (*nv)->hapticsRenderer->setValue(new OpenHapticsRenderer);
+       }
       break;
     case FRAME_CHAI3D:
 #ifdef HAVE_CHAI3D
-//        for (NodeVector::const_iterator nv = allDevices.begin(); nv != allDevices.end(); nv++) {
-//          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->setValue(new CHAI3DRenderer);
-//        }
+        for (NodeVector::const_iterator nv = allDevices.begin(); 
+              nv != allDevices.end(); nv++) {
+          static_cast < H3DHapticsDevice *> 
+            (*nv)->hapticsRenderer->setValue(new CHAI3DRenderer);
+        }
 #endif
       break;
     case FRAME_GODOBJECT:
-      myH3Ddevice = mydevice->device->getValueByIndex(0);
-      myH3Ddevice->hapticsRenderer->setValue(new GodObjectRenderer);
-//      for (NodeVector::const_iterator nv = allDevices.begin(); 
-//             nv != allDevices.end(); nv++) {
-//          static_cast < H3DHapticsDevice *> (*nv)->
-//              hapticsRenderer->setValue(new GodObjectRenderer);
-//        }
+      for (NodeVector::const_iterator nv = allDevices.begin(); 
+             nv != allDevices.end(); nv++) {
+          static_cast < H3DHapticsDevice *> (*nv)->
+              hapticsRenderer->setValue(new GodObjectRenderer);
+        }
 	    break;
     case FRAME_RUSPINI:
-      myH3Ddevice = mydevice->device->getValueByIndex(0);
-      myH3Ddevice->hapticsRenderer->setValue(new RuspiniRenderer);
-/*        for (NodeVector::const_iterator nv = allDevices.begin(); 
+        for (NodeVector::const_iterator nv = allDevices.begin(); 
                  nv != allDevices.end(); nv++) {
             static_cast < H3DHapticsDevice *> (*nv)->
               hapticsRenderer->setValue(new RuspiniRenderer);
-        } */
+        }
 		  break;
   }
 }
 
 //Toggle haptics
-void H3DWxFrame::ToggleHaptics (wxCommandEvent & event) {
-  if (lastDeviceStatus) {
-    myH3Ddevice->disableDevice();
-    lastDeviceStatus = false;
-    deviceMenu->Destroy(FRAME_DEVICECONTROL);
-    deviceMenu->Insert(0, FRAME_DEVICECONTROL, "Enable devices",
-                       "Start haptic devices");
-  }
-  else {
-    myH3Ddevice->enableDevice();
-    lastDeviceStatus = true;
-    deviceMenu->Destroy(FRAME_DEVICECONTROL);
-    deviceMenu->Insert(0, FRAME_DEVICECONTROL, "Disable devices",
-                       "Stop haptic devices");
+void WxFrame::ToggleHaptics (wxCommandEvent & event) {
+  for (NodeVector::const_iterator nv = allDevices.begin(); 
+        nv != allDevices.end(); nv++) {
+    if (lastDeviceStatus) {
+      static_cast < H3DHapticsDevice *> (*nv)->disableDevice();
+      lastDeviceStatus = false;
+    }
+    else {
+      static_cast < H3DHapticsDevice *> (*nv)->enableDevice();
+      lastDeviceStatus = true;
+    }
   }
 }
 
 //Show console event
-void H3DWxFrame::ShowConsole(wxCommandEvent & event)
+void WxFrame::ShowConsole(wxCommandEvent & event)
 {
   theConsole->Show();
 }
 
 //Change Viewpoint
-void H3DWxFrame::ChangeViewpoint (wxCommandEvent & event)
+void WxFrame::ChangeViewpoint (wxCommandEvent & event)
 {	
 	//Default viewpoint
 	if (viewpointCount <= 1) {
@@ -977,20 +933,11 @@ void H3DWxFrame::ChangeViewpoint (wxCommandEvent & event)
 		//Enable that viewpoint
 		(*vp)->set_bind->setValue(true);
     viewpointMenu->Check(selection, true);
-    /*i = 0;
-    for (vp = VPlist.begin(); vp != VPlist.end(); vp++) {
-      if ((*vp) == Viewpoint::getActive()) {
-          Console (3) << i << endl;
-          viewpointMenu->Check(FRAME_VIEWPOINT + i, true);
-          break;
-      }
-      i++;
-    }*/
 	}
 }
 
 //Change Navigation
-void H3DWxFrame::ChangeNavigation (wxCommandEvent & event)
+void WxFrame::ChangeNavigation (wxCommandEvent & event)
 {
   if (mynav) {
     mynav->setNavType ((navigationMenu->GetLabel(selection)).c_str());
@@ -1001,19 +948,19 @@ void H3DWxFrame::ChangeNavigation (wxCommandEvent & event)
 }
 
 //Gets Menu Selections
-void H3DWxFrame::GetSelection (wxMenuEvent & event)
+void WxFrame::GetSelection (wxMenuEvent & event)
 {
 	selection = event.GetMenuId();
 }
 
 //Exit via menu
-void H3DWxFrame::OnExit (wxCommandEvent & event)
+void WxFrame::OnExit (wxCommandEvent & event)
 {
 	Close(true);
 }
 
 //Exit via window manager
-void H3DWxFrame::OnWindowExit (wxCloseEvent & event) 
+void WxFrame::OnWindowExit (wxCloseEvent & event) 
 {
   Destroy();
   SaveMRU();
@@ -1023,31 +970,31 @@ void H3DWxFrame::OnWindowExit (wxCloseEvent & event)
 
 /*******************Standard trivial functions*********************/
 //Get current filename
-wxString H3DWxFrame::GetCurrentFilename()
+wxString WxFrame::GetCurrentFilename()
 {
  return currentFilename;
 }
 
 //Set current filename
-void H3DWxFrame::SetCurrentFilename(wxString n)
+void WxFrame::SetCurrentFilename(wxString n)
 {
  currentFilename = n;
 }
 
 //Get current path
-wxString H3DWxFrame::GetCurrentPath()
+wxString WxFrame::GetCurrentPath()
 {
  return currentPath;
 }
 
 //Set current path
-void H3DWxFrame::SetCurrentPath(wxString n)
+void WxFrame::SetCurrentPath(wxString n)
 {
  currentPath = n;
 }
 
 ////Save file history for next initialization
-void H3DWxFrame::SaveMRU () {
+void WxFrame::SaveMRU () {
   h3dConfig = wxConfigBase::Get();
 
   //Store number of files in history
@@ -1063,7 +1010,7 @@ void H3DWxFrame::SaveMRU () {
 }
 
 ///Save settings for next initialization
-void H3DWxFrame::SaveSettings () {
+void WxFrame::SaveSettings () {
   h3dConfig = wxConfigBase::Get();
 
   //Save debug options
@@ -1125,7 +1072,7 @@ void H3DWxFrame::SaveSettings () {
   }
 }
 
-void H3DWxFrame::LoadMRU () {
+void WxFrame::LoadMRU () {
   h3dConfig = wxConfigBase::Get();
 
   //Load file history from previous sessions
@@ -1140,7 +1087,7 @@ void H3DWxFrame::LoadMRU () {
   }
 }
 
-void H3DWxFrame::LoadSettings () {
+void WxFrame::LoadSettings () {
   h3dConfig = wxConfigBase::Get();
 
   //Load settings from previous sessions
@@ -1232,7 +1179,7 @@ void H3DWxFrame::LoadSettings () {
 }
 
 //Build Navigation Menu
-void H3DWxFrame::buildNavMenu () {
+void WxFrame::buildNavMenu () {
 	//Get active navigation info object
 	if (NavigationInfo::getActive()) {
 		mynav = NavigationInfo::getActive();
@@ -1312,9 +1259,9 @@ void H3DWxFrame::buildNavMenu () {
 				navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, typeName.c_str(),
                                         "Select a navigation mode");
 				Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT,
-                wxMenuEventHandler(H3DWxFrame::GetSelection));
+                wxMenuEventHandler(WxFrame::GetSelection));
 				Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED,
-                wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
+                wxCommandEventHandler(WxFrame::ChangeNavigation));
 				j++;
       }
 
@@ -1344,9 +1291,9 @@ void H3DWxFrame::buildNavMenu () {
       navigationMenu->AppendRadioItem(FRAME_NAVIGATION + j, (*allList).c_str(),
                                       "Select a navigation mode");
 		  Connect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT,
-              wxMenuEventHandler(H3DWxFrame::GetSelection));
+              wxMenuEventHandler(WxFrame::GetSelection));
 			Connect(FRAME_NAVIGATION + j,wxEVT_COMMAND_MENU_SELECTED, 
-              wxCommandEventHandler(H3DWxFrame::ChangeNavigation));
+              wxCommandEventHandler(WxFrame::ChangeNavigation));
 			j++;
     }
     //mynav->setNavType("EXAMINE");
@@ -1357,7 +1304,7 @@ void H3DWxFrame::buildNavMenu () {
 
 //Validate NavType
 //Checks whether a navigation type is valid
-bool H3DWxFrame::validateNavType (string a) {
+bool WxFrame::validateNavType (string a) {
 	if ( a == "ANY" || a == "EXAMINE" || a == "FLY" || a == "WALK" ||
        a == "LOOKAT" || a == "NONE" ) {
 		return true;
@@ -1366,7 +1313,7 @@ bool H3DWxFrame::validateNavType (string a) {
 }
 
 
-void H3DWxFrame::OnSettings (wxCommandEvent & event) {
+void WxFrame::OnSettings (wxCommandEvent & event) {
   settings = new SettingsDialog(this, global_settings.get() );
   settings->Show();
 }
@@ -1842,7 +1789,7 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent,
 
 
 
-void H3DWxFrame::readSettingsFromINIFile( const string &filename, 
+void WxFrame::readSettingsFromINIFile( const string &filename, 
                                           GlobalSettings *gs ) {
   gs->options->clear();
 
@@ -1973,12 +1920,12 @@ void H3DWxFrame::readSettingsFromINIFile( const string &filename,
 }
 
 void SettingsDialog::OnOk (wxCommandEvent & event) {
-  static_cast< H3DWxFrame* >(this->GetParent())->SaveSettings();
+  static_cast< WxFrame* >(this->GetParent())->SaveSettings();
   this->Show(false);
 }
 
 void SettingsDialog::OnCancel (wxCommandEvent & event) {
-  static_cast< H3DWxFrame* >(this->GetParent())->LoadSettings();
+  static_cast< WxFrame* >(this->GetParent())->LoadSettings();
   H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
   this->Show(false);
 }

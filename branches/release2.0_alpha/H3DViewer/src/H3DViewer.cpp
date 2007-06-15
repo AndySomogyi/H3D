@@ -30,8 +30,8 @@
 // ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
-#include <H3DWxFrame.h>
-#include <H3DWxWidgetsWindow.h>
+#include <WxFrame.h>
+#include <WxWidgetsWindow.h>
 
 #include <VrmlParser.h>
 #include <Group.h>
@@ -39,9 +39,11 @@
 #include <Scene.h>
 #include <KeySensor.h>
 #include <MouseSensor.h>
+
 #ifndef MACOSX
 #include <SpaceWareSensor.h>
 #endif
+
 #include <DeviceInfo.h>
 #include <INIFile.h>
 #include <ResourceResolver.h>
@@ -135,26 +137,26 @@ bool MyApp::OnInit()
     return false;
 
   SetVendorName(_T("SenseGraphics AB"));
-  SetAppName(_T("H3D Player"));
+  SetAppName(_T("H3D Viewer"));
 
   //initializeH3D();
 
   // create a window to display
-  H3DWxFrame *theWxFrame = new H3DWxFrame(NULL, wxID_ANY, "H3D Player",
+  WxFrame *theWxFrame = new WxFrame(NULL, wxID_ANY, "H3DViewer",
                                           wxDefaultPosition, wxSize(800, 600));
-	//glwindow constructed in the frame constructor.  Next line redundant.
-	//theWxFrame->glwindow = new H3DWxWidgetsWindow(theWxFrame);
+
 	theWxFrame->Show(true);
 
   if(cmd_line_filename != "") theWxFrame->loadFile(string(cmd_line_filename));
+
   //This next line is used to set the icon file h3d.ico, when created.
 	//theWxframe->SetIcon(wxIcon(_T("h3d_icn")));
 
     
-    // Using this line instead of the two previous lines will make
-    // H3DWxWidgetsWindow create an instance of a wxframe with no menus and use
-    // this as parent to the canvas.
-    // H3DWxWidgetsWindow *glwindow = new H3DWxWidgetsWindow();
+  // Using this line instead of the two previous lines will make
+  // WxWidgetsWindow create an instance of a wxframe with no menus and use
+  // this as parent to the canvas.
+  // WxWidgetsWindow *glwindow = new WxWidgetsWindow();
 
   return true;
 }

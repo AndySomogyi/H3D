@@ -32,7 +32,7 @@
 //  Includes
 // ---------------------------------------------------------------------------
 
-#include <consoleDialog.h>
+#include <ConsoleDialog.h>
 #include <Console.h>
 
 using namespace std;
@@ -89,8 +89,7 @@ wxDialog (parent, id, title, pos, size, style)
   H3DUtil::Console.setOutputStream( *t );
 	
   std::cerr.rdbuf(sbOld); 
-  //  std::cerr << "TESTS" << endl;
-	//*logText << 123.456 << " some text\n";
+
 #endif
 }
 
