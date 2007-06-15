@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="H3DLoad"
 	ProjectGUID="{6A2D73A4-3E06-4324-8C03-B3441F4B2DA2}"
 	RootNamespace="H3DLoad"
@@ -107,7 +107,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
+			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="Debug\obj"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -162,13 +162,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /NODEFAULTLIB:msvcrt"
-				AdditionalDependencies="H3DAPI20_vc8_d.lib HAPI10_vc8_d.lib H3DUtil10_vc8_d.lib"
 				OutputFile="$(OutDir)/H3DLoad.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\HAPI\build\win32\vc8\Debug;..\..\..\..\H3DUtil\build\win32\vc8\Debug;&quot;$(OutDir)&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				ProgramDatabaseFile="$(OutDir)/$(TargetName).pdb"
 				SubSystem="1"
 			/>
 			<Tool
