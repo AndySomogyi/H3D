@@ -108,7 +108,7 @@ void FalconDevice::initialize() {
 
 H3DHapticsDevice::ErrorCode FalconDevice::initDevice() {
   HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::initDevice();
-#ifdef HAVE_OPENHAPTICS
+#ifdef HAVE_FALCONAPI
    HAPI::FalconHapticsDevice *pd = 
     dynamic_cast< HAPI::FalconHapticsDevice * >(hapi_device.get() );
   if( e == HAPI::HAPIHapticsDevice::SUCCESS && pd ) {
