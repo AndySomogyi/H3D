@@ -32,13 +32,13 @@
 //  Includes
 // ---------------------------------------------------------------------------
 
-#include <WxFrame.h>
-#include <ConsoleDialog.h>
+#include "WxFrame.h"
+#include "ConsoleDialog.h"
 #include <vector>
-#include <WxWidgetsWindow.h>
+#include "WxWidgetsWindow.h"
 
 #include <wx/wx.h>
-#include <envini.h>
+#include "envini.h"
 
 // ---------------------------------------------------------------------------
 //  Includes (to open X3D files)
@@ -872,7 +872,7 @@ void WxFrame::ChangeRenderer(wxCommandEvent & event)
         for (NodeVector::const_iterator nv = allDevices.begin(); 
               nv != allDevices.end(); nv++) {
           static_cast < H3DHapticsDevice *> 
-            (*nv)->hapticsRenderer->setValue(new CHAI3DRenderer);
+            (*nv)->hapticsRenderer->setValue(new Chai3DRenderer);
         }
 #endif
       break;

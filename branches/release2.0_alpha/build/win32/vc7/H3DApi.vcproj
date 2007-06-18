@@ -120,90 +120,6 @@
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
-		<Configuration
-			Name="Debug Static|Win32"
-			OutputDirectory="..\..\..\lib"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\src;..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\Chai3DRenderer;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;;c:\test\chai3d\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;HAPI_LIB;H3DUTIL_LIB;H3DAPI_LIB"
-				MinimalRebuild="TRUE"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="2"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/libH3DAPI_d.lib"
-				AdditionalLibraryDirectories=""/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="Release Static|Win32"
-			OutputDirectory="..\..\..\lib"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\src;..\..\..\..\H3DUtil\src;..\..\..\..\HAPI\Chai3DRenderer;..\..\..\..\HAPI\OpenHapticsRenderer;..\..\..\..\HAPI\src;&quot;$(H3D_EXTERNAL_ROOT)\include\DHD-API&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\DirectShow\BaseClasses&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\OpenAL&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\libaudiofile&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\vorbis\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\zlib&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FreeImage\Dist&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\fparser&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\FTGL\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(3DTOUCH_BASE)\utilities\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\3dconnexion\inc&quot;;&quot;$(H3D_PYTHON_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\freetype-2.1.9\include&quot;;c:\test\chai3d\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;HAPI_LIB;H3DUTIL_LIB;H3DAPI_LIB"
-				RuntimeLibrary="2"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="3"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/libH3DApi.lib"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -213,13 +129,58 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath="..\..\..\src\Anchor.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\AnyDevice.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\Appearance.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Arc2D.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\ArcClose2D.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\AudioClip.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\AudioFileReader.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Background.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\Billboard.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\BooleanFilter.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\BooleanSequencer.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\BooleanToggle.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\BooleanTrigger.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\BoundedPhysicsModel.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Box.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Circle2D.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\ClipPlane.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Collision.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Color.cpp">
@@ -229,6 +190,21 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\ColorRGBA.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Composed3DTexture.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\ComposedCubeMapTexture.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\ComposedShader.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Cone.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\ConeEmitter.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Contour2D.cpp">
@@ -243,10 +219,28 @@
 				RelativePath="..\..\..\src\Coordinate.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\CoordinateDeformer.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\CoordinateInterpolator.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\CoordinateInterpolator2D.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Cylinder.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\CylinderSensor.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\DebugOptions.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\DefaultAppearance.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\DeformableShape.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\DeviceInfo.cpp">
@@ -258,13 +252,43 @@
 				RelativePath="..\..\..\src\DirectionalLight.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\DirectShowDecoder.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Disk2D.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\DynamicLibrary.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\DynamicTransform.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\ElevationGrid.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\ExplosionEmitter.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\Extrusion.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\FakeHapticsDevice.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\FalconDevice.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Field.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\FillProperties.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\FitToBoxTransform.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\src\FloatVertexAttribute.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\Fog.cpp">

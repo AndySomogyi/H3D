@@ -36,7 +36,7 @@
 #include <wx/config.h>
 #include <wx/confbase.h>
 
-#include <WxWidgetsWindow.h>
+#include "WxWidgetsWindow.h"
 #include <GlobalSettings.h>
 
 #include <Group.h>
@@ -51,7 +51,7 @@
 #include <Console.h>
 #include <NavigationInfo.h>
 
-#include <ConsoleDialog.h>
+#include "ConsoleDialog.h"
 
 using namespace std;
 using namespace H3D;

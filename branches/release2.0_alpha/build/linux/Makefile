@@ -8,7 +8,7 @@ include Makefile.objects
 # You should only need to edit these:
 #
 
-FREEIMAGE_INCLUDE = /home/Knok/H3D/External/FreeImage/Source
+FREEIMAGE_INCLUDE = /usr/include
 FREEIMAGE_LIBS    = /usr/lib
 
 FREETYPE_INCLUDE  = /usr/include/freetype2
@@ -26,7 +26,7 @@ OPENAL_LIBS       = /usr/lib
 XERCESC_INCLUDE   = /usr/include
 XERCESC_LIBS      = /usr/lib
 
-SPACEWARE_INCLUDE = /home/Knok/3dx
+#SPACEWARE_INCLUDE = /home/Knok/3dx
 
 H3D_HOME          = ../..
 H3DUTIL_HOME      = ../../../H3DUtil
@@ -49,6 +49,7 @@ INCLUDES  += -I$(H3DUTIL_HOME)/src
 #HAPI
 CXXLIBS   += -lHAPI
 INCLUDES  += -I$(HAPI_HOME)/src
+INCLUDES  += -I$(HAPI_HOME)/OpenHapticsRenderer
 
 #libcurl
 CXXLIBS   += -lcurl
@@ -71,8 +72,8 @@ CXXLIBS   += -L$(FREETYPE_LIBS) -lfreetype
 INCLUDES  += -I$(FREETYPE_INCLUDE)
 
 #SpaceWare
-INCLUDES  += -I$(SPACEWARE_INCLUDE)
-OBJECTS   += $(SPACEWARE_INCLUDE)/xdrvlib.o
+#INCLUDES  += -I$(SPACEWARE_INCLUDE)
+#OBJECTS   += $(SPACEWARE_INCLUDE)/xdrvlib.o
 
 
 # FTGL

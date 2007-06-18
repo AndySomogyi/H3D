@@ -48,7 +48,7 @@ using namespace H3D;
     PATH + ini_file.get( GROUP, VAR ) :                 \
     DEFAULT ) )
 
-string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
+inline string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
                             const string &ENV,
                             const string &DISPLAY_PATH,
                             const string &COMMON_PATH,
@@ -59,15 +59,17 @@ string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
   
   if( ini_file.hasOption(GROUP,VAR) ) { 
     string option = ini_file.get( GROUP, VAR );
-    
-    ifstream inp( (DISPLAY_PATH + option).c_str() );
+    string full_path = string(DISPLAY_PATH) + option;
+    ifstream inp( full_path.c_str() );
     inp.close();
-    if(!inp.fail()) return DISPLAY_PATH + option;
-
+	string r = full_path;
+    if(!inp.fail()) return "";
     inp.clear();
-    inp.open( (COMMON_PATH + option).c_str() );
+
+	full_path = (COMMON_PATH + option);
+    inp.open( full_path.c_str() );
     inp.close();
-    if(!inp.fail()) return COMMON_PATH + option;
+    if(!inp.fail()) return full_path;
   }
   return "";
 }
