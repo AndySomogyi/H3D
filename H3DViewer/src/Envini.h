@@ -62,8 +62,8 @@ inline string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
     string full_path = string(DISPLAY_PATH) + option;
     ifstream inp( full_path.c_str() );
     inp.close();
-	string r = full_path;
-    if(!inp.fail()) return "";
+    string r = full_path;
+    if(!inp.fail()) return full_path;
     inp.clear();
 
 	full_path = (COMMON_PATH + option);
