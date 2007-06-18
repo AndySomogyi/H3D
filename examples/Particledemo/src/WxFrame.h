@@ -34,7 +34,7 @@
 #include <wx/spinctrl.h>
 #include <wx/config.h>
 #include <wx/confbase.h>
-#include <H3DWxWidgetsWindow.h>
+#include <WxWidgetsWindow.h>
 #include <GlobalSettings.h>
 
 #include <Box.h>
