@@ -270,7 +270,6 @@
 		96E9DD020B8C6D7C00B4BE63 /* ScalarInterpolator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DBA70B8C6D7C00B4BE63 /* ScalarInterpolator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DD030B8C6D7C00B4BE63 /* Scene.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DBA80B8C6D7C00B4BE63 /* Scene.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DD040B8C6D7C00B4BE63 /* Script.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DBA90B8C6D7C00B4BE63 /* Script.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		96E9DD050B8C6D7C00B4BE63 /* SensAbleDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DBAA0B8C6D7C00B4BE63 /* SensAbleDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DD060B8C6D7C00B4BE63 /* SFBool.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DBAB0B8C6D7C00B4BE63 /* SFBool.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DD070B8C6D7C00B4BE63 /* SFColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DBAC0B8C6D7C00B4BE63 /* SFColor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E9DD080B8C6D7C00B4BE63 /* SFColorRGBA.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E9DBAD0B8C6D7C00B4BE63 /* SFColorRGBA.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -567,7 +566,6 @@
 		96E9DF3A0B8C6DA900B4BE63 /* ScalarInterpolator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DE2F0B8C6DA900B4BE63 /* ScalarInterpolator.cpp */; };
 		96E9DF3B0B8C6DA900B4BE63 /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DE300B8C6DA900B4BE63 /* Scene.cpp */; };
 		96E9DF3C0B8C6DA900B4BE63 /* Script.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DE310B8C6DA900B4BE63 /* Script.cpp */; };
-		96E9DF3D0B8C6DA900B4BE63 /* SensAbleDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DE320B8C6DA900B4BE63 /* SensAbleDevice.cpp */; };
 		96E9DF3E0B8C6DA900B4BE63 /* SFNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DE330B8C6DA900B4BE63 /* SFNode.cpp */; };
 		96E9DF3F0B8C6DA900B4BE63 /* ShaderFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DE340B8C6DA900B4BE63 /* ShaderFunctions.cpp */; };
 		96E9DF400B8C6DA900B4BE63 /* ShaderPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DE350B8C6DA900B4BE63 /* ShaderPart.cpp */; };
@@ -673,6 +671,15 @@
 		96E9DFA40B8C6DA900B4BE63 /* X3DViewpointNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DE990B8C6DA900B4BE63 /* X3DViewpointNode.cpp */; };
 		96E9DFA60B8C6DEC00B4BE63 /* lex.yy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96E9DFA50B8C6DEC00B4BE63 /* lex.yy.cc */; };
 		96E9E04A0B8C853300B4BE63 /* H3DLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96E9E0490B8C853300B4BE63 /* H3DLoad.cpp */; };
+		96FA00970C269C4800C1F160 /* FalconDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96FA00940C269C4800C1F160 /* FalconDevice.cpp */; };
+		96FA00980C269C4800C1F160 /* PhantomDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96FA00950C269C4800C1F160 /* PhantomDevice.cpp */; };
+		96FA00990C269C4800C1F160 /* SpaceWareHapticsDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96FA00960C269C4800C1F160 /* SpaceWareHapticsDevice.cpp */; };
+		96FA00A00C269C7C00C1F160 /* FakeHapticsDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 96FA009A0C269C7C00C1F160 /* FakeHapticsDevice.h */; };
+		96FA00A10C269C7C00C1F160 /* FalconDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 96FA009B0C269C7C00C1F160 /* FalconDevice.h */; };
+		96FA00A20C269C7C00C1F160 /* H3DFakeHapticsDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 96FA009C0C269C7C00C1F160 /* H3DFakeHapticsDevice.h */; };
+		96FA00A30C269C7C00C1F160 /* PhantomDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 96FA009D0C269C7C00C1F160 /* PhantomDevice.h */; };
+		96FA00A40C269C7C00C1F160 /* QuanserDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 96FA009E0C269C7C00C1F160 /* QuanserDevice.h */; };
+		96FA00A50C269C7C00C1F160 /* SpaceWareHapticsDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 96FA009F0C269C7C00C1F160 /* SpaceWareHapticsDevice.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -702,7 +709,7 @@
 		4D7B1D8E08A8AC72008FFC05 /* libftgl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libftgl.a; path = /usr/local/lib/libftgl.a; sourceTree = SOURCE_ROOT; };
 		4D7B1D9008A8ACA6008FFC05 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = /usr/local/lib/libfreetype.a; sourceTree = SOURCE_ROOT; };
 		4D7B1D9208A8ACCB008FFC05 /* libfreeimage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreeimage.a; path = /usr/local/lib/libfreeimage.a; sourceTree = SOURCE_ROOT; };
-		4D7B1D9808A8AD7C008FFC05 /* H3DLoad */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = H3DLoad; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D7B1D9808A8AD7C008FFC05 /* H3DLoad */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = H3DLoad; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D07F2C70486CC7A007CD1D0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D07F2C80486CC7A007CD1D0 /* H3D.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = H3D.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		967A00260B932EE8009CBE63 /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
@@ -954,7 +961,6 @@
 		96E9DBA70B8C6D7C00B4BE63 /* ScalarInterpolator.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = ScalarInterpolator.h; path = ../../src/ScalarInterpolator.h; sourceTree = SOURCE_ROOT; };
 		96E9DBA80B8C6D7C00B4BE63 /* Scene.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = Scene.h; path = ../../src/Scene.h; sourceTree = SOURCE_ROOT; };
 		96E9DBA90B8C6D7C00B4BE63 /* Script.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = Script.h; path = ../../src/Script.h; sourceTree = SOURCE_ROOT; };
-		96E9DBAA0B8C6D7C00B4BE63 /* SensAbleDevice.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = SensAbleDevice.h; path = ../../src/SensAbleDevice.h; sourceTree = SOURCE_ROOT; };
 		96E9DBAB0B8C6D7C00B4BE63 /* SFBool.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = SFBool.h; path = ../../src/SFBool.h; sourceTree = SOURCE_ROOT; };
 		96E9DBAC0B8C6D7C00B4BE63 /* SFColor.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = SFColor.h; path = ../../src/SFColor.h; sourceTree = SOURCE_ROOT; };
 		96E9DBAD0B8C6D7C00B4BE63 /* SFColorRGBA.h */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.c.h; name = SFColorRGBA.h; path = ../../src/SFColorRGBA.h; sourceTree = SOURCE_ROOT; };
@@ -1253,7 +1259,6 @@
 		96E9DE2F0B8C6DA900B4BE63 /* ScalarInterpolator.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = ScalarInterpolator.cpp; path = ../../src/ScalarInterpolator.cpp; sourceTree = SOURCE_ROOT; };
 		96E9DE300B8C6DA900B4BE63 /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = Scene.cpp; path = ../../src/Scene.cpp; sourceTree = SOURCE_ROOT; };
 		96E9DE310B8C6DA900B4BE63 /* Script.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = Script.cpp; path = ../../src/Script.cpp; sourceTree = SOURCE_ROOT; };
-		96E9DE320B8C6DA900B4BE63 /* SensAbleDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = SensAbleDevice.cpp; path = ../../src/SensAbleDevice.cpp; sourceTree = SOURCE_ROOT; };
 		96E9DE330B8C6DA900B4BE63 /* SFNode.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = SFNode.cpp; path = ../../src/SFNode.cpp; sourceTree = SOURCE_ROOT; };
 		96E9DE340B8C6DA900B4BE63 /* ShaderFunctions.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderFunctions.cpp; path = ../../src/ShaderFunctions.cpp; sourceTree = SOURCE_ROOT; };
 		96E9DE350B8C6DA900B4BE63 /* ShaderPart.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderPart.cpp; path = ../../src/ShaderPart.cpp; sourceTree = SOURCE_ROOT; };
@@ -1359,6 +1364,15 @@
 		96E9DE990B8C6DA900B4BE63 /* X3DViewpointNode.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = X3DViewpointNode.cpp; path = ../../src/X3DViewpointNode.cpp; sourceTree = SOURCE_ROOT; };
 		96E9DFA50B8C6DEC00B4BE63 /* lex.yy.cc */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = lex.yy.cc; path = ../../src/lex.yy.cc; sourceTree = SOURCE_ROOT; };
 		96E9E0490B8C853300B4BE63 /* H3DLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = sourcecode.cpp.cpp; name = H3DLoad.cpp; path = ../../src/H3DLoad.cpp; sourceTree = SOURCE_ROOT; };
+		96FA00940C269C4800C1F160 /* FalconDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = FalconDevice.cpp; path = ../../src/FalconDevice.cpp; sourceTree = SOURCE_ROOT; };
+		96FA00950C269C4800C1F160 /* PhantomDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = PhantomDevice.cpp; path = ../../src/PhantomDevice.cpp; sourceTree = SOURCE_ROOT; };
+		96FA00960C269C4800C1F160 /* SpaceWareHapticsDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SpaceWareHapticsDevice.cpp; path = ../../src/SpaceWareHapticsDevice.cpp; sourceTree = SOURCE_ROOT; };
+		96FA009A0C269C7C00C1F160 /* FakeHapticsDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FakeHapticsDevice.h; path = ../../src/FakeHapticsDevice.h; sourceTree = SOURCE_ROOT; };
+		96FA009B0C269C7C00C1F160 /* FalconDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FalconDevice.h; path = ../../src/FalconDevice.h; sourceTree = SOURCE_ROOT; };
+		96FA009C0C269C7C00C1F160 /* H3DFakeHapticsDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = H3DFakeHapticsDevice.h; path = ../../src/H3DFakeHapticsDevice.h; sourceTree = SOURCE_ROOT; };
+		96FA009D0C269C7C00C1F160 /* PhantomDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PhantomDevice.h; path = ../../src/PhantomDevice.h; sourceTree = SOURCE_ROOT; };
+		96FA009E0C269C7C00C1F160 /* QuanserDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = QuanserDevice.h; path = ../../src/QuanserDevice.h; sourceTree = SOURCE_ROOT; };
+		96FA009F0C269C7C00C1F160 /* SpaceWareHapticsDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SpaceWareHapticsDevice.h; path = ../../src/SpaceWareHapticsDevice.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1458,6 +1472,9 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				96FA00940C269C4800C1F160 /* FalconDevice.cpp */,
+				96FA00950C269C4800C1F160 /* PhantomDevice.cpp */,
+				96FA00960C269C4800C1F160 /* SpaceWareHapticsDevice.cpp */,
 				96DEE4540C1EDD8B00879FC4 /* FakeHapticsDevice.cpp */,
 				96DEE42D0C1EDB4A00879FC4 /* H3DFakeHapticsDevice.cpp */,
 				96DEE4140C1EBE6100879FC4 /* Image.cpp */,
@@ -1655,7 +1672,6 @@
 				96E9DE2F0B8C6DA900B4BE63 /* ScalarInterpolator.cpp */,
 				96E9DE300B8C6DA900B4BE63 /* Scene.cpp */,
 				96E9DE310B8C6DA900B4BE63 /* Script.cpp */,
-				96E9DE320B8C6DA900B4BE63 /* SensAbleDevice.cpp */,
 				96E9DE330B8C6DA900B4BE63 /* SFNode.cpp */,
 				96E9DE340B8C6DA900B4BE63 /* ShaderFunctions.cpp */,
 				96E9DE350B8C6DA900B4BE63 /* ShaderPart.cpp */,
@@ -1767,6 +1783,12 @@
 		4D0AFE9508A7975100A71D46 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				96FA009A0C269C7C00C1F160 /* FakeHapticsDevice.h */,
+				96FA009B0C269C7C00C1F160 /* FalconDevice.h */,
+				96FA009C0C269C7C00C1F160 /* H3DFakeHapticsDevice.h */,
+				96FA009D0C269C7C00C1F160 /* PhantomDevice.h */,
+				96FA009E0C269C7C00C1F160 /* QuanserDevice.h */,
+				96FA009F0C269C7C00C1F160 /* SpaceWareHapticsDevice.h */,
 				96C99A540BF4506E009CFA83 /* Anchor.h */,
 				96C99A550BF4506E009CFA83 /* NurbsCurve.h */,
 				96E9DAD80B8C6D7C00B4BE63 /* AnyDevice.h */,
@@ -1979,7 +2001,6 @@
 				96E9DBA70B8C6D7C00B4BE63 /* ScalarInterpolator.h */,
 				96E9DBA80B8C6D7C00B4BE63 /* Scene.h */,
 				96E9DBA90B8C6D7C00B4BE63 /* Script.h */,
-				96E9DBAA0B8C6D7C00B4BE63 /* SensAbleDevice.h */,
 				96E9DBAB0B8C6D7C00B4BE63 /* SFBool.h */,
 				96E9DBAC0B8C6D7C00B4BE63 /* SFColor.h */,
 				96E9DBAD0B8C6D7C00B4BE63 /* SFColorRGBA.h */,
@@ -2343,7 +2364,6 @@
 				96E9DD020B8C6D7C00B4BE63 /* ScalarInterpolator.h in Headers */,
 				96E9DD030B8C6D7C00B4BE63 /* Scene.h in Headers */,
 				96E9DD040B8C6D7C00B4BE63 /* Script.h in Headers */,
-				96E9DD050B8C6D7C00B4BE63 /* SensAbleDevice.h in Headers */,
 				96E9DD060B8C6D7C00B4BE63 /* SFBool.h in Headers */,
 				96E9DD070B8C6D7C00B4BE63 /* SFColor.h in Headers */,
 				96E9DD080B8C6D7C00B4BE63 /* SFColorRGBA.h in Headers */,
@@ -2495,6 +2515,12 @@
 				96D455AC0BE0BFFA001E8F3F /* X3DEnvironmentalSensorNode.h in Headers */,
 				96C99A560BF4506E009CFA83 /* Anchor.h in Headers */,
 				96C99A570BF4506E009CFA83 /* NurbsCurve.h in Headers */,
+				96FA00A00C269C7C00C1F160 /* FakeHapticsDevice.h in Headers */,
+				96FA00A10C269C7C00C1F160 /* FalconDevice.h in Headers */,
+				96FA00A20C269C7C00C1F160 /* H3DFakeHapticsDevice.h in Headers */,
+				96FA00A30C269C7C00C1F160 /* PhantomDevice.h in Headers */,
+				96FA00A40C269C7C00C1F160 /* QuanserDevice.h in Headers */,
+				96FA00A50C269C7C00C1F160 /* SpaceWareHapticsDevice.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2765,7 +2791,6 @@
 				96E9DF3A0B8C6DA900B4BE63 /* ScalarInterpolator.cpp in Sources */,
 				96E9DF3B0B8C6DA900B4BE63 /* Scene.cpp in Sources */,
 				96E9DF3C0B8C6DA900B4BE63 /* Script.cpp in Sources */,
-				96E9DF3D0B8C6DA900B4BE63 /* SensAbleDevice.cpp in Sources */,
 				96E9DF3E0B8C6DA900B4BE63 /* SFNode.cpp in Sources */,
 				96E9DF3F0B8C6DA900B4BE63 /* ShaderFunctions.cpp in Sources */,
 				96E9DF400B8C6DA900B4BE63 /* ShaderPart.cpp in Sources */,
@@ -2890,6 +2915,9 @@
 				96DEE4190C1EBE6100879FC4 /* QuanserDevice.cpp in Sources */,
 				96DEE42E0C1EDB4A00879FC4 /* H3DFakeHapticsDevice.cpp in Sources */,
 				96DEE4550C1EDD8B00879FC4 /* FakeHapticsDevice.cpp in Sources */,
+				96FA00970C269C4800C1F160 /* FalconDevice.cpp in Sources */,
+				96FA00980C269C4800C1F160 /* PhantomDevice.cpp in Sources */,
+				96FA00990C269C4800C1F160 /* SpaceWareHapticsDevice.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
