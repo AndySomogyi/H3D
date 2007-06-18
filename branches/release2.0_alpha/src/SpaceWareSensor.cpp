@@ -28,6 +28,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+
 #include <SpaceWareSensor.h>
 
 #ifdef WIN32
@@ -45,7 +46,6 @@ extern "C" {
 #include <siapp.h>
   extern  SpwRetVal SpwErrorVal;
 }
-#endif // HAVE_3DXWARE
 
 #include <process.h>
 
@@ -62,6 +62,7 @@ extern "C" {
 #include <xdrvlib.h>
 }
 #endif // __linux
+#endif // HAVE_3DXWARE
 
 using namespace H3D;
 SpaceWareSensor * SpaceWareSensor::sws_instance = 0;
@@ -589,3 +590,5 @@ void SpaceWareSensor::traverseSG( TraverseInfo &ti ) {
     }
   }
 }
+
+
