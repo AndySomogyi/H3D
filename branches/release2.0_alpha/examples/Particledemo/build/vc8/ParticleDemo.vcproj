@@ -16,7 +16,7 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
+			OutputDirectory="..\..\..\..\..\bin"
 			IntermediateDirectory="Release\obj"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="C:\H3D\HAPI\OpenHapticsRenderer;C:\H3D\HAPI\src;C:\H3D\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;"
+				AdditionalIncludeDirectories="..\..\src;..\..\..\..\..\H3DUtil\src;..\..\..\..\..\HAPI\src;..\..\..\..\..\HAPI\OpenHapticsRenderer;C:\H3D\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;"
 				PreprocessorDefinitions="_NDEBUG;_CONSOLE;WIN32;_WINDOWS;PLATFORM_WIN32;__WXMSW__"
 				StringPooling="true"
 				BasicRuntimeChecks="0"
@@ -71,11 +71,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="H3DAPI.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib wxmsw28_adv.lib HAPI.lib OpenHapticsRenderer.lib rpcrt4.lib comctl32.lib"
+				AdditionalOptions="/MACHINE:I386&#x0D;&#x0A;/FORCE:MULTIPLE"
+				AdditionalDependencies="H3DUtil10_vc8.lib H3DAPI20_vc8.lib wxmsw28_gl_vc8.lib wxmsw28_core_vc8.lib wxbase28_vc8.lib wxmsw28_adv_vc8.lib HAPI10_vc8.lib OpenHapticsRenderer10_vc8.lib rpcrt4.lib comctl32.lib"
 				OutputFile="$(OutDir)/ParticleDemo.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\H3D\HAPI\build\win32\vc8\release;C:\H3D\H3DUtil\build\win32\vc8\Release;&quot;$(H3D_ROOT)\build\win32\vc8\Release&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\..\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
@@ -107,7 +107,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
+			OutputDirectory="..\..\..\..\..\bin"
 			IntermediateDirectory="Debug\obj"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -133,8 +133,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\H3D\HAPI\OpenHapticsRenderer;C:\H3D\HAPI\src;C:\H3D\H3DUtil\src;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_WINDOWS;PLATFORM_WIN32;__WXMSW__;__WXDEBUG__;NOPCH"
+				AdditionalIncludeDirectories="..\..\src;..\..\..\..\..\H3DUtil\src;..\..\..\..\..\HAPI\src;..\..\..\..\..\HAPI\OpenHapticsRenderer;&quot;$(H3D_EXTERNAL_ROOT)\include&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\pthread&quot;;&quot;$(H3D_EXTERNAL_ROOT)\include\Xerces-C-src_2_7_0\src&quot;;&quot;$(3DTOUCH_BASE)\include&quot;;&quot;$(H3D_ROOT)\src&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_WINDOWS;PLATFORM_WIN32;__WXMSW__;NOPCH"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
 				DisableLanguageExtensions="false"
@@ -160,12 +160,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="H3DAPI.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib HAPI.lib OpenHapticsRenderer.lib rpcrt4.lib comctl32.lib"
-				OutputFile="$(OutDir)/WxLoad.exe"
+				AdditionalOptions="/MACHINE:I386&#x0D;&#x0A;/FORCE:MULTIPLE"
+				AdditionalDependencies="msvcrtd.lib H3DUtil10_vc8_d.lib H3DAPI20_vc8_d.lib wxmsw28_gl_vc8.lib wxmsw28_core_vc8.lib wxbase28_vc8.lib wxmsw28_adv_vc8.lib HAPI10_vc8_d.lib OpenHapticsRenderer10_vc8_d.lib rpcrt4.lib comctl32.lib"
+				OutputFile="$(OutDir)/ParticleDemo_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="C:\H3D\HAPI\build\win32\vc8\release;C:\H3D\H3DUtil\build\win32\vc8\Release;&quot;$(H3D_ROOT)\build\win32\vc8\Release&quot;;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\..\lib;&quot;$(H3D_EXTERNAL_ROOT)\lib&quot;;&quot;$(3DTOUCH_BASE)\lib&quot;;&quot;$(3DTOUCH_BASE)\utilities\lib&quot;"
+				IgnoreDefaultLibraryNames="msvcrt.lib"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
@@ -202,51 +203,51 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\src\consoleDialog.cpp"
+			RelativePath="..\..\src\ConsoleDialog.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\consoleDialog.h"
+			RelativePath="..\..\src\ConsoleDialog.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\emittersettings.cpp"
+			RelativePath="..\..\src\EmitterSettings.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\emittersettings.h"
+			RelativePath="..\..\src\EmitterSettings.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\envini.h"
+			RelativePath="..\..\src\Envini.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxFrame.cpp"
+			RelativePath="..\..\src\ParticleDemo.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxFrame.h"
+			RelativePath="..\..\src\PhysicsModels.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxWidgetsWindow.cpp"
+			RelativePath="..\..\src\PhysicsModels.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\H3DWxWidgetsWindow.h"
+			RelativePath="..\..\src\WxFrame.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\physicsmodels.cpp"
+			RelativePath="..\..\src\WxFrame.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\physicsmodels.h"
+			RelativePath="..\..\src\WxWidgetsWindow.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\WxMain.cpp"
+			RelativePath="..\..\src\WxWidgetsWindow.h"
 			>
 		</File>
 	</Files>
