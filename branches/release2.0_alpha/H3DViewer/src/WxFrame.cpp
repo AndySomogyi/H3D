@@ -1041,7 +1041,7 @@ void WxFrame::SaveSettings () {
   global_settings->getOptionNode (ho);
   if (ho) {
     h3dConfig->SetPath(_T("/Settings/Haptics"));
-    h3dConfig->Write(_T("touchableFace"), ho->touchableFace->getValue());
+    h3dConfig->Write(_T("touchableFace"), wxString( ho->touchableFace->getValue().c_str() ));
     h3dConfig->Write(_T("maxDistance"), ho->maxDistance->getValue());
     h3dConfig->Write(_T("lookAheadFactor"), ho->lookAheadFactor->getValue());
     h3dConfig->Write(_T("useBoundTree"), (bool) ho->useBoundTree->getValue());
@@ -1056,7 +1056,7 @@ void WxFrame::SaveSettings () {
                      oho->useAdaptiveViewport->getValue());
     h3dConfig->Write(_T("useHapticCameraView"),
                      oho->useHapticCameraView->getValue());
-    h3dConfig->Write(_T("GLShape"), oho->GLShape->getValue());
+    h3dConfig->Write(_T("GLShape"), wxString(oho->GLShape->getValue().c_str() ) );
     h3dConfig->Write(_T("forceFullGeometryRender"),
                      oho->forceFullGeometryRender->getValue());
   }
@@ -1066,7 +1066,7 @@ void WxFrame::SaveSettings () {
   global_settings->getOptionNode (gbto);
   if (gbto) {
     h3dConfig->SetPath(_T("/Settings/GeometryBoundTree"));
-    h3dConfig->Write(_T("boundType"), gbto->boundType->getValue());
+    h3dConfig->Write(_T("boundType"), wxString(gbto->boundType->getValue().c_str()));
     h3dConfig->Write(_T("maxTrianglesInLeaf"),
                      gbto->maxTrianglesInLeaf->getValue());
   }
