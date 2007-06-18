@@ -30,18 +30,8 @@
 // ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
-//#pragma once
-//#include "header.h"
-#include <H3DWxFrame.h>
-#include <H3DWxWidgetsWindow.h>
-//#include <fstream>
-//#include "X3D.h"
-//#include <string.h>
-
-//#include <iostream>
-
-//#include "X3DSAX2Handlers.h"
-//#include "GLUTWindow.h"
+#include <WxFrame.h>
+#include <WxWidgetsWindow.h>
 #include <VrmlParser.h>
 #include <Group.h>
 #include <Transform.h>
@@ -51,8 +41,6 @@
 #ifndef MACOSX
 #include <SpaceWareSensor.h>
 #endif
-//#include "DEFNodes.h"
-//#include "Viewpoint.h"
 #include <DeviceInfo.h>
 #include <INIFile.h>
 #include <ResourceResolver.h>
@@ -150,7 +138,7 @@ bool MyApp::OnInit()
   //initializeH3D();
 
   // create a window to display
-  H3DWxFrame *theWxFrame = new H3DWxFrame(NULL, wxID_ANY, "Particle Systems - Demo", wxDefaultPosition, wxSize(800, 600));
+  WxFrame *theWxFrame = new WxFrame(NULL, wxID_ANY, "Particle Systems - Demo", wxDefaultPosition, wxSize(800, 600));
 	//glwindow constructed in the frame constructor.  Next line redundant.
 	//theWxFrame->glwindow = new H3DWxWidgetsWindow(theWxFrame);
 	theWxFrame->Show(true);
@@ -161,9 +149,9 @@ bool MyApp::OnInit()
 
     
     // Using this line instead of the two previous lines will make
-    // H3DWxWidgetsWindow create an instance of a wxframe with no menus and use
+    // WxWidgetsWindow create an instance of a wxframe with no menus and use
     // this as parent to the canvas.
-    // H3DWxWidgetsWindow *glwindow = new H3DWxWidgetsWindow();
+    // WxWidgetsWindow *glwindow = new WxWidgetsWindow();
 
   return true;
 }

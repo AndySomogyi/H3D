@@ -26,8 +26,8 @@
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
-#ifndef __H3DWXWIDGETSWINDOW_H__
-#define __H3DWXWIDGETSWINDOW_H__
+#ifndef __WXWIDGETSWINDOW_H__
+#define __WXWIDGETSWINDOW_H__
 
 #include "wx/wx.h"
 #include <H3DWindowNode.h>
@@ -41,19 +41,19 @@
 namespace H3D {
 
   /// \ingroup Nodes
-  /// \class H3DWxWidgetsWindow
+  /// \class WxWidgetsWindow
   /// \brief H3DWindowNode implemented using wxWidgets. 
   /// 
-  class H3DWxWidgetsWindow : public H3DWindowNode {
+  class WxWidgetsWindow : public H3DWindowNode {
   public:
 
-    class H3DwxGLCanvas: public wxGLCanvas
+    class MyWxGLCanvas: public wxGLCanvas
     {
     public:
-      H3DwxGLCanvas(H3DWxWidgetsWindow *_myOwner, wxWindow* _parent,
+      MyWxGLCanvas(WxWidgetsWindow *_myOwner, wxWindow* _parent,
         wxWindowID _id, const wxPoint& _pos, const wxSize& _size, int*
         _attribList = 0, long _style=0, 
-        const wxString& _name="H3DwxGLCanvas",
+        const wxString& _name="MyWxGLCanvas",
         const wxPalette& _palette = wxNullPalette );
       void OnSize(wxSizeEvent& event);
       void OnPaint(wxPaintEvent& event);
@@ -74,12 +74,12 @@ namespace H3D {
 #endif
 
     protected:
-      H3DWxWidgetsWindow * myOwner;
+      WxWidgetsWindow * myOwner;
       DECLARE_EVENT_TABLE()
     };
 
     /// Constructor.
-    H3DWxWidgetsWindow( wxWindow *_theParent = 0,
+    WxWidgetsWindow( wxWindow *_theParent = 0,
       Inst< SFInt32     > _width      = 0,
                 Inst< SFInt32     > _height     = 0,
                 Inst< SFBool      > _fullscreen = 0,
@@ -89,7 +89,7 @@ namespace H3D {
                 Inst< SFTime      > _time       = 0 );
 
     ///// Destructor.
-    //~H3DWxWidgetsWindow();
+    //~WxWidgetsWindow();
 
     /// Calls wxGLCanvas::SwapBuffers
     virtual void swapBuffers(); 
@@ -111,7 +111,7 @@ namespace H3D {
 
   protected:
     wxWindow * theWindow;
-    H3DwxGLCanvas * theWxGLCanvas;
+    MyWxGLCanvas * theWxGLCanvas;
 	bool last_fullscreen;
   };
 }

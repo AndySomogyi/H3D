@@ -21,13 +21,13 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file physicsmodels.cpp
-/// \brief Implementation file for physicsmodels
+/// \file PhysicsModels.cpp
+/// \brief Implementation file for PhysicsModels
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <physicsmodels.h>
+#include <PhysicsModels.h>
 
 using namespace std;
 using namespace H3D;
@@ -43,7 +43,8 @@ BEGIN_EVENT_TABLE(BoundedPhysicsModelDialog, wxPropertySheetDialog)
   EVT_CHECKBOX(ID_ENABLED, BoundedPhysicsModelDialog::handleSettingsChange)
 END_EVENT_TABLE()
 
-BoundedPhysicsModelDialog::BoundedPhysicsModelDialog(wxWindow* win, ParticleSystem* PS)
+BoundedPhysicsModelDialog::BoundedPhysicsModelDialog(wxWindow* win, 
+                                                     ParticleSystem* PS)
 {
   SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -55,9 +56,9 @@ BoundedPhysicsModelDialog::BoundedPhysicsModelDialog(wxWindow* win, ParticleSyst
 
   m_imageList = NULL;
 
-  Create(win, wxID_ANY, _("Bounded Physics Model"), wxDefaultPosition, wxDefaultSize,
-      wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
-  );
+  Create(win, wxID_ANY, _("Bounded Physics Model"), wxDefaultPosition, 
+         wxDefaultSize, wxDEFAULT_DIALOG_STYLE| (
+         int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)  );
 
   // If using a toolbook, also follow Mac style and don't create buttons
   CreateButtons(wxOK | wxCANCEL |
@@ -67,9 +68,11 @@ BoundedPhysicsModelDialog::BoundedPhysicsModelDialog(wxWindow* win, ParticleSyst
   wxBookCtrlBase* notebook = GetBookCtrl();
   notebook->SetImageList(m_imageList);
 
-  wxPanel* BoundedPhysicsModelSettings = CreateBoundedPhysicsModelSettingsPage(notebook);
+  wxPanel* BoundedPhysicsModelSettings = 
+    CreateBoundedPhysicsModelSettingsPage(notebook);
 
-  notebook->AddPage(BoundedPhysicsModelSettings, _("Physics Properties"), true, tabImage1);
+  notebook->AddPage(BoundedPhysicsModelSettings, 
+                    _("Physics Properties"), true, tabImage1);
 
   LayoutDialog();
 
@@ -89,7 +92,8 @@ BoundedPhysicsModelDialog::~BoundedPhysicsModelDialog()
 
 }
 
-wxPanel* BoundedPhysicsModelDialog::CreateBoundedPhysicsModelSettingsPage(wxWindow *parent)
+wxPanel* BoundedPhysicsModelDialog::
+  CreateBoundedPhysicsModelSettingsPage(wxWindow *parent)
 {
   wxPanel* panel = new wxPanel(parent, wxID_ANY);
   
@@ -98,8 +102,12 @@ wxPanel* BoundedPhysicsModelDialog::CreateBoundedPhysicsModelSettingsPage(wxWind
 
   //ENABLE
   wxBoxSizer* enableSizer = new wxBoxSizer( wxHORIZONTAL );
-  wxCheckBox* boundedPhysicsModelEnable = new wxCheckBox(panel, ID_ENABLED, _("&Enable"), wxDefaultPosition, wxDefaultSize);
-  enableSizer->Add(boundedPhysicsModelEnable, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  wxCheckBox* boundedPhysicsModelEnable = new wxCheckBox(panel, ID_ENABLED,
+                                                          _("&Enable"), 
+                                                          wxDefaultPosition, 
+                                                          wxDefaultSize);
+  enableSizer->Add(boundedPhysicsModelEnable, 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
   item0->Add(enableSizer, 0, wxGROW|wxALL, 0);
 
   topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
@@ -122,7 +130,8 @@ void BoundedPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
 
 void BoundedPhysicsModelDialog::getIndex () {
   int count = 0;
-  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = ePS->physics->begin();
+  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = 
+       ePS->physics->begin();
        i != ePS->physics->end(); i++ ) {
     boundedPhysicsModel = 
       dynamic_cast<BoundedPhysicsModel *> (*i);
@@ -145,7 +154,8 @@ BEGIN_EVENT_TABLE(GravityPhysicsModelDialog, wxPropertySheetDialog)
   EVT_TEXT(ID_GRAVITY, GravityPhysicsModelDialog::handleSettingsChange)
 END_EVENT_TABLE()
 
-GravityPhysicsModelDialog::GravityPhysicsModelDialog(wxWindow* win, ParticleSystem* PS)
+GravityPhysicsModelDialog::
+  GravityPhysicsModelDialog(wxWindow* win, ParticleSystem* PS)
 {
   SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -157,8 +167,9 @@ GravityPhysicsModelDialog::GravityPhysicsModelDialog(wxWindow* win, ParticleSyst
 
   m_imageList = NULL;
 
-  Create(win, wxID_ANY, _("Gravity Physics Model"), wxDefaultPosition, wxDefaultSize,
-      wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+  Create(win, wxID_ANY, _("Gravity Physics Model"), wxDefaultPosition, 
+  wxDefaultSize, 
+  wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
   );
 
   // If using a toolbook, also follow Mac style and don't create buttons
@@ -169,9 +180,11 @@ GravityPhysicsModelDialog::GravityPhysicsModelDialog(wxWindow* win, ParticleSyst
   wxBookCtrlBase* notebook = GetBookCtrl();
   notebook->SetImageList(m_imageList);
 
-  wxPanel* GravityPhysicsModelSettings = CreateGravityPhysicsModelSettingsPage(notebook);
+  wxPanel* GravityPhysicsModelSettings = 
+    CreateGravityPhysicsModelSettingsPage(notebook);
 
-  notebook->AddPage(GravityPhysicsModelSettings, _("Physics Properties"), true, tabImage1);
+  notebook->AddPage(GravityPhysicsModelSettings,
+                    _("Physics Properties"), true, tabImage1);
 
   LayoutDialog();
 
@@ -191,7 +204,8 @@ GravityPhysicsModelDialog::~GravityPhysicsModelDialog()
 
 }
 
-wxPanel* GravityPhysicsModelDialog::CreateGravityPhysicsModelSettingsPage(wxWindow *parent)
+wxPanel* GravityPhysicsModelDialog::
+  CreateGravityPhysicsModelSettingsPage(wxWindow *parent)
 {
   wxPanel* panel = new wxPanel(parent, wxID_ANY);
   
@@ -200,15 +214,24 @@ wxPanel* GravityPhysicsModelDialog::CreateGravityPhysicsModelSettingsPage(wxWind
 
   //ENABLE
   wxBoxSizer* enableSizer = new wxBoxSizer( wxHORIZONTAL );
-  wxCheckBox* gravityPhysicsModelEnable = new wxCheckBox(panel, ID_ENABLED, _("&Enable"), wxDefaultPosition, wxDefaultSize);
-  enableSizer->Add(gravityPhysicsModelEnable, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  wxCheckBox* gravityPhysicsModelEnable = new wxCheckBox(panel, ID_ENABLED,
+                                                         _("&Enable"), 
+                                                         wxDefaultPosition, 
+                                                         wxDefaultSize);
+  enableSizer->Add(gravityPhysicsModelEnable, 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
   item0->Add(enableSizer, 0, wxGROW|wxALL, 0);
 
   //// GRAVITY
   wxBoxSizer* gravitySizer = new wxBoxSizer( wxHORIZONTAL );
-  gravitySizer->Add(new wxStaticText(panel, wxID_ANY, _("&Gravity :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-  wxTextCtrl* gravityPhysicsModelGravity = new wxTextCtrl(panel, ID_GRAVITY, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-  gravitySizer->Add(gravityPhysicsModelGravity, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  gravitySizer->Add(new wxStaticText(panel, wxID_ANY, _("&Gravity :")), 0, 
+                                     wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  wxTextCtrl* gravityPhysicsModelGravity = new wxTextCtrl(panel, ID_GRAVITY, 
+                                                wxEmptyString, 
+                                                wxDefaultPosition, 
+                                                wxSize(40, wxDefaultCoord));
+  gravitySizer->Add(gravityPhysicsModelGravity, 0, 
+                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
   item0->Add(gravitySizer, 0, wxGROW|wxALL, 0);
 
   topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
@@ -220,7 +243,8 @@ wxPanel* GravityPhysicsModelDialog::CreateGravityPhysicsModelSettingsPage(wxWind
 }
 
 void GravityPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
-  gravityPhysicsModel = dynamic_cast<GravityPhysicsModel *> (ePS->physics->getValueByIndex(index));
+  gravityPhysicsModel = 
+    dynamic_cast<GravityPhysicsModel *> (ePS->physics->getValueByIndex(index));
 
   if (gravityPhysicsModel) {
 
@@ -271,7 +295,8 @@ void GravityPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
 
 void GravityPhysicsModelDialog::getIndex () {
   int count = 0;
-  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = ePS->physics->begin();
+  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = 
+       ePS->physics->begin();
        i != ePS->physics->end(); i++ ) {
     gravityPhysicsModel = 
       dynamic_cast<GravityPhysicsModel *> (*i);
@@ -298,7 +323,8 @@ BEGIN_EVENT_TABLE(WindPhysicsModelDialog, wxPropertySheetDialog)
   EVT_TEXT(ID_DIRECTION, WindPhysicsModelDialog::handleSettingsChange)
 END_EVENT_TABLE()
 
-WindPhysicsModelDialog::WindPhysicsModelDialog(wxWindow* win, ParticleSystem* PS)
+WindPhysicsModelDialog::
+  WindPhysicsModelDialog(wxWindow* win, ParticleSystem* PS)
 {
     SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
@@ -310,8 +336,9 @@ WindPhysicsModelDialog::WindPhysicsModelDialog(wxWindow* win, ParticleSystem* PS
 
     m_imageList = NULL;
 
-    Create(win, wxID_ANY, _("Wind Physics Model"), wxDefaultPosition, wxDefaultSize,
-        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+    Create(win, wxID_ANY, _("Wind Physics Model"), wxDefaultPosition, 
+    wxDefaultSize, wxDEFAULT_DIALOG_STYLE| 
+    (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
     );
 
     // If using a toolbook, also follow Mac style and don't create buttons
@@ -322,9 +349,11 @@ WindPhysicsModelDialog::WindPhysicsModelDialog(wxWindow* win, ParticleSystem* PS
     wxBookCtrlBase* notebook = GetBookCtrl();
     notebook->SetImageList(m_imageList);
 
-    wxPanel* WindPhysicsModelSettings = CreateWindPhysicsModelSettingsPage(notebook);
+    wxPanel* WindPhysicsModelSettings = 
+      CreateWindPhysicsModelSettingsPage(notebook);
 
-    notebook->AddPage(WindPhysicsModelSettings, _("Physics Properties"), true, tabImage1);
+    notebook->AddPage(WindPhysicsModelSettings, _("Physics Properties"), 
+                      true, tabImage1);
 
     LayoutDialog();
 
@@ -345,7 +374,8 @@ WindPhysicsModelDialog::~WindPhysicsModelDialog()
 
 }
 
-wxPanel* WindPhysicsModelDialog::CreateWindPhysicsModelSettingsPage(wxWindow *parent)
+wxPanel* WindPhysicsModelDialog::
+  CreateWindPhysicsModelSettingsPage(wxWindow *parent)
 {
   wxPanel* panel = new wxPanel(parent, wxID_ANY);
   
@@ -354,36 +384,59 @@ wxPanel* WindPhysicsModelDialog::CreateWindPhysicsModelSettingsPage(wxWindow *pa
 
   //ENABLE
   wxBoxSizer* enableSizer = new wxBoxSizer( wxHORIZONTAL );
-  wxCheckBox* windPhysicsModelEnable = new wxCheckBox(panel, ID_ENABLED, _("&Enable"), wxDefaultPosition, wxDefaultSize);
-  enableSizer->Add(windPhysicsModelEnable, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  wxCheckBox* windPhysicsModelEnable = new wxCheckBox(panel, ID_ENABLED, 
+                                                      _("&Enable"), 
+                                                      wxDefaultPosition, 
+                                                      wxDefaultSize);
+  enableSizer->Add(windPhysicsModelEnable, 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
   item0->Add(enableSizer, 0, wxGROW|wxALL, 0);
 
   //// SPEED
   wxBoxSizer* speedSizer = new wxBoxSizer( wxHORIZONTAL );
-  speedSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Speed            :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-  wxTextCtrl* windPhysicsModelSpeed = new wxTextCtrl (panel, ID_SPEED, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+  speedSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Speed            :")), 
+                  0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  wxTextCtrl* windPhysicsModelSpeed = new wxTextCtrl (panel, ID_SPEED, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
   speedSizer->Add(windPhysicsModelSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
   item0->Add(speedSizer, 0, wxGROW|wxALL, 0);
 
   ////GUSTINESS
   wxBoxSizer* gustinessSizer = new wxBoxSizer( wxHORIZONTAL );
-  gustinessSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Gustiness      :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-  wxTextCtrl* windPhysicsModelGustiness = new wxTextCtrl (panel, ID_GUSTINESS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+  gustinessSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Gustiness      :")),
+                      0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  wxTextCtrl* windPhysicsModelGustiness = new wxTextCtrl (panel, ID_GUSTINESS, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
   gustinessSizer->Add(windPhysicsModelGustiness, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
   item0->Add(gustinessSizer, 0, wxGROW|wxALL, 0);
 
   //// TURBULENCE
   wxBoxSizer* turbulenceSizer = new wxBoxSizer( wxHORIZONTAL );
-  turbulenceSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Turbulence    :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-  wxTextCtrl* windPhysicsModelTurbulence = new wxTextCtrl(panel, ID_TURBULENCE, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-  turbulenceSizer->Add(windPhysicsModelTurbulence, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  turbulenceSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Turbulence    :")), 
+                       0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  wxTextCtrl* windPhysicsModelTurbulence = new wxTextCtrl(panel, ID_TURBULENCE, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
+  turbulenceSizer->Add(windPhysicsModelTurbulence, 0, 
+                       wxALL|wxALIGN_CENTER_VERTICAL, 5);
   item0->Add(turbulenceSizer, 0, wxGROW|wxALL, 0);
 
   //// DIRECTION
   wxBoxSizer* directionSizer = new wxBoxSizer( wxHORIZONTAL );
-  directionSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Direction        :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-  wxTextCtrl* windPhysicsModelDirection = new wxTextCtrl(panel, ID_DIRECTION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-  directionSizer->Add(windPhysicsModelDirection, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  directionSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                      _("&Direction        :")), 0, 
+                      wxALL|wxALIGN_CENTER_VERTICAL, 5);
+  wxTextCtrl* windPhysicsModelDirection = new wxTextCtrl(panel, ID_DIRECTION, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
+  directionSizer->Add(windPhysicsModelDirection, 0, 
+                      wxALL|wxALIGN_CENTER_VERTICAL, 5);
   item0->Add(directionSizer, 0, wxGROW|wxALL, 0);
 
   topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
@@ -395,7 +448,8 @@ wxPanel* WindPhysicsModelDialog::CreateWindPhysicsModelSettingsPage(wxWindow *pa
 }
 
 void WindPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
-  windPhysicsModel = dynamic_cast<WindPhysicsModel *> (ePS->physics->getValueByIndex(index));
+  windPhysicsModel = 
+    dynamic_cast<WindPhysicsModel *> (ePS->physics->getValueByIndex(index));
 
   int id = event.GetId();
 
@@ -449,14 +503,18 @@ void WindPhysicsModelDialog::handleSettingsChange (wxCommandEvent & event) {
   Console (3) << index << endl;
   Console (3) << "Enabled: " << windPhysicsModel->enabled->getValue() << endl;
   Console (3) << "Speed: " << windPhysicsModel->speed->getValue() << endl;
-  Console (3) << "Gustiness: " << windPhysicsModel->gustiness->getValue() << endl;
-  Console (3) << "Turbulence: " << windPhysicsModel->turbulence->getValue() << endl;
-  Console (3) << "Direction: " << windPhysicsModel->direction->getValue() << endl;
+  Console (3) << "Gustiness: " << windPhysicsModel->gustiness->getValue() << 
+    endl;
+  Console (3) << "Turbulence: " << windPhysicsModel->turbulence->getValue() << 
+    endl;
+  Console (3) << "Direction: " << windPhysicsModel->direction->getValue() << 
+    endl;
 }
 
 void WindPhysicsModelDialog::getIndex () {
   int count = 0;
-  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = ePS->physics->begin();
+  for( ParticleSystem::MFPhysicsModelNode::const_iterator i = 
+       ePS->physics->begin();
        i != ePS->physics->end(); i++ ) {
     windPhysicsModel = 
       dynamic_cast<WindPhysicsModel *> (*i);

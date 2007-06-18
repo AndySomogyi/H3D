@@ -21,8 +21,8 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file consoleDialog.cpp
-/// \brief Implementation file for consoleDialog
+/// \file ConsoleDialog.cpp
+/// \brief Implementation file for ConsoleDialog
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,8 @@ wxDialog (parent, id, title, pos, size, style)
 
 	// create text ctrl with minimal size 400x200
 	logText = (wxTextCtrl *) NULL;
-	logText = new wxTextCtrl ( this, -1, "", wxDefaultPosition, wxSize(400, 200), wxTE_MULTILINE | wxTE_READONLY );
+	logText = new wxTextCtrl ( this, -1, "", wxDefaultPosition, wxSize(400, 200),
+                             wxTE_MULTILINE | wxTE_READONLY );
 
 	topsizer->Add(logText, 
 				  1,            // make vertically stretchable
@@ -88,8 +89,7 @@ wxDialog (parent, id, title, pos, size, style)
   H3DUtil::Console.setOutputStream( *t );
 	
   std::cerr.rdbuf(sbOld); 
-  //  std::cerr << "TESTS" << endl;
-	//*logText << 123.456 << " some text\n";
+
 #endif
 }
 

@@ -21,7 +21,7 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file envini.h
+/// \file Envini.h
 /// \brief Header file for environment variables for ParticleDemo.
 ///
 //
