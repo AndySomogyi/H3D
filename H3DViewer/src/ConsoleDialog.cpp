@@ -32,7 +32,7 @@
 //  Includes
 // ---------------------------------------------------------------------------
 
-#include <ConsoleDialog.h>
+#include "ConsoleDialog.h"
 #include <Console.h>
 
 using namespace std;

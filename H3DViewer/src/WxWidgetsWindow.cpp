@@ -28,7 +28,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <WxWidgetsWindow.h>
+#include "WxWidgetsWindow.h"
 #ifndef WIN32
 #include <X3DKeyDeviceSensorNode.h>
 #include <MouseSensor.h>

@@ -30,8 +30,8 @@
 // ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
-#include <WxFrame.h>
-#include <WxWidgetsWindow.h>
+#include "WxFrame.h"
+#include "WxWidgetsWindow.h"
 
 #include <VrmlParser.h>
 #include <Group.h>
