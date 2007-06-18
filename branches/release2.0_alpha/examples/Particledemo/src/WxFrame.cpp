@@ -31,10 +31,10 @@
 //  Includes
 // ---------------------------------------------------------------------------
 
-#include <H3DWxFrame.h>
+#include <WxFrame.h>
 #include <consoleDialog.h>
 #include <vector>
-#include <H3DWxWidgetsWindow.h>
+#include <WxWidgetsWindow.h>
 
 #include <wx/wx.h>
 #include <envini.h>
