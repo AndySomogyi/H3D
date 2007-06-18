@@ -21,8 +21,8 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file emittersettings.h
-/// \brief Header file for emittersettings
+/// \file Emittersettings.h
+/// \brief Header file for EmitterSettings
 ///
 //
 //////////////////////////////////////////////////////////////////////////////

@@ -56,27 +56,27 @@
 #include <Console.h>
 #include <ParticleSystem.h>
 #include <NavigationInfo.h>
-#include <consoleDialog.h>
-#include <emittersettings.h>
-#include <physicsmodels.h>
+#include <ConsoleDialog.h>
+#include <EmitterSettings.h>
+#include <PhysicsModels.h>
 
 using namespace std;
 using namespace H3D;
 
 // ---------------------------------------------------------------------------
-//  H3DWxFrame Definition
+//  WxFrame Definition
 // ---------------------------------------------------------------------------
 
-class H3DWxFrame: public wxFrame
+class WxFrame: public wxFrame
 {
 public:
-  H3DWxFrame( wxWindow *_parent, wxWindowID _id, const wxString& _title,
+  WxFrame( wxWindow *_parent, wxWindowID _id, const wxString& _title,
               const wxPoint& _pos, const wxSize& _size,
               long _style = wxDEFAULT_FRAME_STYLE,
               const wxString& name = "MedX3D Demo" );
 
   //Pointer to H3DWxWidgetsWindow
-  H3DWxWidgetsWindow *glwindow;
+  WxWidgetsWindow *glwindow;
 
   /***************Interface Features*****************/
   //Main Menu Bar
@@ -126,8 +126,6 @@ public:
 private:
 	wxString currentFilename;
 	wxString currentPath;
-  //ConeEmitter * coneEmitter;
-  //PointEmitter * pointEmitter;
   DeviceInfo *di;
   H3DHapticsDevice *hdev;
   ParticleSystem *PS;
@@ -179,9 +177,6 @@ private:
 protected:
   DECLARE_EVENT_TABLE()
 };
-
-
-
 
 enum
 { FRAME_EXIT    =   wxID_HIGHEST + 1,

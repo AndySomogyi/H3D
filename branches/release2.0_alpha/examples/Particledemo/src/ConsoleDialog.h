@@ -21,8 +21,8 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file consoleDialog.h
-/// \brief Header file for consoleDialog
+/// \file ConsoleDialog.h
+/// \brief Header file for ConsoleDialog
 ///
 //
 //////////////////////////////////////////////////////////////////////////////

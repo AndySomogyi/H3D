@@ -32,12 +32,12 @@
 // ---------------------------------------------------------------------------
 
 #include <WxFrame.h>
-#include <consoleDialog.h>
+#include <ConsoleDialog.h>
 #include <vector>
 #include <WxWidgetsWindow.h>
 
 #include <wx/wx.h>
-#include <envini.h>
+#include <Envini.h>
 
 // ---------------------------------------------------------------------------
 //  Includes (to open X3D files)
@@ -97,7 +97,7 @@ static const wxChar *FILETYPES = _T( "x3d files|*.x3d|"
                                    );
 
 /*******************Constructor*********************/
-H3DWxFrame::H3DWxFrame( wxWindow *_parent, wxWindowID _id,
+WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
                         const wxString& _title, const wxPoint& _pos,
                         const wxSize& _size, long _style,
                         const wxString& _name ):
@@ -115,7 +115,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 	device_info.reset (NULL);
 	g.reset ( new Group );
 
-	glwindow = new H3DWxWidgetsWindow(this);
+	glwindow = new WxWidgetsWindow(this);
 	int width, height;
 	GetClientSize(&width, &height);
 	glwindow->width->setValue(width);
@@ -135,7 +135,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   theConsole = new consoleDialog(this, wxID_ANY, console_string, wxDefaultPosition, 
                                      wxDefaultSize, wxDEFAULT_DIALOG_STYLE);
 
-  //H3DWxWidgetsWindow *glwindow = new H3DWxWidgetsWindow(theWxFrame);
+  //WxWidgetsWindow *glwindow = new WxWidgetsWindow(theWxFrame);
   //Main Menu Bar
   menuBar  = (wxMenuBar *) NULL;
 
@@ -211,28 +211,28 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 }
 
 /*******************Event Table*********************/
-BEGIN_EVENT_TABLE(H3DWxFrame, wxFrame)
-	EVT_MENU (FRAME_EXIT, H3DWxFrame::OnExit)
-	EVT_MENU (FRAME_OPEN, H3DWxFrame::OnOpenFile)
-  EVT_MENU (FRAME_OPEN_URL, H3DWxFrame::OnOpenFileURL)
-	EVT_MENU (FRAME_CLOSE, H3DWxFrame::OnCloseFile)
-	EVT_MENU (FRAME_CONSOLE, H3DWxFrame::ShowConsole)
-	EVT_MENU_HIGHLIGHT (FRAME_SELECTION, H3DWxFrame::GetSelection)
-	EVT_MENU (FRAME_ABOUT, H3DWxFrame::OnAbout)
-	EVT_MENU (FRAME_HELP, H3DWxFrame::OnHelp)
-  EVT_MENU_RANGE (FRAME_QUAD, FRAME_LINE, H3DWxFrame::OnParticleGeometry)
-  EVT_MENU (FRAME_PARTICLECONTROL, H3DWxFrame::ToggleParticles)
-  EVT_MENU (FRAME_PARTICLECREATION, H3DWxFrame::ParticleGeneration)
-  EVT_MENU (FRAME_POINTEMITTER, H3DWxFrame::PointEmitterSettingsDialog)
-  EVT_MENU (FRAME_POLYLINEEMITTER, H3DWxFrame::PolylineEmitterSettingsDialog)
-  EVT_MENU (FRAME_VOLUMEEMITTER, H3DWxFrame::VolumeEmitterSettingsDialog)
-  EVT_MENU (FRAME_CONEEMITTER, H3DWxFrame::ConeEmitterSettingsDialog)
-  EVT_MENU (FRAME_EXPLOSIONEMITTER, H3DWxFrame::ExplosionEmitterSettingsDialog)
-  EVT_MENU (FRAME_SURFACEEMITTER, H3DWxFrame::SurfaceEmitterSettingsDialog)
-  EVT_MENU (FRAME_BOUNDEDPHYSICSMODEL, H3DWxFrame::BoundedPhysicsModelSettingsDialog)
-  EVT_MENU (FRAME_GRAVITYPHYSICSMODEL, H3DWxFrame::GravityPhysicsModelSettingsDialog)
-  EVT_MENU (FRAME_WINDPHYSICSMODEL, H3DWxFrame::WindPhysicsModelSettingsDialog)
-  EVT_CLOSE(H3DWxFrame::OnWindowExit)
+BEGIN_EVENT_TABLE(WxFrame, wxFrame)
+	EVT_MENU (FRAME_EXIT, WxFrame::OnExit)
+	EVT_MENU (FRAME_OPEN, WxFrame::OnOpenFile)
+  EVT_MENU (FRAME_OPEN_URL, WxFrame::OnOpenFileURL)
+	EVT_MENU (FRAME_CLOSE, WxFrame::OnCloseFile)
+	EVT_MENU (FRAME_CONSOLE, WxFrame::ShowConsole)
+	EVT_MENU_HIGHLIGHT (FRAME_SELECTION, WxFrame::GetSelection)
+	EVT_MENU (FRAME_ABOUT, WxFrame::OnAbout)
+	EVT_MENU (FRAME_HELP, WxFrame::OnHelp)
+  EVT_MENU_RANGE (FRAME_QUAD, FRAME_LINE, WxFrame::OnParticleGeometry)
+  EVT_MENU (FRAME_PARTICLECONTROL, WxFrame::ToggleParticles)
+  EVT_MENU (FRAME_PARTICLECREATION, WxFrame::ParticleGeneration)
+  EVT_MENU (FRAME_POINTEMITTER, WxFrame::PointEmitterSettingsDialog)
+  EVT_MENU (FRAME_POLYLINEEMITTER, WxFrame::PolylineEmitterSettingsDialog)
+  EVT_MENU (FRAME_VOLUMEEMITTER, WxFrame::VolumeEmitterSettingsDialog)
+  EVT_MENU (FRAME_CONEEMITTER, WxFrame::ConeEmitterSettingsDialog)
+  EVT_MENU (FRAME_EXPLOSIONEMITTER, WxFrame::ExplosionEmitterSettingsDialog)
+  EVT_MENU (FRAME_SURFACEEMITTER, WxFrame::SurfaceEmitterSettingsDialog)
+  EVT_MENU (FRAME_BOUNDEDPHYSICSMODEL, WxFrame::BoundedPhysicsModelSettingsDialog)
+  EVT_MENU (FRAME_GRAVITYPHYSICSMODEL, WxFrame::GravityPhysicsModelSettingsDialog)
+  EVT_MENU (FRAME_WINDPHYSICSMODEL, WxFrame::WindPhysicsModelSettingsDialog)
+  EVT_CLOSE(WxFrame::OnWindowExit)
 END_EVENT_TABLE()
 
 /*******************Event Table*********************/
@@ -240,7 +240,7 @@ END_EVENT_TABLE()
 
 /*******************Member Functions*********************/
 
-bool H3DWxFrame::loadFile( const string &filename) {
+bool WxFrame::loadFile( const string &filename) {
   
   char *r = getenv( "H3D_ROOT" );
 
@@ -439,14 +439,14 @@ bool H3DWxFrame::loadFile( const string &filename) {
 }
 
 //Clear data when closing file
-void H3DWxFrame::clearData () {
+void WxFrame::clearData () {
   t->children->clear();
 	viewpoint.reset (NULL);
 }
 
 
 //Open a file
-void H3DWxFrame::OnOpenFileURL(wxCommandEvent & event) {
+void WxFrame::OnOpenFileURL(wxCommandEvent & event) {
    auto_ptr< wxTextEntryDialog > text_dialog( new wxTextEntryDialog ( this,
 													   "Enter the location of the file here",
 													   "Open file from URL",
@@ -458,7 +458,7 @@ void H3DWxFrame::OnOpenFileURL(wxCommandEvent & event) {
    }
 }
 
-void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
+void WxFrame::OnOpenFile(wxCommandEvent & event)
 {
 	auto_ptr< wxFileDialog > openFileDialog( new wxFileDialog ( this,
 													   "Open file",
@@ -486,7 +486,7 @@ void H3DWxFrame::OnOpenFile(wxCommandEvent & event)
 }
 
 //Close File
-void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
+void WxFrame::OnCloseFile(wxCommandEvent & event) {
   //clearData();
   t->children->clear();
 	SetStatusText("Open a file...", 0);
@@ -495,7 +495,7 @@ void H3DWxFrame::OnCloseFile(wxCommandEvent & event) {
 
 
 //About dialog
-void H3DWxFrame::OnAbout(wxCommandEvent & event)
+void WxFrame::OnAbout(wxCommandEvent & event)
 { wxString t = TITLE;
 
   t.append( AUTHOR );
@@ -505,7 +505,7 @@ void H3DWxFrame::OnAbout(wxCommandEvent & event)
 }
 
 //Particle Geometry event
-void H3DWxFrame::OnParticleGeometry(wxCommandEvent & event)
+void WxFrame::OnParticleGeometry(wxCommandEvent & event)
 {
   wxString geometry;
   switch ( event.GetId() ) {
@@ -529,7 +529,7 @@ void H3DWxFrame::OnParticleGeometry(wxCommandEvent & event)
 }
 
 //Toggle Particles
-void H3DWxFrame::ToggleParticles(wxCommandEvent & event)
+void WxFrame::ToggleParticles(wxCommandEvent & event)
 {
   if (ParticleStatus) {
     PS->enabled->setValue(false);
@@ -546,7 +546,7 @@ void H3DWxFrame::ToggleParticles(wxCommandEvent & event)
 }
 
 //Toggle Particle Generation
-void H3DWxFrame::ParticleGeneration(wxCommandEvent & event)
+void WxFrame::ParticleGeneration(wxCommandEvent & event)
 {
   /*if (ParticleStatus) {
     PS->createParticles->setValue(false);
@@ -564,122 +564,119 @@ void H3DWxFrame::ParticleGeneration(wxCommandEvent & event)
 }
 
 //Point Emitter settings
-void H3DWxFrame::PointEmitterSettingsDialog(wxCommandEvent & event)
+void WxFrame::PointEmitterSettingsDialog(wxCommandEvent & event)
 {
-  /*pointEmitter = (PointEmitter *) NULL;
-  pointEmitter = new PointEmitter;
-  PS->emitter->setValue(pointEmitter);*/
   pointEmitterSettings->Show();
 }
 
 //Polyline Emitter settings
-void H3DWxFrame::PolylineEmitterSettingsDialog(wxCommandEvent & event)
+void WxFrame::PolylineEmitterSettingsDialog(wxCommandEvent & event)
 {
   polylineEmitterSettings->Show();
 }
 
 //Volume Emitter settings
-void H3DWxFrame::VolumeEmitterSettingsDialog(wxCommandEvent & event)
+void WxFrame::VolumeEmitterSettingsDialog(wxCommandEvent & event)
 {
   volumeEmitterSettings->Show();
 }
 
 //Cone Emitter settings
-void H3DWxFrame::ConeEmitterSettingsDialog(wxCommandEvent & event)
+void WxFrame::ConeEmitterSettingsDialog(wxCommandEvent & event)
 {
   coneEmitterSettings->Show();
 }
 
 //Explosion Emitter settings
-void H3DWxFrame::ExplosionEmitterSettingsDialog(wxCommandEvent & event)
+void WxFrame::ExplosionEmitterSettingsDialog(wxCommandEvent & event)
 {
   explosionEmitterSettings->Show();
 }
 
 //Surface Emitter settings
-void H3DWxFrame::SurfaceEmitterSettingsDialog(wxCommandEvent & event)
+void WxFrame::SurfaceEmitterSettingsDialog(wxCommandEvent & event)
 {
   surfaceEmitterSettings->Show();
 }
 
 //Bounded Physics Model settings
-void H3DWxFrame::BoundedPhysicsModelSettingsDialog(wxCommandEvent & event)
+void WxFrame::BoundedPhysicsModelSettingsDialog(wxCommandEvent & event)
 {
   boundedPhysicsModelSettings = new BoundedPhysicsModelDialog(this, PS);
   boundedPhysicsModelSettings->Show();
 }
 
 //Wind Physics Model settings
-void H3DWxFrame::WindPhysicsModelSettingsDialog(wxCommandEvent & event)
+void WxFrame::WindPhysicsModelSettingsDialog(wxCommandEvent & event)
 {
   windPhysicsModelSettings = new WindPhysicsModelDialog(this, PS);
   windPhysicsModelSettings->Show();
 }
 
 //Gravity Physics Model settings
-void H3DWxFrame::GravityPhysicsModelSettingsDialog(wxCommandEvent & event)
+void WxFrame::GravityPhysicsModelSettingsDialog(wxCommandEvent & event)
 {
   gravityPhysicsModelSettings = new GravityPhysicsModelDialog(this, PS);
   gravityPhysicsModelSettings->Show();
 }
 
 //Help event
-void H3DWxFrame::OnHelp(wxCommandEvent & event)
+void WxFrame::OnHelp(wxCommandEvent & event)
 {
 
 }
 
 //Show console event
-void H3DWxFrame::ShowConsole(wxCommandEvent & event)
+void WxFrame::ShowConsole(wxCommandEvent & event)
 {
   theConsole->Show();
 }
 
 //Gets Menu Selections
-void H3DWxFrame::GetSelection (wxMenuEvent & event)
+void WxFrame::GetSelection (wxMenuEvent & event)
 {
 	selection = event.GetMenuId();
 }
 
 //Exit via menu
-void H3DWxFrame::OnExit (wxCommandEvent & event)
+void WxFrame::OnExit (wxCommandEvent & event)
 {
 	Close(true);
 }
 
 //Exit via window manager
-void H3DWxFrame::OnWindowExit (wxCloseEvent & event) 
+void WxFrame::OnWindowExit (wxCloseEvent & event) 
 {
   Destroy();
 }
 
 /*******************Standard trivial functions*********************/
 //Get current filename
-wxString H3DWxFrame::GetCurrentFilename()
+wxString WxFrame::GetCurrentFilename()
 {
  return currentFilename;
 }
 
 //Set current filename
-void H3DWxFrame::SetCurrentFilename(wxString n)
+void WxFrame::SetCurrentFilename(wxString n)
 {
  currentFilename = n;
 }
 
 //Get current path
-wxString H3DWxFrame::GetCurrentPath()
+wxString WxFrame::GetCurrentPath()
 {
  return currentPath;
 }
 
 //Set current path
-void H3DWxFrame::SetCurrentPath(wxString n)
+void WxFrame::SetCurrentPath(wxString n)
 {
  currentPath = n;
 }
 
 /*******************Create Geometries for use with emitters and physics models*********************/
-void H3DWxFrame::CreateGeometries()
+void WxFrame::CreateGeometries()
 {
   ////Box
   box = (Box *) NULL;

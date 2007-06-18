@@ -21,13 +21,13 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file emittersettings.cpp
-/// \brief Implementation file for emittersettings
+/// \file EmitterSettings.cpp
+/// \brief Implementation file for EmitterSettings
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <emittersettings.h>
+#include <EmitterSettings.h>
 
 using namespace std;
 using namespace H3D;
@@ -92,7 +92,8 @@ PointEmitterDialog::PointEmitterDialog(wxWindow* win, ParticleSystem* PS,
     m_imageList = NULL;
 
     Create(win, wxID_ANY, _("Point Emitter"), wxDefaultPosition, wxDefaultSize,
-        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, 
+        resizeBorder)
     );
 
     // If using a toolbook, also follow Mac style and don't create buttons
@@ -105,7 +106,8 @@ PointEmitterDialog::PointEmitterDialog(wxWindow* win, ParticleSystem* PS,
 
     wxPanel* PointEmitterSettings = CreatePointEmitterSettingsPage(notebook);
 
-    notebook->AddPage(PointEmitterSettings, _("Particle Properties"), true, tabImage1);
+    notebook->AddPage(PointEmitterSettings, _("Particle Properties"), true, 
+                      tabImage1);
 
     LayoutDialog();
 
@@ -134,47 +136,80 @@ wxPanel* PointEmitterDialog::CreatePointEmitterSettingsPage(wxWindow* parent)
     //// SPEED
 
     wxBoxSizer* speedSizer = new wxBoxSizer( wxHORIZONTAL );
-    speedSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Speed            :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* pointEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    speedSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                    _("&Speed            :")), 0, 
+                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* pointEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
     speedSizer->Add(pointEmitterSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(speedSizer, 0, wxGROW|wxALL, 0);
 
     ////VARIATION
 
     wxBoxSizer* variationSizer = new wxBoxSizer( wxHORIZONTAL );
-    variationSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Variation        :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* pointEmitterSpeedVariation = new wxTextCtrl (panel, ID_VARIATION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    variationSizer->Add(pointEmitterSpeedVariation, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    variationSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                        _("&Variation        :")), 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* pointEmitterSpeedVariation = new wxTextCtrl (panel, 
+                                                 ID_VARIATION, 
+                                                 wxEmptyString, 
+                                                 wxDefaultPosition, 
+                                                 wxSize(40, wxDefaultCoord));
+    variationSizer->Add(pointEmitterSpeedVariation, 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(variationSizer, 0, wxGROW|wxALL, 0);
 
     //// MASS
 
     wxBoxSizer* massSizer = new wxBoxSizer( wxHORIZONTAL );
-    massSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Mass              :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* pointEmitterMass = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    massSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                                    _("&Mass              :")), 0, 
+                                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* pointEmitterMass = new wxTextCtrl(panel, ID_MASS, 
+                                                  wxEmptyString, 
+                                                  wxDefaultPosition, 
+                                                  wxSize(40, wxDefaultCoord));
     massSizer->Add(pointEmitterMass, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(massSizer, 0, wxGROW|wxALL, 0);
 
     //// SURFACE AREA
 
     wxBoxSizer* areaSizer = new wxBoxSizer( wxHORIZONTAL );
-    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Surface Area :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* pointEmitterArea = new wxTextCtrl(panel, ID_SURFACE_AREA, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Surface Area :")), 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* pointEmitterArea = new wxTextCtrl(panel, ID_SURFACE_AREA, 
+                                                  wxEmptyString, 
+                                                  wxDefaultPosition, 
+                                                  wxSize(40, wxDefaultCoord));
     areaSizer->Add(pointEmitterArea, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(areaSizer, 0, wxGROW|wxALL, 0);
 
     //// DIRECTION
     wxBoxSizer* directionSizer = new wxBoxSizer( wxHORIZONTAL );
-    directionSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Direction        :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* pointEmitterDirection = new wxTextCtrl(panel, ID_DIRECTION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    directionSizer->Add(pointEmitterDirection, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    directionSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                        _("&Direction        :")), 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* pointEmitterDirection = new wxTextCtrl(panel, ID_DIRECTION, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
+    directionSizer->Add(pointEmitterDirection, 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(directionSizer, 0, wxGROW|wxALL, 0);
 
     //// POSITION
     wxBoxSizer* positionSizer = new wxBoxSizer( wxHORIZONTAL );
-    positionSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Position          :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* pointEmitterPosition = new wxTextCtrl(panel, ID_POSITION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    positionSizer->Add(pointEmitterPosition, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    positionSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                        _("&Position          :")), 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* pointEmitterPosition = new wxTextCtrl(panel, ID_POSITION, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
+    positionSizer->Add(pointEmitterPosition, 0, 
+                       wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(positionSizer, 0, wxGROW|wxALL, 0);
 
     topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
@@ -304,8 +339,9 @@ PolylineEmitterDialog::PolylineEmitterDialog(wxWindow* win, ParticleSystem* PS,
 
     m_imageList = NULL;
 
-    Create(win, wxID_ANY, _("Polyline Emitter"), wxDefaultPosition, wxDefaultSize,
-        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+    Create(win, wxID_ANY, _("Polyline Emitter"), wxDefaultPosition, 
+           wxDefaultSize, wxDEFAULT_DIALOG_STYLE| 
+           (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
     );
 
     // If using a toolbook, also follow Mac style and don't create buttons
@@ -316,9 +352,11 @@ PolylineEmitterDialog::PolylineEmitterDialog(wxWindow* win, ParticleSystem* PS,
     wxBookCtrlBase* notebook = GetBookCtrl();
     notebook->SetImageList(m_imageList);
 
-    wxPanel* PolylineEmitterSettings = CreatePolylineEmitterSettingsPage(notebook);
+    wxPanel* PolylineEmitterSettings = 
+      CreatePolylineEmitterSettingsPage(notebook);
 
-    notebook->AddPage(PolylineEmitterSettings, _("Properties"), true, tabImage1);
+    notebook->AddPage(PolylineEmitterSettings, _("Properties"), true, 
+                      tabImage1);
 
     LayoutDialog();
 
@@ -336,7 +374,8 @@ PolylineEmitterDialog::~PolylineEmitterDialog()
 
 }
 
-wxPanel* PolylineEmitterDialog::CreatePolylineEmitterSettingsPage(wxWindow* parent)
+wxPanel* PolylineEmitterDialog::
+  CreatePolylineEmitterSettingsPage(wxWindow* parent)
 {
     wxPanel* panel = new wxPanel(parent, wxID_ANY);
 
@@ -346,32 +385,54 @@ wxPanel* PolylineEmitterDialog::CreatePolylineEmitterSettingsPage(wxWindow* pare
     //// SPEED
 
     wxBoxSizer* speedSizer = new wxBoxSizer( wxHORIZONTAL );
-    speedSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Particle Speed            :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* polylineEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    speedSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                    _("&Particle Speed            :")), 0, 
+                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* polylineEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
     speedSizer->Add(polylineEmitterSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(speedSizer, 0, wxGROW|wxALL, 0);
 
     //// COORDINATE INDEX
 
     wxBoxSizer* coordIndexSizer = new wxBoxSizer( wxHORIZONTAL );
-    coordIndexSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Coordinate Index       :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* polylineEmitterCoordIndex = new wxTextCtrl (panel, ID_COORD_INDEX, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    coordIndexSizer->Add(polylineEmitterCoordIndex, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    coordIndexSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                         _("&Coordinate Index       :")), 0, 
+                         wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* polylineEmitterCoordIndex = new wxTextCtrl (panel, 
+                                            ID_COORD_INDEX, 
+                                            wxEmptyString, 
+                                            wxDefaultPosition, 
+                                            wxSize(40, wxDefaultCoord));
+    coordIndexSizer->Add(polylineEmitterCoordIndex, 0, 
+                         wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(coordIndexSizer, 0, wxGROW|wxALL, 0);
 
     //// MASS
 
     wxBoxSizer* massSizer = new wxBoxSizer( wxHORIZONTAL );
-    massSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Particle Mass              :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* polylineEmitterMass = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    massSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                   _("&Particle Mass              :")), 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* polylineEmitterMass = new wxTextCtrl(panel, ID_MASS, 
+                                      wxEmptyString, 
+                                      wxDefaultPosition, 
+                                      wxSize(40, wxDefaultCoord));
     massSizer->Add(polylineEmitterMass, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(massSizer, 0, wxGROW|wxALL, 0);
 
     //// SURFACE AREA
 
     wxBoxSizer* areaSizer = new wxBoxSizer( wxHORIZONTAL );
-    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Particle Surface Area :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* polylineEmitterArea = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    areaSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                   _("&Particle Surface Area :")), 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* polylineEmitterArea = new wxTextCtrl(panel, ID_MASS, 
+                                                  wxEmptyString, 
+                                                  wxDefaultPosition, 
+                                                  wxSize(40, wxDefaultCoord));
     areaSizer->Add(polylineEmitterArea, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(areaSizer, 0, wxGROW|wxALL, 0);
 
@@ -409,7 +470,8 @@ VolumeEmitterDialog::VolumeEmitterDialog(wxWindow* win, ParticleSystem* PS,
     m_imageList = NULL;
 
     Create(win, wxID_ANY, _("Volume Emitter"), wxDefaultPosition, wxDefaultSize,
-        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, 
+        resizeBorder)
     );
 
     // If using a toolbook, also follow Mac style and don't create buttons
@@ -446,32 +508,54 @@ wxPanel* VolumeEmitterDialog::CreateVolumeEmitterSettingsPage(wxWindow* parent)
     //// SPEED
 
     wxBoxSizer* speedSizer = new wxBoxSizer( wxHORIZONTAL );
-    speedSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Particle Speed            :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* volumeEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    speedSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                    _("&Particle Speed            :")), 
+                    0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* volumeEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
     speedSizer->Add(volumeEmitterSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(speedSizer, 0, wxGROW|wxALL, 0);
 
     //// COORDINATE INDEX
 
     wxBoxSizer* coordIndexSizer = new wxBoxSizer( wxHORIZONTAL );
-    coordIndexSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Coordinate Index       :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* volumeEmitterCoordIndex = new wxTextCtrl (panel, ID_COORD_INDEX, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    coordIndexSizer->Add(volumeEmitterCoordIndex, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    coordIndexSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                         _("&Coordinate Index       :")), 0, 
+                         wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* volumeEmitterCoordIndex = new wxTextCtrl (panel, 
+                                                ID_COORD_INDEX, 
+                                                wxEmptyString, 
+                                                wxDefaultPosition, 
+                                                wxSize(40, wxDefaultCoord));
+    coordIndexSizer->Add(volumeEmitterCoordIndex, 0, 
+                         wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(coordIndexSizer, 0, wxGROW|wxALL, 0);
 
     //// MASS
 
     wxBoxSizer* massSizer = new wxBoxSizer( wxHORIZONTAL );
-    massSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Particle Mass              :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* volumeEmitterMass = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    massSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                   _("&Particle Mass              :")), 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* volumeEmitterMass = new wxTextCtrl(panel, ID_MASS, 
+                                                wxEmptyString, 
+                                                wxDefaultPosition, 
+                                                wxSize(40, wxDefaultCoord));
     massSizer->Add(volumeEmitterMass, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(massSizer, 0, wxGROW|wxALL, 0);
 
     //// SURFACE AREA
 
     wxBoxSizer* areaSizer = new wxBoxSizer( wxHORIZONTAL );
-    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Particle Surface Area :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* volumeEmitterArea = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    areaSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                   _("&Particle Surface Area :")), 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* volumeEmitterArea = new wxTextCtrl(panel, ID_MASS, 
+                                          wxEmptyString, 
+                                          wxDefaultPosition, 
+                                          wxSize(40, wxDefaultCoord));
     areaSizer->Add(volumeEmitterArea, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(areaSizer, 0, wxGROW|wxALL, 0);
 
@@ -513,7 +597,8 @@ ConeEmitterDialog::ConeEmitterDialog(wxWindow* win, ParticleSystem* PS,
     m_imageList = NULL;
 
     Create(win, wxID_ANY, _("Cone Emitter"), wxDefaultPosition, wxDefaultSize,
-        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, 
+        resizeBorder)
     );
 
     // If using a toolbook, also follow Mac style and don't create buttons
@@ -526,7 +611,8 @@ ConeEmitterDialog::ConeEmitterDialog(wxWindow* win, ParticleSystem* PS,
 
     wxPanel* ConeEmitterSettings = CreateConeEmitterSettingsPage(notebook);
 
-    notebook->AddPage(ConeEmitterSettings, _("Particle Properties"), true, tabImage1);
+    notebook->AddPage(ConeEmitterSettings, _("Particle Properties"), true, 
+                      tabImage1);
 
     LayoutDialog();
 
@@ -566,39 +652,66 @@ wxPanel* ConeEmitterDialog::CreateConeEmitterSettingsPage(wxWindow* parent)
     ////VARIATION
 
     wxBoxSizer* variationSizer = new wxBoxSizer( wxHORIZONTAL );
-    variationSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Variation        :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* coneEmitterSpeedVariation = new wxTextCtrl (panel, ID_VARIATION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    variationSizer->Add(coneEmitterSpeedVariation, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    variationSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                        _("&Variation        :")), 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* coneEmitterSpeedVariation = new wxTextCtrl (panel, 
+                                                   ID_VARIATION, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
+    variationSizer->Add(coneEmitterSpeedVariation, 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(variationSizer, 0, wxGROW|wxALL, 0);
 
     //// MASS
 
     wxBoxSizer* massSizer = new wxBoxSizer( wxHORIZONTAL );
-    massSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Mass              :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* coneEmitterMass = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    massSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                    _("&Mass              :")), 
+                    0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* coneEmitterMass = new wxTextCtrl(panel, ID_MASS, 
+                                            wxEmptyString, 
+                                            wxDefaultPosition, 
+                                            wxSize(40, wxDefaultCoord));
     massSizer->Add(coneEmitterMass, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(massSizer, 0, wxGROW|wxALL, 0);
 
     //// SURFACE AREA
 
     wxBoxSizer* areaSizer = new wxBoxSizer( wxHORIZONTAL );
-    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Surface Area :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* coneEmitterArea = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Surface Area :")), 0, 
+                                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* coneEmitterArea = new wxTextCtrl(panel, ID_MASS, wxEmptyString,
+                                                 wxDefaultPosition, 
+                                                 wxSize(40, wxDefaultCoord));
     areaSizer->Add(coneEmitterArea, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(areaSizer, 0, wxGROW|wxALL, 0);
 
     //// DIRECTION
     wxBoxSizer* directionSizer = new wxBoxSizer( wxHORIZONTAL );
-    directionSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Direction        :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* coneEmitterDirection = new wxTextCtrl(panel, ID_DIRECTION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    directionSizer->Add(coneEmitterDirection, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    directionSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                        _("&Direction        :")), 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* coneEmitterDirection = new wxTextCtrl(panel, ID_DIRECTION, 
+                                                wxEmptyString, 
+                                                wxDefaultPosition,
+                                                wxSize(40, wxDefaultCoord));
+    directionSizer->Add(coneEmitterDirection, 0, wxALL|wxALIGN_CENTER_VERTICAL,
+                        5);
     item0->Add(directionSizer, 0, wxGROW|wxALL, 0);
 
     //// POSITION
     wxBoxSizer* positionSizer = new wxBoxSizer( wxHORIZONTAL );
-    positionSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Position          :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* coneEmitterPosition = new wxTextCtrl(panel, ID_POSITION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    positionSizer->Add(coneEmitterPosition, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    positionSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                        _("&Position          :")), 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* coneEmitterPosition = new wxTextCtrl(panel, ID_POSITION, 
+                                              wxEmptyString, 
+                                              wxDefaultPosition, 
+                                              wxSize(40, wxDefaultCoord));
+    positionSizer->Add(coneEmitterPosition, 0, wxALL|wxALIGN_CENTER_VERTICAL,
+                       5);
     item0->Add(positionSizer, 0, wxGROW|wxALL, 0);
 
     topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
@@ -733,7 +846,8 @@ ExplosionEmitterDialog::ExplosionEmitterDialog(wxWindow* win,
     m_imageList = NULL;
 
     Create(win, wxID_ANY, _("Explosion Emitter"), wxDefaultPosition, wxDefaultSize,
-        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, 
+        resizeBorder)
     );
 
     // If using a toolbook, also follow Mac style and don't create buttons
@@ -744,9 +858,11 @@ ExplosionEmitterDialog::ExplosionEmitterDialog(wxWindow* win,
     wxBookCtrlBase* notebook = GetBookCtrl();
     notebook->SetImageList(m_imageList);
 
-    wxPanel* ExplosionEmitterSettings = CreateExplosionEmitterSettingsPage(notebook);
+    wxPanel* ExplosionEmitterSettings = 
+      CreateExplosionEmitterSettingsPage(notebook);
 
-    notebook->AddPage(ExplosionEmitterSettings, _("Particle Properties"), true, tabImage1);
+    notebook->AddPage(ExplosionEmitterSettings, _("Particle Properties"), true,
+                      tabImage1);
 
     LayoutDialog();
 
@@ -763,7 +879,8 @@ ExplosionEmitterDialog::~ExplosionEmitterDialog()
 
 }
 
-wxPanel* ExplosionEmitterDialog::CreateExplosionEmitterSettingsPage(wxWindow* parent)
+wxPanel* ExplosionEmitterDialog::
+  CreateExplosionEmitterSettingsPage(wxWindow* parent)
 {
     wxPanel* panel = new wxPanel(parent, wxID_ANY);
 
@@ -773,40 +890,68 @@ wxPanel* ExplosionEmitterDialog::CreateExplosionEmitterSettingsPage(wxWindow* pa
     //// SPEED
 
     wxBoxSizer* speedSizer = new wxBoxSizer( wxHORIZONTAL );
-    speedSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Speed            :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* explosionEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    speedSizer->Add(explosionEmitterSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    speedSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                    _("&Speed            :")), 0, 
+                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* explosionEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
+    speedSizer->Add(explosionEmitterSpeed, 0, 
+                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(speedSizer, 0, wxGROW|wxALL, 0);
 
     ////VARIATION
 
     wxBoxSizer* variationSizer = new wxBoxSizer( wxHORIZONTAL );
-    variationSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Variation        :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* explosionEmitterSpeedVariation = new wxTextCtrl (panel, ID_VARIATION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    variationSizer->Add(explosionEmitterSpeedVariation, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    variationSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                        _("&Variation        :")), 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* explosionEmitterSpeedVariation = new wxTextCtrl (panel, 
+                                                   ID_VARIATION, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
+    variationSizer->Add(explosionEmitterSpeedVariation, 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(variationSizer, 0, wxGROW|wxALL, 0);
 
     //// MASS
 
     wxBoxSizer* massSizer = new wxBoxSizer( wxHORIZONTAL );
-    massSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Mass              :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* explosionEmitterMass = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    massSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                   _("&Mass              :")), 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* explosionEmitterMass = new wxTextCtrl(panel, ID_MASS, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition, 
+                                                   wxSize(40, wxDefaultCoord));
     massSizer->Add(explosionEmitterMass, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(massSizer, 0, wxGROW|wxALL, 0);
 
     //// SURFACE AREA
 
     wxBoxSizer* areaSizer = new wxBoxSizer( wxHORIZONTAL );
-    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Surface Area :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* explosionEmitterArea = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Surface Area :")), 0, 
+                                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* explosionEmitterArea = new wxTextCtrl(panel, ID_MASS, 
+                                                 wxEmptyString, 
+                                                 wxDefaultPosition, 
+                                                 wxSize(40, wxDefaultCoord));
     areaSizer->Add(explosionEmitterArea, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(areaSizer, 0, wxGROW|wxALL, 0);
 
     //// POSITION
     wxBoxSizer* positionSizer = new wxBoxSizer( wxHORIZONTAL );
-    positionSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Position          :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* explosionEmitterPosition = new wxTextCtrl(panel, ID_POSITION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    positionSizer->Add(explosionEmitterPosition, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    positionSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                                        _("&Position          :")), 0, 
+                                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* explosionEmitterPosition = new wxTextCtrl(panel, ID_POSITION, 
+                                                  wxEmptyString, 
+                                                  wxDefaultPosition, 
+                                                  wxSize(40, wxDefaultCoord));
+    positionSizer->Add(explosionEmitterPosition, 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(positionSizer, 0, wxGROW|wxALL, 0);
 
     topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
@@ -905,7 +1050,8 @@ SurfaceEmitterDialog::SurfaceEmitterDialog(wxWindow* win, ParticleSystem* PS,
     m_imageList = NULL;
 
     Create(win, wxID_ANY, _("Surface Emitter"), wxDefaultPosition, wxDefaultSize,
-        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, resizeBorder)
+        wxDEFAULT_DIALOG_STYLE| (int)wxPlatform::IfNot(wxOS_WINDOWS_CE, 
+        resizeBorder)
     );
 
     // If using a toolbook, also follow Mac style and don't create buttons
@@ -918,7 +1064,8 @@ SurfaceEmitterDialog::SurfaceEmitterDialog(wxWindow* win, ParticleSystem* PS,
 
     wxPanel* SurfaceEmitterSettings = CreateSurfaceEmitterSettingsPage(notebook);
 
-    notebook->AddPage(SurfaceEmitterSettings, _("Particle Properties"), true, tabImage1);
+    notebook->AddPage(SurfaceEmitterSettings, _("Particle Properties"), true, 
+        tabImage1);
 
     LayoutDialog();
 
@@ -936,7 +1083,8 @@ SurfaceEmitterDialog::~SurfaceEmitterDialog()
 
 }
 
-wxPanel* SurfaceEmitterDialog::CreateSurfaceEmitterSettingsPage(wxWindow* parent)
+wxPanel* SurfaceEmitterDialog::
+  CreateSurfaceEmitterSettingsPage(wxWindow* parent)
 {
     wxPanel* panel = new wxPanel(parent, wxID_ANY);
 
@@ -946,41 +1094,69 @@ wxPanel* SurfaceEmitterDialog::CreateSurfaceEmitterSettingsPage(wxWindow* parent
     //// SPEED
 
     wxBoxSizer* speedSizer = new wxBoxSizer( wxHORIZONTAL );
-    speedSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Speed            :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* surfaceEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    speedSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                    _("&Speed            :")), 0, 
+                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* surfaceEmitterSpeed = new wxTextCtrl (panel, ID_SPEED, 
+                                               wxEmptyString, 
+                                               wxDefaultPosition, 
+                                               wxSize(40, wxDefaultCoord));
     speedSizer->Add(surfaceEmitterSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(speedSizer, 0, wxGROW|wxALL, 0);
 
     ////VARIATION
 
     wxBoxSizer* variationSizer = new wxBoxSizer( wxHORIZONTAL );
-    variationSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Variation        :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* surfaceEmitterSpeedVariation = new wxTextCtrl (panel, ID_VARIATION, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    variationSizer->Add(surfaceEmitterSpeedVariation, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    variationSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                        _("&Variation        :")), 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* surfaceEmitterSpeedVariation = new wxTextCtrl (panel, 
+                                                   ID_VARIATION, 
+                                                   wxEmptyString, 
+                                                   wxDefaultPosition,
+                                                   wxSize(40, wxDefaultCoord));
+    variationSizer->Add(surfaceEmitterSpeedVariation, 0, 
+                        wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(variationSizer, 0, wxGROW|wxALL, 0);
 
     //// MASS
 
     wxBoxSizer* massSizer = new wxBoxSizer( wxHORIZONTAL );
-    massSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Mass              :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* surfaceEmitterMass = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    massSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                   _("&Mass              :")), 0, 
+                   wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* surfaceEmitterMass = new wxTextCtrl(panel, ID_MASS, 
+                                                wxEmptyString, 
+                                                wxDefaultPosition, 
+                                                wxSize(40, wxDefaultCoord));
     massSizer->Add(surfaceEmitterMass, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(massSizer, 0, wxGROW|wxALL, 0);
 
     //// SURFACE AREA
 
     wxBoxSizer* areaSizer = new wxBoxSizer( wxHORIZONTAL );
-    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Surface Area :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* surfaceEmitterArea = new wxTextCtrl(panel, ID_MASS, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
+    areaSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Surface Area :")), 0, 
+                                    wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* surfaceEmitterArea = new wxTextCtrl(panel, ID_MASS, 
+                                              wxEmptyString, 
+                                              wxDefaultPosition, 
+                                              wxSize(40, wxDefaultCoord));
     areaSizer->Add(surfaceEmitterArea, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(areaSizer, 0, wxGROW|wxALL, 0);
 
     //// COORDINATE INDEX
 
     wxBoxSizer* coordIndexSizer = new wxBoxSizer( wxHORIZONTAL );
-    coordIndexSizer->Add(new wxStaticText(panel, wxID_ANY, _("&Coordinate Index       :")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    wxTextCtrl* surfaceEmitterCoordIndex = new wxTextCtrl (panel, ID_COORD_INDEX, wxEmptyString, wxDefaultPosition, wxSize(40, wxDefaultCoord));
-    coordIndexSizer->Add(surfaceEmitterCoordIndex, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    coordIndexSizer->Add(new wxStaticText(panel, wxID_ANY, 
+                         _("&Coordinate Index       :")), 0, 
+                         wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    wxTextCtrl* surfaceEmitterCoordIndex = new wxTextCtrl (panel, 
+                                                ID_COORD_INDEX, 
+                                                wxEmptyString, 
+                                                wxDefaultPosition, 
+                                                wxSize(40, wxDefaultCoord));
+    coordIndexSizer->Add(surfaceEmitterCoordIndex, 0, 
+                         wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(coordIndexSizer, 0, wxGROW|wxALL, 0);
 
     topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );

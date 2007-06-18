@@ -21,8 +21,8 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file physicsmodels.h
-/// \brief Header file for physicsmodels
+/// \file PhysicsModels.h
+/// \brief Header file for PhysicsModels
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
