@@ -134,7 +134,7 @@ void SuperShape::render() {
   if( res > 0 ) {
     X3DTextureCoordinateNode *tex_coord = 0;
     // always generate texture coordinate from bounding box
-    startTexGen();
+    //    startTexGen();
     coord->getValue()->renderArray();
     normal->getValue()->renderArray();
     H3DInt32 size = res * ( res + 1 ) * 2;
@@ -147,7 +147,7 @@ void SuperShape::render() {
     }
     coord->getValue()->disableArray();
     normal->getValue()->disableArray();
-    stopTexGen();
+    //    stopTexGen();
   }
 }
 
