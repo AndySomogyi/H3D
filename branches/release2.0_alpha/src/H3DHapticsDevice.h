@@ -606,6 +606,8 @@ namespace H3D {
     // TODO
     HAPI::HAPIHapticsRenderer::Contacts last_contacts;
 
+    bool error_msg_printed;
+
   };
 }
 

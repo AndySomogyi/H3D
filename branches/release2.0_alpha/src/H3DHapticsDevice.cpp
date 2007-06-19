@@ -116,7 +116,8 @@ H3DHapticsDevice::H3DHapticsDevice(
   set_enabled( new SetEnabled ),
   enabled( new SFBool ),
   adjustedPositionCalibration( new PosCalibration ),
-  adjustedOrnCalibration( new OrnCalibration ){
+  adjustedOrnCalibration( new OrnCalibration ),
+  error_msg_printed( false ) {
 
   type_name = "H3DHapticsDevice";  
   database.initFields( this );
@@ -178,7 +179,10 @@ H3DHapticsDevice::ErrorCode H3DHapticsDevice::initDevice() {
         hapi_device->enableDevice();
         initialized->setValue( true, id );
       } else {
-        Console(4) << hapi_device->getLastErrorMsg() << endl;
+        if( !error_msg_printed ) {
+          Console(4) << hapi_device->getLastErrorMsg() << endl;
+          error_msg_printed = true;
+        }
       }
       return e;
     } else {
