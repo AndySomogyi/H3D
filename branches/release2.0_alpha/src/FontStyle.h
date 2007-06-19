@@ -210,6 +210,7 @@ namespace H3D {
     /// Render the character.
     virtual void renderChar( unsigned char c ) {
       char t[2];  t[0]=c; t[1]='\0';
+      glMatrixMode(GL_MODELVIEW);
       glPushMatrix();
       H3DFloat s = size->getValue();
       H3DFloat default_size = font->Ascender() - font->Descender();
@@ -229,6 +230,7 @@ namespace H3D {
         glDisable( GL_ALPHA_TEST );
         glDisable( GL_TEXTURE_2D);
       }
+      glMatrixMode(GL_MODELVIEW);
       glPopMatrix();
     }
     
