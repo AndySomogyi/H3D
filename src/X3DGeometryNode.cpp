@@ -463,7 +463,7 @@ void X3DGeometryNode::createAndAddHapticShapes(
   if( use_bound_tree ) {
     if( radius < 0 ) {
       boundTree->getValue()->getAllPrimitives( tris, lines, points );
-    } {
+    } else {
       boundTree->getValue()->getPrimitivesIntersectedByMovingSphere(
         radius * 1e3 * H3DMax( scale.x, H3DMax( scale.y, scale.z ) ),
         local_proxy,
@@ -575,7 +575,6 @@ void X3DGeometryNode::createAndAddHapticShapes(
   }
 
   if( lines.size() > 0 )  {
-    //cerr << lines.size();// << endl;
     HAPI::HapticLineSet * lin_set = 
       new HAPI::HapticLineSet( lines ,
       this,
