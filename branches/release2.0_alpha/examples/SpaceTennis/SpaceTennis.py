@@ -167,7 +167,7 @@ class SpaceTennisGame:
         rackPos = self.dn["R_T2"].position.getValue()
         ballPos = pos
         ballDiff = ballPos  - rackPos
-        xPos = rackPos.x + ballDiff.x*self.opponentSpeed*0.5 #*dt
+        xPos = rackPos.x + ballDiff.x*self.opponentSpeed*0.5 
         yPos = rackPos.y + ballDiff.y*self.opponentSpeed
         
         #make sure the opponent doesnt move outside of the play area
@@ -185,7 +185,7 @@ class SpaceTennisGame:
         rackPos = self.dn["R_T2"].position.getValue() 
         ballPos = pos
         ballDiff = ballPos - rackPos
-        xPos = rackPos.x + ballDiff.x*self.opponentSpeed/3*0.5 #*dt
+        xPos = rackPos.x + ballDiff.x*self.opponentSpeed/3*0.5 
         yPos = rackPos.y + ballDiff.y*self.opponentSpeed/3
         
         #make sure the opponent doesnt move outside of the play area
