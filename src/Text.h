@@ -86,10 +86,10 @@ namespace H3D {
     /// The SFBound field is specialized to update itself from the
     /// values in the fields of the Text node.
     /// 
-    /// routes_in[0] is the fontStyle field.
-    /// routes_in[1] is the length field.
-    /// routes_in[2] is the maxExtent field.
-    /// routes_in[3] is the string field.
+    /// - routes_in[0] is the fontStyle field.
+    /// - routes_in[1] is the length field.
+    /// - routes_in[2] is the maxExtent field.
+    /// - routes_in[3] is the string field.
     class H3DAPI_API SFBound: 
       public TypedField< X3DGeometryNode::SFBound,
       Types< SFFontStyleNode, MFFloat, SFFloat, MFString > >{
