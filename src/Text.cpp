@@ -200,6 +200,7 @@ void Text::moveToNewLine( const string &text, X3DFontStyleNode *font ) {
 
 void Text::renderTextLine( const string& text,
                            X3DFontStyleNode *font ) {
+  glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   X3DFontStyleNode::Alignment alignment = font->getAlignment();
   bool left_to_right = font->isLeftToRight();
@@ -243,6 +244,7 @@ void Text::renderTextLine( const string& text,
     break;
   }
   }
+  glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
 }
 
@@ -313,6 +315,7 @@ void Text::render() {
   if( font ) {
     // we will make changes to the transformation matrices so we save
     // the current matrices.
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
     font->buildFonts();
@@ -343,6 +346,7 @@ void Text::render() {
         if( line != text.begin() )
           moveToNewLine( *line, font );
       
+      glMatrixMode(GL_MODELVIEW);
       glPushMatrix();   
       
       // if we have values in the length field we scale in order to have
@@ -364,6 +368,7 @@ void Text::render() {
       // render the line of text in the style of the font.
       renderTextLine( *line, font );
 
+      glMatrixMode(GL_MODELVIEW);
       glPopMatrix();
 
       // translate to the next line. What the next line is depends on the 
@@ -372,6 +377,7 @@ void Text::render() {
         moveToNewLine( *line, font );
       
     }
+    glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
   }
 }
