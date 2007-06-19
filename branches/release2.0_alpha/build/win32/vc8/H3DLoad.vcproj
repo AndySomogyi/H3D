@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="H3DLoad"
 	ProjectGUID="{6A2D73A4-3E06-4324-8C03-B3441F4B2DA2}"
 	RootNamespace="H3DLoad"
@@ -15,7 +15,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Release|Win32"
+			Name="Release DLL|Win32"
 			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="Release\obj"
 			ConfigurationType="1"
@@ -105,7 +105,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Win32"
+			Name="Debug DLL|Win32"
 			OutputDirectory="..\..\..\..\bin"
 			IntermediateDirectory="Debug\obj"
 			ConfigurationType="1"
