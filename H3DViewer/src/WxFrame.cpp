@@ -210,9 +210,9 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   hapticsRenderer->AppendRadioItem(FRAME_OPENHAPTICS, "Openhaptics", 
                                    "Openhaptics Renderer");
   hapticsRenderer->AppendRadioItem(FRAME_CHAI3D, "CHAI3D", "CHAI3D Renderer");
-  hapticsRenderer->AppendRadioItem(FRAME_GODOBJECT, "GodObject", 
+  hapticsRenderer->AppendRadioItem(FRAME_GODOBJECT, "GodObject (prototype)", 
                                    "GodObject Renderer");
-  hapticsRenderer->AppendRadioItem(FRAME_RUSPINI, "Ruspini", 
+  hapticsRenderer->AppendRadioItem(FRAME_RUSPINI, "Ruspini (early prototype)", 
                                    "Ruspini Renderer");
 
   //renderMode
@@ -604,6 +604,7 @@ bool WxFrame::loadFile( const string &filename) {
 
   //Enable graphical rendering options in rendererMenu
   rendererMenu->Enable(FRAME_RENDERMODE, true);
+  rendererMenu->Enable(FRAME_CHOOSERENDERER, true);
 
 	/****************************Device Info****************************/
 	//Enable Device Menu
