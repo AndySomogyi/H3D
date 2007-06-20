@@ -488,11 +488,11 @@ bool WxFrame::loadFile( const string &filename) {
   bool fullscreen    = GET_BOOL("graphical", "fullscreen", false);
   if( char *buffer = getenv("H3D_FULLSCREEN") ) {
     if (strcmp( buffer, "TRUE" ) == 0 ){
-      fullscreen = true; }
+	  fullscreen = true; }
     else if (strcmp( buffer, "FALSE" ) == 0 ){
-      fullscreen = false; }
+	  fullscreen = false; }
     else
-      Console(4) << "Invalid valid value \"" << buffer 
+      Console(4) << "Invalid value \"" << buffer 
                  << "\" on environment "
                  << "variable H3D_FULLSCREEN. Must be TRUE or FALSE. "
                  << endl;
@@ -505,7 +505,7 @@ bool WxFrame::loadFile( const string &filename) {
     else if (strcmp( buffer, "FALSE" ) == 0 ){
       mirrored = false; }
     else
-      Console(4) << "Invalid valid value \"" << buffer 
+      Console(4) << "Invalid value \"" << buffer 
                  << "\" on environment "
                  << "variable H3D_MIRRORED. Must be TRUE or FALSE. "<< endl;
   }
@@ -595,6 +595,10 @@ bool WxFrame::loadFile( const string &filename) {
       i++;
 		}
   }
+
+    /**********************Reset mirrored and fullscreen********************/
+  rendererMenu->Check(FRAME_FULLSCREEN, false);
+  rendererMenu->Check(FRAME_MIRROR, false);
 
 	/****************************Navigation Info****************************/
 	//Enable Navigation Menu
