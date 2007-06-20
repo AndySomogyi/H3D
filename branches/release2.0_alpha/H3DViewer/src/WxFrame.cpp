@@ -610,6 +610,7 @@ bool WxFrame::loadFile( const string &filename) {
   mydevice = DeviceInfo::getActive();
   if (mydevice && (mydevice->device->size() > 0) ) {
     menuBar->EnableTop(2, true);
+	allDevices = mydevice->device->getValue();
   }
 
 /*
