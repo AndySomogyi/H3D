@@ -295,8 +295,8 @@ void H3DHapticsDevice::updateDeviceValues() {
       adjust_matrix = translation_matrix_new *
         (rotation_matrix * default_vp_pos_mtx_mm.inverse());
 
-      hapi_device->setPositionCalibration(
-        adjust_matrix * positionCalibration->rt_pos_calibration );
+      hapi_device->setPositionCalibration(Matrix4f( 1e3, 0, 0, 0, 0, 1e3, 0, 0, 0, 0, 1e3,0, 0, 0, 0, 1 ) *
+        adjust_matrix * positionCalibration->rt_pos_calibration * Matrix4f( 1e-3, 0, 0, 0, 0, 1e-3, 0, 0, 0, 0, 1e-3,0, 0, 0, 0, 1 ));
       
       // Create adjusted OrnCalibration and send to HAPI
       adjustedOrnCalibration->setValue(
@@ -307,7 +307,7 @@ void H3DHapticsDevice::updateDeviceValues() {
     }
     else {
       hapi_device->
-        setPositionCalibration( positionCalibration->rt_pos_calibration );
+        setPositionCalibration( Matrix4f( 1e3, 0, 0, 0, 0, 1e3, 0, 0, 0, 0, 1e3,0, 0, 0, 0, 1 ) * positionCalibration->rt_pos_calibration * Matrix4f( 1e-3, 0, 0, 0, 0, 1e-3, 0, 0, 0, 0, 1e-3,0, 0, 0, 0, 1 ));
       hapi_device->setOrientationCalibration(
         orientationCalibration->rt_orn_calibration );
     }
