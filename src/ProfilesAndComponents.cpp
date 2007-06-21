@@ -38,7 +38,7 @@ using namespace H3D;
 using namespace std;
 
 ProfilesAndComponents * ProfilesAndComponents::instance = 0;
-bool ProfilesAndComponents::check_profiles_components = true;
+bool ProfilesAndComponents::check_profiles_components = false;
 
 namespace ProfilesAndComponentsInternal {
   SAX2XMLReader* getNewXMLParser() {
