@@ -180,7 +180,6 @@ void IndexedLineSet::render() {
         // Render the vertices.
         coordinate_node->render( coord_index[ i ] );
         if( fogCoord->getValue()){
-          cerr<< " fogCoord = true " << endl;
           fogCoord->getValue()->render(coord_index[ i ]);
         }
 

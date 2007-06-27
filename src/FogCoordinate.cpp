@@ -59,7 +59,6 @@ FogCoordinate::FogCoordinate(   Inst< MFFloat  > _depth,
 void FogCoordinate::render( int depth_index ) {
   const GLfloat d = depth->getValueByIndex( depth_index );
   glFogCoordfEXT( d);
-  cerr << "inne i fogCord render for index = [" << depth_index << "], ger d = " << d << endl;
 }
 
 /// Perform the OpenGL commands to render the fog for
@@ -71,8 +70,7 @@ void FogCoordinate::renderArray() {
     glEnableClientState(GL_FOG_COORD_ARRAY);
     glFogCoordPointerEXT(GL_FLOAT, 0,
                      &(*depth->begin()) );
-   cerr<< "inne i fogCoord renderArray, första depth = " << *depth->begin()<< endl;
-    
+   
   
     // *depth->begin() gives the first value of the MFFloat depth
     // &(*depth->begin()) gives a pointer to the adress of the 
