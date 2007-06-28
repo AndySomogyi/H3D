@@ -74,7 +74,7 @@ void PositionInterpolator::SFValue::update() {
   H3DFloat weight;
   int key_index = interpolator->lookupKey( fraction, 
                                            weight );
-  if( key_index >= 0 && key_index + 1 < key_values.size() ) {
+  if( key_index >= 0 && key_index + 1 < (int)key_values.size() ) {
     if (weight<=0) 
       value = key_values[key_index];
     else if (weight>=1)

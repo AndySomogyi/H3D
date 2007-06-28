@@ -107,7 +107,7 @@ void SplinePositionInterpolator::SFValue::update() {
   Vec3f T0;
   Vec3f T1;
 
-  if( key_index >= 0 && (key_index + 1) < key_value.size() ) {
+  if( key_index >= 0 && (key_index + 1) < (int)key_value.size() ) {
 
     int tMinus1 = (key_size-2);
     int tN = 1;
@@ -194,8 +194,6 @@ void SplinePositionInterpolator::SFValue::update() {
       for(int i=1; i<key_size-1; i++){
         F1.push_back(2*((key[i] - key[i-1])/(key[i+1] - key[i-1])));
         F2.push_back(2*((key[i+1] - key[i])/(key[i+1] - key[i-1])));
-        cerr << " F1[" <<(i-1)<< "] = " << F1[i-1] << "  *****  ";
-        cerr << " F2[" <<(i-1)<< "] = " << F2[i-1] << "  *****  ";
       }
       if((key_index>0) && (key_index <key_size-2)){
         T0 = (T[key_index]*F1[key_index-1]); 
@@ -217,8 +215,6 @@ void SplinePositionInterpolator::SFValue::update() {
         T0=(F1[key_index-1]*T[key_index]);
         T1=Vec3f(0,0,0);
       }
-        cerr << " T0 = " << T0 << "  *****  ";
-        cerr << " T1 = " << T1 << "  *****  ";
     }
 
     else if(closed && !ignoreClosed){

@@ -258,7 +258,7 @@ void Scene::replaceWorld( AutoRef< Node > new_world,
       X3DGroupingNode * scene_root = dynamic_cast< X3DGroupingNode * >
         ( (*i)->sceneRoot->getValue() );
       if( scene_root ) {
-        for( int j = 0; j < scene_root->children->size(); j++ ) {
+        for(unsigned int j = 0; j < scene_root->children->size(); j++ ) {
           X3DGroupingNode * temp_gr = dynamic_cast< X3DGroupingNode * >
             ( scene_root->children->getValueByIndex( j ) );
         }

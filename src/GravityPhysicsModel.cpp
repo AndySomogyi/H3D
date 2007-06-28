@@ -53,7 +53,7 @@ GravityPhysicsModel::GravityPhysicsModel(
   type_name = "GravityPhysicsModel";
   database.initFields( this );
 
-  gravity->setValue( Vec3f( 0, -9.8, 0 ) );
+  gravity->setValue( Vec3f( 0, -9.8f, 0 ) );
 }
 
 

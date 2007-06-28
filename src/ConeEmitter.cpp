@@ -66,7 +66,7 @@ ConeEmitter::ConeEmitter(
 
   position->setValue( Vec3f( 0, 0, 0 ) );
   direction->setValue( Vec3f( 0, 1, 0 ) );
-  angle->setValue( Constants::pi / 4 );
+  angle->setValue( Constants::pi / 4.0f );
 }
 
 void ConeEmitter::generateParticles( ParticleSystem *ps,
@@ -102,7 +102,7 @@ void ConeEmitter::generateParticles( ParticleSystem *ps,
                                                     angle->getValue() / 2 ) ) *
       dir;
     dir = Rotation( direction->getValue(), 
-                    ParticleSystem::getRandomValue( 0, Constants::pi * 2 ) ) *
+                    ParticleSystem::getRandomValue( 0, Constants::pi * 2.0f ) ) *
       dir;
                     
 

@@ -151,7 +151,6 @@ namespace H3D {
         setName( "Scene::eventSink" ); 
       }
       ~EventSink(){
-      //cerr << " ~EventSink  " << endl;
     }  
     protected:
       virtual void update();

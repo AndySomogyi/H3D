@@ -153,9 +153,9 @@ H3DHapticsDevice::ErrorCode PhantomDevice::initDevice() {
     pd->getUsableWorkspaceDimensions( min, max );
     usableWorkspaceDimensions->setValue( 0, (Vec3f)min, id ); 
     usableWorkspaceDimensions->setValue( 1, (Vec3f)max, id ); 
-    tabletopOffset->setValue( pd->getTabletopOffset(), id );
-    maxForce->setValue( pd->getMaxForce(), id );
-    maxContinuousForce->setValue( pd->getMaxContinuousForce(), id );
+    tabletopOffset->setValue((H3DFloat) pd->getTabletopOffset(), id );
+    maxForce->setValue( (H3DFloat)pd->getMaxForce(), id );
+    maxContinuousForce->setValue( (H3DFloat)pd->getMaxContinuousForce(), id );
     needsCalibration->setValue( pd->needsCalibration(), id );
   }
 #endif

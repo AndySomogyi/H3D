@@ -72,7 +72,7 @@ namespace H3D {
         value.resize( value_size );
 
 	if ( key_index >= 0 && 
-	     (key_index + 2)* value_size - 1 < key_values.size() ) {
+	     (key_index + 2)* value_size - 1 < (int)key_values.size() ) {
           if (weight<=0) 
             for (int x = 0; x < value_size; x++ )
               value[x] = key_values[ key_index*value_size + x ];

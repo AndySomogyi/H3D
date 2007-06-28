@@ -86,12 +86,12 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
 			
 		const Matrix4f &vs_frw_m = ti.getAccForwardMatrix();
 
-		H3DFloat xmin = center->getValue().x - size->getValue().x / 2.0;
-		H3DFloat xmax = center->getValue().x + size->getValue().x / 2.0;
-		H3DFloat ymin = center->getValue().y - size->getValue().y / 2.0;
-		H3DFloat ymax = center->getValue().y + size->getValue().y / 2.0;
-		H3DFloat zmin = center->getValue().z - size->getValue().z / 2.0;
-		H3DFloat zmax = center->getValue().z + size->getValue().z / 2.0;
+		H3DFloat xmin = center->getValue().x - size->getValue().x / 2.0f;
+		H3DFloat xmax = center->getValue().x + size->getValue().x / 2.0f;
+		H3DFloat ymin = center->getValue().y - size->getValue().y / 2.0f;
+		H3DFloat ymax = center->getValue().y + size->getValue().y / 2.0f;
+		H3DFloat zmin = center->getValue().z - size->getValue().z / 2.0f;
+		H3DFloat zmax = center->getValue().z + size->getValue().z / 2.0f;
 		
 		Vec3f loc0(xmin, ymin, zmax);
 		Vec3f loc1(xmax, ymin, zmax);
@@ -206,7 +206,7 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
 								&sampleCount);
 
 	
-		if( sampleCount > visib_pix_no_threshold )
+		if( (int)sampleCount > visib_pix_no_threshold )
 		{
 			vector<int>::iterator p = find(list.begin(), list.end(), 
 				no_instance );
