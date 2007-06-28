@@ -99,7 +99,7 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
                                weight, color_key );
     
     if( key_index >= 0 && 
-        key_index < color_ramp->nrAvailableColors()  ) {
+        key_index < (int)color_ramp->nrAvailableColors()  ) {
       have_color_value = true;
       if (weight<=0) 
         color = color_ramp->getColor( 0 );

@@ -165,7 +165,7 @@ void NurbsCurve::render( ) {
   if(no_of_weights == no_of_control_points){
     const vector< H3DDouble > &w = weight->getValue();
     if(!valid_weight) valid_weight = true;
-    for ( int j = 0; j<w.size(); j++){
+    for (unsigned int j = 0; j<w.size(); j++){
       weight_float[j]= (GLfloat)w[j];
     }
   } 
@@ -202,7 +202,7 @@ void NurbsCurve::render( ) {
 
   // setting the gluNurbsProperty after the value of tessellation   
   H3DInt32 tess_val = tessellation->getValue();
-  int tess_step;
+  GLfloat tess_step;
 
   if(tess_val>0){
     tess_step= (tess_val+1);

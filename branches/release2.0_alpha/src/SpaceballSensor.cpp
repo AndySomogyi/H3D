@@ -77,7 +77,7 @@ SpaceballSensor::~SpaceballSensor() {
 
 void SpaceballSensor::addGLUTMotionAction( int x, int y, int z ) { 
   
-  motion->setValue( Vec3f( x, y, z ), id );
+  motion->setValue( Vec3f( (H3DFloat)x, (H3DFloat)y, (H3DFloat)z ), id );
   
 }
 
@@ -87,7 +87,7 @@ void SpaceballSensor::addGLUTRotateAction( int x, int y, int z ) {
 }
 
 void SpaceballSensor::addGLUTButtonAction( int button, int state ) { 
-  if ( button > buttons->size() ) {
+  if ( button > (int)buttons->size() ) {
     buttons->resize( button, id );
   }
   buttons->setValue( button-1, state, id );

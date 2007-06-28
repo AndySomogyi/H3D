@@ -108,7 +108,7 @@ void SplineScalarInterpolator::SFValue::update() {
   vector< H3DFloat > F2;
 
 
-  if( key_index >= 0 && (key_index + 1) < key_value.size() ) {
+  if( key_index >= 0 && (key_index + 1) < (int)key_value.size() ) {
 
     int tMinus1 = (key_size-2);
     int tN = 1;

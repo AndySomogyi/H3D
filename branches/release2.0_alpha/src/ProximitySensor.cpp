@@ -127,9 +127,9 @@ void ProximitySensor::traverseSG( TraverseInfo &ti ) {
 		H3DFloat cy = center->getValue().y;
 		H3DFloat cz = center->getValue().z;
 
-		H3DFloat x = size->getValue().x / 2.0;
-		H3DFloat y = size->getValue().y / 2.0;
-		H3DFloat z = size->getValue().z / 2.0;
+		H3DFloat x = size->getValue().x / 2.0f;
+		H3DFloat y = size->getValue().y / 2.0f;
+		H3DFloat z = size->getValue().z / 2.0f;
 		
 		if (prev_vp_pos_wrt_pr.x >= cx - x && prev_vp_pos_wrt_pr.x <= cx + x &&
 			prev_vp_pos_wrt_pr.y >= cy - y && prev_vp_pos_wrt_pr.y <= cy + y &&
