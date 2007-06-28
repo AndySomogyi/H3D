@@ -1008,7 +1008,7 @@ void WxFrame::SaveMRU () {
 
   //Store each individual file info
   h3dConfig->SetPath(_T("/Recent/List"));
-  for (int i = 0; i < recentFiles->GetCount(); i++) {
+  for (int i = 0; i < (int)recentFiles->GetCount(); i++) {
     wxString entry = wxString ("") << i;
     h3dConfig->Write(entry, recentFiles->GetHistoryFile(i));
   }

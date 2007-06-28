@@ -88,7 +88,7 @@ public:
   }
 
   virtual bool OnCmdLineParsed(wxCmdLineParser& parser) {
-    for (int i = 0; i < parser.GetParamCount(); i++) {
+    for (int i = 0; i < (int)parser.GetParamCount(); i++) {
       cmd_line_filename = parser.GetParam(i);
     }
 
