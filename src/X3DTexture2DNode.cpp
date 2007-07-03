@@ -115,14 +115,6 @@ void X3DTexture2DNode::glTexImage( Image *i, GLenum texture_target,
   // at the end of the function or not.
   bool free_image_data = false;
 
-  // if width < 4 we have to pad the data in order for it to be 4 byte 
-  // aligned as required by the glTexImage2D function.
-  if( width < 4 ) {
-    image_data = padTo4ByteAlignment( image_data, width, height, 1,
-                                      i->bitsPerPixel() );
-    free_image_data = true;
-  }
-
   if( scale_to_power_of_two && !GLEW_ARB_texture_non_power_of_two ) {
     // check if any scaling is required and if so scale the image.
     bool needs_scaling = false;

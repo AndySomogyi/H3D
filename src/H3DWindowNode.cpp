@@ -217,6 +217,8 @@ void H3DWindowNode::initialize() {
   glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
   GLfloat no_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
   glLightModelfv( GL_LIGHT_MODEL_AMBIENT, no_ambient);
+  glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+  glPixelStorei( GL_PACK_ALIGNMENT, 1 );
   Node::initialize();
 }
 
