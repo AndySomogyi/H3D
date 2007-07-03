@@ -152,14 +152,6 @@ void X3DTexture3DNode::glTexImage( Image *i, GLenum texture_target,
     }
   }
 
-  // if width < 4 we have to pad the data in order for it to be 4 byte 
-  // aligned as required by the glTexImage3D function.
-  if( width < 4 ) {
-    image_data = padTo4ByteAlignment( image_data, width, height, depth, 
-                                      i->bitsPerPixel() );
-    free_image_data = true;
-  }
-
   TextureProperties *texture_properties = textureProperties->getValue();
   
   if( texture_properties && texture_properties->generateMipMaps->getValue() ) {
