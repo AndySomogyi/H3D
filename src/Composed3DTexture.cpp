@@ -69,6 +69,7 @@ void Composed3DTexture::SFImage::update() {
   unsigned int width  = 1;
   unsigned int height = 1;
   unsigned int depth = (unsigned int)texture->size();
+  Vec3f pixel_size = Vec3f(1,1,1);
   Image::PixelType pixel_type = Image::LUMINANCE;
   unsigned int bits_per_pixel = 1;
 
@@ -150,7 +151,7 @@ void Composed3DTexture::SFImage::update() {
             bytes_per_pixel % 8 == 0 ? 
             bytes_per_pixel / 8 : bytes_per_pixel / 8 + 1;
       
-	  unsigned int new_size = width*height*bytes_per_pixel;
+	        unsigned int new_size = width*height*bytes_per_pixel;
           void * new_data = malloc( new_size );
           gluScaleImage( t->glPixelFormat( tex_image ), 
                          tex_image->width(),
@@ -167,18 +168,19 @@ void Composed3DTexture::SFImage::update() {
             free_image_data = true;
           }
           image_data = new_data;
-        }
-
-	memcpy( data + width * height * i * bytes_per_pixel, 
-		image_data, 
-		width * height * bytes_per_pixel );
+       } else {
+         if(pixel_size.x == 1 ) pixel_size = tex_image->pixelSize();
+       }
+	     memcpy( data + width * height * i * bytes_per_pixel, 
+		           image_data, 
+		           width * height * bytes_per_pixel );
 
       }
     }
   }
 
   value = new PixelImage( width, height, depth, 
-			  bits_per_pixel, pixel_type, Image::UNSIGNED, 
-			  data );
+			                    bits_per_pixel, pixel_type, Image::UNSIGNED, 
+			                    data, false, pixel_size );
 }
 
