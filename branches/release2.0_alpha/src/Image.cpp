@@ -158,13 +158,18 @@ H3D::RGBA Image::getPixel( int x, int y, int z ) {
   unsigned int bytes_per_pixel = bitsPerPixel() / 8;
 
   assert( byte_rem == 0 );
-
-  char *pixel_data = new char[bytes_per_pixel];
-  getElement( pixel_data, x, y, z );
-  H3DUtil::RGBA rgba = imageValueToRGBA( pixel_data );
-  delete [] pixel_data;
-
-  return rgba;
+  if( bytes_per_pixel <= 8 ) {
+    char pixel_data[8]; 
+    getElement( pixel_data, x, y, z );
+    H3DUtil::RGBA rgba = imageValueToRGBA( pixel_data );
+    return rgba;
+  } else {
+    char *pixel_data = new char[bytes_per_pixel];
+    getElement( pixel_data, x, y, z );
+    H3DUtil::RGBA rgba = imageValueToRGBA( pixel_data );
+    delete [] pixel_data;
+    return rgba;
+  }
 }
 
 void Image::setPixel( const H3D::RGBA &value, int x, int y, int z ) {
@@ -172,11 +177,16 @@ void Image::setPixel( const H3D::RGBA &value, int x, int y, int z ) {
   unsigned int bytes_per_pixel = bitsPerPixel() / 8;
 
   assert( byte_rem == 0 );
-
-  char *pixel_data = new char[bytes_per_pixel];
-  RGBAToImageValue( value, pixel_data );
-  setElement( pixel_data, x, y, z );
-  delete [] pixel_data;
+  if( bytes_per_pixel <= 8 ) {
+    char pixel_data[8];
+    RGBAToImageValue( value, pixel_data );
+    setElement( pixel_data, x, y, z );    
+  } else {
+    char *pixel_data = new char[bytes_per_pixel];
+    RGBAToImageValue( value, pixel_data );
+    setElement( pixel_data, x, y, z );
+    delete [] pixel_data;
+  }
 }
 
 H3D::RGBA Image::imageValueToRGBA( void *_pixel_data ) {
