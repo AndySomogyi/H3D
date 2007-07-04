@@ -16,7 +16,7 @@ import random
 import math
 import sys
 import os.path
-import thread, winsound
+import thread
 
 bonustime=15
 
