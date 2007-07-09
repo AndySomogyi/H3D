@@ -58,7 +58,9 @@ namespace H3D {
     /// \param _bitmap The FreeImage bitmap we want to encapsulate.
     ///
     FreeImageImage( FIBITMAP *_bitmap ):
-      bitmap( _bitmap ){}
+      bitmap( _bitmap ){
+      byte_alignment = 4;
+    }
 
     /// Destructor.
     ~FreeImageImage() {

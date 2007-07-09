@@ -115,6 +115,10 @@ void X3DTexture2DNode::glTexImage( Image *i, GLenum texture_target,
   // at the end of the function or not.
   bool free_image_data = false;
 
+  GLint byte_alignment;
+  glGetIntegerv( GL_UNPACK_ALIGNMENT, &byte_alignment );
+  glPixelStorei( GL_UNPACK_ALIGNMENT, i->byteAlignment() );
+
   if( scale_to_power_of_two && !GLEW_ARB_texture_non_power_of_two ) {
     // check if any scaling is required and if so scale the image.
     bool needs_scaling = false;
@@ -133,9 +137,9 @@ void X3DTexture2DNode::glTexImage( Image *i, GLenum texture_target,
     if( needs_scaling ) {
       unsigned int bytes_per_pixel = i->bitsPerPixel();
       bytes_per_pixel = 
-        bytes_per_pixel % 8 ? 
-        bytes_per_pixel / 8 : bytes_per_pixel - 8 + 1;
-      
+        bytes_per_pixel % 8 == 0 ? 
+        bytes_per_pixel / 8 : bytes_per_pixel / 8 + 1;
+
       void * new_data = malloc( H3DMax( new_width, 4u )*
                                 new_height*bytes_per_pixel );
       gluScaleImage( glPixelFormat( i ), 
@@ -193,6 +197,8 @@ void X3DTexture2DNode::glTexImage( Image *i, GLenum texture_target,
                   glPixelComponentType( i ),
                   image_data );
   }
+
+  glPixelStorei( GL_UNPACK_ALIGNMENT, byte_alignment );
 
   // free the temporary image data if necessary.
   if( free_image_data ) 
