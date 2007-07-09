@@ -259,10 +259,6 @@ void H3DHapticsDevice::updateDeviceValues() {
         default_vp_pos_mtx[0][3] = default_vp_pos.x;
         default_vp_pos_mtx[1][3] = default_vp_pos.y;
         default_vp_pos_mtx[2][3] = default_vp_pos.z;
-        // Convert to millimeters
-        default_vp_pos_mtx_mm[0][3] = default_vp_pos.x * 1e3f;
-        default_vp_pos_mtx_mm[1][3] = default_vp_pos.y * 1e3f;
-        default_vp_pos_mtx_mm[2][3] = default_vp_pos.z * 1e3f;
 
         default_vp_orn_mtx = vp_accFrw.inverse();
         vp_initialized = true;
@@ -286,17 +282,8 @@ void H3DHapticsDevice::updateDeviceValues() {
       adjustedPositionCalibration->
         setValue( adjust_matrix * positionCalibration->getValue() );
 
-      // Convert to millimeters
-      translation_matrix_new[0][3] = translation_matrix_new[0][3] * 1e3f;
-      translation_matrix_new[1][3] = translation_matrix_new[1][3] * 1e3f;
-      translation_matrix_new[2][3] = translation_matrix_new[2][3] * 1e3f;
-
-      // create the matrix used to adjust the positionCalibration
-      adjust_matrix = translation_matrix_new *
-        (rotation_matrix * default_vp_pos_mtx_mm.inverse());
-
       hapi_device->setPositionCalibration(Matrix4f( 1e3, 0, 0, 0, 0, 1e3, 0, 0, 0, 0, 1e3,0, 0, 0, 0, 1 ) *
-        adjust_matrix * positionCalibration->rt_pos_calibration * Matrix4f( 1e-3, 0, 0, 0, 0, 1e-3, 0, 0, 0, 0, 1e-3,0, 0, 0, 0, 1 ));
+        adjustedPositionCalibration->rt_pos_calibration * Matrix4f( 1e-3, 0, 0, 0, 0, 1e-3, 0, 0, 0, 0, 1e-3,0, 0, 0, 0, 1 ));
       
       // Create adjusted OrnCalibration and send to HAPI
       adjustedOrnCalibration->setValue(
