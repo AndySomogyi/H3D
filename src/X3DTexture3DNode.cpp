@@ -154,6 +154,9 @@ void X3DTexture3DNode::glTexImage( Image *i, GLenum texture_target,
 
   TextureProperties *texture_properties = textureProperties->getValue();
   
+  GLint byte_alignment;
+  glGetIntegerv( GL_UNPACK_ALIGNMENT, &byte_alignment );
+  glPixelStorei( GL_UNPACK_ALIGNMENT, i->byteAlignment() );
   if( texture_properties && texture_properties->generateMipMaps->getValue() ) {
 #if( GLU_VERSION_1_3 )
     gluBuild3DMipmaps(  texture_target, 
@@ -189,6 +192,8 @@ void X3DTexture3DNode::glTexImage( Image *i, GLenum texture_target,
                   glPixelComponentType( i ),
                   image_data );
   }
+
+  glPixelStorei( GL_UNPACK_ALIGNMENT, byte_alignment );
 
   if( free_image_data ) 
     free( image_data );

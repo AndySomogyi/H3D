@@ -41,6 +41,10 @@ namespace H3D {
   ///
   class H3DAPI_API Image: public RefCountedClass {
   public:
+    /// Constructor.
+    Image():
+      byte_alignment( 1 ) {}
+
     /// Type that defines what format each pixel in the image is
     /// on.
     typedef enum {
@@ -179,6 +183,15 @@ namespace H3D {
               value, 
               bytes_per_pixel );
     }
+
+    /// Gets the byte alignment for the start of each pixel row in memory.
+    /// Valid values are 1, 2, 4 and 8.
+    virtual int byteAlignment() {
+      return byte_alignment;
+    }
+
+	protected:
+	  int byte_alignment;
   };
 }
 
