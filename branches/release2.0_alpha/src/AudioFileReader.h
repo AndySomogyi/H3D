@@ -33,7 +33,7 @@
 
 #ifdef HAVE_LIBAUDIOFILE
 #if defined(_MSC_VER) || defined(__BORLANDC__)
-#pragma comment( lib, "audiofile.lib" )
+#pragma comment( lib, "libaudiofile.lib" )
 #endif
 #include <audiofile.h>
 
