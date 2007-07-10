@@ -1,7 +1,7 @@
 <DeviceInfo>
-  <FalconDevice positionCalibration="1 0 0 0
-  0 1 0 0
-  0 0 1 0
+  <FalconDevice positionCalibration="3 0 0 0
+  0 3 0 0
+  0 0 3 0
   0 0 0 1" >
 	<GodObjectRenderer/>
   </FalconDevice>
