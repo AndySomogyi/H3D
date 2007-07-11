@@ -166,6 +166,7 @@ public:
   void ShowConsole	(wxCommandEvent & event);
   void GetSelection (wxMenuEvent & event);
   void ChangeViewpoint (wxCommandEvent & event);
+  void ResetViewpoint (wxCommandEvent & event);
   void ChangeNavigation (wxCommandEvent & event);
   void ChangeRenderer (wxCommandEvent & event);
   void ToggleHaptics  (wxCommandEvent & event);
@@ -199,7 +200,8 @@ private:
 	DeviceInfo *mydevice;
 	H3DHapticsDevice *myH3Ddevice;
 	NodeVector allDevices;
-
+	X3DViewpointNode *defaultvp;
+	
 	//One time intialization variables
 	string settings_path;
 	string common_path;
@@ -273,7 +275,8 @@ enum
   BASIC_DIR,
   FRAME_ABOUT,
   FRAME_HELP,
-  FRAME_SETTINGS
+  FRAME_SETTINGS,
+  FRAME_RESET_VIEWPOINT
 };
 
 
