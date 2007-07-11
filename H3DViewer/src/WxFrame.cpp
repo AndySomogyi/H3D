@@ -133,7 +133,7 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
 	glwindow->width->setValue(width);
   glwindow->height->setValue(height);
 
-	t->children->clear();	
+	t->children->clear();
 	g->children->push_back( t.get() );
 	scene->window->push_back( glwindow );
 	scene->sceneRoot->setValue( g.get() );
@@ -142,6 +142,11 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   theConsole = new consoleDialog(this, wxID_ANY, console_string, 
                                  wxDefaultPosition, wxDefaultSize,
                                  wxDEFAULT_DIALOG_STYLE);
+
+
+  defaultvp = (X3DViewpointNode *) NULL;
+  mydevice = (DeviceInfo *) NULL;
+  mynav = (NavigationInfo *) NULL;
 
   //Haptics on by default
   /*********TODO: Save this in registry for next session**************/
@@ -313,6 +318,7 @@ BEGIN_EVENT_TABLE(WxFrame, wxFrame)
 	EVT_MENU (FRAME_CONSOLE, WxFrame::ShowConsole)
 	EVT_MENU_HIGHLIGHT (FRAME_SELECTION, WxFrame::GetSelection)
 	EVT_MENU (FRAME_VIEWPOINT, WxFrame::ChangeViewpoint)
+	EVT_MENU (FRAME_RESET_VIEWPOINT, WxFrame::ResetViewpoint)
 	EVT_MENU (FRAME_NAVIGATION, WxFrame::ChangeNavigation)
   EVT_MENU_RANGE (FRAME_OPENHAPTICS, FRAME_RUSPINI, WxFrame::ChangeRenderer)
   EVT_MENU (FRAME_DEVICECONTROL, WxFrame::ToggleHaptics)
@@ -563,39 +569,6 @@ bool WxFrame::loadFile( const string &filename) {
         t->children->push_back( X3D::createX3DFromURL( filename, 
                                                        &dn ) );
 
-	/****************************Intialize Viewpoints***************************/
-	//Enable Viewpoints Menu
-	menuBar->EnableTop(3, true);
-  VPlist = X3DViewpointNode::getViewpointHierarchy();
-  
-  //Store number of viewpoints for processing later
-  viewpointCount = VPlist.size();
-  
-  //Create Viewpoints menu using list
-  //If no viewpoints are specified in the file
-  if (viewpointCount <= 1) {
-    viewpointMenu->Append(FRAME_VIEWPOINT, "Default", "Default Viewpoint");
-    viewpointMenu->Enable(FRAME_VIEWPOINT, false);
-  }
-  else {
-    int i = 0;
-    for (X3DViewpointNode::ViewpointList::iterator vp = VPlist.begin(); 
-           vp != VPlist.end(); vp++) {
-      string vpDescription = (*vp)->description->getValue();
-			viewpointMenu->AppendRadioItem(FRAME_VIEWPOINT + i, 
-                                     vpDescription.c_str(),
-                                     "Select a viewpoint");
-      if ((*vp) == Viewpoint::getActive()) {
-        viewpointMenu->Check(FRAME_VIEWPOINT+i, true);
-      }
-			Connect(FRAME_VIEWPOINT +i,wxEVT_MENU_HIGHLIGHT,
-              wxMenuEventHandler(WxFrame::GetSelection));
-			Connect(FRAME_VIEWPOINT +i,wxEVT_COMMAND_MENU_SELECTED,
-              wxCommandEventHandler(WxFrame::ChangeViewpoint));
-      i++;
-		}
-  }
-
     /**********************Reset mirrored and fullscreen********************/
   rendererMenu->Check(FRAME_FULLSCREEN, false);
   rendererMenu->Check(FRAME_MIRROR, false);
@@ -638,6 +611,44 @@ bool WxFrame::loadFile( const string &filename) {
                    << e << endl;
       }
     }
+
+/****************************Intialize Viewpoints***************************/
+  //Enable Viewpoints Menu
+  menuBar->EnableTop(3, true);
+  VPlist = X3DViewpointNode::getViewpointHierarchy();
+  defaultvp = Viewpoint::getActive();
+  
+  //Store number of viewpoints for processing later
+  viewpointCount = VPlist.size();
+  
+  //Create Viewpoints menu using list
+  //If no viewpoints are specified in the file
+  if (viewpointCount <= 1) {
+    viewpointMenu->Append(FRAME_VIEWPOINT, "Default", "Default Viewpoint");
+    viewpointMenu->Enable(FRAME_VIEWPOINT, true);
+  }
+  else {
+    int i = 0;
+    for (X3DViewpointNode::ViewpointList::iterator vp = VPlist.begin(); 
+           vp != VPlist.end(); vp++) {
+      string vpDescription = (*vp)->description->getValue();
+			viewpointMenu->AppendRadioItem(FRAME_VIEWPOINT + i, 
+                                     vpDescription.c_str(),
+                                     "Select a viewpoint");
+      if ((*vp) == Viewpoint::getActive()) {
+        viewpointMenu->Check(FRAME_VIEWPOINT+i, true);
+      }
+			Connect(FRAME_VIEWPOINT +i,wxEVT_MENU_HIGHLIGHT,
+              wxMenuEventHandler(WxFrame::GetSelection));
+			Connect(FRAME_VIEWPOINT +i,wxEVT_COMMAND_MENU_SELECTED,
+              wxCommandEventHandler(WxFrame::ChangeViewpoint));
+      i++;
+		}
+  }
+  viewpointMenu->AppendSeparator();
+  viewpointMenu->Append(FRAME_RESET_VIEWPOINT, 
+                                     "Reset",
+                                     "Reset current viewpoint");
     
     if( X3DBindableNode::getStack( "DeviceInfo" ).size() > 1 ) {
       device_info.reset( NULL );
@@ -937,8 +948,19 @@ void WxFrame::ChangeViewpoint (wxCommandEvent & event)
 		}
 		//Enable that viewpoint
 		(*vp)->set_bind->setValue(true);
+		defaultvp = *vp;
+		Console (3) << "Viewpoint Set" << endl;
     viewpointMenu->Check(selection, true);
 	}
+}
+
+//Reset Active Viewpoint
+void WxFrame::ResetViewpoint(wxCommandEvent & event)
+{
+  if (defaultvp) {
+      defaultvp->rel_orn = Rotation();
+      defaultvp->rel_pos = Vec3f();
+  }
 }
 
 //Change Navigation
