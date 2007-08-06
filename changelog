@@ -67,6 +67,8 @@ easily.
 - Fixed a bug when using double versions of linear algebra types in
 Python(e.g. Vec3d)
 - MultiTexture can now be used for all geometry types.
+- Fixed bugs that gave warning messages when using the Prototype features 
+of X3D.
 
 	
 Compatability issues:
