@@ -123,10 +123,6 @@ IF( GENERATE_CPACK_PROJECT )
                                      "H3DViewer;H3DViewer" )
       SET(WXWINDOWS_USE_GL 1)
       FIND_PACKAGE(wxWidgetsWin)
-      IF(wxWidgets_FOUND)
-        SET( CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                         "${wxWidgets_INCLUDE_DIR}/wx;External/include/wx" )
-      ENDIF(wxWidgets_FOUND)
     ENDIF( H3DViewer_cmake_install )
 
     #If particleDemo should be added to package.
@@ -135,13 +131,6 @@ IF( GENERATE_CPACK_PROJECT )
     IF( ParticleDemo_cmake_install )
       SET( CPACK_INSTALL_CMAKE_PROJECTS ${CPACK_INSTALL_CMAKE_PROJECTS}
                                         "${ParticleDemo_cmake_install};ParticleDemo;ALL;/" )
-      IF( NOT H3DViewer_cmake_install )
-        FIND_PACKAGE(wxWidgetsWin)
-        IF(wxWidgets_FOUND)
-          SET( CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                           "${wxWidgets_INCLUDE_DIR}/wx;External/include/wx" )
-        ENDIF(wxWidgets_FOUND)
-      ENDIF( NOT H3DViewer_cmake_install )
     ELSE( ParticleDemo_cmake_install )
       SET(H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/ )
     ENDIF( ParticleDemo_cmake_install )
@@ -175,7 +164,9 @@ IF( GENERATE_CPACK_PROJECT )
                            /pthreadGC2\\\\.dll$
                            /pthreadGCE2\\\\.dll$
                            /pthreadVSE2\\\\.dll$
-                           /HAPI/doc/ )
+                           /HAPI/doc/
+                           /include/fparser
+                           /include/teem )
     
     # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
     SET(CPACK_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/../../H3DAPI;H3DAPI"
@@ -500,104 +491,9 @@ ENDIF(NOT WIN32 AND NOT APPLE)
 # a number of extra directories needs to be added to be installed.
 IF( GENERATE_CPACK_PROJECT )
   IF( WIN32 )
-    IF( PTHREAD_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${PTHREAD_INCLUDE_DIR};External/include/pthread" )
-    ENDIF( PTHREAD_FOUND )
-
-    IF( OPENGL_FOUND AND OPENGL_INCLUDE_DIR )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${OPENGL_INCLUDE_DIR}/GL;External/include/GL" )
-    ENDIF( OPENGL_FOUND AND OPENGL_INCLUDE_DIR )
-
-    IF( GLUT_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${GLUT_INCLUDE_DIR}/GL;External/include/GL" )
-    ENDIF( GLUT_FOUND )
-
-    IF( GLEW_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${GLEW_INCLUDE_DIR}/GL;External/include/GL" )
-    ENDIF( GLEW_FOUND )
-
-    IF( XERCES_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${XERCES_INCLUDE_DIR}/..;External/include/xerces-c-src_2_7_0" )
-    ENDIF( XERCES_FOUND )
-
-    IF( CURL_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${CURL_INCLUDE_DIR}/curl;External/include/curl" )
-    ENDIF( CURL_FOUND )
-
-    IF( NVIDIACG_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${NVIDIACG_INCLUDE_DIR};External/include/Cg" )
-    ENDIF( NVIDIACG_FOUND )
-
-    IF( ZLIB_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${ZLIB_INCLUDE_DIR};External/include/zlib" )
-    ENDIF( ZLIB_FOUND )
-
-    IF( OPENAL_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${OPENAL_INCLUDE_DIR};External/include/OpenAL" )
-    ENDIF( OPENAL_FOUND )
-
-    IF( VORBIS_FOUND )
-      FOREACH(TEMP_LIST_ITEM ${VORBIS_INCLUDE_DIR})
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${TEMP_LIST_ITEM}/..;External/include/vorbis" )
-      ENDFOREACH(TEMP_LIST_ITEM ${ARGV})
-    ENDIF( VORBIS_FOUND )
-
-    IF( AUDIOFILE_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${AUDIOFILE_INCLUDE_DIR};External/include/libaudiofile" )
-    ENDIF( AUDIOFILE_FOUND )
-
-    IF( FREETYPE_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${FREETYPE_INCLUDE_DIR}/..;External/include/freetype" )
-    ENDIF( FREETYPE_FOUND )
-
-    IF( 3DXWARE_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${3DXWARE_INCLUDE_DIR}/..;External/include/3dconnexion" )
-    ENDIF( 3DXWARE_FOUND )
-
-    IF( FTGL_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${FTGL_INCLUDE_DIR}/FTGL;External/include/FTGL" )
-    ENDIF( FTGL_FOUND )
-
-    IF( FREEIMAGE_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${FREEIMAGE_INCLUDE_DIR}/..;External/include/FreeImage" )
-    ENDIF( FREEIMAGE_FOUND )
-
-    IF( DIRECTSHOW_FOUND )
-      SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                      "${DIRECTSHOW_INCLUDE_DIR_STREAMS_H}/..;External/include/DirectShow" )
-    ENDIF( DIRECTSHOW_FOUND )
-  
     SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
                                     ${HAPI_CPACK_INSTALLED_DIRECTORIES} )
 
-    IF( H3DViewer_cmake_install )
-      FIND_PACKAGE(wxWidgetsWin)
-      IF(wxWidgets_FOUND)
-        SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                        "${wxWidgets_INCLUDE_DIR}/wx;External/include/wx" )
-      ENDIF(wxWidgets_FOUND)
-    ENDIF( H3DViewer_cmake_install )
-
-    # External/bin and External/lib are needed to run program.
-    SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                    "${H3DAPI_SOURCE_DIR}/../../External/bin;External/bin" )  
-    SET(CPACK_INSTALLED_DIRECTORIES ${CPACK_INSTALLED_DIRECTORIES}
-                                    "${H3DAPI_SOURCE_DIR}/../../External/lib;External/lib" )
   ENDIF(WIN32)
 
   INCLUDE(CPack)
