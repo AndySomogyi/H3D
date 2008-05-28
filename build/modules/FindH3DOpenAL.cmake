@@ -10,11 +10,9 @@
 FIND_PACKAGE(OpenAL)
 IF(NOT OPENAL_FOUND AND WIN32)
   # Look for the header file.
-  FIND_PATH( OPENAL_INCLUDE_DIR NAMES al.h
+  FIND_PATH( OPENAL_INCLUDE_DIR NAMES AL/al.h
              PATHS $ENV{H3D_EXTERNAL_ROOT}/include  
-                   $ENV{H3D_EXTERNAL_ROOT}/include/OpenAL
-                   ../../External/include    
-                   ../../External/include/OpenAL )
+                   ../../External/include )
   
   # Look for the library.
   FIND_LIBRARY( OPENAL_LIBRARY NAMES OpenAL32

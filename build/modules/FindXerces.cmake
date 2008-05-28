@@ -8,10 +8,8 @@
 
 # Look for the header file.
 FIND_PATH(XERCES_INCLUDE_DIR NAMES xercesc/sax2/Attributes.hpp
-                             PATHS $ENV{H3D_EXTERNAL_ROOT}/include  
-                                   $ENV{H3D_EXTERNAL_ROOT}/include/xerces-c-src_2_7_0/src
-                                   ../../External/include    
-                                   ../../External/include/xerces-c-src_2_7_0/src)
+                             PATHS $ENV{H3D_EXTERNAL_ROOT}/include
+                                   ../../External/include )
 MARK_AS_ADVANCED(XERCES_INCLUDE_DIR)
 
 # Look for the library.

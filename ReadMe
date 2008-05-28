@@ -24,7 +24,7 @@ on Linux follow these steps.
    are installed on the system and only enable the features that the system can
    support. The libraries used by H3D API are:
 
-   Required libraries. Without this H3D API will not function.
+   Required libraries. Without these H3D API will not function.
     - glew, extended OpenGL functions
     - opengl.
 

@@ -9,16 +9,12 @@
 # Look for the header file.
 FIND_PATH(VORBIS_INCLUDE_DIR NAMES vorbis/vorbisfile.h
                              PATHS $ENV{H3D_EXTERNAL_ROOT}/include  
-                                   $ENV{H3D_EXTERNAL_ROOT}/include/vorbis/include
-                                   ../../External/include    
-                                   ../../External/include/vorbis/include)
+                                   ../../External/include )
 MARK_AS_ADVANCED(VORBIS_INCLUDE_DIR)
 
 FIND_PATH(OGG_INCLUDE_DIR NAMES ogg/ogg.h
                           PATHS $ENV{H3D_EXTERNAL_ROOT}/include  
-                                $ENV{H3D_EXTERNAL_ROOT}/include/vorbis/include
-                                ../../External/include    
-                                ../../External/include/vorbis/include)
+                                ../../External/include )
 MARK_AS_ADVANCED(OGG_INCLUDE_DIR)
 
 # Look for the library.
