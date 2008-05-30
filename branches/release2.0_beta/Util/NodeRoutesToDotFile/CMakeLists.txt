@@ -47,6 +47,17 @@ IF(HAPI_FOUND)
   SET(requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
 ENDIF(HAPI_FOUND)
 
+# Optional extra library. Used for sound in H3D API.
+FIND_PACKAGE(H3DOpenAL)
+IF(OPENAL_FOUND)
+  INCLUDE_DIRECTORIES( ${OPENAL_INCLUDE_DIR} )
+  IF(WIN32)
+    STRIP_AND_ADD_LIBRARY_DIRECTORIES( ${OPENAL_LIBRARIES})
+  ELSE(WIN32)
+    SET(optionalLibs ${optionalLibs} ${OPENAL_LIBRARIES} )
+  ENDIF(WIN32)
+ENDIF(OPENAL_FOUND)
+
 # Create build filess.
 ADD_EXECUTABLE(NodeRoutesToDotFile  ${NodeRoutesToDotFile_SRCS})
 TARGET_LINK_LIBRARIES( NodeRoutesToDotFile ${requiredLibs} ${optionalLibs} )
