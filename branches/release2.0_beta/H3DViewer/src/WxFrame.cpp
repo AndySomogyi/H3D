@@ -481,7 +481,7 @@ void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
 #ifdef WIN32
     if( DynamicLibrary::load( "hd.dll" ) &&
         DynamicLibrary::load( "hl.dll" ) ) {
-#endif WIN32
+#endif
 
     OpenHapticsOptions *oho = NULL;
     wx_frame->global_settings->getOptionNode( oho );
