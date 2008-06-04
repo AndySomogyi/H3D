@@ -165,6 +165,7 @@ IF( GENERATE_CPACK_PROJECT )
                            /pthreadGCE2\\\\.dll$
                            /pthreadVSE2\\\\.dll$
                            /HAPI/doc/
+                           /H3DUtil/doc/
                            /include/fparser
                            /include/teem )
     
@@ -186,9 +187,13 @@ IF( GENERATE_CPACK_PROJECT )
     SET( PythonInstallMSI "" CACHE FILEPATH "Needs to be set to add python installation to the package." )
     MARK_AS_ADVANCED(PythonInstallMSI)
     IF( PythonInstallMSI )
+      STRING( REGEX MATCH 2\\.[456789] CPACK_PYTHON_VERSION ${PythonInstallMSI} )
+      GET_FILENAME_COMPONENT( PYTHON_FILE_NAME ${PythonInstallMSI} NAME )
       STRING( REPLACE "/" "\\\\" TEMP_PythonInstallMSI ${PythonInstallMSI} )
+      #STRING( REPLACE "." "\\\\\\." TEMP_CPACK_PYTHON_VERSION ${CPACK_PYTHON_VERSION} )
+      #STRING( REPLACE "." "\\\\\\." TEMP_PYTHON_FILE_NAME ${PYTHON_FILE_NAME} )
       SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                             "   Code to install Python\\n   ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\2.4\\\\InstallPath \\\"\\\"\\n   StrCmp $0 \\\"\\\" 0 +5\\n  file ${TEMP_PythonInstallMSI}\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\python-2.4.4.msi\\\"'\\n  delete $INSTDIR\\\\python-2.4.4.msi\\n   ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\2.4\\\\InstallPath \\\"\\\"\\n" )
+                                             "   Code to install Python\\n   ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n   StrCmp $0 \\\"\\\" 0 +5\\n  file ${TEMP_PythonInstallMSI}\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"'\\n  delete $INSTDIR\\\\${PYTHON_FILE_NAME}\\n   ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n" )
     ENDIF( PythonInstallMSI )
     
     # Install OpenAL.

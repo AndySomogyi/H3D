@@ -122,11 +122,24 @@ namespace WxFrameInternals {
   wxString wx_front_and_back = wxT("Front and back");
   wxString wx_front = wxT("Front only");
   wxString wx_back = wxT("Back only");
-
   string as_graphics = "AS_GRAPHICS";
   string front_and_back = "FRONT_AND_BACK";
   string front = "FRONT";
   string back = "BACK";
+
+  wxString wx_OBB = wxT("Oriented bounding box");
+  wxString wx_AABB = wxT("Axis-aligned bounding box");
+  wxString wx_SPHERE = wxT("Sphere");
+  string str_OBB = "OBB";
+  string str_AABB = "AABB";
+  string str_SPHERE = "SPHERE";
+
+  wxString wx_FEEDBACK = wxT("Feedback buffer");
+  wxString wx_DEPTH = wxT("Depth buffer");
+  wxString wx_CUSTOM = wxT("Custom");
+  string str_FEEDBACK = "FEEDBACK_BUFFER";
+  string str_DEPTH = "DEPTH_BUFFER";
+  string str_CUSTOM = "CUSTOM";
 }
 
 /*******************Constructor*********************/
@@ -478,9 +491,9 @@ void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
     }
     if( id == ID_OH_SHAPE_TYPE ) {
       int i = event.GetSelection();
-      if( i == 0 ) oho->GLShape->setValue( "FEEDBACK_BUFFER" );
-      else if( i == 1 ) oho->GLShape->setValue( "DEPTH_BUFFER" );
-      else if( i == 2 ) oho->GLShape->setValue( "CUSTOM" );
+      if( i == 0 ) oho->GLShape->setValue( WxFrameInternals::str_FEEDBACK );
+      else if( i == 1 ) oho->GLShape->setValue( WxFrameInternals::str_DEPTH );
+      else if( i == 2 ) oho->GLShape->setValue( WxFrameInternals::str_CUSTOM );
     } else if( id == ID_ADAPTIVE_VIEWPORT ) {
       oho->useAdaptiveViewport->setValue( event.IsChecked() );
     } else if( id == ID_HAPTIC_CAMERA ) {
@@ -500,9 +513,10 @@ void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
       wx_frame->global_settings->options->push_back( gbto );
     }
     int i = event.GetSelection();
-    if( i == 0 ) gbto->boundType->setValue( "OBB" );
-    else if( i == 1 ) gbto->boundType->setValue( "AABB" );
-    else if( i == 2 ) gbto->boundType->setValue( "SPHERE" );
+    if( i == 0 ) gbto->boundType->setValue( WxFrameInternals::str_OBB );
+    else if( i == 1 ) gbto->boundType->setValue( WxFrameInternals::str_AABB );
+    else if( i == 2 ) gbto->boundType->setValue(
+      WxFrameInternals::str_SPHERE );
   }
 
   if( id == ID_PROXY_RADIUS ) {
@@ -882,14 +896,27 @@ bool WxFrame::loadFile( const string &filename) {
   global_settings->getOptionNode( gbto );
 
   if( gbto ) {
-    settings->bound_choice->SetStringSelection(
-      wxString( gbto->boundType->getValue().c_str(), wxConvUTF8 ) );
+    string bound_type = gbto->boundType->getValue();
+    if( bound_type == WxFrameInternals::str_OBB ) {
+      settings->bound_choice->SetStringSelection( WxFrameInternals::wx_OBB );
+    } else if( bound_type == WxFrameInternals::str_AABB ) {
+      settings->bound_choice->SetStringSelection( WxFrameInternals::wx_AABB );
+    } else if( bound_type == WxFrameInternals::str_SPHERE ) {
+      settings->bound_choice->SetStringSelection(
+        WxFrameInternals::wx_SPHERE );
+    }
     settings->max_triangles_spin->
       SetValue( gbto->maxTrianglesInLeaf->getValue() );
   } else {
     gbto = new GeometryBoundTreeOptions;
-    gbto->boundType->setValue(
-      toStr( settings->bound_choice->GetStringSelection() ) );
+    wxString bound_choice = settings->bound_choice->GetStringSelection();
+    if( bound_choice == WxFrameInternals::wx_OBB ) {
+      gbto->boundType->setValue( WxFrameInternals::str_OBB );
+    } else if( bound_choice == WxFrameInternals::wx_AABB ) {
+      gbto->boundType->setValue( WxFrameInternals::str_AABB );
+    } else if( bound_choice == WxFrameInternals::wx_SPHERE ) {
+      gbto->boundType->setValue( WxFrameInternals::str_SPHERE );
+    }
     gbto->maxTrianglesInLeaf->
       setValue( settings->max_triangles_spin->GetValue() );
     global_settings->options->push_back( gbto );
@@ -924,8 +951,16 @@ bool WxFrame::loadFile( const string &filename) {
       SetValue( oho->useHapticCameraView->getValue() );
     settings->full_geom_render->
       SetValue( oho->forceFullGeometryRender->getValue() );
-    settings->shape_choice->SetStringSelection(
-      wxString( oho->GLShape->getValue().c_str(), wxConvUTF8 ) );
+    string gl_shape = oho->GLShape->getValue();
+    if( gl_shape == WxFrameInternals::str_FEEDBACK ) {
+      settings->shape_choice->SetStringSelection(
+        WxFrameInternals::wx_FEEDBACK );
+    } else if( gl_shape == WxFrameInternals::str_DEPTH ) {
+      settings->shape_choice->SetStringSelection( WxFrameInternals::wx_DEPTH );
+    } else if( gl_shape == WxFrameInternals::str_CUSTOM ) {
+      settings->shape_choice->SetStringSelection(
+        WxFrameInternals::wx_CUSTOM );
+    }
   } else {
     oho = new OpenHapticsOptions;
     oho->useAdaptiveViewport->
@@ -934,8 +969,15 @@ bool WxFrame::loadFile( const string &filename) {
       setValue( settings->haptic_camera->GetValue() );
     oho->forceFullGeometryRender->
       setValue( settings->full_geom_render->GetValue() );
-    oho->GLShape->setValue(
-      toStr( settings->shape_choice->GetStringSelection() ) );
+    wxString shape_choice = settings->shape_choice->GetStringSelection();
+    if( shape_choice == WxFrameInternals::wx_FEEDBACK ) {
+      oho->GLShape->setValue( WxFrameInternals::str_FEEDBACK );
+    } else if( shape_choice == WxFrameInternals::wx_DEPTH ) {
+      oho->GLShape->setValue( WxFrameInternals::str_DEPTH );
+    } else if( shape_choice == WxFrameInternals::wx_CUSTOM ) {
+      oho->GLShape->setValue( WxFrameInternals::str_CUSTOM );
+    }
+
     global_settings->options->push_back( oho );
   }
 #ifdef WIN32
@@ -2030,9 +2072,9 @@ wxPanel* SettingsDialog::CreateOpenHapticsSettingsPage(wxWindow* parent ) {
     item0->Add( full_geom_render_sizer, 0, wxGROW|wxALL, 0);
 
     wxArrayString shape_choices;
-    shape_choices.Add(wxT("Feedback buffer"));
-    shape_choices.Add(wxT("Depth buffer"));
-    shape_choices.Add(wxT("Custom"));
+    shape_choices.Add(WxFrameInternals::wx_FEEDBACK);
+    shape_choices.Add(WxFrameInternals::wx_DEPTH);
+    shape_choices.Add(WxFrameInternals::wx_CUSTOM);
 
     wxBoxSizer* shape_sizer = new wxBoxSizer( wxHORIZONTAL );
  
@@ -2145,9 +2187,9 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent ) {
                                                 wxT("Bound tree:"));
 
   wxArrayString bound_choices;
-  bound_choices.Add(wxT("Oriented bounding box"));
-  bound_choices.Add(wxT("Axis-aligned bounding box"));
-  bound_choices.Add(wxT("Sphere"));
+  bound_choices.Add(WxFrameInternals::wx_OBB);
+  bound_choices.Add(WxFrameInternals::wx_AABB);
+  bound_choices.Add(WxFrameInternals::wx_SPHERE);
 
   wxBoxSizer* bound_tree_sizer = new wxStaticBoxSizer( bound_tree_box,
                                                        wxVERTICAL );
