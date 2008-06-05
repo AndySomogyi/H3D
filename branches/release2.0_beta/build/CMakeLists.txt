@@ -1,6 +1,9 @@
 IF(WIN32)
   cmake_minimum_required(VERSION 2.6.0)
 ENDIF(WIN32)
+# Make include files in paths like /usr/local/include have preference before
+# files in OSX frameworks. 
+SET(CMAKE_FIND_FRAMEWORK "LAST")
 PROJECT (H3DAPI)
 
 # Add a cache variable GENERATE_CPACK_PROJECT to have the choice of generating a project
@@ -11,7 +14,7 @@ IF( NOT DEFINED GENERATE_CPACK_PROJECT )
 ENDIF( NOT DEFINED GENERATE_CPACK_PROJECT )
 
 # Include HAPI in the build.
-IF( NOT GENERATE_CPACK_PROJECT OR WIN32 )
+IF( WIN32 )
   # Should this part only be done for Windows? It is used to avoid placing everything directly in "build" catalogue if some other catalogue is chosen.
   STRING( REPLACE ${H3DAPI_SOURCE_DIR} ${H3DAPI_SOURCE_DIR}/../../HAPI/build BINARY_DIR_FOR_HAPI ${CMAKE_CURRENT_BINARY_DIR} )
   STRING( COMPARE EQUAL ${BINARY_DIR_FOR_HAPI} ${CMAKE_CURRENT_BINARY_DIR} SPECIAL_BINARY_DIR )
@@ -34,7 +37,7 @@ IF( NOT GENERATE_CPACK_PROJECT OR WIN32 )
   IF(OPENHAPTICS_INCLUDE_DIR AND HD_LIBRARY AND HL_LIBRARY AND HDU_LIBRARY)
     SET( OPENHAPTICS_FOUND 1 )
   ENDIF(OPENHAPTICS_INCLUDE_DIR AND HD_LIBRARY AND HL_LIBRARY AND HDU_LIBRARY)
-ENDIF( NOT GENERATE_CPACK_PROJECT OR WIN32 )
+ENDIF( WIN32 )
 
 # Version of H3D API.
 SET( H3DAPI_MAJOR_VERSION 2 )
@@ -103,6 +106,7 @@ IF( GENERATE_CPACK_PROJECT )
   
   # TODO: fix different for windows and unix if needed.
   IF(WIN32 AND NOT UNIX)
+    SET( CPACK_PACKAGE_START_MENU_NAME "H3DAPI 2.0 Beta" )
     # If H3DLoad should be added to the package.
     SET( H3DLoad_cmake_install "" CACHE PATH "Needs to be set if H3DLoad is desired to be packed in the install. Set to location of cmake_install.cmake for H3DLoad." )
     MARK_AS_ADVANCED(H3DLoad_cmake_install)
@@ -252,15 +256,6 @@ ENDIF(NOT WIN32)
 INCLUDE_DIRECTORIES( ../include
 ${H3DAPI_SOURCE_DIR}/../../H3DUtil/include
 ${H3DAPI_SOURCE_DIR}/../../HAPI/include )
-
-# Possible extra include directories.
-IF(CHAI3D_FOUND)
-  INCLUDE_DIRECTORIES( ${H3DAPI_SOURCE_DIR}/../../HAPI/Chai3DRenderer/include )
-ENDIF(CHAI3D_FOUND)
-
-IF(OPENHAPTICS_FOUND)
-  INCLUDE_DIRECTORIES( ${H3DAPI_SOURCE_DIR}/../../HAPI/OpenHapticsRenderer/include )
-ENDIF(OPENHAPTICS_FOUND)
 
 # Extra libs to link against. TODO: Only for MSVC?
 IF(WIN32)
