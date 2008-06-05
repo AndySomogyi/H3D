@@ -253,9 +253,9 @@ wxFrame(_parent, _id, _title, _pos, _size, _style, _name )
   hapticsRenderer->AppendRadioItem(FRAME_OPENHAPTICS, wxT("Openhaptics"), 
                                    wxT("Openhaptics Renderer"));
   hapticsRenderer->AppendRadioItem(FRAME_CHAI3D, wxT("CHAI3D"), wxT("CHAI3D Renderer"));
-  hapticsRenderer->AppendRadioItem(FRAME_GODOBJECT, wxT("GodObject (prototype)"), 
+  hapticsRenderer->AppendRadioItem(FRAME_GODOBJECT, wxT("GodObject"), 
                                    wxT("GodObject Renderer"));
-  hapticsRenderer->AppendRadioItem(FRAME_RUSPINI, wxT("Ruspini (early prototype)"), 
+  hapticsRenderer->AppendRadioItem(FRAME_RUSPINI, wxT("Ruspini"), 
                                    wxT("Ruspini Renderer"));
 
   //renderMode
