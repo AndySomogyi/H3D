@@ -97,7 +97,7 @@ IF( GENERATE_CPACK_PROJECT )
                                     /moondial/moondial_orig\\\\.x3d$
                                     /moondial/themoondial\\\\.wrl$
                                     /plane/bobcat2\\\\.x3d$
-                                    /plane/bobcat_nh\\\\.wrl$
+                                    /plane/bobcat_nh\\\\.x3d$
                                     /plane/bobcat_orig\\\\.x3d$ )
 
   SET(CPACK_PACKAGE_VERSION_MAJOR ${H3DAPI_MAJOR_VERSION})
