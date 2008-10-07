@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<!-- This example requires a haptics device -->
+<Group>
+  <IMPORT inlineDEF='H3D_EXPORTS' exportedDEF='HDEV' AS='HDEV' />
+
+  <Shape>
+    <Appearance>
+      <Material />
+      <ProgramShader DEF="SHADER" language="CG" >
+        <ShaderProgram DEF="FRAGMENT_SHADER" type="FRAGMENT" url="Shaders/cg_Earth.frag" >
+          <field name="EarthDay" type="SFNode" accessType="inputOutput">
+            <ImageTexture DEF="EARTH_DAY" url="../textures/Day.jpg" />
+          </field>
+          <field name="EarthNight" type="SFNode" accessType="inputOutput">
+            <ImageTexture DEF="EARTH_NIGHT" url="../textures/Night.jpg" />
+          </field>
+          <field name="EarthCloudGloss" type="SFNode" accessType="inputOutput">
+            <ImageTexture DEF="EARTH_CLOUDS" url="../textures/Clouds.jpg" />
+          </field>
+        </ShaderProgram>
+        <ShaderProgram DEF="VERTEX_SHADER" type="VERTEX" url="Shaders/cg_Earth.vert" >
+          <field name="lightPosition" type="SFVec3f" value="0.45 0 -0.45"
+                 accessType="inputOutput" />
+          <field name="viewpointPosition" type="SFVec3f" value="0 0 0.6"
+                 accessType="inputOutput" />
+          <field name="viewpointOrn" type="SFMatrix4f" value="1 0 0 0
+                                                              0 1 0 0
+                                                              0 0 1 0
+                                                              0 0 0 1"
+                 accessType="inputOutput" />
+          <field name="viewpointOrnInv" type="SFMatrix4f" value="1 0 0 0
+                                                                 0 1 0 0
+                                                                 0 0 1 0
+                                                                 0 0 0 1"
+                 accessType="inputOutput" />
+        </ShaderProgram>
+      </ProgramShader>
+    </Appearance>
+    <Sphere radius="0.1" />
+  </Shape>
+
+  <PythonScript DEF="PS" url="viewpointMatrices.py" >
+    <ShaderProgram USE="VERTEX_SHADER" containerField="references"/>
+  </PythonScript>
+
+  <ROUTE fromNode="HDEV"        fromField="trackerPosition"
+         toNode="VERTEX_SHADER" toField="lightPosition" />
+</Group>
+
