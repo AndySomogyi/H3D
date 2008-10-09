@@ -39,9 +39,9 @@ IF(NOT XERCES_FOUND)
     "Xerces-c was not found. Make sure XERCES_LIBRARY and
     XERCES_INCLUDE_DIR are set to the directory of your xerces lib and
     include files. If you do not have Xerces x3d/xml files cannot be parsed.")
-  IF(XERCES_FIND_REQUIRED)
+  IF(Xerces_FIND_REQUIRED)
     MESSAGE(FATAL_ERROR "${XERCES_DIR_MESSAGE}")
-  ELSEIF(NOT XERCES_FIND_QUIETLY)
+  ELSEIF(NOT Xerces_FIND_QUIETLY)
     MESSAGE(STATUS "${XERCES_DIR_MESSAGE}")
-  ENDIF(XERCES_FIND_REQUIRED)
+  ENDIF(Xerces_FIND_REQUIRED)
 ENDIF(NOT XERCES_FOUND)

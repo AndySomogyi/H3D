@@ -60,9 +60,9 @@ IF(NOT VORBIS_FOUND)
   SET(VORBIS_DIR_MESSAGE
     "VORBIS was not found. Make sure VORBIS_LIBRARY and
     VORBIS_INCLUDE_DIR are set to the directories containing the include and lib files for ogg/vorbis. If you do not have the library you will not be able to use ogg files as sound.")
-  IF(VORBIS_FIND_REQUIRED)
+  IF(Vorbis_FIND_REQUIRED)
     MESSAGE(FATAL_ERROR "${VORBIS_DIR_MESSAGE}")
-  ELSEIF(NOT VORBIS_FIND_QUIETLY)
+  ELSEIF(NOT Vorbis_FIND_QUIETLY)
     MESSAGE(STATUS "${VORBIS_DIR_MESSAGE}")
-  ENDIF(VORBIS_FIND_REQUIRED)
+  ENDIF(Vorbis_FIND_REQUIRED)
 ENDIF(NOT VORBIS_FOUND)
