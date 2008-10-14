@@ -17,7 +17,6 @@ SET(requiredLibs)
 
 # Where to find cmake modules used to find packages.
 SET(CMAKE_MODULE_PATH "${ParticleDemo_SOURCE_DIR}/../../../build/modules/")
-INCLUDE( StripAndAddLibraryDirectories )
 
 #H3DUtil
 FIND_PACKAGE(H3DUtil REQUIRED)
@@ -40,12 +39,7 @@ FIND_PACKAGE(H3DAPI REQUIRED)
 
 IF(H3DAPI_FOUND)
   INCLUDE_DIRECTORIES( ${H3DAPI_INCLUDE_DIR} ) 
-  IF( WIN32 )
-    STRIP_AND_ADD_LIBRARY_DIRECTORIES( ${H3DAPI_LIBRARIES} )
-    SET(requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
-  ELSE( WIN32 )
-    SET(requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
-  ENDIF( WIN32 )
+  SET(requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
 ENDIF(H3DAPI_FOUND)
 
 # WxWidgets.
