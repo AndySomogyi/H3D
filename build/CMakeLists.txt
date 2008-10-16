@@ -322,8 +322,6 @@ IF(GLUT_FOUND)
     # either this CMakeLists.txt or FindGLUTWin needs to be changed
     # to allow for choice of extra library directory.
     STRIP_AND_ADD_LIBRARY_DIRECTORIES( ${GLUT_LIBRARIES} )
-    SET( FREEGLUT_STATIC "NO" CACHE BOOL "If set to yes then FREEGLUT_STATIC will be define and freeglut will be linked statically. This requires a freeglut_static.lib for the compiler in use." )
-    MARK_AS_ADVANCED( FREEGLUT_STATIC )
   ELSE(WIN32)
     SET(requiredLibs ${requiredLibs} ${GLUT_LIBRARIES} )
   ENDIF(WIN32)
@@ -537,6 +535,9 @@ IF( WIN32 )
     # remove some warnings about deprecated functions.
     SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t-" )
     SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt" )
+    IF( PREFER_STATIC_LIBRARIES )
+      SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /INCREMENTAL:NO" )
+    ENDIF( PREFER_STATIC_LIBRARIES )
     # Needed to delayload OpenHapticsRenderer. They must have changed the way symbols are imported between versions of visual studio.
     IF(OPENHAPTICS_FOUND)
       SET_SOURCE_FILES_PROPERTIES( ../src/MagneticSurface.cpp
