@@ -91,7 +91,6 @@ IF( GENERATE_CPACK_PROJECT )
                                     \\\\.ncb$
                                     \\\\.log$
                                     \\\\.suo$
-                                    \\\\.zip$
                                     \\\\.dir/
                                     \\\\.user$
                                     \\\\.cv$
@@ -103,6 +102,7 @@ IF( GENERATE_CPACK_PROJECT )
                                     /build/win32/
                                     /build/vc8
                                     /build/vc7
+                                    /build/vc9
                                     /osx
                                     /H3DAPI/Util/
                                     /berk/berk\\\\.wrl$
@@ -125,7 +125,7 @@ IF( GENERATE_CPACK_PROJECT )
   
   # TODO: fix different for windows and unix if needed.
   IF(WIN32 AND NOT UNIX)
-    SET( CPACK_PACKAGE_START_MENU_NAME "H3DAPI 2.0 Beta" )
+    SET( CPACK_PACKAGE_START_MENU_NAME "H3DAPI 2.0" )
     # If H3DLoad should be added to the package.
     SET( H3DLoad_cmake_install "" CACHE PATH "Needs to be set if H3DLoad is desired to be packed in the install. Set to location of cmake_install.cmake for H3DLoad." )
     MARK_AS_ADVANCED(H3DLoad_cmake_install)
@@ -190,13 +190,25 @@ IF( GENERATE_CPACK_PROJECT )
                            /HAPI/doc/
                            /H3DUtil/doc/
                            /include/fparser
-                           /include/teem )
+                           /include/teem
+                           /HapticAPI2
+                           /xerces-c_2_7\\\\.dll$
+                           /xerces-c_2_7D\\\\.dll$
+                           /dcmdata\\\\.lib$
+                           /dcmimage\\\\.lib$
+                           /dcmimgle\\\\.lib$
+                           /z\\\\.lib$
+                           /png\\\\.lib$
+                           /bz2\\\\.lib$
+                           /ofstd\\\\.lib$ )
     
     # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
     SET(CPACK_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/../../H3DAPI;H3DAPI"
                                     "${H3DAPI_SOURCE_DIR}/../../HAPI;HAPI"
                                     "${H3DAPI_SOURCE_DIR}/../../H3DUtil;H3DUtil"
-                                    "${H3DAPI_SOURCE_DIR}/../../doc;doc" )
+                                    "${H3DAPI_SOURCE_DIR}/../../doc;doc"
+                                    "${H3DAPI_SOURCE_DIR}/../../bin;bin"
+                                    "${H3DAPI_SOURCE_DIR}/../../lib;lib" )
 
     #Extra links to start menu if values are "ON"
     SET( CPACK_ADD_H3DDOC_LINKS "ON" )

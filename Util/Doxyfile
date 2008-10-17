@@ -220,7 +220,7 @@ SKIP_FUNCTION_MACROS   = YES
 TAGFILES               = ../../doc/H3DUtil/H3DUtil.tag=../../H3DUtil/html \
                          ../../doc/HAPI/HAPI.tag=../../HAPI/html
 GENERATE_TAGFILE       = ../../doc/H3DAPI/H3DAPI.tag
-ALLEXTERNALS           = YES
+ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
 PERL_PATH              = /usr/bin/perl
 #---------------------------------------------------------------------------
