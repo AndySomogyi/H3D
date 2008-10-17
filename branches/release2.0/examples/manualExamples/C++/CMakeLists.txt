@@ -56,14 +56,6 @@ IF(GLUT_FOUND)
   ENDIF( WIN32 )
 ENDIF(GLUT_FOUND)
 
-#Xerces
-FIND_PACKAGE(Xerces REQUIRED)
-
-IF(XERCES_FOUND)
-  INCLUDE_DIRECTORIES( ${XERCES_INCLUDE_DIR} ) 
-  SET(optionalLibs ${optionalLibs} ${XERCES_LIBRARIES} )
-ENDIF(XERCES_FOUND)
-
 # Build files created. Two executables. Sphere_X3D and Spheres_X3D.
 ADD_EXECUTABLE(Sphere_X3D ${ManualExamples_SOURCE_DIR}/Sphere_X3D.cpp )
 ADD_EXECUTABLE(Spheres_X3D ${ManualExamples_SOURCE_DIR}/Spheres_X3D.cpp )

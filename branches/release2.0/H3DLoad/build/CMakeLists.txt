@@ -71,14 +71,6 @@ IF(GLUT_FOUND)
   ENDIF( WIN32 )
 ENDIF(GLUT_FOUND)
 
-# Xerces.
-FIND_PACKAGE(Xerces)
-
-IF(XERCES_FOUND)
-  INCLUDE_DIRECTORIES( ${XERCES_INCLUDE_DIR} ) 
-  SET(optionalLibs ${optionalLibs} ${XERCES_LIBRARIES} )
-ENDIF(XERCES_FOUND)
-
 # Create build filess.
 ADD_EXECUTABLE(H3DLoad  ${H3DLoad_SRCS})
 TARGET_LINK_LIBRARIES( H3DLoad ${requiredLibs} ${optionalLibs} )
