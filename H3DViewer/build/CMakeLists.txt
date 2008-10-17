@@ -68,14 +68,6 @@ ELSE(wxWidgets_FOUND)
   ENDIF(wxWidgets_FOUND)
 ENDIF(wxWidgets_FOUND)
 
-# Xerces.
-FIND_PACKAGE(Xerces)
-
-IF(XERCES_FOUND)
-  INCLUDE_DIRECTORIES( ${XERCES_INCLUDE_DIR} ) 
-  SET(optionalLibs ${optionalLibs} ${XERCES_LIBRARIES} )
-ENDIF(XERCES_FOUND)
-
 # Create build files.
 ADD_EXECUTABLE(H3DViewer WIN32 MACOSX_BUNDLE ${H3DViewer_SRCS})
 
