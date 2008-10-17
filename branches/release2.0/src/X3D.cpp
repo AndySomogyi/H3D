@@ -214,7 +214,7 @@ Group* X3D::createX3DFromURL( const string &url,
 #else
   Console(3) << "H3D API compiled without HAVE_XERCES flag. X3D-XML files "
        << "are not supported" << endl;
-  return AutoRef< Node >(NULL);
+  return 0;
 #endif
 }
 
