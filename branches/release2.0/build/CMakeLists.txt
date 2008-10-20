@@ -269,7 +269,21 @@ SET(requiredLibs)
 
 # Add projects to link against. The projects where created when adding subdirectory in the beginning of this file.
 IF(NOT WIN32)
-  SET(requiredLibs ${requiredLibs} H3DUtil HAPI)
+  #H3DUtil
+  FIND_PACKAGE(H3DUtil REQUIRED)
+
+  IF(H3DUTIL_FOUND)
+    INCLUDE_DIRECTORIES( ${H3DUTIL_INCLUDE_DIR} ) 
+    SET(requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+  ENDIF(H3DUTIL_FOUND)
+
+  #HAPI
+  FIND_PACKAGE(HAPI REQUIRED)
+
+  IF(HAPI_FOUND)
+    INCLUDE_DIRECTORIES( ${HAPI_INCLUDE_DIR} ) 
+    SET(requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+  ENDIF(HAPI_FOUND)
 ELSEIF( MSVC70 OR MSVC71 )
   # On other versions of visual studio dependency setting is enough to link correctly.
   SET(requiredLibs ${requiredLibs} H3DUtil HAPI)
@@ -288,12 +302,13 @@ ELSEIF( MSVC80 )
 ENDIF(NOT WIN32)
 
 # Include directories needed.
-INCLUDE_DIRECTORIES( ../include
-${H3DAPI_SOURCE_DIR}/../../H3DUtil/include
-${H3DAPI_SOURCE_DIR}/../../HAPI/include )
+INCLUDE_DIRECTORIES( ../include )
 
-# Extra libs to link against. TODO: Only for MSVC?
+# Extra libs to link against.
 IF(WIN32)
+  INCLUDE_DIRECTORIES( ${H3DAPI_SOURCE_DIR}/../../H3DUtil/include
+                       ${H3DAPI_SOURCE_DIR}/../../HAPI/include )
+  # TODO: Only for MSVC?
   SET(requiredLibs ${requiredLibs} winmm.lib DelayImp.lib )
 ENDIF(WIN32)
 
@@ -619,11 +634,11 @@ IF( NOT WIN32 )
            PATTERN .svn EXCLUDE )
 ENDIF( NOT WIN32 )
 
-# H3DAPI is dependent on H3DUtil and HAPI
-ADD_DEPENDENCIES( H3DAPI H3DUtil )
-ADD_DEPENDENCIES( H3DAPI HAPI )
-
 IF( WIN32 )
+  # H3DAPI is dependent on H3DUtil and HAPI
+  ADD_DEPENDENCIES( H3DAPI H3DUtil )
+  ADD_DEPENDENCIES( H3DAPI HAPI )
+
   #Only add dependencies if OpenHaptics exists.
   IF(OPENHAPTICS_FOUND)
     ADD_DEPENDENCIES( H3DAPI OpenHapticsRenderer )
