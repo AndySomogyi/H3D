@@ -1475,12 +1475,14 @@ void WxFrame::SaveSettings( bool to_config ) {
 
 void WxFrame::SaveCollisionOptions() {
   // Save collision options
-  CollisionOptions *co = 0;
-  global_settings->getOptionNode( co );
-  if( co ) {
-    h3dConfig = wxConfigBase::Get();
-    h3dConfig->SetPath( wxT("/Settings/Collision") );
-    h3dConfig->Write( wxT("avatar_collision"), avatar_collision );
+  if( global_settings.get() ) {
+    CollisionOptions *co = 0;
+    global_settings->getOptionNode( co );
+    if( co ) {
+      h3dConfig = wxConfigBase::Get();
+      h3dConfig->SetPath( wxT("/Settings/Collision") );
+      h3dConfig->Write( wxT("avatar_collision"), avatar_collision );
+    }
   }
 }
 
