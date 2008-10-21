@@ -200,7 +200,8 @@ IF( GENERATE_CPACK_PROJECT )
                            /z\\\\.lib$
                            /png\\\\.lib$
                            /bz2\\\\.lib$
-                           /ofstd\\\\.lib$ )
+                           /ofstd\\\\.lib$
+                           /Definitions.h$ )
     
     # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
     SET(CPACK_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/../../H3DAPI;H3DAPI"
