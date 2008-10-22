@@ -25,7 +25,8 @@ MARK_AS_ADVANCED(OGG_INCLUDE_DIR)
 # Look for the library.
 FIND_LIBRARY(VORBISFILE_LIBRARY NAMES vorbisfile
                             PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
-                                  ../../External/lib)
+                                  ../../External/lib
+                                  ${module_file_path}/../../../External/lib )
 MARK_AS_ADVANCED(VORBISFILE_LIBRARY)
 
 FIND_LIBRARY(VORBIS_LIBRARY NAMES vorbis
