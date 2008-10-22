@@ -5,20 +5,21 @@
 #  VORBIS_LIBRARIES    - List of libraries when using VORBIS.
 #  VORBIS_FOUND        - True if VORBIS found.
 
+GET_FILENAME_COMPONENT(module_file_path ${CMAKE_CURRENT_LIST_FILE} PATH )
 
 # Look for the header file.
 FIND_PATH(VORBIS_INCLUDE_DIR NAMES vorbis/vorbisfile.h
                              PATHS $ENV{H3D_EXTERNAL_ROOT}/include
                                    $ENV{H3D_ROOT}/../External/include
                                    ../../External/include
-                                   ${CMAKE_MODULE_PATH}/../../../External/include )
+                                   ${module_file_path}/../../../External/include )
 MARK_AS_ADVANCED(VORBIS_INCLUDE_DIR)
 
 FIND_PATH(OGG_INCLUDE_DIR NAMES ogg/ogg.h
                           PATHS $ENV{H3D_EXTERNAL_ROOT}/include
                                 $ENV{H3D_ROOT}/../External/include
                                 ../../External/include
-                                ${CMAKE_MODULE_PATH}/../../../External/include )
+                                ${module_file_path}/../../../External/include )
 MARK_AS_ADVANCED(OGG_INCLUDE_DIR)
 
 # Look for the library.
@@ -31,14 +32,14 @@ FIND_LIBRARY(VORBIS_LIBRARY NAMES vorbis
                             PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                                   $ENV{H3D_ROOT}/../External/lib
                                   ../../External/lib
-                                  ${CMAKE_MODULE_PATH}/../../../External/lib)
+                                  ${module_file_path}/../../../External/lib)
 MARK_AS_ADVANCED(VORBIS_LIBRARY)
 
 FIND_LIBRARY(OGG_LIBRARY NAMES ogg 
                          PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                                $ENV{H3D_ROOT}/../External/lib
                                ../../External/lib
-                               ${CMAKE_MODULE_PATH}/../../../External/lib)
+                               ${module_file_path}/../../../External/lib)
 MARK_AS_ADVANCED(OGG_LIBRARY)
 
 IF( WIN32 AND PREFER_STATIC_LIBRARIES )
@@ -46,14 +47,14 @@ IF( WIN32 AND PREFER_STATIC_LIBRARIES )
                                          PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                                          $ENV{H3D_ROOT}/../External/lib
                                          ../../External/lib
-                                         ${CMAKE_MODULE_PATH}/../../../External/lib )
+                                         ${module_file_path}/../../../External/lib )
   MARK_AS_ADVANCED(VORBISFILE_STATIC_LIBRARY)
   
   FIND_LIBRARY( OGG_STATIC_LIBRARY NAMES ogg_static
                                          PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                                          $ENV{H3D_ROOT}/../External/lib
                                          ../../External/lib
-                                         ${CMAKE_MODULE_PATH}/../../../External/lib )
+                                         ${module_file_path}/../../../External/lib )
   MARK_AS_ADVANCED(OGG_STATIC_LIBRARY)
 ENDIF( WIN32 AND PREFER_STATIC_LIBRARIES )
 
