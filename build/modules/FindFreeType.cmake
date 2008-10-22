@@ -43,6 +43,8 @@ IF(FREETYPE_CONFIG_EXECUTABLE)
 
 ENDIF(FREETYPE_CONFIG_EXECUTABLE)
 
+GET_FILENAME_COMPONENT(module_file_path ${CMAKE_CURRENT_LIST_FILE} PATH )
+
 IF( NOT FREETYPE_INCLUDE_DIR )
   # Look for the header file.
   FIND_PATH(FREETYPE_INCLUDE_DIR NAMES freetype/freetype.h
@@ -52,8 +54,8 @@ IF( NOT FREETYPE_INCLUDE_DIR )
                                     $ENV{H3D_ROOT}/../External/include/freetype/include
                                     ../../External/include
                                     ../../External/include/freetype/include
-                                    ${CMAKE_MODULE_PATH}/../../../External/include
-                                    ${CMAKE_MODULE_PATH}/../../../External/include/freetype/include)
+                                    ${module_file_path}/../../../External/include
+                                    ${module_file_path}/../../../External/include/freetype/include)
   MARK_AS_ADVANCED(FREETYPE_INCLUDE_DIR)
 ENDIF( NOT FREETYPE_INCLUDE_DIR)
 
@@ -62,7 +64,7 @@ FIND_LIBRARY(FREETYPE_LIBRARY NAMES freetype freetype235
                               PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                                     $ENV{H3D_ROOT}/../External/lib
                                     ../../External/lib
-                                    ${CMAKE_MODULE_PATH}/../../../External/lib )
+                                    ${module_file_path}/../../../External/lib )
 MARK_AS_ADVANCED(FREETYPE_LIBRARY)
 
 # Copy the results to the output variables.

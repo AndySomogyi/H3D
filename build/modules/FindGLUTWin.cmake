@@ -4,13 +4,14 @@
 #  GLUT_LIBRARIES    - List of libraries when using GLUT.
 #  GLUT_FOUND        - True if GLUT found.
 
+GET_FILENAME_COMPONENT(module_file_path ${CMAKE_CURRENT_LIST_FILE} PATH )
 
 # Look for the header file.
 FIND_PATH( GLUT_INCLUDE_DIR NAMES GL/glut.h
            PATHS $ENV{H3D_EXTERNAL_ROOT}/include
                  $ENV{H3D_ROOT}/../External/include
                  ../../External/include
-                 ${CMAKE_MODULE_PATH}/../../../External/include )
+                 ${module_file_path}/../../../External/include )
 MARK_AS_ADVANCED(GLUT_INCLUDE_DIR)
 
 # Look for the library.
@@ -18,7 +19,7 @@ FIND_LIBRARY( GLUT_LIBRARY NAMES glut32
               PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                     $ENV{H3D_ROOT}/../External/lib
                     ../../External/lib
-                    ${CMAKE_MODULE_PATH}/../../../External/lib )
+                    ${module_file_path}/../../../External/lib )
 MARK_AS_ADVANCED(GLUT_LIBRARY)
 
 # Copy the results to the output variables.

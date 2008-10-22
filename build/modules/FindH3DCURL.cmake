@@ -14,26 +14,27 @@ ENDIF(H3DCURL_FIND_REQUIRED)
 
 IF( WIN32 )
 IF(NOT CURL_FOUND OR PREFER_STATIC_LIBRARIES)
+  GET_FILENAME_COMPONENT(module_file_path ${CMAKE_CURRENT_LIST_FILE} PATH )
   # Look for the header file.
   FIND_PATH( CURL_INCLUDE_DIR NAMES curl/curl.h
              PATHS $ENV{H3D_EXTERNAL_ROOT}/include
                    $ENV{H3D_ROOT}/../External/include
                    ../../External/include
-                   ${CMAKE_MODULE_PATH}/../../../External/include )
+                   ${module_file_path}/../../../External/include )
   
   # Look for the library.
   FIND_LIBRARY( CURL_LIBRARY NAMES libcurl 
                 PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                       $ENV{H3D_ROOT}/../External/lib
                       ../../External/lib
-                      ${CMAKE_MODULE_PATH}/../../../External/lib )
+                      ${module_file_path}/../../../External/lib )
 
   IF( PREFER_STATIC_LIBRARIES )
     FIND_LIBRARY( CURL_STATIC_LIBRARY NAMES libcurl_static
                                             PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                                             $ENV{H3D_ROOT}/../External/lib
                                             ../../External/lib
-                                            ${CMAKE_MODULE_PATH}/../../../External/lib )
+                                            ${module_file_path}/../../../External/lib )
     MARK_AS_ADVANCED(CURL_STATIC_LIBRARY)
   ENDIF( PREFER_STATIC_LIBRARIES )
 
