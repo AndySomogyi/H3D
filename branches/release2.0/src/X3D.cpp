@@ -350,7 +350,7 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
       // reset base to what it was before since createVRMLNodeFromURL
       // will to its own resolving.
       ResourceResolver::setBaseURL( old_base );
-      AutoRef< Node > n = createVRMLNodeFromURL( resolved_url, dn
+      AutoRef< Node > n = createVRMLNodeFromURL( resolved_url, dn,
                                                  exported_nodes, prototypes );
       if( is_tmp_file ) 
         ResourceResolver::releaseTmpFileName( resolved_url );
