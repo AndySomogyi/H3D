@@ -85,10 +85,10 @@ SAX2XMLReader* X3D::getNewXMLParser() {
 
 Group* X3D::createX3DFromString( const string &str,
                                  DEFNodes *dn,
-         DEFNodes *exported_nodes,
-         PrototypeVector *prototypes  ) {
+                                 DEFNodes *exported_nodes,
+                                 PrototypeVector *prototypes  ) {
   if ( isVRML( str ) )
-    return createVRMLFromString( str, dn );
+    return createVRMLFromString( str, dn, exported_nodes, prototypes );
   Group *g = new Group;
   AutoRef< Node > n = createX3DNodeFromString( str, dn,
                                                exported_nodes, 
@@ -100,8 +100,8 @@ Group* X3D::createX3DFromString( const string &str,
 
 Group* X3D::createX3DFromURL( const string &url,
                               DEFNodes *dn,
-            DEFNodes *exported_nodes,
-            PrototypeVector *prototypes ) {
+                              DEFNodes *exported_nodes,
+                              PrototypeVector *prototypes ) {
   URNResolver *urn_resolver = ResourceResolver::getURNResolver();
   string urn = url;
   if( urn_resolver ) urn = urn_resolver->resolveURN( urn );
@@ -112,6 +112,10 @@ Group* X3D::createX3DFromURL( const string &url,
 
   string::size_type pos = resolved_url.find_last_of( "/\\" );
   string path = resolved_url.substr( 0, pos + 1 );
+  if( is_tmp_file ) {
+    pos = url.find_last_of( "/\\" );
+    path = url.substr( 0, pos + 1 );
+  }
   string old_base = ResourceResolver::getBaseURL();
 
 #ifdef WIN32
@@ -180,12 +184,15 @@ Group* X3D::createX3DFromURL( const string &url,
 
     ifstream istest( resolved_url.c_str() );
     if ( isVRML( istest ) ) {
-      Group *g = createVRMLFromURL( resolved_url, dn );
+      istest.close();
+      Group *g = createVRMLFromURL( resolved_url, dn,
+                                    exported_nodes, prototypes );
       if( is_tmp_file ) 
         ResourceResolver::releaseTmpFileName( resolved_url );
       ResourceResolver::setBaseURL( old_base );
       return g;
     }
+    istest.close();
 
     #ifdef HAVE_XERCES
     XERCES_CPP_NAMESPACE_USE
@@ -234,10 +241,10 @@ Group* X3D::createX3DFromStream( istream &is,
 
 AutoRef< Node > X3D::createX3DNodeFromString( const string &str,
                                               DEFNodes *dn,
-                DEFNodes *exported_nodes,
-                PrototypeVector *prototypes ) {
+                                              DEFNodes *exported_nodes,
+                                              PrototypeVector *prototypes ) {
   if ( isVRML( str ) )
-    return createVRMLNodeFromString( str, dn );
+    return createVRMLNodeFromString( str, dn, exported_nodes, prototypes );
   else {
 #ifdef HAVE_XERCES
     auto_ptr< SAX2XMLReader > parser( getNewXMLParser() );
@@ -339,15 +346,18 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
 
     ifstream istest( resolved_url.c_str() );
     if ( isVRML( istest ) ) {
+      istest.close();
       // reset base to what it was before since createVRMLNodeFromURL
       // will to its own resolving.
       ResourceResolver::setBaseURL( old_base );
-      AutoRef< Node > n = createVRMLNodeFromURL( resolved_url, dn );
+      AutoRef< Node > n = createVRMLNodeFromURL( resolved_url, dn
+                                                 exported_nodes, prototypes );
       if( is_tmp_file ) 
         ResourceResolver::releaseTmpFileName( resolved_url );
       ResourceResolver::setBaseURL( old_base );
       return n;
     }
+    istest.close();
 
 #ifdef HAVE_XERCES
     XERCES_CPP_NAMESPACE_USE
