@@ -166,7 +166,7 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   ss.reset (0);
 #endif
   t.reset ( new Transform );
-  viewpoint.reset (NULL);
+  viewpoint.reset( new Viewpoint );
   device_info.reset (NULL);
   g.reset ( new Group );
 
@@ -543,7 +543,7 @@ bool WxFrame::loadFile( const string &filename) {
   
   //Clear existing data
   t->children->clear();
-  viewpoint.reset (NULL);
+  viewpoint.reset( NULL );
 
   settings_path = 
     GET_ENV_INI_DEFAULT( "H3D_DISPLAY",
@@ -704,6 +704,7 @@ bool WxFrame::loadFile( const string &filename) {
       try {
         viewpoint = X3D::createX3DNodeFromURL( viewpoint_file );
       } catch( const Exception::H3DException &e ) {
+        viewpoint.reset( new Viewpoint );
         Console(3) << "Warning: Could not create default Viewpoint node "
                    << "from file \"" << viewpoint_file << "\": "
                    << e << endl;
@@ -770,6 +771,7 @@ bool WxFrame::loadFile( const string &filename) {
   scene->sceneRoot->setValue( g.get() );
   }
   catch (const Exception::H3DException &e) {
+    viewpoint.reset( new Viewpoint );
     stringstream s;
   s << e;
     wxMessageBox(wxString(s.str().c_str(),wxConvUTF8), wxT("Error"), wxOK | wxICON_EXCLAMATION);
@@ -1009,7 +1011,7 @@ bool WxFrame::loadFile( const string &filename) {
 //Clear data when closing file
 void WxFrame::clearData () {
   t->children->clear();
-  viewpoint.reset (NULL);
+  viewpoint.reset( new Viewpoint );
 
   //Delete items from viewpoint menu & disconnect events
   for (int i = 0; i <= viewpointCount; i++) {
@@ -1115,6 +1117,8 @@ void WxFrame::OnMRUFile(wxCommandEvent & event)
 void WxFrame::OnCloseFile(wxCommandEvent & event) {
   //clearData();
   t->children->clear();
+  if( !Viewpoint::getActive() )
+    viewpoint.reset( new Viewpoint );
   SetStatusText(wxT("Open a file..."), 0);
   SetStatusText(wxT(""),1);
 
