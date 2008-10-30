@@ -26,7 +26,7 @@ tc_step_r = 1.0/ (rows-1)
 
 for c in range( columns ):
   for r in range( rows ):
-    coords.append( Vec3f( step_c * c - size.x / 2, step_r * r - size.x/2, 0 ) )
+    coords.append( Vec3f( step_c * c - size.x / 2, step_r * r - size.y/2, 0 ) )
     tex_coords.append( Vec2f( tc_step_c * c, tc_step_r * r ) )
 
 for c in range( columns - 1 ):
