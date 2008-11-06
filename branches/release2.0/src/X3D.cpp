@@ -278,6 +278,10 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
   
   string::size_type pos = resolved_url.find_last_of( "/\\" );
   string path = resolved_url.substr( 0, pos + 1 );
+  if( is_tmp_file ) {
+    pos = url.find_last_of( "/\\" );
+    path = url.substr( 0, pos + 1 );
+  }
   string old_base = ResourceResolver::getBaseURL();
 
 #ifdef WIN32
