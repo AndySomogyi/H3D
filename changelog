@@ -1,5 +1,7 @@
 Changes for version 2.0:
 
+- Inheritance order for surface nodes changed. Added two base classes and
+ removed one to manage this.
 - Fixed incorrect storage of settings in H3DViewer.
 - Corrections to CMake build system and additions for compiling against static
  libraries.
