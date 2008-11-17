@@ -314,46 +314,6 @@ namespace H3D {
       return transform_stack.top().acc_inv;
     }
     
-    /// Returns the number of times the given geometry has been added
-    /// as the source of a haptic shape so far in the traversal.
-    inline int getGeometryCount( X3DGeometryNode *geom ) {
-      return geometry_count[geom];
-    }
-
-    /// Set user data in the traversinfo object. User data can be used e.g.
-    /// to pass information to child nodes about values in parent nodes
-    inline void setUserData( const string &key, void *data ) {
-      user_data[key] = data;
-    }
-
-    /// Returns true of user data with the given key exists.
-    inline bool haveUserData( const string &key ) {
-      return user_data.find( key ) != user_data.end();
-    }
-
-    /// Delete user data with the given key. Returns 0 on success.
-    inline int deleteUserData( const string &key ) {
-      std::map<string, void *>::iterator i = user_data.find( key );
-      if( i != user_data.end() ) {
-        user_data.erase( i );
-        return 0;
-      } else {
-        return -1;
-      }
-    }
-    
-    /// Get the user data value with the given key. Output in the data
-    /// argument. Returns 0 on success.
-    inline int getUserData( const string &key, void ** data ) {
-      std::map<string, void *>::iterator i = user_data.find( key );
-      if( i != user_data.end() ) {
-        *data = (*i).second; 
-        return 0;
-      } else {
-        return -1;
-      }
-    }
-      
     /// Used to get all the X3DLightNodes that are global.
     typedef AutoRefVector< RefCountedClass > RefCountedVector;
     RefCountedVector x3dlightnode_vector;
@@ -379,7 +339,6 @@ namespace H3D {
 
     typedef std::map< X3DGeometryNode *, int > GeometryCountMap;
     GeometryCountMap geometry_count;
-    std::map< string, void * > user_data;
   };
 
 };

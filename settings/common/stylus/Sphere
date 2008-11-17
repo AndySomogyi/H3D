@@ -4,7 +4,7 @@
       <Appearance>
         <Material/>
       </Appearance>
-      <Sphere DEF="PROXY" radius="0.0025" />
+      <Sphere radius="0.0025" />
     </Shape>
   </Transform>
 </Group>
