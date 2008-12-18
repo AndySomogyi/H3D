@@ -35,17 +35,24 @@ namespace H3D {
 
   /// \ingroup X3DNodes
   /// \class HapticLayeredGroup
-  /// \brief 
+  /// \brief HapticLayeredGroup is a grouping node that can be
+  /// used to set different shapes for different layers of the haptic
+  /// rendering. This can be used in order to simulate for example
+  /// skin with bone under it. The skin would be simulated as a shape
+  /// with a surface with low stiffness and inside it would be another
+  /// shape using a harder surface (surface with higher stiffness).
+  ///
+  /// All childs of HapticLayeredGroup will be rendered in separate layers.
   class H3DAPI_API HapticLayeredGroup : public X3DGroupingNode {
   public:
     /// Constructor.
-    HapticLayeredGroup( Inst< MFChild  > _addChildren    = 0,
-                        Inst< MFChild  > _removeChildren = 0,
-                        Inst< MFChild > _children        = 0,
-                        Inst< SFNode  > _metadata        = 0,
-                        Inst< SFBound > _bound           = 0,
-                        Inst< SFVec3f > _bboxCenter      = 0,
-                        Inst< SFVec3f > _bboxSize        = 0 );
+    HapticLayeredGroup( Inst< AddChildren    > _addChildren     = 0,
+                        Inst< RemoveChildren > _removeChildren  = 0,
+                        Inst< MFChild        > _children        = 0,
+                        Inst< SFNode         > _metadata        = 0,
+                        Inst< SFBound        > _bound           = 0,
+                        Inst< SFVec3f        > _bboxCenter      = 0,
+                        Inst< SFVec3f        > _bboxSize        = 0 );
 
     /// Handles the layering.
     virtual void traverseSG( TraverseInfo &ti );

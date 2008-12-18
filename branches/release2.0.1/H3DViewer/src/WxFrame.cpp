@@ -152,7 +152,8 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   deviceCount(0),
   navigationDevices(0),
   wxFrame(_parent, _id, _title, _pos, _size, _style, _name ),
-  avatar_collision( true )
+  avatar_collision( true ),
+  loaded_first_file( false )
 {
   wxAcceleratorEntry entries[1];
   entries[0].Set(wxACCEL_NORMAL, (int) WXK_F11, FRAME_RESTORE);
@@ -338,6 +339,8 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   menuBar->Append(deviceMenu, wxT("&Device Control"));
   menuBar->Append(viewpointMenu, wxT("&Viewpoints"));
   menuBar->Append(navigationMenu, wxT("&Navigation"));
+  speed_slider = new SpeedDialog( this, this );
+  speed_slider->Show( false );
   menuBar->Append(advancedMenu, wxT("&Advanced"));
   menuBar->Append(helpMenu, wxT("&Help"));
   SetMenuBar(menuBar);
@@ -375,7 +378,8 @@ BEGIN_EVENT_TABLE(WxFrame, wxFrame)
   EVT_MENU (FRAME_NAVIGATION, WxFrame::ChangeNavigation)
   EVT_MENU_RANGE (FRAME_MOUSE_NAV, FRAME_HAPTICSDEVICE_NAV,
                   WxFrame::ChangeNavigationDevice)
-  EVT_MENU (BASIC_COLLISION , WxFrame::ChangeCollision )
+  EVT_MENU (BASIC_COLLISION, WxFrame::ChangeCollision )
+  EVT_MENU (FRAME_SPEED, WxFrame::OnSpeed )
   EVT_MENU_RANGE (FRAME_OPENHAPTICS, FRAME_RUSPINI, WxFrame::ChangeRenderer)
   EVT_MENU (FRAME_DEVICECONTROL, WxFrame::ToggleHaptics)
   EVT_MENU (FRAME_ABOUT, WxFrame::OnAbout)
@@ -397,8 +401,11 @@ void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
 
     wx_frame->global_settings->getOptionNode( dgo );
 
-    if( id == ID_DRAW_BOUNDS ) 
+    if( id == ID_DRAW_BOUNDS ) {
       dgo->drawBound->setValue( event.IsChecked() );
+      H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+      on_cancel_rebuild_displaylist = true;
+    }
     else if( id == ID_DRAW_TRIANGLES ) 
       dgo->drawHapticTriangles->setValue( event.IsChecked() );
     else if( id == ID_DRAW_BOUND_TREE ) {
@@ -410,11 +417,14 @@ void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
         dgo->drawBoundTree->setValue( -1 );
         boundTree = false;
       }
+      H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+      on_cancel_rebuild_displaylist = true;
     } else if( id == ID_DRAW_TREE_DEPTH ) {
       dgo->drawBoundTree->setValue( event.GetInt() );
+      H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+      on_cancel_rebuild_displaylist = true;
     }
 
-    H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
   } else if( id == ID_USE_DISPLAY_LISTS ||
              id == ID_CACHE_ONLY_GEOMS ) {
 
@@ -494,11 +504,14 @@ void SettingsDialog::handleSettingsChange (wxCommandEvent & event) {
     else if( i == 1 ) gbto->boundType->setValue( WxFrameInternals::str_AABB );
     else if( i == 2 ) gbto->boundType->setValue(
       WxFrameInternals::str_SPHERE );
+    H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+    on_cancel_rebuild_displaylist = true;
   }
 
   if( id == ID_PROXY_RADIUS ) {
     wx_frame->setProxyRadius( atof( event.GetString().mb_str() ) );
   }
+
 }
 
 void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
@@ -510,7 +523,8 @@ void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
       dgo->drawBoundTree->setValue( event.GetInt() );
     } 
     treeDepth = event.GetInt();
-    H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();    
+    H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+    on_cancel_rebuild_displaylist = true;
   }
 
   GraphicsCachingOptions *gco = NULL;
@@ -525,8 +539,11 @@ void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
   wx_frame->global_settings->getOptionNode( gbto );
 
   if( gbto ) {
-    if( id == ID_MAX_TRIANGLES ) 
+    if( id == ID_MAX_TRIANGLES )  {
       gbto->maxTrianglesInLeaf->setValue( event.GetInt() );
+      H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+      on_cancel_rebuild_displaylist = true;
+    }
   }
 }
 
@@ -653,13 +670,16 @@ bool WxFrame::loadFile( const string &filename) {
          filename.find( ".wrl", filename.size()-5 ) != string::npos )
       t->children->push_back( X3D::createVRMLFromURL( filename.c_str(), 
                                                       &dn ) );
-      else
+    else
         t->children->push_back( X3D::createX3DFromURL( filename.c_str(), 
                                                        &dn ) );
 
     /**********************Reset mirrored and fullscreen********************/
-  rendererMenu->Check(FRAME_FULLSCREEN, false);
-  rendererMenu->Check(FRAME_MIRROR, false);
+    if( !loaded_first_file ) {
+      rendererMenu->Check(FRAME_FULLSCREEN, fullscreen);
+      rendererMenu->Check(FRAME_MIRROR, mirrored);
+      lastmirror = mirrored;
+    }
 
   /****************************Navigation Info****************************/
   //Enable Navigation Menu
@@ -679,19 +699,39 @@ bool WxFrame::loadFile( const string &filename) {
 
     for( NodeVector::const_iterator nv = allDevices.begin();
          nv != allDevices.end(); nv++ ) {
-      RuspiniRenderer *renderer = 
-        dynamic_cast< RuspiniRenderer * >( 
-        static_cast < H3DHapticsDevice *> (*nv)->
-        hapticsRenderer->getValue() );
+      H3DHapticsRendererNode *renderer =
+        static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->getValue();
+      RuspiniRenderer *ruspini_renderer = 
+        dynamic_cast< RuspiniRenderer * >( renderer );
 
-      if( renderer ) {
+      if( ruspini_renderer ) {
         stringstream proxy_text;
-        proxy_text << renderer->proxyRadius->getValue();
+        proxy_text << ruspini_renderer->proxyRadius->getValue();
         settings->proxy_radius_text->
           SetValue( wxString(proxy_text.str().c_str(),wxConvUTF8) );
         SaveRuspiniSettings(false);
-        break;
+        hapticsRenderer->Check( FRAME_RUSPINI, true );
+        //break;
+      } else if( dynamic_cast< GodObjectRenderer * >(renderer) ) {
+        hapticsRenderer->Check( FRAME_GODOBJECT, true );
       }
+#ifdef HAVE_CHAI3D
+      else if( dynamic_cast< Chai3DRenderer * >(renderer) ) {
+        hapticsRenderer->Check( FRAME_CHAI3D, true );
+      }
+#endif
+#ifdef WIN32
+      else if( DynamicLibrary::load( "hd.dll" ) &&
+          DynamicLibrary::load( "hl.dll" ) ) {
+#else
+      else
+#endif
+      if( dynamic_cast< OpenHapticsRenderer * >(renderer) ) {
+        hapticsRenderer->Check( FRAME_OPENHAPTICS, true );
+      }
+#ifdef WIN32
+      }
+#endif
     }
   }
 
@@ -763,9 +803,12 @@ bool WxFrame::loadFile( const string &filename) {
   // this as parent to the canvas.
   // WxWidgetsWindow *glwindow = new WxWidgetsWindow();
 
-  this->glwindow->fullscreen->setValue( fullscreen );
-  this->glwindow->mirrored->setValue( mirrored );
-  this->glwindow->renderMode->setValue( render_mode );
+    if( !loaded_first_file ) {
+      loaded_first_file = true;
+      this->glwindow->fullscreen->setValue( fullscreen );
+      this->glwindow->mirrored->setValue( mirrored );
+      this->glwindow->renderMode->setValue( render_mode );
+    }
 
   
   scene->sceneRoot->setValue( g.get() );
@@ -773,8 +816,9 @@ bool WxFrame::loadFile( const string &filename) {
   catch (const Exception::H3DException &e) {
     viewpoint.reset( new Viewpoint );
     stringstream s;
-  s << e;
-    wxMessageBox(wxString(s.str().c_str(),wxConvUTF8), wxT("Error"), wxOK | wxICON_EXCLAMATION);
+    s << e;
+    wxMessageBox( wxString(s.str().c_str(),wxConvUTF8), wxT("Error"),
+                  wxOK | wxICON_EXCLAMATION);
     return false;
   }
 
@@ -787,7 +831,7 @@ bool WxFrame::loadFile( const string &filename) {
   CollisionOptions * co = 0;
   global_settings->getOptionNode( co );
   wxMenuItem * col_item = navigationMenu->
-    FindItemByPosition( navigationMenu->GetMenuItemCount() - 1 );
+    FindItemByPosition( navigationMenu->GetMenuItemCount() - 3 );
 
   if( co ) {
     avatar_collision = co->avatarCollision->getValue();
@@ -1004,6 +1048,7 @@ bool WxFrame::loadFile( const string &filename) {
   }
 
   H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+  settings->on_cancel_rebuild_displaylist = false;
 
   return true;
 }
@@ -1388,6 +1433,10 @@ void WxFrame::ChangeCollision (wxCommandEvent & event) {
       col_opt->avatarCollision->setValue( avatar_collision );
     }
   }
+}
+
+void WxFrame::OnSpeed( wxCommandEvent & event ) {
+  speed_slider->Show();
 }
 
 //Change Navigation
@@ -2083,6 +2132,14 @@ void WxFrame::buildNavMenu () {
   }
 
   navigationMenu->AppendSeparator();
+  navigationMenu->AppendCheckItem( BASIC_COLLISION, wxT( "Avatar collision" ),
+    wxT("Turn on and off collision between avatar and objects in scene"));
+  navigationMenu->
+    FindItemByPosition( navigationMenu->GetMenuItemCount() - 1 )->Check( avatar_collision );
+  navigationMenu->Append( FRAME_SPEED, wxT("Speed"),
+                 wxT("Opens a slider bar used to adjust navigation speed" ));
+
+  navigationMenu->AppendSeparator();
   if( !navigationDevices ) {
     navigationDevices = new wxMenu;
     navigationDevices->AppendCheckItem(FRAME_MOUSE_NAV, wxT("Mouse"), 
@@ -2099,12 +2156,6 @@ void WxFrame::buildNavMenu () {
   }
   navigationMenu->AppendSubMenu( navigationDevices, wxT("Navigation Devices"),
                   wxT("Toggle on an off which devices to use for navigation") );
-
-  navigationMenu->AppendSeparator();
-  navigationMenu->AppendCheckItem( BASIC_COLLISION, wxT( "Avatar collision" ),
-    wxT("Turn on and off collision between avatar and objects in scene"));
-  navigationMenu->
-    FindItemByPosition( navigationMenu->GetMenuItemCount() - 1 )->Check( avatar_collision );
 }
 
 
@@ -2250,7 +2301,7 @@ BEGIN_EVENT_TABLE(SettingsDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
   SettingsDialog::SettingsDialog(wxWindow* win, WxFrame *w ):
-    wx_frame( w )
+    wx_frame( w ), on_cancel_rebuild_displaylist( false )
 {
 
 
@@ -2647,12 +2698,15 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent ) {
 
 void SettingsDialog::OnOk (wxCommandEvent & event) {
   static_cast< WxFrame* >(this->GetParent())->SaveSettings( true );
+  on_cancel_rebuild_displaylist = false;
   this->Show(false);
 }
 
 void SettingsDialog::OnCancel (wxCommandEvent & event) {
   static_cast< WxFrame* >(this->GetParent())->LoadSettings( false );
-  H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+  if( on_cancel_rebuild_displaylist )
+    H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+  on_cancel_rebuild_displaylist = false;
   this->Show(false);
 }
 
@@ -2676,3 +2730,52 @@ void WxFrame::setProxyRadius( float r ) {
     }
   }
 }
+
+SpeedDialog::SpeedDialog( wxWindow* parent, WxFrame *f ):
+  wxDialog( parent, wxID_ANY, wxString( _T("Navigation Speed") ) ),
+    wx_frame( f ) {
+  wxBoxSizer *top_sizer = new wxBoxSizer(wxVERTICAL);
+
+  /*wxBoxSizer *title_sizer = new wxBoxSizer( wxHORIZONTAL );
+  title_sizer->Add(new wxStaticText(this, wxID_ANY,
+                  _("Use the slider to change navigation speed")),
+                   0, wxALL|wxALIGN_CENTER_VERTICAL, 5);*/
+
+  wxSize slider_size( wxDefaultSize );
+  //slider_size.SetDefaults( wxDefaultSize );
+  slider_size.SetWidth( 200 );
+
+  wxSlider* speed_value_slider = 
+    new wxSlider( this, FRAME_SPEED_SLIDER,
+                  1, 0, 500, wxDefaultPosition,
+                  slider_size,
+                  wxSL_HORIZONTAL | wxSL_LABELS);  
+
+  //top_sizer->Add(title_sizer, 0, wxALL, 5);
+  top_sizer->Add( speed_value_slider, 0, wxALL, 5);
+
+  SetSizer(top_sizer);
+
+  top_sizer->SetSizeHints(this);
+  top_sizer->Fit(this);
+}
+
+void SpeedDialog::handleSliderEvent( wxScrollEvent &event ) {
+  int id = event.GetId();
+
+  if( id == FRAME_SPEED_SLIDER ) {
+    NavigationInfo *mynav = NavigationInfo::getActive();
+    if( mynav ) {
+      mynav->speed->setValue( event.GetPosition() );
+    } else {
+      wx_frame->glwindow->default_speed = event.GetPosition();
+    }
+  }
+}
+
+
+IMPLEMENT_CLASS(SpeedDialog, wxDialog)
+BEGIN_EVENT_TABLE(SpeedDialog, wxDialog)
+  EVT_COMMAND_SCROLL( FRAME_SPEED_SLIDER, 
+                      SpeedDialog::handleSliderEvent)
+END_EVENT_TABLE()

@@ -47,7 +47,6 @@
 #include <H3D/MouseSensor.h>
 #include <H3D/SpaceWareSensor.h>
 #include <H3D/DeviceInfo.h>
-#include <H3D/INIFile.h>
 #include <H3D/ResourceResolver.h>
 #include <H3D/NavigationInfo.h>
 #include <H3D/X3D.h>
@@ -64,6 +63,16 @@ using namespace H3D;
 // ---------------------------------------------------------------------------
 
 class WxFrame;
+
+class SpeedDialog: public wxDialog {
+  DECLARE_CLASS( SpeedDialog )
+public:
+  SpeedDialog( wxWindow* parent, WxFrame *f );
+  void handleSliderEvent( wxScrollEvent &event );
+protected:
+  WxFrame *wx_frame;
+  DECLARE_EVENT_TABLE()
+};
 
 class SettingsDialog: public wxPropertySheetDialog
 {
@@ -122,7 +131,9 @@ public:
 
   // Proxy radius used by ruspini
   wxTextCtrl* proxy_radius_text;
-  
+
+  bool on_cancel_rebuild_displaylist;
+
 protected:
 
   enum {
@@ -239,6 +250,7 @@ public:
   void ChangeNavigation( wxCommandEvent & event );
   void ChangeNavigationDevice( wxCommandEvent & event );
   void ChangeCollision( wxCommandEvent & event );
+  void OnSpeed( wxCommandEvent & event );
   void ChangeRenderer( wxCommandEvent & event );
   void ToggleHaptics( wxCommandEvent & event );
   void OnSettings( wxCommandEvent & event );
@@ -324,7 +336,10 @@ private:
   H3DHapticsDevice *myH3Ddevice;
   NodeVector allDevices;
   X3DViewpointNode *defaultvp;
-  
+
+  // Check if the first file is loaded.
+  bool loaded_first_file;
+
   // One time intialization variables
   string settings_path;
   string common_path;
@@ -347,6 +362,7 @@ private:
   consoleDialog *  theConsole;
   FrameRateDialog *  frameRates;
   SettingsDialog * settings;
+  SpeedDialog *speed_slider;
 
   AutoRef< GlobalSettings > global_settings;
 
@@ -405,6 +421,8 @@ enum
   BASIC_NAVFLY,
   BASIC_DIR,
   BASIC_COLLISION,
+  FRAME_SPEED,
+  FRAME_SPEED_SLIDER,
   FRAME_ABOUT,
   FRAME_HELP,
   FRAME_SETTINGS,

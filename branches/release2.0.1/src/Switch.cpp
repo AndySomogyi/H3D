@@ -43,16 +43,15 @@ namespace SwitchInternals {
   FIELDDB_ELEMENT( Switch, whichChoice, INPUT_OUTPUT );
 }
 
-Switch::Switch( 
-               Inst< MFChild  > _addChildren,
-               Inst< MFChild  > _removeChildren,
-               Inst< MFChild  > _children,
-               Inst< SFNode   > _metadata,
-               Inst< SFBound  > _bound,
-               Inst< SFVec3f  > _bboxCenter,
-               Inst< SFVec3f  > _bboxSize,
-               Inst< SFInt32  > _whichChoice ) :
-  X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, 
+Switch::Switch( Inst< AddChildren    > _addChildren,
+                Inst< RemoveChildren > _removeChildren,
+                Inst< MFChild        > _children,
+                Inst< SFNode         > _metadata,
+                Inst< SFBound        > _bound,
+                Inst< SFVec3f        > _bboxCenter,
+                Inst< SFVec3f        > _bboxSize,
+                Inst< SFInt32        > _whichChoice ) :
+  X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata,
                    _bound,_bboxCenter, _bboxSize ),
   whichChoice   ( _whichChoice  ) {
 
@@ -67,7 +66,7 @@ Switch::Switch(
 
 void Switch::render() {
   int choice = whichChoice->getValue();
-  if( choice < 0 || (size_t)choice > children->size() - 1 ) return;
+  if( choice < 0 || choice > (int)children->size() - 1 ) return;
   X3DChildNode *child_node = children->getValueByIndex( choice );
   H3DDisplayListObject *dlo = 
     dynamic_cast< H3DDisplayListObject * >(child_node);
@@ -87,7 +86,7 @@ void Switch::SFBound::update() {
 
 void Switch::traverseSG( TraverseInfo &ti ) {
   int choice = whichChoice->getValue();
-  if( choice < 0 || (size_t)choice > children->size() - 1 ) return;
+  if( choice < 0 || choice > (int)children->size() - 1 ) return;
   X3DChildNode *child_node = children->getValueByIndex( choice );
   if( child_node ) child_node->traverseSG( ti );
 }
