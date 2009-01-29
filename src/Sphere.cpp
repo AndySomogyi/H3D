@@ -260,6 +260,7 @@ bool Sphere::lineIntersect(
   bool returnValue =
     temp_sphere.lineIntersect( from, to, temp_result );
   if( returnValue ) {
+    temp_result.primitive = 0;
     result.addResults( temp_result, this );
     result.addPtDevMap();
   }
