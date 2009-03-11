@@ -1,3 +1,4 @@
+
 //////////////////////////////////////////////////////////////////////////////
 //    Copyright 2004-2007, SenseGraphics AB
 //
@@ -76,11 +77,13 @@ void X3DBindableNode::removeFromStack() {
     bool is_active = (s.front() == this);
     
     if ( is_active ) {
-      X3DBindableNode *new_top = s.front();
       s.pop_front();
       isBound->setValue( false, id );
-      new_top->isBound->setValue( true, new_top->id );
-      new_top->bindTime->setValue( TimeStamp(), new_top->id );
+      if( !s.empty() ) {
+        X3DBindableNode *new_top = s.front();
+        new_top->isBound->setValue( true, new_top->id );
+        new_top->bindTime->setValue( TimeStamp(), new_top->id );
+      }
     } else {
       for( StackType::iterator i = s.begin();
            i != s.end(); i++ ) {
@@ -115,4 +118,15 @@ void X3DBindableNode::toStackTop() {
     if( active )
       active->isBound->setValue( false, active->id );
   }
+}
+
+
+ /// Return the map of all bindable nodes available.
+const X3DBindableNode::StackMapType &X3DBindableNode::getStackMap() {
+  return stack;
+}
+
+const X3DBindableNode::StackType &X3DBindableNode::getStack
+( const string &bindable_stack_name ) {
+  return stack[ bindable_stack_name ];
 }

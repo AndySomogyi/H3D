@@ -8,7 +8,7 @@ ENDIF(WIN32)
 project (NodeRoutesToDotFile)
 
 # Where to find Source files.
-AUX_SOURCE_DIRECTORY(. NodeRoutesToDotFile_SRCS)
+SET( NodeRoutesToDotFile_SRCS "${NodeRoutesToDotFile_SOURCE_DIR}/NodeRoutesToDotFile.cpp" )
 
 # Add optional libs to this variable.
 SET(optionalLibs)
@@ -76,7 +76,7 @@ IF(WIN32)
   SET( NODEROUTESTODOTFILE_COMPILE_FLAGS "" )
 
   IF( UI_FOUND )
-    SET( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -D_HAVE_UI" )
+    SET( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -DHAVE_UI" )
   ENDIF( UI_FOUND )
 
   # Set compile and link properties for projects.

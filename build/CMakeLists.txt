@@ -254,8 +254,9 @@ ENDIF( GENERATE_CPACK_PROJECT )
 SET( H3DAPI_FULL_VERSION
 ${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}.${H3DAPI_BUILD_VERSION} ) 
 
-# Add all sources
-AUX_SOURCE_DIRECTORY(../src H3DAPI_SRCS)
+# Add all sources, they are added to a variable called H3DAPI_SRCS
+# defined in the included file
+INCLUDE( ${H3DAPI_SOURCE_DIR}/H3DAPISourceFiles.txt )
 
 # Add the H3DAPI.rc resource file if Visual Studio
 IF(MSVC)
@@ -563,14 +564,13 @@ IF( WIN32 )
     # remove some warnings about deprecated functions.
     SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t-" )
     SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt" )
-    IF( PREFER_STATIC_LIBRARIES )
-      SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /INCREMENTAL:NO" )
-    ENDIF( PREFER_STATIC_LIBRARIES )
+    # H3D API is now to big to link incrementally with vc8.
+    SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /INCREMENTAL:NO" )
     # Needed to delayload OpenHapticsRenderer. They must have changed the way symbols are imported between versions of visual studio.
     IF(OPENHAPTICS_FOUND)
-      SET_SOURCE_FILES_PROPERTIES( ../src/MagneticSurface.cpp
-                                   ../src/OpenHapticsSurface.cpp
-                                   ../src/X3DGeometryNode.cpp
+      SET_SOURCE_FILES_PROPERTIES( "${H3DAPI_SOURCE_DIR}/../src/MagneticSurface.cpp"
+                                   "${H3DAPI_SOURCE_DIR}/../src/OpenHapticsSurface.cpp"
+                                   "${H3DAPI_SOURCE_DIR}/../src/X3DGeometryNode.cpp"
                                    PROPERTIES COMPILE_FLAGS "/Od" )
     ENDIF(OPENHAPTICS_FOUND)
   ELSEIF(MSVC90)
@@ -582,9 +582,9 @@ IF( WIN32 )
     SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt /INCREMENTAL:NO" )
     # Needed to delayload OpenHapticsRenderer. They must have changed the way symbols are imported between versions of visual studio.
     IF(OPENHAPTICS_FOUND)
-      SET_SOURCE_FILES_PROPERTIES( ../src/MagneticSurface.cpp
-                                   ../src/OpenHapticsSurface.cpp
-                                   ../src/X3DGeometryNode.cpp
+      SET_SOURCE_FILES_PROPERTIES( "${H3DAPI_SOURCE_DIR}/../src/MagneticSurface.cpp"
+                                   "${H3DAPI_SOURCE_DIR}/../src/OpenHapticsSurface.cpp"
+                                   "${H3DAPI_SOURCE_DIR}/../src/X3DGeometryNode.cpp"
                                    PROPERTIES COMPILE_FLAGS "/Od" )
     ENDIF(OPENHAPTICS_FOUND)
   ENDIF(MSVC70 OR MSVC71)
