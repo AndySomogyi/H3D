@@ -39,12 +39,14 @@ H3DNavigationDevices::H3DNavigationDevices() : shouldGetInfo( new SFBool ) {
   shouldGetInfo->setValue( false );
   h3dnavigations.push_back( this );
   use_center = false;
+  zoom = false;
 }
 
 void H3DNavigationDevices::resetAll() {
   move_dir = Vec3f();
   rel_rot = Rotation();
   use_center = false;
+  zoom = false;
 }
 
 MouseNavigation::MouseNavigation() :
@@ -55,6 +57,8 @@ MouseNavigation::MouseNavigation() :
   calculateMouseMoveInfo->setValue( false );
   mouseSensor->leftButton->routeNoEvent( calculateMouseMoveInfo );
   mouseSensor->motion->routeNoEvent( calculateMouseMoveInfo );
+  mouseSensor->scrollUp->routeNoEvent( calculateMouseMoveInfo );
+  mouseSensor->scrollDown->routeNoEvent( calculateMouseMoveInfo );
   calculateMouseMoveInfo->route( shouldGetInfo );
 }
 
@@ -75,8 +79,8 @@ void MouseNavigation::CalculateMouseMoveInfo::update( ) {
   bool button_pressed = static_cast< SFBool * >(routes_in[0])->getValue();
   Vec2f motion = static_cast< SFVec2f * >(routes_in[1])->getValue();
   string nav_type = the_owner->getNavType();
-  
-  
+
+  the_owner->use_center = false;
   if( event.ptr == routes_in[0] ) {
     if( nav_type == "LOOKAT" ) {
       if( button_pressed ) {
@@ -93,14 +97,24 @@ void MouseNavigation::CalculateMouseMoveInfo::update( ) {
       the_owner->center_of_rot = Vec3f();
       value = false;
     }
-  }
-  else if( button_pressed ) {
+  } else if( event.ptr == routes_in[2] ) {
+    if( nav_type == "EXAMINE" ) {
+      the_owner->move_dir += Vec3f( 0, 0, -2 );
+      the_owner->zoom = true;
+      value = true;
+    }
+  } else if( event.ptr == routes_in[3] ) {
+    if( nav_type == "EXAMINE" ) {
+      the_owner->move_dir += Vec3f( 0, 0, 2 );
+      the_owner->zoom = true;
+      value = true;
+    }
+  } else if( button_pressed ) {
     Vec2f perp = Vec2f( -motion.y, -motion.x );
     perp.normalize();
     if( nav_type == "EXAMINE" || nav_type == "ANY" ) {
       the_owner->rel_rot *=
         Rotation( perp.x, perp.y, 0, motion.length() * 0.01f );
-      the_owner->move_dir = Vec3f();
       the_owner->center_of_rot = Vec3f();
     }
     else if( nav_type == "WALK" ) {
@@ -126,13 +140,13 @@ void MouseNavigation::CalculateMouseMoveInfo::update( ) {
       the_owner->center_of_rot = Vec3f();
     }
     value = true;
-  }
-  else {
+  } else {
     if( nav_type != "LOOKAT" ) {
       the_owner->move_dir = Vec3f();
       the_owner->rel_rot = Rotation();
       the_owner->center_of_rot = Vec3f();
       value = false;
+      the_owner->use_center = false;
     }
   }
 }

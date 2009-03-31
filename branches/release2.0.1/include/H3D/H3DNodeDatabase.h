@@ -36,6 +36,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <list>
 #include <typeinfo>
 
 using namespace std;
@@ -194,8 +195,23 @@ namespace H3D {
   /// H3DNodeDatabase member variable must be defined in the node class
   /// with the (nodename, constructor) pair that is wanted.
 	struct H3DAPI_API H3DNodeDatabase {
+
+    /// Wrapper class to be able to put type_info as a key in a map.
+    struct TypeInfoWrapper {
+      const std::type_info& t; 
+
+      /// Constructor.
+      TypeInfoWrapper (const std::type_info& t_) 
+        : t (t_) {} 
+
+      /// Less than operator
+      bool operator< (const TypeInfoWrapper & o) const { 
+        return t.before (o.t) != 0; 
+      } 
+    };
+
     typedef map< string, FieldDBElement* > FieldDBType;
-    typedef map< string, H3DNodeDatabase*> H3DNodeDatabaseType;
+    typedef map< TypeInfoWrapper, H3DNodeDatabase* > H3DNodeDatabaseType;
     typedef H3DNodeDatabaseType::const_iterator NodeDatabaseConstIterator;
 
     /// The FieldDBConstIterator is an iterator class used for iterating
@@ -207,13 +223,10 @@ namespace H3D {
       FieldDBConstIterator( H3DNodeDatabase * _ndb , bool is_end );
 
       /// Copy constructor.
-      FieldDBConstIterator( const FieldDBConstIterator &f ):
-        status( f.status ),
-        local_iterator( f.local_iterator ),
-        inherited_iterator( new FieldDBConstIterator ),
-        ndb( f.ndb ) {
-        *inherited_iterator = *f.inherited_iterator;
-      }
+      FieldDBConstIterator( const FieldDBConstIterator &f );
+
+      /// Assignment operator.
+      FieldDBConstIterator & operator=(const FieldDBConstIterator &rhs);
 
       /// Pre-increment operator.
       inline FieldDBConstIterator &operator++(int) {
@@ -239,9 +252,28 @@ namespace H3D {
           /// status == LOCAL )
           return (*local_iterator).first;
       }
+
+      /// Get the FieldDBElement associated with the iterator.
+      inline FieldDBElement *getFieldDBElement() {
+        if( status == INHERITED )
+          return (*inherited_iterator).getFieldDBElement();
+        else 
+          /// status == LOCAL )
+          return (*local_iterator).second;
+      }
+
+      /// Get the Field * associated with the iterator.
+      inline Field * getField( Node *n ) {
+        if( status == INHERITED )
+          return (*inherited_iterator).getField( n );
+        else 
+          /// status == LOCAL )
+          return (*local_iterator).second->getField( n ) ;
+      }
       
     protected:
-      FieldDBConstIterator(){}
+      FieldDBConstIterator():
+        inherited_iterator( NULL ) {}
 
       typedef enum {
         /// The iterator is currently iterating through the local field 
@@ -262,7 +294,7 @@ namespace H3D {
       FieldDBType::const_iterator local_iterator;
       /// Iterator used for iterating through the fields inherited from
       /// the parent database if it exists. Only valid if status == INHERITED.
-      FieldDBConstIterator* inherited_iterator;
+      auto_ptr< FieldDBConstIterator > inherited_iterator;
       /// The database which fields this iterator iterates through.
       H3DNodeDatabase * ndb;
     };
@@ -273,6 +305,15 @@ namespace H3D {
 
     /// Constructor.
 	  H3DNodeDatabase( const string&_name, 
+                     H3DCreateNodeFunc _createf,
+                     const type_info &_ti,
+                     H3DNodeDatabase *_parent = 0 );
+
+    /// Constructor. Allows the adding of one alias name as well
+    /// as the ordinary name. Any extra alias names must be added
+    /// with the addAlias method.
+	  H3DNodeDatabase( const string&_name, 
+                     const string &_alias,
                      H3DCreateNodeFunc _createf,
                      const type_info &_ti,
                      H3DNodeDatabase *_parent = 0 );
@@ -289,11 +330,33 @@ namespace H3D {
     /// Search the node database for an entry with a matching name.
     static H3DNodeDatabase *lookupName( const string &name );
     
+    /// Add an alias for the node in the database.
+    inline void addAlias( const string &alias ) {
+      aliases.push_back( alias );
+    }
+
     /// Create a new instance of a Node type.
     /// \param name The name of the node in the database.
     /// \returns A new instance of the node if it exists in the database,
     /// otherwise NULL is returned.
 	  static Node *createNode( const string &name );
+
+    /// Get the name of the node in the database object.
+    inline const string &getName() {
+      return name;
+    }
+
+    /// Get the type_info of the node in the database object.
+    inline const type_info &getTypeInfo() {
+      return ti;
+    }
+
+    /// Create a new instance of the node type the database object
+    /// refers to.
+    inline Node * createNode() {
+      if( createf ) return createf();
+      else return NULL;
+    }
 
     /// add a field to the node database entry
     void addField( FieldDBElement *f );
@@ -330,6 +393,10 @@ namespace H3D {
     
     /// Static map of nodes that have initialised themselves into the database
 		static bool initialized;
+
+    /// A list of aliases for this node, i.e. other names this node is known
+    /// as.
+    list< string > aliases;
     
   public:
     /// The database with all H3DNodeDatabase instances.

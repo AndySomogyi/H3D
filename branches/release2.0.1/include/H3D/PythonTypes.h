@@ -71,6 +71,13 @@
 ///   - createX3DFromString( string ) 
 ///   - createX3DNodeFromURL( url ) 
 ///   - createX3DNodeFromString( string ) 
+///   - createVRMLFromURL( url ) 
+///   - createVRMLFromString( string ) 
+///   - createVRMLNodeFromURL( url ) 
+///   - createVRMLNodeFromString( string ) 
+/// - X3D write functions. Each of these functions returns a string which
+///   contains the X3D syntax of the argument.
+///   - writeNodeAsX3D( node )
 /// - Bindable nodes access - the following functions return the currently
 ///   bound node for different bindable node stacks 
 ///   - getActiveDeviceInfo() 
@@ -141,6 +148,8 @@
 ///     and rotation of the Matrix4f/d
 ///   - getRotationPart() - returns a Matrix3f/d containing the rotation
 ///     of the Matrix4f/d
+///   - getTranslationPart() - returns a Vec3f/d containing the translation
+///     part of the Matrix4f/d
 /// - Node methods.
 ///   - getFieldList()
 ///   - addField( name, field_type, access_type ) - can only be used with nodes
@@ -879,6 +888,9 @@ namespace H3D {
 
     /// Returns the scaling part of the Matrix4f.
     static PyObject* getScalePart( PyObject *self, PyObject *args );
+    
+    /// Returns the translation part of the Matrix4f.
+    static PyObject* getTranslationPart( PyObject *self, PyObject *args );
 
     /// Get an element in the matrix.
     static PyObject* getElement( PyObject *self, PyObject *args );
@@ -1047,6 +1059,9 @@ namespace H3D {
 
     /// Returns the scaling part of the Matrix4d.
     static PyObject* getScalePart( PyObject *self, PyObject *args );
+
+    /// Returns the translation part of the Matrix4d.
+    static PyObject* getTranslationPart( PyObject *self, PyObject *args );
 
     /// Get an element in the matrix.
     static PyObject* getElement( PyObject *self, PyObject *args );
