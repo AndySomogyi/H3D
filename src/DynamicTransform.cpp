@@ -56,7 +56,6 @@ namespace DynamicTransformInternals {
   FIELDDB_ELEMENT( DynamicTransform, torque,          INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicTransform, mass,            INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicTransform, inertiaTensor,   INPUT_OUTPUT );
-  FIELDDB_ELEMENT( DynamicTransform, motion,          INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicTransform, accumulatedInverse, INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicTransform, accumulatedForward, INPUT_OUTPUT );
   FIELDDB_ELEMENT( DynamicTransform, matrix,          INPUT_OUTPUT );
@@ -130,6 +129,7 @@ DynamicTransform::DynamicTransform(
   inertiaTensor->route( angularVelocity, id );
   angularMomentum->route( angularVelocity, id );
 
+  motion->setOwner( this );
   Scene::time->route( motion );
   motion->route( Scene::eventSink );
 }

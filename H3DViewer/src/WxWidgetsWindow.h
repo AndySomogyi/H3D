@@ -38,6 +38,11 @@
     #error "OpenGL required: set wxUSE_GLCANVAS to 1 and rebuild the library"
 #endif
 
+// Define this if you want the gl context be created explicitly. This does
+// not work under OSX v2.8 wxWidgets and does not really add anything unless
+// you want to share rendering contexts. So by default we do not use it.
+//#define USE_EXPLICIT_GLCONTEXT
+
 namespace H3D {
 
   /// \ingroup Nodes
@@ -88,7 +93,11 @@ namespace H3D {
                 Inst< SFViewpoint > _viewpoint  = 0 );
 
     ///// Destructor.
-    //~WxWidgetsWindow();
+    ~WxWidgetsWindow() {
+      if( !have_parent ) {
+        theWindow->Destroy();
+      }
+    }
 
     /// Calls wxGLCanvas::SwapBuffers
     virtual void swapBuffers(); 
@@ -109,9 +118,13 @@ namespace H3D {
     static H3DNodeDatabase database;
 
   protected:
+    bool is_initialized;
+    bool have_parent;
     wxWindow * theWindow;
     MyWxGLCanvas * theWxGLCanvas;
+#ifdef USE_EXPLICIT_GLCONTEXT
     wxGLContext * theWxGLContext;
+#endif
 	bool last_fullscreen;
   };
 }

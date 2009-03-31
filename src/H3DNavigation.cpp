@@ -77,29 +77,70 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
   last_time = current_time;
 
   if( navigation_type == "EXAMINE" || navigation_type == "ANY" ) {
-    Vec3f translation_delta;
-    Rotation rotation_value;
-    Vec3f center_of_rot;
-    bool use_center;
-    if( H3DNavigationDevices::getMoveInfo(
-        translation_delta, rotation_value, center_of_rot, use_center ) ) {
-      if( use_center ) {
-        vp->translate( translation_delta, false, avatar_size, topNode );
-        vp->rotateAround( rotation_value, false,
-                  vp->accInverseMatrix->getValue() * center_of_rot );
+    H3DNavigationDevices::MoveInfo move_info;
+    if( H3DNavigationDevices::getMoveInfo( move_info ) ) {
+      if( move_info.zoom ) {
+        Vec3f scaling = vp->accForwardMatrix->getValue().getScalePart();
+        if( H3DAbs( scaling.x - scaling.y ) < Constants::f_epsilon
+          && H3DAbs( scaling.y - scaling.z ) < Constants::f_epsilon ) {
+            vector< H3DFloat > temp_avatar_size( avatar_size );
+            for( unsigned int i = 0; i < temp_avatar_size.size(); i++ ) {
+              temp_avatar_size[i] *= scaling.x;
+            }
+            Vec3f direction = vp->centerOfRotation->getValue() - 
+                              vp->totalPosition->getValue();
+            H3DFloat max_movement = direction.length();
+            if( max_movement < Constants::f_epsilon ) {
+              // Should never come here unless user manually aligns the
+              // position of the viewpoint with the center of rotation.
+              // Just choose a direction to zoom out from.
+              direction = Vec3f( 1, 0, 0 );
+              max_movement = 1;
+            }
+            direction = direction / max_movement;
+            bool move_towards = true;
+            if( move_info.translation_sum * Vec3f( 0, 0, -1 ) < 0 ) {
+              direction = -direction;
+              move_towards = false;
+            }
+            direction = -vp_full_orientation * direction;
+            direction = move_info.translation_sum.length() * direction *
+                        speed *
+                        delta_time * scaling.x;
+            if( move_towards ) {
+              H3DFloat dist_from_center = 1e-5f;
+              max_movement = max_movement > dist_from_center ?
+                             max_movement - dist_from_center : 0;
+              if( direction.length() < max_movement )
+                vp->translate( direction, false, temp_avatar_size, topNode );
+              else {
+                direction.normalize();
+                vp->translate( direction * max_movement,
+                               false, temp_avatar_size, topNode );
+              }
+            } else
+              vp->translate( direction, false, temp_avatar_size, topNode );
+        } else {
+          Console(3) << "Warning: Non-uniform scaling in the"
+            << " active X3DViewpointNode ( "
+            << vp->getName()
+            << " ) nodes local coordinate system. Speed and avatar size of "
+            << "Avatar is undefined ";
+        }
+      } else if( move_info.use_center_sum ) {
+        vp->translate( move_info.translation_sum,
+                       false, avatar_size, topNode );
+        vp->rotateAround( move_info.rotation_sum, false,
+                  vp->accInverseMatrix->getValue() * move_info.center_of_rot_sum );
       }
       else {
-        vp->rotateAround( rotation_value, false,
+        vp->rotateAround( move_info.rotation_sum, false,
                           vp->centerOfRotation->getValue() );
       }
     }
     else if( detect_collision )
       vp->detectCollision( avatar_size, topNode );
   } else if( navigation_type == "WALK" || navigation_type == "FLY" ) {
-    Vec3f translation_delta;
-    Rotation rotation_value;
-    Vec3f center_of_rot;
-    bool use_center;
     Vec3f scaling = vp->accForwardMatrix->getValue().getScalePart();
     if( H3DAbs( scaling.x - scaling.y ) < Constants::f_epsilon
         && H3DAbs( scaling.y - scaling.z ) < Constants::f_epsilon ) {
@@ -107,10 +148,11 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
       for( unsigned int i = 0; i < temp_avatar_size.size(); i++ ) {
         temp_avatar_size[i] *= scaling.x;
       }
-      if( H3DNavigationDevices::getMoveInfo(
-          translation_delta, rotation_value, center_of_rot, use_center ) ) {
-        vp->rotateAroundSelf( rotation_value );
-        vp->translate( translation_delta * speed * delta_time * scaling.x,
+      H3DNavigationDevices::MoveInfo move_info;
+      if( H3DNavigationDevices::getMoveInfo( move_info ) ) {
+        vp->rotateAroundSelf( move_info.rotation_sum );
+        vp->translate( move_info.translation_sum * speed *
+                        delta_time * scaling.x,
                        detect_collision, temp_avatar_size, topNode );
       }
       else if( detect_collision )
@@ -123,12 +165,8 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
           << "Avatar is undefined ";
     }
   } else if( navigation_type == "LOOKAT" ) {
-    Vec3f translation_delta;
-    Rotation rotation_value;
-    Vec3f center_of_rot;
-    bool use_center;
-    if( H3DNavigationDevices::getMoveInfo(
-          translation_delta, rotation_value, center_of_rot, use_center ) ) {
+    H3DNavigationDevices::MoveInfo move_info;
+    if( H3DNavigationDevices::getMoveInfo( move_info ) ) {
 
       // TODO: maybe change this to allow for other devices to specify what
       // to look at ( for example by supply a point and direction ).
@@ -139,7 +177,8 @@ void H3DNavigation::navigate( string navigation_type, X3DViewpointNode * vp,
       glGetDoublev( GL_MODELVIEW_MATRIX, mvmatrix );
       glGetDoublev( GL_PROJECTION_MATRIX, projmatrix );
 
-      Vec2f mouse_pos = Vec2f( translation_delta.x, translation_delta.y );
+      Vec2f mouse_pos = Vec2f( move_info.translation_sum.x,
+                               move_info.translation_sum.y );
       mouse_pos.y = viewport[3] - mouse_pos.y - 1;
       gluUnProject( (GLdouble) mouse_pos.x, (GLdouble) mouse_pos.y,
         0.0, mvmatrix, projmatrix, viewport, &wx, &wy, &wz );

@@ -75,6 +75,9 @@ namespace H3D {
         /// Stereo mode where every second vertical line is rendered for the 
         /// left eye and every other line for the right eye.
         VERTICAL_INTERLACED,  
+        /// Stereo mode where "white" and "black" in a checker pattern
+        /// are rendered for the left and right eye, respectively.
+        CHECKER_INTERLACED,
         /// Stereo mode where every second vertical line is rendered for the 
         /// left eye and every other line for the right eye, but with the green 
         /// pixel shifted one pixel to the right. Used with for example the 

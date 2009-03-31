@@ -50,8 +50,27 @@ parent( _parent ) {
     database = new H3DNodeDatabaseType;
     initialized = true;
   }
-  (*database)[ name ] = this;
+  (*database)[ ti ] = this;
 }
+
+H3DNodeDatabase::H3DNodeDatabase( const string &_name, 
+                                  const string &_alias,
+                                  H3DCreateNodeFunc _createf,
+                                  const type_info &_ti,
+                                  H3DNodeDatabase *_parent ) :
+name( _name ), 
+createf( _createf ),
+ti( _ti ),
+parent( _parent ) {
+  if (!initialized) {
+    database = new H3DNodeDatabaseType;
+    initialized = true;
+  }
+  (*database)[ ti ] = this;
+  addAlias( _alias );
+}
+
+
 
 H3DNodeDatabase::H3DNodeDatabase( const type_info &_ti,
                                   H3DNodeDatabase *_parent ) :
@@ -78,11 +97,11 @@ H3DNodeDatabase::~H3DNodeDatabase(void){
 
 
 Node *H3DNodeDatabase::createNode( const string &name ) {
-  H3DNodeDatabaseType::iterator pos = database->find( name );
-  if( pos == database->end() || (*pos).second->createf == NULL )
+  H3DNodeDatabase *db = lookupName( name );
+  if( !db || db->createf == NULL )
     return NULL;
   else
-    return (*(*pos).second->createf)();
+    return db->createf();
 }
 
 void H3DNodeDatabase::initFields( Node *n ) const {
@@ -108,6 +127,8 @@ Field *H3DNodeDatabase::getFieldHelp( Node *n, const string &f ) const {
     const string &name = (*i).first;
     if ( name == f )
       return fdb->getField( n );
+
+    // check for dynamic field.
     ostringstream namestr;
     namestr << fdb << "_" << f; 
     if( namestr.str() == name ) {
@@ -155,21 +176,30 @@ void H3DNodeDatabase::addField( FieldDBElement *f ) {
 }
 
 H3DNodeDatabase *H3DNodeDatabase::lookupTypeId( const type_info &t ) {
-  for( H3DNodeDatabaseType::iterator i = database->begin(); 
-       i != database->end(); i++ ) {
-    H3DNodeDatabase *n = (*i).second;
-    if ( n->ti == t )
-      return n;
-  }
-  return NULL;
-}
-
-H3DNodeDatabase *H3DNodeDatabase::lookupName( const string &name ) {
-  H3DNodeDatabaseType::iterator pos = database->find( name );
+  H3DNodeDatabaseType::iterator pos = database->find( t );
   if( pos == database->end() )
     return NULL;
   else
     return (*pos).second;
+}
+
+H3DNodeDatabase *H3DNodeDatabase::lookupName( const string &name ) {
+   for( H3DNodeDatabaseType::iterator i = database->begin(); 
+       i != database->end(); i++ ) {
+    H3DNodeDatabase *n = (*i).second;
+    // name is a match
+    if ( n->name == name )
+      return n;  
+
+    // an alias is a match
+    for( list< string >::iterator a = n->aliases.begin();
+         a != n->aliases.end(); a++ ) {
+      if( name == *a ) {
+        return n;
+      }
+    }
+  }
+  return NULL; 
 }
 
 FieldDBElement::FieldDBElement( H3DNodeDatabase *_container,
@@ -246,4 +276,26 @@ void H3DNodeDatabase::clearDynamicFields() {
       fields.erase( to_erase );
     } 
   }
+}
+
+H3DNodeDatabase::FieldDBConstIterator::FieldDBConstIterator( const FieldDBConstIterator &f ):
+  status( f.status ),
+  local_iterator( f.local_iterator ),
+  inherited_iterator( new FieldDBConstIterator ),
+  ndb( f.ndb ) {
+  *inherited_iterator = *f.inherited_iterator;
+}
+
+H3DNodeDatabase::FieldDBConstIterator & H3DNodeDatabase::FieldDBConstIterator::operator=(const FieldDBConstIterator &f) {
+  status = f.status;
+  local_iterator = f.local_iterator;
+  ndb = f.ndb;
+  if( f.inherited_iterator.get() ) {
+    if( inherited_iterator.get() == NULL ) 
+      inherited_iterator.reset( new FieldDBConstIterator );
+    *inherited_iterator = *f.inherited_iterator;
+  } else {
+    inherited_iterator.reset( NULL );
+  }
+  return *this;
 }

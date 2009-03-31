@@ -29,6 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "WxWidgetsWindow.h"
+#include "WxFrame.h"
 #ifndef WIN32
 #include <H3D/X3DKeyDeviceSensorNode.h>
 #include <H3D/MouseSensor.h>
@@ -51,10 +52,21 @@ WxWidgetsWindow::WxWidgetsWindow( wxWindow *_theParent,
                         Inst< SFViewpoint > _viewpoint ) :
   H3DWindowNode( _width, _height, _fullscreen, _mirrored, _renderMode,
                  _viewpoint ),
-  theWindow( _theParent ){
+  theWindow( _theParent ),
+  is_initialized( false ) {
   type_name = "WxWidgetsWindow";
   database.initFields( this );
   
+  have_parent = theWindow != NULL;
+ 
+  if( !theWindow ) {
+     theWindow = new wxFrame( NULL, wxID_ANY, wxT("WxFrame"),
+                              wxDefaultPosition,
+                              wxSize( width->getValue(), height->getValue() ));
+  }
+}
+
+void WxWidgetsWindow::initWindow() {
   int attribList[8];
   attribList[0] = WX_GL_RGBA;
   attribList[1] = WX_GL_DOUBLEBUFFER;
@@ -71,16 +83,12 @@ WxWidgetsWindow::WxWidgetsWindow( wxWindow *_theParent,
   //  attribList[6] = WX_GL_STEREO;
   attribList[7] = 0;
 #endif
- 
-  if( !theWindow ) {
-     theWindow = new wxFrame( NULL, wxID_ANY, wxT("WxFrame"),
-                              wxDefaultPosition,
-                              wxSize( width->getValue(), height->getValue() ));
-  }
-
   theWxGLCanvas = new MyWxGLCanvas( this, theWindow, -1, wxDefaultPosition,
               wxSize( width->getValue(), height->getValue() ), attribList );
+#ifdef USE_EXPLICIT_GLCONTEXT
   theWxGLContext = new wxGLContext( theWxGLCanvas );
+#endif
+
   wxSizer *tmp_sizer = theWindow->GetSizer();
   if( tmp_sizer ) {
     tmp_sizer->Add( theWxGLCanvas, 1, wxEXPAND );
@@ -92,16 +100,19 @@ WxWidgetsWindow::WxWidgetsWindow( wxWindow *_theParent,
     wpOrigProc = (WNDPROC) SetWindowLongPtr(hWnd, 
                           GWL_WNDPROC, (LONG_PTR) WindowProc);
 #endif
-}
 
-void WxWidgetsWindow::initWindow() {
   last_fullscreen = !fullscreen->getValue();
   theWindow->Show();
   theWxGLCanvas->Show();
+#ifdef USE_EXPLICIT_GLCONTEXT
   theWxGLCanvas->SetCurrent( *theWxGLContext );
+#else
+  theWxGLCanvas->SetCurrent();
+#endif
   glClearColor( 0, 0, 0, 1 );
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
   glClear( GL_COLOR_BUFFER_BIT );
+  is_initialized = true;
 }
 
 void WxWidgetsWindow::setFullscreen( bool fullscreen ) {
@@ -121,7 +132,11 @@ void WxWidgetsWindow::swapBuffers() {
 }
 
 void WxWidgetsWindow::makeWindowActive() {
+#ifdef USE_EXPLICIT_GLCONTEXT
   theWxGLCanvas->SetCurrent( *theWxGLContext );
+#else
+  theWxGLCanvas->SetCurrent();
+#endif
 }
 
 BEGIN_EVENT_TABLE(WxWidgetsWindow::MyWxGLCanvas, wxGLCanvas)
@@ -156,16 +171,35 @@ WxWidgetsWindow::MyWxGLCanvas::MyWxGLCanvas( WxWidgetsWindow *_myOwner,
                                                   long _style, 
                                                   const wxString& _name,
                                                   const wxPalette& _palette ):
+#ifdef USE_EXPLICIT_GLCONTEXT
 wxGLCanvas( _parent, _id, _attribList, _pos, _size,
             _style | wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS, _name,
             _palette ),
+#else
+wxGLCanvas( _parent, _id, _pos, _size,
+            _style | wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS, _name,
+	    _attribList,  _palette ),
+#endif
 myOwner( _myOwner )
 {
 }
 
 void WxWidgetsWindow::MyWxGLCanvas::OnIdle(wxIdleEvent& event) {
-  //TODO:
-  //  static_cast< WxFrame * >(myOwner->theWindow)->updateFrameRates();
+  if( myOwner->is_initialized ) {
+    static_cast< WxFrame * >(myOwner->theWindow)->updateFrameRates();
+   
+    // resize the window if the size is different from the current size.
+    int w = myOwner->width->getValue();
+    int h = myOwner->height->getValue();
+    int current_w, current_h;
+    GetSize( &current_w, &current_h );
+    if( w != current_w || h != current_h ) {
+      SetSize( w, h );
+    }
+
+    myOwner->theWindow->Fit();
+                                                           
+  }
   event.RequestMore();
 }
 
@@ -174,8 +208,12 @@ void WxWidgetsWindow::MyWxGLCanvas::OnSize( wxSizeEvent& event ) {
   // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
   int w, h;
   GetClientSize(&w, &h);
-  //if ( GetContext() )
+#ifdef USE_EXPLICIT_GLCONTEXT
   myOwner->reshape( w, h );
+#else
+  if ( GetContext() )
+    myOwner->reshape( w, h );
+#endif
 }
 
 void WxWidgetsWindow::MyWxGLCanvas::OnPaint( wxPaintEvent& WXUNUSED(event))

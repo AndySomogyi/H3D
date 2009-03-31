@@ -153,7 +153,8 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   navigationDevices(0),
   wxFrame(_parent, _id, _title, _pos, _size, _style, _name ),
   avatar_collision( true ),
-  loaded_first_file( false )
+  loaded_first_file( false ),
+  change_nav_type( new ChangeNavType )
 {
   wxAcceleratorEntry entries[1];
   entries[0].Set(wxACCEL_NORMAL, (int) WXK_F11, FRAME_RESTORE);
@@ -162,7 +163,6 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
 
     scene.reset( new Scene );
   ks.reset ( new KeySensor );
-  ms.reset ( new MouseSensor );
 #ifndef MACOSX
   ss.reset (0);
 #endif
@@ -355,6 +355,75 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   rendererMenu->Enable(FRAME_CHOOSERENDERER, false);
   rendererMenu->Enable(FRAME_RENDERMODE, false);
 
+  change_nav_type->setOwnerWindow( glwindow );
+  ks->keyPress->route( change_nav_type );
+}
+
+void WxFrame::ChangeNavType::update() {
+  NavigationInfo *mynav =0;
+  if(NavigationInfo::getActive()){
+    mynav = NavigationInfo::getActive();
+  }
+  string s = static_cast< SFString * >(routes_in[0])->getValue();
+  if( s[0] == 119) {
+    // Set navigation type to WALK
+    if(mynav){
+      mynav->setNavType("WALK");
+    }
+    else{
+      glwindow->default_nav = "WALK"; 
+    }
+  } else if( s[0] == 102 ) {
+    // Set navigation type to FLY
+    if(mynav){
+      mynav->setNavType("FLY");
+    }
+    else{
+      glwindow->default_nav = "FLY"; 
+    }
+  } else if( s[0] == 101 ) {
+    // Set navigation type to EXAMINE
+    if(mynav){
+      mynav->setNavType("EXAMINE");
+    }
+    else{
+      glwindow->default_nav = "EXAMINE"; 
+    }
+  } else if( s[0] == 108 ) {
+    // Set navigation type to LOOKAT
+    if(mynav){
+      mynav->setNavType("LOOKAT");
+    }
+    else{
+      glwindow->default_nav = "LOOKAT"; 
+    }
+  } else if( s[0] == 110 ) {
+    // Set navigation type to NONE
+    if(mynav){
+      mynav->setNavType("NONE");
+    }
+    else{
+      glwindow->default_nav = "NONE"; 
+    }
+  } else if( s == "+" ) {
+    if( mynav ) {
+      mynav->speed->setValue( mynav->speed->getValue() + speed_increment );
+    } else {
+      glwindow->default_speed += speed_increment;
+    }
+  } else if( s == "-" ) {
+    if( mynav ) {
+      H3DFloat tmp_speed = mynav->speed->getValue() - speed_increment;
+      if( tmp_speed < 0 )
+        tmp_speed = 0;
+      mynav->speed->setValue( tmp_speed );
+    } else {
+      H3DFloat tmp_speed = glwindow->default_speed - speed_increment;
+      if( tmp_speed  < 0 )
+        tmp_speed = 0;
+      glwindow->default_speed = tmp_speed;
+    }
+  }
 }
 
 /*******************Event Table*********************/
@@ -551,7 +620,10 @@ void SettingsDialog::handleSpinEvent (wxSpinEvent & event) {
 /*******************Member Functions*********************/
 
 bool WxFrame::loadFile( const string &filename) {
-  
+#ifdef WIN32
+  UINT old_error_mode;
+  old_error_mode = SetErrorMode( 0 );
+#endif
   char *r = getenv( "H3D_ROOT" );
 
   string h3d_root = r ? r : ""; 
@@ -628,7 +700,8 @@ bool WxFrame::loadFile( const string &filename) {
     X3D::DEFNodes dn;
     QuitAPIField *quit_api = new QuitAPIField;
 
-    if (!DeviceInfo::getActive()) {    
+    DeviceInfo *di = DeviceInfo::getActive();
+    if( !di ) {
       if( deviceinfo_file.size() ) {
         try {
           device_info = X3D::createX3DNodeFromURL( deviceinfo_file );
@@ -642,7 +715,7 @@ bool WxFrame::loadFile( const string &filename) {
 
 
       AutoRef< Node > default_stylus( 0 );
-      DeviceInfo *di = DeviceInfo::getActive();
+      di = DeviceInfo::getActive();
       if( di && stylus_file.size() ) {
         try {
           default_stylus = X3D::createX3DNodeFromURL( stylus_file,
@@ -661,9 +734,7 @@ bool WxFrame::loadFile( const string &filename) {
         }
       }
     }
-
-    DeviceInfo::DeviceInfoList DEVlist = DeviceInfo::getAllDeviceInfos();
-    int devcount = DEVlist.size();
+    unsigned int device_info_size = DeviceInfo::getAllDeviceInfos().size();
 
     Console(3) << "Loading " << filename << endl;
     if ( filename.size() > 4 && 
@@ -673,6 +744,21 @@ bool WxFrame::loadFile( const string &filename) {
     else
         t->children->push_back( X3D::createX3DFromURL( filename.c_str(), 
                                                        &dn ) );
+
+    DeviceInfo::DeviceInfoList device_infos = DeviceInfo::getAllDeviceInfos();
+    if( di && device_infos.size() > device_info_size ) {
+      unsigned int j = 0;
+      for( DeviceInfo::DeviceInfoList::iterator i = device_infos.begin();
+           i != device_infos.end(); i++ ) {
+        if( j < device_info_size )
+          di->set_bind->setValue( false );
+        else {
+          (*i)->set_bind->setValue( true );
+          break;
+        }
+        j++;
+      }
+    }
 
     /**********************Reset mirrored and fullscreen********************/
     if( !loaded_first_file ) {
@@ -819,6 +905,9 @@ bool WxFrame::loadFile( const string &filename) {
     s << e;
     wxMessageBox( wxString(s.str().c_str(),wxConvUTF8), wxT("Error"),
                   wxOK | wxICON_EXCLAMATION);
+#ifdef WIN32
+    SetErrorMode( old_error_mode );
+#endif
     return false;
   }
 
@@ -1049,7 +1138,9 @@ bool WxFrame::loadFile( const string &filename) {
 
   H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
   settings->on_cancel_rebuild_displaylist = false;
-
+#ifdef WIN32
+  SetErrorMode( old_error_mode );
+#endif
   return true;
 }
 
@@ -2779,3 +2870,4 @@ BEGIN_EVENT_TABLE(SpeedDialog, wxDialog)
   EVT_COMMAND_SCROLL( FRAME_SPEED_SLIDER, 
                       SpeedDialog::handleSliderEvent)
 END_EVENT_TABLE()
+
