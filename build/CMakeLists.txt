@@ -111,6 +111,9 @@ IF( GENERATE_CPACK_PROJECT )
                                     /build/vc8
                                     /build/vc7
                                     /build/vc9
+                                    /build/vc9_HAPI/
+                                    /build/vc8_HAPI/
+                                    /build/vc7_HAPI/
                                     /osx
                                     /H3DAPI/Util/
                                     /berk/berk\\\\.wrl$
@@ -169,7 +172,6 @@ IF( GENERATE_CPACK_PROJECT )
     # Pattern in folders and files to ignore when adding files to installation package.
     SET(CPACK_IGNORE_FILES ${H3DAPI_CPACK_IGNORE_PATTERNS}
                            /fparser\\\\.lib$
-                           /teem\\\\.lib$
                            /wxbase28_net\\\\.lib$
                            /wxbase28_odbc\\\\.lib$
                            /wxbase28_xml\\\\.lib$
@@ -198,7 +200,6 @@ IF( GENERATE_CPACK_PROJECT )
                            /HAPI/doc/
                            /H3DUtil/doc/
                            /include/fparser
-                           /include/teem
                            /HapticAPI2
                            /xerces-c_2_7\\\\.dll$
                            /xerces-c_2_7D\\\\.dll$
