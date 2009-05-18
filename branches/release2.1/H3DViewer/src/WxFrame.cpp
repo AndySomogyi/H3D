@@ -106,6 +106,23 @@ class QuitAPIField: public AutoUpdate< SFString > {
   }
 };
 
+
+#if wxUSE_DRAG_AND_DROP
+
+void onDropFiles(wxCoord x, wxCoord y,
+		 const wxArrayString& filenames,
+		 void *arg ) {
+  WxFrame *f = static_cast< WxFrame * >( arg );
+  size_t n_files = filenames.GetCount();
+  // load the first file, ignore the rest
+  if( n_files > 0 ) {
+    f->clearData();
+    f->loadFile( string(filenames[0].mb_str()) );
+  }
+};
+
+#endif
+
 /*******************Global Constants*********************/
 static const wxChar *TITLE     = wxT("H3DViewer ");
 static const wxChar *AUTHOR    = wxT("\nSenseGraphics\n\nCopyright 2006-2009.\n"
@@ -179,6 +196,9 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   g.reset ( new Group );
 
   glwindow = new WxWidgetsWindow(this);
+#if wxUSE_DRAG_AND_DROP
+  glwindow->onFileDraggedAndDroppedFunction( &onDropFiles, this );
+#endif
   int width, height;
   GetClientSize(&width, &height);
   glwindow->width->setValue(width);
@@ -347,7 +367,7 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   //Help Menu
   helpMenu = new wxMenu;
   //helpMenu->Append(FRAME_HELP, wxT("Help"));
-  helpMenu->Append(FRAME_ABOUT, wxT("About"));
+  helpMenu->Append(wxID_ABOUT, wxT("About"));
 
   //Install Menu Bar
   menuBar = new wxMenuBar;
@@ -469,6 +489,7 @@ BEGIN_EVENT_TABLE(WxFrame, wxFrame)
   EVT_MENU_RANGE (FRAME_OPENHAPTICS, FRAME_RUSPINI, WxFrame::ChangeRenderer)
   EVT_MENU (FRAME_DEVICECONTROL, WxFrame::ToggleHaptics)
   EVT_MENU (FRAME_ABOUT, WxFrame::OnAbout)
+  EVT_MENU (wxID_ABOUT, WxFrame::OnAbout)
   EVT_MENU (FRAME_HELP, WxFrame::OnHelp)
   EVT_CLOSE(WxFrame::OnWindowExit)
 END_EVENT_TABLE()
@@ -1231,15 +1252,26 @@ void WxFrame::clearData () {
   viewpoint.reset( new Viewpoint );
 
   //Delete items from viewpoint menu & disconnect events
-  for (int i = 0; i < viewpointCount; i++) {
-    viewpointMenu->Destroy(FRAME_VIEWPOINT + i);
-    Disconnect(FRAME_VIEWPOINT + i,wxEVT_MENU_HIGHLIGHT,
-               wxMenuEventHandler(WxFrame::GetSelection));
-    Disconnect(FRAME_VIEWPOINT + i,wxEVT_COMMAND_MENU_SELECTED,
-               wxCommandEventHandler(WxFrame::ChangeViewpoint));
-  }
-  if( viewpointCount != 0 )
+  if( viewpointMenu->GetMenuItemCount() != 0 ) {
+    if( viewpointCount <= 1 ) {
+      viewpointMenu->Destroy(FRAME_VIEWPOINT );
+      Disconnect(FRAME_VIEWPOINT ,wxEVT_MENU_HIGHLIGHT,
+		 wxMenuEventHandler(WxFrame::GetSelection));
+      Disconnect(FRAME_VIEWPOINT,wxEVT_COMMAND_MENU_SELECTED,
+		 wxCommandEventHandler(WxFrame::ChangeViewpoint));
+    } else {
+      for (int i = 0; i < viewpointCount; i++) {
+        viewpointMenu->Destroy(FRAME_VIEWPOINT + i);
+        Disconnect(FRAME_VIEWPOINT + i,wxEVT_MENU_HIGHLIGHT,
+                   wxMenuEventHandler(WxFrame::GetSelection));
+        Disconnect(FRAME_VIEWPOINT + i,wxEVT_COMMAND_MENU_SELECTED,
+                   wxCommandEventHandler(WxFrame::ChangeViewpoint));
+      } 
+    }
     viewpointMenu->Destroy( FRAME_RESET_VIEWPOINT ); 
+  }
+
+  
   
   // Find all separators and destroy them, if the item is not a separator
   // something is wrong but not enough to quit.
@@ -1922,7 +1954,7 @@ void WxFrame::LoadPlugins() {
     bool res = h3dConfig->Read( str + wxT("/Library"), &library );    
     if( res && !library.IsEmpty() ) {
      H3DUtil::DynamicLibrary::LIBHANDLE lib = 
-       H3DUtil::DynamicLibrary::load( library.mb_str() );
+       H3DUtil::DynamicLibrary::load( string(library.mb_str()) );
      res = lib != NULL;
     }  
     if( !res ) {
