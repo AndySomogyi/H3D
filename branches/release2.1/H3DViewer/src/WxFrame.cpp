@@ -288,6 +288,9 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
                               wxT("Quad Buffered Stereo"));
   renderMode->AppendRadioItem(FRAME_HORZSPLIT, wxT("Horizontal Split"),
                               wxT("Horizontal Split"));
+  renderMode->AppendRadioItem(FRAME_HORZSPLITKEEPASPECT,
+                              wxT("Horizontal Split Keep Aspect"),
+                       wxT("Horizontal Split with aspect ratio kept the same."));
   renderMode->AppendRadioItem(FRAME_VERTSPLIT, wxT("Vertical Split"),
                               wxT("Vertical Split"));
   renderMode->AppendRadioItem(FRAME_VERTSPLITKEEPASPECT,
@@ -932,6 +935,8 @@ bool WxFrame::loadFile( const string &filename) {
         renderMode->Check( FRAME_QUADBUFFERED, true );
       else if( render_mode == "HORIZONTAL_SPLIT" )
         renderMode->Check( FRAME_HORZSPLIT, true );
+      else if( render_mode == "HORIZONTAL_SPLIT_KEEP_RATIO" )
+        renderMode->Check( FRAME_HORZSPLITKEEPASPECT, true );
       else if( render_mode == "VERTICAL_SPLIT" )
         renderMode->Check( FRAME_VERTSPLIT, true );
       else if( render_mode == "VERTICAL_SPLIT_KEEP_RATIO" )
@@ -1226,14 +1231,15 @@ void WxFrame::clearData () {
   viewpoint.reset( new Viewpoint );
 
   //Delete items from viewpoint menu & disconnect events
-  for (int i = 0; i <= viewpointCount; i++) {
+  for (int i = 0; i < viewpointCount; i++) {
     viewpointMenu->Destroy(FRAME_VIEWPOINT + i);
     Disconnect(FRAME_VIEWPOINT + i,wxEVT_MENU_HIGHLIGHT,
                wxMenuEventHandler(WxFrame::GetSelection));
     Disconnect(FRAME_VIEWPOINT + i,wxEVT_COMMAND_MENU_SELECTED,
                wxCommandEventHandler(WxFrame::ChangeViewpoint));
   }
-  viewpointMenu->Destroy( FRAME_RESET_VIEWPOINT ); 
+  if( viewpointCount != 0 )
+    viewpointMenu->Destroy( FRAME_RESET_VIEWPOINT ); 
   
   // Find all separators and destroy them, if the item is not a separator
   // something is wrong but not enough to quit.
@@ -1248,7 +1254,7 @@ void WxFrame::clearData () {
   }
 
   //Delete items from navigation menu & disconnect events
-  for (int j = 0; j <= navTypeCount; j++) {
+  for (int j = 0; j < navTypeCount; j++) {
     navigationMenu->Destroy(FRAME_NAVIGATION + j);
     Disconnect(FRAME_NAVIGATION + j,wxEVT_MENU_HIGHLIGHT,
                wxMenuEventHandler(WxFrame::GetSelection));
@@ -1417,6 +1423,9 @@ void WxFrame::RenderMode(wxCommandEvent & event)
       break;
     case FRAME_HORZSPLIT:
       renderMode = "HORIZONTAL_SPLIT";
+      break;
+    case FRAME_HORZSPLITKEEPASPECT:
+      renderMode = "HORIZONTAL_SPLIT_KEEP_RATIO";
       break;
     case FRAME_VERTSPLIT:
       renderMode = "VERTICAL_SPLIT";
