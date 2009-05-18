@@ -68,7 +68,7 @@ ENDIF( WIN32 )
 
 # Version of H3D API.
 SET( H3DAPI_MAJOR_VERSION 2 )
-SET( H3DAPI_MINOR_VERSION 0 )
+SET( H3DAPI_MINOR_VERSION 1 )
 SET( H3DAPI_BUILD_VERSION 0 )
 
 # Set here already in case a special NSIS template needs to be used by cpack.
@@ -209,7 +209,8 @@ IF( GENERATE_CPACK_PROJECT )
                            /png\\\\.lib$
                            /bz2\\\\.lib$
                            /ofstd\\\\.lib$
-                           /Definitions.h$ )
+                           /Definitions.h$
+                           "/DentalSimAPI\\\\.(lib)*(dll)*(h)*$" )
     
     # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
     SET(CPACK_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/../../H3DAPI;H3DAPI"
@@ -585,6 +586,16 @@ IF( WIN32 )
     SET( TEMP_OUTPUT_POSTFIX _vc8 )
     # remove some warnings about deprecated functions.
     SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t-" )
+    
+    # This might be useful for visual studio 2005 users that often recompile the api.
+    IF( NOT DEFINED USE_VC8_MP_FLAG )
+      SET( USE_VC8_MP_FLAG "NO" CACHE BOOL "In visual studio 8 the MP flag exists but is not documented. Maybe it is unsafe to use. If you want to use it then set this flag to yes." )
+    ENDIF( NOT DEFINED USE_VC8_MP_FLAG )
+    
+    IF( USE_VC8_MP_FLAG )
+      SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /MP" )
+    ENDIF( USE_VC8_MP_FLAG )
+    
     SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt" )
     # if we are using 64 bit compiler some object files get too big so we need
     # to add the /bigobj flag
@@ -696,12 +707,7 @@ IF( H3DAPI_LOADER_PROJECTS )
   STRING( REPLACE ${H3DAPI_SOURCE_DIR} ${H3DAPI_SOURCE_DIR}/../H3DViewer/build H3DAPI_LOADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
   ADD_SUBDIRECTORY( ${H3DAPI_SOURCE_DIR}/../H3DViewer/build
                     ${H3DAPI_LOADER_BINARY_DIR} )
-  ADD_DEPENDENCIES( H3DViewer H3DAPI )
-  
-  STRING( REPLACE ${H3DAPI_SOURCE_DIR} ${H3DAPI_SOURCE_DIR}/../Util/TreeViewer/build H3DAPI_LOADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
-  ADD_SUBDIRECTORY( ${H3DAPI_SOURCE_DIR}/../Util/TreeViewer/build
-                    ${H3DAPI_LOADER_BINARY_DIR} )
-  ADD_DEPENDENCIES( TreeViewer H3DAPI )
+  ADD_DEPENDENCIES( H3DViewer H3DAPI )  
 ENDIF( H3DAPI_LOADER_PROJECTS )
 
 IF( NOT DEFINED H3DAPI_EXAMPLE_PROJECTS )
