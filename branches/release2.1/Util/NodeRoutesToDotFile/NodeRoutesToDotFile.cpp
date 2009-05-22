@@ -280,7 +280,7 @@ int main(int argc, char* argv[]) {
            H3DNodeDatabase::begin();
          i != H3DNodeDatabase::end();
          i++ ) {
-      string node_name = (*i).first;
+      string node_name = (*i).second->getName();
       Node *n = H3DNodeDatabase::createNode( node_name.c_str()  );
       // The dot hierarchy gets completely screwed up without this since
       // routes and fields are left over from previous instance of Scene::time.

@@ -212,6 +212,7 @@ namespace H3D {
                                         const Vec3f &to,
                                         NodeIntersectResult &result );
 
+    /// Tells which type of geometry should be rendered.
     typedef enum {
       /// render only transparent objects
       TRANSPARENT_ONLY,
@@ -219,7 +220,7 @@ namespace H3D {
       TRANSPARENT_FRONT,
       /// render only the back face of transparent objects
       TRANSPARENT_BACK,
-      /// render only noon-transparent objects
+      /// render only non-transparent objects
       SOLID,
       /// render all objects
       ALL

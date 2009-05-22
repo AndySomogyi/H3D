@@ -241,7 +241,7 @@ namespace H3D {
     /// \dotfile DynamicTransform_inertiaTensor.dot
     auto_ptr<    SFMatrix3f  >  inertiaTensor;
 
-    /// Dynamic update algorithm
+    /// Dynamic update algorithm. Only accessable in C++.
     ///
     /// \dotfile DynamicTransform_motion.dot
     auto_ptr<    SFMotion    >  motion;
