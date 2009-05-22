@@ -32,7 +32,7 @@ INCLUDE_DIRECTORIES( ../src )
 SET(requiredLibs)
 
 # Where to find cmake modules used to find packages.
-SET(CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/../../build/modules/")
+SET(CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules/")
 INCLUDE( StripAndAddLibraryDirectories )
 
 #H3DAPI
@@ -142,7 +142,7 @@ ENDIF(WIN32)
 INSTALL( TARGETS H3DViewer
          LIBRARY DESTINATION lib
          RUNTIME DESTINATION bin
-	 BUNDLE DESTINATION "/Applications" )
+         BUNDLE DESTINATION "/Applications" )
 
 
 # Add a cache variable GENERATE_H3DVIEWER_CPACK_PROJECT to have the choice of generating a project
@@ -183,7 +183,27 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
       INSTALL( FILES ${OSX_DEPENDENT_LIBRARIES}
                DESTINATION lib )
     ENDIF( H3DVIEWER_CPACK_INCLUDE_LIBRARIES )
+  ELSEIF( WIN32 )
+    # File patterns to ignore.
+    SET(CPACK_IGNORE_FILES /\\\\.svn/
+                           \\\\.obj$
+                           \\\\.ncb$
+                           \\\\.log$
+                           \\\\.suo$
+                           \\\\.dir/
+                           \\\\.user$
+                           \\\\.cv$
+                           /pthreadGC2\\\\.dll$
+                           /pthreadGCE2\\\\.dll$
+                           /pthreadVSE2\\\\.dll$
+                           "/HapticAPI2\\\\.(lib)*(dll)*(h)*$"
+                           /xerces-c_2_7\\\\.dll$
+                           /xerces-c_2_7D\\\\.dll$
+                           "/DentalSimAPI\\\\.(lib)*(dll)*(h)*$" )
 
+    # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
+    SET(CPACK_INSTALLED_DIRECTORIES "${H3DViewer_SOURCE_DIR}/../../../bin;bin"
+                                    "${H3DViewer_SOURCE_DIR}/../../../External/bin;bin" )
   ENDIF( APPLE )
 
   INCLUDE(CPack)

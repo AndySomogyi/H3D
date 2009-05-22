@@ -115,7 +115,7 @@ namespace H3D {
 
     /// The linetype field selects a line pattern to be used for lines. For 
     /// more information see the 
-    /// \ref Lineproperties_details "Detailed description" 
+    /// \ref LineProperties_details "Detailed description" 
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 1 \n

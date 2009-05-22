@@ -114,6 +114,7 @@ IF( GENERATE_CPACK_PROJECT )
                                     /build/vc9_HAPI/
                                     /build/vc8_HAPI/
                                     /build/vc7_HAPI/
+                                    /build/vc9_H3DViewer/
                                     /osx
                                     /H3DAPI/Util/
                                     /berk/berk\\\\.wrl$

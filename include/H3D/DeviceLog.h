@@ -84,7 +84,7 @@ namespace H3D {
     /// never show up.
     /// When logging to a binary file the file format will be the following.
     /// The first bytes should be read as characters into a string. When two
-    /// consecutive '\0'-characters are found the section with different
+    /// consecutive '\\0'-characters are found the section with different
     /// strings are over. These strings correspond to the first line in a text
     /// file.
     /// When the first strings are read the data that follows will be in the

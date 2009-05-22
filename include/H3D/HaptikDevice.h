@@ -37,7 +37,8 @@ namespace H3D {
   /// \ingroup H3DNodes
   /// \class HaptikDevice
   /// \brief The HaptikDevice uses the Haptik library
-  /// (www.haptiklibrary.org) to access haptics devices.
+  /// (www.haptiklibrary.org) to access haptics devices. NOTE that this class
+  /// is extremely untested.
   /// 
   /// The deviceName, modelName and manufacturer fields contain a string
   /// for each device available through the Haptik library interface, 

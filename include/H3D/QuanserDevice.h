@@ -40,7 +40,8 @@ namespace H3D {
   /// \ingroup H3DNodes
   /// \class QuanserDevice
   /// \brief A QuanserDevice is a node for handling communication
-  /// with a haptics device from Quanser, such as the 2-DOF Pantograph.
+  /// with a haptics device from Quanser, such as the 2-DOF Pantograph. NOTE
+  /// that this class is extremely untested.
   class H3DAPI_API QuanserDevice: public H3DHapticsDevice {
   public:
 
