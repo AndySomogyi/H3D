@@ -45,6 +45,10 @@ namespace H3D {
   /// to the lowest allowed value and White(255) corresponds to the highest
   /// allowed value.
   ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/Surfaces.x3d">Surfaces.x3d</a>
+  ///     ( <a href="examples/Surfaces.x3d.html">Source</a> )
+  ///
   /// \par Internal routes:
   /// \dotfile HapticTexturesSurface.dot
   class H3DAPI_API HapticTexturesSurface: public H3DFrictionalSurfaceNode {

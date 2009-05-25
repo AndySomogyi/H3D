@@ -84,6 +84,11 @@ namespace H3D {
   /// (0, 0, 0) is identical to (1, 0, 0). Attenuation values shall be
   /// greater than or equal to zero. 
   ///
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/SpotLight.x3d">SpotLight.x3d</a>
+  ///     ( <a href="examples/SpotLight.x3d.html">Source</a> )
+  ///
   /// \par Internal routes:
   /// \dotfile SpotLight.dot
   class H3DAPI_API SpotLight : public X3DLightNode {

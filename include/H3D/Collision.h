@@ -111,6 +111,10 @@ namespace H3D {
   // but since this is not allowed (for the database and such) the fields
   // in common with X3DSensorNode (enabled and isActive)
   // will just be defined here instead.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/Collision.x3d">Collision.x3d</a>
+  ///     ( <a href="examples/Collision.x3d.html">Source</a> )
   class H3DAPI_API Collision : public X3DGroupingNode {
   public:
     

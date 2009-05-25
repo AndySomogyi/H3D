@@ -78,10 +78,10 @@ if os.path.isdir( examples_dir ):
     for temp_file in files:
       file_name_no_end = temp_file.replace( ".x3d", "" )
       if( temp_file.endswith(".x3d") ):
-        examples_doxygen_page = examples_doxygen_page + """/// - \\anchor %s_x3d %s
-///   - <a href="../../../H3DAPI/examples/All/%s">Example</a>
-///   - <a href="examples/%s.html">Source</a>
-""" % ( file_name_no_end, file_name_no_end, temp_file, temp_file )
+        examples_doxygen_page = examples_doxygen_page + """/// - \\anchor %(fn_ne)s_x3d
+///   <a href="../../../H3DAPI/examples/All/%(tf)s">%(tf)s</a>
+///   ( <a href="examples/%(tf)s.html">Source</a> )
+""" % { 'fn_ne': file_name_no_end, 'tf': temp_file }
         os.system ("highlight -i %s -o %s.html --include-style" % (join(root, temp_file), temp_file))
         os.system ("move %s.html %s" % (temp_file, output_dir))
 

@@ -37,6 +37,10 @@ namespace H3D {
   /// \class AnyDevice
   /// \brief AnyDevice tries to initialize all available HAPI haptics
   /// device nodes and uses the first one that succeeds.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/AnyDevice.x3d">AnyDevice.x3d</a>
+  ///     ( <a href="examples/AnyDevice.x3d.html">Source</a> )
   class H3DAPI_API AnyDevice: public H3DHapticsDevice {
   public:
 

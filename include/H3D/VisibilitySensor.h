@@ -83,6 +83,11 @@ namespace H3D {
   ///  instances. An instanced VisibilitySensor node shall detect visibility
   ///  changes for all instances of the box and send events appropriately.
   ///
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/VisibilitySensor.x3d">VisibilitySensor.x3d</a>
+  ///     ( <a href="examples/VisibilitySensor.x3d.html">Source</a> )
+  ///
   /// \par Internal routes:
   /// \dotfile VisibilitySensor.dot
 
