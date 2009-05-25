@@ -123,6 +123,11 @@ namespace H3D {
   /// the sound. If the sound source is multi-channel, the source shall retain
   /// its channel separation during playback.
   ///
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/Sound.x3d">Sound.x3d</a>
+  ///     ( <a href="examples/Sound.x3d.html">Source</a> )
+  ///
   /// \par Internal routes:
   /// \dotfile Sound.dot
   class H3DAPI_API Sound : public X3DSoundNode {

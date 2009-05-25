@@ -52,6 +52,10 @@ namespace H3D {
   /// OpenHaptics even for dual device configurations. The default value for
   /// the field desiredHapticsRate is different from the default value of
   /// H3DHapticsDevice since the allowed values of this field differs.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/PhantomDevice.x3d">PhantomDevice.x3d</a>
+  ///     ( <a href="examples/PhantomDevice.x3d.html">Source</a> )
   class H3DAPI_API PhantomDevice: public H3DHapticsDevice {
   public:
 

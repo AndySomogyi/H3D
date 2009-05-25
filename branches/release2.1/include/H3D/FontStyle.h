@@ -150,6 +150,10 @@ namespace H3D {
   /// and "OUTLINE". "TEXTURE" will use texture maps to render the font,
   /// "POLYGON" will create a polygon model for each character and render
   /// it and "OUTLINE" will render the outlines for each character.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/FontStyle.x3d">FontStyle.x3d</a>
+  ///     ( <a href="examples/FontStyle.x3d.html">Source</a> )
   class H3DAPI_API FontStyle : public X3DFontStyleNode {
   public:
     /// Thrown when the string in the style field is an invalid value.

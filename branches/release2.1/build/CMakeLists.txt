@@ -144,8 +144,11 @@ IF( GENERATE_CPACK_PROJECT )
     IF( H3DLoad_cmake_install )
       SET(CPACK_INSTALL_CMAKE_PROJECTS ${CPACK_INSTALL_CMAKE_PROJECTS}
                                        "${H3DLoad_cmake_install};H3DLoad;ALL;/" )
-      SET( CPACK_ADD_H3DLOAD_DEMOS_LINKS "ON" )
     ENDIF( H3DLoad_cmake_install )
+
+    IF( H3DLoad_cmake_install OR H3DAPI_LOADER_PROJECTS )
+      SET( CPACK_ADD_H3DLOAD_DEMOS_LINKS "ON" )
+    ENDIF( H3DLoad_cmake_install OR H3DAPI_LOADER_PROJECTS )
 
     # If H3DViewer should be added to package.
     SET( H3DViewer_cmake_install "" CACHE PATH "Needs to be set if H3DViewer is desired to be packed in the install.  Set to location of cmake_install.cmake for H3DViewer." )
@@ -153,12 +156,14 @@ IF( GENERATE_CPACK_PROJECT )
     IF( H3DViewer_cmake_install )
       SET( CPACK_INSTALL_CMAKE_PROJECTS ${CPACK_INSTALL_CMAKE_PROJECTS}
                                         "${H3DViewer_cmake_install};H3DViewer;ALL;/" )
-
-      SET( CPACK_PACKAGE_EXECUTABLES ${CPACK_PACKAGE_EXECUTABLES}
-                                     "H3DViewer;H3DViewer" )
       SET(WXWINDOWS_USE_GL 1)
       FIND_PACKAGE(wxWidgetsWin)
     ENDIF( H3DViewer_cmake_install )
+    
+    IF( H3DViewer_cmake_install OR H3DAPI_LOADER_PROJECTS )
+      SET( CPACK_PACKAGE_EXECUTABLES ${CPACK_PACKAGE_EXECUTABLES}
+                                     "H3DViewer;H3DViewer" )
+    ENDIF( H3DViewer_cmake_install OR H3DAPI_LOADER_PROJECTS )
 
     #If particleDemo should be added to package.
     SET( ParticleDemo_cmake_install "" CACHE PATH "Needs to be set if ParticleDemo is desired to be packed in the install.  Set to location of cmake_install.cmake for ParticleDemo." )

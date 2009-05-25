@@ -236,6 +236,10 @@ namespace H3D {
   /// for content authors to include geometry intended to remain fixed relative
   /// to the viewer). Such geometry shall not be occluded by geometry outside
   /// of the collision volume.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/NavigationInfo.x3d">NavigationInfo.x3d</a>
+  ///     ( <a href="examples/NavigationInfo.x3d.html">Source</a> )
   class H3DAPI_API NavigationInfo : public X3DBindableNode {
   public:
 
