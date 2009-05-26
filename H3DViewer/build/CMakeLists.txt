@@ -199,11 +199,37 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
                            "/HapticAPI2\\\\.(lib)*(dll)*(h)*$"
                            /xerces-c_2_7\\\\.dll$
                            /xerces-c_2_7D\\\\.dll$
-                           "/DentalSimAPI\\\\.(lib)*(dll)*(h)*$" )
+                           "/DentalSimAPI\\\\.(lib)*(dll)*(h)*$"
+                           "/ogg_d\\\\.dll$"
+                           "_d\\\\.(lib)*(dll)*(exe)*$"
+                           "H3DLoad\\\\.exe$" )
 
     # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
     SET(CPACK_INSTALLED_DIRECTORIES "${H3DViewer_SOURCE_DIR}/../../../bin;bin"
                                     "${H3DViewer_SOURCE_DIR}/../../../External/bin;bin" )
+
+    # Start menu shortcut.
+    SET( CPACK_PACKAGE_EXECUTABLES ${CPACK_PACKAGE_EXECUTABLES}
+                                   "H3DViewer;H3DViewer" )
+
+    # Add a cache variable vc_redist which should be set to the install file
+    # for microsoft visual studio redistributable.
+    IF( NOT DEFINED vc_redist )
+      SET( vc_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for the choosen compiler." )
+      MARK_AS_ADVANCED(vc_redist)
+    ENDIF( NOT DEFINED vc_redist )
+
+    IF( vc_redist )
+      STRING( REPLACE "/" "\\\\" Temp_vc_redist ${vc_redist} )
+      GET_FILENAME_COMPONENT( VC_FILE_NAME ${vc_redist} NAME )
+      SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\\n" )
+      SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+                                             " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc_redist}\\\"\\n"
+                                             " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
+                                             " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+                                             " Delete file\\n  Delete \\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"\\n\\n" )
+    ENDIF( vc_redist )
+    SET( CPACK_NSIS_MODIFY_PATH "ON" )
   ENDIF( APPLE )
 
   INCLUDE(CPack)

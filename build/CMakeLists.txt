@@ -111,9 +111,9 @@ IF( GENERATE_CPACK_PROJECT )
                                     /build/vc8
                                     /build/vc7
                                     /build/vc9
-                                    /build/vc9_HAPI/
-                                    /build/vc8_HAPI/
-                                    /build/vc7_HAPI/
+                                    /vc9_HAPI/
+                                    /vc8_HAPI/
+                                    /vc7_HAPI/
                                     /build/vc9_H3DViewer/
                                     /osx
                                     /H3DAPI/Util/
@@ -137,7 +137,7 @@ IF( GENERATE_CPACK_PROJECT )
   
   # TODO: fix different for windows and unix if needed.
   IF(WIN32 AND NOT UNIX)
-    SET( CPACK_PACKAGE_START_MENU_NAME "H3DAPI 2.0" )
+    SET( CPACK_PACKAGE_START_MENU_NAME "H3DAPI 2.1" )
     # If H3DLoad should be added to the package.
     SET( H3DLoad_cmake_install "" CACHE PATH "Needs to be set if H3DLoad is desired to be packed in the install. Set to location of cmake_install.cmake for H3DLoad." )
     MARK_AS_ADVANCED(H3DLoad_cmake_install)
@@ -217,7 +217,10 @@ IF( GENERATE_CPACK_PROJECT )
                            /bz2\\\\.lib$
                            /ofstd\\\\.lib$
                            /Definitions.h$
-                           "/DentalSimAPI\\\\.(lib)*(dll)*(h)*$" )
+                           "/DentalSimAPI\\\\.(lib)*(dll)*(h)*$"
+                           "/ogg_d\\\\.dll$"
+                           "/H3DLoad_d\\\\.exe$"
+                           "/H3DViewer_d\\\\.exe$" )
     
     # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
     SET(CPACK_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/../../H3DAPI;H3DAPI"
@@ -242,20 +245,45 @@ IF( GENERATE_CPACK_PROJECT )
       STRING( REGEX MATCH 2\\.[456789] CPACK_PYTHON_VERSION ${PythonInstallMSI} )
       GET_FILENAME_COMPONENT( PYTHON_FILE_NAME ${PythonInstallMSI} NAME )
       STRING( REPLACE "/" "\\\\" TEMP_PythonInstallMSI ${PythonInstallMSI} )
-      #STRING( REPLACE "." "\\\\\\." TEMP_CPACK_PYTHON_VERSION ${CPACK_PYTHON_VERSION} )
-      #STRING( REPLACE "." "\\\\\\." TEMP_PYTHON_FILE_NAME ${PYTHON_FILE_NAME} )
       SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                             "   Code to install Python\\n   ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n   StrCmp $0 \\\"\\\" 0 +5\\n  file ${TEMP_PythonInstallMSI}\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"'\\n  delete $INSTDIR\\\\${PYTHON_FILE_NAME}\\n   ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n" )
+                                             " Code to install Python\\n  ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n"
+                                             " Check if python is installed\\n  StrCmp $0 \\\"\\\" 0 +5\\n"
+                                             " Extract python installer\\n  File \\\"${TEMP_PythonInstallMSI}\\\"\\n"
+                                             " Execute python installer, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"'  $0\\n"
+                                             " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+                                             " Delete python installer\\n  Delete \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"\\n" )
+                                             #" Is this some copy paste problem?\\n  ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n" )
     ENDIF( PythonInstallMSI )
     
     # Install OpenAL.
     SET( OpenAlInstallExe "" CACHE FILEPATH "Needs to be set to add openal installation to the package." )
     MARK_AS_ADVANCED(OpenAlInstallExe)
     IF( OpenAlInstallExe )
+      GET_FILENAME_COMPONENT( OpenAL_FILE_NAME ${OpenAlInstallExe} NAME )
       STRING( REPLACE "/" "\\\\" TEMP_OpenAlInstallExe ${OpenAlInstallExe} )
       SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                             "   Code to install OPENAL\\n   file ${TEMP_OpenAlInstallExe}\\n  ExecWait \\\"$INSTDIR\\\\OpenALwEAX.exe\\\"\\n  delete $INSTDIR\\\\OpenALwEAX.exe\\n" )
+                                             " Code to install OPENAL\\n  File \\\"${TEMP_OpenAlInstallExe}\\\"\\n"
+                                             " Execute install file\\n  ExecWait \\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\" $0\\n"
+                                             " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+                                             " Delete install file\\n  Delete \\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\"\\n" )
     ENDIF( OpenAlInstallExe )
+    
+    # Add a cache variable vc_redist which should be set to the install file
+    # for microsoft visual studio redistributable.
+    IF( NOT DEFINED vc_redist )
+      SET( vc_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for the choosen compiler." )
+      MARK_AS_ADVANCED(vc_redist)
+    ENDIF( NOT DEFINED vc_redist )
+
+    IF( vc_redist )
+      STRING( REPLACE "/" "\\\\" Temp_vc_redist ${vc_redist} )
+      GET_FILENAME_COMPONENT( VC_FILE_NAME ${vc_redist} NAME )
+      SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+                                             " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc_redist}\\\"\\n"
+                                             " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
+                                             " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+                                             " Delete file\\n  Delete \\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"\\n\\n" )
+    ENDIF( vc_redist )
 
     # Do not modify path since this is done by the NSIS template.
     SET( CPACK_NSIS_MODIFY_PATH "ON" )
