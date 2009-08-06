@@ -1,62 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<X3D profile='Full' version='3.2'>
+<X3D profile='H3DAPI' version='1.4'>
   <head>
-    <meta name='title' content='BooleanTrigger.x3d'/>
-    <meta name='description' content='X3D BooleanTrigger example.'/>
-    <meta name='author' content='SenseGraphics AB, 2006-2009'/>
+    <meta name='title' content='TimeTrigger.x3d'/>
+    <meta name='description' content='H3DAPI TimeTrigger example. Prints the
+      value of accForwardMatrix.
+      This example uses H3DAPI node(s) and runs on H3DAPI-supported browsers 
+      only. Visit http://www.h3d.org for more information and to download an
+      H3DAPI-compatible browser.'/>
+    <meta name='author' content='SenseGraphics AB, 2006-2008'/>
   </head>
   
   <Scene>
     <Viewpoint position='0 0 0.6' />
     
-    <ParticleSystem DEF='P'
-      enabled='false' particleLifetime='1' maxParticles='400' 
-      particleSize='0.002 0.002' colorKey='0'>
-      <Color 
-        containerField='colorRamp' color='0 1 1' />
-      <ExplosionEmitter
-        speed='0.05' mass='0.0002' position='0 0.1 0' />
-    </ParticleSystem>
-    
+    <MouseSensor DEF='S' />
     <TimeTrigger DEF='T' />
-    <!--TimeSensor DEF='S' cycleInterval='5' />
-    <BooleanSequencer DEF='B' key='0 1' keyValue='false true'/-->
-    
-    <Transform translation='0 -0.1 0'>
-      <Group>
-        <TouchSensor DEF='To' />
-        <Shape>
-          <Appearance>
-            <Material diffuseColor='1 0 0' />
-          </Appearance>
-          <Disk2D outerRadius='0.01' />
-        </Shape>
-      </Group>
-    </Transform>
+    <PythonScript DEF='P' url='script.py' />
+
+    <!-- ExternProto for Text -->
+    <ExternProtoDeclare name='Text' url='"./Prototype.x3d#Text"'>
+      <field accessType='inputOutput' name='offset' type='SFVec3f'/>
+      <field accessType='inputOutput' name='string' type='MFString'/>
+    </ExternProtoDeclare>
+    <ProtoInstance name='Text' DEF='D'>
+      <fieldValue name='offset' value='0 0.1 0' />
+    </ProtoInstance>
 
     <ROUTE
-      fromNode='To' fromField='isActive'
+      fromNode='S' fromField='leftButton'
       toNode='T' toField='set_boolean' />
-    <!--ROUTE
-      fromNode='T' fromField='triggerTrue'
-      toNode='S' toField='startTime' />
     <ROUTE
-      fromNode='S' fromField='fraction_changed'
-      toNode='B' toField='set_fraction' />
+      fromNode='T' fromField='triggerTime'
+      toNode='P' toField='timeToMFString' />
     <ROUTE
-      fromNode='B' fromField='value_changed'
-      toNode='P' toField='enabled' /-->
-    
-    <!-- Instructions -->
-    <Transform translation='0 -0.2 0'>
-      <Shape>
-        <Appearance>
-          <Material diffuseColor='1 1 1' />
-        </Appearance>
-        <Text string='"Mouse over and out the red dot to see effects of BooleanTrigger."'>
-          <FontStyle justify='MIDDLE' size='0.02' />
-        </Text>
-      </Shape>
-    </Transform>
+      fromNode='P' fromField='timeToMFString'
+      toNode='D' toField='string' />
+
   </Scene>
 </X3D>

@@ -77,6 +77,9 @@ void H3DDisplayListObject::DisplayList::update() {
 }
 
 bool H3DDisplayListObject::DisplayList::tryBuildDisplayList( bool cache_broken ) {
+  // do not build a display list if we are not using caching.
+  if( !usingCaching() ) return false;
+
   if( delay_cache_counter == 0 ) {
     bool have_all_needed_display_lists = childrenCachesReady( cache_broken );
   
@@ -115,6 +118,7 @@ void H3DDisplayListObject::DisplayList::propagateEvent( Event e ) {
 }
 
 void H3DDisplayListObject::DisplayList::callList( bool build_list ) {
+  bool was_active = isActive->getValue();
   isActive->callListCalled();
 
   GLuint err = glGetError();
@@ -142,7 +146,7 @@ void H3DDisplayListObject::DisplayList::callList( bool build_list ) {
     } else {
       // if we do not have any event pending and still have no valid
       // display list, try to build a new one.
-      if( !haveValidDisplayList() ) {
+      if( !haveValidDisplayList() && was_active ) {
         have_valid_display_list = tryBuildDisplayList( false );
         if( have_valid_display_list ) return;
       }
@@ -192,10 +196,8 @@ bool H3DDisplayListObject::DisplayList::childrenCachesReady( bool consider_activ
       }
       if( dl ) {
         if( !dl->usingCaching() ) { 
-          if( !dl->childrenCachesReady( consider_active_field ) ) {
-            have_all_needed_display_lists = false;
-            break;
-          }
+          // child does not use caching, so it is not ready
+          return false;
         } else {
           // if the cache was just broken we cannot use the isActive field 
           // any longer since a DisplayList can be activated when 
@@ -212,7 +214,7 @@ bool H3DDisplayListObject::DisplayList::childrenCachesReady( bool consider_activ
                    dl->usingFrustumCulling() ) ) {
               have_all_needed_display_lists = false;
               break;
-            }
+            } 
           }
         }
       }
@@ -226,10 +228,8 @@ bool H3DDisplayListObject::DisplayList::childrenCachesReady( bool consider_activ
             dynamic_cast< H3DDisplayListObject * >( *n );
           if( dlo ) {
             if( !dlo->displayList->usingCaching() ) { 
-              if( !dlo->displayList->childrenCachesReady( consider_active_field ) ) {
-                have_all_needed_display_lists = false;
-                break;
-              }
+              // child does not use caching, so it is not ready
+              return false;
             } else {
               // if the cache was just broken we cannot use the isActive field 
               // any longer since a DisplayList can be activated when 
@@ -246,7 +246,7 @@ bool H3DDisplayListObject::DisplayList::childrenCachesReady( bool consider_activ
                       dlo->displayList->usingFrustumCulling() ) ) {
                   have_all_needed_display_lists = false;
                   break;
-                }
+                } 
               }
             }
           }

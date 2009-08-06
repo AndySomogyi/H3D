@@ -73,7 +73,8 @@ namespace H3D {
             Inst< SFHapticsRendererNode > _hapticsRenderer     = 0,
             Inst< MFVec3f            > _proxyPositions         = 0,
             Inst< SFBool             > _followViewpoint        = 0,
-            Inst< SFString           > _deviceName             = 0 );
+            Inst< SFString           > _deviceName             = 0,
+            Inst< SFInt32            > _deviceIndex            = 0 );
     
     /// Does all the initialization needed for the device before starting to
     /// use it.
@@ -83,15 +84,28 @@ namespace H3D {
     /// with name deviceName
     virtual void initialize();
 
-    /// The name of the device, as specified in Falcon Configuration
-    /// utility. If set to "", the default device will be used. 
+    /// The name of the device, as specified in hdal.ini file for
+    /// Falcon Configuration. If set to "", the default device with
+    /// index 0 will be used.
+    /// Only valid if usedDriver field is "NOVINT". Use deviceIndex
+    /// field instead to work with any driver.
     ///
     /// <b>Access type:</b> initializeOnly \n
     /// <b>Default value:</b> "" \n
     auto_ptr< SFString > deviceName;
 
+    /// The index of the device to use. The index identifies which
+    /// Falcon device to use if several are connected to the computer.
+    /// 
+    /// If usedDriver is "NOVINT" and deviceName is specified this 
+    /// field will be ignored.
+    ///
+    /// <b>Access type:</b> initializeOnly \n
+    /// <b>Default value:</b> 0 \n
+    auto_ptr< SFInt32 > deviceIndex;
+
     /// The device model of the device. Undefined if device not
-    /// initialized.
+    /// initialized. Only valid if the usedDriver field is "NOVINT".
     /// 
     /// <b>Access type: outputOnly</b> 
     auto_ptr< SFString > deviceModelType;
@@ -100,11 +114,27 @@ namespace H3D {
     /// mechanical limits of the device. Undefined if
     /// device not initialized. Contains two values where the first
     /// value is the minimum values and the second the maximum values
-    /// for each axis.
+    /// for each axis. Only valid if the usedDriver field is "NOVINT".
     /// 
     /// <b>Access type: outputOnly</b> 
     auto_ptr< MFVec3f > maxWorkspaceDimensions;
 
+    /// \brief The preferred driver to use to communicate with the falcon
+    /// device if several exists on the system. The NIFALCON driver
+    /// is in beta stage.
+    /// 
+    /// <b>Access type: initializeOnly</b> 
+    /// <b>Default value: "NOVINT" </b>
+    /// <b>Valid values: "NOVINT", "NIFALCON" </b>
+    auto_ptr< SFString > preferredDriver;
+
+    /// \brief The driver that is used to communicate with the falcon
+    /// device.
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    /// <b>Default value: "NONE" </b>
+    /// <b>Possible values: "NOVINT", "NIFALCON", "NONE" </b>
+    auto_ptr< SFString > usedDriver;
 
     /// Node database entry
     static H3DNodeDatabase database;

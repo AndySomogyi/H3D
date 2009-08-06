@@ -73,6 +73,11 @@ SAX2XMLReader* X3D::getNewXMLParser() {
     parser->setFeature(XMLUni::fgXercesDynamic, true);
   }
   if (valScheme == SAX2XMLReader::Val_Never) {
+    // make sure that the DTD is not loaded. Otherwise a NetAccessorException
+    // is thrown if the DTD is not available, e.g. when offline. 
+    parser->setFeature(XMLUni::fgXercesLoadExternalDTD, false);
+    
+    // disable validation
     parser->setFeature(XMLUni::fgSAX2CoreValidation, false);
   }
   if (valScheme == SAX2XMLReader::Val_Always) {
@@ -104,10 +109,6 @@ Group* X3D::createX3DFromURL( const string &url,
                               DEFNodes *exported_nodes,
                               PrototypeVector *prototypes,
                               bool change_base_path_during_parsing ) {
-  URNResolver *urn_resolver = ResourceResolver::getURNResolver();
-  string urn = url;
-  if( urn_resolver ) urn = urn_resolver->resolveURN( urn );
-
   bool is_tmp_file;
   string resolved_url = ResourceResolver::resolveURLAsFile( url, 
     &is_tmp_file );
@@ -273,10 +274,6 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
                                            PrototypeVector *prototypes,
                                            bool change_base_path_during_parsing ) {
 
-  URNResolver *urn_resolver = ResourceResolver::getURNResolver();
-  string urn = url;
-  if( urn_resolver ) urn = urn_resolver->resolveURN( urn );
-
   bool is_tmp_file;
   string resolved_url = ResourceResolver::resolveURLAsFile( url, 
                                                             &is_tmp_file );
@@ -435,7 +432,13 @@ void X3D::writeNodeAsX3DHelp( ostream& os,
 
   
   H3DNodeDatabase *db = H3DNodeDatabase::lookupTypeId( typeid( *node ) );
-  string node_name = node->getTypeName();    
+  string node_name = node->getTypeName();
+  
+  // the following nodes have changed name in the X3D spec. Use the 
+  // one from the new specification instead.
+  if( node_name == "Image3DTexture" ) node_name = "ImageTexture3D";
+  else if( node_name == "Pixel3DTexture" ) node_name = "PixelTexture3D";
+  else if( node_name == "Composed3DTexture" ) node_name = "ComposedTexture3D";        
 
   os << prefix << "<" << node_name << " ";
   string new_prefix = prefix + "  "; 
@@ -467,6 +470,7 @@ void X3D::writeNodeAsX3DHelp( ostream& os,
 
   //only set fields if it is not a node that is USEd
   if( !use_node ) {   
+    AutoRef< Node > default_value_node( H3DNodeDatabase::createNode( node_name ) );
     for( H3DNodeDatabase::FieldDBConstIterator i = db->fieldDBBegin();
          i != db->fieldDBEnd(); i++ ) {
       Field *f = node->getField( *i );
@@ -479,7 +483,12 @@ void X3D::writeNodeAsX3DHelp( ostream& os,
           if( sf_node->getValue() ) sf_nodes.push_back( make_pair( *i, sf_node ) );
         } else if( ParsableField *p_field = 
                    dynamic_cast< ParsableField * >( f ) ){
-          os << *i << "=\'" << p_field->getValueAsString() << "\' ";
+          // only add value if it is different from the default value.
+          ParsableField *default_field = 
+             dynamic_cast< ParsableField * >(default_value_node->getField( *i ));
+          string v = p_field->getValueAsString();
+          if( default_field->getValueAsString() != v )
+            os << *i << "=\'" << v << "\' ";
         }
       }
     }

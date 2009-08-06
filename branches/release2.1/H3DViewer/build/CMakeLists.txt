@@ -16,6 +16,7 @@ SET( H3DViewer_SRCS "${H3DViewer_SOURCE_DIR}/../src/ConsoleDialog.cpp"
                     "${H3DViewer_SOURCE_DIR}/../src/WxFrame.h"
                     "${H3DViewer_SOURCE_DIR}/../src/WxWidgetsWindow.cpp"
                     "${H3DViewer_SOURCE_DIR}/../src/WxWidgetsWindow.h"
+                    "${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h"
                     "${H3DViewer_SOURCE_DIR}/../src/H3DViewerFieldValuesDialog.cpp"
                     "${H3DViewer_SOURCE_DIR}/../src/H3DViewerFieldValuesDialog.h"
                     "${H3DViewer_SOURCE_DIR}/../src/H3DViewerTreeViewDialog.cpp"        
@@ -182,6 +183,9 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
 
       INSTALL( FILES ${OSX_DEPENDENT_LIBRARIES}
                DESTINATION lib )
+
+      INSTALL( FILES ${OSX_PLUGIN_LIBRARIES}
+               DESTINATION Plugins )
     ENDIF( H3DVIEWER_CPACK_INCLUDE_LIBRARIES )
   ELSEIF( WIN32 )
     # File patterns to ignore.

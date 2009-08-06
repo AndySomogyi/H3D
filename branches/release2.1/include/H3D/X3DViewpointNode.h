@@ -353,6 +353,7 @@ namespace H3D {
     virtual ~X3DViewpointNode() {
       removeFromStack();
       viewpoints.remove( this );
+      viewpoints_changed = true;
     }
 
     /// Traverse the scenegraph. Saves the accumulated inverse
@@ -360,10 +361,7 @@ namespace H3D {
     /// GLWindow.
     /// \param ti The TraverseInfo object containing information about the
     /// traversal.
-    virtual void traverseSG( TraverseInfo &ti ) {
-      accInverseMatrix->setValue( ti.getAccInverseMatrix(), id );
-      accForwardMatrix->setValue( ti.getAccForwardMatrix(), id );
-    }
+    virtual void traverseSG( TraverseInfo &ti );
 
     /// Convenience function to get the top of the X3DViewpointNode stack.
     static inline X3DViewpointNode *getActive() {
@@ -428,11 +426,14 @@ namespace H3D {
     static const ViewpointList &getAllViewpoints() {
       return viewpoints;
     }
-
-    /// Get all the X3DViewpointNode instances with the X3DViewpointNode
-    /// that are in ViewpointGroup only present in the group and not 
-    /// by them self in the list.
-    static ViewpointList getViewpointHierarchy();
+    
+    /// True on any addition/deletion/in_scene_graph status change
+    /// of viewpoints, reset once inquired
+    static bool viewpointsChanged() {
+      bool status = viewpoints_changed;
+      viewpoints_changed = false;
+      return status;
+    }
 
     /// The X3DViewpointNode needs to setup a projection matrix, typically done
     /// by calling glFrustum but this might not look the same for all types of
@@ -446,6 +447,16 @@ namespace H3D {
 #else
     {}
 #endif
+
+    /// True if this viewpoint node exists outside a ViewpointGroup
+    inline bool isTopLevel() {
+      return is_top_level;
+    }
+
+    /// True if this viewpoint node exists in scene graph
+    inline bool inSceneGraph() {
+      return in_scene_graph;
+    }
 
     /// The centerOfRotation field specifies a center about which to
     /// rotate the user's eyepoint when in EXAMINE mode.
@@ -550,6 +561,14 @@ namespace H3D {
 
   protected:
     static ViewpointList viewpoints;
+    static bool viewpoints_changed;
+
+    /// True if the viewpooint exists outside a ViewpointGroup
+    bool is_top_level;
+
+    /// True is the viewpoint exists in scene graph
+    bool in_scene_graph;
+
     // Internal function for easier calculations of parameters sent to
     // glFrustum or glOrtho. For usage see function setupProjection in
     // Viewpoint or OrthoViewpoint.
@@ -570,17 +589,22 @@ namespace H3D {
       if( eye_mode == LEFT_EYE || eye_mode == RIGHT_EYE ) {
         if( !stereo_info )
           stereo_info = StereoInfo::getActive();
+
+        H3DFloat interocular_distance = (H3DFloat) 0.06;
+        H3DFloat focal_distance = (H3DFloat) 0.6;
         if( stereo_info ) {
-          frustum_shift = ( stereo_info->interocularDistance->getValue() / 2 )
-                          * clip_near / stereo_info->focalDistance->getValue();
-          if( eye_mode == RIGHT_EYE )
-            frustum_shift = -frustum_shift;
+          interocular_distance = stereo_info->interocularDistance->getValue();
+          focal_distance = stereo_info->focalDistance->getValue();
         }
-      }
+        
+        frustum_shift = ( interocular_distance / 2 )
+          * clip_near / focal_distance;
+        if( eye_mode == RIGHT_EYE )
+          frustum_shift = -frustum_shift;
+      } 
       left += frustum_shift;
       right += frustum_shift;
     }
-
   };
 }
 
