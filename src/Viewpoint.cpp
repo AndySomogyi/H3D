@@ -104,7 +104,7 @@ bool Viewpoint::windowFromfieldOfView( H3DFloat width, H3DFloat height,
     fov_h = 2 * atan( ( aspect_ratio ) * tan(fov_v/2) );
     if ( fov_h > Constants::pi ) {
       fov_h = field_of_view;
-      fov_v = 2 * atan( ( height * tan(fov_h/2) ) / width );        
+      fov_v = 2 * atan( ( height * tan(fov_h/2) ) / width );
     }
   }
 

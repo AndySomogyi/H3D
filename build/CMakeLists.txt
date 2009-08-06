@@ -519,6 +519,8 @@ IF(HAPTIK_FOUND)
 ENDIF(HAPTIK_FOUND)
 
 IF(WIN32)
+  # Windows specific libraries
+
   # Optional extra library. Used to render movies as textures.
   FIND_PACKAGE(DirectShow)
   IF(DIRECTSHOW_FOUND)
@@ -529,12 +531,22 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(NOT WIN32 AND NOT APPLE)
+  # Linux specific libraries
+
   FIND_PACKAGE(FontConfig)
   IF(FONTCONFIG_FOUND)
     SET(HAVE_FONTCONFIG 1)
     INCLUDE_DIRECTORIES( ${FONTCONFIG_INCLUDE_DIR} ) 
     SET(optionalLibs ${optionalLibs} ${FONTCONFIG_LIBRARIES} )
   ENDIF(FONTCONFIG_FOUND)
+
+  # Optional extra library. Used to render movies as textures.
+  FIND_PACKAGE(FFmpeg)
+  IF(FFMPEG_FOUND)
+    SET(HAVE_FFMPEG 1)
+    INCLUDE_DIRECTORIES( ${FFMPEG_INCLUDE_DIRS} )  
+    LIST( APPEND optionalLibs ${FFMPEG_LIBRARIES} )
+  ENDIF(FFMPEG_FOUND)  
 ENDIF(NOT WIN32 AND NOT APPLE)
 
 FIND_PACKAGE(DCMTK)
@@ -548,6 +560,7 @@ IF(TEEM_FOUND)
   INCLUDE_DIRECTORIES( ${TEEM_INCLUDE_DIR} ) 
   SET(requiredLibs ${requiredLibs} ${TEEM_LIBRARIES} )
 ENDIF(TEEM_FOUND)
+
 
 # If cpack project should be generated and windows is the system on which to generate
 # a number of extra directories needs to be added to be installed.
@@ -686,12 +699,16 @@ IF( WIN32 )
   IF(OPENHAPTICS_FOUND)
     SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}_d.dll\"" )
     SET( H3DAPI_LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}.dll\"" )
+    SET( H3DAPI_LINK_FLAGS_RELWITHDEBINFO "${H3DAPI_LINK_FLAGS_RELWITHDEBINFO} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}.dll\"" )
+    SET( H3DAPI_LINK_FLAGS_MINSIZEREL "${H3DAPI_LINK_FLAGS_MINSIZEREL} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}.dll\"" )
   ENDIF(OPENHAPTICS_FOUND)
 
   SET_TARGET_PROPERTIES( H3DAPI
                          PROPERTIES  
                          LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG}"
-                         LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE}" )
+                         LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE}"
+                         LINK_FLAGS_RELWITHDEBINFO "${H3DAPI_LINK_FLAGS_RELEASE}"
+                         H3DAPI_LINK_FLAGS_MINSIZEREL "${H3DAPI_LINK_FLAGS_RELEASE}" )
 ENDIF( WIN32 )
 
 # Set compile properties for H3DAPI.

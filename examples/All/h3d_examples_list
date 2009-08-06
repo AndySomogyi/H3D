@@ -1,0 +1,210 @@
+H3DAPI examples map
+-------------------
+
+NODE                              EXAMPLE FILE (.x3d)
+------------------------------------------------------
+Anchor                            Anchor
+AnyDevice                         AnyDevice
+Appearance                        FillProperties, LineProperties, Material, 
+                                  TwoSidedMaterial, RenderProperties, 
+                                  /demos CubeMap.x3d, 
+                                  /demos glsl_earthshader.x3d
+                                  /demos cg_earthshader.x3d
+                                  ImageTexture
+Arc2D                             Arc2D
+ArcClose2D                        ArcClose2D
+AudioClip                         Sound
+Background                        Background, Background1
+Billboard                         Billboard
+BooleanFilter                     BooleanFilter
+BooleanSequencer                  BooleanSequencer
+BooleanToggle                     BooleanToggle
+BooleanTrigger                    BooleanTrigger
+BoundedPhysicsModel               BoundedPhysicsModel
+Box                               Box
+Circle2D                          Circle2D
+ClipPlane                         ClipPlane
+Collision                         Collision
+CollisionOptions                  CollisionOptions
+Color                             IndexedFaceSet, 
+ColorInterpolator                 ColorInterpolator
+ColorRGBA                         ColorRGBA
+Composed3DTexture                 ComposedTexture3D.x3d
+ComposedCubeMapTexture            /demos CubeMap.x3d
+ComposedShader                    /demos glsl_earthshader.x3d
+Cone                              Cone
+ConeEmitter                       ParticleSystem
+Contour2D                         NurbsTrimmedSurface
+ContourPolyline2D                 NurbsTrimmedSurface
+Coordinate                        IndexedFaceSet, IndexedTriangleSet
+CoordinateDeformer                DeformableShape
+CoordinateDouble                  TriangleSet
+CoordinateInterpolator            CoordinateInterpolator
+CoordinateInterpolator2D          CoordinateInterpolator2D
+Cylinder                          Cylinder
+CylinderSensor                    CylinderSensor
+DebugOptions                      DebugOptions
+DefaultAppearance                 DefaultAppearance
+DeformableShape                   DeformableShape
+DepthMapSurface                   Surfaces
+DeviceInfo                        PhantomDevice, ForceDimensionDevice, FalconDevice
+DeviceLog                         DeviceLog
+DicomImageLoader                  ImageLoaders
+DirectionalLight                  DirectionalLight
+Disk2D                            Disk2D
+DynamicTransform                  DynamicTransform
+ElevationGrid                     ElevationGrid, ElevationGrid1
+ExplosionEmitter                  ParticleSystem
+Extrusion                         Extrusion
+FakeHapticsDevice                 FakeHapticsDevice
+FalconDevice                      FalconDevice
+FillProperties                    FillProperties
+FitToBoxTransform                 FitToBoxTransform
+FloatVertexAttribute              VertexAttributes
+Fog                               Fog
+FogCoordinate                     FogCoordinate
+FontStyle                         FontStyle
+ForceDimensionDevice              ForceDimensionDevice
+ForceField                        ForceField
+FreeImageLoader                   ImageLoaders
+FrictionalSurface                 Sphere, Surfaces
+FunctionPlotTexture               FunctionPlotTexture
+GaussianFunction                  DeformableShape
+GeneralFunction                   TimeFunctionEffect, PositionFunctionEffect
+GeneratedCubeMapTexture           GeneratedCubeMapTexture
+GeometryBoundTreeOptions          GeometryBoundTreeOptions
+GlobalSettings                    GlobalSettings
+GraphicsCachingOptions            GraphicsCachingOptions
+GravityPhysicsModel               GravityPhysicsModel
+Group                             Group
+HapticLayeredGroup                HapticLayeredGroup
+HapticMasterDevice                HapticMasterDevice
+HapticsOptions                    HapticsOptions
+HapticTexturesSurface             Surfaces
+HaptikDevice                      HaptikDevice
+Image3DTexture                    ImageTexture3D
+ImageObjectInfo                   ImageObjectInfo
+ImageObjectTexture                ImageObjectTexture
+ImageTexture                      ImageTexture
+ImportLibrary                     ImportLibrary
+IndexedFaceSet                    IndexedFaceSet
+IndexedLineSet                    IndexedLineSet
+IndexedTriangleFanSet             IndexedTriangleFanSet
+IndexedTriangleSet                IndexedTriangleSet
+IndexedTriangleStripSet           IndexedTriangleStripSet
+Inline                            Switch
+IntegerSequencer                  Switch
+IntegerTrigger                    IntegerTrigger
+KeySensor                         KeySensor
+LineProperties                    LineProperties
+LineSet                           LineSet
+LoadSensor                        LoadSensor
+LocalFog                          LocalFog
+LOD                               LOD
+MagneticGeometryEffect            MagneticGeometryEffect
+MagneticSurface                   Surfaces
+Material                          Material
+Matrix3VertexAttribute            VertexAttributes1
+Matrix4VertexAttribute            VertexAttributes
+MatrixTransform                   MatrixTransform
+MetadataDouble                    Metadata
+MetadataFloat                     Metadata
+MetadataInteger                   Metadata
+MetadataSet                       MetadataSet
+MetadataString                    Metadata
+MouseSensor                       MouseSensor
+MovieTexture
+MultiTexture                      MultiTexture
+MultiTextureCoordinate            MultiTextureCoordinate
+MultiTextureTransform             MultiTextureTransform
+NavigationInfo                    NavigationInfo
+Normal                            Normal
+NormalInterpolator                NormalInterpolator
+NrrdImageLoader                   ImageLoaders
+NurbsCurve                        NurbsCurve
+NurbsCurve2D                      NurbsTrimmedSurface
+NurbsPatchSurface                 NurbsPatchSurface
+NurbsTextureCoordinate            NurbsTextureCoordinate
+NurbsTrimmedSurface               NurbsTrimmedSurface
+OpenHapticsOptions                OpenHapticsOptions
+OpenHapticsSurface                OpenHapticsSurface
+OrientationInterpolator           OrientationInterpolator
+OrthoViewpoint                    OrthoViewpoint
+PackagedShader
+ParticleSystem                    ParticleSystem
+PhantomDevice                     PhantomDevice
+Pixel3DTexture                    PixelTexture3D
+PixelTexture                      PixelTexture
+PlanarReflector                   PlanarReflector
+PlaneSensor                       PlaneSensor
+PointEmitter                      ParticleSystem
+PointLight                        PointLight, PointLight1
+PointNormalClipPlane              PointNormalClipPlane
+PointSet                          PointSet
+Polyline2D                        Polyline2D
+Polypoint2D                       Polypoint2D
+PositionFunctionEffect            PositionFunctionEffect
+PositionInterpolator              PositionInterpolator
+PositionInterpolator2D            PositionInterpolator2D
+ProgramShader                     /demos cg_earthshader.x3d
+ProtoDeclaration                  Prototype, Surfaces
+PrototypeInstance                 Prototype
+ProximitySensor                   ProximitySensor
+PythonScript                      PythonScript, ImageObjectInfo, DeformableShape
+QuanserDevice                     QuanserDevice
+RawImageLoader                    ImageLoaders
+Rectangle2D                       Rectangle2D
+RenderProperties                  RenderProperties, RenderProperties1, RenderProperties2
+ScalarInterpolator                ScalarInterpolator
+ShaderPart                        /demos glsl_earthshader.x3d
+ShaderProgram                     /demos cg_earthshader.x3d
+Shape                             Box, Cone, Sphere
+SimballDevice                     SimballDevice
+SimpleMovieTexture                SimpleMovieTexture
+SmoothSurface                     Surfaces
+Sound                             Sound
+SpaceballSensor                   SpaceballSensor
+SpaceWareHapticsDevice            SpaceWareHapticsDevice
+SpaceWareSensor                   SpaceWareSensor
+Sphere                            Sphere
+SphereSensor                      SphereSensor
+SplinePositionInterpolator        SplinePositionInterpolator
+SplinePositionInterpolator2D      SplinePositionInterpolator2D
+SplineScalarInterpolator          SplineScalarInterpolator
+SpotLight                         SpotLight
+SpringEffect                      SpringEffect
+StereoInfo                        StereoInfo
+StringSensor                      StringSensor
+SuperShape                        SuperShape
+SurfaceEmitter                    ParticleSystem
+Switch                            Switch
+TexGenGeometry                    TexGenGeometry
+Text                              Text, Text1
+TextureBackground                 TextureBackground              
+TextureCoordinate                 TextureCoordinate
+TextureCoordinate3D               ImageTexture3D           
+TextureCoordinate4D               TextureCoordinate4D           
+TextureCoordinateGenerator        TextureCoordinateGenerator     
+TextureMatrixTransform            TextureMatrixTransform
+TextureProperties                 TextureProperties
+TextureTransform                  TextureTransform
+TextureTransform3D                TextureTransform3D            
+TimeFunctionEffect                TimeFunctionEffect              
+TimeSensor                        Switch
+TimeTrigger                       TimeTrigger
+ToggleGroup                       ToggleGroup
+TouchSensor                       TouchSensor, TouchSensor1, TouchSensor2
+TransferFunctionTexture           TransferFunctionTexture
+Transform                         Transform
+TransformInfo                     TransformInfo
+TriangleFanSet                    TriangleFanSet
+TriangleSet                       TriangleSet
+TriangleSet2D                     TriangleSet2D
+TriangleStripSet                  TriangleStripSet
+TwoSidedMaterial                  TwoSidedMaterial
+Viewpoint                         Viewpoint
+ViewpointGroup                    ViewpointGroup
+ViscosityEffect                   ViscosityEffect
+VisibilitySensor                  VisibilitySensor
+WindPhysicsModel                  WindPhysicsModel
+WorldInfo                         WorldInfo
