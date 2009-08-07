@@ -43,6 +43,11 @@ namespace H3D {
   /// properties for defining rigid body motion. This includes
   /// a position, orientation, mass, etc.
   ///
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/DynamicTransform.x3d">DynamicTransform.x3d</a>
+  ///     ( <a href="examples/DynamicTransform.x3d.html">Source</a> )
+  ///
   /// \par Internal routes:
   /// \dotfile DynamicTransform.dot
   class H3DAPI_API DynamicTransform : public MatrixTransform {

@@ -45,6 +45,10 @@ namespace H3D {
   /// a zero force and logs position data.
   /// For information on how to read the log created by this node see comments
   /// for the logBinary field.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/DeviceLog.x3d">DeviceLog.x3d</a>
+  ///     ( <a href="examples/DeviceLog.x3d.html">Source</a> )
   class H3DAPI_API DeviceLog: public H3DForceEffect,
                               public X3DUrlObject {
   public:

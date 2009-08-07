@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 ## Modify header files to include example files in doxygen comments.
+## Outputs a list of example files that do not exist in any headers.
+## Will output coordaxes.x3d since it is inlined in other x3d files.
 
 import os, sys
 import re
@@ -100,18 +102,19 @@ if os.path.isdir( headers_dir ):
     if 'vc9' in dirs:
       dirs.remove('vc9')  # don't visit vc9 directories
     for temp_file in files:
-      fhandle = open( join( headers_dir, temp_file ), "rb" )
-      code = fhandle.read()
-      fhandle.close()
-      examples_to_remove = []
-      for i in examples:
-        find_string1 = """  ///   - <a href="../../../H3DAPI/examples/All/%s.x3d">%s.x3d</a>""" % (i, i)
-        find_string2 = """  ///     ( <a href="examples/%s.x3d.html">""" % (i)
-        if code.find( find_string1 ) != -1 and code.find( find_string2 ) != -1:
-          examples_to_remove.append( i )
+      if( not temp_file.startswith("X3D") and not temp_file.startswith("H3D") and temp_file.endswith(".h") ):
+        fhandle = open( join( headers_dir, temp_file ), "rb" )
+        code = fhandle.read()
+        fhandle.close()
+        examples_to_remove = []
+        for i in examples:
+          find_string1 = """  ///   - <a href="../../../H3DAPI/examples/All/%s.x3d">%s.x3d</a>""" % (i, i)
+          find_string2 = """  ///     ( <a href="examples/%s.x3d.html">""" % (i)
+          if code.find( find_string1 ) != -1 and code.find( find_string2 ) != -1:
+            examples_to_remove.append( i )
 
-      for i in examples_to_remove:
-        examples.remove( i )
+        for i in examples_to_remove:
+          examples.remove( i )
 
   print "These are the example files that are not assigned in the documentation"
   for i in examples:

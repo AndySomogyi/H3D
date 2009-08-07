@@ -54,6 +54,11 @@ namespace H3D {
   /// system of the children). The results are undefined if the specified
   /// bounding box is smaller than the true bounding box of the group. 
   /// 
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/MatrixTransform.x3d">MatrixTransform.x3d</a>
+  ///     ( <a href="examples/MatrixTransform.x3d.html">Source</a> )
+  ///
   /// \par Internal routes:
   /// \dotfile MatrixTransform.dot
   class H3DAPI_API MatrixTransform : public X3DGroupingNode {
