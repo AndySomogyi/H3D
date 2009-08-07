@@ -2,6 +2,11 @@ Changes for version 2.1:
 
 checked up to revision 1268.
 
+- Falcon support on linux.
+- RefCountMField now have erase and insert functions.
+- New functionality for TextureProperties.
+- Video textures works on linux, thanks to PolyDimensions.
+- Updates to compile on 64 bit systems.
 - Updates to Cmake system. Now files belonging to the various projects are
 listed explicitly.
 - Split the option PREFER_STATIC_LIBRARIES of our CMake build system into 
@@ -11,7 +16,7 @@ systems.
 H3DViewer.
 - Various memory leak fixes.
 - Fixes for python H3D connection.
-- AgetTranslationPart of Matrix4f/d and function writeNodeAsX3D can now be
+- getTranslationPart of Matrix4f/d and function writeNodeAsX3D can now be
 used in python.
 - Fixes to ProtoInterface.
 - Fixes to compile on recent versions of gcc.
@@ -61,6 +66,8 @@ H3DAPI.
 New H3D nodes:
 CoordinateDouble
 DicomImageLoader
+EaseInEaseOut
+FFmpedDecoder
 HapticTexturesSurface
 ImageObjectInfo
 NrrdImageLoader

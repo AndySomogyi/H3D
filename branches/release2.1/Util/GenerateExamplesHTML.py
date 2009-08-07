@@ -2,6 +2,7 @@
 
 ## Generate html-files displaying the contents of the example files in ../H3DAPI/examples/All
 ## Run the file from this folder.
+## HTML files will be put in ../../doc/H3DAPI/html/examples
 
 import os, sys
 import re

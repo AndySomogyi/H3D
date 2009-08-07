@@ -59,6 +59,8 @@ namespace H3D {
   /// <b>Examples:</b>
   ///   - <a href="../../../H3DAPI/examples/All/Viewpoint.x3d">Viewpoint.x3d</a>
   ///     ( <a href="examples/Viewpoint.x3d.html">Source</a> )
+  ///   - <a href="../../../H3DAPI/examples/All/Viewpoint1.x3d">Viewpoint1.x3d</a>
+  ///     ( <a href="examples/Viewpoint1.x3d.html">Source</a> )
   class H3DAPI_API Viewpoint : public X3DViewpointNode {
   public:
     /// Constructor.
