@@ -73,6 +73,7 @@ SET( H3DAPI_BUILD_VERSION 0 )
 
 # Set here already in case a special NSIS template needs to be used by cpack.
 SET(CMAKE_MODULE_PATH ${H3DAPI_SOURCE_DIR}/modules )
+cmake_policy( SET CMP0011 NEW )
 INCLUDE( StripAndAddLibraryDirectories )
 
 # If cpack should be configured.
@@ -780,5 +781,12 @@ IF( H3DAPI_EXAMPLE_PROJECTS )
   IF( DEFINED ParticleDemo_SOURCE_DIR )
     ADD_DEPENDENCIES( ParticleDemo H3DAPI )
   ENDIF( DEFINED ParticleDemo_SOURCE_DIR )
+  
+  STRING( REPLACE ${H3DAPI_SOURCE_DIR} ${H3DAPI_SOURCE_DIR}/../examples/ThreadExample H3DAPI_EXAMPLES_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
+  ADD_SUBDIRECTORY( ${H3DAPI_SOURCE_DIR}/../examples/ThreadExample
+                    ${H3DAPI_EXAMPLES_BINARY_DIR} )
+  IF( DEFINED ThreadExample_SOURCE_DIR )
+    ADD_DEPENDENCIES( ThreadExample H3DAPI )
+  ENDIF( DEFINED ThreadExample_SOURCE_DIR )
 ENDIF( H3DAPI_EXAMPLE_PROJECTS )
 
