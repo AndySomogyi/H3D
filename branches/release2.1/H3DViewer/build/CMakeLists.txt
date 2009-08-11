@@ -34,6 +34,7 @@ SET(requiredLibs)
 
 # Where to find cmake modules used to find packages.
 SET(CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules/")
+cmake_policy( SET CMP0011 NEW )
 INCLUDE( StripAndAddLibraryDirectories )
 
 #H3DAPI

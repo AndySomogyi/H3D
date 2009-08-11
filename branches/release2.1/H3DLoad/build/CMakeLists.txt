@@ -21,6 +21,7 @@ SET(requiredLibs)
 
 # Where to find modules, used when finding packages.
 SET(CMAKE_MODULE_PATH "${H3DLoad_SOURCE_DIR}/../../build/modules/")
+cmake_policy( SET CMP0011 NEW )
 INCLUDE( StripAndAddLibraryDirectories )
 
 #H3DAPI
