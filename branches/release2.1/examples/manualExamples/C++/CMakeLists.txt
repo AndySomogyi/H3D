@@ -14,7 +14,9 @@ SET(requiredLibs)
 
 # Where to find modules used to find libraries.
 SET(CMAKE_MODULE_PATH "${ManualExamples_SOURCE_DIR}/../../../build/modules/")
-cmake_policy( SET CMP0011 NEW )
+IF( COMMAND cmake_policy )
+  cmake_policy( SET CMP0011 NEW )
+ENDIF( COMMAND cmake_policy )
 INCLUDE( StripAndAddLibraryDirectories )
 
 #H3DAPI
