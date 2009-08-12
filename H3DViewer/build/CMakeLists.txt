@@ -1,4 +1,6 @@
-cmake_policy(SET CMP0003 OLD) 
+IF( COMMAND cmake_policy )
+  cmake_policy(SET CMP0003 OLD) 
+ENDIF( COMMAND cmake_policy )
 IF(WIN32)
   cmake_minimum_required(VERSION 2.6.0)
 ENDIF(WIN32)
@@ -34,7 +36,9 @@ SET(requiredLibs)
 
 # Where to find cmake modules used to find packages.
 SET(CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules/")
-cmake_policy( SET CMP0011 NEW )
+IF( COMMAND cmake_policy )
+  cmake_policy( SET CMP0011 NEW )
+ENDIF( COMMAND cmake_policy )
 INCLUDE( StripAndAddLibraryDirectories )
 
 #H3DAPI
