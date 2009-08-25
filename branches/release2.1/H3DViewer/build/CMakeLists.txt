@@ -150,7 +150,14 @@ INSTALL( TARGETS H3DViewer
          RUNTIME DESTINATION bin )
 
 IF( APPLE )
-  INSTALL( BUNDLE DESTINATION "/Applications" )
+ INSTALL( TARGETS H3DViewer
+          LIBRARY DESTINATION lib	
+          RUNTIME DESTINATION bin 
+          BUNDLE DESTINATION "/Applications" )
+ELSE( APPLE )
+  INSTALL( TARGETS H3DViewer
+           LIBRARY DESTINATION lib
+           RUNTIME DESTINATION bin )
 ENDIF( APPLE )
 
 # Add a cache variable GENERATE_H3DVIEWER_CPACK_PROJECT to have the choice of generating a project
