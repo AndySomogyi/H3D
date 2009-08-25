@@ -326,7 +326,7 @@ namespace H3D {
     /// when a new Viewpoint node is bound. Not supported by H3D API.
     /// 
     /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> "LINEAR: \n
+    /// <b>Default value:</b> ["LINEAR"]: \n
     /// <b>Valid values:</b> "TELEPORT", "LINEAR", "ANIMATE"
     auto_ptr< MFString > transitionType;
 

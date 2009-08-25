@@ -178,34 +178,43 @@ IF( GENERATE_CPACK_PROJECT )
       SET(H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/ )
     ENDIF( ParticleDemo_cmake_install )
 
+    IF( NOT PREFER_STATIC_LIBRARIES )
+      # Ignore static libraries.
+      SET( H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS}
+                                        /freeglut_static\\\\.lib$
+                                        /glew32_static\\\\.lib$
+                                        "/FreeImage_static(_vc8)*(_vc9)*(_d)*\\\\.lib$"
+                                        "/ftgl_static_MTD(_vc8)*(_vc9)*(_d)*\\\\.lib$"
+                                        /libcurl_static\\\\.lib$
+                                        /ogg_static\\\\.lib$
+                                        /vorbis_static\\\\.lib$
+                                        /vorbisfile_static\\\\.lib$
+                                        "/(X|x)erces-c_static_2(_vc8)*(_vc9)*(_d)*\\\\.lib$" )
+    ENDIF( NOT PREFER_STATIC_LIBRARIES )
+
     # Pattern in folders and files to ignore when adding files to installation package.
     SET(CPACK_IGNORE_FILES ${H3DAPI_CPACK_IGNORE_PATTERNS}
                            /fparser\\\\.lib$
-                           /wxbase28_net\\\\.lib$
-                           /wxbase28_odbc\\\\.lib$
-                           /wxbase28_xml\\\\.lib$
-                           /wxbase28_net\\\\.lib$
-                           /wxbase28_odbc\\\\.lib$
-                           /wxbase28_xml\\\\.lib$
-                           /wxexpat\\\\.lib$
-                           /wxjpeg\\\\.lib$
-                           /wxmsw28_aui\\\\.lib$
-                           /wxmsw28_dbgrid\\\\.lib$
-                           /wxmsw28_html\\\\.lib$
-                           /wxmsw28_media\\\\.lib$
-                           /wxmsw28_qa\\\\.lib$
-                           /wxmsw28_richtext\\\\.lib$
-                           /wxmsw28_xrc\\\\.lib$
-                           /wxpng\\\\.lib$
-                           /wxregex\\\\.lib$
-                           /wxtiff\\\\.lib$
-                           /wxzlib\\\\.lib$
+                           "/wxbase28_net(_vc8)*\\\\.lib$"
+                           "/wxbase28_odbc(_vc8)*\\\\.lib$"
+                           "/wxbase28_xml(_vc8)*\\\\.lib$"
+                           "/wxexpat(_vc8)*\\\\.lib$"
+                           "/wxjpeg(_vc8)*\\\\.lib$"
+                           "/wxmsw28_aui(_vc8)*\\\\.lib$"
+                           "/wxmsw28_dbgrid(_vc8)*\\\\.lib$"
+                           "/wxmsw28_media(_vc8)*\\\\.lib$"
+                           "/wxmsw28_qa(_vc8)*\\\\.lib$"
+                           "/wxmsw28_xrc(_vc8)*\\\\.lib$"
+                           "/wxpng(_vc8)*\\\\.lib$"
+                           "/wxregex(_vc8)*\\\\.lib$"
+                           "/wxtiff(_vc8)*\\\\.lib$"
+                           "/wxzlib(_vc8)*\\\\.lib$"
                            /bz2\\\\.lib$
                            /z\\\\.lib$
                            /png\\\\.lib$
                            /pthreadGC2\\\\.dll$
                            /pthreadGCE2\\\\.dll$
-                           /pthreadVSE2\\\\.dll$
+                           "/pthreadVSE2\\\\.(dll|lib)$"
                            /HAPI/doc/
                            /H3DUtil/doc/
                            /include/fparser

@@ -106,10 +106,10 @@ namespace H3D {
   /// loudness, from 0 dB at the minimum ellipsoid to -20 dB at the maximum
   /// ellipsoid:
   ///
-  ///   attenuation = -20 × (d' / d")
+  ///   attenuation = -20 * (d' / d'')
   ///
   /// where d' is the distance along the location-to-viewer vector, measured 
-  /// from the transformed minimum ellipsoid boundary to the viewer, and d" 
+  /// from the transformed minimum ellipsoid boundary to the viewer, and d'' 
   /// is the distance along the location-to-viewer vector from the transformed
   /// minimum ellipsoid boundary to the transformed maximum ellipsoid boundary.
   /// 
