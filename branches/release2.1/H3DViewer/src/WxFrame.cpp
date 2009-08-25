@@ -129,7 +129,7 @@ void onDropFiles(wxCoord x, wxCoord y,
 #endif
 
 /*******************Global Constants*********************/
-static const wxChar *TITLE     = wxT("H3DViewer ");
+static const wxChar *TITLE     = wxT("H3DViewer 2.1");
 static const wxChar *AUTHOR    = wxT("\nSenseGraphics\n\nCopyright 2006-2009.\n"
                                     "All Rights Reserved.");
 static const wxChar *ABOUT     = wxT("About");
