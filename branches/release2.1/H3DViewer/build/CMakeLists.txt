@@ -147,9 +147,11 @@ ENDIF(WIN32)
 # Install in these folders.
 INSTALL( TARGETS H3DViewer
          LIBRARY DESTINATION lib
-         RUNTIME DESTINATION bin
-         BUNDLE DESTINATION "/Applications" )
+         RUNTIME DESTINATION bin )
 
+IF( APPLE )
+  INSTALL( BUNDLE DESTINATION "/Applications" )
+ENDIF( APPLE )
 
 # Add a cache variable GENERATE_H3DVIEWER_CPACK_PROJECT to have the choice of generating a project
 # for packaging H3DAPI. Default is NO since most people will not use this.

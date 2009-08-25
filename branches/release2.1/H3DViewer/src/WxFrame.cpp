@@ -133,9 +133,7 @@ static const wxChar *TITLE     = wxT("H3DViewer ");
 static const wxChar *AUTHOR    = wxT("\nSenseGraphics\n\nCopyright 2006-2009.\n"
                                     "All Rights Reserved.");
 static const wxChar *ABOUT     = wxT("About");
-static const wxChar *FILETYPES = wxT( "x3d files|*.x3d|"
-                                     "vrml files|*.wrl|"
-                                     "All files|*.*"
+static const wxChar *FILETYPES = wxT( "x3d or vrml 2.0 files|*.x3d;*.x3dv;*.wrl|All files|*.*"
                                    );
 
 /******************Internal definitions**************/
@@ -1895,7 +1893,7 @@ void WxFrame::LoadPlugins() {
   
 #ifdef H3D_WINDOWS
   wxString plugin_dir = executable_dir + wxT("\\..\\plugins" );
-  wxString library_spec = plugin_dir + "\\*.dll";
+  wxString library_spec = plugin_dir + wxT("\\*.dll");
 #else
 #ifdef H3D_OSX
   wxString plugin_dir = executable_dir + wxT("/../Plugins");
@@ -1918,6 +1916,7 @@ void WxFrame::LoadPlugins() {
 #endif  // INCLUDE_PLUGINS_DIR_PLUGINS
 
   // iterate through all plugins
+  h3dConfig->SetPath( wxT("/Plugins") );
   bool  bCont = h3dConfig->GetFirstGroup(str, dummy);
   while ( bCont ) {
     // TODO: add handles somewhere so we can unload libraries if we want to.
