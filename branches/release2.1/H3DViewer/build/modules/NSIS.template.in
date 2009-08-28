@@ -67,7 +67,7 @@ Function .onInit
     ;MessageBox MB_OK 'User "$0" is in the Power Users group'
     StrCpy $SV_ALLUSERS "AllUsers"
     Goto done
-    
+
   noLM:
     StrCpy $SV_ALLUSERS "AllUsers"
     ;Get installation folder from registry if available
@@ -75,6 +75,66 @@ Function .onInit
   done:
   StrCmp $SV_ALLUSERS "AllUsers" 0 +2
     StrCpy $INSTDIR "$PROGRAMFILES\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
+
+  ClearErrors
+  ReadRegStr $R0 SHCTX \
+  "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" \
+  "Patch version"
+  IfErrors checkdone 0
+  IntCmp $R0 @CPACK_PACKAGE_VERSION_PATCH@ equalversion newerversion alreadyupgraded
+
+  equalversion:
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+  "@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@ \
+  is already installed. $\n$\nClick `OK` to repair the \
+  installation or `Cancel` to cancel this installation." \
+  IDOK uninst
+  Abort
+
+  newerversion:
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+  "@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.$R0 \
+  is already installed. $\n$\nClick `OK` to upgrade to version \
+  @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@ \
+  (recommended) or `Cancel` to cancel this installation." \
+  IDOK uninst
+  Abort
+
+  alreadyupgraded:
+  MessageBox MB_OK|MB_ICONINFORMATION \
+  "A newer version of @CPACK_PACKAGE_NAME@ \
+  is already installed. If downgrading is desired then first manually uninstall the older version."
+  Abort
+
+  uninst:
+  ;Run the uninstaller
+  ReadRegStr $R1 SHCTX \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.$R0" \
+  "UninstallString"
+  StrCmp $R1 "" checkdone
+
+  ReadRegStr $R2 SHCTX \
+  "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" \
+  ""
+
+  StrCpy $R3 $INSTDIR
+  StrCpy $INSTDIR $R2
+  ExecWait '$R1 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+  IfErrors no_remove_uninstaller uninstallsucceeded
+
+  no_remove_uninstaller:
+  MessageBox MB_OK|MB_ICONINFORMATION "Uninstall not completed, setup will exit."
+  Abort
+
+  uninstallsucceeded:
+    ; Wait a bit for system to release files and folders.
+    Sleep 1000
+    Delete $R1
+    RMDir $INSTDIR
+    StrCpy $INSTDIR $R3
+
+  checkdone:
+  ClearErrors
 
   StrCmp "@CPACK_NSIS_MODIFY_PATH@" "ON" 0 noOptionsPage
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "NSIS.InstallOptions.ini"
@@ -291,7 +351,7 @@ FunctionEnd
  
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Uninstall sutff
+; Uninstall stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ###########################################
@@ -459,7 +519,8 @@ Section "Installer Section" InstSection
 
   ;Store installation folder
   WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "" $INSTDIR
-  
+  WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "Patch version" "@CPACK_PACKAGE_VERSION_PATCH@"
+
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   Push "DisplayName"
@@ -638,7 +699,14 @@ Section "Uninstall"
     StrCmp "$MUI_TEMP" "$SMPROGRAMS" secondStartMenuDeleteLoopDone secondStartMenuDeleteLoop
   secondStartMenuDeleteLoopDone:
 
-  DeleteRegKey /ifempty SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
+  ClearErrors
+  ; Apparently wxWidgets writes to HKCU and HKU. Which means that we have to remove it here.
+  DeleteRegKey HKCU "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
+  ClearErrors
+  ; Delete the vendor name if it is empty.
+  DeleteRegKey /ifempty HKCU "Software\@CPACK_PACKAGE_VENDOR@"
+  ClearErrors
+
 
   Push $INSTDIR\bin
   StrCmp $DO_NOT_ADD_TO_PATH_ "1" doNotRemoveFromPath 0

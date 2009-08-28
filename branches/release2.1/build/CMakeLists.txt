@@ -114,10 +114,6 @@ IF( GENERATE_CPACK_PROJECT )
                                     /build/vc8
                                     /build/vc7
                                     /build/vc9
-                                    /vc9_HAPI/
-                                    /vc8_HAPI/
-                                    /vc7_HAPI/
-                                    /build/vc9_H3DViewer/
                                     /osx
                                     /H3DAPI/Util/
                                     /berk/berk\\\\.wrl$
@@ -264,7 +260,6 @@ IF( GENERATE_CPACK_PROJECT )
                                              " Execute python installer, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"'  $0\\n"
                                              " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
                                              " Delete python installer\\n  Delete \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"\\n" )
-                                             #" Is this some copy paste problem?\\n  ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n" )
     ENDIF( PythonInstallMSI )
     
     # Install OpenAL.

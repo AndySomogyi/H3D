@@ -53,6 +53,7 @@
 ; "Program Files" for AllUsers, "My Documents" for JustMe...
 
 Function .onInit
+  ClearErrors
   StrCpy $SV_ALLUSERS "JustMe"
   StrCpy $INSTDIR "$DOCUMENTS\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
 
@@ -80,6 +81,72 @@ Function .onInit
   done:
   StrCmp $SV_ALLUSERS "AllUsers" 0 +2
     StrCpy $INSTDIR "C:\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
+
+  ReadRegStr $R0 SHCTX \
+  "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" \
+  ""
+  IfErrors 0 alreadyinstalled
+
+  IfFileExists $INSTDIR 0 checkH3DROOT
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+    "It seems like another version of H3DAPI is already installed in the default \
+    location. If you install this version of H3DAPI make sure that you do not \
+    install into the same folder as any previous versions of H3DAPI. \
+    Note that you might also get conlicting paths in the PATH environment variable \
+    $\n$\nClick `OK` to continue installing or `Cancel` to cancel this installation." \
+    IDOK alreadyinstalledchecked
+    Abort
+
+  alreadyinstalled:
+  MessageBox MB_YESNOCANCEL|MB_ICONQUESTION \
+  "This version of H3DAPI is already installed, do you wish to uninstall the \
+  previous installation (recommended). \
+  $\n$\nClick `Yes` to uninstall previous installation. `NO´ to continue \
+  installation without any changes or `Cancel` to cancel this installation." \
+  IDYES uninstallprevious IDNO alreadyinstalledchecked
+  Abort
+
+  uninstallprevious:
+  ReadRegStr $R1 SHCTX \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" \
+  "UninstallString"
+  StrCmp $R1 "" alreadyinstalledchecked
+
+  ReadRegStr $R2 SHCTX \
+  "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" \
+  ""
+
+  StrCpy $R3 $INSTDIR
+  StrCpy $INSTDIR $R2
+  ExecWait '$R1 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+  IfErrors no_remove_uninstaller uninstallsucceeded
+
+  no_remove_uninstaller:
+  MessageBox MB_OK|MB_ICONINFORMATION "Uninstall not completed, setup will exit."
+  Abort
+
+  checkH3DROOT:
+  ReadEnvStr $R0 H3D_ROOT
+  IfErrors alreadyinstalledchecked 0
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+    "It seems like another version of H3DAPI is already installed. \
+    If you install this version of H3DAPI the \
+    H3D specific environment variables will be changed to point to the new \
+    installation. If you install this version make sure that you do not install \
+    into the same folder as any previous versions of H3DAPI. \
+    Note that you might also get conlicting paths in the PATH environment variable \
+    $\n$\nClick `OK` to continue installing or `Cancel` to cancel this installation." \
+    IDOK alreadyinstalledchecked
+    Abort
+
+  uninstallsucceeded:
+    ; Wait a bit for system to release files and folders.
+    Sleep 1000
+    Delete $R1
+    RMDir $INSTDIR
+    StrCpy $INSTDIR $R3
+
+  alreadyinstalledchecked:
 
   StrCmp "@CPACK_NSIS_MODIFY_PATH@" "ON" 0 noOptionsPage
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "NSIS.InstallOptions.ini"
@@ -518,7 +585,7 @@ Function ConditionalAddToRegisty
   Pop $0
   Pop $1
   StrCmp "$0" "" ConditionalAddToRegisty_EmptyString
-    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_DIRECTORY@" \
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" \
     "$1" "$0"
     ;MessageBox MB_OK "Set Registry: '$1' to '$0'"
     DetailPrint "Set install registry entry: '$1' to '$0'"
@@ -741,14 +808,14 @@ FunctionEnd
 
 Section "Uninstall"
   ReadRegStr $START_MENU SHCTX \
-   "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_DIRECTORY@" "StartMenu"
+   "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "StartMenu"
   ;MessageBox MB_OK "Start menu is in: $START_MENU"
   ReadRegStr $DO_NOT_ADD_TO_PATH SHCTX \
-    "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_DIRECTORY@" "DoNotAddToPath"
+    "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "DoNotAddToPath"
   ReadRegStr $ADD_TO_PATH_ALL_USERS SHCTX \
-    "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_DIRECTORY@" "AddToPathAllUsers"
+    "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "AddToPathAllUsers"
   ReadRegStr $ADD_TO_PATH_CURRENT_USER SHCTX \
-    "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_DIRECTORY@" "AddToPathCurrentUser"
+    "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "AddToPathCurrentUser"
   ;MessageBox MB_OK "Add to path: $DO_NOT_ADD_TO_PATH all users: $ADD_TO_PATH_ALL_USERS"
 
 @CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS@
@@ -760,7 +827,7 @@ Section "Uninstall"
 
   ;Remove the uninstaller itself.
   Delete "$INSTDIR\Uninstall.exe"
-  DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
+  DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
 
   ;Remove the installation directory if it is empty.
   RMDir "$INSTDIR"
