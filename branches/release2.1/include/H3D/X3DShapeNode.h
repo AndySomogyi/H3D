@@ -130,6 +130,12 @@ namespace H3D {
     /// By using an intermediate class the bug dissappears.
     class H3DAPI_API BugWorkaroundDisplayList: 
       public H3DDisplayListObject::DisplayList {
+      /// Returns true if we have a valid display list built that can
+      /// be called. We have to override this method here since the 
+      /// render() function of the X3DShapeNode have the possibility
+      /// to break the cache. The display list can then only be considered
+      /// valid if we know that the cache will not be broken. 
+      virtual bool haveValidDisplayList();
     };
 
     /// Display list is extended in 
