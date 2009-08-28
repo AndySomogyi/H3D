@@ -189,7 +189,7 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   wxAcceleratorTable accel(1, entries);
   SetAcceleratorTable(accel);
 
-    scene.reset( new Scene );
+  scene.reset( new Scene );
   ks.reset ( new KeySensor );
 #ifndef MACOSX
   ss.reset (0);
@@ -677,9 +677,19 @@ bool WxFrame::loadFile( const string &filename) {
   char *r = getenv( "H3D_ROOT" );
 
   string h3d_root = r ? r : ""; 
-  
-  INIFile ini_file( h3d_root + "/settings/h3dload.ini" );
-  
+
+  string ini_file_path = h3d_root + "/settings/h3dload.ini";
+
+  bool ini_file_exists = false;
+  ifstream check_ini_file( ini_file_path.c_str() );
+  if( check_ini_file.is_open() ) {
+    ini_file_exists = true;
+  }
+  check_ini_file.close();
+
+  INIFile ini_file( ini_file_path );
+
+
   //Clear existing data
   t->children->clear();
   viewpoint.reset( NULL );
@@ -802,7 +812,7 @@ bool WxFrame::loadFile( const string &filename) {
       for( DeviceInfo::DeviceInfoList::iterator i = device_infos.begin();
            i != device_infos.end(); i++ ) {
         if( j < device_info_size )
-          di->set_bind->setValue( false );
+          (*i)->set_bind->setValue( false );
         else {
           (*i)->set_bind->setValue( true );
           break;
@@ -885,6 +895,63 @@ bool WxFrame::loadFile( const string &filename) {
         Console(3) << "Warning: Could not create default Viewpoint node "
                    << "from file \"" << viewpoint_file << "\": "
                    << e << endl;
+      }
+    }
+
+    if( !ini_file_exists && device_infos.empty() ) {
+      // No device info exists and no device info file either. Simply
+      // create an anydevice and use that one in the scene.
+      device_info = X3D::createX3DNodeFromString(
+        "<DeviceInfo>"
+        "  <AnyDevice>"
+        "    <GodObjectRenderer/>"
+        "  </AnyDevice>"
+        "</DeviceInfo>" );
+
+      di = DeviceInfo::getActive();
+      if( di ) {
+        // Create stylus.
+        AutoRef< Node > default_stylus( 0 );
+        default_stylus = X3D::createX3DNodeFromString(
+          "  <Group>"
+          "    <Transform>"
+          "      <Shape>"
+          "        <Appearance>"
+          "          <Material/>"
+          "        </Appearance>"
+          "        <Sphere DEF=\"PROXY\" radius=\"0.0025\" />"
+          "      </Shape>"
+          "    </Transform>"
+          "  </Group>",
+          &default_stylus_dn );
+
+        // Create a calibration matrix that will account for not being the H3D
+        // default viewpoint.
+        X3DViewpointNode * active_vp = X3DViewpointNode::getActive();
+        // Set matrix to calibrate the device for a default X3D Viewpoint.
+        // That is, no orientation and position 0, 0, 10. 
+        Matrix4f pos_cal_matrix( 1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 9.4,
+                                 0, 0, 0, 1 );
+        if( active_vp ) {
+          // There is already a viewpoint defined, use this one.
+          Vec3f position_part = active_vp->position->getValue();
+          position_part.z -= 0.6f;
+          pos_cal_matrix = Matrix4f( active_vp->orientation->getValue() );
+          pos_cal_matrix[0][3] = position_part.x;
+          pos_cal_matrix[1][3] = position_part.y;
+          pos_cal_matrix[2][3] = position_part.z;
+        }
+
+        // Set stylus and calibration matrix.
+        for( DeviceInfo::MFDevice::const_iterator i = di->device->begin();
+             i != di->device->end(); i++ ) {
+          H3DHapticsDevice *d = static_cast< H3DHapticsDevice * >(*i);
+          d->positionCalibration->setValue( pos_cal_matrix );
+          if( !d->stylus->getValue() )
+            d->stylus->setValue( default_stylus );
+        }
       }
     }
 

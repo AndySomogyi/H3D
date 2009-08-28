@@ -1,7 +1,6 @@
 Changes for version 2.1:
 
-checked up to revision 1268.
-
+- ThreadExample now compiles into separate DLL that can be run time loaded.
 - Falcon support on linux.
 - RefCountMField now have erase and insert functions.
 - New functionality for TextureProperties.
@@ -78,6 +77,8 @@ H3DWindowNode constructor there will be a compile error since the last argument
 (time) is now removed.
 - Applications using features of H3DAPI node database systems will need to
 update their code.
+- Pixel(3D)Textures images are flipped in t. Because of a fix to reading of
+image data.
 
 Fields added to existing nodes:
 TextureProperties - scale, bias.
