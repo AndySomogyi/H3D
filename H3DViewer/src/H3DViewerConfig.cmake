@@ -44,6 +44,6 @@
 /// key for where recent history and settings will be stored. The application
 /// name depends on whether H3DViewer is built for a stand alone release or as
 /// a part of H3DAPI release.
-#define H3DVIEWER_APP_NAME "${H3DVIEWER_APP_NAME}"
+#define H3DVIEWER_APP_NAME wxT("${H3DVIEWER_APP_NAME}")
 
 #endif
