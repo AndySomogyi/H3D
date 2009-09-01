@@ -159,10 +159,6 @@ IF(WIN32)
 ENDIF(WIN32)
 
 # Install in these folders.
-INSTALL( TARGETS H3DViewer
-         LIBRARY DESTINATION lib
-         RUNTIME DESTINATION bin )
-
 IF( APPLE )
  INSTALL( TARGETS H3DViewer
           LIBRARY DESTINATION lib	
