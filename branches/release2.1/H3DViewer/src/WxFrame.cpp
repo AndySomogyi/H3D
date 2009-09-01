@@ -1357,7 +1357,23 @@ void WxFrame::OnOpenFile(wxCommandEvent & event)
 void WxFrame::OnMRUFile(wxCommandEvent & event)
 {
   wxString filename(recentFiles->GetHistoryFile(event.GetId() - wxID_FILE1));
-  if (filename != wxT("")) {
+  if(!filename.IsEmpty()) {
+#ifdef WIN32
+    SetCurrentFilename(filename.AfterLast('\\') );
+    SetCurrentPath(filename.BeforeLast('\\') );
+#else
+    SetCurrentFilename(filename.AfterLast('/') );
+    SetCurrentPath(filename.BeforeLast('/') );
+#endif
+
+    SetStatusText(GetCurrentFilename(), 0);
+    SetStatusText(GetCurrentPath(),1);
+#ifdef WIN32
+    wxString wx_filename = currentPath + wxT("\\") + currentFilename;
+#else
+    wxString wx_filename = currentPath + wxT("/") + currentFilename;
+#endif
+    string filename(wx_filename.mb_str());
     clearData();
     loadFile( toStr( filename ) );
   }
