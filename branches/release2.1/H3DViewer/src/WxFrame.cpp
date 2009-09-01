@@ -2134,7 +2134,7 @@ void WxFrame::LoadSettings( bool from_config ) {
         // on clean system
         use_caching = gco->useCaching->getValue();
         cache_only_geometries = gco->cacheOnlyGeometries->getValue();
-        caching_delay = gco->cacheOnlyGeometries->getValue();
+        caching_delay = gco->cachingDelay->getValue();
       }
     } else {
       use_caching = non_conf_opt.use_caching;
