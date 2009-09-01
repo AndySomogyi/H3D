@@ -171,9 +171,9 @@ bool MyApp::OnInit()
 #ifdef H3DVIEWER_STANDALONE
     SetAppName(_T(H3DVIEWER_APP_NAME));
 #else
-    string tmp_string = H3DVIEWER_APP_NAME;
-    tmp_string += "(dev)";
-    SetAppName(_T(tmp_string.c_str()));
+    wxString tmp_string = H3DVIEWER_APP_NAME;
+    tmp_string += wxT("(dev)");
+    SetAppName( tmp_string );
 #endif
 
     Console.setShowLevel( false );

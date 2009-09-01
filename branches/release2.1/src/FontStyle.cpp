@@ -34,7 +34,7 @@
 #endif
 
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
-#include <FTGL/ftgl.h>
+#include <FTGL/FTGL.h>
 #include <FTGL/FTGLTextureFont.h>
 #include <FTGL/FTGLPolygonFont.h>
 #include <FTGL/FTGLOutlineFont.h>

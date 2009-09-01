@@ -1375,7 +1375,7 @@ void WxFrame::OnMRUFile(wxCommandEvent & event)
 #endif
     string filename(wx_filename.mb_str());
     clearData();
-    loadFile( toStr( filename ) );
+    loadFile( filename );
   }
 }
 
@@ -2127,9 +2127,9 @@ void WxFrame::LoadSettings( bool from_config ) {
     if( from_config ) {
       if (h3dConfig->Exists(wxT("/Settings/GraphicsCaching"))) {
         h3dConfig->SetPath(wxT("/Settings/GraphicsCaching"));
-        h3dConfig->Read(wxT("useCaching"), &use_caching);
-        h3dConfig->Read(wxT("cacheOnlyGeometries"), &cache_only_geometries);
-        h3dConfig->Read(wxT("cachingDelay"), &caching_delay);
+        h3dConfig->Read(wxT("useCaching"), &use_caching, true );
+        h3dConfig->Read(wxT("cacheOnlyGeometries"), &cache_only_geometries, false);
+        h3dConfig->Read(wxT("cachingDelay"), &caching_delay, 5);
       } else {
         // on clean system
         use_caching = gco->useCaching->getValue();
