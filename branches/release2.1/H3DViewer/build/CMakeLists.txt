@@ -9,10 +9,10 @@ ENDIF(WIN32)
 # to the root binary directory of the project as ${H3DViewer_BINARY_DIR}.
 project (H3DViewer)
 
-SET(H3DViewer_VERSION_MAJOR "2")
-SET(H3DViewer_VERSION_MINOR "1")
-SET(H3DViewer_VERSION_PATCH "0")
-SET( H3DVIEWER_APP_NAME "H3DViewer ${H3DViewer_VERSION_MAJOR}.${H3DViewer_VERSION_MINOR}" )
+SET(H3DViewer_MAJOR_VERSION "2")
+SET(H3DViewer_MINOR_VERSION "1")
+SET(H3DViewer_BUILD_VERSION "0")
+SET( H3DVIEWER_APP_NAME "H3DViewer ${H3DViewer_MAJOR_VERSION}.${H3DViewer_MINOR_VERSION}" )
 
 # Source files.
 SET( H3DViewer_SRCS "${H3DViewer_SOURCE_DIR}/../src/ConsoleDialog.cpp"
@@ -35,6 +35,12 @@ SET( H3DViewer_SRCS "${H3DViewer_SOURCE_DIR}/../src/ConsoleDialog.cpp"
 
 # Include directories.
 INCLUDE_DIRECTORIES( ../src )
+
+# Add the H3DViewer.rc resource file if Visual Studio
+IF(MSVC)
+  SET( H3DViewer_SRCS ${H3DViewer_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc
+                                        ${H3DViewer_SOURCE_DIR}/H3DViewer.ico )
+ENDIF(MSVC)
 
 # Add required libs to this variable.
 SET(requiredLibs)
@@ -104,6 +110,22 @@ ELSE( GENERATE_H3DVIEWER_CPACK_PROJECT )
   ADD_EXECUTABLE(H3DViewer WIN32 MACOSX_BUNDLE ${H3DViewer_SRCS})
 ENDIF ( GENERATE_H3DVIEWER_CPACK_PROJECT )
 
+# make sure that the H3DViewer.rc contains the correct svn-version
+IF( MSVC )
+  EXECUTE_PROCESS( COMMAND ${H3DViewer_SOURCE_DIR}/../../build/FindSVNVersion ${H3DViewer_SOURCE_DIR}/../src/.svn/entries 
+                   OUTPUT_VARIABLE H3DViewer_SVN_VERSION )
+  # autogenerate H3DViewer.rc depending on the version
+  CONFIGURE_FILE( H3DViewer.rc.cmake ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
+
+  ADD_CUSTOM_COMMAND( TARGET H3DViewer 
+                      PRE_BUILD 
+                      COMMAND ${H3DViewer_SOURCE_DIR}/../../build/UpdateResourceFile 
+                      ARGS H3DViewer ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc H3DViewer.rc.cmake
+                      ${H3DViewer_MAJOR_VERSION} ${H3DViewer_MINOR_VERSION}
+                      ${H3DViewer_BUILD_VERSION}
+                      ${H3DViewer_SOURCE_DIR}/../src/.svn/entries )
+ENDIF(MSVC)
+
 CONFIGURE_FILE( ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.cmake ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )
 
 # Link against requiredLibs and optionalLibs.
@@ -161,8 +183,8 @@ ENDIF(WIN32)
 # Install in these folders.
 IF( APPLE )
  INSTALL( TARGETS H3DViewer
-          LIBRARY DESTINATION lib	
-          RUNTIME DESTINATION bin 
+          LIBRARY DESTINATION lib
+          RUNTIME DESTINATION bin
           BUNDLE DESTINATION "/Applications" )
 ELSE( APPLE )
   INSTALL( TARGETS H3DViewer
@@ -185,10 +207,10 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
   SET(CPACK_PACKAGE_CONTACT "support@sensegraphics.com" )
   SET(CPACK_RESOURCE_FILE_LICENSE "${H3DViewer_SOURCE_DIR}/../../LICENSE")
   SET(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};H3DViewer;ALL;/")
-  SET(CPACK_PACKAGE_VERSION_MAJOR ${H3DViewer_VERSION_MAJOR})
-  SET(CPACK_PACKAGE_VERSION_MINOR ${H3DViewer_VERSION_MINOR})
-  SET(CPACK_PACKAGE_VERSION_PATCH ${H3DViewer_VERSION_PATCH})
-  SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "H3DViewer ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}" )
+  SET(CPACK_PACKAGE_MAJOR_VERSION ${H3DViewer_MAJOR_VERSION})
+  SET(CPACK_PACKAGE_MINOR_VERSION ${H3DViewer_MINOR_VERSION})
+  SET(CPACK_PACKAGE_PATCH_VERSION ${H3DViewer_BUILD_VERSION})
+  SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "H3DViewer ${CPACK_PACKAGE_MAJOR_VERSION}.${CPACK_PACKAGE_MINOR_VERSION}" )
 
 
   IF( APPLE )
@@ -250,7 +272,8 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
                            "H3DLoad\\\\.exe$" )
 
     SET( H3DVIEWER_INSTALLED_DIRECTORIES "${H3DViewer_SOURCE_DIR}/../../../bin;bin"
-                                         "${H3DViewer_SOURCE_DIR}/../../../External/bin;bin" )
+                                         "${H3DViewer_SOURCE_DIR}/../../../External/bin;bin"
+                                         "${H3DViewer_SOURCE_DIR}/../../Util/H3DViewerPackageExtraFiles;." )
 
     IF( H3DVIEWER_PLUGIN_DIRECTORY )
       SET( H3DVIEWER_INSTALLED_DIRECTORIES ${H3DVIEWER_INSTALLED_DIRECTORIES}
@@ -264,23 +287,24 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
     SET( CPACK_PACKAGE_EXECUTABLES ${CPACK_PACKAGE_EXECUTABLES}
                                    "H3DViewer;H3DViewer" )
 
+    SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\\n" )
+
     # Add a cache variable vc_redist which should be set to the install file
     # for microsoft visual studio redistributable.
-    IF( NOT DEFINED vc_redist )
-      SET( vc_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for the choosen compiler." )
-      MARK_AS_ADVANCED(vc_redist)
-    ENDIF( NOT DEFINED vc_redist )
+    #IF( NOT DEFINED vc_redist )
+    #  SET( vc_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for the choosen compiler." )
+    #  MARK_AS_ADVANCED(vc_redist)
+    #ENDIF( NOT DEFINED vc_redist )
 
-    IF( vc_redist )
-      STRING( REPLACE "/" "\\\\" Temp_vc_redist ${vc_redist} )
-      GET_FILENAME_COMPONENT( VC_FILE_NAME ${vc_redist} NAME )
-      SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\\n" )
-      SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                             " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc_redist}\\\"\\n"
-                                             " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
-                                             " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-                                             " Delete file\\n  Delete \\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"\\n\\n" )
-    ENDIF( vc_redist )
+    #IF( vc_redist )
+    #  STRING( REPLACE "/" "\\\\" Temp_vc_redist ${vc_redist} )
+    #  GET_FILENAME_COMPONENT( VC_FILE_NAME ${vc_redist} NAME )
+    #  SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+    #                                         " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc_redist}\\\"\\n"
+    #                                         " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
+    #                                         " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+    #                                         " Delete file\\n  Delete \\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"\\n\\n" )
+    #ENDIF( vc_redist )
 
     # Install python if not already installed
     SET( PythonInstallMSI "" CACHE FILEPATH "Needs to be set to add python installation to the package." )

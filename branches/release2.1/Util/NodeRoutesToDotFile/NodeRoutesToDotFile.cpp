@@ -215,6 +215,12 @@ void writeNode( string out_dir, Node *n ) {
 #include <H3D/UI/H3DButtonNode.h>
 #endif
 
+#ifdef HAVE_RigidBodyPhysics
+#include <H3D/RigidBodyPhysics/X3DRigidJointNode.h>
+#include <H3D/RigidBodyPhysics/X3DNBodyCollisionSpaceNode.h>
+#include <H3D/RigidBodyPhysics/SliderJoint.h>
+#endif
+
 inline void resetSceneTimeField() {
   Scene::time.reset( new SFTime( TimeStamp() ) );
   Scene::time->setName( "Scene::time" );
@@ -231,6 +237,13 @@ int main(int argc, char* argv[]) {
   {
     // To make sure that UI is linked in if used.
     auto_ptr<Frame> kurt( new Frame );
+  }
+#endif
+
+#ifdef HAVE_RigidBodyPhysics
+  {
+    // To make sure that UI is linked in if used.
+    auto_ptr<SliderJoint> kurt( new SliderJoint );
   }
 #endif
 
@@ -272,6 +285,14 @@ int main(int argc, char* argv[]) {
   writeNode( out_dir, new H3DLabeledWidget );
   resetSceneTimeField();
   writeNode( out_dir, new H3DButtonNode );
+  resetSceneTimeField();
+#endif
+#ifdef HAVE_RigidBodyPhysics
+  writeNode( out_dir, new X3DNBodyCollidableNode );
+  resetSceneTimeField();
+  writeNode( out_dir, new X3DNBodyCollisionSpaceNode );
+  resetSceneTimeField();
+  writeNode( out_dir, new X3DRigidJointNode );
   resetSceneTimeField();
 #endif
 

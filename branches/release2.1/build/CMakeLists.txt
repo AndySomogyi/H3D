@@ -229,9 +229,52 @@ IF( GENERATE_CPACK_PROJECT )
                            "/ogg_d\\\\.dll$"
                            "/H3DLoad_d\\\\.exe$"
                            "/H3DViewer_d\\\\.exe$" )
-    
+
+    SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES "" )
+
+    # Create cached variable for getting the plugin folder.
+    SET( H3DVIEWER_PLUGIN_FOLDER "" CACHE PATH "Path to folder containing plugins for H3DViewer." )
+    MARK_AS_ADVANCED(H3DVIEWER_PLUGIN_FOLDER)
+    IF( H3DVIEWER_PLUGIN_FOLDER )
+      SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
+                                              "${H3DVIEWER_PLUGIN_FOLDER};Plugins" )
+
+      # Create cached variable for getting the UI examples folder.
+      SET( UI_EXAMPLES_FOLDER "" CACHE PATH "Path to folder containing UI examples." )
+      MARK_AS_ADVANCED(UI_EXAMPLES_FOLDER)
+      IF( UI_EXAMPLES_FOLDER )
+        SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
+                                                "${UI_EXAMPLES_FOLDER};H3DAPI/examples/UI" )
+      ENDIF( UI_EXAMPLES_FOLDER )
+
+      # Create cached variable for getting the MedX3D examples folder.
+      SET( MedX3D_EXAMPLES_FOLDER "" CACHE PATH "Path to folder containing MedX3D examples." )
+      MARK_AS_ADVANCED(MedX3D_EXAMPLES_FOLDER)
+      IF( MedX3D_EXAMPLES_FOLDER )
+        SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
+                                                "${MedX3D_EXAMPLES_FOLDER};H3DAPI/examples/MedX3D" )
+      ENDIF( MedX3D_EXAMPLES_FOLDER )
+
+      # Create cached variable for getting the RigidBodyPhysics examples folder.
+      SET( RigidBodyPhysics_EXAMPLES_FOLDER "" CACHE PATH "Path to folder containing RigidBodyPhysics examples." )
+      MARK_AS_ADVANCED(RigidBodyPhysics_EXAMPLES_FOLDER)
+      IF( RigidBodyPhysics_EXAMPLES_FOLDER )
+        SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
+                                                "${RigidBodyPhysics_EXAMPLES_FOLDER};H3DAPI/examples/RigidBodyPhysics" )
+      ENDIF( RigidBodyPhysics_EXAMPLES_FOLDER )
+
+      # Create cached variable for getting the VHTK examples folder.
+      SET( VHTK_EXAMPLES_FOLDER "" CACHE PATH "Path to folder containing VHTK examples." )
+      MARK_AS_ADVANCED(VHTK_EXAMPLES_FOLDER)
+      IF( VHTK_EXAMPLES_FOLDER )
+        SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
+                                                "${VHTK_EXAMPLES_FOLDER};H3DAPI/examples/VHTK" )
+      ENDIF( VHTK_EXAMPLES_FOLDER )
+    ENDIF( H3DVIEWER_PLUGIN_FOLDER )
+
     # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
-    SET(CPACK_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/../../H3DAPI;H3DAPI"
+    SET(CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
+                                    "${H3DAPI_SOURCE_DIR}/../../H3DAPI;H3DAPI"
                                     "${H3DAPI_SOURCE_DIR}/../../HAPI;HAPI"
                                     "${H3DAPI_SOURCE_DIR}/../../H3DUtil;H3DUtil"
                                     "${H3DAPI_SOURCE_DIR}/../../doc;doc"
@@ -277,20 +320,20 @@ IF( GENERATE_CPACK_PROJECT )
     
     # Add a cache variable vc_redist which should be set to the install file
     # for microsoft visual studio redistributable.
-    IF( NOT DEFINED vc_redist )
-      SET( vc_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for the choosen compiler." )
-      MARK_AS_ADVANCED(vc_redist)
-    ENDIF( NOT DEFINED vc_redist )
+    #IF( NOT DEFINED vc_redist )
+    #  SET( vc_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for the choosen compiler." )
+    #  MARK_AS_ADVANCED(vc_redist)
+    #ENDIF( NOT DEFINED vc_redist )
 
-    IF( vc_redist )
-      STRING( REPLACE "/" "\\\\" Temp_vc_redist ${vc_redist} )
-      GET_FILENAME_COMPONENT( VC_FILE_NAME ${vc_redist} NAME )
-      SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                             " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc_redist}\\\"\\n"
-                                             " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
-                                             " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-                                             " Delete file\\n  Delete \\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"\\n\\n" )
-    ENDIF( vc_redist )
+    #IF( vc_redist )
+    #  STRING( REPLACE "/" "\\\\" Temp_vc_redist ${vc_redist} )
+    #  GET_FILENAME_COMPONENT( VC_FILE_NAME ${vc_redist} NAME )
+    #  SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+    #                                         " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc_redist}\\\"\\n"
+    #                                         " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
+    #                                         " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+    #                                         " Delete file\\n  Delete \\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"\\n\\n" )
+    #ENDIF( vc_redist )
 
     # Do not modify path since this is done by the NSIS template.
     SET( CPACK_NSIS_MODIFY_PATH "ON" )
@@ -706,8 +749,6 @@ IF( WIN32 )
   IF(OPENHAPTICS_FOUND)
     SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}_d.dll\"" )
     SET( H3DAPI_LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}.dll\"" )
-    SET( H3DAPI_LINK_FLAGS_RELWITHDEBINFO "${H3DAPI_LINK_FLAGS_RELWITHDEBINFO} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}.dll\"" )
-    SET( H3DAPI_LINK_FLAGS_MINSIZEREL "${H3DAPI_LINK_FLAGS_MINSIZEREL} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}.dll\"" )
   ENDIF(OPENHAPTICS_FOUND)
 
   SET_TARGET_PROPERTIES( H3DAPI
@@ -715,7 +756,7 @@ IF( WIN32 )
                          LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG}"
                          LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE}"
                          LINK_FLAGS_RELWITHDEBINFO "${H3DAPI_LINK_FLAGS_RELEASE}"
-                         H3DAPI_LINK_FLAGS_MINSIZEREL "${H3DAPI_LINK_FLAGS_RELEASE}" )
+                         LINK_FLAGS_MINSIZEREL "${H3DAPI_LINK_FLAGS_RELEASE}" )
 ENDIF( WIN32 )
 
 # Set compile properties for H3DAPI.
