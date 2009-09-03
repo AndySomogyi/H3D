@@ -396,6 +396,10 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
 
   change_nav_type->setOwnerWindow( glwindow );
   ks->keyPress->route( change_nav_type );
+#ifdef WIN32
+  wxIcon tmpIcon( wxT( "IDI_ICON1" ), wxBITMAP_TYPE_ICO_RESOURCE );
+  SetIcon( tmpIcon );
+#endif
 }
 
 void WxFrame::ChangeNavType::update() {
