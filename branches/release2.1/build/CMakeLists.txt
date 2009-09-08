@@ -111,9 +111,7 @@ IF( GENERATE_CPACK_PROJECT )
                                     /release
                                     /linux
                                     /build/win32/
-                                    /build/vc8
-                                    /build/vc7
-                                    /build/vc9
+                                    "/((C\\\\+\\\\+|ThreadExample)|(build|examples))/vc(7|(8|9))"
                                     /osx
                                     /H3DAPI/Util/
                                     /berk/berk\\\\.wrl$
@@ -205,9 +203,6 @@ IF( GENERATE_CPACK_PROJECT )
                            "/wxregex(_vc8)*\\\\.lib$"
                            "/wxtiff(_vc8)*\\\\.lib$"
                            "/wxzlib(_vc8)*\\\\.lib$"
-                           /bz2\\\\.lib$
-                           /z\\\\.lib$
-                           /png\\\\.lib$
                            /pthreadGC2\\\\.dll$
                            /pthreadGCE2\\\\.dll$
                            "/pthreadVSE2\\\\.(dll|lib)$"
@@ -220,9 +215,6 @@ IF( GENERATE_CPACK_PROJECT )
                            /dcmdata\\\\.lib$
                            /dcmimage\\\\.lib$
                            /dcmimgle\\\\.lib$
-                           /z\\\\.lib$
-                           /png\\\\.lib$
-                           /bz2\\\\.lib$
                            /ofstd\\\\.lib$
                            /Definitions.h$
                            "/DentalSimAPI\\\\.(lib)*(dll)*(h)*$"
@@ -821,14 +813,7 @@ IF( H3DAPI_EXAMPLE_PROJECTS )
                     ${H3DAPI_EXAMPLES_BINARY_DIR} )
   ADD_DEPENDENCIES( Sphere_X3D H3DAPI )
   ADD_DEPENDENCIES( Spheres_X3D H3DAPI )
-  
-  STRING( REPLACE ${H3DAPI_SOURCE_DIR} ${H3DAPI_SOURCE_DIR}/../examples/Particledemo/build H3DAPI_EXAMPLES_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
-  ADD_SUBDIRECTORY( ${H3DAPI_SOURCE_DIR}/../examples/Particledemo/build
-                    ${H3DAPI_EXAMPLES_BINARY_DIR} )
-  IF( DEFINED ParticleDemo_SOURCE_DIR )
-    ADD_DEPENDENCIES( ParticleDemo H3DAPI )
-  ENDIF( DEFINED ParticleDemo_SOURCE_DIR )
-  
+
   STRING( REPLACE ${H3DAPI_SOURCE_DIR} ${H3DAPI_SOURCE_DIR}/../examples/ThreadExample H3DAPI_EXAMPLES_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
   ADD_SUBDIRECTORY( ${H3DAPI_SOURCE_DIR}/../examples/ThreadExample
                     ${H3DAPI_EXAMPLES_BINARY_DIR} )
