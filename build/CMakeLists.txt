@@ -330,7 +330,8 @@ IF( GENERATE_CPACK_PROJECT )
     # Do not modify path since this is done by the NSIS template.
     SET( CPACK_NSIS_MODIFY_PATH "ON" )
   ELSE(WIN32 AND NOT UNIX)
-    SET(H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/ )
+    SET(H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/
+                                                                     "~$" )
     SET(CPACK_SOURCE_IGNORE_FILES ${H3DAPI_CPACK_IGNORE_PATTERNS} )
     SET(CPACK_SOURCE_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/../../H3DAPI;H3DAPI" )
   ENDIF(WIN32 AND NOT UNIX)
