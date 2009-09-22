@@ -956,11 +956,14 @@ Section "Uninstall"
   
     StrCmp "$MUI_TEMP" "$SMPROGRAMS" secondStartMenuDeleteLoopDone secondStartMenuDeleteLoop
   secondStartMenuDeleteLoopDone:
-
-  DeleteRegKey /ifempty SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
-
-  DeleteRegKey HKCU "Software\SenseGraphics AB\H3D Viewer"
-
+  
+  ClearErrors
+  ; Apparently wxWidgets writes to HKCU and HKU. Which means that we have to remove it here.
+  DeleteRegKey HKCU "Software\@CPACK_PACKAGE_VENDOR@\H3DViewer @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@(dev)"
+  ClearErrors
+  ; Delete the vendor name if it is empty.
+  DeleteRegKey /ifempty HKCU "Software\@CPACK_PACKAGE_VENDOR@"
+  ClearErrors
 
   Push H3D_ROOT
   Call un.DeleteEnvStr
