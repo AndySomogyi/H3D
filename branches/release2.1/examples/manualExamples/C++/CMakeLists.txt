@@ -15,7 +15,9 @@ SET(requiredLibs)
 # Where to find modules used to find libraries.
 SET(CMAKE_MODULE_PATH "${ManualExamples_SOURCE_DIR}/../../../build/modules/")
 IF( COMMAND cmake_policy )
-  cmake_policy( SET CMP0011 NEW )
+  IF( POLICY CMP0011 )
+    cmake_policy( SET CMP0011 NEW )
+  ENDIF( POLICY CMP0011 )
 ENDIF( COMMAND cmake_policy )
 INCLUDE( StripAndAddLibraryDirectories )
 

@@ -22,7 +22,9 @@ SET(requiredLibs)
 # Where to find modules, used when finding packages.
 SET(CMAKE_MODULE_PATH "${H3DLoad_SOURCE_DIR}/../../build/modules/")
 IF( COMMAND cmake_policy )
-  cmake_policy( SET CMP0011 NEW )
+  IF( POLICY CMP0011 )
+    cmake_policy( SET CMP0011 NEW )
+  ENDIF( POLICY CMP0011 )
 ENDIF( COMMAND cmake_policy )
 INCLUDE( StripAndAddLibraryDirectories )
 
