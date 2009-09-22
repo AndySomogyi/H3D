@@ -335,7 +335,7 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
                                              " Delete install file\\n  Delete \\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\"\\n" )
     ENDIF( OpenAlInstallExe )
 
-    SET( CPACK_NSIS_MODIFY_PATH "ON" )
+    SET( CPACK_NSIS_MODIFY_PATH "OFF" )
   ENDIF( APPLE )
 
   INCLUDE(CPack)

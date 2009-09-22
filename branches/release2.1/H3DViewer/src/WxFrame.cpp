@@ -890,16 +890,19 @@ bool WxFrame::loadFile( const string &filename) {
     g->children->push_back(ss.get());
 #endif
     //create a Viewpoint if it does not exist.
-    if( !Viewpoint::getActive() && viewpoint_file.size() ) {
-      try {
-        viewpoint = X3D::createX3DNodeFromURL( viewpoint_file );
-        Console( 4 ) << viewpoint_file;
-      } catch( const Exception::H3DException &e ) {
+    if( !Viewpoint::getActive() ) {
+      if( viewpoint_file.size() ) {
+        try {
+          viewpoint = X3D::createX3DNodeFromURL( viewpoint_file );
+          Console( 4 ) << viewpoint_file;
+        } catch( const Exception::H3DException &e ) {
+          viewpoint.reset( new Viewpoint );
+          Console(3) << "Warning: Could not create default Viewpoint node "
+                     << "from file \"" << viewpoint_file << "\": "
+                     << e << endl;
+        }
+      } else if( !ini_file_exists )
         viewpoint.reset( new Viewpoint );
-        Console(3) << "Warning: Could not create default Viewpoint node "
-                   << "from file \"" << viewpoint_file << "\": "
-                   << e << endl;
-      }
     }
 
     if( !ini_file_exists && device_infos.empty() ) {

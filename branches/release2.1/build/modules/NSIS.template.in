@@ -218,7 +218,20 @@ Function AddToPath
   # don't add if the path doesn't exist
   IfFileExists "$0\*.*" "" AddToPath_done
  
-  ReadEnvStr $1 PATH
+  ; Check if nt and read from registry if it is nt, otherwise use path.
+  ; The reason for this is that when uninstalling a previous installation
+  ; the path environment variable might be modified.
+  Call IsNT
+  Pop $1
+  StrCmp $1 1 ReadFromPath_NT
+    ;Not on NT
+    ReadEnvStr $1 PATH
+    Goto +6
+  ReadFromPath_NT:
+    StrCmp $ADD_TO_PATH_ALL_USERS "1" 0 +3
+      ReadRegStr $1 ${NT_all_env} "PATH"
+      Goto +2
+      ReadRegStr $1 ${NT_current_env} "PATH"
   Push "$1;"
   Push "$0;"
   Call StrStr
