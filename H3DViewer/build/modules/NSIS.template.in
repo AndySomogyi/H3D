@@ -281,7 +281,20 @@ Function AddToPath
   # don't add if the path doesn't exist
   IfFileExists "$0\*.*" "" AddToPath_done
  
-  ReadEnvStr $1 PATH
+  ; Check if nt and read from registry if it is nt, otherwise use path.
+  ; The reason for this is that when uninstalling a previous installation
+  ; the path environment variable might be modified.
+  Call IsNT
+  Pop $1
+  StrCmp $1 1 ReadFromPath_NT
+    ;Not on NT
+    ReadEnvStr $1 PATH
+    Goto +6
+  ReadFromPath_NT:
+    StrCmp $ADD_TO_PATH_ALL_USERS "1" 0 +3
+      ReadRegStr $1 ${NT_all_env} "PATH"
+      Goto +2
+      ReadRegStr $1 ${NT_current_env} "PATH"
   Push "$1;"
   Push "$0;"
   Call StrStr
@@ -320,14 +333,20 @@ Function AddToPath
     Goto AddToPath_done
  
   AddToPath_NT:
-    ReadRegStr $1 ${WriteEnvStr_RegKey} "PATH"
+    StrCmp $ADD_TO_PATH_ALL_USERS "1" 0 +3
+      ReadRegStr $1 ${NT_all_env} "PATH"
+      Goto +2
+      ReadRegStr $1 ${NT_current_env} "PATH"
     StrCmp $1 "" AddToPath_NTdoIt
       Push $1
       Call Trim
       Pop $1
       StrCpy $0 "$1;$0"
     AddToPath_NTdoIt:
-      WriteRegExpandStr ${WriteEnvStr_RegKey} "PATH" $0
+      StrCmp $ADD_TO_PATH_ALL_USERS "1" 0 +3
+        WriteRegExpandStr ${NT_all_env} "PATH" $0
+        Goto +2
+        WriteRegExpandStr ${NT_current_env} "PATH" $0
       SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
  
   AddToPath_done:
@@ -662,8 +681,9 @@ Section "Add to path"
   !insertmacro MUI_INSTALLOPTIONS_READ $DO_NOT_ADD_TO_PATH "NSIS.InstallOptions.ini" "Field 2" "State"
   !insertmacro MUI_INSTALLOPTIONS_READ $ADD_TO_PATH_ALL_USERS "NSIS.InstallOptions.ini" "Field 3" "State"
   !insertmacro MUI_INSTALLOPTIONS_READ $ADD_TO_PATH_CURRENT_USER "NSIS.InstallOptions.ini" "Field 4" "State"
-  StrCmp $DO_NOT_ADD_TO_PATH "1" doNotAddToPath 0
-    Call AddToPath
+  StrCmp "@CPACK_NSIS_MODIFY_PATH@" "ON" 0 doNotAddToPath
+    StrCmp $DO_NOT_ADD_TO_PATH "1" doNotAddToPath 0
+      Call AddToPath
   doNotAddToPath:
 SectionEnd
 
@@ -790,10 +810,10 @@ Section "Uninstall"
   DeleteRegKey /ifempty HKCU "Software\@CPACK_PACKAGE_VENDOR@"
   ClearErrors
 
-
-  Push $INSTDIR\bin
-  StrCmp $DO_NOT_ADD_TO_PATH_ "1" doNotRemoveFromPath 0
-    Call un.RemoveFromPath
+  StrCmp "@CPACK_NSIS_MODIFY_PATH@" "ON" 0 doNotRemoveFromPath
+    StrCmp $DO_NOT_ADD_TO_PATH "1" doNotRemoveFromPath 0
+      Push $INSTDIR\bin
+      Call un.RemoveFromPath
   doNotRemoveFromPath:
 SectionEnd
 
