@@ -296,7 +296,7 @@ IF( GENERATE_CPACK_PROJECT )
                                              " Extract python installer\\n  File \\\"${TEMP_PythonInstallMSI}\\\"\\n"
                                              " Execute python installer, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"'  $0\\n"
                                              " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-                                             " Delete python installer\\n  Delete \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"\\n" )
+                                             " Delete python installer\\n  Delete \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"\\n\\n" )
     ENDIF( PythonInstallMSI )
     
     # Install OpenAL.
@@ -309,27 +309,49 @@ IF( GENERATE_CPACK_PROJECT )
                                              " Code to install OPENAL\\n  File \\\"${TEMP_OpenAlInstallExe}\\\"\\n"
                                              " Execute install file\\n  ExecWait \\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\" $0\\n"
                                              " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-                                             " Delete install file\\n  Delete \\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\"\\n" )
+                                             " Delete install file\\n  Delete \\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\"\\n\\n" )
     ENDIF( OpenAlInstallExe )
     
-    # Add a cache variable vc_redist which should be set to the install file
-    # for microsoft visual studio redistributable.
-    #IF( NOT DEFINED vc_redist )
-    #  SET( vc_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for the choosen compiler." )
-    #  MARK_AS_ADVANCED(vc_redist)
-    #ENDIF( NOT DEFINED vc_redist )
+    # Add cache variable vc8(9)_redist which should be set to the install file
+    # for microsoft visual studio redistributables, they can be found in the
+    # installation folder for each visual studio installation.
+    IF( NOT DEFINED vc8_redist )
+      SET( vc8_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for visual studio 8" )
+      MARK_AS_ADVANCED(vc8_redist)
+    ENDIF( NOT DEFINED vc8_redist )
+    
+    IF( NOT DEFINED vc9_redist )
+      SET( vc9_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for visual studio 9." )
+      MARK_AS_ADVANCED(vc9_redist)
+    ENDIF( NOT DEFINED vc9_redist )
 
-    #IF( vc_redist )
-    #  STRING( REPLACE "/" "\\\\" Temp_vc_redist ${vc_redist} )
-    #  GET_FILENAME_COMPONENT( VC_FILE_NAME ${vc_redist} NAME )
-    #  SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-    #                                         " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc_redist}\\\"\\n"
-    #                                         " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
-    #                                         " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-    #                                         " Delete file\\n  Delete \\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"\\n\\n" )
-    #ENDIF( vc_redist )
+    IF( vc8_redist )
+      STRING( REPLACE "/" "\\\\" Temp_vc8_redist ${vc8_redist} )
+      GET_FILENAME_COMPONENT( VC8_FILE_NAME ${vc8_redist} NAME )
+      SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+                                             " Set output Path\\n  SetOutPath \\\"$INSTDIR\\\\vc8\\\"\\n"
+                                             " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc8_redist}\\\"\\n"
+                                             " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\vc8\\\\${VC8_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn\\\"' $0\\n"
+                                             " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+                                             " Delete file\\n  Delete \\\"$INSTDIR\\\\vc8\\\\${VC8_FILE_NAME}\\\"\\n"
+                                             " Reset output Path\\n  SetOutPath \\\"$INSTDIR\\\"\\n"
+                                             " Remove folder\\n  RMDir /r \\\"$INSTDIR\\\\vc8\\\"\\n\\n" )
+    ENDIF( vc8_redist )
+    
+    IF( vc9_redist )
+      STRING( REPLACE "/" "\\\\" Temp_vc9_redist ${vc9_redist} )
+      GET_FILENAME_COMPONENT( VC9_FILE_NAME ${vc9_redist} NAME )
+      SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+                                             " Set output Path\\n  SetOutPath \\\"$INSTDIR\\\\vc9\\\"\\n"
+                                             " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc9_redist}\\\"\\n"
+                                             " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\vc9\\\\${VC9_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
+                                             " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+                                             " Delete file\\n  Delete \\\"$INSTDIR\\\\vc9\\\\${VC9_FILE_NAME}\\\"\\n"
+                                             " Reset output Path\\n  SetOutPath \\\"$INSTDIR\\\"\\n"
+                                             " Remove folder\\n  RMDir /r \\\"$INSTDIR\\\\vc9\\\"\\n\\n" )
+    ENDIF( vc9_redist )
 
-    # Do not modify path since this is done by the NSIS template.
+    # Modify path in the the NSIS template.
     SET( CPACK_NSIS_MODIFY_PATH "ON" )
   ELSE(WIN32 AND NOT UNIX)
     SET(H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/
