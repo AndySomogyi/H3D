@@ -283,6 +283,18 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
       SET( H3DVIEWER_INSTALLED_DIRECTORIES ${H3DVIEWER_INSTALLED_DIRECTORIES}
                                            "${H3DVIEWER_PLUGIN_DIRECTORY};Plugins" )
     ENDIF( H3DVIEWER_PLUGIN_DIRECTORY )
+    
+    # Add a cache variable vc_redist_folder which should be set to a folder containing all needed
+    # visual studio redistributables.
+    IF( NOT DEFINED vc_redist_folder )
+      SET( vc_redist_folder CACHE PATH "Set this to a folder containing all the needed visual studio redistributable dlls." )
+      MARK_AS_ADVANCED(vc_redist_folder)
+    ENDIF( NOT DEFINED vc_redist_folder )
+
+    IF( vc_redist_folder )
+      SET( H3DVIEWER_INSTALLED_DIRECTORIES ${H3DVIEWER_INSTALLED_DIRECTORIES}
+                                           "${vc_redist_folder};bin" )
+    ENDIF( vc_redist_folder )
 
     # Directories to install, and how they should be named. Non-existing folders will be ignored when packing.
     SET(CPACK_INSTALLED_DIRECTORIES ${H3DVIEWER_INSTALLED_DIRECTORIES} )
@@ -292,23 +304,6 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
                                    "H3DViewer;H3DViewer" )
 
     SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\\n" )
-
-    # Add a cache variable vc_redist which should be set to the install file
-    # for microsoft visual studio redistributable.
-    #IF( NOT DEFINED vc_redist )
-    #  SET( vc_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for the choosen compiler." )
-    #  MARK_AS_ADVANCED(vc_redist)
-    #ENDIF( NOT DEFINED vc_redist )
-
-    #IF( vc_redist )
-    #  STRING( REPLACE "/" "\\\\" Temp_vc_redist ${vc_redist} )
-    #  GET_FILENAME_COMPONENT( VC_FILE_NAME ${vc_redist} NAME )
-    #  SET( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-    #                                         " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc_redist}\\\"\\n"
-    #                                         " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"/q:a /c:\\\"msiexec /i vcredist.msi /qn /l*v %temp%\\\\vcredist_x86.log\\\"' $0\\n"
-    #                                         " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-    #                                         " Delete file\\n  Delete \\\"$INSTDIR\\\\${VC_FILE_NAME}\\\"\\n\\n" )
-    #ENDIF( vc_redist )
 
     # Install python if not already installed
     SET( PythonInstallMSI "" CACHE FILEPATH "Needs to be set to add python installation to the package." )
@@ -323,7 +318,7 @@ IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
                                              " Extract python installer\\n  File \\\"${TEMP_PythonInstallMSI}\\\"\\n"
                                              " Execute python installer, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"'  $0\\n"
                                              " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-                                             " Delete python installer\\n  Delete \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"\\n" )
+                                             " Delete python installer\\n  Delete \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"\\n\\n" )
     ENDIF( PythonInstallMSI )
     
     # Install OpenAL.
