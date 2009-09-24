@@ -239,6 +239,9 @@ IF( GENERATE_CPACK_PROJECT )
       IF( UI_EXAMPLES_FOLDER )
         SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
                                                 "${UI_EXAMPLES_FOLDER};H3DAPI/examples/UI" )
+        SET( CPACK_ADD_UI_DEMOS_LINKS "ON" )
+      ELSE( UI_EXAMPLES_FOLDER )
+        SET( CPACK_ADD_UI_DEMOS_LINKS "OFF" )
       ENDIF( UI_EXAMPLES_FOLDER )
 
       # Create cached variable for getting the MedX3D examples folder.
@@ -247,6 +250,9 @@ IF( GENERATE_CPACK_PROJECT )
       IF( MedX3D_EXAMPLES_FOLDER )
         SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
                                                 "${MedX3D_EXAMPLES_FOLDER};H3DAPI/examples/MedX3D" )
+        SET( CPACK_ADD_MedX3D_DEMOS_LINKS "ON" )
+      ELSE( MedX3D_EXAMPLES_FOLDER )
+        SET( CPACK_ADD_MedX3D_DEMOS_LINKS "OFF" )
       ENDIF( MedX3D_EXAMPLES_FOLDER )
 
       # Create cached variable for getting the RigidBodyPhysics examples folder.
@@ -255,6 +261,9 @@ IF( GENERATE_CPACK_PROJECT )
       IF( RigidBodyPhysics_EXAMPLES_FOLDER )
         SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
                                                 "${RigidBodyPhysics_EXAMPLES_FOLDER};H3DAPI/examples/RigidBodyPhysics" )
+        SET( CPACK_ADD_RigidBodyPhysics_DEMOS_LINKS "ON" )
+      ELSE( RigidBodyPhysics_EXAMPLES_FOLDER )
+        SET( CPACK_ADD_RigidBodyPhysics_DEMOS_LINKS "OFF" )
       ENDIF( RigidBodyPhysics_EXAMPLES_FOLDER )
 
       # Create cached variable for getting the VHTK examples folder.
@@ -263,6 +272,9 @@ IF( GENERATE_CPACK_PROJECT )
       IF( VHTK_EXAMPLES_FOLDER )
         SET( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
                                                 "${VHTK_EXAMPLES_FOLDER};H3DAPI/examples/VHTK" )
+        SET( CPACK_ADD_VHTK_DEMOS_LINKS "ON" )
+      ELSE( VHTK_EXAMPLES_FOLDER )
+        SET( CPACK_ADD_VHTK_DEMOS_LINKS "OFF" )
       ENDIF( VHTK_EXAMPLES_FOLDER )
     ENDIF( H3DVIEWER_PLUGIN_FOLDER )
 
