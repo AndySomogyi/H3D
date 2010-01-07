@@ -71,8 +71,29 @@ class SpeedDialog: public wxDialog {
 public:
   SpeedDialog( wxWindow* parent, WxFrame *f );
   void handleSliderEvent( wxScrollEvent &event );
+
+  // Calls the second version of set speed with the speed taken from
+  // current navigation info if there is one, otherwise the speed is the
+  // current default speed for gl_window.
+  void setSpeed();
+
+  // Called to update speed.
+  // speed is the new speed to set.
+  // update_label decides if the value_label text should be updated.
+  // update_slider decides if the slider tick value should be updated.
+  // update_scene_speed decides if the navigation speed in the scene should
+  // be updated.
+  void setSpeed( float speed,
+                 bool update_label,
+                 bool update_slider,
+                 bool update_scene_speed = true );
+
 protected:
+  // The speed increase for each tick on the slider.
+  float speed_per_tick;
   WxFrame *wx_frame;
+  wxStaticText *value_label;
+  wxSlider* speed_slider;
   DECLARE_EVENT_TABLE()
 };
 
@@ -190,6 +211,8 @@ class FrameRateDialog: public wxDialog {
   void updateFrameRates();
   void updateMenuItems();
 
+  void OnKeyDown(wxKeyEvent& event);
+
   wxBoxSizer *topsizer;
   wxStaticText *graphics_rate;
   wxStaticText *haptics_rate;
@@ -212,6 +235,11 @@ public:
               long _style = wxDEFAULT_FRAME_STYLE,
               const wxString& name = wxT("H3D Player") );
 
+  ~WxFrame() {
+    if( recentFiles )
+      delete recentFiles;
+  }
+
   //Pointer to WxWidgetsWindow
   WxWidgetsWindow *glwindow;
 
@@ -220,7 +248,8 @@ public:
   wxMenuBar  *menuBar;
   //Menu Bar Items
   wxMenu     *fileMenu, *rendererMenu, *viewpointMenu,
-             *navigationMenu, *advancedMenu, *helpMenu, *navigationDevices;
+             *navigationMenu, *advancedMenu, *helpMenu;
+  wxMenuItem *navigationDevices;
   //Submenu items
   wxMenu     *hapticsRenderer, *renderMode;
   //File History Menu
@@ -258,9 +287,10 @@ public:
   void ChangeCollision( wxCommandEvent & event );
   void OnSpeed( wxCommandEvent & event );
   void ChangeRenderer( wxCommandEvent & event );
-  void ToggleHaptics( wxCommandEvent & event );
+  //void ToggleHaptics( wxCommandEvent & event );
   void OnSettings( wxCommandEvent & event );
   void OnIdle( wxIdleEvent &event );
+  void OnReload( wxCommandEvent &event);
 
   /***************Standard trivial functions***************/
   wxString GetCurrentFilename();
@@ -337,10 +367,11 @@ private:
   // CollisionOptions
   bool avatar_collision;
 
+  string lastOpenedFilepath;
   wxString currentFilename;
   wxString currentPath;
   bool lastmirror;
-  bool lastDeviceStatus;
+  //bool lastDeviceStatus;
   int selection;
   int navTypeCount;
   int deviceCount;
@@ -377,7 +408,7 @@ private:
   TimeStamp last_viewmenu_update;
 
 public:
-  consoleDialog *  theConsole;
+  ConsoleDialog * the_console;
   H3DViewerTreeViewDialog * tree_view_dialog;
   H3DViewerPluginsDialog * plugins_dialog;
   FrameRateDialog *  frameRates;
@@ -394,14 +425,17 @@ public:
   public:
     ChangeNavType() : glwindow( 0 ), speed_increment( 0.1f ) {}
 
-    inline void setOwnerWindow( H3DWindowNode * owner_window ) {
+    inline void setOwnerWindows( WxWidgetsWindow * owner_window,
+                                 WxFrame *_frame ) {
       glwindow = owner_window;
+      frame = _frame;
     }
 
   protected:
     virtual void update();
 
-    H3DWindowNode *glwindow;
+    WxWidgetsWindow *glwindow;
+    WxFrame * frame;
     H3DFloat speed_increment;
   };
 
@@ -452,7 +486,7 @@ enum
   FRAME_REDBLUE,
   FRAME_REDGREEN,
   FRAME_REDCYAN,
-  FRAME_DEVICECONTROL,
+  //FRAME_DEVICECONTROL,
   FRAME_HAPTICSCONTROL,
   BASIC_PREFRENDERER,
   BASIC_WIREFRAME,
@@ -466,15 +500,13 @@ enum
   BASIC_COLLISION,
   FRAME_SPEED,
   FRAME_SPEED_SLIDER,
-  FRAME_ABOUT,
-  FRAME_HELP,
+  //FRAME_HELP,
   FRAME_SETTINGS,
   FRAME_RESET_VIEWPOINT,
   FRAME_MOUSE_NAV,
   FRAME_KEYBOARD_NAV,
   FRAME_SWS_NAV,
-  FRAME_HAPTICSDEVICE_NAV
+  FRAME_HAPTICSDEVICE_NAV,
+  FRAME_RELOAD
 };
-
-
 

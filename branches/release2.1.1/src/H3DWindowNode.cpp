@@ -376,7 +376,7 @@ bool H3DWindowNode::calculateFarAndNearPlane( H3DFloat &clip_far,
             //const Rotation &rot = hd->trackerOrientation->getValue();
             TransformedBoxBound *tbb = new TransformedBoxBound();
             tbb->boxBound->setValue( bb );
-            Matrix4f m = hd->trackerOrientation->getValue();
+            Matrix4f m( hd->trackerOrientation->getValue() );
             m[0][3] = pos.x;
             m[1][3] = pos.y;
             m[2][3] = pos.z;
@@ -824,7 +824,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glStencilFunc(GL_EQUAL,1,1);
       glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
     } else if( stereo_mode == RenderMode::HORIZONTAL_SPLIT ||
-			   stereo_mode == RenderMode::HORIZONTAL_SPLIT_KEEP_RATIO ) {
+         stereo_mode == RenderMode::HORIZONTAL_SPLIT_KEEP_RATIO ) {
       glViewport( 0, height->getValue() / 2, 
                   width->getValue(), height->getValue() / 2 );
     } else if( stereo_mode == RenderMode::VERTICAL_SPLIT || 
@@ -899,19 +899,13 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
       glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE);
     } else if( stereo_mode == RenderMode::RED_GREEN_STEREO ) {
       glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
       glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE);
     } else if( stereo_mode == RenderMode::RED_CYAN_STEREO ) {
       glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE);
     } else if( stereo_mode == RenderMode::VERTICAL_INTERLACED ||
                stereo_mode == RenderMode::HORIZONTAL_INTERLACED ||
                stereo_mode == RenderMode::CHECKER_INTERLACED ||
@@ -920,7 +914,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glStencilFunc(GL_NOTEQUAL,1,1);
       glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
     } if( stereo_mode == RenderMode::HORIZONTAL_SPLIT ||
-		  stereo_mode == RenderMode::HORIZONTAL_SPLIT_KEEP_RATIO ) {
+      stereo_mode == RenderMode::HORIZONTAL_SPLIT_KEEP_RATIO ) {
       glViewport( 0, 0, 
                   width->getValue(), height->getValue() / 2 );
     } else if( stereo_mode == RenderMode::VERTICAL_SPLIT || 
@@ -970,11 +964,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     H3DMultiPassRenderObject::renderPostSceneAll( child_to_render, 
                                                   vp );
 
-    if( stereo_mode == RenderMode::RED_BLUE_STEREO ||
-        stereo_mode == RenderMode::RED_GREEN_STEREO ||
-        stereo_mode == RenderMode::RED_CYAN_STEREO )
-      glDisable( GL_BLEND );
-    else if( stereo_mode == RenderMode::VERTICAL_INTERLACED ||
+    if( stereo_mode == RenderMode::VERTICAL_INTERLACED ||
              stereo_mode == RenderMode::HORIZONTAL_INTERLACED ||
              stereo_mode == RenderMode::CHECKER_INTERLACED ) 
       glDisable( GL_STENCIL_TEST );
@@ -1391,39 +1381,39 @@ LRESULT H3DWindowNode::Message(HWND _hWnd,
     case WM_LBUTTONDOWN:
     case WM_LBUTTONDBLCLK: {
       MouseSensor::buttonCallback( MouseSensor::LEFT_BUTTON,
-                                      MouseSensor::DOWN );
+                                   MouseSensor::DOWN );
       break;
     }
 
     case WM_LBUTTONUP: {
       MouseSensor::buttonCallback( MouseSensor::LEFT_BUTTON,
-                                      MouseSensor::UP );
+                                   MouseSensor::UP );
       break;
     }
 
     case WM_MBUTTONDOWN:
     case WM_MBUTTONDBLCLK: {
       MouseSensor::buttonCallback( MouseSensor::MIDDLE_BUTTON,
-                                      MouseSensor::DOWN );
+                                   MouseSensor::DOWN );
       break;
     }
 
     case WM_MBUTTONUP: {
       MouseSensor::buttonCallback( MouseSensor::MIDDLE_BUTTON,
-                                      MouseSensor::UP );
+                                   MouseSensor::UP );
       break;
     }
 
     case WM_RBUTTONDOWN:
     case WM_RBUTTONDBLCLK: {
       MouseSensor::buttonCallback( MouseSensor::RIGHT_BUTTON,
-                                      MouseSensor::DOWN );
+                                   MouseSensor::DOWN );
       break;
     }
 
     case WM_RBUTTONUP: {
       MouseSensor::buttonCallback( MouseSensor::RIGHT_BUTTON,
-                                      MouseSensor::UP );
+                                   MouseSensor::UP );
       break;
     }
 

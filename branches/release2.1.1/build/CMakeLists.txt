@@ -1,3 +1,9 @@
+IF( COMMAND cmake_policy )
+  IF( POLICY CMP0003 )
+    cmake_policy(SET CMP0003 OLD)
+  ENDIF( POLICY CMP0003 )
+ENDIF( COMMAND cmake_policy )
+
 IF(WIN32)
   cmake_minimum_required(VERSION 2.6.0)
 ENDIF(WIN32)
@@ -56,9 +62,9 @@ IF( WIN32 )
   ENDIF(CHAI3D_INCLUDE_DIR AND CHAI3D_LIBRARY)
 
   # Check if OpenHaptics was found.
-  IF(OPENHAPTICS_INCLUDE_DIR AND HD_LIBRARY AND HL_LIBRARY AND HDU_LIBRARY)
+  IF(OPENHAPTICS_INCLUDE_DIR AND OPENHAPTICS_HD_LIBRARY AND OPENHAPTICS_HL_LIBRARY AND OPENHAPTICS_HDU_LIBRARY)
     SET( OPENHAPTICS_FOUND 1 )
-  ENDIF(OPENHAPTICS_INCLUDE_DIR AND HD_LIBRARY AND HL_LIBRARY AND HDU_LIBRARY)
+  ENDIF(OPENHAPTICS_INCLUDE_DIR AND OPENHAPTICS_HD_LIBRARY AND OPENHAPTICS_HL_LIBRARY AND OPENHAPTICS_HDU_LIBRARY)
 
   # Check if HAPTIK was found.
   IF(HAPTIK_INCLUDE_DIR AND HAPTIK_LIBRARY)
@@ -410,8 +416,9 @@ IF(NOT WIN32)
     INCLUDE_DIRECTORIES( ${HAPI_INCLUDE_DIR} ) 
     SET(requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
   ENDIF(HAPI_FOUND)
-ELSEIF( MSVC70 OR MSVC71 )
-  # On other versions of visual studio dependency setting is enough to link correctly.
+ELSEIF( MSVC70 OR MSVC71 OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.7)
+  # On other versions than vc7 visual studio dependency setting is enough to 
+  # link correctly( except from cmake v2.8 and forward)
   SET(requiredLibs ${requiredLibs} H3DUtil HAPI)
 
   IF(CHAI3D_FOUND)
@@ -454,7 +461,7 @@ IF(OPENGL_FOUND)
 ENDIF(OPENGL_FOUND)
 
 # Find Glew library. Required to compile.
-FIND_PACKAGE(GLEW)
+FIND_PACKAGE(GLEW REQUIRED)
 IF(GLEW_FOUND)
   INCLUDE_DIRECTORIES( ${GLEW_INCLUDE_DIR} ) 
   SET(requiredLibs ${requiredLibs} ${GLEW_LIBRARIES} )
@@ -582,6 +589,7 @@ ENDIF(3DXWARE_FOUND)
 FIND_PACKAGE(FTGL)
 IF(FTGL_FOUND)
   SET(HAVE_FTGL 1)
+  SET(FTGL_INCLUDE_IS_UPPER ${FTGL_INCLUDE_IS_UPPER})
   INCLUDE_DIRECTORIES( ${FTGL_INCLUDE_DIR} ) 
   SET(optionalLibs ${optionalLibs} ${FTGL_LIBRARIES} )
 ENDIF(FTGL_FOUND)
@@ -670,7 +678,7 @@ IF( MSVC )
   ADD_CUSTOM_COMMAND( TARGET H3DAPI 
                       PRE_BUILD 
                       COMMAND ${H3DAPI_SOURCE_DIR}/UpdateResourceFile 
-                      ARGS H3DAPI ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc H3DAPI.rc.cmake
+                      ARGS H3DAPI ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc ${H3DAPI_SOURCE_DIR}/H3DAPI.rc.cmake
                       ${H3DAPI_MAJOR_VERSION} ${H3DAPI_MINOR_VERSION}
                       ${H3DAPI_BUILD_VERSION}
                       ${H3DAPI_SOURCE_DIR}/../src/.svn/entries )
@@ -748,7 +756,27 @@ IF( WIN32 )
     IF( CMAKE_CL_64 )
       SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /bigobj" )
     ENDIF( CMAKE_CL_64 )
-    # H3D API is now to big to link incrementally with vc9.
+    # H3D API is now too big to link incrementally with vc9.
+    SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt /INCREMENTAL:NO" )
+    # Needed to delayload OpenHapticsRenderer. They must have changed the way symbols are imported between versions of visual studio.
+    IF(OPENHAPTICS_FOUND)
+      SET_SOURCE_FILES_PROPERTIES( "${H3DAPI_SOURCE_DIR}/../src/MagneticSurface.cpp"
+                                   "${H3DAPI_SOURCE_DIR}/../src/OpenHapticsSurface.cpp"
+                                   "${H3DAPI_SOURCE_DIR}/../src/X3DGeometryNode.cpp"
+                                   PROPERTIES COMPILE_FLAGS "/Od" )
+    ENDIF(OPENHAPTICS_FOUND)
+
+  ELSEIF(MSVC10)
+    SET_TARGET_PROPERTIES( H3DAPI PROPERTIES OUTPUT_NAME H3DAPI_vc10 )
+    SET( TEMP_OUTPUT_POSTFIX _vc10 )
+    # remove some warnings about deprecated functions.
+    SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t- /MP" )
+    # if we are using 64 bit compiler some object files get too big so we need
+    # to add the /bigobj flag
+    IF( CMAKE_CL_64 )
+      SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /bigobj" )
+    ENDIF( CMAKE_CL_64 )
+    # H3D API is now to big to link incrementally with vc10.
     SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt /INCREMENTAL:NO" )
     # Needed to delayload OpenHapticsRenderer. They must have changed the way symbols are imported between versions of visual studio.
     IF(OPENHAPTICS_FOUND)
@@ -760,7 +788,7 @@ IF( WIN32 )
   ENDIF(MSVC70 OR MSVC71)
 
   # Set delayload properties of H3D API.
-  SET( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /DELAYLOAD:\"cg.dll\" /DELAYLOAD:\"cgGL.dll\" /DELAYLOAD:\"FreeImage.dll\" /DELAYLOAD:\"ftgl_dynamic_MTD.dll\" /DELAYLOAD:\"OpenAL32.dll\" /DELAYLOAD:\"vorbisfile.dll\"")
+  SET( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /DELAYLOAD:\"cg.dll\" /DELAYLOAD:\"cgGL.dll\" /DELAYLOAD:\"FreeImage.dll\" /DELAYLOAD:\"OpenAL32.dll\" /DELAYLOAD:\"vorbisfile.dll\" /DELAYLOAD:\"VirtualHandDevice.dll\" /DELAYLOAD:\"VirtualHandCore.dll\"")
 
   IF(HAPTIK_FOUND)
     SET( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /DELAYLOAD:\"Haptik.Library.dll\"" )
