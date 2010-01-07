@@ -7,7 +7,7 @@
 
 FIND_PROGRAM(FREETYPE_CONFIG_EXECUTABLE freetype-config
       ONLY_CMAKE_FIND_ROOT_PATH
-      )
+      DOC "Path to freetype_config executable. Used to find freetype, not used on a standard Windows installation of H3DAPI.")
 MARK_AS_ADVANCED( FREETYPE_CONFIG_EXECUTABLE )
 
 IF(FREETYPE_CONFIG_EXECUTABLE)
@@ -57,16 +57,18 @@ IF( NOT FREETYPE_INCLUDE_DIR )
                                     ../../External/include
                                     ../../External/include/freetype/include
                                     ${module_file_path}/../../../External/include
-                                    ${module_file_path}/../../../External/include/freetype/include)
+                                    ${module_file_path}/../../../External/include/freetype/include
+                              DOC "Path in which the file freetype/freetype.h is located." )
   MARK_AS_ADVANCED(FREETYPE_INCLUDE_DIR)
 ENDIF( NOT FREETYPE_INCLUDE_DIR)
 
 # Look for the library.
-FIND_LIBRARY(FREETYPE_LIBRARY NAMES freetype freetype235
+FIND_LIBRARY(FREETYPE_LIBRARY NAMES freetype freetype2311 freetype235
                               PATHS $ENV{H3D_EXTERNAL_ROOT}/lib
                                     $ENV{H3D_ROOT}/../External/lib
                                     ../../External/lib
-                                    ${module_file_path}/../../../External/lib )
+                                    ${module_file_path}/../../../External/lib
+                              DOC "Path to freetype library." )
 MARK_AS_ADVANCED(FREETYPE_LIBRARY)
 
 # Copy the results to the output variables.

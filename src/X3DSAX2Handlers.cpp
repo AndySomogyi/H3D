@@ -291,7 +291,8 @@ Field * X3DSAX2Handlers::handleFieldElement( const Attributes &attrs,
                                   (int)locator->getLineNumber() );
       }
       if( access_type == Field::INITIALIZE_ONLY ||
-          access_type == Field::INPUT_OUTPUT ) {
+          access_type == Field::INPUT_OUTPUT ||
+          access_type == Field::INPUT_ONLY ) {
         try {
           pfield->setValueFromString( toString( field_value ) ); 
         }
@@ -317,7 +318,7 @@ Field * X3DSAX2Handlers::handleFieldElement( const Attributes &attrs,
         }
       } else {
         Console(3) << "Warning: 'value' attribute ignored. Only used if "
-             << "accesstype is initializeOnly or inputOutput " 
+             << "accesstype is initializeOnly, inputOnly or inputOutput " 
              << getLocationString() << endl;
       }
     }
@@ -601,9 +602,9 @@ void X3DSAX2Handlers::handleConnectElement( const Attributes &attrs,
         if( !parent->isInitialized() && parent->getManualInitialize() ) {
           parent->initialize();
           Console(3) << "WARNING: When using a PythonScript in a Protobody "
-                     << "all nodes within the PythonScript tags has to be "
-                     << "declared before the connect elements. This warning "
-                     << "is outputed even if this is already the case. "
+                     << "all nodes specified for the references field of PythonScript "
+                     << "have to be declared before the connect elements. This warning "
+                     << "is displayed even if this is already the case. "
                      << getLocationString() << endl;
         }
       }

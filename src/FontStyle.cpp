@@ -34,11 +34,18 @@
 #endif
 
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
+
+#ifdef FTGL_INCLUDE_IS_UPPER
 #include <FTGL/FTGL.h>
+#else
+#include <FTGL/ftgl.h>
+#endif
+
 #include <FTGL/FTGLTextureFont.h>
 #include <FTGL/FTGLPolygonFont.h>
 #include <FTGL/FTGLOutlineFont.h>
 #include <FTGL/FTGLExtrdFont.h>
+
 #if defined(__APPLE__) && defined(__MACH__)
 #include <freetype/ftmac.h>
 #else
@@ -54,163 +61,92 @@ using namespace H3D;
 
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
 namespace FontStyleInternals {
-	static map< string, FTFont* > font_db;
-
-#if defined(__APPLE__) && defined(__MACH__)
-FT_Error  xFT_GetFile_From_Mac_Name( const char* fontName,
-                                     FSSpec*     pathSpec,
-                                     FT_Long*    face_index )
-{
-    OptionBits            options = kFMUseGlobalScopeOption;
-    
-    FMFontFamilyIterator  famIter;
-    OSStatus              status = FMCreateFontFamilyIterator( NULL, NULL,
-                                                               options,
-                                                               &famIter );
-    FMFont                the_font = NULL;
-    FMFontFamily          family   = NULL;
-    
-    
-    *face_index = 0;
-    while ( status == 0 && !the_font )
-    {
-      status = FMGetNextFontFamily( &famIter, &family );
-      if ( status == 0 )
-      {
-        int                           stat2;
-        FMFontFamilyInstanceIterator  instIter;
-        Str255                        famNameStr;
-        char                          famName[256];
-        
-        
-        /* get the family name */
-        FMGetFontFamilyName( family, famNameStr );
-        CopyPascalStringToC( famNameStr, famName );
-        
-        /* iterate through the styles */
-        FMCreateFontFamilyInstanceIterator( family, &instIter );
-        
-        *face_index = 0;
-        stat2 = 0;
-        while ( stat2 == 0 && !the_font )
-        {
-          FMFontStyle  style;
-          FMFontSize   size;
-          FMFont       font;
-          
-          
-          stat2 = FMGetNextFontFamilyInstance( &instIter, &font,
-                                               &style, &size );
-          if ( stat2 == 0 && size == 0 )
-          {
-            char  fullName[256];
-            
-            
-            /* build up a complete face name */
-            ft_strcpy( fullName, famName );
-            if ( style & bold )
-              strcat( fullName, " Bold" );
-            if ( style & italic )
-              strcat( fullName, " Italic" );
-            
-            /* compare with the name we are looking for */
-            if ( ft_strcmp( fullName, fontName ) == 0 )
-            {
-              /* found it! */
-              the_font = font;
-            }
-            else
-              ++(*face_index);
-          }
-        }
-        
-        FMDisposeFontFamilyInstanceIterator( &instIter );
+  // Internal map where the destructor deletes allocated
+  // FTFonts. Note, this code will not work if FTGL is delayloaded
+  // in Windows because of different initialization order.
+  class FontStyleMap : public map< string, FTFont* > {
+  public:
+    // This will not work if FTGL is delayloaded.
+    ~FontStyleMap() {
+      while( !empty() ) {
+        iterator i = begin();
+        delete (*i).second;
+        erase( i );
       }
     }
-    
-    FMDisposeFontFamilyIterator( &famIter );
-    
-    if ( the_font )
-    {
-      FMGetFontContainer( the_font, pathSpec );
-      return FT_Err_Ok;
-    }
-    else
-      return FT_Err_Unknown_File_Format;
-}
-
-#endif
+  };
+  static FontStyleMap font_db;
 
 #ifdef WIN32
 
 LONG GetNameValue(HKEY key, LPCTSTR subkey, LPCTSTR valuename, LPTSTR retdata)
 {
-	HKEY hkey;
-	LONG retval = RegOpenKeyEx(key, subkey, 0, KEY_QUERY_VALUE, &hkey);
-	
-	*retdata = 0;
+  HKEY hkey;
+  LONG retval = RegOpenKeyEx(key, subkey, 0, KEY_QUERY_VALUE, &hkey);
+  
+  *retdata = 0;
 
-	if (retval == ERROR_SUCCESS) 
-	{
-		DWORD datasize = MAX_PATH;
-		BYTE data[MAX_PATH];
-		DWORD type = 0;
+  if (retval == ERROR_SUCCESS) 
+  {
+    DWORD datasize = MAX_PATH;
+    BYTE data[MAX_PATH];
+    DWORD type = 0;
 
-		retval = RegQueryValueEx(hkey, valuename, NULL, &type, data, &datasize);
-		if (retval == ERROR_SUCCESS) 
-		{
-			lstrcpy(retdata, (const char *)data);
-		}
+    retval = RegQueryValueEx(hkey, valuename, NULL, &type, data, &datasize);
+    if (retval == ERROR_SUCCESS) 
+    {
+      lstrcpy(retdata, (const char *)data);
+    }
 
-		RegCloseKey(hkey);
-	}
+    RegCloseKey(hkey);
+  }
 
 
-	return retval;
+  return retval;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // GetNextNameValue
 LONG GetNextNameValue(HKEY key, LPCTSTR subkey, LPTSTR szName, LPTSTR szData)
 {
-	static HKEY hkey = NULL;
-	static DWORD dwIndex = 0;
-	LONG retval;
+  static HKEY hkey = NULL;
+  static DWORD dwIndex = 0;
+  LONG retval;
 
-	if (subkey == NULL && szName == NULL && szData == NULL)	{
-		if (hkey)
-			RegCloseKey(hkey);
-		hkey = NULL;
-		return ERROR_SUCCESS;
-	}
+  if (subkey == NULL && szName == NULL && szData == NULL)  {
+    if (hkey)
+      RegCloseKey(hkey);
+    hkey = NULL;
+    return ERROR_SUCCESS;
+  }
 
-	if (subkey && subkey[0] != 0)	{
-		retval = RegOpenKeyEx(key, subkey, 0, KEY_READ, &hkey);
-		if (retval != ERROR_SUCCESS){
-			return retval;
-		}
-		dwIndex = 0;
-	}	else	{
-		dwIndex++;
-	}
-	
-	*szName = 0;
-	*szData = 0;
+  if (subkey && subkey[0] != 0)  {
+    retval = RegOpenKeyEx(key, subkey, 0, KEY_READ, &hkey);
+    if (retval != ERROR_SUCCESS){
+      return retval;
+    }
+    dwIndex = 0;
+  }  else  {
+    dwIndex++;
+  }
+  
+  *szName = 0;
+  *szData = 0;
 
-	char szValueName[MAX_PATH];
-	DWORD dwValueNameSize = sizeof(szValueName)-1;
-	BYTE szValueData[MAX_PATH];
-	DWORD dwValueDataSize = sizeof(szValueData)-1;
-	DWORD dwType = 0;
+  char szValueName[MAX_PATH];
+  DWORD dwValueNameSize = sizeof(szValueName)-1;
+  BYTE szValueData[MAX_PATH];
+  DWORD dwValueDataSize = sizeof(szValueData)-1;
+  DWORD dwType = 0;
 
-	retval = RegEnumValue(hkey, dwIndex, szValueName, &dwValueNameSize, NULL, 
-		&dwType, szValueData, &dwValueDataSize);
-	if (retval == ERROR_SUCCESS) 	{
-		lstrcpy(szName, (char *)szValueName);
-		lstrcpy(szData, (char *)szValueData);
-	}
+  retval = RegEnumValue(hkey, dwIndex, szValueName, &dwValueNameSize, NULL, 
+    &dwType, szValueData, &dwValueDataSize);
+  if (retval == ERROR_SUCCESS)   {
+    lstrcpy(szName, (char *)szValueName);
+    lstrcpy(szData, (char *)szValueData);
+  }
 
-	return retval;
+  return retval;
 }
 
 BOOL GetFontFile(LPCTSTR lpszFontName, 
@@ -218,70 +154,100 @@ BOOL GetFontFile(LPCTSTR lpszFontName,
                  string& strFontFile)
 {
 
-	TCHAR szName[2 * MAX_PATH];
-	TCHAR szData[2 * MAX_PATH];
+  TCHAR szName[2 * MAX_PATH];
+  TCHAR szData[2 * MAX_PATH];
 
-	LPCTSTR strFont = "Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts";
+  LPCTSTR strFont = "Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts";
 
-	BOOL bResult = FALSE;
+  BOOL bResult = FALSE;
 
-	while (GetNextNameValue(HKEY_LOCAL_MACHINE, strFont, szName, szData) == 
+  while (GetNextNameValue(HKEY_LOCAL_MACHINE, strFont, szName, szData) == 
          ERROR_SUCCESS)
-	{
-		if (_strnicmp(lpszFontName, szName, strlen(lpszFontName)) == 0)
-		{
-			strDisplayName = szName;
-			strFontFile = szData;
-			bResult = TRUE;
-			break;
-		}
+  {
+    if (_strnicmp(lpszFontName, szName, strlen(lpszFontName)) == 0)
+    {
+      strDisplayName = szName;
+      strFontFile = szData;
+      bResult = TRUE;
+      break;
+    }
     strFont = "";
 
 
-	}
+  }
   // close the registry key
-	GetNextNameValue(HKEY_LOCAL_MACHINE, NULL, NULL, NULL);	
+  GetNextNameValue(HKEY_LOCAL_MACHINE, NULL, NULL, NULL);  
 
-	return bResult;
+  return bResult;
 }
 
 
 #endif
 
 #ifdef LINUX
-string FC_GetFontByName( const char *font_name ) {
-  string fn="";
+string FC_GetFontByName( const char *font_name, bool bold, bool italic ) {
+  // the fn_canditate variable will be set if we have found a font
+  // of the given family but with an unrecognised style. It will be
+  // used of no appropriate style is found for the family.
+  string fn_candidate = "";
   FcObjectSet *os = 0;
-  FcFontSet	*fs;
+  FcFontSet  *fs;
   FcPattern   *pat;
 
+  vector< string > styles;
+
+  if( bold && italic ) {
+    styles.push_back( "BoldItalic" );
+    styles.push_back( "Bold Italic" );
+    styles.push_back( "Bold Oblique" );
+    styles.push_back( "BoldOblique" );
+  } else if( bold ) {
+    styles.push_back( "Bold" );
+  }  else if( italic ) {
+    styles.push_back( "Italic" );
+    styles.push_back( "Oblique" );
+  } else {
+    styles.push_back( "Regular" );
+    styles.push_back( "Normal" );
+    styles.push_back( "Medium" );
+  }
+
   pat = FcPatternCreate ();
-  os = FcObjectSetBuild (FC_FAMILY, FC_FILE, 0);
-  fs = FcFontList (0, pat, os);
+  os = FcObjectSetBuild (FC_FAMILY, FC_FILE, FC_STYLE, NULL);
+  fs = FcFontList (NULL, pat, os);
   if (pat)
     FcPatternDestroy (pat);
   
   if (fs) {
-    int	j;
+    int  j;
     
     for (j = 0; j < fs->nfont; j++) {
-      FcChar8 *font;
       FcChar8 *file;
-      
-      font = FcNameUnparse(fs->fonts[j]);
-      if ( FcPatternGetString(fs->fonts[j], FC_FILE, 0, &file) 
-	   == FcResultMatch) {
-	if (strncasecmp(font_name, (char*)font, strlen(font_name)) == 0)
-	  fn=string((char*)file);
-	//printf ("%s\n ", file);
-	//printf ("%s: ", font);
+      FcChar8 *style;
+      FcChar8 *family;
+
+      FcPatternGetString(fs->fonts[j], FC_FILE, 0, &file); 
+      FcPatternGetString(fs->fonts[j], FC_STYLE, 0, &style );
+      FcPatternGetString(fs->fonts[j], FC_FAMILY, 0, &family );
+   
+      if (strncasecmp(font_name, (char*)family, strlen(font_name)) == 0) {
+        // check if the font is of the correct type.
+        for( size_t s = 0; s < styles.size(); s++ ) {
+          if (strcasecmp( styles[s].c_str(), 
+              (char*)style ) == 0) {
+            FcFontSetDestroy (fs);
+            return( string((char*)file) );
+        }
+
+        // set value to use if no more correct font of same family is found.
+        fn_candidate = string( (char *)file );
+      }
 
       }
-      free (font);
     }
     FcFontSetDestroy (fs);
   }
-  return fn;
+  return fn_candidate;
 }
 
 
@@ -294,42 +260,33 @@ string FC_GetFontByName( const char *font_name ) {
                          bool italic,
                          const string &render_type ) {
 
-	string full_font_path;
+  string full_font_path;
+
+  string full_font_name = font_name;
+  if( bold ) {
+    full_font_name = full_font_name + " Bold";
+  }
+  
+  if( italic ) {
+    full_font_name = full_font_name + " Italic";
+  }
+
 #if defined(__APPLE__) && defined(__MACH__)
-    FSSpec ps;
+    char path[1024];
     FT_Long face_index;
-    FT_Error r = xFT_GetFile_From_Mac_Name( font_name.c_str(), &ps, &face_index );
+    FT_Error r = FT_GetFilePath_From_Mac_ATS_Name( full_font_name.c_str(),
+                                                   (UInt8 * )path,
+                                                   1024,
+                                                   &face_index );
     if ( r != FT_Err_Ok ) {
       return NULL;
     }
     
-    FSRef  ref;
-    char  path[256];
-    OSErr  err;
-    
-      
-    err = FSpMakeFSRef(&ps, &ref);
-    if ( !err ) {
-      err = FSRefMakePath( &ref, (UInt8*)path, sizeof ( path ) );
-      if ( !err ) {
-        full_font_path = path;
-      } else {
-        return NULL;
-      }
-    } else {
-      return NULL;
-    }
+    full_font_path = path;
+
 #endif
 #ifdef WIN32
     string font_display_name, font_file_name;
-    string full_font_name = font_name;
-    if( bold ) {
-      full_font_name = full_font_name + " Bold";
-    }
-    
-    if( italic ) {
-      full_font_name = full_font_name + " Italic";
-    }
     if( !GetFontFile( full_font_name.c_str(), font_display_name, font_file_name ) ) {
       return NULL;
     } 
@@ -338,14 +295,16 @@ string FC_GetFontByName( const char *font_name ) {
     full_font_path = path + font_file_name;
 #endif
 #ifdef LINUX
-    full_font_path = FC_GetFontByName( font_name.c_str() );
+    full_font_path = FC_GetFontByName( font_name.c_str(), bold, italic );
+    if( full_font_path == "" ) return NULL;
 #endif
     FTFont *font = NULL;
-	// search font cache first:
+  // search font cache first:
     string font_to_search = render_type + full_font_path;
-	map<string,FTFont*>::iterator f = font_db.find( font_to_search );
-	if ( f != font_db.end() )
-	  return (*f).second;
+    FontStyleInternals::FontStyleMap::iterator f =
+      font_db.find( font_to_search );
+  if ( f != font_db.end() )
+    return (*f).second;
   if( render_type == "POLYGON" ) {
     font = new FTGLPolygonFont( full_font_path.c_str() ); 
   } else if( render_type == "TEXTURE" ) {
@@ -356,13 +315,13 @@ string FC_GetFontByName( const char *font_name ) {
     font = new FTGLExtrdFont( full_font_path.c_str() ); 
   }
   if( !font || font->Error() ) return NULL;
-	else {
-	  font->FaceSize( 72 );
-	  font->CharMap(ft_encoding_unicode);
-	  font->UseDisplayList( true );
-	  font_db[font_to_search]=font;
-	  return font;
-	}
+  else {
+    font->FaceSize( 72 );
+    font->CharMap(ft_encoding_unicode);
+    font->UseDisplayList( true );
+    font_db[font_to_search]=font;
+    return font;
+  }
   }
 
 }
@@ -495,7 +454,7 @@ void FontStyle::buildFonts() {
        n != family->end();
        n++ ) {
     const char *font_name = (*n).c_str();
-    if( std::strcmp( font_name, "SANS" ) == 0 ) {
+    if( strcmp( font_name, "SANS" ) == 0 ) {
       font_name = DEFAULT_SANS_FONT;
     } else if( strcmp( font_name, "SERIF" ) == 0 ) {
       font_name = DEFAULT_SERIF_FONT;
@@ -503,7 +462,7 @@ void FontStyle::buildFonts() {
       font_name = DEFAULT_TYPEWRITER_FONT;
     } 
     
-	font =FontStyleInternals::getFontByName( font_name, bold, italic, render_type );
+  font =FontStyleInternals::getFontByName( font_name, bold, italic, render_type );
     // if bold or italic font was not found try to get the plain font
     // instead.
     if( !font && ( bold||italic) ) 
@@ -531,12 +490,12 @@ void FontStyle::buildFonts() {
     font = FontStyleInternals::getFontByName( DEFAULT_SERIF_FONT, 
                                               bold, 
                                               italic,
-											  render_type);
+                        render_type);
     if( !font && ( bold||italic) )
       font = FontStyleInternals::getFontByName( DEFAULT_SERIF_FONT, 
                                          false, 
                                          false,
-										 render_type);
+                     render_type);
 
 
     if( !font ) {
@@ -584,7 +543,6 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
 }
 
 void FontStyle::renderChar( unsigned char c ) {
-  char t[2];  t[0]=c; t[1]='\0';
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   H3DFloat s = size->getValue();
@@ -599,7 +557,27 @@ void FontStyle::renderChar( unsigned char c ) {
   }
   
   glNormal3f( 0, 0, 1 );
-  font->Render( t );
+
+#ifndef FTGL_INCLUDE_IS_UPPER
+  if( c < 128 ) {
+    // Ascii c is below 127 which means that we should not
+    // touch the value.
+#endif
+    char t[2];  t[0]=c; t[1]='\0';
+    font->Render( t );
+#ifndef FTGL_INCLUDE_IS_UPPER
+  } else {
+    // The math to explain this conversion can be found here
+    // http://everything2.com/title/Converting+ASCII+to+UTF-8
+    // It is needed because FTGL added unicode support and H3DAPI does
+    // not support unicode correctly yet. This avoids a crash.
+    char t[3];
+    t[0]=(c >> 6) | 0xC0;
+    t[1]=(c & 0x3F) | 0x80;
+    t[2]='\0';
+    font->Render( t );
+  }
+#endif
   
   if( renderType->getValue() == "TEXTURE" ) {
     glDisable( GL_ALPHA_TEST );
@@ -625,13 +603,35 @@ Vec3f FontStyle::charDimensions( unsigned char c ) {
       
   H3DFloat default_size = font->Ascender() - font->Descender();
   H3DFloat scale_factor = size->getValue() / default_size;
-  char t[2];  t[0]=c; t[1]='\0';
-  float llx, lly, llz, urx, ury, urz;
-  font->BBox( t, llx, lly, llz, urx, ury, urz );
-  
-  return Vec3f(font->Advance(t),
-	       font->Ascender()-font->Descender(),
-	       llz-urz) * scale_factor;
+#ifndef FTGL_INCLUDE_IS_UPPER
+  if( c < 128 ) {
+    // Ascii c is below 127 which means that we should not
+    // touch the value.
+#endif
+    char t[2];
+    t[0]=c; t[1]='\0';
+    float llx, lly, llz, urx, ury, urz;
+    font->BBox( t, llx, lly, llz, urx, ury, urz );
+    return Vec3f(font->Advance(t),
+         font->Ascender()-font->Descender(),
+         llz-urz) * scale_factor;
+#ifndef FTGL_INCLUDE_IS_UPPER
+  } else {
+    // The math to explain this conversion can be found here
+    // http://everything2.com/title/Converting+ASCII+to+UTF-8
+    // It is needed because FTGL added unicode support and H3DAPI does
+    // not support unicode correctly yet. This avoids a crash.
+    char t[3];
+    t[0]=(c >> 6) | 0xC0;
+    t[1]=(c & 0x3F) | 0x80;
+    t[2]='\0';
+    float llx, lly, llz, urx, ury, urz;
+    font->BBox( t, llx, lly, llz, urx, ury, urz );
+    return Vec3f(font->Advance(t),
+         font->Ascender()-font->Descender(),
+         llz-urz) * scale_factor;
+  }
+#endif
 
 }
 

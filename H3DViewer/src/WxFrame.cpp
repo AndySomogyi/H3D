@@ -35,13 +35,8 @@
 #include <wx/apptrait.h>
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
+#include <wx/gbsizer.h>
 #include "WxFrame.h"
-#include "ConsoleDialog.h"
-#include <vector>
-#include "WxWidgetsWindow.h"
-
-#include "H3DViewer.h"
-#include <wx/wx.h>
 #include "Envini.h"
 
 // ---------------------------------------------------------------------------
@@ -50,32 +45,17 @@
 
 #include <H3D/VrmlParser.h>
 #include <H3D/Group.h>
-#include <H3D/Transform.h>
-#include <H3D/Scene.h>
-#include <H3D/KeySensor.h>
-#include <H3D/MouseSensor.h>
-
-#ifndef MACOSX
-#include <H3D/SpaceWareSensor.h>
-#endif
-
 #include <H3D/Viewpoint.h>
 #include <H3D/ViewpointGroup.h>
-#include <H3D/X3DViewpointNode.h>
-#include <H3D/DeviceInfo.h>
 #include <H3D/INIFile.h>
-#include <H3D/ResourceResolver.h>
 #include <H3D/GraphicsCachingOptions.h>
 #include <H3D/DebugOptions.h>
 #include <H3D/HapticsOptions.h>
 #include <H3D/GeometryBoundTreeOptions.h>
-#include <H3D/OpenHapticsOptions.h>
 #include <H3D/CollisionOptions.h>
 #include <H3D/H3DNavigation.h>
 #include <H3D/HapticsRenderers.h>
 
-#include <HAPI/HAPIHapticsRenderer.h>
-#include <H3DUtil/Console.h>
 #include <H3DUtil/DynamicLibrary.h>
 
 using namespace std;
@@ -114,9 +94,9 @@ class QuitAPIField: public AutoUpdate< SFString > {
 
 #if wxUSE_DRAG_AND_DROP
 
-void onDropFiles(wxCoord x, wxCoord y,
-		 const wxArrayString& filenames,
-		 void *arg ) {
+void onDropFiles( wxCoord x, wxCoord y,
+                  const wxArrayString& filenames,
+                  void *arg ) {
   WxFrame *f = static_cast< WxFrame * >( arg );
   size_t n_files = filenames.GetCount();
   // load the first file, ignore the rest
@@ -174,16 +154,17 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
                         const wxString& _title, const wxPoint& _pos,
                         const wxSize& _size, long _style,
                         const wxString& _name ):
+  wxFrame(_parent, _id, _title, _pos, _size, _style, _name ),
   navTypeCount(0),
   deviceCount(0),
-  navigationDevices(0),
-  wxFrame(_parent, _id, _title, _pos, _size, _style, _name ),
+  navigationDevices(NULL),
   avatar_collision( true ),
   loaded_first_file( false ),
   change_nav_type( new ChangeNavType ),
   itemIdViewpointMap(),
   current_viewpoint_id(0)
 {
+  lastOpenedFilepath = "";
   wxAcceleratorEntry entries[1];
   entries[0].Set(wxACCEL_NORMAL, (int) WXK_F11, FRAME_RESTORE);
   wxAcceleratorTable accel(1, entries);
@@ -211,12 +192,12 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   t->children->clear();
   g->children->push_back( t.get() );
   scene->window->push_back( glwindow );
-  scene->sceneRoot->setValue( g.get() );
+  scene->sceneRoot->setValue( g );
 
   wxString console_string = wxT("Console");
-  theConsole = new consoleDialog(this, wxID_ANY, console_string, 
-                                 wxDefaultPosition, wxDefaultSize,
-                                 wxDEFAULT_DIALOG_STYLE);
+  the_console = new ConsoleDialog( this, wxID_ANY, console_string,
+                                   wxDefaultPosition, wxDefaultSize,
+                                   wxDEFAULT_DIALOG_STYLE );
   tree_view_dialog = new H3DViewerTreeViewDialog( this ); 
   plugins_dialog = new H3DViewerPluginsDialog( this ); 
   frameRates = new FrameRateDialog( this );
@@ -227,7 +208,7 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
 
   //Haptics on by default
   /*********TODO: Save this in registry for next session**************/
-  lastDeviceStatus = true;
+  //lastDeviceStatus = true;
 
   //Main Menu Bar
   menuBar  = (wxMenuBar *) NULL;
@@ -266,10 +247,13 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   fileMenu->Append(FRAME_OPEN,wxT("&Open file...\tCtrl+O"),wxT("Open a file"));
   fileMenu->Append(FRAME_OPEN_URL, wxT("&Open file from URL..."), wxT("Open a file ")
                    wxT("from UR") );
-  fileMenu->Append(FRAME_CLOSE, wxT("&Close file"),wxT("Close file"));
+  fileMenu->Append(FRAME_CLOSE, wxT("&Close file\tCtrl+F4"),wxT("Close file"));
   fileMenu->AppendSeparator();
   fileMenu->Append(FRAME_CHOOSEDIR, wxT("Change Working Directory"), wxT("Change ")
                    wxT("working directory..."));
+  // 09.10.14 reload page
+  fileMenu->Append(FRAME_RELOAD, wxT("&Reload\tF5"), wxT("Reload the file"));
+
   fileMenu->AppendSeparator();
   fileMenu->Append(FRAME_PLUGINS, wxT("Plugins"),
                    wxT("Show/change installed plugins")); 
@@ -340,7 +324,7 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
 
   //Renderer Menu
   rendererMenu = new wxMenu;
-  rendererMenu->AppendCheckItem(FRAME_FULLSCREEN, wxT("Fullscreen Mode"),
+  rendererMenu->AppendCheckItem(FRAME_FULLSCREEN, wxT("Fullscreen Mode\tF11"),
                                 wxT("View in fullscreen"));
   rendererMenu->AppendCheckItem(FRAME_MIRROR, wxT("Mirror in Y"),
                                 wxT("Mirror Scene in Y"));
@@ -361,12 +345,12 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
 
   //Advanced Menu
   advancedMenu = new wxMenu;
-  advancedMenu->Append(FRAME_CONSOLE, wxT("Show Console"),
+  advancedMenu->Append(FRAME_CONSOLE, wxT("Show Console\tF10"),
                        wxT("Show the message console"));
-  advancedMenu->Append(FRAME_FRAMERATE, wxT("Show frame rates"),
-                       wxT("Show the frame rates of graphics and haptics loop"));
-  advancedMenu->Append(FRAME_TREEVIEW, wxT("Show tree view"),
+  advancedMenu->Append(FRAME_TREEVIEW, wxT("Show Tree View\tF9"),
                        wxT("Show the scene as a tree, making it possible to inspect and change values at runtime."));
+  advancedMenu->Append(FRAME_FRAMERATE, wxT("Show Framerates\tF8"),
+                       wxT("Show the frame rates of graphics and haptics loop"));
    
   //Help Menu
   helpMenu = new wxMenu;
@@ -394,7 +378,7 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   rendererMenu->Enable(FRAME_CHOOSERENDERER, false);
   rendererMenu->Enable(FRAME_RENDERMODE, false);
 
-  change_nav_type->setOwnerWindow( glwindow );
+  change_nav_type->setOwnerWindows( glwindow, this );
   ks->keyPress->route( change_nav_type );
 #ifdef WIN32
   wxIcon tmpIcon( wxT( "IDI_ICON1" ), wxBITMAP_TYPE_ICO_RESOURCE );
@@ -450,21 +434,19 @@ void WxFrame::ChangeNavType::update() {
     }
   } else if( s == "+" ) {
     if( mynav ) {
-      mynav->speed->setValue( mynav->speed->getValue() + speed_increment );
+      frame->speed_slider->setSpeed(
+        mynav->speed->getValue() + speed_increment, true, true );
     } else {
-      glwindow->default_speed += speed_increment;
+      frame->speed_slider->setSpeed(
+        glwindow->default_speed + speed_increment, true, true );
     }
   } else if( s == "-" ) {
     if( mynav ) {
-      H3DFloat tmp_speed = mynav->speed->getValue() - speed_increment;
-      if( tmp_speed < 0 )
-        tmp_speed = 0;
-      mynav->speed->setValue( tmp_speed );
+      frame->speed_slider->setSpeed(
+        mynav->speed->getValue() - speed_increment, true, true );
     } else {
-      H3DFloat tmp_speed = glwindow->default_speed - speed_increment;
-      if( tmp_speed  < 0 )
-        tmp_speed = 0;
-      glwindow->default_speed = tmp_speed;
+      frame->speed_slider->setSpeed(
+        glwindow->default_speed - speed_increment, true, true );
     }
   }
 }
@@ -473,6 +455,7 @@ void WxFrame::ChangeNavType::update() {
 BEGIN_EVENT_TABLE(WxFrame, wxFrame)
   EVT_MENU (FRAME_EXIT, WxFrame::OnExit)
   EVT_MENU (FRAME_OPEN, WxFrame::OnOpenFile)
+  EVT_MENU (FRAME_RELOAD, WxFrame::OnReload)    // 09.10.14 reload frame
   EVT_MENU_RANGE (wxID_FILE1, wxID_FILE9, WxFrame::OnMRUFile)
   EVT_MENU (FRAME_OPEN_URL, WxFrame::OnOpenFileURL)
   EVT_MENU (FRAME_CLOSE, WxFrame::OnCloseFile)
@@ -495,10 +478,9 @@ BEGIN_EVENT_TABLE(WxFrame, wxFrame)
   EVT_MENU (BASIC_COLLISION, WxFrame::ChangeCollision )
   EVT_MENU (FRAME_SPEED, WxFrame::OnSpeed )
   EVT_MENU_RANGE (FRAME_OPENHAPTICS, FRAME_RUSPINI, WxFrame::ChangeRenderer)
-  EVT_MENU (FRAME_DEVICECONTROL, WxFrame::ToggleHaptics)
-  EVT_MENU (FRAME_ABOUT, WxFrame::OnAbout)
+  //EVT_MENU (FRAME_DEVICECONTROL, WxFrame::ToggleHaptics)
   EVT_MENU (wxID_ABOUT, WxFrame::OnAbout)
-  EVT_MENU (FRAME_HELP, WxFrame::OnHelp)
+  //EVT_MENU (FRAME_HELP, WxFrame::OnHelp)
   EVT_IDLE (WxFrame::OnIdle)
   EVT_CLOSE(WxFrame::OnWindowExit)
 END_EVENT_TABLE()
@@ -763,7 +745,6 @@ bool WxFrame::loadFile( const string &filename) {
     if( use_space_mouse ) ss.reset( new SpaceWareSensor );
 #endif
     X3D::DEFNodes dn;
-    QuitAPIField *quit_api = new QuitAPIField;
 
     DeviceInfo *di = DeviceInfo::getActive();
     if( !di ) {
@@ -832,58 +813,60 @@ bool WxFrame::loadFile( const string &filename) {
       lastmirror = mirrored;
     }
 
-  /****************************Navigation Info****************************/
-  //Enable Navigation Menu
-  menuBar->EnableTop(3, true);
-  buildNavMenu();
+    /****************************Navigation Info****************************/
+    // Reset default speed for window.
+    //Enable Navigation Menu
+    menuBar->EnableTop(3, true);
+    buildNavMenu();
+    speed_slider->setSpeed();
 
-  //Enable graphical rendering options in rendererMenu
-  rendererMenu->Enable(FRAME_RENDERMODE, true);
-  rendererMenu->Enable(FRAME_CHOOSERENDERER, true);
+    //Enable graphical rendering options in rendererMenu
+    rendererMenu->Enable(FRAME_RENDERMODE, true);
+    rendererMenu->Enable(FRAME_CHOOSERENDERER, true);
 
-  /****************************Device Info****************************/
-  //Enable Device Menu
-  mydevice = DeviceInfo::getActive();
-  if (mydevice && (mydevice->device->size() > 0) ) {
-    allDevices = mydevice->device->getValue();
+    /****************************Device Info****************************/
+    //Enable Device Menu
+    mydevice = DeviceInfo::getActive();
+    if (mydevice && (mydevice->device->size() > 0) ) {
+      allDevices = mydevice->device->getValue();
 
-    for( NodeVector::const_iterator nv = allDevices.begin();
-         nv != allDevices.end(); nv++ ) {
-      H3DHapticsRendererNode *renderer =
-        static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->getValue();
-      RuspiniRenderer *ruspini_renderer = 
-        dynamic_cast< RuspiniRenderer * >( renderer );
+      for( NodeVector::const_iterator nv = allDevices.begin();
+           nv != allDevices.end(); nv++ ) {
+        H3DHapticsRendererNode *renderer =
+          static_cast < H3DHapticsDevice *> (*nv)->hapticsRenderer->getValue();
+        RuspiniRenderer *ruspini_renderer = 
+          dynamic_cast< RuspiniRenderer * >( renderer );
 
-      if( ruspini_renderer ) {
-        stringstream proxy_text;
-        proxy_text << ruspini_renderer->proxyRadius->getValue();
-        settings->proxy_radius_text->
-          SetValue( wxString(proxy_text.str().c_str(),wxConvUTF8) );
-        SaveRuspiniSettings(false);
-        hapticsRenderer->Check( FRAME_RUSPINI, true );
-        //break;
-      } else if( dynamic_cast< GodObjectRenderer * >(renderer) ) {
-        hapticsRenderer->Check( FRAME_GODOBJECT, true );
+        if( ruspini_renderer ) {
+          stringstream proxy_text;
+          proxy_text << ruspini_renderer->proxyRadius->getValue();
+          settings->proxy_radius_text->
+            SetValue( wxString(proxy_text.str().c_str(),wxConvUTF8) );
+          SaveRuspiniSettings(false);
+          hapticsRenderer->Check( FRAME_RUSPINI, true );
+          //break;
+        } else if( dynamic_cast< GodObjectRenderer * >(renderer) ) {
+          hapticsRenderer->Check( FRAME_GODOBJECT, true );
+        }
+  #ifdef HAVE_CHAI3D
+        else if( dynamic_cast< Chai3DRenderer * >(renderer) ) {
+          hapticsRenderer->Check( FRAME_CHAI3D, true );
+        }
+  #endif
+  #ifdef WIN32
+        else if( DynamicLibrary::load( "hd.dll" ) &&
+            DynamicLibrary::load( "hl.dll" ) ) {
+  #else
+        else
+  #endif
+        if( dynamic_cast< OpenHapticsRenderer * >(renderer) ) {
+          hapticsRenderer->Check( FRAME_OPENHAPTICS, true );
+        }
+  #ifdef WIN32
+        }
+  #endif
       }
-#ifdef HAVE_CHAI3D
-      else if( dynamic_cast< Chai3DRenderer * >(renderer) ) {
-        hapticsRenderer->Check( FRAME_CHAI3D, true );
-      }
-#endif
-#ifdef WIN32
-      else if( DynamicLibrary::load( "hd.dll" ) &&
-          DynamicLibrary::load( "hl.dll" ) ) {
-#else
-      else
-#endif
-      if( dynamic_cast< OpenHapticsRenderer * >(renderer) ) {
-        hapticsRenderer->Check( FRAME_OPENHAPTICS, true );
-      }
-#ifdef WIN32
-      }
-#endif
     }
-  }
 
 #ifndef MACOSX
     if( use_space_mouse )
@@ -939,7 +922,7 @@ bool WxFrame::loadFile( const string &filename) {
         // That is, no orientation and position 0, 0, 10. 
         Matrix4f pos_cal_matrix( 1, 0, 0, 0,
                                  0, 1, 0, 0,
-                                 0, 0, 1, 9.4,
+                                 0, 0, 1, (H3DFloat)9.4,
                                  0, 0, 0, 1 );
         if( active_vp ) {
           // There is already a viewpoint defined, use this one.
@@ -962,28 +945,28 @@ bool WxFrame::loadFile( const string &filename) {
       }
     }
 
-/****************************Intialize Viewpoints***************************/
-  //Enable Viewpoints Menu
-  menuBar->EnableTop(2, true);
-  VPlist = GetTopLevelViews();
-  current_viewpoint = Viewpoint::getActive();
-  current_viewpoint_id = FRAME_VIEWPOINT;
-  
-  BuildViewpointsMenu( VPlist );
-
-  if( X3DBindableNode::getStack( "DeviceInfo" ).size() > 1 ) {
-    device_info.reset( NULL );
-  }
-
-  // create a window to display
+  /****************************Intialize Viewpoints***************************/
+    //Enable Viewpoints Menu
+    menuBar->EnableTop(2, true);
+    VPlist = GetTopLevelViews();
+    current_viewpoint = Viewpoint::getActive();
+    current_viewpoint_id = FRAME_VIEWPOINT;
     
-  //This next line is used to set the icon file h3d.ico, when created.
-  //theWxframe->SetIcon(wxIcon(wxT("h3d_icn")));
-  
-  // Using this line instead of the two previous lines will make
-  // WxWidgetsWindow create an instance of a wxframe with no menus and use
-  // this as parent to the canvas.
-  // WxWidgetsWindow *glwindow = new WxWidgetsWindow();
+    BuildViewpointsMenu( VPlist );
+
+    if( X3DBindableNode::getStack( "DeviceInfo" ).size() > 1 ) {
+      device_info.reset( NULL );
+    }
+
+    // create a window to display
+      
+    //This next line is used to set the icon file h3d.ico, when created.
+    //theWxframe->SetIcon(wxIcon(wxT("h3d_icn")));
+    
+    // Using this line instead of the two previous lines will make
+    // WxWidgetsWindow create an instance of a wxframe with no menus and use
+    // this as parent to the canvas.
+    // WxWidgetsWindow *glwindow = new WxWidgetsWindow();
 
     if( !loaded_first_file ) {
       loaded_first_file = true;
@@ -1018,11 +1001,9 @@ bool WxFrame::loadFile( const string &filename) {
         renderMode->Check( FRAME_REDCYAN, true );
     }
 
-  
-  scene->sceneRoot->setValue( g.get() );
-  tree_view_dialog->showEntireSceneAsTree( true );
-  }
-  catch (const Exception::H3DException &e) {
+    scene->sceneRoot->setValue( g.get() );
+    tree_view_dialog->showEntireSceneAsTree( true );
+  } catch (const Exception::H3DException &e) {
     viewpoint.reset( new Viewpoint );
     stringstream s;
     s << e;
@@ -1306,7 +1287,7 @@ void WxFrame::clearData () {
   // then just remove it.
   while( navigationMenu->GetMenuItemCount() != 0 ) {
     wxMenuItem * temp_menu_item = navigationMenu->FindItemByPosition( 0 );
-    if( temp_menu_item->IsSeparator() ) {
+    if( temp_menu_item != navigationDevices ) {
       navigationMenu->Destroy( temp_menu_item->GetId() );
     } else {
       navigationMenu->Remove( temp_menu_item->GetId() );
@@ -1328,7 +1309,10 @@ void WxFrame::OnOpenFileURL(wxCommandEvent & event) {
    if( text_dialog->ShowModal() == wxID_OK ) {
      string s(text_dialog->GetValue().mb_str());
      clearData();
+     lastOpenedFilepath = s;
      loadFile( s );
+     SetStatusText( wxString(s.c_str(),wxConvUTF8), 1 );
+     SetStatusText( wxT("URL loaded"), 0 );
    }
 }
 
@@ -1346,17 +1330,18 @@ void WxFrame::OnOpenFile(wxCommandEvent & event)
   if (openFileDialog->ShowModal() == wxID_OK) {
     SetCurrentFilename(openFileDialog->GetFilename());  
     SetCurrentPath(openFileDialog->GetDirectory());
-    SetStatusText(GetCurrentFilename(), 0);
-    SetStatusText(openFileDialog->GetDirectory(),1);
 #ifdef WIN32
     wxString wx_filename = currentPath + wxT("\\") + currentFilename;
 #else
     wxString wx_filename = currentPath + wxT("/") + currentFilename;
 #endif
     string filename(wx_filename.mb_str());
+    lastOpenedFilepath = filename;
     clearData();
     loadFile( filename );
     recentFiles->AddFileToHistory ( wx_filename );
+    SetStatusText(wxT("File loaded"), 0);
+    SetStatusText( wxString(filename.c_str(),wxConvUTF8), 1 );
   }
 }
 
@@ -1368,31 +1353,37 @@ void WxFrame::OnMRUFile(wxCommandEvent & event)
 #ifdef WIN32
     SetCurrentFilename(filename.AfterLast('\\') );
     SetCurrentPath(filename.BeforeLast('\\') );
+    wxString wx_filename = currentPath + wxT("\\") + currentFilename;
 #else
     SetCurrentFilename(filename.AfterLast('/') );
     SetCurrentPath(filename.BeforeLast('/') );
-#endif
-
-    SetStatusText(GetCurrentFilename(), 0);
-    SetStatusText(GetCurrentPath(),1);
-#ifdef WIN32
-    wxString wx_filename = currentPath + wxT("\\") + currentFilename;
-#else
     wxString wx_filename = currentPath + wxT("/") + currentFilename;
 #endif
     string filename(wx_filename.mb_str());
     clearData();
     loadFile( filename );
+    lastOpenedFilepath = filename;
+    SetStatusText(wxT("File loaded"), 0);
+    SetStatusText(wxString(lastOpenedFilepath.c_str(),wxConvUTF8), 1);
+    // remove and add back, to make the file jump on top
+    recentFiles->RemoveFileFromHistory( event.GetId() );
+    recentFiles->AddFileToHistory ( wx_filename );
+
   }
 }
 
 //Close File
 void WxFrame::OnCloseFile(wxCommandEvent & event) {
+  if (lastOpenedFilepath.empty()) {
+    return;
+  }
+  lastOpenedFilepath.clear();
   //clearData();
   t->children->clear();
+  tree_view_dialog->clearTreeView();
   if( !Viewpoint::getActive() )
     viewpoint.reset( new Viewpoint );
-  SetStatusText(wxT("Open a file..."), 0);
+  SetStatusText(wxT("File closed"), 0);
   SetStatusText(wxT(""),1);
 
   //Disable menus again
@@ -1405,11 +1396,11 @@ void WxFrame::OnCloseFile(wxCommandEvent & event) {
 }
 
 void WxFrame::OnChooseDir(wxCommandEvent & event) {
-  wxDirDialog *d = new wxDirDialog (this, 
-                                    wxT("Choose a directory"), 
-                                    GetCurrentPath(), 
-                                    0, 
-                                    wxDefaultPosition);
+  auto_ptr< wxDirDialog >  d( new wxDirDialog( this, 
+                                               wxT("Choose a directory"),
+                                               GetCurrentPath(), 
+                                               0, 
+                                               wxDefaultPosition ) );
   if (d->ShowModal() == wxID_OK)
   {
     SetCurrentPath(d->GetPath());
@@ -1427,10 +1418,10 @@ void WxFrame::OnAbout(wxCommandEvent & event)
 }
 
 //Help event
-void WxFrame::OnHelp(wxCommandEvent & event)
-{
-
-}
+//void WxFrame::OnHelp(wxCommandEvent & event)
+//{
+//
+//}
 
 //Idle event
 void WxFrame::OnIdle(wxIdleEvent &event) {
@@ -1607,30 +1598,35 @@ void WxFrame::ChangeRenderer(wxCommandEvent & event)
 }
 
 //Toggle haptics
-void WxFrame::ToggleHaptics (wxCommandEvent & event) {
-  for (NodeVector::const_iterator nv = allDevices.begin(); 
-        nv != allDevices.end(); nv++) {
-    if (lastDeviceStatus) {
-      static_cast < H3DHapticsDevice *> (*nv)->disableDevice();
-      lastDeviceStatus = false;
-    }
-    else {
-      static_cast < H3DHapticsDevice *> (*nv)->enableDevice();
-      lastDeviceStatus = true;
-    }
-  }
-}
+//void WxFrame::ToggleHaptics (wxCommandEvent & event) {
+//  for (NodeVector::const_iterator nv = allDevices.begin(); 
+//        nv != allDevices.end(); nv++) {
+//    if (lastDeviceStatus) {
+//      static_cast < H3DHapticsDevice *> (*nv)->disableDevice();
+//      lastDeviceStatus = false;
+//    }
+//    else {
+//      static_cast < H3DHapticsDevice *> (*nv)->enableDevice();
+//      lastDeviceStatus = true;
+//    }
+//  }
+//}
 
 //Show console event
 void WxFrame::ShowConsole(wxCommandEvent & event)
 {
-  theConsole->Show();
+  if (!the_console->Show()) {
+    // already shown, bring it up
+    the_console->SetFocus();
+  }
 }
 
 //Show console event
 void WxFrame::ShowTreeView(wxCommandEvent & event)
 {
-  tree_view_dialog->Show();
+  if (!tree_view_dialog->Show()) {
+    tree_view_dialog->SetFocus();
+  }
 }
 
 void WxFrame::ShowPluginsDialog(wxCommandEvent & event)
@@ -1648,7 +1644,9 @@ void WxFrame::ShowFrameRate(wxCommandEvent & event)
   frameRates->graphics_rate->SetLabel( wxT("100") );
   frameRates->haptics_rate->SetLabel( wxT("1000") );
   frameRates->haptics_time->SetLabel( wxT("100") );
-  frameRates->Show();
+  if (!frameRates->Show()) {
+    frameRates->SetFocus();
+  }
 }
 
 //Change Viewpoint
@@ -1702,6 +1700,17 @@ void WxFrame::ChangeNavigation (wxCommandEvent & event)
   }
 }
 
+// 09.10.14 Reload
+void WxFrame::OnReload (wxCommandEvent & event)
+{
+  if (lastOpenedFilepath.empty())
+    return;
+  clearData();
+  loadFile(lastOpenedFilepath);
+  SetStatusText(wxT("Reloaded"), 0);
+  SetStatusText(wxString(lastOpenedFilepath.c_str(),wxConvUTF8), 1);
+}
+
 //Gets Menu Selections
 void WxFrame::GetSelection (wxMenuEvent & event)
 {
@@ -1724,12 +1733,12 @@ void WxFrame::OnWindowExit (wxCloseEvent & event)
   delete wxConfigBase::Set((wxConfigBase *) NULL);
 }
 
-/*******************Standard trivial functions*********************/
-//Get current filename
-wxString WxFrame::GetCurrentFilename()
-{
- return currentFilename;
-}
+///*******************Standard trivial functions*********************/
+////Get current filename
+//wxString WxFrame::GetCurrentFilename()
+//{
+// return currentFilename;
+//}
 
 //Set current filename
 void WxFrame::SetCurrentFilename(wxString n)
@@ -2358,8 +2367,7 @@ void WxFrame::buildNavMenu () {
       navigationMenu->Append(FRAME_NAVIGATION, wxT("Unavailable"),
                              wxT("Navigation Disabled"));
       navigationMenu->Enable(FRAME_NAVIGATION, false);
-    }
-    else {
+    } else {
       vector<string> allowedTypes;
       vector<string>::iterator navList = navTypes.begin();
       bool hasAny = false;
@@ -2464,7 +2472,6 @@ void WxFrame::buildNavMenu () {
               wxCommandEventHandler(WxFrame::ChangeNavigation));
       j++;
     }
-    //mynav->setNavType("EXAMINE");
     glwindow->default_nav = "EXAMINE";
   }
 
@@ -2478,21 +2485,24 @@ void WxFrame::buildNavMenu () {
 
   navigationMenu->AppendSeparator();
   if( !navigationDevices ) {
-    navigationDevices = new wxMenu;
-    navigationDevices->AppendCheckItem(FRAME_MOUSE_NAV, wxT("Mouse"), 
+    wxMenu *tmp_menu = new wxMenu;
+    tmp_menu->AppendCheckItem(FRAME_MOUSE_NAV, wxT("Mouse"), 
                                        wxT("Mouse can be used to navigate scene"));
-    navigationDevices->Check( FRAME_MOUSE_NAV, true );
-    navigationDevices->AppendCheckItem(FRAME_KEYBOARD_NAV, wxT("Keyboard"),
+    tmp_menu->Check( FRAME_MOUSE_NAV, true );
+    tmp_menu->AppendCheckItem(FRAME_KEYBOARD_NAV, wxT("Keyboard"),
                               wxT("Keyboard can be used to navigate scene"));
-    navigationDevices->Check( FRAME_KEYBOARD_NAV, true );
-    navigationDevices->AppendCheckItem(FRAME_SWS_NAV, wxT("SpaceWareSensor"), 
+    tmp_menu->Check( FRAME_KEYBOARD_NAV, true );
+    tmp_menu->AppendCheckItem(FRAME_SWS_NAV, wxT("SpaceWareSensor"), 
       wxT("SpaceWareSensor can be used to navigate scene."));
-    navigationDevices->AppendCheckItem( FRAME_HAPTICSDEVICE_NAV,
+    tmp_menu->AppendCheckItem( FRAME_HAPTICSDEVICE_NAV,
                                         wxT("Haptics Device"),
                           wxT("A haptics device can be used to navigate scene"));
+    navigationDevices =
+      navigationMenu->AppendSubMenu( tmp_menu, wxT("Navigation Devices"),
+                    wxT("Toggle on an off which devices to use for navigation") );
+  } else {
+    navigationMenu->Append( navigationDevices );
   }
-  navigationMenu->AppendSubMenu( navigationDevices, wxT("Navigation Devices"),
-                  wxT("Toggle on an off which devices to use for navigation") );
 }
 
 
@@ -2516,6 +2526,7 @@ void WxFrame::OnSettings (wxCommandEvent & event) {
 IMPLEMENT_CLASS(FrameRateDialog, wxDialog)
 
 BEGIN_EVENT_TABLE(FrameRateDialog, wxDialog)
+  EVT_KEY_DOWN(FrameRateDialog::OnKeyDown)
 END_EVENT_TABLE()
 
 FrameRateDialog::FrameRateDialog(wxWindow* win ) :
@@ -2525,11 +2536,21 @@ FrameRateDialog::FrameRateDialog(wxWindow* win ) :
   haptics_rate = NULL;
 
   topsizer = new wxBoxSizer( wxVERTICAL );
+
   updateMenuItems();
+
+  Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FrameRateDialog::OnKeyDown));
 
   SetSizer( topsizer );      // use the sizer for layout
 
   topsizer->SetSizeHints( this );   // set size hints to honour minimum size
+}
+
+void FrameRateDialog::OnKeyDown(wxKeyEvent& event) {
+  wxMessageBox(wxT("hello from  framerate"));
+  if (event.GetKeyCode() == WXK_ESCAPE || event.GetKeyCode() == WXK_F9) {
+    Hide();
+  }
 }
 
 void FrameRateDialog::updateMenuItems() {
@@ -2538,8 +2559,6 @@ void FrameRateDialog::updateMenuItems() {
   if( di ) {
     nr_devices = di->device->size();
   }
-
-  topsizer = new wxBoxSizer( wxVERTICAL );
 
   wxBoxSizer* framerate_sizer = new wxBoxSizer( wxHORIZONTAL );
   framerate_sizer->Add( new wxStaticText( this, wxID_ANY, wxT("&Graphics:")), 0,
@@ -2627,7 +2646,7 @@ void WxFrame::BuildViewpointsSubMenu(
       // create submenu
       wxMenu *submenu = new wxMenu();
       menu->AppendSubMenu( submenu, wxString(v_description.c_str(),
-					     wxConvUTF8) );
+               wxConvUTF8) );
       BuildViewpointsSubMenu( vg->getChildrenAsList(), submenu, count, unnamed_vp, unnamed_vg );
     } else {
       X3DViewpointNode * vp = static_cast< X3DViewpointNode * >( *v ); 
@@ -2746,7 +2765,7 @@ BEGIN_EVENT_TABLE(SettingsDialog, wxPropertySheetDialog)
 
 END_EVENT_TABLE()
 
-  SettingsDialog::SettingsDialog(wxWindow* win, WxFrame *w ):
+SettingsDialog::SettingsDialog(wxWindow* win, WxFrame *w ):
     wx_frame( w ), on_cancel_rebuild_displaylist( false )
 {
 
@@ -2789,7 +2808,6 @@ END_EVENT_TABLE()
 
 SettingsDialog::~SettingsDialog()
 {
-    
 }
 
 wxPanel* SettingsDialog::CreateDebugSettingsPage(wxWindow* parent ) {
@@ -3196,25 +3214,58 @@ void WxFrame::setProxyRadius( float r ) {
 SpeedDialog::SpeedDialog( wxWindow* parent, WxFrame *f ):
   wxDialog( parent, wxID_ANY, wxString( _T("Navigation Speed") ) ),
     wx_frame( f ) {
-  wxBoxSizer *top_sizer = new wxBoxSizer(wxVERTICAL);
+  wxGridBagSizer *top_sizer = new wxGridBagSizer;
+  top_sizer->SetFlexibleDirection( wxBOTH );
+  top_sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+  float max_speed = 50;
+  int max_tick_value = 500;
+  speed_per_tick = max_speed / max_tick_value;
 
-  /*wxBoxSizer *title_sizer = new wxBoxSizer( wxHORIZONTAL );
-  title_sizer->Add(new wxStaticText(this, wxID_ANY,
-                  _("Use the slider to change navigation speed")),
-                   0, wxALL|wxALIGN_CENTER_VERTICAL, 5);*/
+  wxStaticText *min_label =
+    new wxStaticText( this,
+                      wxID_ANY,
+                      wxT( "0" ),
+                      wxDefaultPosition,
+                      wxDefaultSize,
+                      wxALIGN_LEFT|wxST_NO_AUTORESIZE );
+  min_label->Wrap( -1 );
+  min_label->SetMinSize( wxSize( 60, -1 ) );
+  top_sizer->Add( min_label, wxGBPosition( 0, 0 ),
+                  wxGBSpan( 1, 1 ), wxALL, 5 );
 
-  wxSize slider_size( wxDefaultSize );
-  //slider_size.SetDefaults( wxDefaultSize );
-  slider_size.SetWidth( 200 );
+  value_label = new wxStaticText( this,
+                                  wxID_ANY,
+                                  wxT( "1" ),
+                                  wxDefaultPosition,
+                                  wxDefaultSize,
+                                  wxALIGN_CENTER|wxST_NO_AUTORESIZE );
+  value_label->SetMinSize( wxSize( 60, -1 ) );
+  value_label->Wrap( -1 );
+  top_sizer->Add( value_label, wxGBPosition( 0, 1 ),
+                  wxGBSpan( 1, 1 ), wxALL, 5 );
 
-  wxSlider* speed_value_slider = 
-    new wxSlider( this, FRAME_SPEED_SLIDER,
-                  1, 0, 500, wxDefaultPosition,
-                  slider_size,
-                  wxSL_HORIZONTAL | wxSL_LABELS);  
+  stringstream max_speed_stm;
+  max_speed_stm << max_speed;
+  wxStaticText *max_label =
+    new wxStaticText( this,
+                      wxID_ANY,
+                      wxString(max_speed_stm.str().c_str(),wxConvUTF8),
+                      wxDefaultPosition,
+                      wxDefaultSize,
+                      wxALIGN_RIGHT|wxST_NO_AUTORESIZE );
+  max_label->SetMinSize( wxSize( 60, -1 ) );
+  max_label->Wrap( -1 );
+  top_sizer->Add( max_label, wxGBPosition( 0, 2 ),
+                  wxGBSpan( 1, 1 ), wxALL, 5 );
+
+  speed_slider = new wxSlider( this, FRAME_SPEED_SLIDER,
+                               1, 0, max_tick_value );
+  speed_slider->SetMinSize( wxSize( 200, -1 ) );
+
 
   //top_sizer->Add(title_sizer, 0, wxALL, 5);
-  top_sizer->Add( speed_value_slider, 0, wxALL, 5);
+  top_sizer->Add( speed_slider, wxGBPosition( 1, 0 ),
+                  wxGBSpan( 1, 3 ), wxALL, 5 );
 
   SetSizer(top_sizer);
 
@@ -3222,23 +3273,53 @@ SpeedDialog::SpeedDialog( wxWindow* parent, WxFrame *f ):
   top_sizer->Fit(this);
 }
 
-void SpeedDialog::handleSliderEvent( wxScrollEvent &event ) {
-  int id = event.GetId();
-
-  if( id == FRAME_SPEED_SLIDER ) {
-    NavigationInfo *mynav = NavigationInfo::getActive();
-    if( mynav ) {
-      mynav->speed->setValue( event.GetPosition() );
-    } else {
-      wx_frame->glwindow->default_speed = event.GetPosition();
-    }
-  }
-}
-
-
 IMPLEMENT_CLASS(SpeedDialog, wxDialog)
 BEGIN_EVENT_TABLE(SpeedDialog, wxDialog)
   EVT_COMMAND_SCROLL( FRAME_SPEED_SLIDER, 
                       SpeedDialog::handleSliderEvent)
 END_EVENT_TABLE()
+
+void SpeedDialog::handleSliderEvent( wxScrollEvent &event ) {
+  int id = event.GetId();
+
+  if( id == FRAME_SPEED_SLIDER ) {
+    float new_value = event.GetPosition() * speed_per_tick;
+    setSpeed( new_value, true, false );
+  }
+}
+
+void SpeedDialog::setSpeed() {
+  NavigationInfo *mynav = NavigationInfo::getActive();
+  if( mynav ) {
+    setSpeed( mynav->speed->getValue(), true, true, false );
+  } else {
+    setSpeed( wx_frame->glwindow->default_speed, true, true, false );
+  }
+}
+
+void SpeedDialog::setSpeed( float speed,
+                            bool update_label,
+                            bool update_slider,
+                            bool update_scene_speed ) {
+  if( speed < 0 )
+    speed = 0;
+
+  if( update_label ) {
+    stringstream new_value_stm;
+    new_value_stm << speed;
+    value_label->SetLabel( wxString(new_value_stm.str().c_str(),wxConvUTF8) );
+  }
+
+  if( update_slider ) {
+    speed_slider->SetValue( (int)( speed / speed_per_tick ) );
+  }
+
+  if( update_scene_speed ) {
+    NavigationInfo *mynav = NavigationInfo::getActive();
+    if( mynav ) {
+      mynav->speed->setValue( speed );
+    }
+    wx_frame->glwindow->default_speed = speed;
+  }
+}
 
