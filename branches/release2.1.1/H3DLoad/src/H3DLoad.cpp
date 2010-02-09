@@ -295,7 +295,6 @@ string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
 
 
 int main(int argc, char* argv[]) {
-  Console(3) << "unsigned short " << sizeof( unsigned short ) * CHAR_BIT << endl;
 #ifdef H3DAPI_LIB
   initializeH3D();
 #endif
