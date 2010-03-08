@@ -117,10 +117,9 @@ int main(int argc, char* argv[]) {
   }
 
   // Open resource file.
-  ofstream rc( argv[2] );
-  if( !rc.is_open() ) {
-    cerr << "The path to resource file is incorrect, "
-         << "or write access is missing." << endl;
+  ifstream rc_read( argv[2] );
+  if( !rc_read.is_open() ) {
+    cerr << "The path to resource file is incorrect." << endl;
     return 1;
   }
 
@@ -131,32 +130,47 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  bool replace_file = false;
+  string new_content = "";
   /// Read rc.cmake and replace all occurrances of variables.
-  while( !rc_cmake.eof() ) {
-    string line;
-    getline( rc_cmake, line );
+  while( !rc_cmake.eof() && !rc_read.eof() ) {
+    string new_line, old_line;
+    getline( rc_cmake, new_line );
+    getline( rc_read, old_line );
     // Only try to find variables in lines that contains ${
-    if( line.find( "${" ) != string::npos ) {
+    if( new_line.find( "${" ) != string::npos ) {
       for( unsigned int i = 0; i < configure_vars.size(); i++ ) {
         // Find and replace this variable, one variable might exist
         // several times on the same line so simply check a lot of times.
-        size_t found_pos = line.find( configure_vars[i].first );
+        size_t found_pos = new_line.find( configure_vars[i].first );
         while( found_pos != string::npos ) {
-          line.replace( found_pos,
-                        configure_vars[i].first.size(),
-                        configure_vars[i].second );
-          found_pos = line.find( configure_vars[i].first );
+          new_line.replace( found_pos,
+                            configure_vars[i].first.size(),
+                            configure_vars[i].second );
+          found_pos = new_line.find( configure_vars[i].first );
         }
       }
+      if( new_line != old_line )
+        replace_file = true;
     }
-    // Write output.
-    rc << line << endl;
+    new_content = new_line + "\n";
   }
 
   // Close files.
-  rc.close();
+  rc_read.close();
   rc_cmake.close();
 
+  if( replace_file ) {
+    // Write output.
+    ofstream rc( argv[2] );
+    if( !rc.is_open() ) {
+      cerr << "Could not update rc file. Write access missing." << endl;
+      return 1;
+    }
+    
+    rc << new_content << endl;
+    rc.close();
+  }
 
   return 0;
 }
