@@ -67,13 +67,6 @@ int main(int argc, char* argv[]) {
   configure_vars.push_back(
     make_pair( "${" + project_name + "_BUILD_VERSION}", argv[6] ) );
 
-  // Open entries files, find svn version.
-  ifstream entries( argv[7] );
-  if( !entries.is_open() ) {
-    cerr << "The entries file could not be opened." << endl;
-    return 1;
-  }
-
   // Parse entries file to find the subversion number.
   // It is assumed that the interesting part of the entries file looks like
   // this:
@@ -81,34 +74,40 @@ int main(int argc, char* argv[]) {
   // xxxx
   // Where xxxx is the revision number.
   string last_line;
-  while( !entries.eof() ) {
-    string line;
-    getline( entries, line );
-    if( last_line == "dir"  && !line.empty() ) {
-      char last_char = ' ';
-      bool check_last_char = false;
-      string new_line;
-      for( unsigned int i = 0; i < line.size(); i++ ) {
-        if( !isspace( line[i] ) ) {
-          new_line = new_line + line[i];
-          if( check_last_char ) {
-            if( isspace( last_char ) ) {
-              cerr << "The entries file is not as expected." << endl;
-              return 1;
-            }
-          } else
-            check_last_char = true;
+  string svn_version = "0";
+  // Open entries files, find svn version.
+  ifstream entries( argv[7] );
+  if( entries.is_open() ) {
+    while( !entries.eof() ) {
+      string line;
+      getline( entries, line );
+      if( last_line == "dir"  && !line.empty() ) {
+        char last_char = ' ';
+        bool check_last_char = false;
+        string new_line;
+        for( unsigned int i = 0; i < line.size(); i++ ) {
+          if( !isspace( line[i] ) ) {
+            new_line = new_line + line[i];
+            if( check_last_char ) {
+              if( isspace( last_char ) ) {
+                cerr << "The entries file is not as expected." << endl;
+                break;
+              }
+            } else
+              check_last_char = true;
+          }
+          last_char = line[i];
         }
-        last_char = line[i];
+        // Remove whitespace.
+        svn_version = new_line;
+        break;
       }
-      // Remove whitespace.
-      configure_vars.push_back(
-        make_pair( "${" + project_name + "_SVN_VERSION}", new_line ) );
-      break;
+      last_line = line;
     }
-    last_line = line;
+    entries.close();
   }
-  entries.close();
+  configure_vars.push_back(
+    make_pair( "${" + project_name + "_SVN_VERSION}", svn_version ) );
 
   // Add extra arguments.
   for( int i = 8; i + 1 < argc; i = i + 2 ) {
@@ -119,7 +118,9 @@ int main(int argc, char* argv[]) {
   // Open resource file.
   ifstream rc_read( argv[2] );
   if( !rc_read.is_open() ) {
-    cerr << "The path to resource file is incorrect." << endl;
+    cerr << "The path to resource file is incorrect. "
+         << "If the path is correct but the file is missing configure "
+         << "the project through CMake again to restore the file." << endl;
     return 1;
   }
 
@@ -133,10 +134,12 @@ int main(int argc, char* argv[]) {
   bool replace_file = false;
   string new_content = "";
   /// Read rc.cmake and replace all occurrances of variables.
-  while( !rc_cmake.eof() && !rc_read.eof() ) {
-    string new_line, old_line;
+  while( !rc_cmake.eof() ) {
+    string new_line;
+    string old_line = "";
     getline( rc_cmake, new_line );
-    getline( rc_read, old_line );
+    if( !rc_read.eof() )
+      getline( rc_read, old_line );
     // Only try to find variables in lines that contains ${
     if( new_line.find( "${" ) != string::npos ) {
       for( unsigned int i = 0; i < configure_vars.size(); i++ ) {
@@ -152,8 +155,9 @@ int main(int argc, char* argv[]) {
       }
       if( new_line != old_line )
         replace_file = true;
-    }
-    new_content = new_line + "\n";
+    } else if( new_line != old_line )
+      replace_file = true;
+    new_content += new_line + "\n";
   }
 
   // Close files.
@@ -168,7 +172,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
     
-    rc << new_content << endl;
+    rc << new_content;
     rc.close();
   }
 
