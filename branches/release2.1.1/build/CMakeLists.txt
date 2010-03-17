@@ -750,7 +750,8 @@ IF( WIN32 )
       SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /bigobj" )
     ENDIF( CMAKE_CL_64 )
     # H3D API is now to big to link incrementally with vc8.
-    SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /INCREMENTAL:NO" )
+    SET( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /INCREMENTAL:NO" )
+    SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG}" )
     # Needed to delayload OpenHapticsRenderer. They must have changed the way symbols are imported between versions of visual studio.
     IF(OPENHAPTICS_FOUND)
       SET_SOURCE_FILES_PROPERTIES( "${H3DAPI_SOURCE_DIR}/../src/MagneticSurface.cpp"
@@ -769,7 +770,8 @@ IF( WIN32 )
       SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /bigobj" )
     ENDIF( CMAKE_CL_64 )
     # H3D API is now too big to link incrementally with vc9.
-    SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt /INCREMENTAL:NO" )
+    SET( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /INCREMENTAL:NO" )
+    SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt" )
     # Needed to delayload OpenHapticsRenderer. They must have changed the way symbols are imported between versions of visual studio.
     IF(OPENHAPTICS_FOUND)
       SET_SOURCE_FILES_PROPERTIES( "${H3DAPI_SOURCE_DIR}/../src/MagneticSurface.cpp"
@@ -789,7 +791,8 @@ IF( WIN32 )
       SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /bigobj" )
     ENDIF( CMAKE_CL_64 )
     # H3D API is now to big to link incrementally with vc10.
-    SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt /INCREMENTAL:NO" )
+    SET( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /INCREMENTAL:NO" )
+    SET( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt" )
     # Needed to delayload OpenHapticsRenderer. They must have changed the way symbols are imported between versions of visual studio.
     IF(OPENHAPTICS_FOUND)
       SET_SOURCE_FILES_PROPERTIES( "${H3DAPI_SOURCE_DIR}/../src/MagneticSurface.cpp"
