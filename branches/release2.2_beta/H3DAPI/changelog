@@ -1,3 +1,67 @@
+Changes for version 2.2 beta:
+
+-Fix bugs with dual windows navigation
+-ToogleGroup and ClipPane works per device instead of globally
+-Added damping field to SpringEffect
+-Changed to TouchSensor to comply with Immersive Profile
+-Added X3DMatrix3 and X3DMatrix4 to SpiderMonkey Script.
+-multiPassTransparancy is only enabled if graphics is enabled
+-Support for geometry shader
+-Added fields in GraphicsCachingOptions to control shadows defined by the shadow field in Appearance
+-Each user can now have their own h3dload.ini file on the system
+-Memory leak fixes
+-support for automatic tangent and binormal generation for IndexedFaceSet
+-Added resolveURLAsFolder functionality
+-Added getTopLevelFields function to PythonScript.
+-Added motorTemperaturs field to PhantomDevice <Version 1646>
+-Added multi-sampling support to FrameBufferTextureGenerator <version 1671>
+-Added resolveURLAsFolder functionality
+-Implemented vertex buffer object support in ElevationGrid and SuperShape
+-Added unity build option to cmake to faster build files
+-Added getNamedNode to H3DInterface python module
+-Added generated shader framework, nodes and examples.
+-Added EntactDevice
+-Added ShaderCombiner <version 1701>
+-Added RotationalSpringEffect, similar to SpringEffect but for torque.<1709>
+-H3DViewer compilable for wx 2.9 <1711>
+-Added getViewMatrix method to X3DViewpointNode <1718>
+-Added addPostTraverseCallback method to TraverseInfo <1720>
+-Added EntactDevice to settings<1723>
+-Added accumulatedJointMatrix field <1747>
+-Added x3dROUTESendsEvent and loadTexturesInThread fields to GlobalSettings <1783>
+-Added transparencyDetectMode to ComposedShader. <1812>
+-Update shadow nodes to avoid z-fighting
+-Support for fullscreen anti-aliasing if using wxWidgets 2.9 or later
+-Added PhongShader.
+-Added torque field to ForceField node
+-support several x3d/xml nodes on the same level in a proto body
+-Added nearVisibilityLimit field to NavigationInfo
+-Added force and torque limits to haptics device
+-Added GraphicsHardwareInfo node/functions
+
+New H3D items:
+ShadowTransform
+PhongShader
+ComposedGeneratedShader
+MultiRenderTargetShader
+NormalShader
+Enctact Device
+VirtuoseDevice
+EnvironmentMapShader
+MultiDeviceSurface
+FrameBufferTextureGenerator
+GeneratedTexture
+GeneratedTexture3D
+FullscreenRectangle
+RenderTargetSelectGroup
+HAnimHumanoid
+HAnimJoint
+HAnimDisplacer
+HAnimSite
+HAnimSegment
+GraphicsHardwareInfo
+
+
 Changes for version 2.1.1:
 - CMake updates for handling builds with Visual studio 2010 and CMake 2.8.0.
 Still considered test-verison since Visual studio 2010 is not released yet.
@@ -5,7 +69,7 @@ Still considered test-verison since Visual studio 2010 is not released yet.
 - Exported some more classes. In case some application needs it.
 - Added clear button to console dialog of H3DViewer.
 - Added reload menu and some keyboard shortcuts to H3DViewer.
-- Varios other updates to H3DViewer.
+- Various other updates to H3DViewer.
 - Memory leak fixes.
 - Updates to compile on 64 bit ubuntu and gcc 3.1.1.
 - Added collision detection functions for Lod and Switch.
