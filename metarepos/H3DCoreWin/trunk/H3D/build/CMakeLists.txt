@@ -1,0 +1,35 @@
+cmake_minimum_required(VERSION 2.6.0)
+PROJECT( H3DCoreWin )
+IF( WIN32 )
+  # set the install directory to the H3D directory on Windows
+  MESSAGE( STATUS "INSIDE WIN32" )
+  IF( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
+    MESSAGE( STATUS "INSIDE CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT" )
+    SET( CMAKE_INSTALL_PREFIX ${UWO_SOURCE_DIR}/.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
+  ENDIF( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
+ENDIF( WIN32 )
+
+SET( H3D_USE_DEPENDECIES_ONLY "TRUE" )
+
+SET(CMAKE_MODULE_PATH "${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build/modules" )
+
+#pthread is required for using the H3DUtil library
+FIND_PACKAGE(PTHREAD REQUIRED)
+
+SET( H3DUTIL_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../H3DUtil/include" )
+SET( HAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../HAPI/include" )
+SET( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../H3DAPI/include" )
+SET( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../External/include" )
+
+IF( NOT WIN32 )
+  ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../HAPI/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
+  ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/..//build
+                  ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+ENDIF( NOT WIN32 )
+
+ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build
+                  ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
+
+
+
