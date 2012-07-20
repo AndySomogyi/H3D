@@ -25,8 +25,6 @@ SET( RigidBodyPhysics_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../RigidBodyPhy
 IF( NOT WIN32 )
   ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../HAPI/build
                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
-  ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/Util )
 ENDIF( NOT WIN32 )
 
 ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build
