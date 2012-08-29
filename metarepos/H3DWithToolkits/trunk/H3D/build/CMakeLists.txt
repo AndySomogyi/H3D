@@ -11,6 +11,7 @@ SET( H3D_USE_DEPENDENCIES_ONLY "TRUE" )
 
 SET(CMAKE_MODULE_PATH "${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build/modules" )
 
+
 #pthread is required for using the H3DUtil library
 FIND_PACKAGE(PTHREAD REQUIRED)
 
