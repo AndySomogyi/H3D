@@ -1,16 +1,15 @@
 cmake_minimum_required(VERSION 2.6.0)
 PROJECT( H3DCore )
-IF( WIN32 )
-  # set the install directory to the H3D directory on Windows
-  IF( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
-    SET( CMAKE_INSTALL_PREFIX ${H3DCore_SOURCE_DIR}/.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
-  ENDIF( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
-ENDIF( WIN32 )
+# set the install directory to the H3DCore directory on Windows
+IF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
+  SET( CMAKE_INSTALL_PREFIX ${H3DCore_SOURCE_DIR}/.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
+  SET( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
+ENDIF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
 
-SET( H3D_USE_DEPENDENCIES_ONLY "TRUE" )
+SET( H3D_USE_DEPENDENCIES_ONLY TRUE )
 
 # use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
