@@ -36,10 +36,15 @@ SET( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../H3DAPI/include" )
 SET( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../External/include" )
 
 IF( NOT WIN32 )
+  MESSAGE( STATUS "Including H3DUtil" )
+  ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build
+                  ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+  MESSAGE( STATUS "Including HAPI" )
   ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../HAPI/build
                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
 ENDIF( NOT WIN32 )
 
+MESSAGE( STATUS "Including H3DAPI" )
 ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build
                   ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
 
