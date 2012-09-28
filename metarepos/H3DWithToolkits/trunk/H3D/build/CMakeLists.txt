@@ -38,18 +38,26 @@ SET( MedX3D_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../MedX3D/include" )
 SET( RigidBodyPhysics_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../RigidBodyPhysics/include" )
 
 IF( NOT WIN32 )
+	MESSAGE( STATUS "Including H3DUtil" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+  MESSAGE( STATUS "Including HAPI" )
   ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../HAPI/build
                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
 ENDIF( NOT WIN32 )
 
+MESSAGE( STATUS "Including H3DAPI" )
 ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build
                   ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
 
+MESSAGE( STATUS "Including UI" )
 ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../UI/build
                   ${CMAKE_CURRENT_BINARY_DIR}/UI )
 
+MESSAGE( STATUS "Including MedX3D" )
 ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../MedX3D/build
                   ${CMAKE_CURRENT_BINARY_DIR}/MedX3D )
 
+MESSAGE( STATUS "Including RigidBodyPhysics" )
 ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../RigidBodyPhysics/build
                   ${CMAKE_CURRENT_BINARY_DIR}/RigidBodyPhysics )
