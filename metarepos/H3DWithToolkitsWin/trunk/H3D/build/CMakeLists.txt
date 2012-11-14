@@ -39,27 +39,34 @@ SET( MedX3D_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/include" )
 SET( RigidBodyPhysics_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/include" )
 SET( EXTERNAL_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" )
 
-IF( NOT WIN32 )
-  MESSAGE( STATUS "Including H3DUtil" )
-  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
-  MESSAGE( STATUS "Including HAPI" )
-  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build
-                    ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
-ENDIF( NOT WIN32 )
+ IF( NOT WIN32 )
+   MESSAGE( STATUS "Including H3DUtil" )
+   ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build
+					 ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+   MESSAGE( STATUS "Including HAPI" )
+   ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build
+                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
+ ENDIF( NOT WIN32 )
 
 MESSAGE( STATUS "Including H3DAPI" )
 ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build
                   ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
+INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build/H3DAPICPack.cmake)
 
 MESSAGE( STATUS "Including UI" )
 ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../UI/build
                   ${CMAKE_CURRENT_BINARY_DIR}/UI )
+INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../UI/build/UICPack.cmake)
+
 
 MESSAGE( STATUS "Including MedX3D" )
 ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build
                   ${CMAKE_CURRENT_BINARY_DIR}/MedX3D )
+INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build/MedX3DCPack.cmake)
 
 MESSAGE( STATUS "Including RigidBodyPhysics" )
 ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/RigidBodyPhysics )
+                   ${CMAKE_CURRENT_BINARY_DIR}/RigidBodyPhysics )
+INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/build/RigidBodyPhysicsCPack.cmake)
+
+INCLUDE(CPack)
