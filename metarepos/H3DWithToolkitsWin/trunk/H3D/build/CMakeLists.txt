@@ -39,14 +39,14 @@ SET( MedX3D_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/include" )
 SET( RigidBodyPhysics_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/include" )
 SET( EXTERNAL_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" )
 
- IF( NOT WIN32 )
-   MESSAGE( STATUS "Including H3DUtil" )
-   ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build
-					 ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
-   MESSAGE( STATUS "Including HAPI" )
-   ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build
-                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
- ENDIF( NOT WIN32 )
+IF( NOT WIN32 )
+  MESSAGE( STATUS "Including H3DUtil" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build
+				 ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+  MESSAGE( STATUS "Including HAPI" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
+ENDIF( NOT WIN32 )
 
 MESSAGE( STATUS "Including H3DAPI" )
 ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build
@@ -69,4 +69,15 @@ ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/build
                    ${CMAKE_CURRENT_BINARY_DIR}/RigidBodyPhysics )
 INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/build/RigidBodyPhysicsCPack.cmake)
 
-INCLUDE(CPack)
+# If cpack should be configured.
+IF( GENERATE_CPACK_PROJECT )
+  INSTALL( FILES ${H3DWithToolkitsWin_SOURCE_DIR}/CMakeLists.txt
+           DESTINATION build
+           COMPONENT H3DUtil_cpack_sources )
+  # Make sure that the nsis template for H3DAPI is used for packaging.
+  SET(CMAKE_MODULE_PATH ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build/modules )
+  SET(CPACK_PACKAGE_VERSION_MAJOR 2)
+  SET(CPACK_PACKAGE_VERSION_MINOR 2)
+  SET(CPACK_PACKAGE_VERSION_PATCH 0)
+	INCLUDE(CPack)
+ENDIF( GENERATE_CPACK_PROJECT )
