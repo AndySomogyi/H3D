@@ -31,6 +31,7 @@ SET(CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build/modules"
 #pthread is required for using the H3DUtil library
 FIND_PACKAGE(PTHREAD REQUIRED)
 
+#set include directories
 SET( H3DUTIL_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/include" )
 SET( HAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/include" )
 SET( H3DAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/include" )
@@ -38,6 +39,11 @@ SET( UI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../UI/include" )
 SET( MedX3D_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/include" )
 SET( RigidBodyPhysics_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/include" )
 SET( EXTERNAL_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" )
+
+# Version of H3DWithToolkitsWin
+SET( H3DWithToolkitsWin_MAJOR_VERSION 2 )
+SET( H3DWithToolkitsWin_MINOR_VERSION 2 )
+SET( H3DWithToolkitsWin_BUILD_VERSION 0 )
 
 IF( NOT WIN32 )
   MESSAGE( STATUS "Including H3DUtil" )
@@ -79,5 +85,22 @@ IF( GENERATE_CPACK_PROJECT )
   SET(CPACK_PACKAGE_VERSION_MAJOR 2)
   SET(CPACK_PACKAGE_VERSION_MINOR 2)
   SET(CPACK_PACKAGE_VERSION_PATCH 0)
+  
+  # Set information properties about the project to install.
+  SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "H3DAPI. A cross platform, haptics device independent, X3D based API for 3D graphics and haptics.")
+  SET(CPACK_PACKAGE_VENDOR "SenseGraphics AB")
+  SET(CPACK_PACKAGE_CONTACT "support@sensegraphics.com" )
+  SET(CPACK_PACKAGE_DESCRIPTION_FILE "${H3DAPI_SOURCE_DIR}/../ReadMe")
+  SET(CPACK_RESOURCE_FILE_LICENSE "${H3DAPI_SOURCE_DIR}/../LICENSE")
+  
+  ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/DummyFile
+                      COMMAND echo )
+  ADD_CUSTOM_TARGET( INSTALL_RUNTIME_AND_LIBRARIES_ONLY
+                     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/DummyFile )
+  
+  ADD_CUSTOM_COMMAND( TARGET INSTALL_RUNTIME_AND_LIBRARIES_ONLY
+                      POST_BUILD
+                      ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_POST_BUILD} )
+  ADD_DEPENDENCIES( INSTALL_RUNTIME_AND_LIBRARIES_ONLY UI ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
 	INCLUDE(CPack)
 ENDIF( GENERATE_CPACK_PROJECT )
