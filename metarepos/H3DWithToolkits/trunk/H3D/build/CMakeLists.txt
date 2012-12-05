@@ -43,6 +43,6 @@ MESSAGE( STATUS "Including MedX3D" )
 ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../MedX3D/build
                   ${CMAKE_CURRENT_BINARY_DIR}/MedX3D )
 
-MESSAGE( STATUS "Including RigidBodyPhysics" )
-ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../RigidBodyPhysics/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/RigidBodyPhysics )
+MESSAGE( STATUS "Including H3DPhysics" )
+ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build
+                   ${CMAKE_CURRENT_BINARY_DIR}/H3DPhysics )
