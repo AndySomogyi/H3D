@@ -20,7 +20,7 @@ SET( HAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/include" )
 SET( H3DAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/include" )
 SET( UI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../UI/include" )
 SET( MedX3D_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/include" )
-SET( RigidBodyPhysics_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/include" )
+SET( H3DPhysics_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/include" )
 SET( EXTERNAL_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" )
 
 # Version of H3DWithToolkitsWin
@@ -53,10 +53,10 @@ ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build
                   ${CMAKE_CURRENT_BINARY_DIR}/MedX3D )
 INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build/MedX3DCPack.cmake)
 
-MESSAGE( STATUS "Including RigidBodyPhysics" )
-ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/build
-                   ${CMAKE_CURRENT_BINARY_DIR}/RigidBodyPhysics )
-INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../RigidBodyPhysics/build/RigidBodyPhysicsCPack.cmake)
+MESSAGE( STATUS "Including H3DPhysics" )
+ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build
+                   ${CMAKE_CURRENT_BINARY_DIR}/H3DPhysics )
+INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build/H3DPhysicsCPack.cmake)
 
 # If cpack should be configured.
 IF( GENERATE_CPACK_PROJECT )
