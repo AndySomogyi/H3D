@@ -59,6 +59,15 @@ ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build
                    ${CMAKE_CURRENT_BINARY_DIR}/H3DPhysics )
 INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build/H3DPhysicsCPack.cmake)
 
+IF( GENERATE_NODEROUTESTODOTFILE_BUILD )
+  IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/NodeRoutesToDotFile )
+    # This project is added here since H3DPhysics/UI should be defined before this is done.
+    MESSAGE( STATUS "Including NodeRoutesToDotFile" )
+    ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/NodeRoutesToDotFile
+                      ${CMAKE_CURRENT_BINARY_DIR}/NodeRoutesToDotFile )
+  ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/NodeRoutesToDotFile )
+ENDIF( GENERATE_NODEROUTESTODOTFILE_BUILD )
+
 # If cpack should be configured.
 IF( GENERATE_CPACK_PROJECT )
   INSTALL( FILES ${H3DWithToolkitsWin_SOURCE_DIR}/CMakeLists.txt
