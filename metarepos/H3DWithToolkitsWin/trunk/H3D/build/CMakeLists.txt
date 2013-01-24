@@ -68,6 +68,18 @@ IF( GENERATE_NODEROUTESTODOTFILE_BUILD )
   ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/NodeRoutesToDotFile )
 ENDIF( GENERATE_NODEROUTESTODOTFILE_BUILD )
 
+IF( NOT DEFINED CreateH3DNodesFieldsList_PROJECT )
+  SET( CreateH3DNodesFieldsList_PROJECT "NO" CACHE BOOL "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
+ENDIF( NOT DEFINED CreateH3DNodesFieldsList_PROJECT )
+IF( CreateH3DNodesFieldsList_PROJECT )
+  IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
+    # This project is added here since H3DPhysics/UI/MedX3D should be defined before this is done.
+    MESSAGE( STATUS "Including CreateH3DNodesFieldsList" )
+    ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList
+                      ${CMAKE_CURRENT_BINARY_DIR}/CreateH3DNodesFieldsList )
+  ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
+ENDIF( CreateH3DNodesFieldsList_PROJECT )
+
 # If cpack should be configured.
 IF( GENERATE_CPACK_PROJECT )
   INSTALL( FILES ${H3DWithToolkitsWin_SOURCE_DIR}/CMakeLists.txt
