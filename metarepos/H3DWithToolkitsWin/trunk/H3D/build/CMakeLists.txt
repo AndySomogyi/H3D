@@ -90,6 +90,7 @@ IF( GENERATE_CPACK_PROJECT )
   SET(CPACK_PACKAGE_VERSION_MAJOR 2)
   SET(CPACK_PACKAGE_VERSION_MINOR 2)
   SET(CPACK_PACKAGE_VERSION_PATCH 0)
+	SET( CPACK_PACKAGE_NAME "H3DApi-Full" )
   
   # Set information properties about the project to install.
   SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "H3DAPI. A cross platform, haptics device independent, X3D based API for 3D graphics and haptics.")
