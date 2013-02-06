@@ -9,7 +9,7 @@ ENDIF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
 
 SET( H3D_USE_DEPENDENCIES_ONLY TRUE )
 
-SET(CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build/modules" )
+SET(CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build/modules" )
 
 SET (INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES})
 
@@ -30,34 +30,55 @@ SET( H3DWithToolkitsWin_MAJOR_VERSION 2 )
 SET( H3DWithToolkitsWin_MINOR_VERSION 2 )
 SET( H3DWithToolkitsWin_BUILD_VERSION 1 )
 IF( NOT WIN32 )
-  MESSAGE( STATUS "Including H3DUtil" )
-  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build
-				 ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+  IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build )
+    MESSAGE( STATUS "Including H3DUtil" )
+    ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build
+                      ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+  ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build )
+  
+  IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build )
+    MESSAGE( STATUS "Including HAPI" )
+    ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build
+                      ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
+  ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build )
+ENDIF( NOT WIN32 )
+
+IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build )
+  MESSAGE( STATUS "Including H3DAPI" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
+  INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build/H3DAPICPack.cmake)
+ELSEIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build )
   MESSAGE( STATUS "Including HAPI" )
   ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build
                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
-ENDIF( NOT WIN32 )
+ELSEIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build )
+  MESSAGE( STATUS "Including H3DUtil" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build )
 
-MESSAGE( STATUS "Including H3DAPI" )
-ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
-INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build/H3DAPICPack.cmake)
-
-MESSAGE( STATUS "Including UI" )
-ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../UI/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/UI )
-INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../UI/build/UICPack.cmake)
+IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../UI/build )
+  MESSAGE( STATUS "Including UI" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../UI/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/UI )
+  INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../UI/build/UICPack.cmake)
+ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../UI/build )
 
 
-MESSAGE( STATUS "Including MedX3D" )
-ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/MedX3D )
-INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build/MedX3DCPack.cmake)
+IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build )
+  MESSAGE( STATUS "Including MedX3D" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/MedX3D )
+  INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build/MedX3DCPack.cmake)
+ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/build )
 
-MESSAGE( STATUS "Including H3DPhysics" )
-ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build
-                   ${CMAKE_CURRENT_BINARY_DIR}/H3DPhysics )
-INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build/H3DPhysicsCPack.cmake)
+IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build )
+  MESSAGE( STATUS "Including H3DPhysics" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build
+                     ${CMAKE_CURRENT_BINARY_DIR}/H3DPhysics )
+  INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build/H3DPhysicsCPack.cmake)
+ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build )
 
 IF( GENERATE_NODEROUTESTODOTFILE_BUILD )
   IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/NodeRoutesToDotFile )
@@ -68,20 +89,21 @@ IF( GENERATE_NODEROUTESTODOTFILE_BUILD )
   ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/NodeRoutesToDotFile )
 ENDIF( GENERATE_NODEROUTESTODOTFILE_BUILD )
 
-IF( NOT DEFINED CreateH3DNodesFieldsList_PROJECT )
-  SET( CreateH3DNodesFieldsList_PROJECT "NO" CACHE BOOL "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
-ENDIF( NOT DEFINED CreateH3DNodesFieldsList_PROJECT )
-IF( CreateH3DNodesFieldsList_PROJECT )
-  IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
+IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
+  IF( NOT DEFINED CreateH3DNodesFieldsList_PROJECT )
+    SET( CreateH3DNodesFieldsList_PROJECT "NO" CACHE BOOL "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
+  ENDIF( NOT DEFINED CreateH3DNodesFieldsList_PROJECT )
+  IF( CreateH3DNodesFieldsList_PROJECT )
+  
     # This project is added here since H3DPhysics/UI/MedX3D should be defined before this is done.
     MESSAGE( STATUS "Including CreateH3DNodesFieldsList" )
     ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList
                       ${CMAKE_CURRENT_BINARY_DIR}/CreateH3DNodesFieldsList )
-  ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
-ENDIF( CreateH3DNodesFieldsList_PROJECT )
+  ENDIF( CreateH3DNodesFieldsList_PROJECT )
+ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
 
 # If cpack should be configured.
-IF( GENERATE_CPACK_PROJECT )
+IF( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
   INSTALL( FILES ${H3DWithToolkitsWin_SOURCE_DIR}/CMakeLists.txt
            DESTINATION build
            COMPONENT H3DUtil_cpack_sources )
@@ -182,4 +204,4 @@ IF( GENERATE_CPACK_PROJECT )
     
   ENDIF( MSVC )
 	INCLUDE(CPack)
-ENDIF( GENERATE_CPACK_PROJECT )
+ENDIF( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
