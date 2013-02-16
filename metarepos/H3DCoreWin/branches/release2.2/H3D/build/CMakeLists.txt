@@ -8,7 +8,7 @@ ENDIF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
 
 SET( H3D_USE_DEPENDENCIES_ONLY TRUE )
 
-SET(CMAKE_MODULE_PATH "${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build/modules" )
+SET(CMAKE_MODULE_PATH "${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build/modules" )
 
 #pthread is required for using the H3DUtil library
 FIND_PACKAGE(PTHREAD REQUIRED)
@@ -19,17 +19,30 @@ SET( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../H3DAPI/include" )
 SET( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../External/include" )
 
 IF( NOT WIN32 )
-  MESSAGE( STATUS "Including H3DUtil" )
-  ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+  IF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build )
+    MESSAGE( STATUS "Including H3DUtil" )
+    ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build
+                      ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+  ENDIF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build )
+  
+  IF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../HAPI/build )
+    MESSAGE( STATUS "Including HAPI" )
+    ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../HAPI/build
+                      ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
+  ENDIF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../HAPI/build )
+ENDIF( NOT WIN32 )
+
+IF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build )
+  MESSAGE( STATUS "Including H3DAPI" )
+  ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
+  INCLUDE (${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build/H3DAPICPack.cmake)
+ELSEIF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../HAPI/build )
   MESSAGE( STATUS "Including HAPI" )
   ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../HAPI/build
                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
-ENDIF( NOT WIN32 )
-
-MESSAGE( STATUS "Including H3DAPI" )
-ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
-
-
-
+ELSEIF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build )
+  MESSAGE( STATUS "Including H3DUtil" )
+  ADD_SUBDIRECTORY( ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+ENDIF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../H3DAPI/build )
