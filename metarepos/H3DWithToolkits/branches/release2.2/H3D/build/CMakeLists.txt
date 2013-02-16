@@ -8,7 +8,7 @@ ENDIF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
 
 SET( H3D_USE_DEPENDENCIES_ONLY TRUE )
 
-SET(CMAKE_MODULE_PATH "${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build/modules" )
+SET(CMAKE_MODULE_PATH "${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build/modules" )
 
 #pthread is required for using the H3DUtil library
 FIND_PACKAGE(PTHREAD REQUIRED)
@@ -21,31 +21,55 @@ SET( MedX3D_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../MedX3D/include" )
 SET( RigidBodyPhysics_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../RigidBodyPhysics/include" )
 
 IF( NOT WIN32 )
-	MESSAGE( STATUS "Including H3DUtil" )
-  ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build
-                    ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
-	GET_DIRECTORY_PROPERTY( H3DUTIL_INCLUDE_DIR DIRECTORY ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build INCLUDE_DIRECTORIES )
+  IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build )
+    MESSAGE( STATUS "Including H3DUtil" )
+    ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build
+                      ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+  ENDIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build )
+  
+  IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../HAPI/build )
+    MESSAGE( STATUS "Including HAPI" )
+    ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../HAPI/build
+                      ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
+  ENDIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../HAPI/build )
+ENDIF( NOT WIN32 )
+
+IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build )
+  MESSAGE( STATUS "Including H3DAPI" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
+  INCLUDE (${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build/H3DAPICPack.cmake)
+ELSEIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../HAPI/build )
   MESSAGE( STATUS "Including HAPI" )
   ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../HAPI/build
                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
-	GET_DIRECTORY_PROPERTY( HAPI_INCLUDE_DIR DIRECTORY ${H3DWithToolkits_SOURCE_DIR}/../HAPI/build INCLUDE_DIRECTORIES )
-ENDIF( NOT WIN32 )
+ELSEIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build )
+  MESSAGE( STATUS "Including H3DUtil" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
+ENDIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build )
 
-MESSAGE( STATUS "Including H3DAPI" )
-ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
+IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../UI/build )
+  MESSAGE( STATUS "Including UI" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../UI/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/UI )
+  INCLUDE (${H3DWithToolkits_SOURCE_DIR}/../UI/build/UICPack.cmake)
+ENDIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../UI/build )
 
-MESSAGE( STATUS "Including UI" )
-ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../UI/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/UI )
 
-MESSAGE( STATUS "Including MedX3D" )
-ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../MedX3D/build
-                  ${CMAKE_CURRENT_BINARY_DIR}/MedX3D )
+IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../MedX3D/build )
+  MESSAGE( STATUS "Including MedX3D" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../MedX3D/build
+                    ${CMAKE_CURRENT_BINARY_DIR}/MedX3D )
+  INCLUDE (${H3DWithToolkits_SOURCE_DIR}/../MedX3D/build/MedX3DCPack.cmake)
+ENDIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../MedX3D/build )
 
-MESSAGE( STATUS "Including H3DPhysics" )
-ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build
-                   ${CMAKE_CURRENT_BINARY_DIR}/H3DPhysics )
+IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build )
+  MESSAGE( STATUS "Including H3DPhysics" )
+  ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build
+                     ${CMAKE_CURRENT_BINARY_DIR}/H3DPhysics )
+  INCLUDE (${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build/H3DPhysicsCPack.cmake)
+ENDIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build )
 
 # If cpack should be configured.
 IF( GENERATE_CPACK_PROJECT AND UNIX AND NOT WIN32 )
