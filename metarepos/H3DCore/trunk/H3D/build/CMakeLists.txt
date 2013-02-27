@@ -16,6 +16,10 @@ FIND_PACKAGE(PTHREAD REQUIRED)
 SET( H3DUTIL_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../H3DUtil/include" )
 SET( HAPI_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../HAPI/include" )
 SET( H3DAPI_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../H3DAPI/include" )
+# PTHREAD_INCLUDE_DIR is added here since it is normally found by FindH3DUtil.
+# for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
+# is done then any of the included CMakeLists.txt is doing something wrong.
+SET( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIR}" )
 
 IF( NOT WIN32 )
   IF( EXISTS ${H3DCore_SOURCE_DIR}/../H3DUtil/build )
