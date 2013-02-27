@@ -19,6 +19,10 @@ SET( H3DAPI_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/include" )
 SET( UI_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../UI/include" )
 SET( MedX3D_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../MedX3D/include" )
 SET( RigidBodyPhysics_INCLUDE_DIR "${H3DWithToolkits_SOURCE_DIR}/../RigidBodyPhysics/include" )
+# PTHREAD_INCLUDE_DIR is added here since it is normally found by FindH3DUtil.
+# for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
+# is done then any of the included CMakeLists.txt is doing something wrong.
+SET( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIR}" )
 
 IF( NOT WIN32 )
   IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DUtil/build )
