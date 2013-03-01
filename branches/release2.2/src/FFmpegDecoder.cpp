@@ -162,12 +162,16 @@ bool FFmpegDecoder::testClip( const string &url ) {
   if(avformat_find_stream_info(pFormatCtx,NULL)<0)
 #endif
   return 0;
- 
-#if ( ( LIBAVCODEC_VERSION_MAJOR < 53 ) || ( LIBAVCODEC_VERSION_MAJOR == 53 && LIBAVCODEC_VERSION_MINOR < 35 ) )
-  dump_format(pFormatCtx, 0, url.c_str(), 0);
-	av_close_input_file(pFormatCtx);
+
+#if LIBAVCODEC_VERSION_MAJOR < 53
+	dump_format(pFormatCtx, 0, url.c_str(), 0);
 #else
   av_dump_format(pFormatCtx, 0, url.c_str(), 0);
+#endif
+ 
+#if ( ( LIBAVCODEC_VERSION_MAJOR < 53 ) || ( LIBAVCODEC_VERSION_MAJOR == 53 && LIBAVCODEC_VERSION_MINOR < 35 ) )
+	av_close_input_file(pFormatCtx);
+#else
 	avformat_close_input(&pFormatCtx);
 #endif
   return 1;
