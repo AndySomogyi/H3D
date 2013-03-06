@@ -560,7 +560,7 @@ IF( GENERATE_CPACK_PROJECT )
   INSTALL( DIRECTORY ${H3DAPI_SOURCE_DIR}/../examples
            DESTINATION H3DAPI
            COMPONENT H3DAPI_cpack_sources
-           REGEX "(/.svn)|(/CVS)" EXCLUDE
+           REGEX "(/.svn)|(/CVS)|(/Particledemo)" EXCLUDE
            PATTERN "berk.wrl" EXCLUDE
 					 PATTERN "berk_orig.x3d" EXCLUDE
 					 PATTERN "Kumanomi.wrl" EXCLUDE
