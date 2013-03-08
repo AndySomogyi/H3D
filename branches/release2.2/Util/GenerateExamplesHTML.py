@@ -67,7 +67,7 @@ for a_project in projects_list:
   //
   //////////////////////////////////////////////////////////////////////////////
   /// \\page %sExamples List of examples
-  """ % (a_project[0], a_project[0], a_project[0] )
+  """ % (a_project[0], a_project[0] )
 
     for root, dirs, files in os.walk(examples_dir):
       if '.svn' in dirs:
