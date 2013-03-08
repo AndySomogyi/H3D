@@ -1629,7 +1629,8 @@ PREDEFINED             = H3D_WINDOWS:=1 \
                          HAVE_SPIDERMONKEY:=1 \
                          HAVE_DSHOW:=1 \
                          HAVE_FFMPEG:=1 \
-                         HAVE_VIRTUAL_HAND_SDK:=1
+                         HAVE_VIRTUAL_HAND_SDK:=1 \
+                         USE_DOUBLE_PRECISION:=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.
