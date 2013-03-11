@@ -66,8 +66,9 @@ for a_project in projects_list:
   //
   //
   //////////////////////////////////////////////////////////////////////////////
-  /// \\page %sExamples List of examples
-  """ % (a_project[0], a_project[0] )
+  /// \\page %sExamples
+  /// \\section %sExamplesList List of examples
+  """ % (a_project[0], a_project[0], a_project[0] )
 
     for root, dirs, files in os.walk(examples_dir):
       if '.svn' in dirs:
@@ -87,6 +88,7 @@ for a_project in projects_list:
         if( temp_file.endswith(".x3d") ):
           index_to_examples_dir = root.find( a_project[4] )
           file_path_stripped = join( root, temp_file )[index_to_examples_dir + len(a_project[4]): len(join( root, temp_file ))]
+          file_path_stripped = file_path_stripped.replace( "\\", "/" )
           examples_doxygen_page = examples_doxygen_page + """/// - \\anchor %(fn_ne)s_x3d
   ///   <a href="%(rel_path)s%(stripped_file)s">%(tf)s</a>
   ///   ( <a href="%(source_dir)s/%(tf)s.html">Source</a> )
