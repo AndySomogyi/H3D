@@ -687,6 +687,7 @@ IF( GENERATE_CPACK_PROJECT )
   set(CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_INSTALL_TYPES Developer Full)
   
   set(CPACK_COMPONENT_GROUP_H3DAPI_CPACK_GROUP_DISPLAY_NAME "H3DAPI")
+  set(CPACK_COMPONENT_GROUP_H3DAPI_CPACK_GROUP_DESCRIPTION "H3DAPI is an open source, cross platform, scene graph API. Build X3D scenes by using the nodes written in H3DAPI. Load scenes using H3DViewer or H3DLoad that comes with this package.")
   set(CPACK_COMPONENT_GROUP_HAPI_CPACK_GROUP_PARENT_GROUP "H3DAPI_cpack_group")  
 
   # Add a cache variable H3D_cmake_runtime_path to point to cmake binary.
