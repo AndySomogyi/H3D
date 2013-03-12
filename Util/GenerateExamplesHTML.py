@@ -18,7 +18,7 @@ projects_list = [["H3DAPI", ["/../examples/All"], "/../../doc", current_dir, "ex
 
 for a_project in projects_list:
   examples_doxygen_page = """//////////////////////////////////////////////////////////////////////////////
-    //    Copyright 2009, SenseGraphics AB
+    //    Copyright 2009-2013, SenseGraphics AB
     //
     //    This file is part of H3DAPI.
     //
