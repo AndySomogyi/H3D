@@ -40,6 +40,7 @@ ELSE(wxWidgets_USE_LIBS)
 ENDIF(wxWidgets_USE_LIBS)
 
 SET( wxWidgets_Win_DEBUG_LIBS "YES" CACHE BOOL "If set to YES debug libraries will be included." )
+MARK_AS_ADVANCED( wxWidgets_Win_DEBUG_LIBS )
 IF( wxWidgets_Win_DEBUG_LIBS )
   SET( _DBG "d" )
 ELSE( wxWidgets_Win_DEBUG_LIBS )
