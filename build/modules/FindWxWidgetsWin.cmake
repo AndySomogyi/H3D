@@ -21,7 +21,7 @@ IF( MSVC10 )
                                       $ENV{H3D_ROOT}/../External/include
                                       ../../External/include
                                       ${module_file_path}/../../../External/include )
-  SET( wxWidgets_LIBRARY_SEARCH_PATHS ENV{H3D_EXTERNAL_ROOT}/${LIB}
+  SET( wxWidgets_LIBRARY_SEARCH_PATHS $ENV{H3D_EXTERNAL_ROOT}/${LIB}
                                       $ENV{H3D_ROOT}/../External/${LIB}
                                       ../../External/${LIB}
                                       ${module_file_path}/../../../External/${LIB} )
