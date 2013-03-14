@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.6.0)
 PROJECT( H3DCoreWin )
 # set the install directory to the H3DCoreWin directory on Windows
-IF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
+IF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
   SET( CMAKE_INSTALL_PREFIX ${H3DCoreWin_SOURCE_DIR}/.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
   SET( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
-ENDIF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
+ENDIF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
 
 SET( H3D_USE_DEPENDENCIES_ONLY TRUE )
 
@@ -17,6 +17,10 @@ SET( H3DUTIL_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../H3DUtil/include" )
 SET( HAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../HAPI/include" )
 SET( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../H3DAPI/include" )
 SET( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../External/include" )
+# PTHREAD_INCLUDE_DIR is added here since it is normally found by FindH3DUtil.
+# for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
+# is done then any of the included CMakeLists.txt is doing something wrong.
+SET( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIR}" "${H3DCoreWin_SOURCE_DIR}/../External/include" )
 
 IF( NOT WIN32 )
   IF( EXISTS ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build )
