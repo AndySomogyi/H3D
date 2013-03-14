@@ -71,6 +71,17 @@ IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build )
   INCLUDE (${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build/H3DPhysicsCPack.cmake)
 ENDIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics/build )
 
+IF( NOT DEFINED H3D_EXTRA_TOOLKITS )
+  SET( H3D_EXTRA_TOOLKITS "" CACHE STRING "Add names of directories of extra toolkits that you want to include. Separate each name by ;. The extra toolkit CMakeLists.txt must be located in ${H3DWithToolkits_SOURCE_DIR}/../(name of toolkit)/build" FORCE )
+ENDIF( NOT DEFINED H3D_EXTRA_TOOLKITS )
+
+FOREACH( EXTRA_TOOLKIT ${H3D_EXTRA_TOOLKITS} )
+  IF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build )
+    MESSAGE( STATUS "Including ${EXTRA_TOOLKIT}" )
+    ADD_SUBDIRECTORY( ${H3DWithToolkits_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build
+                       ${CMAKE_CURRENT_BINARY_DIR}/${EXTRA_TOOLKIT} )
+  ENDIF( EXISTS ${H3DWithToolkits_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build )
+ENDFOREACH()
 # If cpack should be configured.
 IF( GENERATE_CPACK_PROJECT AND UNIX AND NOT WIN32 )
 	INCLUDE (${H3DWithToolkits_SOURCE_DIR}/../H3DAPI/build/H3DAPICPack.cmake)
