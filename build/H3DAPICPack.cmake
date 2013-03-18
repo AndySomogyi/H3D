@@ -251,13 +251,12 @@ IF( GENERATE_CPACK_PROJECT )
                  DESTINATION External/${EXTERNAL_BIN_PATH}
                  COMPONENT H3DAPI_cpack_external_runtime )
       ENDIF( EXISTS ${binary} )
-      # Add the other binary path as external_source since it only needs to be included when
-      # a user wants to build H3D or against it.
+
       STRING( REGEX REPLACE "(/${EXTERNAL_BIN_PATH}/)" "/${EXTERNAL_BIN_REPLACE_PATH}/" other_binary ${binary} )
       IF( EXISTS ${other_binary} )
         INSTALL( FILES ${other_binary}
                  DESTINATION External/${EXTERNAL_BIN_REPLACE_PATH}
-                 COMPONENT H3DAPI_cpack_external_source )
+                 COMPONENT H3DAPI_cpack_external_runtime )
       ENDIF( EXISTS ${other_binary} )
     endforeach( binary )    
     
