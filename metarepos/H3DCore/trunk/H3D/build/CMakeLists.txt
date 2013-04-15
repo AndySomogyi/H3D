@@ -49,3 +49,14 @@ ELSEIF( EXISTS ${H3DCore_SOURCE_DIR}/../H3DUtil/build )
   ADD_SUBDIRECTORY( ${H3DCore_SOURCE_DIR}/../H3DUtil/build
                     ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
 ENDIF( EXISTS ${H3DCore_SOURCE_DIR}/../H3DAPI/build )
+IF( NOT DEFINED H3D_EXTRA_TOOLKITS )
+  SET( H3D_EXTRA_TOOLKITS "" CACHE STRING "Add names of directories of extra toolkits that you want to include. Separate each name by ;. The extra toolkit CMakeLists.txt must be located in ${H3DCore_SOURCE_DIR}/../(name of toolkit)/build" FORCE )
+ENDIF( NOT DEFINED H3D_EXTRA_TOOLKITS )
+
+FOREACH( EXTRA_TOOLKIT ${H3D_EXTRA_TOOLKITS} )
+  IF( EXISTS ${H3DCore_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build )
+    MESSAGE( STATUS "Including ${EXTRA_TOOLKIT}" )
+    ADD_SUBDIRECTORY( ${H3DCore_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build
+                       ${CMAKE_CURRENT_BINARY_DIR}/${EXTRA_TOOLKIT} )
+  ENDIF( EXISTS ${H3DCore_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build )
+ENDFOREACH()
