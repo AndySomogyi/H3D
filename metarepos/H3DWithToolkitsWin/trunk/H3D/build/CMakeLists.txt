@@ -105,6 +105,21 @@ IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsL
   ENDIF( CreateH3DNodesFieldsList_PROJECT )
 ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
 
+IF( NOT DEFINED H3D_EXTRA_TOOLKITS )
+  SET( H3D_EXTRA_TOOLKITS "" CACHE STRING "Add names of directories of extra toolkits that you want to include. Separate each name by ;. The extra toolkit CMakeLists.txt must be located in ${H3DWithToolkitsWin_SOURCE_DIR}/../(name of toolkit)/build" FORCE )
+ENDIF( NOT DEFINED H3D_EXTRA_TOOLKITS )
+
+FOREACH( EXTRA_TOOLKIT ${H3D_EXTRA_TOOLKITS} )
+  IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build )
+    MESSAGE( STATUS "Including ${EXTRA_TOOLKIT}" )
+    ADD_SUBDIRECTORY( ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build
+                       ${CMAKE_CURRENT_BINARY_DIR}/${EXTRA_TOOLKIT} )
+    IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build/${EXTRA_TOOLKIT}CPack.cmake )
+      INCLUDE (${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build/${EXTRA_TOOLKIT}CPack.cmake)
+    ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build/${EXTRA_TOOLKIT}CPack.cmake )
+  ENDIF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build )
+ENDFOREACH()
+
 # If cpack should be configured.
 IF( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
   INSTALL( FILES ${H3DWithToolkitsWin_SOURCE_DIR}/CMakeLists.txt
