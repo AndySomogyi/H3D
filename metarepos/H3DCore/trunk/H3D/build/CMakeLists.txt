@@ -13,13 +13,13 @@ SET(CMAKE_MODULE_PATH "${H3DCore_SOURCE_DIR}/../H3DUtil/build/modules" )
 #pthread is required for using the H3DUtil library
 FIND_PACKAGE(PTHREAD REQUIRED)
 
-SET( H3DUTIL_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../H3DUtil/include" )
-SET( HAPI_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../HAPI/include" )
-SET( H3DAPI_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../H3DAPI/include" )
+SET( H3DUTIL_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../H3DUtil/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+SET( HAPI_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../HAPI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+SET( H3DAPI_INCLUDE_DIR "${H3DCore_SOURCE_DIR}/../H3DAPI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
 # PTHREAD_INCLUDE_DIR is added here since it is normally found by FindH3DUtil.
 # for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
 # is done then any of the included CMakeLists.txt is doing something wrong.
-SET( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIR}" )
+SET( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIR}" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
 
 IF( NOT WIN32 )
   IF( EXISTS ${H3DCore_SOURCE_DIR}/../H3DUtil/build )
