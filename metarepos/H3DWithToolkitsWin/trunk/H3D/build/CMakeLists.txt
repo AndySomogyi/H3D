@@ -227,6 +227,16 @@ IF( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
                COMPONENT H3DAPI_cpack_runtime )
     ENDIF( EXISTS ${FILE_NAME_TO_INSTALL} )
     
+    SET( FILE_NAMES_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/H3DViewerPackageExtraFiles/ACKNOWLEDGEMENTS
+                              ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/H3DViewerPackageExtraFiles/NOTICE )
+    foreach( NAME_TO_INSTALL ${FILE_NAMES_TO_INSTALL} )
+      IF( EXISTS ${NAME_TO_INSTALL} )
+        INSTALL( FILES ${NAME_TO_INSTALL}
+                 DESTINATION .
+                 COMPONENT H3DUtil_cpack_runtime )
+      ENDIF( EXISTS ${NAME_TO_INSTALL} )
+    endforeach( NAME_TO_INSTALL )
+    
     
   ENDIF( MSVC )
 	INCLUDE(CPack)
