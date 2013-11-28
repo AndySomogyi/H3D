@@ -30,8 +30,8 @@ SET( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIR}" "${H3DWithToolkitsWin_SOURCE_
 
 # Version of H3DWithToolkitsWin
 SET( H3DWithToolkitsWin_MAJOR_VERSION 2 )
-SET( H3DWithToolkitsWin_MINOR_VERSION 2 )
-SET( H3DWithToolkitsWin_BUILD_VERSION 1 )
+SET( H3DWithToolkitsWin_MINOR_VERSION 3 )
+SET( H3DWithToolkitsWin_BUILD_VERSION 0 )
 IF( NOT WIN32 )
   IF( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build )
     MESSAGE( STATUS "Including H3DUtil" )
