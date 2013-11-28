@@ -105,7 +105,7 @@ IF( GENERATE_CPACK_PROJECT AND UNIX AND NOT WIN32 )
 						"${H3DWithToolkits_SOURCE_DIR}/../MedX3D;MedX3D"
 						"${H3DWithToolkits_SOURCE_DIR}/../H3DPhysics;H3DPhysics" )
   SET(CPACK_PACKAGE_VERSION_MAJOR 2)
-  SET(CPACK_PACKAGE_VERSION_MINOR 2)
+  SET(CPACK_PACKAGE_VERSION_MINOR 3)
   SET(CPACK_PACKAGE_VERSION_PATCH 0)
   
   # Set information properties about the project to install.
