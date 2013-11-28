@@ -30,8 +30,8 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 SET(H3DLoad_MAJOR_VERSION "2")
-SET(H3DLoad_MINOR_VERSION "2")
-SET(H3DLoad_BUILD_VERSION "1")
+SET(H3DLoad_MINOR_VERSION "3")
+SET(H3DLoad_BUILD_VERSION "0")
 
 # Where to find Source files.
 SET( H3DLoad_SRCS "${H3DLoad_SOURCE_DIR}/../src/H3DLoad.cpp" )
