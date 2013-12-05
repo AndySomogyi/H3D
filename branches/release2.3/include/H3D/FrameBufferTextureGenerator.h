@@ -539,6 +539,7 @@ namespace H3D {
     /// \param srcY The y component of low left corner of the area to be copied
     /// \param w    The width of area to be copied
     /// \param h    The height of area to be copied
+		/// \param depth The depth of area to be copied
     void preProcessFBO(int srcX, int srcY, int w, int h, int depth);
 
     /// Blit the depth buffer from src fbo to dst fbo.
@@ -558,7 +559,7 @@ namespace H3D {
     /// \param w    The width of area to be copied
     /// \param h    The height of area to be copied
     /// \param src_index  The color buffer index to be copied
-    /// \param src_index  The color buffer index to be used as target
+    /// \param dst_index  The color buffer index to be used as target
     void blitColorBuffer(GLenum src, GLenum dst, 
       int srcX, int srcY, int w, int h, int src_index, int dst_index);
 

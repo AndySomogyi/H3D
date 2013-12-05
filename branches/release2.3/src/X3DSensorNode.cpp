@@ -54,8 +54,8 @@ X3DSensorNode::X3DSensorNode( Inst< SFBool >  _enabled,
   type_name = "X3DSensorNode";
   database.initFields( this );
 
+	isActive->setValue( false, id );
   enabled->setValue( true );
-  isActive->setValue( false, id );
 }
 
 
