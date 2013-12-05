@@ -83,7 +83,7 @@ namespace H3D {
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 120 \n
-    /// \dotfile ShadowSphere_resolution.dot
+    /// \dotfile ShadowSphere_detailLevel.dot
     auto_ptr< SFInt32 > detailLevel;
     
     /// The H3DNodeDatabase for this node.

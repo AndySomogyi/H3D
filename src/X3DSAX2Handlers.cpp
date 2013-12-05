@@ -680,6 +680,8 @@ void X3DSAX2Handlers::handleConnectElement( const Attributes &attrs,
 		// proto. This is needed in order to use any connect statements with
 		// fields created by the python code.
 		parent_node_element = &node_stack.top();
+		if( !parent_node_element->haveConnectElement() )
+			parent_node_element->setConnectElement( true );
 	}
   node_stack.push( NodeElement( NULL ) );
 
@@ -687,7 +689,7 @@ void X3DSAX2Handlers::handleConnectElement( const Attributes &attrs,
     Console(3) << "Warning: \"connect\" element can only be defined in a IS element "
          << getLocationString() << endl;
   } else if( proto_instance ) {
-  
+
     XMLSize_t nr_attrs = attrs.getLength();
     const XMLCh *node_field_name  = NULL;
     const XMLCh *proto_field_name    = NULL;
@@ -727,11 +729,6 @@ void X3DSAX2Handlers::handleConnectElement( const Attributes &attrs,
 						}
 					}
           parent->initialize();
-          Console(3) << "WARNING: When using a PythonScript in a Protobody "
-                     << "all nodes specified for the references field of PythonScript "
-                     << "have to be declared before the connect elements. This warning "
-                     << "is displayed even if this is already the case. "
-                     << getLocationString() << endl;
         }
       }
 #endif
@@ -1509,7 +1506,15 @@ void X3DSAX2Handlers::startElement(const XMLCh* const uri,
               }
             } else if( name == "containerField" ) {
               string s = toString( attrs.getValue( i ) );
-              container_field = s; 
+              container_field = s;
+							if( dynamic_cast< PythonScript * >(parent) &&
+									container_field == "references" &&
+									node_stack.top().haveConnectElement() ) {
+								Console(3) << "WARNING: When using a PythonScript in a Protobody "
+													 << "all nodes specified for the references field of PythonScript "
+													 << "have to be declared before the connect elements. "
+													 << getLocationString() << endl;
+							}
             } else if( proto_instance ) {
             } else if( use_name ) {
               // node is defined by USE, so we ignore all fields that are not

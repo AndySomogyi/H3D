@@ -381,7 +381,7 @@ void X3DTexture2DNode::renderSubImage( Image *image, GLenum texture_target,
 void X3DTexture2DNode::enableTexturing() {
   glEnable( texture_target );
   Image * i = static_cast< Image * >(image->getValue());
-  if( i&&!imageNeedsUpdate->isUpToDate() ) {
+  if( i ) {
     // update blend state when image exist and image needs update
     Image::PixelType pixel_type = i->pixelType();
     if( pixel_type == Image::LUMINANCE_ALPHA ||
@@ -396,7 +396,7 @@ void X3DTexture2DNode::enableTexturing() {
 void X3DTexture2DNode::disableTexturing() {
   glDisable( texture_target );
   Image * i = static_cast< Image * >(image->getValue());
-  if( i&&!imageNeedsUpdate->isUpToDate() ) {
+  if( i ) {
     Image::PixelType pixel_type = i->pixelType();
     if( pixel_type == Image::LUMINANCE_ALPHA ||
       pixel_type == Image::RGBA || 

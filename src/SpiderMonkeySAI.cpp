@@ -153,7 +153,7 @@ string SpiderMonkeySAI::loadScript( const string &script, const string &filename
   JSBool ok; 
 
   jsval rval;
-  ok = JS_EvaluateScript(cx, global, script.c_str(), script.length(), 
+  ok = JS_EvaluateScript(cx, global, script.c_str(), uintN( script.length() ),
                          filename.c_str(), 1, &rval); 
   if( ok ) {                       
 

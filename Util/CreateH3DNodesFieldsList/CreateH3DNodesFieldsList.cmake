@@ -54,6 +54,13 @@ struct less_than_field_name {
       }	
 };
 
+string getFieldName( Field *f, string node_name ) {
+	string field_name = f->getName();
+	if( node_name == "UniversalJoint" && field_name == "stopBounce1" )
+		return "stop1Bounce";
+	return field_name;
+}
+
 void writeNode( ostream &os, Node *n ) {
   if( !n ) {
     return;
@@ -91,7 +98,7 @@ void writeNode( ostream &os, Node *n ) {
 						break;
 					}
 				if( field_name_is_variable_name )
-          ordered_field_names.push_back( pair< string, string >( tmp_field_name, i.getFieldDBElement()->getField(n)->getName() ) );
+          ordered_field_names.push_back( pair< string, string >( tmp_field_name, getFieldName( i.getFieldDBElement()->getField(n), node_name ) ) );
 			}
     }
     sort( ordered_field_names.begin(), ordered_field_names.end() );
@@ -156,6 +163,8 @@ int main(int argc, char* argv[]) {
   }
 
 	deprecated_names_list.push_back( pair< string, string >( "ImportLibrary", "library" ) );
+  deprecated_names_list.push_back( pair< string, string >( "Contact", "minBounceSpeed" ) );
+  deprecated_names_list.push_back( pair< string, string >( "UniversalJoint", "stopBounce1" ) );
 
 	field_name_not_variable_name.push_back( pair< string, pair< string, string > >( "Text", pair< string, string >( "string", "stringF" ) ) );
   field_name_not_variable_name.push_back( pair< string, pair< string, string > >( "MetadataDouble", pair< string, string >( "name", "nameF" ) ) );
@@ -163,6 +172,7 @@ int main(int argc, char* argv[]) {
   field_name_not_variable_name.push_back( pair< string, pair< string, string > >( "MetadataInteger", pair< string, string >( "name", "nameF" ) ) );
   field_name_not_variable_name.push_back( pair< string, pair< string, string > >( "MetadataSet", pair< string, string >( "name", "nameF" ) ) );
   field_name_not_variable_name.push_back( pair< string, pair< string, string > >( "MetadataString", pair< string, string >( "name", "nameF" ) ) );
+  field_name_not_variable_name.push_back( pair< string, pair< string, string > >( "Contact", pair< string, string >( "minbounceSpeed", "minBounceSpeed" ) ) );
 
   vector< string > all_node_names;
   for( unsigned int i = 0; i <= extra_output.size(); i++ ) {
