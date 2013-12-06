@@ -245,8 +245,8 @@ void RazerHydraSensor::EnableHydraSensor::onValueChange( const bool &new_value )
 
 void RazerHydraSensor::traverseSG( TraverseInfo &ti ) {
 	X3DSensorNode::traverseSG( ti );
-	if( enabled->getValue() && isActive->getValue() ) {
 #ifdef HAVE_SIXENSE
+	if( enabled->getValue() && isActive->getValue() ) {
 		queue< RazerHydraData > tmp_hydra_data;
 		data_lock.lock();
 		tmp_hydra_data.swap( hydra_data );
