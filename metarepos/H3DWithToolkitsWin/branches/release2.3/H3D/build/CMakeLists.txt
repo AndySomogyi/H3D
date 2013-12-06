@@ -173,20 +173,24 @@ IF( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
     IF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
       SET( 32_OR_64 "32" )
     ENDIF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    SET( NAMES_TO_INSTALL "H3DUtil" "HAPI" "H3DAPI" "H3DPhysics" "MedX3D" "UI" )
+    SET( NAMES_TO_INSTALL "H3DUtil" "HAPI" "H3DAPI" "H3DPhysics" "MedX3D" "UI" "OpenHapticsRenderer" "Chai3DRenderer" )
     foreach( NAME_TO_INSTALL ${NAMES_TO_INSTALL} )
+      SET( COMPONENT_PREFIX "${NAME_TO_INSTALL}_cpack_" )
+      IF( ${COMPONENT_PREFIX} STREQUAL "OpenHapticsRenderer" OR ${COMPONENT_PREFIX} STREQUAL "Chai3DRenderer" )
+        SET( COMPONENT_PREFIX "HAPI_cpack_" )
+      ENDIF( ${COMPONENT_PREFIX} STREQUAL "OpenHapticsRenderer" OR ${COMPONENT_PREFIX} STREQUAL "Chai3DRenderer" )
       SET( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../lib${32_OR_64}/${NAME_TO_INSTALL}_vc${H3D_MSVC_VERSION}.lib )
       IF( EXISTS ${FILE_NAME_TO_INSTALL} )
         INSTALL( FILES ${FILE_NAME_TO_INSTALL}
                  DESTINATION lib${32_OR_64}
-                 COMPONENT ${NAME_TO_INSTALL}_cpack_libraries )
+                 COMPONENT ${COMPONENT_PREFIX}libraries )
       ENDIF( EXISTS ${FILE_NAME_TO_INSTALL} )
       
       SET( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_OR_64}/${NAME_TO_INSTALL}_vc${H3D_MSVC_VERSION}.dll )
       IF( EXISTS ${FILE_NAME_TO_INSTALL} )
         INSTALL( FILES ${FILE_NAME_TO_INSTALL}
                  DESTINATION bin${32_OR_64}
-                 COMPONENT ${NAME_TO_INSTALL}_cpack_runtime )
+                 COMPONENT ${COMPONENT_PREFIX}runtime )
       ENDIF( EXISTS ${FILE_NAME_TO_INSTALL} )
 
       foreach( base_dir ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/ ${CMAKE_CURRENT_BINARY_DIR}/${NAME_TO_INSTALL}/ ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI/${NAME_TO_INSTALL}/ ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI/HAPI/${NAME_TO_INSTALL}/ )
@@ -194,21 +198,21 @@ IF( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
         IF( EXISTS ${FILE_NAME_TO_INSTALL} )
           INSTALL( FILES ${FILE_NAME_TO_INSTALL}
                    DESTINATION ${NAME_TO_INSTALL}/include/H3D
-                   COMPONENT ${NAME_TO_INSTALL}_cpack_headers )
+                   COMPONENT ${COMPONENT_PREFIX}headers )
         ENDIF( EXISTS ${FILE_NAME_TO_INSTALL} )
         
         SET( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/include/${NAME_TO_INSTALL}/${NAME_TO_INSTALL}_${32_OR_64}.h )
         IF( EXISTS ${FILE_NAME_TO_INSTALL} )
           INSTALL( FILES ${FILE_NAME_TO_INSTALL}
                    DESTINATION ${NAME_TO_INSTALL}/include/${NAME_TO_INSTALL}
-                   COMPONENT ${NAME_TO_INSTALL}_cpack_headers )
+                   COMPONENT ${COMPONENT_PREFIX}headers )
         ENDIF( EXISTS ${FILE_NAME_TO_INSTALL} )
         
         SET( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/include/H3D/${NAME_TO_INSTALL}/${NAME_TO_INSTALL}_${32_OR_64}.h )
         IF( EXISTS ${FILE_NAME_TO_INSTALL} )
           INSTALL( FILES ${FILE_NAME_TO_INSTALL}
                    DESTINATION ${NAME_TO_INSTALL}/include/H3D/${NAME_TO_INSTALL}
-                   COMPONENT ${NAME_TO_INSTALL}_cpack_headers )
+                   COMPONENT ${COMPONENT_PREFIX}headers )
         ENDIF( EXISTS ${FILE_NAME_TO_INSTALL} )
       endforeach( base_dir )
     endforeach( NAME_TO_INSTALL )
