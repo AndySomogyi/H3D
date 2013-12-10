@@ -472,6 +472,10 @@ IF( GENERATE_CPACK_PROJECT )
 
     # Modify path in the the NSIS template.
     SET( CPACK_NSIS_MODIFY_PATH "ON" )
+    
+    CONFIGURE_FILE( ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions_64.ini.cmake ${CMAKE_CURRENT_BINARY_DIR}/NSIS.InstallOptions_64.ini )
+    STRING( REPLACE "/" "\\\\" Temp_CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
+    SET( CPACK_NSIS_INSTALLOPTIONS_64 "${Temp_CMAKE_CURRENT_BINARY_DIR}\\\\NSIS.InstallOptions_64.ini" )
   ELSE(WIN32 AND NOT UNIX)
     SET(H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/
                                                                      "~$" )
@@ -547,6 +551,7 @@ IF( GENERATE_CPACK_PROJECT )
                  ${H3DAPI_SOURCE_DIR}/modules/FindXerces.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/InstallH3DAPIAndExternals.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions.ini.in
+                 ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions_64.ini.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/NSIS.template.in
                  ${H3DAPI_SOURCE_DIR}/modules/StripAndAddLibraryDirectories.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/TestIfVCExpress.cmake
