@@ -69,7 +69,8 @@ WxWidgetsWindow::WxWidgetsWindow( wxWindow *_theParent,
   use_h3d_settings( true ),
   theWxGLCanvas( NULL ),
   fullscreen_initialized ( false ),
-        theWxGLContext( NULL ) {
+  theWxGLContext( NULL ),
+	allow_new_pixel_format_creation( true ) {
   type_name = "WxWidgetsWindow";
   database.initFields( this );
  
@@ -96,6 +97,16 @@ WxWidgetsWindow::WxWidgetsWindow( wxWindow *_theParent,
 }
 
 void WxWidgetsWindow::initWindow() {
+	if( isInitialized() && !allow_new_pixel_format_creation ) {
+    Console(4) << "WxWidgetsWindow does not support changing pixel format from/to "
+               << "quad buffered stereo support after initialization." << endl;
+    if( last_render_mode == RenderMode::QUAD_BUFFERED_STEREO ) {
+      renderMode->setValue( "QUAD_BUFFERED_STEREO" );
+    } else {
+      renderMode->setValue( "MONO" );
+    }
+    return;
+  }
   RenderMode::Mode stereo_mode = renderMode->getRenderMode();
 
   int attribList[20];
@@ -334,9 +345,12 @@ myOwner( _myOwner )
 
 void WxWidgetsWindow::MyWxGLCanvas::OnIdle(wxIdleEvent& event) {
 
-if( myOwner && myOwner->is_initialized ) {
-    if( WxFrame * owner_is_frame = dynamic_cast< WxFrame * >(myOwner->theWindow) )
+	if( myOwner && myOwner->is_initialized ) {
+    if( WxFrame * owner_is_frame = dynamic_cast< WxFrame * >(myOwner->theWindow) ) {
       owner_is_frame->updateFrameRates();
+			if( myOwner->allow_new_pixel_format_creation && owner_is_frame->isFirstFileLoaded() )
+				myOwner->allow_new_pixel_format_creation = false;
+		}
    
     // resize the window if the size is different from the current size.
     int w = myOwner->width->getValue();

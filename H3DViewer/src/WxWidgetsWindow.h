@@ -204,7 +204,8 @@ namespace H3D {
     wxGLContext * theWxGLContext;
     bool last_fullscreen;
 
-  bool fullscreen_initialized;
+		bool fullscreen_initialized;
+		bool allow_new_pixel_format_creation;
 
  
 

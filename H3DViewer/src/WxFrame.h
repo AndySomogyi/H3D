@@ -352,6 +352,10 @@ public:
   void updateFrameRates() {
     frameRates->updateFrameRates();
   }
+
+	bool isFirstFileLoaded() {
+		return loaded_first_file;
+	}
 private:
   struct NonConfigOptions {
     // DebugOptions
@@ -509,6 +513,21 @@ public:
     WxFrame * frame;
   };
   auto_ptr< HandleActionKey > handle_action_key;
+
+	class UpdateStereoModeMenu : public PeriodicUpdate< SFString > {
+	public:
+		UpdateStereoModeMenu() : frame( NULL ) {}
+
+    inline void setOwnerWindow( WxFrame *_frame ) {
+      frame = _frame;
+    }
+
+  protected:
+    virtual void update();
+
+    WxFrame * frame;
+	};
+	auto_ptr< UpdateStereoModeMenu > updateStereoModeMenu;
 
 protected:
   DECLARE_EVENT_TABLE()
