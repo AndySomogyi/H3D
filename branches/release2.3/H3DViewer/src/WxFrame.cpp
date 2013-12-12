@@ -185,7 +185,8 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   handle_action_key( new HandleActionKey ),
   itemIdViewpointMap(),
   current_viewpoint_id(0),
-	check_dialogs_position_because_of_fullscreen_and_not_quadro( false )
+	check_dialogs_position_because_of_fullscreen_and_not_quadro( false ),
+	updateStereoModeMenu( new UpdateStereoModeMenu )
 {
   lastOpenedFilepath = "";
   wxAcceleratorEntry entries[1];
@@ -197,7 +198,10 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   ks.reset ( new KeySensor );
   viewpoint.reset( new Viewpoint );
   device_info.reset (NULL);
-
+	wxString console_string = wxT("Console");
+  the_console = new WxConsoleDialog( this, wxID_ANY, console_string,
+                                   wxDefaultPosition, wxDefaultSize,
+                                   (wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX) );
   glwindow = new WxWidgetsWindow(this);
 #if wxUSE_DRAG_AND_DROP
   glwindow->onFileDraggedAndDroppedFunction( &onDropFiles, this );
@@ -208,13 +212,11 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   glwindow->height->setValue(height);
 	loadIniFile();
 	glwindow->renderMode->setValue(render_mode);
+	updateStereoModeMenu->setOwnerWindow( this );
+	glwindow->renderMode->route( updateStereoModeMenu );
     
   scene->window->push_back( glwindow );
   
-  wxString console_string = wxT("Console");
-  the_console = new WxConsoleDialog( this, wxID_ANY, console_string,
-                                   wxDefaultPosition, wxDefaultSize,
-                                   (wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX) );
 #ifdef HAVE_PROFILER
   the_profiled_result = new WxProfiledResultDialog( this, wxID_ANY, console_string,
                                    wxDefaultPosition, wxDefaultSize,
@@ -460,7 +462,6 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   //Certain options in rendererMenu
   rendererMenu->Enable(FRAME_CHOOSERENDERER, false);
   rendererMenu->Enable(FRAME_RENDERMODE, false);
-  rendererMenu->Enable(FRAME_STEREORENDERMODE, false);
 
   change_nav_type->setOwnerWindows( glwindow, this );
   handle_action_key->setOwnerWindows( glwindow, this );
@@ -548,6 +549,65 @@ void WxFrame::HandleActionKey::update() {
      }
      default: {}
   }
+}
+
+void WxFrame::UpdateStereoModeMenu::update() {
+  string stereo_mode = static_cast< SFString * >(routes_in[0])->getValue();
+	frame->stereoRenderMode->Enable( FRAME_QUADBUFFERED, !frame->loaded_first_file );
+  if( stereo_mode == "MONO" )
+    frame->stereoRenderMode->Check( FRAME_MONO, true );
+  else if( stereo_mode == "QUAD_BUFFERED_STEREO" ) {
+		frame->stereoRenderMode->Check( FRAME_QUADBUFFERED, true );
+		if( frame->loaded_first_file ) {
+			frame->stereoRenderMode->Enable( FRAME_MONO, false );
+			frame->stereoRenderMode->Enable( FRAME_QUADBUFFERED, true );
+			frame->stereoRenderMode->Enable( FRAME_HORZSPLIT, false );
+			frame->stereoRenderMode->Enable( FRAME_HORZSPLITKEEPASPECT, false );
+			frame->stereoRenderMode->Enable( FRAME_VERTSPLIT, false );
+			frame->stereoRenderMode->Enable( FRAME_VERTSPLITKEEPASPECT, false );
+			frame->stereoRenderMode->Enable( FRAME_HORZINTERLACED, false );
+			frame->stereoRenderMode->Enable( FRAME_VERTINTERLACED, false );
+			frame->stereoRenderMode->Enable( FRAME_CHECKERINTERLACED, false );
+			frame->stereoRenderMode->Enable( FRAME_SHARPDISPLAY, false );
+			frame->stereoRenderMode->Enable( FRAME_REDBLUE, false );
+			frame->stereoRenderMode->Enable( FRAME_REDGREEN, false );
+			frame->stereoRenderMode->Enable( FRAME_REDCYAN, false );
+			frame->stereoRenderMode->Enable( FRAME_HDMI720P, false );
+			frame->stereoRenderMode->Enable( FRAME_HDMI1080P, false );
+#ifdef HAVE_DX9
+			frame->stereoRenderMode->Enable( FRAME_NVIDIA_3DVISION, false );
+#endif
+		}
+	} else if( stereo_mode == "HORIZONTAL_SPLIT" )
+		frame->stereoRenderMode->Check( FRAME_HORZSPLIT, true );
+	else if( stereo_mode == "HORIZONTAL_SPLIT_KEEP_RATIO" )
+		frame->stereoRenderMode->Check( FRAME_HORZSPLITKEEPASPECT, true );
+	else if( stereo_mode == "VERTICAL_SPLIT" )
+		frame->stereoRenderMode->Check( FRAME_VERTSPLIT, true );
+	else if( stereo_mode == "VERTICAL_SPLIT_KEEP_RATIO" )
+		frame->stereoRenderMode->Check( FRAME_VERTSPLITKEEPASPECT, true );
+	else if( stereo_mode == "HORIZONTAL_INTERLACED" )
+		frame->stereoRenderMode->Check( FRAME_HORZINTERLACED, true );
+	else if( stereo_mode == "VERTICAL_INTERLACED" )
+		frame->stereoRenderMode->Check( FRAME_VERTINTERLACED, true );
+	else if( stereo_mode == "CHECKER_INTERLACED" )
+		frame->stereoRenderMode->Check( FRAME_CHECKERINTERLACED, true );
+	else if( stereo_mode == "VERTICAL_INTERLACED_GREEN_SHIFT" )
+		frame->stereoRenderMode->Check( FRAME_SHARPDISPLAY, true );
+	else if( stereo_mode == "RED_BLUE_STEREO" )
+		frame->stereoRenderMode->Check( FRAME_REDBLUE, true );
+	else if( stereo_mode == "RED_GREEN_STEREO" )
+		frame->stereoRenderMode->Check( FRAME_REDGREEN, true );
+	else if( stereo_mode == "RED_CYAN_STEREO" )
+		frame->stereoRenderMode->Check( FRAME_REDCYAN, true );
+	else if( stereo_mode == "HDMI_FRAME_PACKED_720P" )
+		frame->stereoRenderMode->Check( FRAME_HDMI720P, true );
+	else if( stereo_mode == "HDMI_FRAME_PACKED_1080P" )
+		frame->stereoRenderMode->Check( FRAME_HDMI1080P, true );
+#ifdef HAVE_DX9
+	else if( stereo_mode == "NVIDIA_3DVISION" )
+		frame->stereoRenderMode->Check( FRAME_NVIDIA_3DVISION, true );
+#endif
 }
 
 /*******************Event Table*********************/
@@ -986,7 +1046,6 @@ bool WxFrame::loadFile( const string &filename) {
 
     //Enable graphical rendering options in rendererMenu
     rendererMenu->Enable(FRAME_RENDERMODE, true);
-    rendererMenu->Enable(FRAME_STEREORENDERMODE, true);
     rendererMenu->Enable(FRAME_CHOOSERENDERER, true);
 
     /****************************Device Info****************************/
@@ -1134,41 +1193,8 @@ bool WxFrame::loadFile( const string &filename) {
       this->glwindow->fullscreen->setValue( ini_fullscreen );
       this->glwindow->mirrored->setValue( ini_mirrored );
       this->glwindow->manualCursorControl->setValue( manualCursorControl );
-      this->glwindow->renderMode->setValue( render_mode );
-      if( render_mode == "MONO" )
-        stereoRenderMode->Check( FRAME_MONO, true );
-      else if( render_mode == "QUAD_BUFFERED_STEREO" )
-        stereoRenderMode->Check( FRAME_QUADBUFFERED, true );
-      else if( render_mode == "HORIZONTAL_SPLIT" )
-        stereoRenderMode->Check( FRAME_HORZSPLIT, true );
-      else if( render_mode == "HORIZONTAL_SPLIT_KEEP_RATIO" )
-        stereoRenderMode->Check( FRAME_HORZSPLITKEEPASPECT, true );
-      else if( render_mode == "VERTICAL_SPLIT" )
-        stereoRenderMode->Check( FRAME_VERTSPLIT, true );
-      else if( render_mode == "VERTICAL_SPLIT_KEEP_RATIO" )
-        stereoRenderMode->Check( FRAME_VERTSPLITKEEPASPECT, true );
-      else if( render_mode == "HORIZONTAL_INTERLACED" )
-        stereoRenderMode->Check( FRAME_HORZINTERLACED, true );
-      else if( render_mode == "VERTICAL_INTERLACED" )
-        stereoRenderMode->Check( FRAME_VERTINTERLACED, true );
-      else if( render_mode == "CHECKER_INTERLACED" )
-        stereoRenderMode->Check( FRAME_CHECKERINTERLACED, true );
-      else if( render_mode == "VERTICAL_INTERLACED_GREEN_SHIFT" )
-        stereoRenderMode->Check( FRAME_SHARPDISPLAY, true );
-      else if( render_mode == "RED_BLUE_STEREO" )
-        stereoRenderMode->Check( FRAME_REDBLUE, true );
-      else if( render_mode == "RED_GREEN_STEREO" )
-        stereoRenderMode->Check( FRAME_REDGREEN, true );
-      else if( render_mode == "RED_CYAN_STEREO" )
-        stereoRenderMode->Check( FRAME_REDCYAN, true );
-      else if( render_mode == "HDMI_FRAME_PACKED_720P" )
-        stereoRenderMode->Check( FRAME_HDMI720P, true );
-      else if( render_mode == "HDMI_FRAME_PACKED_1080P" )
-        stereoRenderMode->Check( FRAME_HDMI1080P, true );
-#ifdef HAVE_DX9
-      else if( render_mode == "NVIDIA_3DVISION" )
-        stereoRenderMode->Check( FRAME_NVIDIA_3DVISION, true );
-#endif
+			// Just making sure that we trigger update of the menu.
+      this->glwindow->renderMode->touch();
     }
 
     tree_view_dialog->showEntireSceneAsTree( H3DViewerTreeViewDialog::EXPAND_GROUP );
@@ -1651,7 +1677,6 @@ void WxFrame::OnCloseFile(wxCommandEvent & event) {
   //Disable items in rendererMenu again
   rendererMenu->Enable(FRAME_CHOOSERENDERER, false);
   rendererMenu->Enable(FRAME_RENDERMODE, false);
-  rendererMenu->Enable(FRAME_STEREORENDERMODE, false);
 }
 
 void WxFrame::OnChooseDir(wxCommandEvent & event) {

@@ -29,10 +29,10 @@
     
     <RazerHydraSensor DEF="RAZER_HYDRA"/>
     <ProtoInstance DEF="RazerHydraC0" name='RazerHydraGeometry' containerField='children' >
-      <fieldValue name='color' value='0.1 0.8 0' />
+      <fieldValue name='color' value='0.1 0.7 0' />
     </ProtoInstance>
     <ProtoInstance DEF="RazerHydraC1" name='RazerHydraGeometry' containerField='children' >
-      <fieldValue name='color' value='0.8 0.1 0' />
+      <fieldValue name='color' value='0.7 0.1 0' />
     </ProtoInstance>
     
     <ROUTE fromNode="RAZER_HYDRA" fromField="c0Position"
