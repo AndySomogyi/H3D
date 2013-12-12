@@ -38,7 +38,7 @@ State=1
 
 [Field 5]
 Type=checkbox
-Text=If checked 64 bit binaries are installed, otherwise 32 bit binaries are installed.
+Text=Use 64 bit binaries.
 Left=0
 Right=-1
 Top=60

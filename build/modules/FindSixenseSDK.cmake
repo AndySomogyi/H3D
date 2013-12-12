@@ -41,7 +41,6 @@ FIND_LIBRARY(SIXENSE_LIBRARY NAMES sixense sixense_${SDK_LIB}
 				      ${steam_path}/lib/${SDK_LIB}/release_dll
 				      $ENV{SIXENSE_SDK_PATH}/lib/${SDK_LIB}/release_dll
                                 DOC "Path to sixense library." )
-MESSAGE( STATUS ${steam_path}/lib/{SDK_LIB}/release_dll )
 MARK_AS_ADVANCED(SIXENSE_LIBRARY)
 
 # Copy the results to the output variables.
