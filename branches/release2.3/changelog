@@ -13,7 +13,7 @@ Changes for version 2.3.0:
 - Scene::findNode* functions now handle Inline. FindNode* functions are now
  static.
 - Updates to fix artifacts with GPU shadows.
-- X3DTexture nodes can now have their current state saved as PNG.
+- X3DTextureNode nodes can now have their current state saved as PNG.
 - Fixed issues with QUAD_BUFFERED_STEREO.
 - Updates to handle protos better.
 - If GLUT gameMode is used then GLUTWindow now still handle keyboard inputs
