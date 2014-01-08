@@ -1254,13 +1254,25 @@ Section "Uninstall"
     StrCmp "$MUI_TEMP" "$SMPROGRAMS" secondStartMenuDeleteLoopDone secondStartMenuDeleteLoop
   secondStartMenuDeleteLoopDone:
   
-  ClearErrors
-  ; Apparently wxWidgets writes to HKCU and HKU. Which means that we have to remove it here.
-  DeleteRegKey HKCU "Software\@CPACK_PACKAGE_VENDOR@\H3DViewer @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@(dev)"
-  ClearErrors
-  ; Delete the vendor name if it is empty.
+  ${If} ${RunningX64}
+    SetRegView 64
+  ${EndIf}
+  DeleteRegKey HKCU "$1\Software\@CPACK_PACKAGE_VENDOR@\H3DViewer @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@(x86)(dev)"
+  DeleteRegKey HKCU "$1\Software\@CPACK_PACKAGE_VENDOR@\H3DViewer @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@(x64)(dev)"
   DeleteRegKey /ifempty HKCU "Software\@CPACK_PACKAGE_VENDOR@"
-  ClearErrors
+  StrCpy $0 0
+  loop_remove_reg_key:
+    EnumRegKey $1 HKU "" $0
+    StrCmp $1 "" done_remove_reg_key
+    IntOp $0 $0 + 1
+    DeleteRegKey HKU "$1\Software\@CPACK_PACKAGE_VENDOR@\H3DViewer @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@(x86)(dev)"
+    DeleteRegKey HKU "$1\Software\@CPACK_PACKAGE_VENDOR@\H3DViewer @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@(x64)(dev)"
+    DeleteRegKey /ifempty HKU "$1\Software\@CPACK_PACKAGE_VENDOR@"
+    Goto loop_remove_reg_key
+  done_remove_reg_key:
+  ${If} ${RunningX64}
+    SetRegView 32
+  ${EndIf}
 
   Push H3D_ROOT
   Call un.DeleteEnvStr
