@@ -12,6 +12,7 @@
       <ProtoInterface>
         <field accessType='inputOutput' name='offset' type='SFVec3f' value='0 0 0'/>
         <field accessType='inputOutput' name='string' type='MFString' value='"Hello"'/>
+        <field accessType='inputOutput' name='solid' type='SFBool' value='false'/>
       </ProtoInterface>
       <ProtoBody>
       <Transform>
