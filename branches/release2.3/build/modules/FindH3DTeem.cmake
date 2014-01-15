@@ -4,6 +4,9 @@
 #  Teem_INCLUDE_DIR -  where to find Teem.h, etc.
 #  Teem_LIBRARIES    - List of libraries when using Teem.
 #  Teem_FOUND        - True if Teem found.
+IF( NOT WIN32 )
+  SET( Teem_NO_LIBRARY_DEPENDS "YES" )
+ENDIF( NOT WIN32 )
 IF(H3DTeem_FIND_REQUIRED)
     FIND_PACKAGE(Teem QUIET REQUIRED)
 ELSE(H3DTeem_FIND_REQUIRED)
@@ -21,7 +24,12 @@ IF( Teem_FOUND AND Teem_USE_FILE )
   SET( Teem_INCLUDE_DIR ${Teem_INCLUDE_DIRS} )
   SET( Teem_LIBRARIES_tmp ${Teem_LIBRARIES} )
   # Do we need to loop here? In that case beware of optimized and debug keywords.
-  SET( Teem_LIBRARIES "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.so" )
+  IF( EXISTS "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.so" )
+    SET( Teem_LIBRARIES "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.so" )
+  ELSE( EXISTS "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.so" )
+    # The library version is now assumed to be in a default location so we can actually use the UseFile.
+    INCLUDE( ${Teem_USE_FILE} )
+  ENDIF( EXISTS "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.so" )
 ELSE( Teem_FOUND AND Teem_USE_FILE )
   SET( Teem_PNG "NO" CACHE BOOL "If teem is built with png support then this variable should be set to ON." )
   IF( WIN32 )
