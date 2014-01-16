@@ -57,7 +57,7 @@ namespace H3D {
 	///
 	/// <b>Examples:</b>
   ///   - <a href="../../../H3DAPI/examples/All/BoxMan.x3d">BoxMan.x3d</a>
-  ///     ( <a href="examples/BoxMan.html">Source</a> )
+  ///     ( <a href="examples/BoxMan.x3d.html">Source</a> )
 	///
   /// \par Internal routes:
   /// \dotfile HAnimHumanoid.dot
