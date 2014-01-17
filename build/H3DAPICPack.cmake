@@ -607,7 +607,7 @@ IF( GENERATE_CPACK_PROJECT )
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DCURL.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DFreetype.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DOpenAL.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/FindH3DTEEM.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/FindH3DTeem.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DUtil.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DZLIB.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindHAPI.cmake
