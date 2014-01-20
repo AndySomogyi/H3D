@@ -186,7 +186,8 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   itemIdViewpointMap(),
   current_viewpoint_id(0),
 	check_dialogs_position_because_of_fullscreen_and_not_quadro( false ),
-	updateStereoModeMenu( new UpdateStereoModeMenu )
+	updateStereoModeMenu( new UpdateStereoModeMenu ),
+	a_file_is_loaded( false )
 {
   lastOpenedFilepath = "";
   wxAcceleratorEntry entries[1];
@@ -553,12 +554,12 @@ void WxFrame::HandleActionKey::update() {
 
 void WxFrame::UpdateStereoModeMenu::update() {
   string stereo_mode = static_cast< SFString * >(routes_in[0])->getValue();
-	frame->stereoRenderMode->Enable( FRAME_QUADBUFFERED, !frame->loaded_first_file );
+	frame->stereoRenderMode->Enable( FRAME_QUADBUFFERED, !frame->a_file_is_loaded );
   if( stereo_mode == "MONO" )
     frame->stereoRenderMode->Check( FRAME_MONO, true );
   else if( stereo_mode == "QUAD_BUFFERED_STEREO" ) {
 		frame->stereoRenderMode->Check( FRAME_QUADBUFFERED, true );
-		if( frame->loaded_first_file ) {
+		if( frame->a_file_is_loaded ) {
 			frame->stereoRenderMode->Enable( FRAME_MONO, false );
 			frame->stereoRenderMode->Enable( FRAME_QUADBUFFERED, true );
 			frame->stereoRenderMode->Enable( FRAME_HORZSPLIT, false );
@@ -1193,9 +1194,12 @@ bool WxFrame::loadFile( const string &filename) {
       this->glwindow->fullscreen->setValue( ini_fullscreen );
       this->glwindow->mirrored->setValue( ini_mirrored );
       this->glwindow->manualCursorControl->setValue( manualCursorControl );
+    }
+		if( !a_file_is_loaded ) {
+			a_file_is_loaded = true;
 			// Just making sure that we trigger update of the menu.
       this->glwindow->renderMode->touch();
-    }
+		}
 
     tree_view_dialog->showEntireSceneAsTree( H3DViewerTreeViewDialog::EXPAND_GROUP );
   } 
@@ -1674,6 +1678,8 @@ void WxFrame::OnCloseFile(wxCommandEvent & event) {
   menuBar->EnableTop(2, false);
   menuBar->EnableTop(3, false);
 
+	a_file_is_loaded = false;
+	this->glwindow->renderMode->touch();
   //Disable items in rendererMenu again
   rendererMenu->Enable(FRAME_CHOOSERENDERER, false);
   rendererMenu->Enable(FRAME_RENDERMODE, false);

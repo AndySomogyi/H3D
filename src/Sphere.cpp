@@ -91,6 +91,9 @@ H3DShadowObjectNode *Sphere::getShadowObject() {
 }
 
 void Sphere::render() {
+	GLboolean norm= glIsEnabled( GL_NORMALIZE );
+  if ( !norm ) 
+    glEnable( GL_NORMALIZE );
   bool prefer_vertex_buffer_object = false;
   if( GLEW_ARB_vertex_buffer_object ) {
     GraphicsOptions * go = NULL;
@@ -248,6 +251,8 @@ void Sphere::render() {
 		glBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
 		glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );
   }
+	if ( !norm ) 
+    glEnable( GL_NORMALIZE );
 }
 
 void Sphere::traverseSG( TraverseInfo &ti ) {
