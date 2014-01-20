@@ -348,7 +348,7 @@ void WxWidgetsWindow::MyWxGLCanvas::OnIdle(wxIdleEvent& event) {
 	if( myOwner && myOwner->is_initialized ) {
     if( WxFrame * owner_is_frame = dynamic_cast< WxFrame * >(myOwner->theWindow) ) {
       owner_is_frame->updateFrameRates();
-			if( myOwner->allow_new_pixel_format_creation && owner_is_frame->isFirstFileLoaded() )
+			if( myOwner->allow_new_pixel_format_creation && owner_is_frame->isFileLoaded() )
 				myOwner->allow_new_pixel_format_creation = false;
 		}
    

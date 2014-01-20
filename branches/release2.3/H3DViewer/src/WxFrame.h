@@ -353,8 +353,8 @@ public:
     frameRates->updateFrameRates();
   }
 
-	bool isFirstFileLoaded() {
-		return loaded_first_file;
+	bool isFileLoaded() {
+		return a_file_is_loaded;
 	}
 private:
   struct NonConfigOptions {
@@ -419,6 +419,8 @@ private:
 
   // Check if the first file is loaded.
   bool loaded_first_file;
+	// True if a file is currently loaded.
+	bool a_file_is_loaded;
 
   // One time intialization variables
   string settings_path;
