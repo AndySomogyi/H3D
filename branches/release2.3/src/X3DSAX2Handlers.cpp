@@ -1507,6 +1507,7 @@ void X3DSAX2Handlers::startElement(const XMLCh* const uri,
             } else if( name == "containerField" ) {
               string s = toString( attrs.getValue( i ) );
               container_field = s;
+#ifdef HAVE_PYTHON
 							if( dynamic_cast< PythonScript * >(parent) &&
 									container_field == "references" &&
 									node_stack.top().haveConnectElement() ) {
@@ -1515,6 +1516,7 @@ void X3DSAX2Handlers::startElement(const XMLCh* const uri,
 													 << "have to be declared before the connect elements. "
 													 << getLocationString() << endl;
 							}
+#endif
             } else if( proto_instance ) {
             } else if( use_name ) {
               // node is defined by USE, so we ignore all fields that are not
