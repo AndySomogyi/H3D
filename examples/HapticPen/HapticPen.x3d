@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <X3D profile='H3DAPI' version='1.4'>
+  <head>
+    <meta name='title' content='HapticPen.x3d'/>
+    <meta name='description' content='Small scene demonstrating how to "draw" in free air using a haptics device.'/>
+    <meta name='author' content='SenseGraphics AB, 2010-2014'/>
+  </head>
   <Scene>
     <DeviceInfo>
       <AnyDevice DEF='DEVICE'>
