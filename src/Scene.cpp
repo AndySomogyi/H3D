@@ -35,6 +35,7 @@
 #endif
 #include <H3D/DeviceInfo.h>
 #include <GL/glew.h>
+#ifdef HAVE_GLUT
 #ifdef MACOSX
 #include <GLUT/glut.h>
 #else
@@ -43,6 +44,7 @@
 #ifdef FREEGLUT
 #include <GL/freeglut.h>
 #endif
+#endif // HAVE_GLUT
 #include <H3D/PeriodicUpdate.h>
 #include <H3D/GLUTWindow.h>
 #include <H3D/X3DShapeNode.h>
@@ -557,11 +559,13 @@ Scene::~Scene() {
 #endif
 }
 
+#ifdef HAVE_GLUT
 void Scene::mainLoop() {
   GLUTWindow::initGLUT();
   glutIdleFunc( SceneInternal::idle );
   glutMainLoop();
 }
+#endif
 
 void Scene::EventSink::update() {
   for( unsigned int i = 0; i < routes_in.size(); ++i ) {

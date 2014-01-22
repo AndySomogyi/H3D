@@ -30,6 +30,7 @@
 #define __GLUTWINDOW_H__
 
 #include <H3D/H3DWindowNode.h>
+#ifdef HAVE_GLUT
 
 namespace H3D {
 
@@ -157,4 +158,5 @@ namespace H3D {
 		int last_x_pos, last_y_pos, last_width, last_height;
   };
 }
+#endif // HAVE_GLUT
 #endif

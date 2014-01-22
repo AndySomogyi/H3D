@@ -147,6 +147,9 @@
 /// CyberGloveSensor and HumanHand nodes.
 #cmakedefine HAVE_VIRTUAL_HAND_SDK
 
+/// Undef if you do not have Glut or FreeGlut.
+#cmakedefine HAVE_GLUT
+
 #define XML_USE_WIN32_TRANSCODER
 #define XML_USE_INMEM_MESSAGELOADER
 #define XML_USE_NETACCESSOR_WINSOCK

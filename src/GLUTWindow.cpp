@@ -29,6 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <H3D/GLUTWindow.h>
+#ifdef HAVE_GLUT
 
 #include <GL/glew.h>
 #ifdef MACOSX
@@ -542,3 +543,5 @@ string GLUTWindow::getCursorForMode( const string &mode ) {
 
   return "DEFAULT";
 }
+#endif // HAVE_GLUT
+
