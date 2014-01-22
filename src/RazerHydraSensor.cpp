@@ -377,7 +377,7 @@ PeriodicThread::CallbackCode RazerHydraSensor::razerHydraCallback( void* data ) 
 			razer_hydra_data.hemi_tracking_enabled = controller_data.controllers[j].hemi_tracking_enabled == 1;
 			razer_hydra_data.which_hand = controller_data.controllers[j].which_hand;
 			razer_hydra_datas.push_back( razer_hydra_data );
-			if( unsigned char(last_sequence_number[j] + 1) == controller_data.controllers[j].sequence_number ) {
+			if( (unsigned char)(last_sequence_number[j] + 1) == controller_data.controllers[j].sequence_number ) {
 				controller_updated[j] = true;
 			}
 		}
