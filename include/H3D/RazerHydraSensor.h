@@ -31,7 +31,6 @@
 
 
 #include <H3D/X3DSensorNode.h>
-#include <queue>
 #include <H3D/SFVec3f.h>
 #include <H3D/SFVec2f.h>
 #include <H3D/SFFloat.h>
@@ -41,10 +40,6 @@
 
 
 namespace H3D {
-//Have to implement RazerHydraSensorCommunication or something like that in which each node
-// can register an update callback. In that update callback there is a queue which data is stored
-// on then in traversesg this queue is used.
-
   /// \ingroup H3DNodes
   /// \class RazerHydraSensor
   /// \brief This is a X3DSensorNode for reading values from a Razer hydra sensor.
@@ -424,7 +419,7 @@ namespace H3D {
 			bool connected, docked, hemi_tracking_enabled;
 			H3DInt32 which_hand, controller;
 		};
-		queue< RazerHydraData > hydra_data;
+		list< RazerHydraData > hydra_data;
 		MutexLock data_lock;
 
 		static PeriodicThread::CallbackCode addHydraInstanceCB( void *data );
