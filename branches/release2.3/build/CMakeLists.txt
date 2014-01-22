@@ -216,6 +216,7 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 IF(GLUT_FOUND)
+	SET(HAVE_GLUT 1)
   INCLUDE_DIRECTORIES( ${GLUT_INCLUDE_DIR} )
   IF(WIN32)
     IF(MINGW)
@@ -705,9 +706,11 @@ IF( NOT DEFINED H3DAPI_EXAMPLE_PROJECTS )
 ENDIF( NOT DEFINED H3DAPI_EXAMPLE_PROJECTS )
 
 IF( H3DAPI_EXAMPLE_PROJECTS )
-  MESSAGE( STATUS "Including H3DAPI manual Examples" )
-  ADD_SUBDIRECTORY( ${H3DAPI_SOURCE_DIR}/../examples/manualExamples/C++
-                    ${CMAKE_CURRENT_BINARY_DIR}/examples/manualExamples )
+	IF( GLUT_FOUND )
+		MESSAGE( STATUS "Including H3DAPI manual Examples" )
+		ADD_SUBDIRECTORY( ${H3DAPI_SOURCE_DIR}/../examples/manualExamples/C++
+											${CMAKE_CURRENT_BINARY_DIR}/examples/manualExamples )
+	ENDIF( GLUT_FOUND )
 	
 	IF( EXISTS ${H3DAPI_SOURCE_DIR}/../examples/Particledemo )
 		IF( ( NOT H3D_USE_DEPENDENCIES_ONLY ) OR wxWidgets_FOUND )

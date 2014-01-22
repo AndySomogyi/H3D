@@ -30,15 +30,6 @@
 
 #include <H3D/HAnimSite.h>
 
-#ifdef MACOSX
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-#ifdef FREEGLUT
-#include <GL/freeglut.h>
-#endif
-
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
