@@ -247,7 +247,7 @@ void RazerHydraSensor::traverseSG( TraverseInfo &ti ) {
 	X3DSensorNode::traverseSG( ti );
 #ifdef HAVE_SIXENSE
 	if( enabled->getValue() && isActive->getValue() ) {
-		queue< RazerHydraData > tmp_hydra_data;
+		list< RazerHydraData > tmp_hydra_data;
 		data_lock.lock();
 		tmp_hydra_data.swap( hydra_data );
 		data_lock.unlock();
@@ -294,7 +294,7 @@ void RazerHydraSensor::traverseSG( TraverseInfo &ti ) {
 			} else {
 				Console(3) << "Warning: Developer forgot to take care of a new case of controller index for RazerHydraSensor " << getName() << " make sure the lazy **** fixes it." << endl;
 			}
-			tmp_hydra_data.pop();
+			tmp_hydra_data.pop_front();
 		}
 	}
 #endif
@@ -305,7 +305,7 @@ void RazerHydraSensor::transferValues( const vector< RazerHydraData > &new_data 
 	// Only call this function when new_data is not empty.
   data_lock.lock();
 	for( int i = new_data.size() -1; i >= 0; --i )
-		hydra_data.push( new_data[i] );
+		hydra_data.push_back( new_data[i] );
 	data_lock.unlock();
 }
 
