@@ -33,20 +33,8 @@
 #include "WxFrame.h"
 #include "WxWidgetsWindow.h"
 
-#include <H3D/VrmlParser.h>
-#include <H3D/Group.h>
-#include <H3D/Transform.h>
 #include <H3D/Scene.h>
-#include <H3D/KeySensor.h>
-#include <H3D/MouseSensor.h>
 
-#ifndef MACOSX
-#include <H3D/SpaceWareSensor.h>
-#endif
-
-#include <H3D/DeviceInfo.h>
-#include <H3D/INIFile.h>
-#include <H3D/ResourceResolver.h>
 #include <H3D/PythonScript.h>
 
 #include <wx/cmdline.h>
