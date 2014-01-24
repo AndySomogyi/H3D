@@ -917,6 +917,16 @@ Section "-Core installation"
     ${If} $HAPI_cpack_headers_selected > 0
       CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Docs\HAPI Manual.lnk" "$INSTDIR\doc\HAPI Manual.pdf"
     ${EndIf}
+    ${If} $H3DPhysics_cpack_headers_selected > 0
+      CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Docs\H3DPhysics C++ Reference Guide.lnk" "$INSTDIR\H3DPhysics\doc\html\index.html"
+      CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Docs\H3DPhysics Python Reference Guide.lnk" "$INSTDIR\H3DPhysics\doc\python\doc\html\index.html"
+    ${EndIf}
+    ${If} $MedX3D_cpack_headers_selected > 0
+      CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Docs\MedX3D C++ Reference Guide.lnk" "$INSTDIR\MedX3D\doc\html\index.html"
+    ${EndIf}
+    ${If} $UI_cpack_headers_selected > 0
+      CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Docs\UI C++ Reference Guide.lnk" "$INSTDIR\UI\doc\html\index.html"
+    ${EndIf}
   doc_links_added:
   
   ${If} $H3DAPI_cpack_runtime_selected > 0
@@ -1160,6 +1170,10 @@ Section "Uninstall"
     Delete "$SMPROGRAMS\$MUI_TEMP\Docs\H3D Python Reference Guide.lnk"
     Delete "$SMPROGRAMS\$MUI_TEMP\Docs\H3D API Manual.lnk"
     Delete "$SMPROGRAMS\$MUI_TEMP\Docs\HAPI Manual.lnk"
+    Delete "$SMPROGRAMS\$MUI_TEMP\Docs\H3DPhysics C++ Reference Guide.lnk"
+    Delete "$SMPROGRAMS\$MUI_TEMP\Docs\H3DPhysics Python Reference Guide.lnk"
+    Delete "$SMPROGRAMS\$MUI_TEMP\Docs\MedX3D C++ Reference Guide.lnk"
+    Delete "$SMPROGRAMS\$MUI_TEMP\Docs\UI C++ Reference Guide.lnk"
     
     ;Remove Docs folder.
     RMDir "$SMPROGRAMS\$MUI_TEMP\Docs"
@@ -1231,6 +1245,10 @@ Section "Uninstall"
     Delete "$SMPROGRAMS\$MUI_TEMP\Docs\H3D API Manual.lnk"
     Delete "$SMPROGRAMS\$MUI_TEMP\Docs\HAPI Manual.lnk"
     Delete "$SMPROGRAMS\$MUI_TEMP\Docs\C++ Reference Guide.lnk"
+    Delete "$SMPROGRAMS\$MUI_TEMP\Docs\H3DPhysics C++ Reference Guide.lnk"
+    Delete "$SMPROGRAMS\$MUI_TEMP\Docs\H3DPhysics Python Reference Guide.lnk"
+    Delete "$SMPROGRAMS\$MUI_TEMP\Docs\MedX3D C++ Reference Guide.lnk"
+    Delete "$SMPROGRAMS\$MUI_TEMP\Docs\UI C++ Reference Guide.lnk"
     
     ;Remove Docs folder.
     RMDir "$SMPROGRAMS\$MUI_TEMP\Docs"
