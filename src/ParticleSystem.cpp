@@ -268,39 +268,41 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
   vector< Particles::iterator > to_remove;
   
   X3DViewpointNode *vp = X3DViewpointNode::getActive();
-  Matrix4f vp_to_local = ti.getAccInverseMatrix() *
-    vp->accForwardMatrix->getValue();
-  
-  Matrix3f vp_to_local_rot = vp_to_local.getRotationPart();
+  if( vp ) {
+    Matrix4f vp_to_local = ti.getAccInverseMatrix() *
+      vp->accForwardMatrix->getValue();
     
-  Vec3f vp_position =  vp_to_local * vp->totalPosition->getValue();
-  Rotation vp_orn = vp->totalOrientation->getValue();
-  Vec3f vp_up = vp_to_local_rot * ( vp_orn *  Vec3f( 0, 1, 0 ) );
-  Vec3f vp_lookat = vp_to_local_rot * ( vp_orn *  Vec3f( 0, 0, -1 ) );
+    Matrix3f vp_to_local_rot = vp_to_local.getRotationPart();
+      
+    Vec3f vp_position =  vp_to_local * vp->totalPosition->getValue();
+    Rotation vp_orn = vp->totalOrientation->getValue();
+    Vec3f vp_up = vp_to_local_rot * ( vp_orn *  Vec3f( 0, 1, 0 ) );
+    Vec3f vp_lookat = vp_to_local_rot * ( vp_orn *  Vec3f( 0, 0, -1 ) );
 
-  for( Particles::iterator p = particles.begin(); 
-       p != particles.end(); ++p ) {
-    displayList->breakCache();
-    X3DParticleEmitterNode::Particle last_particle = *p;
-    // update the position of the particle due to velocity
-    (*p).updateParticle( ti.getAccInverseMatrix(), 
-                         vp_position,
-                         vp_up,
-                         vp_lookat,
-                         dt );
-    
-    if( !(*p).isDead() ) {
-      // update the particles values due to physics effects
-      for( MFPhysicsModelNode::const_iterator i = physics->begin();
-           i != physics->end(); ++i ) {
-        X3DParticlePhysicsModelNode *pm = 
-          static_cast< X3DParticlePhysicsModelNode * >( *i );
-        pm->updateParticleValues( last_particle, *p, 
-                                  last_particle_system_time, 
-                                  particle_system_time );
+    for( Particles::iterator p = particles.begin(); 
+         p != particles.end(); ++p ) {
+      displayList->breakCache();
+      X3DParticleEmitterNode::Particle last_particle = *p;
+      // update the position of the particle due to velocity
+      (*p).updateParticle( ti.getAccInverseMatrix(), 
+                           vp_position,
+                           vp_up,
+                           vp_lookat,
+                           dt );
+      
+      if( !(*p).isDead() ) {
+        // update the particles values due to physics effects
+        for( MFPhysicsModelNode::const_iterator i = physics->begin();
+             i != physics->end(); ++i ) {
+          X3DParticlePhysicsModelNode *pm = 
+            static_cast< X3DParticlePhysicsModelNode * >( *i );
+          pm->updateParticleValues( last_particle, *p, 
+                                    last_particle_system_time, 
+                                    particle_system_time );
+        }
+      } else {
+        to_remove.push_back( p );
       }
-    } else {
-      to_remove.push_back( p );
     }
   }
   

@@ -351,13 +351,13 @@ void X3DNurbsSurfaceGeometryNode::render( ) {
 
       texKnotU[0] = (GLfloat)u_knots[0];
       texKnotU[1] = (GLfloat)u_knots[0];
-      texKnotU[2] = (GLfloat)u_knots[ uKnot->size() - 1 ];
-      texKnotU[3] = (GLfloat)u_knots[ uKnot->size() - 1 ];
+      texKnotU[2] = (GLfloat)u_knots[ uSizeToUse - 1 ];
+      texKnotU[3] = (GLfloat)u_knots[ uSizeToUse - 1 ];
 
       texKnotV[0] = (GLfloat)v_knots[0];
       texKnotV[1] = (GLfloat)v_knots[0];
-      texKnotV[2] = (GLfloat)v_knots[ vKnot->size() - 1 ];
-      texKnotV[3] = (GLfloat)v_knots[ vKnot->size() - 1 ];
+      texKnotV[2] = (GLfloat)v_knots[ vSizeToUse - 1 ];
+      texKnotV[3] = (GLfloat)v_knots[ vSizeToUse - 1 ];
     }
 
     glEnable( GL_AUTO_NORMAL );
