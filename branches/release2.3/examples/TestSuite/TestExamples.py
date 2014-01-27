@@ -857,7 +857,7 @@ def testH3DPhysics (global_variations):
   def isTestable ( file_path ):
     
     if file_path.find ( 'ParallelPhysicsEngines/x3d' ) >= 0 or file_path.find ( 'ParallelPhysicsEngines\\x3d' ) >= 0:
-      return false
+      return False
     f= open ( file_path, 'r' )
     contents= f.read ()
     f.close()
