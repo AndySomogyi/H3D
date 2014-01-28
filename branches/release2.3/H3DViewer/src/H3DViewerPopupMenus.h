@@ -45,32 +45,14 @@ public:
     MenuContainer( parent,id, title, pos, size, style ),
     treeview_dialog( _treeview_dialog ) {
 #ifndef HAVE_TEEM
-		// If we dont have TEEM, disable that menu item
-		/// \todo This is untested because RightClickMenuTexture is not used anywhere at the moment.
-		int item= RightClickMenuTexture->FindItem ( wxT("Save texture image in NRRD format..") );
-		if ( item != wxNOT_FOUND ) {
-			RightClickMenuTexture->Enable ( item, false );
-		}
-#endif
-		// Menus can't be in menu bars when used as pop-up menus.
-		// Since we use wxFormBuilder we can't have several menus if they are not
-		// put in a menu bar. Therefore we remove them here manually instead and
-		// delete them in the destructor properly. Having them in a menu bar
-		// will result in assertion failures in debug mode when right clicking.
-		while( m_menubar2->GetMenuCount() > 0 )
-			m_menubar2->Remove( 0 );
+  // If we dont have TEEM, disable that menu item
+  /// \todo This is untested because RightClickMenuTexture is not used anywhere at the moment.
+  int item= RightClickMenuTexture->FindItem ( wxT("Save texture image in NRRD format..") );
+  if ( item != wxNOT_FOUND ) {
+    RightClickMenuTexture->Enable ( item, false );
   }
-
-	~H3DViewerPopupMenus() {
-		// Deleting the menus since they are no longer in the menu bar
-		// and are therefore not removed by wxWidgets automatically.
-		delete RightClickMenu;
-		delete RightClickMenuTexture;
-		delete RightClickMenuGeometry;
-		RightClickMenu = NULL;
-		RightClickMenuTexture = NULL;
-		RightClickMenuGeometry = NULL;
-	}
+#endif
+  }
         
   /// Callback for collapse all menu choice.
   virtual void OnTreeViewCollapseAll( wxCommandEvent& event );
