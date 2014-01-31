@@ -32,6 +32,7 @@ Changes for version 2.3.0:
 - DirectShowDecoder now plays wmv files.
 - PointSet, LineSet, IndexedLineSet now have vertex attribute support.
 - Doxygen documentation now links to python documentation as well.
+- Extrusion now calculates normal per triangle face instead of per quad face.
 
 New H3D nodes:
 FBODebugger
