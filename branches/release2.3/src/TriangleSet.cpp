@@ -265,7 +265,7 @@ X3DNormalNode *TriangleSet::AutoNormal::generateNormalsPerVertex(
     unsigned int nr_coords = coord->nrAvailableCoords();
     vector< Vec3f > normals( nr_coords, 
                              Vec3f( 0, 0, 0 ) );
-    for( unsigned int j = 0; j < coord->nrAvailableCoords(); j+=3 ) {
+    for( unsigned int j = 0; j + 2 < nr_coords; j+=3 ) {
       Vec3f norm, A, B, C, AB, BC;
       // make sure we have a valid face. If not use a dummy normal. 
       if( j+2 >= nr_coords ) {

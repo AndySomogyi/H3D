@@ -204,6 +204,7 @@ namespace H3D {
 
   protected:
     GLUnurbsObj *theNurb;
+		auto_ptr< Field > printWarning;
   };
 }
 
