@@ -836,7 +836,7 @@ td, th {
 def testH3DAPI (global_variations):
 
   def isTestable ( file_path ):
-    return file_path.find ( 'TestAll' ) < 0
+    return file_path.find ( 'TestAll' ) < 0 and file_path.find( 'SpaceTennis.x3d' ) < 0
 
   tester= TestExamples( os.path.join(args.output, "H3DAPI"), startup_time= 10, shutdown_time= 10, testable_callback= isTestable )
   results= tester.testAllExamples( global_variations, directory= "../../../H3DAPI/examples" )
