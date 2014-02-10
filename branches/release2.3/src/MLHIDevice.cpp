@@ -85,7 +85,10 @@ void MLHIDevice::initialize() {
   #ifdef HAVE_MLHIAPI
     if( ip != "" ) {
       hapi_device.reset( new HAPI::MLHIHapticsDevice( serverIPAddress ) );
-    }
+    } else {
+			Console(4) << "Warning: No server IP address set for node " << getName()
+								 << ". Node will not be initialized properly." << endl;
+		}
   #else
     Console(4) << "Cannot use MLHIDevice. HAPI compiled without"
              << " MLHIAPI support. Recompile HAPI with "
