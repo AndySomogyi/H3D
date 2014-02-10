@@ -39,6 +39,10 @@ namespace H3D {
 	/// with MLHI devices.
 	/// 
 	/// That is a Maglev haptics device.
+	///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/MLHIDevice.x3d">MLHIDevice.x3d</a>
+  ///     ( <a href="examples/MLHIDevice.x3d.html">Source</a> )
 	/// \note THIS NODE IS COMPLETELY UNTESTED.
 	class H3DAPI_API MLHIDevice: public H3DHapticsDevice {
 	public:
