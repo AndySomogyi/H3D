@@ -494,7 +494,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
     render_patches= render_patches_new;
     if ( !GLEW_ARB_tessellation_shader ) {
       if ( render_patches_new ) {
-        Console(4) << "WARNING: Tessellation shaders are not supported by your graphics hardware! "
+        Console(4) << "Warning: Tessellation shaders are not supported by your graphics hardware! "
           "IndexedTriangleSet " << getName() << " will not be rendered as GL_PATCHES." << endl;
       }
     } else {
