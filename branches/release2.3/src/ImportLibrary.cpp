@@ -100,7 +100,7 @@ void ImportLibrary::initialize() {
   }
 
   // no library found
-  Console(4) << "WARNING: Could not load any of the dynamic libraries ";
+  Console(4) << "Warning: Could not load any of the dynamic libraries ";
   for( MFString::const_iterator i = url->begin();
        i != url->end();
        ++i ) {

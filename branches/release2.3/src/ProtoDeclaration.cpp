@@ -194,7 +194,7 @@ AutoRef< Node > ProtoDeclaration::createProtoInstanceNodeVRML( PrototypeInstance
       }
     }
   } else {
-    Console(3) << "WARNING: Could not parse VRML from string" << endl;
+    Console(3) << "Warning: Could not parse VRML from string" << endl;
   }
   return n;
 }
