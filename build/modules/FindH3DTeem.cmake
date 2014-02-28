@@ -26,6 +26,8 @@ IF( Teem_FOUND AND Teem_USE_FILE )
   # Do we need to loop here? In that case beware of optimized and debug keywords.
   IF( EXISTS "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.so" )
     SET( Teem_LIBRARIES "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.so" )
+  ELSE IF( EXISTS "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.dylib" )
+    SET( Teem_LIBRARIES "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.dylib" )
   ELSE( EXISTS "${Teem_LIBRARY_DIRS}/lib${Teem_LIBRARIES}.so" )
     # The library version is now assumed to be in a default location so we can actually use the UseFile.
     INCLUDE( ${Teem_USE_FILE} )
