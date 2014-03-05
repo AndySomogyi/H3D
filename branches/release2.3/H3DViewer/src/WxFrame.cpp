@@ -620,7 +620,7 @@ BEGIN_EVENT_TABLE(WxFrame, wxFrame)
   EVT_MENU (FRAME_OPEN_URL, WxFrame::OnOpenFileURL)
   EVT_MENU (FRAME_CLOSE, WxFrame::OnCloseFile)
   EVT_MENU (FRAME_CHOOSEDIR, WxFrame::OnChooseDir)
-  EVT_MENU (FRAME_FULLSCREEN, WxFrame::OnFullscreen)
+  EVT_MENU (FRAME_FULLSCREEN, WxFrame::ToggleFullscreen)
   EVT_MENU (FRAME_SETTINGS, WxFrame::OnSettings)
   EVT_MENU (FRAME_TOGGLE_FULLSCREEN, WxFrame::ToggleFullscreen)
   EVT_MENU (FRAME_MIRROR, WxFrame::MirrorScene)
@@ -1724,12 +1724,6 @@ void WxFrame::OnIdle(wxIdleEvent &event) {
     DestroyViewpointsMenu();
     BuildViewpointsMenu( v );
   }
-}
-
-//Fullscreen mode
-void WxFrame::OnFullscreen (wxCommandEvent & event)
-{
-  SetFullscreen( true );
 }
 
 void WxFrame::SetFullscreen( bool fullscreen ) {

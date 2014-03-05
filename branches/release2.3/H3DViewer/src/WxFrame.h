@@ -291,7 +291,6 @@ public:
   void OnWindowExit( wxCloseEvent & event );
   void OnAbout( wxCommandEvent & event );
   void OnHelp( wxCommandEvent & event );
-  void OnFullscreen( wxCommandEvent & event );
   void ToggleFullscreen( wxCommandEvent & event );
   void MirrorScene( wxCommandEvent & event );
   void RenderMode( wxCommandEvent & event );
