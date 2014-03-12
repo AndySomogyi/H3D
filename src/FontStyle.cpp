@@ -400,6 +400,7 @@ FontStyle::FontStyle(
 #endif
  {
 
+	mbrlen (NULL,0,&mbs);
   type_name = "FontStyle";
   
   database.initFields( this );
@@ -573,7 +574,16 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
    }
    
    glNormal3f( 0, 0, 1 );
-   font->Render( text.c_str() );
+	 wchar_t * wtext = new wchar_t[text.size()];
+	 const char *src = text.c_str();
+	 size_t ret = mbsrtowcs( wtext, &src, size_t( text.size() ), &mbs );
+	 if( errno == EILSEQ ) {
+		// Could not convert try to use original text string.
+		font->Render( text.c_str() );
+	 } else {
+		font->Render( wtext, ret );
+	 }
+	 delete [] wtext;
 
    if( renderType->getValue() == "TEXTURE" ) {
      glDisable( GL_ALPHA_TEST );
