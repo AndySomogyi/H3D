@@ -399,8 +399,9 @@ FontStyle::FontStyle(
   ,font( NULL )
 #endif
  {
-
+#ifdef H3D_WINDOWS
 	mbrlen (NULL,0,&mbs);
+#endif
   type_name = "FontStyle";
   
   database.initFields( this );
@@ -574,6 +575,7 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
    }
    
    glNormal3f( 0, 0, 1 );
+#ifdef H3D_WINDOWS
 	 wchar_t * wtext = new wchar_t[text.size()];
 	 const char *src = text.c_str();
 	 size_t ret = mbsrtowcs( wtext, &src, size_t( text.size() ), &mbs );
@@ -584,6 +586,9 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
 		font->Render( wtext, ret );
 	 }
 	 delete [] wtext;
+#else
+   font->Render( text.c_str() );
+#endif
 
    if( renderType->getValue() == "TEXTURE" ) {
      glDisable( GL_ALPHA_TEST );
