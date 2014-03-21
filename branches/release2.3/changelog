@@ -56,7 +56,13 @@ H3DViewer updates:
 - Updates to handle QUAD_BUFFERED_STEREO on an NVIDIA_3DVISION ready display
  with a non-quadro card. Note that this requires a special built wxWidgets.
  WxWidgets adopted a patch supplied by us so in the future this should work
- for standard releases of WxWidgets.
+ for standard releases of WxWidgets. The patch is actually applied in wxWidgets
+ 3.0 release.
+- Updates to make sure that the stereo menu disables stereo modes that can not
+ be switched to after selected a stereo mode.
+- Added "-dp" command line switch to disable plugins at startup.
+- Made sure that starting up in fullscreen results in displaying window in
+ windowed mode as short time as possible.
 
 Compatability issues:
 - Changed default depth buffer type of FrameBufferTextureGenerator.
