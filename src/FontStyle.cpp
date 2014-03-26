@@ -399,9 +399,6 @@ FontStyle::FontStyle(
   ,font( NULL )
 #endif
  {
-#ifdef H3D_WINDOWS
-	mbrlen (NULL,0,&mbs);
-#endif
   type_name = "FontStyle";
   
   database.initFields( this );
@@ -578,7 +575,7 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
 #ifdef H3D_WINDOWS
 	 wchar_t * wtext = new wchar_t[text.size()];
 	 const char *src = text.c_str();
-	 size_t ret = mbsrtowcs( wtext, &src, size_t( text.size() ), &mbs );
+	 size_t ret = mbsrtowcs( wtext, &src, size_t( text.size() ), NULL );
 	 if( errno == EILSEQ ) {
 		// Could not convert try to use original text string.
 		font->Render( text.c_str() );
