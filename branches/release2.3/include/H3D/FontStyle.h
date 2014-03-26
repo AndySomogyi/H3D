@@ -336,9 +336,6 @@ namespace H3D {
     /// measure bounding  boxes, render, advance, etc.
     FTFont *font;
 #endif
-#ifdef H3D_WINDOWS
-		mbstate_t mbs;
-#endif
   };
 }
 

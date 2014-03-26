@@ -524,7 +524,10 @@ void H3DViewerFieldValuesPanelPropGrid::PropertyUpdater::update() {
     ParsableField *pfield = dynamic_cast< ParsableField * >( f );
     if( pfield ) {
       string s = pfield->getValueAsString();
-      property->SetValueFromString( wxString( s.c_str(), wxConvUTF8 ) );
+			wxString the_string( s.c_str(), wxConvUTF8 );
+			if( !s.empty() && the_string.IsEmpty() )
+				the_string = wxString( s.c_str(), *wxConvCurrent );
+      property->SetValueFromString( the_string );
     }
   }
 
