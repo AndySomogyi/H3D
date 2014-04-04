@@ -87,7 +87,7 @@ namespace H3D {
   ///   is replicated into all four (including alpha) channels.
   /// - The function field defines an optional function to be applied to
   ///   the argument after the mode has been evaluated.
-  ///   "" (default)	No function is applied.
+  ///   "" (default) No function is applied.
   ///   "COMPLEMENT" Invert the argument so that, if the result of the 
   ///   argument were referred to by the variable x, the value would be
   ///   1.0 minus x.

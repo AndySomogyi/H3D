@@ -76,14 +76,14 @@ namespace H3D {
   class H3DAPI_API MultiTextureCoordinate : public X3DTextureCoordinateNode {
   public:
 
-		/// The MFTextureCoordinateNode is dependent on the propertyChanged 
+    /// The MFTextureCoordinateNode is dependent on the propertyChanged 
     /// field of the contained X3DTextureCoordinateNodes.
     typedef DependentMFNode< 
                 X3DTextureCoordinateNode,
                 FieldRef< X3DGeometricPropertyNode,
                           Field,
                           &X3DTextureCoordinateNode::propertyChanged >, true >
-		MFTextureCoordinateNode;
+    MFTextureCoordinateNode;
 
     /// Constructor.
     MultiTextureCoordinate( Inst< SFNode                  > _metadata = 0,

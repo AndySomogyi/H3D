@@ -85,19 +85,19 @@ namespace H3D {
 
     /// Constructor.
     ConvolutionFilterShader( Inst< DisplayList  > _displayList = 0,
-			     Inst< SFNode       > _metadata    = 0,
-			     Inst< SFBool       > _isSelected  = 0,
-			     Inst< SFBool       > _isValid     = 0,
-			     Inst< SFBool       > _activate    = 0,
-			     Inst< SFString     > _language    = 0,
-			     Inst< MFShaderPart > _parts       = 0,
-			     Inst< SFBool       > _suppressUniformWarnings = 0,
-			     Inst< MFString     > _fragmentShaderString    = 0,
-			     Inst< MFString     > _vertexShaderString      = 0,
-			     Inst< SFTexture2DNode > _texture = 0,
-			     Inst< SFString     > _type        = 0,
-			     Inst< MFFloat      > _weights     = 0,
-			     Inst< SFInt32      > _kernelSize  = 0 );
+           Inst< SFNode       > _metadata    = 0,
+           Inst< SFBool       > _isSelected  = 0,
+           Inst< SFBool       > _isValid     = 0,
+           Inst< SFBool       > _activate    = 0,
+           Inst< SFString     > _language    = 0,
+           Inst< MFShaderPart > _parts       = 0,
+           Inst< SFBool       > _suppressUniformWarnings = 0,
+           Inst< MFString     > _fragmentShaderString    = 0,
+           Inst< MFString     > _vertexShaderString      = 0,
+           Inst< SFTexture2DNode > _texture = 0,
+           Inst< SFString     > _type        = 0,
+           Inst< MFFloat      > _weights     = 0,
+           Inst< SFInt32      > _kernelSize  = 0 );
     
     /// The texture field contains the texture on which to apply the 
     /// filter kernel.

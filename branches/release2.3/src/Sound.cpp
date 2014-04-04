@@ -122,12 +122,12 @@ Sound::Sound(
                << endl;
   }
   if( !al_context )
-	  al_context = alcCreateContext( al_device, NULL);
+    al_context = alcCreateContext( al_device, NULL);
   
-	if( !al_context ) {
+  if( !al_context ) {
     Console(4) << "Warning: Could not create OpenAL context for use with Sound node."
                << endl;
-	}
+  }
   alcMakeContextCurrent(al_context);
   if( !al_source ) {
     alGenSources( 1, &al_source );

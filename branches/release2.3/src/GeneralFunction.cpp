@@ -125,10 +125,10 @@ GeneralFunction::SFFunctionObject::SFFunctionObject() {
 }
 
 GeneralFunction::SFFunctionObject::~SFFunctionObject() {
-	if( value ) {
-		delete value;
-		value = NULL;
-	}
+  if( value ) {
+    delete value;
+    value = NULL;
+  }
 }
 
 #endif

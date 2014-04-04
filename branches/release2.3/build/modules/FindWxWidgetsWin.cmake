@@ -59,21 +59,21 @@ FOREACH(WXLIB ${wxlibs} )
         DOC "Path to wx ${WXLIB} library."
         )
         MARK_AS_ADVANCED(wxWidgets_${WXLIB}_LIBRARY)
-	IF( wxWidgets_Win_DEBUG_LIBS )
-			# The _DBG variable is not used for 2.8 since the libraries in External works for both debug and release.
-			FIND_LIBRARY(wxWidgets_${WXLIB}${_DBG}_LIBRARY
-			NAMES
+  IF( wxWidgets_Win_DEBUG_LIBS )
+      # The _DBG variable is not used for 2.8 since the libraries in External works for both debug and release.
+      FIND_LIBRARY(wxWidgets_${WXLIB}${_DBG}_LIBRARY
+      NAMES
       wxmsw30u${_DBG}_${WXLIB}
       wxbase30u${_DBG}_${WXLIB}
-			wxmsw29u${_DBG}_${WXLIB}
+      wxmsw29u${_DBG}_${WXLIB}
       wxbase29u${_DBG}_${WXLIB}
-			wxmsw28${_UCD}_${WXLIB}
+      wxmsw28${_UCD}_${WXLIB}
       wx${WXLIB}${_DBG}
-			PATHS ${wxWidgets_LIBRARY_SEARCH_PATHS}
-			DOC "Path to wx ${WXLIB}d library."
-			)
-			MARK_AS_ADVANCED(wxWidgets_${WXLIB}${_DBG}_LIBRARY)
-	ENDIF( wxWidgets_Win_DEBUG_LIBS )
+      PATHS ${wxWidgets_LIBRARY_SEARCH_PATHS}
+      DOC "Path to wx ${WXLIB}d library."
+      )
+      MARK_AS_ADVANCED(wxWidgets_${WXLIB}${_DBG}_LIBRARY)
+  ENDIF( wxWidgets_Win_DEBUG_LIBS )
 ENDFOREACH( WXLIB )
 
 
@@ -82,10 +82,10 @@ FIND_LIBRARY(wxWidgets_base_LIBRARY NAMES wxbase30u wxbase29u wxbase28
                                       DOC "Path to wx base library." )
 
 IF( wxWidgets_Win_DEBUG_LIBS )
-	# The _DBG variable is not used for 2.8 since the libraries in External works for both debug and release.
-	FIND_LIBRARY(wxWidgets_base${_DBG}_LIBRARY NAMES wxbase30u${_DBG} wxbase29u${_DBG} wxbase28
-										  PATHS ${wxWidgets_LIBRARY_SEARCH_PATHS}
-										  DOC "Path to wx base library." )
+  # The _DBG variable is not used for 2.8 since the libraries in External works for both debug and release.
+  FIND_LIBRARY(wxWidgets_base${_DBG}_LIBRARY NAMES wxbase30u${_DBG} wxbase29u${_DBG} wxbase28
+                      PATHS ${wxWidgets_LIBRARY_SEARCH_PATHS}
+                      DOC "Path to wx base library." )
 ENDIF( wxWidgets_Win_DEBUG_LIBS )
 
 IF( wxWidgets_base_LIBRARY )

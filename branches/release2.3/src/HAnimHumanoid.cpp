@@ -308,7 +308,7 @@ void HAnimHumanoid::traverseSG( TraverseInfo &ti ) {
       Console(4) << "Unsupported X3DNormalNode: \"" 
                    << base_normal->getTypeName() << "\" in HAnimHumanoid." << endl;
       normals_single.clear();
-		}
+    }
   }
   
   X3DChildNode::traverseSG( ti );

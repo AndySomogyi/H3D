@@ -123,8 +123,8 @@ void NoiseTexture::SFImage::update() {
   H3DFloat perlinValue;
   H3DFloat perlinGrayValue;
 
-	H3DFloat width_minus_1 = H3DFloat( width-1 );
-	H3DFloat height_minus_1 = H3DFloat( height-1 );
+  H3DFloat width_minus_1 = H3DFloat( width-1 );
+  H3DFloat height_minus_1 = H3DFloat( height-1 );
   for( y = 0; y < height; ++y ) {
     for( x = 0; x < width; ++x) {
       H3DFloat x_norm = x/width_minus_1;

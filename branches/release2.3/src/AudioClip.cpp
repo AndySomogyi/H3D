@@ -108,7 +108,7 @@ void AudioClip::ALrender() {
     }
 
     if( reader.get() ) { 
-	    if( reader->nrChannels() == 1 )
+      if( reader->nrChannels() == 1 )
         if( reader->bitsPerSample() == 16 )
           al_format = AL_FORMAT_MONO16;
         else if( reader->bitsPerSample() == 8 ) 

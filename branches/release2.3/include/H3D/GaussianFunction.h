@@ -35,7 +35,7 @@
 namespace H3D {
   /// \ingroup H3DNodes
   /// \brief The function node implements a gaussian function.
-	/// <b>Examples:</b>
+  /// <b>Examples:</b>
   ///   - <a href="../../../H3DAPI/examples/All/DeformableShape.x3d">DeformableShape.x3d</a>
   ///     ( <a href="examples/DeformableShape.x3d.html">Source</a> )
   class H3DAPI_API GaussianFunction : public H3DFunctionNode {

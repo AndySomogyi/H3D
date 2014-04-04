@@ -43,7 +43,7 @@ namespace H3D {
   /// the piecewise linear curve.
   ///
   /// ContourPolyline2D nodes are used as children of the Contour2D group.
-	/// <b>Examples:</b>
+  /// <b>Examples:</b>
   ///   - <a href="../../../H3DAPI/examples/All/NurbsTrimmedSurface.x3d">NurbsTrimmedSurface.x3d</a>
   ///     ( <a href="examples/NurbsTrimmedSurface.x3d.html">Source</a> )
   ///

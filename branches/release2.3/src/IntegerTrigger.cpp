@@ -57,7 +57,7 @@ IntegerTrigger::IntegerTrigger( Inst< SFNode          > _metadata,
   type_name = "IntegerTrigger";
   database.initFields( this );
 
-	integerKey->setValue( -1 );
+  integerKey->setValue( -1 );
 
   set_boolean->route( triggerValue, id );
 

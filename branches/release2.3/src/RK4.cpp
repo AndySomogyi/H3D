@@ -83,7 +83,7 @@ void LinearMotion::solve( LMState &state, H3DTime dt ) {
   DvState b = evaluate( state, 0.5*dt, a );
   DvState c = evaluate( state, 0.5*dt, b );
   DvState d = evaluate( state, dt, c );
-		
+
   // update position and momentum from a weighted average of the
   // four evaluations performed above:
   state.pos    += dt * (a.vel + 2*(b.vel + c.vel) + d.vel) / 6;
@@ -93,4 +93,4 @@ void LinearMotion::solve( LMState &state, H3DTime dt ) {
   state.angMom += dt * (a.torque + 2.0f*(b.torque + c.torque) + d.torque) / 6;
 
   update( state );
-}	
+}

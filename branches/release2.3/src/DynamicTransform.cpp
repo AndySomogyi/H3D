@@ -166,11 +166,11 @@ void DynamicTransform::SFMotion::update() {
 
   if( ( ds->position->getValue() - state.pos ).lengthSqr() > Constants::f_epsilon )
     ds->position->setValue( state.pos );
-	if( ( ds->momentum->getValue() - state.mom ).lengthSqr() > Constants::f_epsilon )
+  if( ( ds->momentum->getValue() - state.mom ).lengthSqr() > Constants::f_epsilon )
     ds->momentum->setValue( state.mom );
-	if( ( Quaternion( ds->orientation->getValue() ) - state.orn ).norm() > Constants::f_epsilon )
+  if( ( Quaternion( ds->orientation->getValue() ) - state.orn ).norm() > Constants::f_epsilon )
     ds->orientation->setValue( Rotation( state.orn ) );
-	if( ( ds->angularMomentum->getValue() - state.angMom ).lengthSqr() > Constants::f_epsilon )
+  if( ( ds->angularMomentum->getValue() - state.angMom ).lengthSqr() > Constants::f_epsilon )
     ds->angularMomentum->setValue( state.angMom );
 }
 

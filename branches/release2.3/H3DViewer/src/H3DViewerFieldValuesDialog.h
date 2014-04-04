@@ -46,10 +46,10 @@ class H3DViewerFieldValuesPanel : public wxPanel
 public:
   /** Constructor */
   H3DViewerFieldValuesPanel( wxWindow* parent, 
-			     wxWindowID id = wxID_ANY, 
-			     const wxPoint& pos = wxDefaultPosition, 
-			     const wxSize& size = wxSize( 236,335 ), 
-			     long style = wxTAB_TRAVERSAL );
+           wxWindowID id = wxID_ANY, 
+           const wxPoint& pos = wxDefaultPosition, 
+           const wxSize& size = wxSize( 236,335 ), 
+           long style = wxTAB_TRAVERSAL );
   ~H3DViewerFieldValuesPanel();
 
   void OnIdle( wxIdleEvent& event );

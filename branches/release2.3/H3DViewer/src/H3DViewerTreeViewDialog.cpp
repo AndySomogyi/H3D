@@ -197,17 +197,17 @@ void H3DViewerTreeViewDialog::addNodeToTree( wxTreeItemId tree_id,
 void H3DViewerTreeViewDialog::updateNodeTree( wxTreeItemId tree_id, 
                                               list< pair< H3D::Node *, string > > nodes,
                                               H3DViewerTreeViewDialog::ExpandMode expand_new,
-																							bool check_if_expanded ) {
+                                              bool check_if_expanded ) {
 
   // find all children of tree_id
   list< wxTreeItemId > children_ids;
   wxTreeItemIdValue cookie;
 
   wxTreeItemId id = TreeViewTree->GetFirstChild( tree_id, cookie );
-	if( check_if_expanded )
-		if( id.IsOk() && TreeViewTree->HasChildren(tree_id ) && !TreeViewTree->IsExpanded( tree_id ) ) { 
-			return;
-		}
+  if( check_if_expanded )
+    if( id.IsOk() && TreeViewTree->HasChildren(tree_id ) && !TreeViewTree->IsExpanded( tree_id ) ) { 
+      return;
+    }
   while( id.IsOk() ) {
     children_ids.push_back( id );
     id = TreeViewTree->GetNextSibling( id );

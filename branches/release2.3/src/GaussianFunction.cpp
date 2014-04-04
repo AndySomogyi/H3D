@@ -76,5 +76,5 @@ HAPI::HAPIFunctionObject *GaussianFunction::getAsHAPIFunctionObject() {
   return_function->setFunctionString( function_string );
   return return_function;
 #endif
-	return NULL;
+  return NULL;
 }

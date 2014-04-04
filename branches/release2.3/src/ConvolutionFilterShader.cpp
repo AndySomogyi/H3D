@@ -83,13 +83,13 @@ void ConvolutionFilterShader::traverseSG( TraverseInfo &ti ) {
   RenderTargetTexture *rtt = dynamic_cast< RenderTargetTexture* >( texture->getValue() );
   Image *image = NULL;
   if( t ){
-	image = t->image->getValue();
+  image = t->image->getValue();
 
   }
 
   if( image ) {
-	t->repeatS->setValue(false);
-	t->repeatT->setValue(false);
+  t->repeatS->setValue(false);
+  t->repeatT->setValue(false);
     if( textureWidth->getValue() != image->width() ) {
       textureWidth->setValue( image->width() );
     }
@@ -175,7 +175,7 @@ string ConvolutionFilterShader::addUniformFields( ComposedShader *shader ) {
                                      "float",
                                      H3D::Field::INPUT_OUTPUT,
                                      copyAndRouteField( weights ),
-				     nr_weights );
+             nr_weights );
 
   return s.str();
 }
@@ -200,7 +200,7 @@ string ConvolutionFilterShader::getFragmentShaderString() {
       s << "  int max_index_v = 0; " << endl;
     } else {
       if( t != "FULL" ) {
-	// print error message
+      // print error message
       }
       s << "  int min_index_h = -(KERNEL_SIZE - 1)/2; " << endl;
       s << "  int max_index_h = -min_index_h; " << endl;
@@ -215,8 +215,8 @@ string ConvolutionFilterShader::getFragmentShaderString() {
     s << "       vec2 offset = vec2( float(h) * pixel_step.x, " << endl;
     s << "                           float(v) * pixel_step.y ); " << endl; 
     s << "       vec2 tc = gl_TexCoord[0].st + offset; " << endl;
-	s << "       tc.x = clamp(tc.x,0.0,1.0); " << endl;
-	s << "       tc.y = clamp(tc.y,0.0,1.0); " << endl;
+    s << "       tc.x = clamp(tc.x,0.0,1.0); " << endl;
+    s << "       tc.y = clamp(tc.y,0.0,1.0); " << endl;
     s << "       color = color + texture2D( " << uniqueShaderName("texture") << ", tc ) * " << uniqueShaderName( "weights" ) << "[index]; " << endl;
     s << "       index++; " << endl;
     s << "    } " << endl;

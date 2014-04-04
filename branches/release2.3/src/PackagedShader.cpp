@@ -80,7 +80,7 @@ bool PackagedShader::addField( const string &name,
                                Field *field ) {
   bool success = X3DProgrammableShaderObject::addField( name, 
                                                         access, 
-                                                        field  );	
+                                                        field  );
   if( success ) {
     field->route( displayList );
   }

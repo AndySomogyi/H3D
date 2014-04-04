@@ -130,20 +130,20 @@ namespace H3D {
 
     /// Constructor.
     X3DBackgroundNode( Inst< SFSetBind > _set_bind    = 0,
-		       Inst< SFNode    > _metadata    = 0,
-		       Inst< SFTime    > _bindTime    = 0,
-		       Inst< SFBool    > _isBound     = 0,
-		       Inst< DisplayList > _displayList = 0,
-		       Inst< MFFloat   > _groundAngle = 0,
-		       Inst< MFColor   > _groundColor = 0,
-		       Inst< MFFloat   > _skyAngle    = 0,
-		       Inst< MFColor   > _skyColor    = 0,
+           Inst< SFNode    > _metadata    = 0,
+           Inst< SFTime    > _bindTime    = 0,
+           Inst< SFBool    > _isBound     = 0,
+           Inst< DisplayList > _displayList = 0,
+           Inst< MFFloat   > _groundAngle = 0,
+           Inst< MFColor   > _groundColor = 0,
+           Inst< MFFloat   > _skyAngle    = 0,
+           Inst< MFColor   > _skyColor    = 0,
            Inst< SFFloat   > _transparency = 0);
 
     /// Convenience function to get the top of the X3DBackgroundNode stack.
     static inline X3DBackgroundNode *getActive() {
       return static_cast< X3DBackgroundNode * >
-	( X3DBindableNode::getActive( "X3DBackgroundNode" ) );
+        ( X3DBindableNode::getActive( "X3DBackgroundNode" ) );
     }
 
     /// Saves the accForwardMatrix for use in the render function.

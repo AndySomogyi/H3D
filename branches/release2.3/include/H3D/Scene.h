@@ -49,8 +49,8 @@ namespace H3D {
   /// \brief The Scene node is topmost node that takes care of the rendering
   /// of the scene graph both haptically and graphically. Scene::mainLoop() 
   /// can be called to start the main event loop when using GLUT, e.g. start
-	/// the haptic and graphical rendering. Before this function is called at
-	/// least one instance of Scene must have created and be active. 
+  /// the haptic and graphical rendering. Before this function is called at
+  /// least one instance of Scene must have created and be active. 
   /// 
   class H3DAPI_API Scene : public Node {
   public:

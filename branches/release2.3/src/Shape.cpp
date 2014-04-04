@@ -37,7 +37,7 @@ H3DNodeDatabase Shape::database(
                                 "Shape", 
                                 &(newInstance<Shape>), 
                                 typeid( Shape ),
-				                &X3DShapeNode::database 
+                        &X3DShapeNode::database
  );
 
 namespace ShapeInternals {

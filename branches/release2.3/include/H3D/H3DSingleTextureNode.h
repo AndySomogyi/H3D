@@ -47,7 +47,7 @@ namespace H3D {
     
     /// Constructor.
     H3DSingleTextureNode( Inst< DisplayList > _displayList = 0,
-			  Inst< SFNode  > _metadata  = 0 ): 
+                          Inst< SFNode  > _metadata  = 0 ): 
       X3DTextureNode( _displayList, _metadata ) {
     }
 
