@@ -177,9 +177,9 @@ void VrmlDriver::setNodeStatement( int nullnode ) {
   Node *node_value = NULL;
   if ( !nullnode ) {
     node_value = node_stack.back();
-		if( !node_value->isInitialized() && node_value->getManualInitialize() ) {
+    if( !node_value->isInitialized() && node_value->getManualInitialize() ) {
       node_value->initialize();
-		}
+    }
     node_stack.pop_back();
   }
   if ( node_stack.size() == 0 || field_stack.size() == 0 ) {
@@ -272,9 +272,9 @@ int yyFlexLexer::yylex() {
 
 /// Adds a new field to the current node if it is a H3DDynamicFieldsObject
 bool VrmlDriver::addDynamicField( const string &name, 
-				  const string& type, 
-				  const Field::AccessType &access_type, 
-				  const string & value ) {
+          const string& type, 
+          const Field::AccessType &access_type, 
+          const string & value ) {
   if( node_stack.empty() ) return false;
   
   H3DDynamicFieldsObject *df = 
@@ -296,7 +296,7 @@ bool VrmlDriver::addDynamicField( const string &name,
 /// Connects the current proto instance field with the node field from the
 /// not at the top of the node_stack.
 bool VrmlDriver::connectProtoField( const string &proto_field_name, 
-				    const string &node_field_name ) {
+            const string &node_field_name ) {
   if ( proto_instance != NULL ) {
     Node *node = node_stack.back();
     Field *node_field = node->getField( node_field_name );

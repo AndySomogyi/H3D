@@ -247,7 +247,7 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
   if( !enabled->getValue() ) {
     particle_system_time = 0;
     particles.clear();
-		last_time = TimeStamp();
+    last_time = TimeStamp();
     return;
   }
   
@@ -327,8 +327,8 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
     min = max = (*p).position;
     ++p;
 
-		// find the min and max center values for each particle
-		for( ; p != particles.end(); ++p ) {
+    // find the min and max center values for each particle
+    for( ; p != particles.end(); ++p ) {
       if( (*p).position.x < min.x ) min.x = (*p).position.x;
       if( (*p).position.y < min.y ) min.y = (*p).position.y;
       if( (*p).position.z < min.z ) min.z = (*p).position.z;
@@ -338,9 +338,9 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
     }
     
 
-		// calculate the size of each particle by looking at the first
-		// particle.
-		H3DFloat ps = 0;
+    // calculate the size of each particle by looking at the first
+    // particle.
+    H3DFloat ps = 0;
     p = particles.begin(); 
     if( geometryType->getValue() == "GEOMETRY" ) {
       if( (*p).geometry.get() ) {
@@ -363,8 +363,8 @@ void ParticleSystem::traverseSG( TraverseInfo &ti ) {
       ps= H3DMax( particle_size.x, particle_size.y );
     }
 
-		// the final bounding box is the bounding box of point particles 
-		// extended by the size of the particle.
+    // the final bounding box is the bounding box of point particles 
+    // extended by the size of the particle.
     Vec3f s = max - min;
     bb->center->setValue( min + s / 2.0 );
     bb->size->setValue( s  + Vec3f( ps, ps, ps ) );
@@ -396,8 +396,8 @@ Vec3f ParticleSystem::getRandomPointOnUnitSphere() {
   H3DFloat x1_sqr = x1 * x1;
   H3DFloat x2_sqr = x2 * x2;
   while( x1_sqr + x2_sqr >= 1 ) {
-		x1 = getRandomValue( -1, 1 );
-		x1_sqr = x1 * x1;
+    x1 = getRandomValue( -1, 1 );
+    x1_sqr = x1 * x1;
     x2 = getRandomValue( -1, 1 );
     x2_sqr = x2 * x2;
   }

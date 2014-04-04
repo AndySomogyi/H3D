@@ -674,15 +674,15 @@ void X3DSAX2Handlers::handleExportElement( const Attributes &attrs  ) {
 void X3DSAX2Handlers::handleConnectElement( const Attributes &attrs, 
                                             Node *parent ) {
   // push NULL on the node stack to skip elements within connect element.
-	NodeElement *parent_node_element = NULL;
-	if( parent ) {
-		// This allows for proper parsing of CDATA in a python script inside a
-		// proto. This is needed in order to use any connect statements with
-		// fields created by the python code.
-		parent_node_element = &node_stack.top();
-		if( !parent_node_element->haveConnectElement() )
-			parent_node_element->setConnectElement( true );
-	}
+  NodeElement *parent_node_element = NULL;
+  if( parent ) {
+    // This allows for proper parsing of CDATA in a python script inside a
+    // proto. This is needed in order to use any connect statements with
+    // fields created by the python code.
+    parent_node_element = &node_stack.top();
+    if( !parent_node_element->haveConnectElement() )
+      parent_node_element->setConnectElement( true );
+  }
   node_stack.push( NodeElement( NULL ) );
 
   if( !defining_proto_connections ) {
@@ -721,13 +721,13 @@ void X3DSAX2Handlers::handleConnectElement( const Attributes &attrs,
 #ifdef HAVE_PYTHON
       if( dynamic_cast< PythonScript * >(parent) ) {
         if( !parent->isInitialized() && parent->getManualInitialize() ) {
-					if( parent_node_element->haveCDATA() ) {
-						if( X3DUrlObject *url_object = 
-								dynamic_cast< X3DUrlObject * >( parent ) ) {
-							url_object->url->push_back( parent_node_element->getCDATA() );
-							parent_node_element->setCDATA( "" );
-						}
-					}
+          if( parent_node_element->haveCDATA() ) {
+            if( X3DUrlObject *url_object = 
+                dynamic_cast< X3DUrlObject * >( parent ) ) {
+              url_object->url->push_back( parent_node_element->getCDATA() );
+              parent_node_element->setCDATA( "" );
+            }
+          }
           parent->initialize();
         }
       }
@@ -792,47 +792,47 @@ void X3DSAX2Handlers::protoStartElement( const XMLCh* const uri,
   if( node_stack.size() > 0 ) parent = node_stack.top().getNode();  
 
   if( !parent ) {
-		if( called_from_proto_declaration ) {
-			// Assume that the ProtoDeclaration is the first of the nodes in some x3d syntax
-			// given by ProtoDeclaration::createProtoInstanceNodeX3D.
-			node_stack.push( NodeElement( new Group ) );
-		} else {
-			node_stack.push( NodeElement( NULL ) );
-			return;
-		}
+    if( called_from_proto_declaration ) {
+      // Assume that the ProtoDeclaration is the first of the nodes in some x3d syntax
+      // given by ProtoDeclaration::createProtoInstanceNodeX3D.
+      node_stack.push( NodeElement( new Group ) );
+    } else {
+      node_stack.push( NodeElement( NULL ) );
+      return;
+    }
   }
 
   string localname_string = toString( localname );
 
-	if( defining_proto_body > 0 ) {
-		if( defining_proto_connections ) {
-			Console(3) << "Warning: Only \"connect\" elements allowed in IS element "
-								 << getLocationString() << endl;
-			node_stack.push( NodeElement( NULL ) );
-		} else {
-			if( localname_string == "ProtoBody" )
-				defining_proto_body++;
-			stringstream s;
+  if( defining_proto_body > 0 ) {
+    if( defining_proto_connections ) {
+      Console(3) << "Warning: Only \"connect\" elements allowed in IS element "
+                 << getLocationString() << endl;
+      node_stack.push( NodeElement( NULL ) );
+    } else {
+      if( localname_string == "ProtoBody" )
+        defining_proto_body++;
+      stringstream s;
 
-			s << "<" << localname << " ";
-			for( unsigned int i = 0; i < attrs.getLength(); ++i ) {
-				// make sure that MFString are correct. All attribute values
-				// are enclosed in "..", unless the string itself starts with "
-				// then they are inclosed in '..'
-				const XMLCh *v = attrs.getValue( i );
-				char quote = '"';
-				if( v ) {
-					unsigned int ci = 0;
-					while( v[ci] != '\0' && isspace( v[ci] ) ) ++ci;
-					if( v[ci] == '"' ) quote = '\'';
-				}
-				s << attrs.getQName( i ) << "=" << quote << v << quote << " ";
-			}
-			s << ">" << endl;
+      s << "<" << localname << " ";
+      for( unsigned int i = 0; i < attrs.getLength(); ++i ) {
+        // make sure that MFString are correct. All attribute values
+        // are enclosed in "..", unless the string itself starts with "
+        // then they are inclosed in '..'
+        const XMLCh *v = attrs.getValue( i );
+        char quote = '"';
+        if( v ) {
+          unsigned int ci = 0;
+          while( v[ci] != '\0' && isspace( v[ci] ) ) ++ci;
+          if( v[ci] == '"' ) quote = '\'';
+        }
+        s << attrs.getQName( i ) << "=" << quote << v << quote << " ";
+      }
+      s << ">" << endl;
 
-			proto_body += s.str();
-			++proto_body_count;
-		}
+      proto_body += s.str();
+      ++proto_body_count;
+    }
   } else if( localname_string == "ProtoDeclare" ) {
     if( proto_declaration.get() ) {
       Console(3) << "Warning: ProtoDeclare element not allowed inside other ProtoDeclare element"
@@ -912,25 +912,25 @@ void X3DSAX2Handlers::protoEndElement( const XMLCh* const uri,
   }
 
   string localname_string = toString( localname );
-	if( localname_string == "ProtoBody" ) {
+  if( localname_string == "ProtoBody" ) {
     defining_proto_body--;
   }
-	
-	if( defining_proto_body > 0) { 
-		stringstream s;
-		s << "</" << localname << ">" << endl;
-		proto_body += s.str();
+  
+  if( defining_proto_body > 0) { 
+    stringstream s;
+    s << "</" << localname << ">" << endl;
+    proto_body += s.str();
 
-		--proto_body_count;
-		if( proto_body_count == 0 ) {
-			if( proto_declaration->getProtoBody().empty() ) {
-				proto_declaration->setProtoBody( proto_body );
-			} else {
-				proto_declaration->addProtoBodyExtra( proto_body );
-			}
-			proto_body = "";
-		}
-	} else if( localname_string == "ProtoDeclare" ) {
+    --proto_body_count;
+    if( proto_body_count == 0 ) {
+      if( proto_declaration->getProtoBody().empty() ) {
+        proto_declaration->setProtoBody( proto_body );
+      } else {
+        proto_declaration->addProtoBodyExtra( proto_body );
+      }
+      proto_body = "";
+    }
+  } else if( localname_string == "ProtoDeclare" ) {
     if( proto_declaration.get() ) {
       proto_declarations->push_back( proto_declaration.get() );
       if( !proto_declarations->getFirstProtoDeclaration() ) {
@@ -1508,14 +1508,14 @@ void X3DSAX2Handlers::startElement(const XMLCh* const uri,
               string s = toString( attrs.getValue( i ) );
               container_field = s;
 #ifdef HAVE_PYTHON
-							if( dynamic_cast< PythonScript * >(parent) &&
-									container_field == "references" &&
-									node_stack.top().haveConnectElement() ) {
-								Console(3) << "Warning: When using a PythonScript in a Protobody "
-													 << "all nodes specified for the references field of PythonScript "
-													 << "have to be declared before the connect elements. "
-													 << getLocationString() << endl;
-							}
+              if( dynamic_cast< PythonScript * >(parent) &&
+                  container_field == "references" &&
+                  node_stack.top().haveConnectElement() ) {
+                Console(3) << "Warning: When using a PythonScript in a Protobody "
+                           << "all nodes specified for the references field of PythonScript "
+                           << "have to be declared before the connect elements. "
+                           << getLocationString() << endl;
+              }
 #endif
             } else if( proto_instance ) {
             } else if( use_name ) {

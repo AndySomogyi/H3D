@@ -41,14 +41,14 @@ using namespace std;
 using namespace H3D;
 
 string getFieldName( Field *f, string node_name ) {
-	string field_name = f->getName();
-	if( node_name == "UniversalJoint" && field_name == "stopBounce1" )
-		return "stop1Bounce";
-	return field_name;
+  string field_name = f->getName();
+  if( node_name == "UniversalJoint" && field_name == "stopBounce1" )
+    return "stop1Bounce";
+  return field_name;
 }
 
 void writeFieldDef( ostream &os, Field *f, string nodename = "", bool filled = false ) {
-	string field_name = getFieldName( f, nodename );
+  string field_name = getFieldName( f, nodename );
   os << "\"" << nodename << field_name << "\" [URL=\"\\ref " 
      << nodename << field_name << "\"";
   if( filled )
@@ -322,7 +322,7 @@ int main(int argc, char* argv[]) {
   resetSceneTimeField();
   writeNode( out_dir, new X3DGroupingNode );
   resetSceneTimeField();
-	writeNode( out_dir, new H3DGeneratedShaderNode );
+  writeNode( out_dir, new H3DGeneratedShaderNode );
   resetSceneTimeField();
 #ifdef HAVE_UI
   writeNode( out_dir, new H3DWidgetNode );

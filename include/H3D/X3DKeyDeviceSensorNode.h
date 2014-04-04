@@ -64,9 +64,9 @@ namespace H3D {
       DOWN  = 18,
       LEFT  = 19,
       RIGHT = 20,
-	    ALT = 21,
-	    CONTROL = 22,
-	    SHIFT = 23
+      ALT = 21,
+      CONTROL = 22,
+      SHIFT = 23
     } ActionKeys;
     
     /// Constructor. 

@@ -36,8 +36,8 @@
 #ifdef HAVE_FPARSER
 
 namespace HAPI {
-	// Forward declaration.
-	class ParsedFunction;
+  // Forward declaration.
+  class ParsedFunction;
 }
 
 namespace H3D {

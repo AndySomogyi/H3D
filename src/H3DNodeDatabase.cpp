@@ -93,10 +93,10 @@ H3DNodeDatabase::~H3DNodeDatabase(void){
   if(initialized) {
     // remove entry from global database
     for( H3DNodeDatabaseType::iterator i = database->begin();
-	 i != database->end(); ++i ) {
+         i != database->end(); ++i ) {
       if( (*i).second == this ) {
-	database->erase( i );
-	break;
+        database->erase( i );
+        break;
       }
     }
 

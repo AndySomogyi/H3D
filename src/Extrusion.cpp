@@ -65,71 +65,71 @@ namespace ExtrusionInternals {
              vertex_vector[ left ] - vertex_vector[ middle ] );
   }
 
-	// Find the indices in the normals_per_face vector to the vertex defined
-	// by i and j where 0 <= i < spine_size and 0 <= j < cross_section_size
-	vector< H3DInt32 > findSurroundingNormalIndex( H3DInt32 i,
-																								 H3DInt32 j,
-																								 bool closed_spine,
-																								 H3DInt32 spine_size,
-																								 bool closed_cross_section,
-																								 H3DInt32 cross_section_size_minone,
-																								 int if_caps_add,
-																								 bool end_cap ) {
-		H3DInt32 i0 = -1;
-		H3DInt32 i_minone = -1;
-		H3DInt32 j0 = -1;
-		H3DInt32 j_minone = -1;
-		if( i < spine_size - 1 )
-			i0 = i;
-		else if( closed_spine )
-			i0 = 0;
-		if( i > 0 )
-			i_minone = i - 1;
-		else if( closed_spine )
-			i_minone = spine_size - 2;
+  // Find the indices in the normals_per_face vector to the vertex defined
+  // by i and j where 0 <= i < spine_size and 0 <= j < cross_section_size
+  vector< H3DInt32 > findSurroundingNormalIndex( H3DInt32 i,
+                                                 H3DInt32 j,
+                                                 bool closed_spine,
+                                                 H3DInt32 spine_size,
+                                                 bool closed_cross_section,
+                                                 H3DInt32 cross_section_size_minone,
+                                                 int if_caps_add,
+                                                 bool end_cap ) {
+    H3DInt32 i0 = -1;
+    H3DInt32 i_minone = -1;
+    H3DInt32 j0 = -1;
+    H3DInt32 j_minone = -1;
+    if( i < spine_size - 1 )
+      i0 = i;
+    else if( closed_spine )
+      i0 = 0;
+    if( i > 0 )
+      i_minone = i - 1;
+    else if( closed_spine )
+      i_minone = spine_size - 2;
 
-		// Decrease cross_section_size to not have to write -1 everywhere we use it.
-		if( j < cross_section_size_minone )
-			j0 = j;
-		else if( closed_cross_section )
-			j0 = 0;
-		if( j > 0 )
-			j_minone = j - 1;
-		else if( closed_cross_section )
-			j_minone = cross_section_size_minone - 1;
-		
-		vector< H3DInt32 > found_indices;
-		if( if_caps_add > 0 && i == 0 ) {
-			found_indices.push_back( 0 );
-		}
+    // Decrease cross_section_size to not have to write -1 everywhere we use it.
+    if( j < cross_section_size_minone )
+      j0 = j;
+    else if( closed_cross_section )
+      j0 = 0;
+    if( j > 0 )
+      j_minone = j - 1;
+    else if( closed_cross_section )
+      j_minone = cross_section_size_minone - 1;
+    
+    vector< H3DInt32 > found_indices;
+    if( if_caps_add > 0 && i == 0 ) {
+      found_indices.push_back( 0 );
+    }
 
-		if( j0 != -1 ) {
-			if( i0 != -1 ) {
-				found_indices.push_back( 2 * ( i0 * cross_section_size_minone + j0 ) + if_caps_add );
-				found_indices.push_back( found_indices.back() + 1 );
-			}
+    if( j0 != -1 ) {
+      if( i0 != -1 ) {
+        found_indices.push_back( 2 * ( i0 * cross_section_size_minone + j0 ) + if_caps_add );
+        found_indices.push_back( found_indices.back() + 1 );
+      }
 
-			if( i_minone != -1 ) {
-				found_indices.push_back( 2 * ( i_minone * cross_section_size_minone + j0 ) + 1 + if_caps_add );
-			}
-		}
+      if( i_minone != -1 ) {
+        found_indices.push_back( 2 * ( i_minone * cross_section_size_minone + j0 ) + 1 + if_caps_add );
+      }
+    }
 
-		if( j_minone != -1 ) {
-			if( i0 != -1 ) {
-				found_indices.push_back( 2 * ( i0 * cross_section_size_minone + j_minone ) + if_caps_add );
-			}
+    if( j_minone != -1 ) {
+      if( i0 != -1 ) {
+        found_indices.push_back( 2 * ( i0 * cross_section_size_minone + j_minone ) + if_caps_add );
+      }
 
-			if( i_minone != -1 ) {
-				found_indices.push_back( 2 * ( i_minone * cross_section_size_minone + j_minone ) + if_caps_add );
-				found_indices.push_back( found_indices.back() + 1 );
-			}
-		}
+      if( i_minone != -1 ) {
+        found_indices.push_back( 2 * ( i_minone * cross_section_size_minone + j_minone ) + if_caps_add );
+        found_indices.push_back( found_indices.back() + 1 );
+      }
+    }
 
-		if( end_cap && i == spine_size - 1 ) {
-			found_indices.push_back( ( spine_size - 1 ) * cross_section_size_minone * 2 + if_caps_add );
-		}
-		return found_indices;
-	}
+    if( end_cap && i == spine_size - 1 ) {
+      found_indices.push_back( ( spine_size - 1 ) * cross_section_size_minone * 2 + if_caps_add );
+    }
+    return found_indices;
+  }
 }
 
 Extrusion::Extrusion(  Inst< SFNode      > _metadata,
@@ -528,8 +528,8 @@ void Extrusion::render() {
     const vector< Vec3f > &normals = auto_normal->vector->getValue();
     H3DInt32 if_caps_add = 0;
     bool begin_cap = beginCap->getValue();
-		bool normal_per_vertex = crease_angle > Constants::f_epsilon;
-		bool crease_angle_below_pi = crease_angle < Constants::pi;
+    bool normal_per_vertex = crease_angle > Constants::f_epsilon;
+    bool crease_angle_below_pi = crease_angle < Constants::pi;
     if( begin_cap ) {
       if( !normal_per_vertex )
         if_caps_add = 1;
@@ -563,7 +563,7 @@ void Extrusion::render() {
 
     // draw the quads of the body.
     unsigned int quad_index = 0;
-		Vec3f n, v;
+    Vec3f n, v;
     for( int i = 0; i < spine_size - 1; ++i ) {
       for( int j = 0; j < nr_of_cross_section_points - 1; ++j ) {
         H3DInt32 lower = i * nr_of_cross_section_points + j;
@@ -579,7 +579,7 @@ void Extrusion::render() {
                                                v_tex_coord[i],
                                                0 ) );
         if( normal_per_vertex ) {
-					Vec3f n;
+          Vec3f n;
           if( crease_angle_below_pi )
             n = normals[ if_caps_add + quad_index * 6 ];
           else
@@ -616,16 +616,16 @@ void Extrusion::render() {
         glVertex3f( v.x, v.y, v.z );
 
 
-				if( !normal_per_vertex ) {
+        if( !normal_per_vertex ) {
           n = normals[if_caps_add + quad_index + 1];
           glNormal3f( n.x, n.y, n.z );
         }
 
-				renderTexCoordForActiveTexture( Vec3f( u_tex_coord[j], 
+        renderTexCoordForActiveTexture( Vec3f( u_tex_coord[j], 
                                                v_tex_coord[i],
                                                0 ) );
         if( normal_per_vertex ) {
-					Vec3f n;
+          Vec3f n;
           if( crease_angle_below_pi )
             n = normals[ if_caps_add + quad_index * 6 + 3 ];
           else
@@ -635,7 +635,7 @@ void Extrusion::render() {
         v = vertexvec[ lower ];
         glVertex3f( v.x, v.y, v.z );
 
-				renderTexCoordForActiveTexture( Vec3f( u_tex_coord[ j + 1 ], 
+        renderTexCoordForActiveTexture( Vec3f( u_tex_coord[ j + 1 ], 
                                                v_tex_coord[ i + 1 ],
                                                0 ) );
         if( normal_per_vertex ) {
@@ -663,8 +663,8 @@ void Extrusion::render() {
 
         glEnd();
         ++quad_index;
-				if( !normal_per_vertex )
-					++quad_index;
+        if( !normal_per_vertex )
+          ++quad_index;
       }
     }
 
@@ -784,7 +784,7 @@ void Extrusion::AutoNormal::update() {
 
       if( temp.length() >= Constants::f_epsilon ) {
         collinear = false;
-				break;
+        break;
       }
     }
 
@@ -987,52 +987,52 @@ Normal * Extrusion::AutoNormal::generateNormalsPerFace(
       indices.push_back( ( i + 1 ) * nr_of_cross_section_points + j + 1 );
       indices.push_back( ( i + 1 ) * nr_of_cross_section_points + j );
       bool zero_normal = true;
-			Vec3f first_normal = ExtrusionInternals::calculateNormal( vertex_vector,
-																																indices[ 1 ],
-																																indices[ 0 ],
-																																indices[ 2 ] );
-			Vec3f second_normal = ExtrusionInternals::calculateNormal( vertex_vector,
-																																indices[ 2 ],
-																																indices[ 0 ],
-																																indices[ 3 ] );
-			if( first_normal.length() > Constants::f_epsilon ) {
-				zero_normal = false;
-				if( second_normal.length() <= Constants::f_epsilon )
-					second_normal = first_normal;
-			} else if( second_normal.length() > Constants::f_epsilon ) {
-				zero_normal = false;
-				first_normal = second_normal;
-			} else {
-				Vec3f the_normal = ExtrusionInternals::calculateNormal( vertex_vector,
-																																indices[ 1 ],
-																																indices[ 0 ],
-																																indices[ 3 ] );
-				if( the_normal.length() > Constants::f_epsilon ) {
-					zero_normal = false;
-					first_normal = second_normal = the_normal;
-				} else {
-					the_normal = ExtrusionInternals::calculateNormal( vertex_vector,
-																														indices[ 2 ],
-																														indices[ 1 ],
-																														indices[ 3 ] );
-					if( the_normal.length() > Constants::f_epsilon ) {
-						zero_normal = false;
-						first_normal = second_normal = the_normal;
-					}
-				}
-			}
-			if( !zero_normal ) {
-				first_normal.normalize();
-				second_normal.normalize();
-			}
+      Vec3f first_normal = ExtrusionInternals::calculateNormal( vertex_vector,
+                                                                indices[ 1 ],
+                                                                indices[ 0 ],
+                                                                indices[ 2 ] );
+      Vec3f second_normal = ExtrusionInternals::calculateNormal( vertex_vector,
+                                                                indices[ 2 ],
+                                                                indices[ 0 ],
+                                                                indices[ 3 ] );
+      if( first_normal.length() > Constants::f_epsilon ) {
+        zero_normal = false;
+        if( second_normal.length() <= Constants::f_epsilon )
+          second_normal = first_normal;
+      } else if( second_normal.length() > Constants::f_epsilon ) {
+        zero_normal = false;
+        first_normal = second_normal;
+      } else {
+        Vec3f the_normal = ExtrusionInternals::calculateNormal( vertex_vector,
+                                                                indices[ 1 ],
+                                                                indices[ 0 ],
+                                                                indices[ 3 ] );
+        if( the_normal.length() > Constants::f_epsilon ) {
+          zero_normal = false;
+          first_normal = second_normal = the_normal;
+        } else {
+          the_normal = ExtrusionInternals::calculateNormal( vertex_vector,
+                                                            indices[ 2 ],
+                                                            indices[ 1 ],
+                                                            indices[ 3 ] );
+          if( the_normal.length() > Constants::f_epsilon ) {
+            zero_normal = false;
+            first_normal = second_normal = the_normal;
+          }
+        }
+      }
+      if( !zero_normal ) {
+        first_normal.normalize();
+        second_normal.normalize();
+      }
       
       if( ccw_value ) {
         normal_vector.push_back( first_normal );
-				normal_vector.push_back( second_normal );
+        normal_vector.push_back( second_normal );
       } else {
         normal_vector.push_back( -first_normal );
-				normal_vector.push_back( second_normal );
-			}
+        normal_vector.push_back( second_normal );
+      }
     }
   }
   
@@ -1085,7 +1085,7 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
   if( begin_cap )
     if_caps_add = 1;
 
-	H3DInt32 nr_of_cross_section_points_minone = nr_of_cross_section_points - 1;
+  H3DInt32 nr_of_cross_section_points_minone = nr_of_cross_section_points - 1;
   // no separate normals are needed for the caps.
   for( int i = 0; i < spine_size; ++i ) {
     for( int j = 0; j < nr_of_cross_section_points; ++j ) {
@@ -1104,8 +1104,8 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
                                          end_cap );
 
       for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
-				normal_vector.back() += normals_per_face[*k];
-			}
+        normal_vector.back() += normals_per_face[*k];
+      }
       normal_vector.back().normalizeSafe();
     }
   }
@@ -1158,7 +1158,7 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
     Vec3f quad_normal = normals_per_face[1];
     if( quad_normal * face_normal > cos_crease_angle )
       normal_vector.back() += quad_normal;
-		quad_normal = normals_per_face[2];
+    quad_normal = normals_per_face[2];
     if( quad_normal * face_normal > cos_crease_angle )
       normal_vector.back() += quad_normal;
     if( closed_cross_section ) {
@@ -1181,7 +1181,7 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
 
-			quad_normal = normals_per_face[ if_caps_add + 2 * (i-1) ];
+      quad_normal = normals_per_face[ if_caps_add + 2 * (i-1) ];
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
 
@@ -1197,28 +1197,28 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
       quad_normal = normals_per_face[1];
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
-			quad_normal = normals_per_face[2];
+      quad_normal = normals_per_face[2];
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
     }
     normal_vector.back().normalizeSafe();
   }
 
-	H3DInt32 nr_of_cross_section_points_minone = nr_of_cross_section_points - 1;
+  H3DInt32 nr_of_cross_section_points_minone = nr_of_cross_section_points - 1;
   // normals for every face except the beginCap and endCap
   for( int i = 0; i < spine_size - 1; ++i ) {
     for( int j = 0; j < nr_of_cross_section_points - 1; ++j ) {
       vector< H3DInt32 > indices;
-			H3DInt32 lower_index = if_caps_add +
-														 2 * ( i * (nr_of_cross_section_points - 1) + j );
+      H3DInt32 lower_index = if_caps_add +
+                             2 * ( i * (nr_of_cross_section_points - 1) + j );
       Vec3f face0_normal = normals_per_face[ lower_index ];
-			Vec3f face1_normal = normals_per_face[ lower_index + 1 ];
+      Vec3f face1_normal = normals_per_face[ lower_index + 1 ];
       bool begin_cap_summed = false;
       bool end_cap_summed = false;
 
       //  vertex 0
       normal_vector.push_back( Vec3f( 0, 0, 0 ) );
-			Vec3f face1_vertex0( 0, 0, 0 );
+      Vec3f face1_vertex0( 0, 0, 0 );
       H3DInt32 i_index = i;
       H3DInt32 j_index = j;
       indices = ExtrusionInternals::findSurroundingNormalIndex( i_index,
@@ -1229,15 +1229,15 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
                                            nr_of_cross_section_points_minone,
                                            begin_cap, end_cap );
 
-			for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
-				const Vec3f &quad_normal = normals_per_face[*k];
-				if( quad_normal * face0_normal > cos_crease_angle )
+      for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
+        const Vec3f &quad_normal = normals_per_face[*k];
+        if( quad_normal * face0_normal > cos_crease_angle )
           normal_vector.back() += quad_normal;
-				if( quad_normal * face1_normal > cos_crease_angle )
+        if( quad_normal * face1_normal > cos_crease_angle )
           face1_vertex0 += quad_normal;
-			}
+      }
       normal_vector.back().normalizeSafe();
-			face1_vertex0.normalizeSafe();
+      face1_vertex0.normalizeSafe();
 
 
       //  vertex 1
@@ -1254,18 +1254,18 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
                                            nr_of_cross_section_points_minone,
                                            begin_cap, end_cap );
 
-			for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
-				const Vec3f &quad_normal = normals_per_face[*k];
-				if( quad_normal * face0_normal > cos_crease_angle )
+      for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
+        const Vec3f &quad_normal = normals_per_face[*k];
+        if( quad_normal * face0_normal > cos_crease_angle )
           normal_vector.back() += quad_normal;
-			}
+      }
       normal_vector.back().normalizeSafe();
 
       //  vertex 2
       begin_cap_summed = false;
       end_cap_summed = false;
       normal_vector.push_back( Vec3f( 0, 0, 0 ) );
-			Vec3f face1_vertex2( 0, 0, 0 );
+      Vec3f face1_vertex2( 0, 0, 0 );
       i_index = i + 1;
       j_index = j + 1;
       indices = ExtrusionInternals::findSurroundingNormalIndex( i_index,
@@ -1276,21 +1276,21 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
                                            nr_of_cross_section_points_minone,
                                            begin_cap, end_cap );
 
-			for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
-				const Vec3f &quad_normal = normals_per_face[*k];
-				if( quad_normal * face0_normal > cos_crease_angle )
+      for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
+        const Vec3f &quad_normal = normals_per_face[*k];
+        if( quad_normal * face0_normal > cos_crease_angle )
           normal_vector.back() += quad_normal;
-				if( quad_normal * face1_normal > cos_crease_angle )
-					face1_vertex2 += quad_normal;
-			}
+        if( quad_normal * face1_normal > cos_crease_angle )
+          face1_vertex2 += quad_normal;
+      }
       normal_vector.back().normalizeSafe();
-			face1_vertex2.normalizeSafe();
+      face1_vertex2.normalizeSafe();
 
       //  vertex 3
       begin_cap_summed = false;
       end_cap_summed = false;
-			normal_vector.push_back( face1_vertex0 );
-			normal_vector.push_back( face1_vertex2 );
+      normal_vector.push_back( face1_vertex0 );
+      normal_vector.push_back( face1_vertex2 );
       normal_vector.push_back( Vec3f( 0, 0, 0 ) );
       i_index = i + 1;
       j_index = j;
@@ -1302,11 +1302,11 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
                                            nr_of_cross_section_points_minone,
                                            begin_cap, end_cap );
 
-			for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
-				const Vec3f &quad_normal = normals_per_face[*k];
-				if( quad_normal * face1_normal > cos_crease_angle )
+      for( vector< H3DInt32 >::iterator k = indices.begin(); k != indices.end(); ++k ) {
+        const Vec3f &quad_normal = normals_per_face[*k];
+        if( quad_normal * face1_normal > cos_crease_angle )
           normal_vector.back() += quad_normal;
-			}
+      }
 
       normal_vector.back().normalizeSafe();
     }
@@ -1326,7 +1326,7 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
         normals_per_face[ theLastVertexNormal - 1 ];
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
-			quad_normal = 
+      quad_normal = 
         normals_per_face[ theLastVertexNormal - 2 ];
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
@@ -1342,13 +1342,13 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
 
-			int low_index = theLastVertexNormal -
+      int low_index = theLastVertexNormal -
                           2 * ( nr_of_cross_section_points - i );
       quad_normal = normals_per_face[ low_index ];
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
 
-			quad_normal = normals_per_face[ low_index + 1 ];
+      quad_normal = normals_per_face[ low_index + 1 ];
       if( quad_normal * face_normal > cos_crease_angle )
         normal_vector.back() += quad_normal;
 
@@ -1359,7 +1359,7 @@ Normal * Extrusion::AutoNormal::generateNormalsPerVertex(
     quad_normal = normals_per_face[ theLastVertexNormal - 2 ];
     if( quad_normal * face_normal > cos_crease_angle )
       normal_vector.back() += quad_normal;
-		quad_normal = normals_per_face[ theLastVertexNormal - 1 ];
+    quad_normal = normals_per_face[ theLastVertexNormal - 1 ];
     if( quad_normal * face_normal > cos_crease_angle )
       normal_vector.back() += quad_normal;
     if( closed_cross_section ) {

@@ -158,7 +158,7 @@ IF( H3DAPI_INCLUDE_DIR AND EXTERNAL_ROOT)
     ENDIF( PythonInstallMSI )
     
     # Extra install commands will be set to install python and OpenAL
-		SET( redist_versions 8 9 10 )
+    SET( redist_versions 8 9 10 )
     foreach( redist_version ${redist_versions} )
       # Add cache variable vc${redist_version}_redist which should be set to the install file
       # for microsoft visual studio redistributables, they can be found in the

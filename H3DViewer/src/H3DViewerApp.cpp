@@ -73,7 +73,7 @@ const wxCmdLineEntryDesc gCmdLineDesc[] =
       "No registered plugins are loaded on startup. They are however still listed in the plugins dialog and can be enabled if desired."
 #endif
     },
-		{ wxCMD_LINE_PARAM, NULL, NULL, 
+    { wxCMD_LINE_PARAM, NULL, NULL, 
 #if( defined( wxUSE_UNICODE ) && wxMAJOR_VERSION == 2 && wxMINOR_VERSION <= 8 )
       wxT("File to load"), 
 #else 
@@ -107,16 +107,16 @@ public:
   }
 
   virtual bool OnCmdLineParsed(wxCmdLineParser& parser) {
-		disable_plugin_dialog = parser.Found( wxString( "dp", wxConvUTF8 ) );
+    disable_plugin_dialog = parser.Found( wxString( "dp", wxConvUTF8 ) );
     for (int i = 0; i < (int)parser.GetParamCount(); ++i) {
-			cmd_line_filename = parser.GetParam(i);
+      cmd_line_filename = parser.GetParam(i);
     }
 
     return true;
   }
 protected:
   wxString cmd_line_filename;
-	bool disable_plugin_dialog;
+  bool disable_plugin_dialog;
   WxFrame *theWxFrame;
   DECLARE_EVENT_TABLE()
 };
@@ -134,7 +134,7 @@ void MyApp::OnIdle(wxIdleEvent& event) {
   }
 
 #if defined( H3D_WINDOWS ) || defined( H3D_OSX ) || ( wxMAJOR_VERSION <= 2 && wxMINOR_VERSION < 9 )
-	wxApp::OnIdle(event);
+  wxApp::OnIdle(event);
 #endif
 }
 
@@ -181,7 +181,7 @@ bool MyApp::OnInit()
     tmp_string += wxT("(debug)");
 #endif
     SetAppName( tmp_string );
-	
+  
     Console.setShowLevel( false );
 
 #ifdef H3DAPI_LIB
@@ -204,7 +204,7 @@ bool MyApp::OnInit()
     
     theWxFrame->Show(true);
     
-	if( !cmd_line_filename.IsEmpty() ) {
+  if( !cmd_line_filename.IsEmpty() ) {
       theWxFrame->clearData();
       theWxFrame->loadFile(toStr(cmd_line_filename));
     }

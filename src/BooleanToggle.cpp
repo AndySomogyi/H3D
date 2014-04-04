@@ -54,5 +54,5 @@ BooleanToggle::BooleanToggle( Inst< SFNode       > _metadata,
   type_name = "BooleanToggle";
   database.initFields( this );
 
-	toggle->setValue( false );
+  toggle->setValue( false );
 }

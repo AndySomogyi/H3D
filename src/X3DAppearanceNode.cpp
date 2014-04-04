@@ -49,7 +49,7 @@ X3DAppearanceNode::X3DAppearanceNode( Inst< DisplayList > _displayList,
   X3DNode( _metadata ),
   H3DDisplayListObject( _displayList ),
   surface( _surface )
-	{
+  {
 
   type_name = "X3DAppearanceNode";
   database.initFields( this );

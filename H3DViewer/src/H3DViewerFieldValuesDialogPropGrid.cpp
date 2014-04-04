@@ -524,9 +524,9 @@ void H3DViewerFieldValuesPanelPropGrid::PropertyUpdater::update() {
     ParsableField *pfield = dynamic_cast< ParsableField * >( f );
     if( pfield ) {
       string s = pfield->getValueAsString();
-			wxString the_string( s.c_str(), wxConvUTF8 );
-			if( !s.empty() && the_string.IsEmpty() )
-				the_string = wxString( s.c_str(), *wxConvCurrent );
+      wxString the_string( s.c_str(), wxConvUTF8 );
+      if( !s.empty() && the_string.IsEmpty() )
+        the_string = wxString( s.c_str(), *wxConvCurrent );
       property->SetValueFromString( the_string );
     }
   }
@@ -567,18 +567,18 @@ bool H3DViewerFieldValuesPanelPropGrid::PropertyUpdater::isDefaultValue( Field *
   } 
 
   if( value_size != default_value_size ) {
-		delete [] value;
-		return false;
-	}
+    delete [] value;
+    return false;
+  }
 
   for( unsigned int i = 0; i < value_size; ++i ) {
     if( value[i] != default_value.get()[i] ) {
-			delete [] value;
-			return false;
-		}
+      delete [] value;
+      return false;
+    }
   }
   
-	delete [] value;
+  delete [] value;
   return true;
 } 
 

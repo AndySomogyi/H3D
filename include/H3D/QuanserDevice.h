@@ -75,9 +75,9 @@ namespace H3D {
     /// Creates a QuanserHapticsDevice in the hapi_device
     virtual void initialize();
 
-		/// An uri to some quanser file or something. The one that implemented
-		/// this should comment it. Lazy bugger.
-		/// \todo Comment this properly.
+    /// An uri to some quanser file or something. The one that implemented
+    /// this should comment it. Lazy bugger.
+    /// \todo Comment this properly.
     ///
     /// <b>Access type:</b> initalizeOnly \n
     auto_ptr< SFString > uri;

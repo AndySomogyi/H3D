@@ -108,5 +108,5 @@ void ImportLibrary::initialize() {
   }
 
   Console(4) << "specified in " << getName() 
-	     << " (" << DynamicLibrary::getLastError() << ")." << endl;
+             << " (" << DynamicLibrary::getLastError() << ")." << endl;
 }

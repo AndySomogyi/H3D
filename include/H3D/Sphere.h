@@ -163,7 +163,7 @@ namespace H3D {
     // Can not use -1 because vbo_id is an GLuint.
     static bool vbo_initialized;
 
-		static vector< GLfloat > sphere_data;
+    static vector< GLfloat > sphere_data;
     static vector< GLuint > sphere_index_data;
   };
 }

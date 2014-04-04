@@ -91,8 +91,8 @@ void ShadowCaster::addHeadLight() {
     Vec3f direction = Vec3f( 0, 0, -1 );
     if( vp ) {
       direction = 
-	vp->accForwardMatrix->getValue().getRotationPart() * 
-	(vp->totalOrientation->getValue() * Vec3f( 0, 0, -1 ));
+  vp->accForwardMatrix->getValue().getRotationPart() * 
+  (vp->totalOrientation->getValue() * Vec3f( 0, 0, -1 ));
     }
     DirectionalLight *dir_light = new DirectionalLight();
     dir_light->direction->setValue( direction );

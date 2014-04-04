@@ -33,17 +33,17 @@
 using namespace H3D;
 
 H3DNodeDatabase ContourPolyline2D::database( 
-	"ContourPolyline2D", 
-	&(newInstance<ContourPolyline2D>),
-	typeid( ContourPolyline2D ),
-	&X3DNurbsControlCurveNode::database );
+  "ContourPolyline2D", 
+  &(newInstance<ContourPolyline2D>),
+  typeid( ContourPolyline2D ),
+  &X3DNurbsControlCurveNode::database );
 
 namespace ContourPolyline2DInternals {
 }
 
-ContourPolyline2D::ContourPolyline2D( Inst< SFNode	 > _metadata,
-																			Inst< MFVec2d  > _controlPoint ):
-											X3DNurbsControlCurveNode( _metadata, _controlPoint ) {
+ContourPolyline2D::ContourPolyline2D( Inst< SFNode   > _metadata,
+                                      Inst< MFVec2d  > _controlPoint ):
+                      X3DNurbsControlCurveNode( _metadata, _controlPoint ) {
 
 type_name = "ContourPolyline2D";
 database.initFields( this );

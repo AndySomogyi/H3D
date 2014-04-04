@@ -141,7 +141,7 @@ namespace H3D {
 #else
     { return GLLightInfo (RGBA(0.0f,0.0f,0.0f, 1.0f), RGBA(0.0f,0.0f,0.0f,1.0f), 
                    RGBA(0.0f,0.0f,0.0f,1.0f), Vec4f(0.0f,0.0f,0.0f,0.0f), Vec3f(), 0,
-				   180.0f, 0.0f, 0.0f, 0.0f ); }
+           180.0f, 0.0f, 0.0f, 0.0f ); }
 #endif
 
     /// Add light to TraverseInfo.

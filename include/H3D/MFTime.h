@@ -41,8 +41,8 @@ namespace H3D {
   public:
     MFTime(){}
     MFTime( size_type sz ) {
-	  value.resize( sz );	
-	}
+    value.resize( sz );
+  }
     virtual string getTypeName() { return classTypeName(); }
     static string classTypeName() { return "MFTime"; }
     virtual X3DTypes::X3DType getX3DType() { return X3DTypes::MFTIME; }

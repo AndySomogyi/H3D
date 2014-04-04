@@ -57,35 +57,35 @@ IF( GENERATE_CPACK_PROJECT )
   
   # File patterns to ignore, common for all operating systems.
   SET( H3DAPI_CPACK_IGNORE_PATTERNS /\\\\.svn/
-									\\\\.obj$
-									\\\\.ncb$
-									\\\\.log$
-									\\\\.suo$
-									\\\\.dir/
-									\\\\.user$
-									\\\\.cv$
-									"/Debug(.)*/"
-									"/debug(.)*/"
-									/Release
-									/release
-									/linux
-									/build/win32/
-									"/((C\\\\+\\\\+|ThreadExample)|(build|examples))/vc(7|(8|9))"
-									/osx
-									/H3DAPI/Util/
-									/berk/berk\\\\.wrl$
-									/berk/berk_orig\\\\.x3d$
-									/fish/Kumanomi\\\\.wrl$
-									/fish/Kumanomi_orig\\\\.x3d$
-									/humvee/humvee\\\\.WRL$
-									/humvee/humvee_orig\\\\.x3d$
-									/manikin/manikin\\\\.wrl$
-									/manikin/manikin_orig\\\\.x3d$
-									/moondial/moondial_orig\\\\.x3d$
-									/moondial/themoondial\\\\.wrl$
-									/plane/bobcat2\\\\.x3d$
-									/plane/bobcat_nh\\\\.x3d$
-									/plane/bobcat_orig\\\\.x3d$ )
+                  \\\\.obj$
+                  \\\\.ncb$
+                  \\\\.log$
+                  \\\\.suo$
+                  \\\\.dir/
+                  \\\\.user$
+                  \\\\.cv$
+                  "/Debug(.)*/"
+                  "/debug(.)*/"
+                  /Release
+                  /release
+                  /linux
+                  /build/win32/
+                  "/((C\\\\+\\\\+|ThreadExample)|(build|examples))/vc(7|(8|9))"
+                  /osx
+                  /H3DAPI/Util/
+                  /berk/berk\\\\.wrl$
+                  /berk/berk_orig\\\\.x3d$
+                  /fish/Kumanomi\\\\.wrl$
+                  /fish/Kumanomi_orig\\\\.x3d$
+                  /humvee/humvee\\\\.WRL$
+                  /humvee/humvee_orig\\\\.x3d$
+                  /manikin/manikin\\\\.wrl$
+                  /manikin/manikin_orig\\\\.x3d$
+                  /moondial/moondial_orig\\\\.x3d$
+                  /moondial/themoondial\\\\.wrl$
+                  /plane/bobcat2\\\\.x3d$
+                  /plane/bobcat_nh\\\\.x3d$
+                  /plane/bobcat_orig\\\\.x3d$ )
 
   SET(CPACK_PACKAGE_VERSION_MAJOR ${H3DAPI_MAJOR_VERSION})
   SET(CPACK_PACKAGE_VERSION_MINOR ${H3DAPI_MINOR_VERSION})
@@ -93,9 +93,9 @@ IF( GENERATE_CPACK_PROJECT )
   
   # TODO: fix different for windows and unix if needed.
   IF(WIN32 AND NOT UNIX)
-	SET(CPACK_NSIS_INSTALL_ROOT "C:" )
-	SET(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL "ON" )
-	SET( CPACK_PACKAGE_START_MENU_NAME "H3DAPI ${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}" )
+  SET(CPACK_NSIS_INSTALL_ROOT "C:" )
+  SET(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL "ON" )
+  SET( CPACK_PACKAGE_START_MENU_NAME "H3DAPI ${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}" )
     
     # External binary directory to add to path.
     SET( CPACK_EXTERNAL_BIN "bin32" )
@@ -496,8 +496,8 @@ IF( GENERATE_CPACK_PROJECT )
                                                  "A comment\\n \\\${EndIf}\\n" )
       ENDIF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
     ENDIF( OpenAlInstallExe )
-	
-	SET( CMakeInstallExe "" CACHE FILEPATH "Needs to be set to add CMake installation to the package." )
+
+  SET( CMakeInstallExe "" CACHE FILEPATH "Needs to be set to add CMake installation to the package." )
     MARK_AS_ADVANCED(CMakeInstallExe)
     IF( CMakeInstallExe )
       SET( CMAKE_VERSION_TO_CHECK "" )
@@ -553,7 +553,7 @@ IF( GENERATE_CPACK_PROJECT )
     SET(H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/
                                                                      "~$" )
     SET( H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS}
-				    "/CVS/;/.svn/;/.bzr/;/.hg/;/.git.*/;.swp$;.#;/#;~$")
+            "/CVS/;/.svn/;/.bzr/;/.hg/;/.git.*/;.swp$;.#;/#;~$")
     SET(CPACK_SOURCE_GENERATOR TGZ ZIP ) 
     SET(CPACK_SOURCE_PACKAGE_FILE_NAME "h3dapi-${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}.${H3DAPI_BUILD_VERSION}") 
     SET(CPACK_SOURCE_IGNORE_FILES ${H3DAPI_CPACK_IGNORE_PATTERNS} )
@@ -567,8 +567,8 @@ IF( GENERATE_CPACK_PROJECT )
 
   # H3DApi.cmake that goes to headers is not needed unless sources is required.
   INSTALL( FILES ${H3DAPI_SOURCE_DIR}/../include/H3D/H3DApi.cmake
-			DESTINATION H3DAPI/include/H3D
-			COMPONENT H3DAPI_cpack_sources )
+      DESTINATION H3DAPI/include/H3D
+      COMPONENT H3DAPI_cpack_sources )
   
   # Install src files.
   INSTALL( FILES ${H3DAPI_SRCS}
@@ -642,18 +642,18 @@ IF( GENERATE_CPACK_PROJECT )
            COMPONENT H3DAPI_cpack_sources
            REGEX "(/.svn)|(/CVS)|(/Particledemo)" EXCLUDE
            PATTERN "berk.wrl" EXCLUDE
-					 PATTERN "berk_orig.x3d" EXCLUDE
-					 PATTERN "Kumanomi.wrl" EXCLUDE
-					 PATTERN "Kumanomi_orig.x3d" EXCLUDE
-					 PATTERN "humvee.WRL" EXCLUDE
-					 PATTERN "humvee_orig.x3d" EXCLUDE
-					 PATTERN "manikin.wrl" EXCLUDE
-					 PATTERN "manikin_orig.x3d" EXCLUDE
-					 PATTERN "moondial_orig.x3d" EXCLUDE
-					 PATTERN "themoondial.wrl" EXCLUDE
-					 PATTERN "bobcat2.x3d" EXCLUDE
-					 PATTERN "bobcat_nh.x3d" EXCLUDE
-					 PATTERN "bobcat_orig.x3d" EXCLUDE )
+           PATTERN "berk_orig.x3d" EXCLUDE
+           PATTERN "Kumanomi.wrl" EXCLUDE
+           PATTERN "Kumanomi_orig.x3d" EXCLUDE
+           PATTERN "humvee.WRL" EXCLUDE
+           PATTERN "humvee_orig.x3d" EXCLUDE
+           PATTERN "manikin.wrl" EXCLUDE
+           PATTERN "manikin_orig.x3d" EXCLUDE
+           PATTERN "moondial_orig.x3d" EXCLUDE
+           PATTERN "themoondial.wrl" EXCLUDE
+           PATTERN "bobcat2.x3d" EXCLUDE
+           PATTERN "bobcat_nh.x3d" EXCLUDE
+           PATTERN "bobcat_orig.x3d" EXCLUDE )
 
   INSTALL( DIRECTORY ${H3DAPI_SOURCE_DIR}/../H3DLoad
            DESTINATION H3DAPI
@@ -823,7 +823,7 @@ IF( GENERATE_CPACK_PROJECT )
   ENDIF( H3D_cmake_runtime_path )
 
   IF( NOT H3D_USE_DEPENDENCIES_ONLY)
-	INCLUDE(CPack)
+  INCLUDE(CPack)
     INCLUDE(UseDebian)
     IF(DEBIAN_FOUND)
       ADD_DEBIAN_TARGETS(H3DAPI)

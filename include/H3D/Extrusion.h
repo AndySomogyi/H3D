@@ -52,7 +52,7 @@ namespace H3D {
   ///
   /// \par Internal routes:
   /// \dotfile Extrusion.dot 
-	/// \todo Implement vertex arrays in no-normal-per-face cases.
+  /// \todo Implement vertex arrays in no-normal-per-face cases.
   class H3DAPI_API Extrusion : public X3DGeometryNode {
   public:
 

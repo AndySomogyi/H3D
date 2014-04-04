@@ -86,7 +86,7 @@ namespace H3D {
 
     /// Constructor.
     EaseInEaseOut( Inst< SFFloat    > _set_fraction    = 0,
-		               Inst< MFVec2f    > _easeInEaseOut = 0,
+                   Inst< MFVec2f    > _easeInEaseOut = 0,
                    Inst< MFFloat    > _key = 0,
                    Inst< SFNode     > _metadata = 0,
                    Inst< SFFraction > _modifiedFraction_changed = 0 );

@@ -70,7 +70,7 @@ namespace H3D {
       create_func( _create ),
       supports_func( _supports ),
       supports_stream_func ( _supports_stream ) {
-		  
+
         if( !H3DImageLoaderNode::initialized ) {
           H3DImageLoaderNode::registered_file_readers.reset(
             new list< FileReaderRegistration > );
@@ -131,8 +131,8 @@ namespace H3D {
     /// \param create A function for creating an instance of that class.
     /// \param supports A function to determine if the class supports a
     /// given file type.
-		/// \param supports_stream A function to determine if the class supports loading
-		/// from a file stream.
+    /// \param supports_stream A function to determine if the class supports loading
+    /// from a file stream.
     static void registerFileReader( const string &name,
                                     CreateNodeFunc create, 
                                     SupportsFileFunc supports,

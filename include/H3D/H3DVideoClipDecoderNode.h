@@ -66,7 +66,7 @@ namespace H3D {
       name( _name ),
       create_func( _create ),
       supports_func( _supports ) {
-		  
+
         if( !H3DVideoClipDecoderNode::initialized ) {
           H3DVideoClipDecoderNode::registered_decoders.reset( 
             new list< DecoderRegistration >);

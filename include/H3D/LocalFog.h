@@ -69,7 +69,7 @@ namespace H3D {
               Inst< SFColor   > _color            = 0,
               Inst< SFString  > _localFogType     = 0,
               Inst< SFFloat   > _visibilityRange  = 0,
-							Inst< SFBool   > _enabled  = 0 );
+              Inst< SFBool   > _enabled  = 0 );
 
     /// Set up and enable the fog with OpenGL.
     virtual void enableGraphicsState();
@@ -77,12 +77,12 @@ namespace H3D {
     /// Restore the previous attribs.
     virtual void disableGraphicsState();
 
-		/// If enabled is true the LocalFog node is enabled otherwise it is
+    /// If enabled is true the LocalFog node is enabled otherwise it is
     /// disabled and will not affect the scene.
     ///
     /// <b>Access type:</b> inputOutput
-		/// <b>Default value:</b> TRUE \n
-		/// 
+    /// <b>Default value:</b> TRUE \n
+    /// 
     /// \dotfile LocalFog_enabled.dot
     auto_ptr< SFBool >  enabled;
 

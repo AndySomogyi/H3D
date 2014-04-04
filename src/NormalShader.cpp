@@ -72,7 +72,7 @@ string NormalShader::getFragmentShaderString() {
 
 void NormalShader::getVaryingVariables( vector< VaryingVariable > &variables ){
   VaryingVariable v(uniqueShaderName("normal"), 
-		    "vec3", 
-		    uniqueShaderName("normal") + " = gl_NormalMatrix * gl_Normal;");
+        "vec3", 
+        uniqueShaderName("normal") + " = gl_NormalMatrix * gl_Normal;");
   variables.push_back( v );
 }

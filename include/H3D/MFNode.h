@@ -70,7 +70,7 @@ namespace H3D {
       /// Constructor.
       const_reverse_iterator( base_const_reverse_iterator i ):
         RefCountMField< Node >::const_reverse_iterator( i ) {
-	
+
       }
       
       Node * const operator*() {

@@ -209,7 +209,7 @@ void X3DTexture2DNode::glTexImage( Image *i, GLenum texture_target,
   TextureProperties *texture_properties = textureProperties->getValue();
   
   if( texture_properties ) {
-    glPushAttrib( GL_PIXEL_MODE_BIT );	
+    glPushAttrib( GL_PIXEL_MODE_BIT );
     const Vec4f &scale = texture_properties->textureTransferScale->getValue();
     glPixelTransferf( GL_RED_SCALE, scale.x );
     glPixelTransferf( GL_BLUE_SCALE, scale.y );
@@ -351,7 +351,7 @@ void X3DTexture2DNode::renderSubImage( Image *image, GLenum texture_target,
 
   TextureProperties *texture_properties = textureProperties->getValue();
   if( texture_properties ) {
-    glPushAttrib( GL_PIXEL_MODE_BIT );	
+    glPushAttrib( GL_PIXEL_MODE_BIT );
     const Vec4f &scale = texture_properties->textureTransferScale->getValue();
     glPixelTransferf( GL_RED_SCALE, scale.x );
     glPixelTransferf( GL_BLUE_SCALE, scale.y );
@@ -414,10 +414,10 @@ GLenum X3DTexture2DNode::getTextureTarget() {
     if( target_type == "RECTANGLE" ) return GL_TEXTURE_RECTANGLE_ARB;
     else if( target_type == "2DARRAY" ) {
       Console(3) << "Warning: Invalid textureType \"2DARRAY\" in TextureProperties for "
-		 << "X3DTexture2DNode. \"2DARRAY\" can only be used for 3D textures" << endl;
+     << "X3DTexture2DNode. \"2DARRAY\" can only be used for 3D textures" << endl;
     } else if( target_type != "NORMAL" ) {
       Console(3) << "Warning: Invalid textureType: \"" << target_type << "\" in TextureProperties for "
-		 << "X3DTexture2DNode. " << endl;
+     << "X3DTexture2DNode. " << endl;
     }
   }
   return GL_TEXTURE_2D;

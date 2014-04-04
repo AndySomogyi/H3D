@@ -301,7 +301,7 @@ void Scene::idle() {
   shadow_caster->light->clear();
   
   DeviceInfo *di = DeviceInfo::getActive();
-	X3DChildNode *scene_root = static_cast< X3DChildNode * >( sceneRoot->getValue() );
+  X3DChildNode *scene_root = static_cast< X3DChildNode * >( sceneRoot->getValue() );
   if( di ) {
     vector< H3DHapticsDevice * > hds;
     // update the values for all H3DHapticsDevices
@@ -550,7 +550,7 @@ Scene::Scene( Inst< SFChildNode >  _sceneRoot,
 
 Scene::~Scene() {
   scenes.erase( this );
-	setSceneRoot( NULL );
+  setSceneRoot( NULL );
 
   if( last_traverseinfo )
     delete last_traverseinfo;
@@ -594,7 +594,7 @@ void Scene::loadSceneRoot( const string &url ) {
 }
 
 void Scene::setSceneRoot( SAI::SAIScene *scene ) {
-	SAI::ExecutionContext::cleanUp();
+  SAI::ExecutionContext::cleanUp();
   SAI_browser.replaceWorld( scene );
 }
 
@@ -712,7 +712,7 @@ H3D::Node* Scene::findChildNode(H3D::Group *group, const std::string &nodeType, 
     for( unsigned int i = 0; i < c.size(); ++i ) {
       if( c[i]){
         H3D::Group *childgroup = dynamic_cast<H3D::Group*>(c[i]);
-        if (childgroup){	
+        if (childgroup){
           H3D::Node *node = findChildNode(childgroup, nodeType, nodeName);
           if (node)
             return node;
@@ -779,7 +779,7 @@ H3D::Node* Scene::findNodeType(H3D::Node *node, const std::string &nodeType, con
         {
           H3D::Node *node = findNodeType(appearance, nodeType, nodeName);
           if (node)
-            return node;			
+            return node;
         }
       }
       return NULL;

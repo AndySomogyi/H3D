@@ -36,7 +36,7 @@ using namespace H3D;
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase X3DVertexAttributeNode::database( 
                                    "X3DVertexAttributeNode", 
-				   NULL, 
+                                   NULL, 
                                    typeid( X3DVertexAttributeNode ),
                                    &X3DGeometricPropertyNode::database );
 

@@ -78,7 +78,7 @@ namespace H3D {
       return valid_values;
     }
 
-		/// Clears the valid values for the field.
+    /// Clears the valid values for the field.
     void clearValidValues() {
       valid_values.clear();
     }
