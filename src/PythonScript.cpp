@@ -155,7 +155,7 @@ PyObject *PythonScript::getPythonAttribute( const string &name ) {
   return NULL;
 }
 
-Field *PythonScript::lookupField( const string &name ) {
+Field *PythonScript::lookupField( const string &name ) const {
   if( module_dict ) {
     // ensure we have the GIL lock to work with multiple python threads.
     PyGILState_STATE state = PyGILState_Ensure();
