@@ -135,7 +135,7 @@ void H3DNodeDatabase::initFields( Node *n ) const {
 }
 
 
-Field *H3DNodeDatabase::getFieldHelp( Node *n, const string &f ) const {
+Field *H3DNodeDatabase::getFieldHelp( const Node *n, const string &f ) const {
   for( FieldDBType::const_iterator i = fields.begin(); i != fields.end(); ++i ) {
     FieldDBElement *fdb = (*i).second;
     const string &name = (*i).first;
@@ -157,7 +157,7 @@ Field *H3DNodeDatabase::getFieldHelp( Node *n, const string &f ) const {
     return NULL;
 }
 
-Field *H3DNodeDatabase::getField( Node *n, const string &name ) const {
+Field *H3DNodeDatabase::getField( const Node *n, const string &name ) const {
   Field *f = getFieldHelp( n, name );
   if( f ) return f;
   

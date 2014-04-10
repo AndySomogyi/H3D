@@ -188,7 +188,7 @@ bool ComposedShader::addField( const string &name,
   }else{
     // can not add same field twice,even though it has different name.
     // This is the limit of h3d dynamic field object. 
-    Console(4)<<"Warning: Failed to add field: "<<name<<" to shader"<< getName()
+    Console(4)<<"Warning: Failed to add field: "<<name<<" to shader "<< getName()
       <<", either current node is invalid or the added field is already in the node database!"
       <<endl;
   }

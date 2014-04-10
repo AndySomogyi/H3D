@@ -63,14 +63,14 @@ namespace H3D {
                                   const Field::AccessType &access,
                                   Field *field ) {
       Node *n = dynamic_cast< Node * >( this );
-      if( n && !database->getField( n, name.c_str() ) ) {
+      if( n && !database->getField( n, name ) ) {
         // Set the placeholder to the node address.
         inherited_node = n;
         field->setOwner( n );
         field->setName( name );
         field->setAccessType( access );
         database->addField( new DynamicFieldDBElement( database,
-                                                       name.c_str(),
+                                                       name,
                                                        access,
                                                        field ) );
         dynamic_fields.push_back( field );

@@ -451,7 +451,7 @@ void IndexedTriangleSet::render() {
     // restore previous fog attributes
     if( GLEW_EXT_fog_coord && fog_coord_node ) {
       glPopAttrib();
-    }      
+    }
 
     // disable texture coordinate generation.
     if( tex_coord_gen ) {
