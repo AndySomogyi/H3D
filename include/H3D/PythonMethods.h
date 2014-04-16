@@ -205,6 +205,10 @@ namespace H3D {
 
     PyObject* pythonGetProgramSettings( PyObject *self, PyObject *arg );
 */
+
+    PyObject* pythonFindNodes( PyObject *self, PyObject *arg );
+
+    PyObject* pythonTakeScreenshot( PyObject *self, PyObject *arg );
   }
 
     

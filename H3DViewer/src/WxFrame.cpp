@@ -216,7 +216,6 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   tree_view_dialog = new H3DViewerTreeViewDialog( this ); 
 #ifdef HAVE_WXPROPGRID
   program_settings_dialog = new H3DViewerFieldValuesDialogPropGrid( this ); 
-  program_settings_dialog->displayFieldsFromProgramSettings();
   program_settings_dialog->destroy_on_close = false;
 #endif
   plugins_dialog = new H3DViewerPluginsDialog( this ); 
@@ -1993,9 +1992,10 @@ void WxFrame::ShowProgramSettings(wxCommandEvent & event)
     if( program_settings_dialog->IsIconized() )
       program_settings_dialog->Iconize(false);
     if( !program_settings_dialog->Show())
-    // already shown, bring it up
+      // already shown, bring it up
       program_settings_dialog->SetFocus();
   }
+  program_settings_dialog->displayFieldsFromProgramSettings();
 #endif
 }
 

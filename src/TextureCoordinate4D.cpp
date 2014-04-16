@@ -41,6 +41,7 @@ H3DNodeDatabase TextureCoordinate4D::database(
 
 namespace TextureCoordinate4DInternals {
   FIELDDB_ELEMENT( TextureCoordinate4D, point, INPUT_OUTPUT );
+  FIELDDB_ELEMENT ( TextureCoordinate4D, isDynamic, INPUT_OUTPUT );
 }
 
 
@@ -48,14 +49,11 @@ TextureCoordinate4D::TextureCoordinate4D(
                                      Inst< SFNode >  _metadata,
                                      Inst< MFVec4f>  _point ) :
   X3DTextureCoordinateNode( _metadata ),
-  point( _point ),
-  vboFieldsUpToDate( new Field ),
-  vbo_id( NULL ) {
+  point( _point ) {
 
   type_name = "TextureCoordinate4D";
   database.initFields( this );
   point->route( propertyChanged );
-  vboFieldsUpToDate->setName( "vboFieldsUpToDate" );
   point->route( vboFieldsUpToDate );
 }
 
@@ -92,32 +90,33 @@ void TextureCoordinate4D::disableArray() {
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-// Perform the OpenGL commands to render all vertices as a vertex
-// buffer object.
-void TextureCoordinate4D::renderVertexBufferObject() {
-  if( !point->empty() ) {
-    if( !vboFieldsUpToDate->isUpToDate() ) {
-      // Only transfer data when it has been modified.
-      vboFieldsUpToDate->upToDate();
-      if( !vbo_id ) {
-        vbo_id = new GLuint;
-        glGenBuffersARB( 1, vbo_id );
-      }
-      glBindBufferARB( GL_ARRAY_BUFFER_ARB, *vbo_id );
-      glBufferDataARB( GL_ARRAY_BUFFER_ARB,
-                       point->size() * 4 * sizeof(GLfloat),
-                       &(*point->begin()), GL_STATIC_DRAW_ARB );
-    } else {
-      glBindBufferARB( GL_ARRAY_BUFFER_ARB, *vbo_id );
-    }
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(4, GL_FLOAT, 0, NULL );
+bool TextureCoordinate4D::preRenderCheckFail ( ){
+  return GLVertexAttributeObject::preRenderCheckFail ( ) ||
+    point->empty ( );
+}
+
+void TextureCoordinate4D::setAttributeData ( ){
+  attrib_data = (GLvoid*)&(*point->begin ( ));
+  attrib_size = point->size ( ) * 4 * sizeof(GLfloat);
+}
+
+void TextureCoordinate4D::renderVBO ( ){
+  glEnableClientState ( GL_TEXTURE_COORD_ARRAY );
+  if ( use_bindless )
+  {
+    glTexCoordFormatNV ( 4, GL_FLOAT, 0 );
+    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+    // vbo is dedicated for this vertex attribute, so there is no offset
+    glBufferAddressRangeNV ( GL_TEXTURE_COORD_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
+  } else{
+    glTexCoordPointer ( 4, GL_FLOAT, 0, NULL );
   }
 }
 
-// Disable the array state enabled in renderVertexBufferObject().
-void TextureCoordinate4D::disableVertexBufferObject() {
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+void TextureCoordinate4D::disableVBO ( ){
+  if ( use_bindless )
+  {
+    glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+  }
+  glDisableClientState ( GL_TEXTURE_COORD_ARRAY );
 }
-
