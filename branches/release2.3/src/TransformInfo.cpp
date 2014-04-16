@@ -45,6 +45,7 @@ namespace TransformInfoInternals {
   FIELDDB_ELEMENT( TransformInfo, outputGLMatrices, INPUT_OUTPUT );
   FIELDDB_ELEMENT( TransformInfo, glModelViewMatrix, OUTPUT_ONLY );
   FIELDDB_ELEMENT( TransformInfo, glModelViewMatrixInverse, OUTPUT_ONLY );
+  FIELDDB_ELEMENT ( TransformInfo, glModelViewMatrixInverseTranspose, OUTPUT_ONLY );
   FIELDDB_ELEMENT( TransformInfo, glProjectionMatrix, OUTPUT_ONLY );
   FIELDDB_ELEMENT( TransformInfo, glProjectionMatrixInverse, OUTPUT_ONLY );
 }
@@ -57,7 +58,8 @@ TransformInfo::TransformInfo( Inst< SFNode     > _metadata,
                               Inst< SFMatrix4f  > _glModelViewMatrix,
                               Inst< Matrix4fInverse > _glModelViewMatrixInverse,
                               Inst< SFMatrix4f  > _glProjectionMatrix,
-                              Inst< Matrix4fInverse > _glProjectionMatrixInverse ) :
+                              Inst< Matrix4fInverse > _glProjectionMatrixInverse,
+                              Inst< Matrix4fInverseTranspose > _glModelViewMatrixInverseTranspose ) :
   X3DChildNode( _metadata ),
   H3DDisplayListObject( _displayList ),
   accForwardMatrix( _accForwardMatrix ),
@@ -66,7 +68,8 @@ TransformInfo::TransformInfo( Inst< SFNode     > _metadata,
   glModelViewMatrix( _glModelViewMatrix ),
   glModelViewMatrixInverse( _glModelViewMatrixInverse ),
   glProjectionMatrix( _glProjectionMatrix ),
-  glProjectionMatrixInverse( _glProjectionMatrixInverse ) {
+  glProjectionMatrixInverse( _glProjectionMatrixInverse ),
+  glModelViewMatrixInverseTranspose( _glModelViewMatrixInverseTranspose ) {
 
   type_name = "TransformInfo";
   database.initFields( this );
@@ -76,6 +79,7 @@ TransformInfo::TransformInfo( Inst< SFNode     > _metadata,
   outputGLMatrices->setValue( false );
 
   glModelViewMatrix->route( glModelViewMatrixInverse, id );
+  glModelViewMatrix->route ( glModelViewMatrixInverseTranspose, id );
   glProjectionMatrix->route( glProjectionMatrixInverse, id );
 
   outputGLMatrices->route( displayList );
@@ -116,6 +120,8 @@ void TransformInfo::render() {
     if( glModelViewMatrix->getValue() != model_view ) {
       glModelViewMatrix->setValue( model_view, id );
       glModelViewMatrixInverse->setValue( model_view.inverse(), id );
+      // TODO: is this really necessary to explicitly set the value here?
+      glModelViewMatrixInverseTranspose->setValue ( model_view.inverse().transpose(),id ); 
     }
 
     if( glProjectionMatrix->getValue() != projection ) {

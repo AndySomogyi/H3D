@@ -31,6 +31,7 @@ namespace ConvolutionFilterShaderInternals {
   FIELDDB_ELEMENT( ConvolutionFilterShader, type, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ConvolutionFilterShader, weights, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ConvolutionFilterShader, kernelSize, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( ConvolutionFilterShader, pixelStepOffset, INPUT_OUTPUT );
 }
 
 ConvolutionFilterShader::ConvolutionFilterShader( Inst< DisplayList  > _displayList,
@@ -46,7 +47,8 @@ ConvolutionFilterShader::ConvolutionFilterShader( Inst< DisplayList  > _displayL
                             Inst< SFTexture2DNode > _texture,
                             Inst< SFString        > _type,
                             Inst< MFFloat         > _weights,
-                            Inst< SFInt32         > _kernelSize ) :
+                            Inst< SFInt32         > _kernelSize,
+                            Inst< SFFloat         > _pixelStepOffset) :
   H3DGeneratedFragmentShaderNode( _displayList, _metadata, _isSelected, 
                                   _isValid, _activate, _language, _parts, 
                                   _suppressUniformWarnings, _fragmentShaderString, 
@@ -55,12 +57,15 @@ ConvolutionFilterShader::ConvolutionFilterShader( Inst< DisplayList  > _displayL
   type( _type ),
   weights( _weights ),
   kernelSize( _kernelSize ),
-  textureWidth( new SFInt32 ),
-  textureHeight( new SFInt32 ) {
+  pixelStepOffset( _pixelStepOffset ),
+  textureWidth( new TextureMonitor ),
+  textureHeight( new TextureMonitor ) {
   
   type_name = "ConvolutionFilterShader";
   database.initFields( this );
 
+  textureHeight->setOwner(this);
+  textureWidth->setOwner(this),
 
   type->addValidValue( "HORIZONTAL" );
   type->addValidValue( "VERTICAL" );
@@ -71,8 +76,11 @@ ConvolutionFilterShader::ConvolutionFilterShader( Inst< DisplayList  > _displayL
   weights->push_back( 1 );
   textureWidth->setValue( 0 );
   textureHeight->setValue( 0 );
+  pixelStepOffset->setValue( 0.0 );
 
+  pixelStepOffset->route( rebuildShader );
   kernelSize->route( rebuildShader );
+  weights->route( rebuildShader );
   type->route( rebuildShader );
 }
 
@@ -88,8 +96,6 @@ void ConvolutionFilterShader::traverseSG( TraverseInfo &ti ) {
   }
 
   if( image ) {
-  t->repeatS->setValue(false);
-  t->repeatT->setValue(false);
     if( textureWidth->getValue() != image->width() ) {
       textureWidth->setValue( image->width() );
     }
@@ -115,7 +121,7 @@ void ConvolutionFilterShader::traverseSG( TraverseInfo &ti ) {
       textureHeight->setValue( 0 );
     }
   }
-  if( rtt ) {// if texutre is a renderTargetTexture
+  if( rtt ) {// if texture is a renderTargetTexture
     GLuint tex_id = rtt->getTextureId();
     glPushAttrib( GL_TEXTURE_BIT );
     glBindTexture( rtt->getTextureTarget(), tex_id );
@@ -150,74 +156,62 @@ string ConvolutionFilterShader::addUniformFields( ComposedShader *shader ) {
                                      H3D::Field::INPUT_OUTPUT,
                                      copyAndRouteField( texture ) );
 
-    s << addUniformToFragmentShader( shader,
-                                     uniqueShaderName( "textureWidth" ), 
-                                     "int",
-                                     H3D::Field::INPUT_OUTPUT,
-                                     copyAndRouteField( textureWidth ) );
-
-    s << addUniformToFragmentShader( shader,
-                                     uniqueShaderName( "textureHeight" ), 
-                                     "int",
-                                     H3D::Field::INPUT_OUTPUT,
-                                     copyAndRouteField( textureHeight ) );
-
-    
-    int nr_weights;
-    if( type->getValue() == "FULL" ) {
-      nr_weights = kernelSize->getValue()  * kernelSize->getValue();
-    } else {
-      nr_weights = kernelSize->getValue();
-    }
-
-    s << addUniformToFragmentShader( shader,
-                                     uniqueShaderName( "weights" ), 
-                                     "float",
-                                     H3D::Field::INPUT_OUTPUT,
-                                     copyAndRouteField( weights ),
-             nr_weights );
-
   return s.str();
 }
 
 string ConvolutionFilterShader::getFragmentShaderString() {
   if( canBuildShader() ) {
     stringstream s;
-    s << "  const int KERNEL_SIZE = " << kernelSize->getValue() << "; " << endl;
+    int kernel_size = kernelSize->getValue();
+    s << "  const int KERNEL_SIZE = " << kernel_size << "; " << endl;
+    s << "  const int texture_width =  " << textureWidth->getValueAsString() <<"; "<<endl;
+    s << "  const int texture_height = " << textureHeight->getValueAsString() << "; "<<endl;
     s << "  // the step in texture coordinates between each pixel " << endl;
-    s << "  vec2 pixel_step = vec2( 1.0 / float( " << uniqueShaderName( "textureWidth" ) << " ), 1.0 / float( " << uniqueShaderName( "textureHeight" ) <<" ) ); " << endl;
+    s << "  const vec2 pixel_step = vec2( (1.0+" << pixelStepOffset->getValueAsString ( ) 
+      << ") / float( texture_width ), (1.0+" << pixelStepOffset->getValueAsString ( ) << ") / float( texture_height ) ); " << endl;
+    string weightsInString = "";
+    for( unsigned int i = 0; i< weights->size(); ++i ) {
+      stringstream ss;
+      ss << weights->getValueByIndex(i);
+      string currentValue( ss.str() );
+      if( currentValue.find(".")==std::string::npos ) {
+        currentValue+= ".0";
+      }
+      weightsInString += currentValue+=",";
+    }
+    weightsInString.erase( weightsInString.size()-1);
+    //weightsInString.pop_back();
+    s << "  const float weights["<< weights->size()<<"] = float["<<weights->size()<<"]("<<weightsInString<<");"  <<endl;
     const string &t = type->getValue(); 
 
     if( t == "VERTICAL" ) {
-      s << "  int min_index_h = 0; " << endl;
-      s << "  int max_index_h = 0; " << endl;
-      s << "  int min_index_v = -(KERNEL_SIZE - 1)/2; " << endl;
-      s << "  int max_index_v = -min_index_v; " << endl;
+      s << "  const int min_index_h = 0; " << endl;
+      s << "  const int max_index_h = 0; " << endl;
+      s << "  const int min_index_v = " <<-(kernel_size - 1)/2 <<";" << endl;
+      s << "  const int max_index_v = " << (kernel_size - 1)/2 <<";" << endl;
     } else if( t == "HORIZONTAL" ) {
-      s << "  int min_index_h = -(KERNEL_SIZE - 1)/2; " << endl;
-      s << "  int max_index_h = -min_index_h; " << endl;
-      s << "  int min_index_v = 0; " << endl;
-      s << "  int max_index_v = 0; " << endl;
+      s << "  const int min_index_h = " <<-(kernel_size - 1)/2<< ";" << endl;
+      s << "  const int max_index_h = " << (kernel_size - 1)/2<< ";" << endl;
+      s << "  const int min_index_v = 0; " << endl;
+      s << "  const int max_index_v = 0; " << endl;
     } else {
       if( t != "FULL" ) {
       // print error message
       }
-      s << "  int min_index_h = -(KERNEL_SIZE - 1)/2; " << endl;
-      s << "  int max_index_h = -min_index_h; " << endl;
-      s << "  int min_index_v = min_index_h; " << endl;
-      s << "  int max_index_v = max_index_h; " << endl;
+      s << "  const int min_index_h = " << -(kernel_size - 1)/2<< ";" << endl;
+      s << "  const int max_index_h = " <<  (kernel_size - 1)/2<< ";" << endl;
+      s << "  const int min_index_v = " << -(kernel_size - 1)/2<< ";" << endl;
+      s << "  const int max_index_v = " <<  (kernel_size - 1)/2<< ";" << endl;
     } 
 
-    s << "  int index = 0; " << endl;
+    s << "  uint index = 0; " << endl;
     s << "  vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 ); " << endl;
     s << "  for( int v = min_index_v; v <= max_index_v; v++ ) { " << endl;
     s << "    for( int h = min_index_h; h <= max_index_h; h++ ) { " << endl;
-    s << "       vec2 offset = vec2( float(h) * pixel_step.x, " << endl;
-    s << "                           float(v) * pixel_step.y ); " << endl; 
-    s << "       vec2 tc = gl_TexCoord[0].st + offset; " << endl;
-    s << "       tc.x = clamp(tc.x,0.0,1.0); " << endl;
-    s << "       tc.y = clamp(tc.y,0.0,1.0); " << endl;
-    s << "       color = color + texture2D( " << uniqueShaderName("texture") << ", tc ) * " << uniqueShaderName( "weights" ) << "[index]; " << endl;
+    s << "       vec2 tc = vec2( h,v )*pixel_step + gl_TexCoord[0].st; " << endl;
+    s << "       tc = clamp(tc,vec2(0),vec2(1));" << endl;
+    s << "       color = texture2D( " << uniqueShaderName("texture") 
+      << ", tc  ) * " <<"weights[index] + color; " << endl;
     s << "       index++; " << endl;
     s << "    } " << endl;
     s << "  } " << endl;

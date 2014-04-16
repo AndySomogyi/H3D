@@ -16,6 +16,7 @@
 
 #include <H3D/MFFloat.h>
 #include <H3D/H3DGeneratedFragmentShaderNode.h>
+#include <H3D/FieldTemplates.h>
 
 namespace H3D {
 
@@ -83,6 +84,15 @@ namespace H3D {
                              true >
     SFTexture2DNode;
 
+    class TextureMonitor: public OnValueChangeSField<SFInt32>
+    {
+    public:
+      virtual void onValueChange(  const int &new_value ){
+        ConvolutionFilterShader* owner = dynamic_cast<ConvolutionFilterShader*> (getOwner());
+        owner->buildShader();
+      }
+    };
+
     /// Constructor.
     ConvolutionFilterShader( Inst< DisplayList  > _displayList = 0,
            Inst< SFNode       > _metadata    = 0,
@@ -97,7 +107,8 @@ namespace H3D {
            Inst< SFTexture2DNode > _texture = 0,
            Inst< SFString     > _type        = 0,
            Inst< MFFloat      > _weights     = 0,
-           Inst< SFInt32      > _kernelSize  = 0 );
+           Inst< SFInt32      > _kernelSize  = 0,
+           Inst< SFFloat      > _pixelStepOffset = 0);
     
     /// The texture field contains the texture on which to apply the 
     /// filter kernel.
@@ -133,11 +144,20 @@ namespace H3D {
 
     /// The kernelSize field specifies the size convolution kernel.
     ///
-    /// This referes to how many pixels should be sampled in each direction.
+    /// This refers to how many pixels should be sampled in each direction.
     /// 
     /// <b>Access type:</b> inputOutput
     /// <b>Default value:</b> 1
     auto_ptr< SFInt32  > kernelSize;
+
+    /// The pixelStepOffset is used to add customized offset to the pixel step
+    /// using in convolving, the metric of this value is pixel, so please keep 
+    /// this value relatively small as too many pixel offset will make result strange.
+    /// By using this value, you can enhance or weaken the convolving effect with
+    /// slight artifact while no extra texture read
+    /// <b>Access type:</b> inputOutput
+    /// <b>Default value:</b> 0.0
+    auto_ptr< SFFloat > pixelStepOffset;
 
     /// Traverse the scene graph.
     virtual void traverseSG( TraverseInfo &ti );
@@ -146,14 +166,15 @@ namespace H3D {
     static H3DNodeDatabase database;
   protected:
 
-    /// The width of the node instance in the texture field.
-    auto_ptr< SFInt32 > textureWidth;
+    /// Once texture width changes, rebuild the shader
+    auto_ptr<TextureMonitor> textureWidth;
 
-    /// The width of the node instance in the texture field.
-    auto_ptr< SFInt32 > textureHeight;
-    
+    /// Once texture height changes, rebuild the shader
+    auto_ptr<TextureMonitor> textureHeight;
+
+
     /// Returns true if all conditions to be able to use the values to build a
-    /// proper shader are fullfilled.
+    /// proper shader are fulfilled.
     virtual bool canBuildShader();
 
     /// Overriding buildShader to only build the shader if canBuildShader is true.
@@ -161,7 +182,7 @@ namespace H3D {
 
     /// Adds uniform fields to the shader. A ComposedShader uses its
     /// dynamic fields to define uniform variables. Hence we need to
-    /// add dynamic fields for each field that we want to be accessable
+    /// add dynamic fields for each field that we want to be accessible
     /// in the shader.
     string addUniformFields( ComposedShader *shader );
 

@@ -35,6 +35,8 @@
 #include <H3D/GraphicsOptions.h>
 #include <H3D/H3DWindowNode.h>
 #include <H3D/Scene.h>
+#include <H3D/H3DWindowNode.h>
+#include <H3D/H3DNavigation.h>
 
 using namespace H3D;
 
@@ -57,6 +59,7 @@ namespace FrameBufferTextureGeneratorInternals {
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, framesBeforeStop, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, depthTexture, OUTPUT_ONLY );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, colorTextures, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( FrameBufferTextureGenerator, colorTexture, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, viewpoint, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, navigationInfo, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, width, INPUT_OUTPUT );
@@ -69,6 +72,7 @@ namespace FrameBufferTextureGeneratorInternals {
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, externalFBODepthBuffer, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, colorBufferStorages, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, externalFBOColorBuffers, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( FrameBufferTextureGenerator, useNavigation, INPUT_OUTPUT );
 }
 
 FrameBufferTextureGenerator::~FrameBufferTextureGenerator() {
@@ -102,11 +106,12 @@ FrameBufferTextureGenerator::FrameBufferTextureGenerator( Inst< AddChildren    >
   Inst< MFTexturePropertiesNode > _colorTextureProperties,
   Inst< SFTexturePropertiesNode > _depthTextureProperties,
   Inst< MFGeneratedTextureNode > _colorTextures, 
+  Inst< SFGeneratedTextureNode > _colorTexture, 
   Inst< SFGeneratedTextureNode > _depthTexture,
   Inst< SFString         > _depthBufferType,
   Inst< SFString         > _outputTextureType,
   Inst< SFInt32        > _samples,
-  Inst< SFString       > _update,
+  Inst< UpdateMode     > _update,
   Inst< SFInt32        > _framesBeforeStop,
   Inst< SFViewpointNode > _viewpoint,
   Inst< SFNavigationInfo > _navigationInfo,
@@ -117,7 +122,8 @@ FrameBufferTextureGenerator::FrameBufferTextureGenerator( Inst< AddChildren    >
   Inst< SFString        > _depthBufferStorage,
   Inst< SFFrameBufferTextureGeneratorNode > _externalFBODepthBuffer,
   Inst< MFString        > _colorBufferStorages,
-  Inst< MFFrameBufferTextureGeneratorNode > _externalFBOColorBuffers):
+  Inst< MFFrameBufferTextureGeneratorNode > _externalFBOColorBuffers,
+  Inst< SFBool          > _useNavigation ):
 X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound, 
   _bboxCenter, _bboxSize ),
   generateColorTextures( _generateColorTextures ),
@@ -125,6 +131,7 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
   colorTextureProperties( _colorTextureProperties ),
   depthTextureProperties( _depthTextureProperties ),
   colorTextures( _colorTextures ),
+  colorTexture( _colorTexture ),
   depthTexture( _depthTexture ),
   depthBufferStorage( _depthBufferStorage ),
   colorBufferStorages( _colorBufferStorages ),
@@ -141,6 +148,7 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
   width( _width ),
   height( _height ),
   useStereo( _useStereo ),
+  useNavigation( _useNavigation ),
   fbo_initialized( false ),
   buffers_width(-1),
   buffers_height(-1),
@@ -171,6 +179,7 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
     width->setValue( -1 );
     height->setValue( -1 );
     useStereo->setValue( false );
+    useNavigation->setValue( false );
 
     depthBufferType->addValidValue( "DEPTH" );
     depthBufferType->addValidValue( "DEPTH16" );
@@ -184,6 +193,7 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
     update->addValidValue( "NEXT_FRAME_ONLY" );
     update->addValidValue( "SPECIFIED_FRAMES_ONLY" );
     update->addValidValue( "ALWAYS" );
+    update->addValidValue( "NOW" );
     update->setValue( "ALWAYS" );
 
     framesBeforeStop->setValue(-1);
@@ -396,7 +406,7 @@ void FrameBufferTextureGenerator::render()     {
     }else{
       framesBeforeStop->setValue(framesBeforeStop->getValue()-1);
     }
-  }else if( update_string == "NEXT_FRAME_ONLY" ) {
+  }else if( update_string == "NEXT_FRAME_ONLY" || update_string == "NOW" ) {
     update->setValue("NONE");
   }else if( update_string == "ALWAYS" ) {
     //continue
@@ -492,9 +502,23 @@ void FrameBufferTextureGenerator::render()     {
   // been set up (current active viewpoint)
 
   X3DViewpointNode* vp = static_cast<X3DViewpointNode*>(viewpoint->getValue());
+  
+  bool use_local_viewpoint = true;
+  if( useNavigation->getValue()||!vp ) { 
+    // when useNavigation or no local viewpoint exist, use current active viewpoint
+    vp = X3DViewpointNode::getActive();
+    use_local_viewpoint = false;
+  }
   NavigationInfo *nav_info = navigationInfo->getValue();
+  bool use_local_navi = true;
+  if( !nav_info ) {
+    nav_info = NavigationInfo::getActive();
+    use_local_navi = false; 
+  }
   X3DBackgroundNode* bg = background->getValue();
-  if( vp ) {
+  if( use_local_viewpoint||use_local_navi ) {
+    // have to setup separate rendering view matrix and projection matrix when 
+    // either local viewpoint or local navigationInfo is specified.
     H3DFloat clip_near = (H3DFloat)0.01;
     H3DFloat clip_far = -1;
 
@@ -515,20 +539,13 @@ void FrameBufferTextureGenerator::render()     {
     }
     X3DViewpointNode::EyeMode eye_mode = X3DViewpointNode::MONO;
     StereoInfo* stereo_info = NULL;
-    if( useStereo->getValue() ) {
-      Scene *scene = Scene::scenes.size() > 0 ? *Scene::scenes.begin(): NULL;
-      H3DWindowNode* window = static_cast<H3DWindowNode*>(scene->window->getValue()[0]);
-      eye_mode = window->getEyeMode();
-      if( eye_mode!=X3DViewpointNode::MONO ) {
-        stereo_info = StereoInfo::getActive();
-        H3DFloat focal_distance = stereo_info->focalDistance->getValue();
-        if( focal_distance <= clip_near ) {
-          clip_near = focal_distance - 0.01f;
-        }
-        if( focal_distance >= clip_far && clip_far != -1 ) {
-          clip_far = focal_distance + 0.01f;
-        }
-      }
+    Scene *scene = Scene::scenes.size ( ) > 0 ? *Scene::scenes.begin ( ) : NULL;
+    H3DWindowNode* window = static_cast<H3DWindowNode*>(scene->window->getValue ( )[0]);
+    if( useStereo->getValue()&&window->getEyeMode()!=eye_mode ) {
+      // when current active eyemode is not MONO and FBO need to use stereo, need to specify 
+      // stereo_info
+      eye_mode = window->getEyeMode ( );
+      stereo_info = StereoInfo::getActive();
     }
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
@@ -548,6 +565,7 @@ void FrameBufferTextureGenerator::render()     {
 
     // render scene.
     if( render_func ) {
+       preProcessFBO(default_x, default_y, current_width,current_height,current_depth);
       render_func( this, -1, render_func_data );
     } else {
       // Get background and set clear color
@@ -599,7 +617,7 @@ void FrameBufferTextureGenerator::render()     {
       }
 
       X3DShapeNode::geometry_render_mode= m;
-      if( current_shadow_caster ) current_shadow_caster->render();
+      if( current_shadow_caster && !current_shadow_caster->object->empty() ) current_shadow_caster->render();
     }
 
     // blit multi sample render buffer to output textures if using multi sampling.
@@ -667,7 +685,7 @@ void FrameBufferTextureGenerator::render()     {
         }
       }
 
-      if( current_shadow_caster ) current_shadow_caster->render();
+      if( current_shadow_caster && !current_shadow_caster->object->empty() ) current_shadow_caster->render();
 
       // blit multi sample render buffer to output textures if using multi sampling.
       if( nr_samples > 0 ) {
@@ -688,7 +706,7 @@ void FrameBufferTextureGenerator::render()     {
     }
   }
 
-  if( vp ) {
+  if( use_local_navi||use_local_viewpoint ) {
     glMatrixMode( GL_PROJECTION );
     glPopMatrix();
     glMatrixMode( GL_MODELVIEW );
@@ -815,6 +833,9 @@ void FrameBufferTextureGenerator::initializeFBO() {
       multi_samples_color_ids.push_back( ms_id );
       draw_buffers.get()[i] = (GLenum) (GL_COLOR_ATTACHMENT0_EXT+i);
     }
+
+    if (!colorTextures->empty())
+      colorTexture->setValue(colorTextures->front());
 
     fbo_initialized = true;
   }
@@ -1561,5 +1582,11 @@ void FrameBufferTextureGenerator::blitColorBuffer(GLenum src, GLenum dst,
       0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     if( error!=GL_NO_ERROR ) {
       Console(4)<<"While blit color buffer, opengl error occur:"<<gluErrorString(error)<<std::endl;
+    }
+}
+
+void FrameBufferTextureGenerator::UpdateMode::onNewValue( const std::string& new_value ) {
+    if ( new_value == "NOW" ) {
+        static_cast < FrameBufferTextureGenerator* > ( getOwner() )->render();
     }
 }
