@@ -57,7 +57,12 @@ using namespace H3D;
   #if defined(__APPLE__) && defined(__MACH__)
     #include <freetype/ftmac.h>
   #else
-    #include <freetype/freetype.h>
+    //#include <freetype/freetype.h>
+    // from 2.5 to 2.5.1 for freetype libarary, the freetype.h path is 
+    // changed, it is the official way to handle it as below
+    #include <ft2build.h>
+    #include FT_FREETYPE_H
+    #include FT_TRUETYPE_TABLES_H
   #endif
 #endif //else HAVE_FONTCONFIG
 
