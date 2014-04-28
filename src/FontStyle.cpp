@@ -50,7 +50,12 @@ using namespace H3D;
 
 
 #ifdef HAVE_FONTCONFIG
-  #include <freetype/freetype.h>
+  //#include <freetype/freetype.h>
+  // from 2.5 to 2.5.1 for freetype libarary, the freetype.h path is 
+  // changed, it is the official way to handle it as below
+  #include <ft2build.h>
+  #include FT_FREETYPE_H
+  #include FT_TRUETYPE_TABLES_H
   #include <fontconfig/fontconfig.h>
   #include <string.h>
 #else //HAVE_FONTCONFIG
