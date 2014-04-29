@@ -63,7 +63,7 @@ using namespace H3D;
     #include <freetype/ftmac.h>
   #else
     //#include <freetype/freetype.h>
-    // from 2.5 to 2.5.1 for freetype libarary, the freetype.h path is 
+    // from 2.5 to 2.5.1 for freetype library, the freetype.h path is 
     // changed, it is the official way to handle it as below
     #include <ft2build.h>
     #include FT_FREETYPE_H
