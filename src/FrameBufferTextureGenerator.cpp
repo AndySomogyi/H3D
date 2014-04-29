@@ -64,6 +64,8 @@ namespace FrameBufferTextureGeneratorInternals {
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, navigationInfo, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, width, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, height, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( FrameBufferTextureGenerator, widthInUse, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( FrameBufferTextureGenerator, heightInUse, OUTPUT_ONLY );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, useStereo, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, depthTextureProperties, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, colorTextureProperties, INITIALIZE_ONLY );
@@ -118,6 +120,8 @@ FrameBufferTextureGenerator::FrameBufferTextureGenerator( Inst< AddChildren    >
   Inst< SFBackgroundNode > _background,
   Inst< SFInt32         > _width,
   Inst< SFInt32         > _height,
+  Inst< SFInt32         > _widthInUse,
+  Inst< SFInt32         > _heightInUse,
   Inst< SFBool          > _useStereo,
   Inst< SFString        > _depthBufferStorage,
   Inst< SFFrameBufferTextureGeneratorNode > _externalFBODepthBuffer,
@@ -147,6 +151,8 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
   background ( _background ),
   width( _width ),
   height( _height ),
+  widthInUse( _widthInUse ),
+  heightInUse( _heightInUse ),
   useStereo( _useStereo ),
   useNavigation( _useNavigation ),
   fbo_initialized( false ),
@@ -178,6 +184,8 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
     last_samples = 0;
     width->setValue( -1 );
     height->setValue( -1 );
+    widthInUse->setValue( -1, id );
+    heightInUse->setValue( -1, id );
     useStereo->setValue( false );
     useNavigation->setValue( false );
 
@@ -425,6 +433,11 @@ void FrameBufferTextureGenerator::render()     {
   // Save current state.
   glPushAttrib( GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT | GL_VIEWPORT_BIT );
 
+  /// Check if we just need to generate depth texture.
+  if( generateColorTextures->size() == 0&&generateDepthTexture->getValue() ) {
+    glColorMask(false,false,false,false);
+  }
+
   /// Make sure all textures and buffers are initialized.
   if( !fbo_initialized ) initializeFBO();
 
@@ -598,7 +611,8 @@ void FrameBufferTextureGenerator::render()     {
         glDepthMask( GL_TRUE );
         glPopMatrix();
       }
-
+      widthInUse->setValue(current_width, id);
+      heightInUse->setValue(current_height, id);
       X3DShapeNode::GeometryRenderMode  m= X3DShapeNode::geometry_render_mode;
 
       if( children_multi_pass_transparency ) {
