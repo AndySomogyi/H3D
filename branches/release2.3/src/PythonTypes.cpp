@@ -293,7 +293,7 @@ self, name, field_type, access_type )" );
     Node *n = PyNode_AsNode( self );
 
     bool deepCopy= true;
-    if( arg && !PyBool_Check( arg ) ) {
+    if( arg && !( PyBool_Check( arg ) || PyInt_Check( arg ) ) ) {
       PyErr_SetString( PyExc_ValueError, 
                        "Invalid argument(s) to function PyNode.clone( \
 self, deepCopy )" );

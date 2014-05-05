@@ -3206,7 +3206,7 @@ call the base class __init__ function." );
         if ( nr_args > 4 ) {
           // Verbose
           PyObject* py_exact_node_name= PyTuple_GetItem( args, 4 );
-          if ( PyBool_Check ( py_exact_node_name ) ) {
+          if ( PyBool_Check( py_exact_node_name ) || PyInt_Check( py_exact_node_name ) ) {
             exact_node_name= PyObject_IsTrue ( py_exact_node_name );
           } else {
             PyErr_SetString( PyExc_ValueError, 
@@ -3219,7 +3219,7 @@ call the base class __init__ function." );
         if ( nr_args > 5 ) {
           // Verbose
           PyObject* py_verbose= PyTuple_GetItem( args, 5 );
-          if ( PyBool_Check ( py_verbose ) ) {
+          if ( PyBool_Check( py_verbose ) || PyInt_Check( py_verbose ) ) {
             verbose= PyObject_IsTrue ( py_verbose );
           } else {
             PyErr_SetString( PyExc_ValueError, 
@@ -3285,7 +3285,7 @@ call the base class __init__ function." );
         PyErr_SetString( PyExc_ValueError, success.c_str() );
         return NULL;
       }
-      return Py_True;
+      return Py_RETURN_TRUE;
     }
   }
 }
