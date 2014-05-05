@@ -51,6 +51,9 @@
 #include <cctype>
 
 #ifdef HAVE_PYTHON
+// DEV WARNING, never use PyBool_Check without also using PyInt_Check, the reason
+// is that pythonfieldGetValue returns an integer for the SFBool type. Until that is
+// changed this PyInt_Check also have to be used.
 
 using namespace H3D;
 using namespace PythonInternals;
@@ -3207,7 +3210,7 @@ call the base class __init__ function." );
           // Verbose
           PyObject* py_exact_node_name= PyTuple_GetItem( args, 4 );
           if ( PyBool_Check( py_exact_node_name ) || PyInt_Check( py_exact_node_name ) ) {
-            exact_node_name= PyObject_IsTrue ( py_exact_node_name );
+            exact_node_name= PyObject_IsTrue ( py_exact_node_name ) == 1;
           } else {
             PyErr_SetString( PyExc_ValueError, 
               "Invalid argument(s) to function findNodes(): Invalid exactNodeName argument (5)." );
@@ -3220,7 +3223,7 @@ call the base class __init__ function." );
           // Verbose
           PyObject* py_verbose= PyTuple_GetItem( args, 5 );
           if ( PyBool_Check( py_verbose ) || PyInt_Check( py_verbose ) ) {
-            verbose= PyObject_IsTrue ( py_verbose );
+            verbose= PyObject_IsTrue ( py_verbose ) == 1;
           } else {
             PyErr_SetString( PyExc_ValueError, 
               "Invalid argument(s) to function findNodes(): Invalid verbose argument (6)." );
@@ -3285,7 +3288,7 @@ call the base class __init__ function." );
         PyErr_SetString( PyExc_ValueError, success.c_str() );
         return NULL;
       }
-      return Py_RETURN_TRUE;
+      Py_RETURN_TRUE;
     }
   }
 }
