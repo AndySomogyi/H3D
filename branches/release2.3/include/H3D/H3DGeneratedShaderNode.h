@@ -282,7 +282,8 @@ namespace H3D {
                                               const string &glsl_type,
                                               const Field::AccessType &access,
                                               Field *field,
-                                              int array_size = -1 );
+                                              int array_size = -1,
+                                              bool delete_unadded_field = true );
 
     // Duplicates the input field and routes it to the output.
     // Use this to add the render shader's auto_ptr<field> to the shader.
