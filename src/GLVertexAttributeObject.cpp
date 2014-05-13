@@ -20,7 +20,7 @@
 //    A commercial license is also available. Please contact us at 
 //    www.sensegraphics.com for more information.
 //
-/// \file GLVertexBufferObject.cpp
+/// \file GLVertexAttributeObject.cpp
 /// \brief cpp file for GLVertexAttributeObject class.
 //
 //////////////////////////////////////////////////////////////////////////////

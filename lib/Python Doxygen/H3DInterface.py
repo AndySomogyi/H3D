@@ -1,4 +1,4 @@
-
+## \file H3DInterface.py Documentation file for the H3DInterface module.
 from H3D import *
 
 #import sys
