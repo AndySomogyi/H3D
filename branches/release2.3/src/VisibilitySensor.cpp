@@ -66,7 +66,8 @@ VisibilitySensor::VisibilitySensor( Inst< SFNode > _metadata ,
                                                                 _exitTime,
                                                                 _isActive ),
                   viewFrustumMode(_viewFrustumMode),
-                                    set_time( new SetTime ) {
+                                    set_time( new SetTime ),
+                                    queryId(0){
 
   type_name = "VisibilitySensor";
   database.initFields( this );
@@ -129,8 +130,7 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
     Vec3f g5 = vs_frw_m * loc5;
     Vec3f g6 = vs_frw_m * loc6;
     Vec3f g7 = vs_frw_m * loc7;
-    
-    GLuint queries[1];
+
     GLuint sampleCount;
     GLint available;
     GLint bitsSupported;
@@ -143,7 +143,8 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
       
     }
 
-    glGenQueriesARB(1, queries);
+    if ( !glIsQuery( queryId ) )
+      glGenQueriesARB(1, &queryId );
       
     // before this point, render major occluders
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -154,7 +155,7 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
     glDisable(GL_DEPTH_TEST);
   
   // also disable texturing and any fancy shaders
-    glBeginQueryARB(GL_SAMPLES_PASSED_ARB, queries[0]);
+    glBeginQueryARB(GL_SAMPLES_PASSED_ARB, queryId );
     // render bounding box for object i
     glBegin( GL_QUADS );
   
@@ -215,7 +216,7 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
     glFlush();
 
     do {
-      glGetQueryObjectivARB(queries[0],
+      glGetQueryObjectivARB(queryId,
                 GL_QUERY_RESULT_AVAILABLE_ARB,
                 &available);
     } while (!available);
@@ -226,7 +227,7 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
   if( viewFrustumMode->getValue() && depthTestEnabled )
     glEnable(GL_DEPTH_TEST);
       
-    glGetQueryObjectuivARB(queries[0], GL_QUERY_RESULT_ARB,
+    glGetQueryObjectuivARB(queryId, GL_QUERY_RESULT_ARB,
                 &sampleCount);
 
   
