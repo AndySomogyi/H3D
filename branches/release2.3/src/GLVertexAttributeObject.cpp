@@ -43,7 +43,7 @@ use_bindless( false ){
   isDynamic->setValue ( false );
   if ( GLEW_EXT_direct_state_access&&GL_NV_vertex_buffer_unified_memory )
   {
-    use_bindless = true;
+    use_bindless = false;
   }
 }
 
