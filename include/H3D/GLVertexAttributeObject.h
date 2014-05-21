@@ -57,6 +57,9 @@ namespace H3D {
     /// Constructor
     GLVertexAttributeObject ( VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE type );
 
+    /// Destructor
+    virtual ~GLVertexAttributeObject();
+
     /// pure virtual function has to be implemented by inherited class
     /// to specify necessay data and format for this vertex attrib
     virtual void setAttributeData ( ) = 0;

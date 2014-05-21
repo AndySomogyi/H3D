@@ -47,9 +47,18 @@ use_bindless( false ){
   }
 }
 
+GLVertexAttributeObject::~GLVertexAttributeObject() {
+  if( vbo_id ) {
+    glDeleteBuffersARB( 1, vbo_id );
+    delete vbo_id;
+    vbo_id = NULL;
+  }
+}
+
 bool GLVertexAttributeObject::preRenderCheckFail ( ){
   return !GLEW_ARB_vertex_program;
 }
+
 void GLVertexAttributeObject::updateVertexBufferObject ( ){
   
   if ( !vboFieldsUpToDate->isUpToDate() ){
