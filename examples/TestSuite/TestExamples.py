@@ -894,7 +894,7 @@ def testH3DPhysics (global_variations):
 
   if h3dphysics_header_string == "" or h3dphysics_header_string.find( "define HAVE_PHYSX3" ) != -1:
     physx3_variation= Variation ( "PhysX3" )
-    physx3_variation.options.append ( Option ( ["RigidBodyCollection","PhysicsBodyCollection"], "physicsEngine", "PhysX3" ) )
+    physx3_variation.options.append ( Option ( ["RigidBodyCollection"], "physicsEngine", "PhysX3" ) )
     variations.append( physx3_variation )
 
   if h3dphysics_header_string == "" or h3dphysics_header_string.find( "define HAVE_SOFA" ) != -1:
