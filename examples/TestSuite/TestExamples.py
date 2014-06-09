@@ -54,7 +54,7 @@ if platform.system() == 'Windows':
 # Find this directory.
 test_suite_directory = "."
 if os.getenv("H3D_ROOT") != None:
-  test_suite_directory = os.environ["H3D_ROOT"] + "\examples\TestSuite"
+  test_suite_directory = os.environ["H3D_ROOT"] + "/examples/TestSuite"
 
 geometries_directory = test_suite_directory + "/geometries"
 sys.path.append( geometries_directory )
