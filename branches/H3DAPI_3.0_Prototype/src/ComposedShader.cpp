@@ -248,10 +248,11 @@ bool ComposedShader::removeField ( const string& _name ) {
 
 GLbitfield ComposedShader::getAffectedGLAttribs() {
   GLbitfield res = X3DShaderNode::getAffectedGLAttribs();
-  if( GLEW_ARB_shader_objects ) {
-    res = res | Shaders::getAffectedGLAttribs( this );
+  if( GLEW_ARB_shader_objects ) 
+	{
+    res |= Shaders::getAffectedGLAttribs( this );
   }
-  res = res | GL_COLOR_BUFFER_BIT;
+  res |= GL_COLOR_BUFFER_BIT;
   return res;
 }
 
@@ -666,7 +667,8 @@ void ComposedShader::UpdateUniforms::update() {
   ComposedShader* node= static_cast<ComposedShader*>(getOwner());
   bool update_all= hasCausedEvent ( node->activate );
   if( update_all ) { // program re-linked, need to update all uniform
-    // update the uniform location information in unifromFields
+    // update the uniform location information in uniformFields
+
     UniformFieldMap::iterator it;
     for( it = node->uniformFields.begin(); it!= node->uniformFields.end(); ++it  ) {
       const string &name = it->first;

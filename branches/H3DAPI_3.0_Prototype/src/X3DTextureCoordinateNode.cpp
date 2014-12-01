@@ -300,7 +300,8 @@ void X3DTextureCoordinateNode::disableVertexBufferObjectForTexture(
 }
 
 
-void X3DTextureCoordinateNode::disableVertexBufferObjectForActiveTexture() {
+void X3DTextureCoordinateNode::disableVertexBufferObjectForActiveTexture() 
+{
   disableVertexBufferObjectForTexture( X3DTextureNode::getActiveTexture() );
 }
 

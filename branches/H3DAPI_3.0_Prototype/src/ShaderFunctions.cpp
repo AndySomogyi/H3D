@@ -1340,17 +1340,19 @@ GLbitfield H3D::Shaders::getAffectedGLAttribs( H3DDynamicFieldsObject *dfo ) {
       if( H3DSingleTextureNode *t = 
         dynamic_cast< H3DSingleTextureNode *>( n ) ) 
       {
-          res = res | t->getAffectedGLAttribs();
+          res |= t->getAffectedGLAttribs();
       } 
     }
     else if(x3d_type==X3DTypes::MFNODE)
     {
       mfnode = static_cast< MFNode * >( *f );
-      for( unsigned int i = 0; i < mfnode->size(); ++i ) {
+      for( unsigned int i = 0; i < mfnode->size(); ++i ) 
+			{
         n = mfnode->getValueByIndex( i ); 
         if( H3DSingleTextureNode *t = 
-          dynamic_cast< H3DSingleTextureNode *>( n ) ) {
-            res = res | t->getAffectedGLAttribs();
+          dynamic_cast< H3DSingleTextureNode *>( n ) ) 
+					{
+            res |= t->getAffectedGLAttribs();
         } 
       }
     }
@@ -1358,9 +1360,11 @@ GLbitfield H3D::Shaders::getAffectedGLAttribs( H3DDynamicFieldsObject *dfo ) {
   return res;
 }
 
-void H3D::Shaders::preRenderTextures( H3DDynamicFieldsObject *dfo ) {
+void H3D::Shaders::preRenderTextures( H3DDynamicFieldsObject *dfo ) 
+{
 
-  if ( X3DProgrammableShaderObject::use_bindless_textures ) {
+  if ( X3DProgrammableShaderObject::use_bindless_textures ) 
+	{
     // Bindless textures
 
     Node* n;
@@ -1374,7 +1378,8 @@ void H3D::Shaders::preRenderTextures( H3DDynamicFieldsObject *dfo ) {
         if( H3DSingleTextureNode *t = 
           dynamic_cast< H3DSingleTextureNode *>( n ) ) {
           t->inUse();
-          if ( !t->isResident () ) {
+          if ( !t->isResident () ) 
+					{
             t->displayList->callList();
 
             if ( t->getTextureId() != 0 ) {

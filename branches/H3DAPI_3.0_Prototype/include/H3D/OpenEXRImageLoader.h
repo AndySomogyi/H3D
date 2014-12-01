@@ -52,6 +52,10 @@ namespace H3D {
   /// <b>Examples:</b>
   ///   - <a href="../../../H3DAPI/examples/All/ImageLoaders.x3d">ImageLoaders.x3d</a>
   ///     ( <a href="examples/ImageLoaders.x3d.html">Source</a> )
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/OpenEXRImageLoader.x3d">OpenEXRImageLoader.x3d</a>
+  ///     ( <a href="examples/OpenEXRImageLoader.x3d.html">Source</a> )
   class H3DAPI_API OpenEXRImageLoader : public H3DImageLoaderNode {
   public:
     /// Constructor.

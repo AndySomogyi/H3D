@@ -134,7 +134,8 @@ void Matrix3VertexAttribute::setAttributeData ( ) {
     data[i * 9 + 8] = m[2][2];
   }
   attrib_data = (GLvoid*)data;
-  attrib_size = value->size ( ) * 9 * sizeof(GLfloat);
+  element_size = 9 * sizeof(GLfloat);
+  attrib_size = value->size ( ) * element_size;
 }
 
 void Matrix3VertexAttribute::renderVBO ( ){

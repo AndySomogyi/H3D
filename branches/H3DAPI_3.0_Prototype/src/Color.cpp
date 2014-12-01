@@ -82,7 +82,8 @@ bool Color::preRenderCheckFail ( ){
 
 void Color::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*color->begin ( ));
-  attrib_size = color->size ( ) * 3 * sizeof(GLfloat);
+  element_size = 3 * sizeof(GLfloat);
+  attrib_size = color->size ( ) * element_size;
 }
 
 void Color::renderVBO ( ){

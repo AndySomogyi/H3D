@@ -31,86 +31,111 @@
 #include <H3D/H3DApi.h>
 #include <H3D/Node.h>
 #include <H3D/SFBool.h>
+#include <H3D/RenderData.h>
 #include <GL/glew.h>
 
-namespace H3D {
-  namespace VERTEXATTRIBUTE{
-    enum VERTEXATTRIBUTETYPE{
-      VERTEX,
-      NORMAL,
-      TEXCOORD,
-      FOGCOORD,
-      COLOR,
-      GENERIC
-    };
-  }
+namespace H3D 
+{
+	/// \ingroup AbstractInterface
+	/// \class GLVertexAttributeObject
+	/// \brief This abstract interface is inherited by all nodes that 
+	/// could be used as vertex attributes in a glsl shader.
+	///
+	/// Example of such nodes are Color, Coordinate and Normal nodes.
+	class H3DAPI_API GLVertexAttributeObject
+	{
+	public:
+		/// Constructor
+		GLVertexAttributeObject ( VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE type );
 
-  /// \ingroup AbstractInterface
-  /// \class GLVertexAttributeObject
-  /// \brief This abstract interface is inherited by all nodes that 
-  /// could be used as vertex attributes in a glsl shader.
-  ///
-  /// Example of such nodes are Color, Coordinate and Normal nodes.
-  class H3DAPI_API GLVertexAttributeObject{
+		/// Destructor
+		virtual ~GLVertexAttributeObject();
 
-  public:
-    /// Constructor
-    GLVertexAttributeObject ( VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE type );
+		/// pure virtual function has to be implemented by inherited class
+		/// to specify necessay data and format for this vertex attrib
+		virtual void setAttributeData ( ) = 0;
 
-    /// Destructor
-    virtual ~GLVertexAttributeObject();
+		/// pure virtual function has to be implemented by inherited class
+		/// to specify the actual render function
+		virtual void renderVBO ( ) = 0;
 
-    /// pure virtual function has to be implemented by inherited class
-    /// to specify necessay data and format for this vertex attrib
-    virtual void setAttributeData ( ) = 0;
+		/// pure virtual function has to be implemented by inherited class
+		/// to specify the actual render disable function
+		virtual void disableVBO ( ) = 0;
 
-    /// pure virtual function has to be implemented by inherited class
-    /// to specify the actual render function
-    virtual void renderVBO ( ) = 0;
+		/// pre-render check to determine if need to render this vertex attribute
+		virtual bool preRenderCheckFail( );
 
-    /// pure virtual function has to be implemented by inherited class
-    /// to specify the actual render disable function
-    virtual void disableVBO ( ) = 0;
+		/// Perform the OpenGL commands to render all vertices as a vertex
+		/// buffer object.
+		void renderVertexBufferObject ( );
 
-    /// pre-render check to dertermine if need to render this vertex attribute
-    virtual bool preRenderCheckFail( );
+		/// Disable the vertex buffer object enabled in renderVertexBufferObject().
+		void disableVertexBufferObject ( );
 
-    /// Perform the OpenGL commands to render all vertices as a vertex
-    /// buffer object.
-    void renderVertexBufferObject ( );
+		/// Perform the OpenGL commands to update vertex attribute data/format
+		virtual void updateVertexBufferObject ( );
 
-    /// Disable the vertex buffer object enabled in renderVertexBufferObject().
-    void disableVertexBufferObject ( );
+		/// Option to indicate whether this vertex attribute is dynamic or not
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> false
+		auto_ptr<SFBool> isDynamic;
 
-    /// Perform the OpenGL commands to update vertex attribute data/format
-    virtual void updateVertexBufferObject ( );
+		/// Returns whether this attribute is bindless or not
+		inline bool usesBindless()
+		{
+			return use_bindless;
+		}
 
-    /// Option to indicate whether this vertex attribute is dynamic or not
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> false
-    auto_ptr<SFBool> isDynamic;
+		/// Based on whether this attribute is bindless or not
+		/// it either returns the 64bit unsigned gpu addr or the normal vbo_id as a 32bit uint.
+		inline GLuint64 getVBO()
+		{
+			if(use_bindless)
+			{
+				return vbo_GPUaddr;
+			}
 
+			//Implicit cast from 32bit to 64bit. Shouldn't 
+			return vbo_id;
+		}
+		
 
-  protected:
-    // Internal field used to know if vertex buffer object can be created.
-    auto_ptr< Field > vboFieldsUpToDate;
-    // The index for the vertex buffer object
-    GLuint *vbo_id;
+		inline GLsizei getAttribSize()
+		{
+			return attrib_size;
+		}
 
-    GLsizei attrib_size;
+		//Size of each individual element
+		inline GLsizei getElementSize()
+		{
+			return element_size;
+		}
 
-    GLvoid* attrib_data;
+	protected:
+		/// Internal field used to know if vertex buffer object can be created.
+		auto_ptr<Field> vboFieldsUpToDate;
 
-    // the type of vertex attribute
-    VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE attrib_type;
+		/// The index for the vertex buffer object
+		GLuint vbo_id;
 
-    // address of the vertex buffer object, will be used for binless
-    // vertex attribute
-    GLuint64 vbo_GPUaddr;
+		/// Size of each individual element
+		GLsizei element_size;
 
-    bool use_bindless;
+		/// Total size of attrib_data
+		GLsizei attrib_size;
 
-  };
+		/// Do not be alarmed that we don't delete this object in our destructor. Its' lifetime is governed elsewhere.
+		GLvoid* attrib_data;
+
+		/// If we use bindless rendering, this variable will contain the actual pointer into the GPU memory where this buffer is stored.
+		GLuint64EXT vbo_GPUaddr;
+
+		/// the type of vertex attribute
+		VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE attrib_type;
+
+		bool use_bindless;
+	};
 }
 
 #endif

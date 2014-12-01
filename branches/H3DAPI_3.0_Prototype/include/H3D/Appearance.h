@@ -199,7 +199,8 @@ namespace H3D {
 
     /// This function return true if the appearance has decided that
     /// shadow should be cast. 
-    virtual bool hasGeometryShadow() {
+    virtual bool hasGeometryShadow() 
+	{
       return shadow->getValue();
     }
 

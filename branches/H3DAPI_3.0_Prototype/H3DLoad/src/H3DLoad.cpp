@@ -692,7 +692,7 @@ int main(int argc, char* argv[]) {
     for( vector<string>::iterator file = xml_files.begin() ;
       file != xml_files.end() ; ++file ){
       Console(3) << "Loading " << *file << endl;
-      scene->loadSceneRoot( *file );
+      scene->loadSceneRoot( *file ); //<------------------------------------------------------------------------------------ This is where x3d scene gets loaded into H3DScene.cpp
     }
 
     DeviceInfo::DeviceInfoList device_infos = DeviceInfo::getAllDeviceInfos();

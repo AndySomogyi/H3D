@@ -38,6 +38,10 @@ namespace H3D {
   /// \class VirtuoseDevice
   /// \brief A VirtuoseDevice is a node for handling communication
   /// with a haptics device from Haption, such as the Virtuose haptics device.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/VirtuoseDevice.x3d">VirtuoseDevice.x3d</a>
+  ///     ( <a href="examples/VirtuoseDevice.x3d.html">Source</a> )
   class H3DAPI_API VirtuoseDevice: public H3DHapticsDevice {
   public:
 

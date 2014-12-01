@@ -41,286 +41,287 @@
 
 namespace H3D {
 
-  /// \ingroup AbstractNodes
-  /// \class X3DComposedGeometryNode
-  /// \brief This is the base node type for all composed 3D geometry in X3D. 
-  ///
-  /// A composed geometry node type defines an abstract type that composes
-  /// geometry from a set of nodes that define individual
-  /// components. Composed geometry may have color, coordinates, normal and
-  /// texture coordinates supplied. The rendered output of the combination
-  /// of these is dependent on the concrete node definition. However, in
-  /// general, the following rules shall be applied for all nodes:
-  ///
-  /// - If the color field is not NULL, it shall contain an X3DColorNode node
-  ///   whose colours are applied to the vertices or faces of the
-  ///   X3DComposedGeometryNode as follows: 
-  ///
-  /// - If colorPerVertex is FALSE, colours are applied to each face. If
-  ///   colorPerVertex is true, colours are applied to each vertex. 
-  ///
-  /// - If the color field is NULL, the geometry shall be rendered normally
-  ///   using the Material and texture defined in the Appearance node (see
-  ///   12.2.2 Appearance node for details). 
-  ///
-  /// - If normalPerVertex is FALSE, colours are applied to each face. If
-  ///   normalPerVertex is true, colours are applied to each vertex. 
-  ///
-  /// - If the normal field is not NULL, it shall contain a Normal node whose
-  ///   normals are applied to the vertices or faces of the
-  ///   X3DComposedGeometryNode in a manner exactly equivalent to that
-  ///   described above for applying colours to vertices/faces (where
-  ///   normalPerVertex corresponds to colorPerVertex and normalIndex
-  ///   corresponds to colorIndex). 
-  ///
-  /// - If the normal field is NULL, the browser shall automatically generate
-  ///   normals in accordance with the node's definition. If the node does not
-  ///   define a behaviour, the default is to generate an averaged normal for
-  ///   all faces that share that vertex. 
-  ///
-  /// If the texCoord field is not NULL, it shall contain a
-  /// TextureCoordinate node.
-  ///
-  /// If the attrib field is not empty it shall contain a list of
-  /// X3DVertexAttributeNode instances with per-vertex attribute
-  /// information for programmable shaders.
-  ///
-  /// If the fogCoord field is not empty, it shall contain a list 
-  /// of per-vertex depth values for calculating fog depth.
-  /// 
-  /// \par Internal routes:
-  /// \dotfile X3DComposedGeometryNode.dot 
-  class H3DAPI_API X3DComposedGeometryNode : public X3DGeometryNode {
-  public:
-    /// The SFColorNode is dependent on the propertyChanged field of the 
-    /// contained X3DColorNode.
-    typedef  DependentSFNode< X3DColorNode,
-                              FieldRef< X3DGeometricPropertyNode,
-                                        Field,
-                                        &X3DColorNode::propertyChanged > >  
-    SFColorNode;
-    
-    /// The SFCoordinateNode is dependent on the propertyChanged field of the 
-    /// contained X3DCoordinateNode.
-    typedef DependentSFNode< X3DCoordinateNode,
-                             FieldRef< X3DGeometricPropertyNode,
-                                       Field,
-                                       &X3DCoordinateNode::propertyChanged > > 
-    SFCoordinateNode;
-    
-    /// The SFNormalNode is dependent on the propertyChanged field of the 
-    /// contained X3DNormalNode.
-    typedef DependentSFNode< X3DNormalNode,
-                             FieldRef< X3DGeometricPropertyNode,
-                                       Field,
-                                       &X3DNormalNode::propertyChanged > > 
-    SFNormalNode;
+	/// \ingroup AbstractNodes
+	/// \class X3DComposedGeometryNode
+	/// \brief This is the base node type for all composed 3D geometry in X3D. 
+	///
+	/// A composed geometry node type defines an abstract type that composes
+	/// geometry from a set of nodes that define individual
+	/// components. Composed geometry may have color, coordinates, normal and
+	/// texture coordinates supplied. The rendered output of the combination
+	/// of these is dependent on the concrete node definition. However, in
+	/// general, the following rules shall be applied for all nodes:
+	///
+	/// - If the color field is not NULL, it shall contain an X3DColorNode node
+	///   whose colours are applied to the vertices or faces of the
+	///   X3DComposedGeometryNode as follows: 
+	///
+	/// - If colorPerVertex is FALSE, colours are applied to each face. If
+	///   colorPerVertex is true, colours are applied to each vertex. 
+	///
+	/// - If the color field is NULL, the geometry shall be rendered normally
+	///   using the Material and texture defined in the Appearance node (see
+	///   12.2.2 Appearance node for details). 
+	///
+	/// - If normalPerVertex is FALSE, normal data is defined on a per-face basis. If
+	///   normalPerVertex is true, normals are defined individually for each vertex. 
+	///
+	/// - If the normal field is not NULL, it shall contain a Normal node whose
+	///   normals are applied to the vertices or faces of the
+	///   X3DComposedGeometryNode in a manner exactly equivalent to that
+	///   described above for applying colours to vertices/faces (where
+	///   normalPerVertex corresponds to colorPerVertex and normalIndex
+	///   corresponds to colorIndex). 
+	///
+	/// - If the normal field is NULL, the browser shall automatically generate
+	///   normals in accordance with the node's definition. If the node does not
+	///   define a behaviour, the default is to generate an averaged normal for
+	///   all faces that share that vertex. 
+	///
+	/// If the texCoord field is not NULL, it shall contain a
+	/// TextureCoordinate node.
+	///
+	/// If the attrib field is not empty it shall contain a list of
+	/// X3DVertexAttributeNode instances with per-vertex attribute
+	/// information for programmable shaders.
+	///
+	/// If the fogCoord field is not empty, it shall contain a list 
+	/// of per-vertex depth values for calculating fog depth.
+	/// 
+	/// \par Internal routes:
+	/// \dotfile X3DComposedGeometryNode.dot 
+	class H3DAPI_API X3DComposedGeometryNode : public X3DGeometryNode 
+	{
+	public:
+		/// The SFColorNode is dependent on the propertyChanged field of the 
+		/// contained X3DColorNode.
+		typedef  DependentSFNode< X3DColorNode,
+			FieldRef< X3DGeometricPropertyNode,
+			Field,
+			&X3DColorNode::propertyChanged > >  
+			SFColorNode;
 
-    /// The SFTextureCoordinteNode is dependent on the propertyChanged 
-    /// field of the contained X3DTextureCoordinateNode.
-    typedef DependentSFNode< 
-                X3DTextureCoordinateNode,
-                FieldRef< X3DGeometricPropertyNode,
-                          Field,
-                          &X3DTextureCoordinateNode::propertyChanged > > 
-    SFTextureCoordinateNode;   
+		/// The SFCoordinateNode is dependent on the propertyChanged field of the 
+		/// contained X3DCoordinateNode.
+		typedef DependentSFNode< X3DCoordinateNode,
+			FieldRef< X3DGeometricPropertyNode,
+			Field,
+			&X3DCoordinateNode::propertyChanged > >
+			SFCoordinateNode;
 
-    /// The MFVertexAttributeNode is dependent on the propertyChanged
-    /// field of the contained X3DVertexAttributeNode.
-    class H3DAPI_API MFVertexAttributeNode : public DependentMFNode< 
-                X3DVertexAttributeNode,
-                FieldRef< X3DGeometricPropertyNode,
-                          Field,
-                          &X3DVertexAttributeNode::propertyChanged > > {
-    };
+		/// The SFNormalNode is dependent on the propertyChanged field of the 
+		/// contained X3DNormalNode.
+		typedef DependentSFNode< X3DNormalNode,
+			FieldRef< X3DGeometricPropertyNode,
+			Field,
+			&X3DNormalNode::propertyChanged > > 
+			SFNormalNode;
 
-    
-   /// The SFFogCoordinate is dependent on the propertyChanged
-    /// field of the contained FogCoordinate.
-    typedef DependentSFNode< 
-                FogCoordinate,
-                FieldRef< X3DGeometricPropertyNode,
-                          Field,
-                          &FogCoordinate::propertyChanged > > 
-    SFFogCoordinate;   
+		/// The SFTextureCoordinteNode is dependent on the propertyChanged 
+		/// field of the contained X3DTextureCoordinateNode.
+		typedef DependentSFNode< 
+			X3DTextureCoordinateNode,
+			FieldRef< X3DGeometricPropertyNode,
+			Field,
+			&X3DTextureCoordinateNode::propertyChanged > > 
+			SFTextureCoordinateNode;   
 
-    /// Display list is extended in order to set front sidedness of 
-    /// triangles outside the display list. This is due to that the 
-    /// front face value depends the previous value of front face. If we did 
-    /// not do this and the display list was used in several places where
-    /// the front face differs there would be normal errors. The drawback with
-    /// having it outside the display list is that you cannot call the render()
-    /// function to render the geometry correctly, but MUST use the callList()
-    /// function in DisplayList.
-    class H3DAPI_API DisplayList: public X3DGeometryNode::DisplayList {
-    public: 
-      /// Perform front face code outside the display list.
-      virtual void callList( bool build_list = true );
-    };
+		/// The MFVertexAttributeNode is dependent on the propertyChanged
+		/// field of the contained X3DVertexAttributeNode.
+		class H3DAPI_API MFVertexAttributeNode : public DependentMFNode< 
+			X3DVertexAttributeNode,
+			FieldRef< X3DGeometricPropertyNode,
+			Field,
+			&X3DVertexAttributeNode::propertyChanged > > 
+		{
+		};
 
-    /// Start texture coordinate generation. Texture coordinates will be
-    /// generated for all texture units used by the currently active texture.
-    /// If tex_coord is NULL then texture coordinates will be generated 
-    /// from the bounding box of the geometry as defined in the X3D 
-    /// specification. If tex_coord is not NULL then we use the 
-    /// TextureCoordinateGenerator to define the texture coordinate generation.
-    virtual void startTexGen( X3DTextureCoordinateNode *tex_coord );
 
-    /// Stop texture coordinate generation.
-    virtual void stopTexGen( X3DTextureCoordinateNode *tex_coord );
+		/// The SFFogCoordinate is dependent on the propertyChanged
+		/// field of the contained FogCoordinate.
+		typedef DependentSFNode< 
+			FogCoordinate,
+			FieldRef< X3DGeometricPropertyNode,
+			Field,
+			&FogCoordinate::propertyChanged > > 
+			SFFogCoordinate;   
 
-    /// Render the texure coordinate with the given index from the 
-    /// tc argument. If the currently active texture is a MultiTexture
-    /// the texture coordinate will be rendered for the texture units of
-    /// all textures in MultiTexture. tc must not be NULL. 
-    virtual void renderTexCoord( int index, X3DTextureCoordinateNode *tc );
+		/// Display list is extended in order to set front sidedness of 
+		/// triangles outside the display list. This is due to that the 
+		/// front face value depends the previous value of front face. If we did 
+		/// not do this and the display list was used in several places where
+		/// the front face differs there would be normal errors. The drawback with
+		/// having it outside the display list is that you cannot call the render()
+		/// function to render the geometry correctly, but MUST use the callList()
+		/// function in DisplayList.
+		class H3DAPI_API DisplayList: public X3DGeometryNode::DisplayList 
+		{
+		public: 
+			/// Perform front face code outside the display list.
+			virtual void callList( bool build_list = true );
+		};
 
-    /// Render the X3DTextureCoordinate as an array. If the currently 
-    /// active texture is a MultiTexture it will be rendered for the
-    /// texture units of all textures in MultiTexture. tc must not be NULL. 
-    virtual void renderTexCoordArray( X3DTextureCoordinateNode *tc );
+		/// Start texture coordinate generation. Texture coordinates will be
+		/// generated for all texture units used by the currently active texture.
+		/// If tex_coord is NULL then texture coordinates will be generated 
+		/// from the bounding box of the geometry as defined in the X3D 
+		/// specification. If tex_coord is not NULL then we use the 
+		/// TextureCoordinateGenerator to define the texture coordinate generation.
+		virtual void startTexGen( X3DTextureCoordinateNode *tex_coord );
 
-    /// Disable the arrays that were enabled in renderTexCoordArray().
-    virtual void disableTexCoordArray( X3DTextureCoordinateNode *tc );
+		/// Stop texture coordinate generation.
+		virtual void stopTexGen( X3DTextureCoordinateNode *tex_coord );
 
-    /// Render the X3DTextureCoordinate as a vertex buffer object. If the
-    /// currently  active texture is a MultiTexture it will be rendered for the
-    /// texture units of all textures in MultiTexture. tc must not be NULL.
-    virtual void renderTexCoordVertexBufferObject(
-                   X3DTextureCoordinateNode *tc );
+		/// Render the texure coordinate with the given index from the 
+		/// tc argument. If the currently active texture is a MultiTexture
+		/// the texture coordinate will be rendered for the texture units of
+		/// all textures in MultiTexture. tc must not be NULL. 
+		virtual void renderTexCoord( int index, X3DTextureCoordinateNode *tc );
 
-    /// Disable the vertex buffer objects that were enabled in
-    /// renderTexCoordArray().
-    virtual void disableTexCoordVertexBufferObject(
-                   X3DTextureCoordinateNode *tc );
+		/// Render the X3DTextureCoordinate as an array. If the currently 
+		/// active texture is a MultiTexture it will be rendered for the
+		/// texture units of all textures in MultiTexture. tc must not be NULL. 
+		virtual void renderTexCoordArray( X3DTextureCoordinateNode *tc );
 
-    /// Gets the matrix that transforms from object space to texture
-    /// coordinate space in the default case when no texCoord node
-    /// is specified. 
-    virtual Matrix4f getDefaultTexGenMatrix();
+		/// Disable the arrays that were enabled in renderTexCoordArray().
+		virtual void disableTexCoordArray( X3DTextureCoordinateNode *tc );
 
-    /// Constructor.
-    X3DComposedGeometryNode( Inst< SFNode           > _metadata        = 0,
-                             Inst< SFBound          > _bound           = 0,
-                             Inst< DisplayList      > _displayList     = 0,
-                             Inst< SFColorNode      > _color           = 0,
-                             Inst< SFCoordinateNode > _coord           = 0,
-                             Inst< SFNormalNode     > _normal          = 0,
-                             Inst< SFTextureCoordinateNode > _texCoord = 0,
-                             Inst< SFBool           > _ccw             = 0,
-                             Inst< SFBool           > _colorPerVertex  = 0,
-                             Inst< SFBool           > _normalPerVertex = 0,
-                             Inst< SFBool           > _solid           = 0,
-                             Inst< MFVertexAttributeNode > _attrib     = 0,
-                             Inst< SFFogCoordinate     > _fogCoord     =0 );
+		/// Render the X3DTextureCoordinate as a vertex buffer object. If the
+		/// currently  active texture is a MultiTexture it will be rendered for the
+		/// texture units of all textures in MultiTexture. tc must not be NULL.
+		virtual void renderTexCoordVertexBufferObject( X3DTextureCoordinateNode *tc );
 
-    /// Contains an X3DColorNode whose colors are applied to the
-    /// X3DComposedGeometryNode. If the color field is NULL, the
-    /// geometry shall be rendered normally using the Material
-    /// and texture defined in the Appearance node
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    ///
-    /// \dotfile X3DComposedGeometryNode_color.dot 
-    auto_ptr< SFColorNode >  color;
+		/// Disable the vertex buffer objects that were enabled in
+		/// renderTexCoordArray().
+		virtual void disableTexCoordVertexBufferObject( X3DTextureCoordinateNode *tc );
 
-    /// An X3DCoordinate node with the coordinates to use.
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// 
-    /// \dotfile X3DComposedGeometryNode_coord.dot 
-    auto_ptr< SFCoordinateNode >  coord;
-    
-    /// Contains an X3DNormalNode which colors are applied to the
-    /// X3DComposedGeometryNode. If the normal field is NULL, the
-    /// normals are automatically generated in accordance with the
-    /// node's definition. If the node does not define a behaviour,
-    /// the default is to generate an averaged normal for all faces
-    /// that share that vertex.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    ///
-    /// \dotfile X3DComposedGeometryNode_normal.dot 
-    auto_ptr< SFNormalNode >  normal;
-    
-    /// Contains an X3DTextureCoordinateNode which colors are applied
-    /// to the X3DComposedGeometryNode.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    ///
-    /// \dotfile X3DComposedGeometryNode_texCoord.dot 
-    auto_ptr< SFTextureCoordinateNode >  texCoord;
-    
-    /// The ccw field defines the ordering of the vertex coordinates of 
-    /// the geometry with respect to user-given or automatically generated
-    /// normal vectors used in the lighting model equations. If ccw is TRUE,
-    /// the normals shall follow the right hand rule; the orientation of
-    /// each normal with respect to the vertices (taken in order) shall be
-    /// such that the vertices appear to be oriented in a counterclockwise
-    /// order when the vertices are viewed (in the local coordinate system
-    /// of the Shape) from the opposite direction as the normal. If ccw is
-    /// FALSE, the normals shall be oriented in the opposite direction. If
-    /// normals are not generated but are supplied using a Normal node, and
-    /// the orientation of the normals does not match the setting of the 
-    /// ccw field, results are undefined.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> TRUE \n
-    /// 
-    /// \dotfile X3DComposedGeometryNode_ccw.dot 
-    auto_ptr< SFBool >  ccw;
-    
-    /// If TRUE the colors in the color field is applied per vertex,
-    /// otherwise it is applied per face.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> TRUE \n
-    /// 
-    /// \dotfile X3DComposedGeometryNode_colorPerVertex.dot 
-    auto_ptr< SFBool >  colorPerVertex;
+		/// Gets the matrix that transforms from object space to texture
+		/// coordinate space in the default case when no texCoord node
+		/// is specified. 
+		virtual Matrix4f getDefaultTexGenMatrix();
 
-    /// If TRUE the normals in the normal field is applied per vertex,
-    /// otherwise it is applied per face.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> TRUE \n
-    /// 
-    /// \dotfile X3DComposedGeometryNode_normalPerVertex.dot 
-    auto_ptr< SFBool >  normalPerVertex;
+		/// Constructor.
+		X3DComposedGeometryNode( Inst< SFNode           > _metadata        = 0,
+			Inst< SFBound          > _bound           = 0,
+			Inst< DisplayList      > _displayList     = 0,
+			Inst< SFColorNode      > _color           = 0,
+			Inst< SFCoordinateNode > _coord           = 0,
+			Inst< SFNormalNode     > _normal          = 0,
+			Inst< SFTextureCoordinateNode > _texCoord = 0,
+			Inst< SFBool           > _ccw             = 0,
+			Inst< SFBool           > _colorPerVertex  = 0,
+			Inst< SFBool           > _normalPerVertex = 0,
+			Inst< SFBool           > _solid           = 0,
+			Inst< MFVertexAttributeNode > _attrib     = 0,
+			Inst< SFFogCoordinate     > _fogCoord     =0 );
 
-    /// The solid field determines whether one or both sides of each polygon
-    /// shall be displayed. If solid is FALSE, each polygon shall be visible
-    /// regardless of the viewing direction (i.e., no backface culling shall
-    /// be done, and two sided lighting shall be performed to illuminate both
-    /// sides of lit surfaces). If solid is TRUE, back face culling will be 
-    /// performed.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> TRUE \n
-    ///
-    /// \dotfile X3DComposedGeometryNode_ccw.dot 
-    auto_ptr< SFBool >  solid;
-    
-    /// If the attrib field is not empty it shall contain a list of
-    /// X3DVertexAttributeNode instances with per-vertex attribute
-    /// information for programmable shaders.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    ///
-    /// \dotfile X3DComposedGeometryNode_attrib.dot 
-    auto_ptr< MFVertexAttributeNode > attrib;
+		/// Contains an X3DColorNode whose colors are applied to the
+		/// X3DComposedGeometryNode. If the color field is NULL, the
+		/// geometry shall be rendered normally using the Material
+		/// and texture defined in the Appearance node
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		///
+		/// \dotfile X3DComposedGeometryNode_color.dot 
+		auto_ptr< SFColorNode >  color;
 
-    /// If the fogCoord field is not empty, it shall contain a list 
-    /// of per-vertex depth values for calculating fog depth.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    ///
-    /// \dotfile X3DComposedGeometryNode_fogCoord.dot 
-    auto_ptr< SFFogCoordinate > fogCoord;
+		/// An X3DCoordinate node with the coordinates to use.
+		///
+		/// <b>Access type:</b> inputOutput \n
+		/// 
+		/// \dotfile X3DComposedGeometryNode_coord.dot 
+		auto_ptr< SFCoordinateNode >  coord;
 
-    /// The H3DNodeDatabase for this node.
-    static H3DNodeDatabase database;
-  };
+		/// Contains an X3DNormalNode which colors are applied to the
+		/// X3DComposedGeometryNode. If the normal field is NULL, the
+		/// normals are automatically generated in accordance with the
+		/// node's definition. If the node does not define a behaviour,
+		/// the default is to generate an averaged normal for all faces
+		/// that share that vertex.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		///
+		/// \dotfile X3DComposedGeometryNode_normal.dot 
+		auto_ptr< SFNormalNode >  normal;
+
+		/// Contains an X3DTextureCoordinateNode which colors are applied
+		/// to the X3DComposedGeometryNode.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		///
+		/// \dotfile X3DComposedGeometryNode_texCoord.dot 
+		auto_ptr< SFTextureCoordinateNode >  texCoord;
+
+		/// The ccw field defines the ordering of the vertex coordinates of 
+		/// the geometry with respect to user-given or automatically generated
+		/// normal vectors used in the lighting model equations. If ccw is TRUE,
+		/// the normals shall follow the right hand rule; the orientation of
+		/// each normal with respect to the vertices (taken in order) shall be
+		/// such that the vertices appear to be oriented in a counterclockwise
+		/// order when the vertices are viewed (in the local coordinate system
+		/// of the Shape) from the opposite direction as the normal. If ccw is
+		/// FALSE, the normals shall be oriented in the opposite direction. If
+		/// normals are not generated but are supplied using a Normal node, and
+		/// the orientation of the normals does not match the setting of the 
+		/// ccw field, results are undefined.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> TRUE \n
+		/// 
+		/// \dotfile X3DComposedGeometryNode_ccw.dot 
+		auto_ptr< SFBool >  ccw;
+
+		/// If TRUE the colors in the color field is applied per vertex,
+		/// otherwise it is applied per face.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> TRUE \n
+		/// 
+		/// \dotfile X3DComposedGeometryNode_colorPerVertex.dot 
+		auto_ptr< SFBool >  colorPerVertex;
+
+		/// If TRUE the normals in the normal field is applied per vertex,
+		/// otherwise it is applied per face.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> TRUE \n
+		/// 
+		/// \dotfile X3DComposedGeometryNode_normalPerVertex.dot 
+		auto_ptr< SFBool >  normalPerVertex;
+
+		/// The solid field determines whether one or both sides of each polygon
+		/// shall be displayed. If solid is FALSE, each polygon shall be visible
+		/// regardless of the viewing direction (i.e., no backface culling shall
+		/// be done, and two sided lighting shall be performed to illuminate both
+		/// sides of lit surfaces). If solid is TRUE, back face culling will be 
+		/// performed.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> TRUE \n
+		///
+		/// \dotfile X3DComposedGeometryNode_ccw.dot 
+		auto_ptr< SFBool >  solid;
+
+		/// If the attrib field is not empty it shall contain a list of
+		/// X3DVertexAttributeNode instances with per-vertex attribute
+		/// information for programmable shaders.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		///
+		/// \dotfile X3DComposedGeometryNode_attrib.dot 
+		auto_ptr< MFVertexAttributeNode > attrib;
+
+		/// If the fogCoord field is not empty, it shall contain a list 
+		/// of per-vertex depth values for calculating fog depth.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		///
+		/// \dotfile X3DComposedGeometryNode_fogCoord.dot 
+		auto_ptr< SFFogCoordinate > fogCoord;
+
+		/// The H3DNodeDatabase for this node.
+		static H3DNodeDatabase database;
+	};
 }
 
 #endif

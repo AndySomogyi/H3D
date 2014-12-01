@@ -82,7 +82,8 @@ bool ColorRGBA::preRenderCheckFail ( ){
 
 void ColorRGBA::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*color->begin ( ));
-  attrib_size = color->size ( ) * 4 * sizeof(GLfloat);
+  element_size = 4 * sizeof(GLfloat);
+  attrib_size = color->size ( ) * element_size;
 }
 
 void ColorRGBA::renderVBO ( ){

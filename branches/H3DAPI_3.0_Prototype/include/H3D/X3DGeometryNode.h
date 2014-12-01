@@ -178,7 +178,8 @@ namespace H3D {
 
     /// Enabling/disabling back face culling. Same as doing  
     /// useCulling( enabled ); setCullFace( GL_BACK );
-    inline void useBackFaceCulling( bool enabled ) {
+    inline void useBackFaceCulling( bool enabled ) 
+	{
       useCulling( enabled );
       setCullFace( GL_BACK );
     }

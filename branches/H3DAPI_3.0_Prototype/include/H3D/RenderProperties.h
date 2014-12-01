@@ -36,7 +36,8 @@
 #include <H3D/SFString.h>
 #include <H3D/SFFloat.h>
 
-namespace H3D {
+namespace H3D 
+{
 
   /// \ingroup H3DNodes
   /// \class RenderProperties
@@ -76,7 +77,8 @@ namespace H3D {
   /// 
   /// \par Internal routes:
   /// \dotfile RenderProperties.dot
-  class H3DAPI_API RenderProperties : public X3DAppearanceChildNode {
+  class H3DAPI_API RenderProperties : public X3DAppearanceChildNode 
+	{
   public:
     
     /// Constructor.
@@ -347,7 +349,7 @@ namespace H3D {
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
-  protected:
+  //protected:
     int getSFactor( const string &sfactor_string, GLenum &sfactor );
     int getDFactor( const string &dfactor_string, GLenum &dfactor );
     int getBlendEquation( const string &equation_string, GLenum &equation );

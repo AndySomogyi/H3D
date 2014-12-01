@@ -65,11 +65,10 @@ namespace H3D {
     /// SFGeometryNode is dependent on the displayList field of its
     /// encapsulated X3DGeometryNode node, i.e. an event from that
     /// field will trigger an event from the SFGeometryNode as
-    /// well. Also we ovverride onAdd and onRemove in order to uphold
+    /// well. Also we override onAdd and onRemove in order to uphold
     /// a route between the encapsulated X3DGeometryNode's bound field
     /// to the bound field of the X3DShapeNode the field resides in.
-    ///
-    class SFGeometryNode: 
+    class SFGeometryNode : 
       public DependentSFNode< X3DGeometryNode, 
       FieldRef< H3DDisplayListObject,
       H3DDisplayListObject::DisplayList,
@@ -185,7 +184,7 @@ namespace H3D {
     /// Render the shape using OpenGL.
     virtual void render();
 
-    /// Traverse the scenegraph. Calls traverseSG on appeance and geometry.
+    /// Traverse the scenegraph. Calls traverseSG on appearance and geometry.
     virtual void traverseSG( TraverseInfo &ti );
 
     /// Detect intersection between a line segment and the X3DGeometryNode
@@ -222,7 +221,8 @@ namespace H3D {
                                         NodeIntersectResult &result );
 
     /// Tells which type of geometry should be rendered.
-    typedef enum {
+    typedef enum 
+	{
       /// render only transparent objects
       TRANSPARENT_ONLY,
       /// render only the front face of transparent objects
@@ -300,6 +300,14 @@ namespace H3D {
     // The GlobalSettings node that was in used in last call to 
     // traverseSG
     AutoRef<Node> last_global_settings;
+
+	//Handle into Renderer where our total renderstate is saved.
+	unsigned int renderStateHandle;
+
+	// TODO: Could potentially just save this as a bit flag in the 
+	// 32nd bit of renderStateHandle and always do a bitfilter. 
+	// But not sure if necessary. Also a little confusing.
+	bool renderStateUpdated; 
   };
 }
 

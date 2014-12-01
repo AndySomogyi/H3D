@@ -38,212 +38,217 @@
 #include <H3D/SFTime.h>
 
 namespace H3D {
-  /// \ingroup AbstractInterface
-  /// \brief This abstract interface class is the base class for all node
-  /// types that wants to create an OpenGL display list for the OpenGL
-  /// calls it makes in its render() function. 
-  ///
-  /// Subclasses should set the owner and name of the 
-  /// displayList field. Fields can be routed to the displayList field in
-  /// order to break the cache and create a new display list when values
-  /// have changed. In order to make use of the display list the callList()
-  /// function of the displayList field should be called instead of the 
-  /// render() function.
-  
-  class GraphicsOptions;
-  class H3DAPI_API H3DDisplayListObject {
-  public:
+	/// \ingroup AbstractInterface
+	/// \brief This abstract interface class is the base class for all node
+	/// types that wants to create an OpenGL display list for the OpenGL
+	/// calls it makes in its render() function. 
+	///
+	/// Subclasses should set the owner and name of the 
+	/// displayList field. Fields can be routed to the displayList field in
+	/// order to break the cache and create a new display list when values
+	/// have changed. In order to make use of the display list the callList()
+	/// function of the displayList field should be called instead of the 
+	/// render() function.
 
-    /// We use the Field's lazy evaluation mechanisms to manage the
-    /// GL display lists for rendering, giving automatic cache breaking
-    /// when dependencies are modified.
-    class H3DAPI_API DisplayList : public Field {
-    protected:
-      /// The IsActive field is updated each scenegraph loop, since
-      /// Scene::time is routed to it to see if the callList() function
-      /// was called during or since the last loop. 
-      class IsActive: public AutoUpdate< TypedField< SFBool, SFTime > > {
-        public:
-        /// Constructor.
-        IsActive():
-          active( true ) {}
-        
-        /// Updates the value of the field.
-        virtual void update() {
-          value = active;
-          active = false;
-        }
+	class GraphicsOptions;
+	class H3DAPI_API H3DDisplayListObject {
+	public:
 
-        friend class DisplayList;
+		/// We use the Field's lazy evaluation mechanisms to manage the
+		/// GL display lists for rendering, giving automatic cache breaking
+		/// when dependencies are modified.
+		class H3DAPI_API DisplayList : public Field {
+		protected:
+			/// The IsActive field is updated each scenegraph loop, since
+			/// Scene::time is routed to it to see if the callList() function
+			/// was called during or since the last loop. 
+			class IsActive: public AutoUpdate< TypedField< SFBool, SFTime > > {
+			public:
+				/// Constructor.
+				IsActive():
+						active( true ) {}
 
-      protected:
-        /// Should be called from callList().
-        void callListCalled() {
-          setValue( true );
-          active = true;
-        }
-        bool active;
-      };
-      
-    public:
-      /// \brief The entries in CacheMode enumerator is used for checking if
-      /// caching should be done or not.
-      typedef enum {
-        /// Caching is on.
-        ON, 
-        /// Caching is off.
-        OFF,
-        /// Caching is depending on the GraphicalRenderingOptions in use.
-        OPTIONS
-      } CacheMode;
+						/// Updates the value of the field.
+						virtual void update() {
+							value = active;
+							active = false;
+						}
 
-      /// \brief The entries in FrustumCullingMode enumerator is used for
-      /// checking if view frustum culling should be done.
-      typedef CacheMode FrustumCullingMode;
-        
-      /// Constructor
-      DisplayList();
+						friend class DisplayList;
 
-      /// Destructor.
-      ~DisplayList() {
-        if( display_list ) glDeleteLists( display_list, 1 );
-      }
-      
-      /// Set the cache mode.
-      void setCacheMode( CacheMode m  ) {
-        cache_mode = m;
-      }
+			protected:
+				/// Should be called from callList().
+				void callListCalled() 
+				{
+					setValue( true );
+					active = true;
+				}
+				bool active;
+			};
 
-      /// Get the cache mode.
-      CacheMode getCacheMode( ) {
-        return cache_mode;
-      }
+		public:
+			/// \brief The entries in CacheMode enumerator is used for checking if
+			/// caching should be done or not.
+			typedef enum {
+				/// Caching is on.
+				ON, 
+				/// Caching is off.
+				OFF,
+				/// Caching is depending on the GraphicalRenderingOptions in use.
+				OPTIONS
+			} CacheMode;
 
-      /// Set the frustum culling mode.
-      void setFrustumCullingMode( FrustumCullingMode m  ) {
-        frustum_culling_mode = m;
-      }
+			/// \brief The entries in FrustumCullingMode enumerator is used for
+			/// checking if view frustum culling should be done.
+			typedef CacheMode FrustumCullingMode;
 
-      /// Get the frustum culling mode.
-      FrustumCullingMode getFrustumCullingMode( ) {
-        return frustum_culling_mode;
-      }
+			/// Constructor
+			DisplayList();
 
-      /// Returns true if caching is in use and false otherwise.
-      virtual bool usingCaching();
+			/// Destructor.
+			~DisplayList() 
+			{
+				if( display_list )
+				{ 
+					glDeleteLists( display_list, 1 );
+				}
+			}
 
-      /// Returns true if view frustum culling is on.
-      bool usingFrustumCulling();
+			/// Set the cache mode.
+			void setCacheMode( CacheMode m  ) {
+				cache_mode = m;
+			}
 
-      /// Returns true if the bounding box of the owner of this field
-      /// lies outside the view frustum. 
-      bool isOutsideViewFrustum();
+			/// Get the cache mode.
+			CacheMode getCacheMode( ) {
+				return cache_mode;
+			}
 
-      /// Force a rebuild of all display lists created.
-      static void rebuildAllDisplayLists();
+			/// Set the frustum culling mode.
+			void setFrustumCullingMode( FrustumCullingMode m  ) {
+				frustum_culling_mode = m;
+			}
 
-      /// Returns the number of loops the DisplayList must render without
-      /// receiving an event before a display is built.
-      virtual unsigned int cachingDelay();
+			/// Get the frustum culling mode.
+			FrustumCullingMode getFrustumCullingMode( ) {
+				return frustum_culling_mode;
+			}
 
-      /// If called the display list will be rebuilt on next call to
-      void breakCache();
+			/// Returns true if caching is in use and false otherwise.
+			virtual bool usingCaching();
 
-      /// Calls tryBuildDisplayList().
-      virtual void update();
-      
-      /// When the event is propagated the display list is invalidated.
-      virtual void propagateEvent( Event e );
-      
-      /// Calls the OpenGL call list for if it exists. If it does
-      /// not exist we try to build it and execute it. 
-      virtual void callList( bool build_list = true );
+			/// Returns true if view frustum culling is on.
+			bool usingFrustumCulling();
 
-      /// Gets the pointer to the last field that created an event to 
-      /// this field 
-      inline Field *getEventPointer() {
-        return event.ptr;
-      }
+			/// Returns true if the bounding box of the owner of this field
+			/// lies outside the view frustum. 
+			bool isOutsideViewFrustum();
 
-      /// Returns true if the Field given has generated an event to this
-      /// field since the last call to the update() function.
-      inline bool hasCausedEvent( Field *f ) {
-        return event_fields.find( f ) != event_fields.end();
-      }
+			/// Force a rebuild of all display lists created.
+			static void rebuildAllDisplayLists();
 
-      /// Returns true if the Field given has generated an event to this
-      /// field since the last call to the update() function.
-      template< class FieldType >
-      inline bool hasCausedEvent( auto_ptr< FieldType > &f ) {
-        return hasCausedEvent( f.get() );
-      }
+			/// Returns the number of loops the DisplayList must render without
+			/// receiving an event before a display is built.
+			virtual unsigned int cachingDelay();
 
-      /// initialize previous graphic option
-      void initGraphicOption();
+			/// If called the display list will be rebuilt on next call to
+			void breakCache();
 
-    protected:
-      bool childrenCachesReady( bool consider_active_field );
+			/// Calls tryBuildDisplayList().
+			virtual void update();
 
-      /// Returns true if we have a valid display list built that can
-      /// be called.
-      inline virtual bool haveValidDisplayList() {
-        return have_valid_display_list;
-      }
-      
-      /// Try to build a display list. Requires that the display lists
-      /// of all H3DDisplayListNode instances that are routed to us
-      /// are valid in order to build the cache. 
-      /// \param cache_broken true if this call is made when the cache has just
-      /// been broken, e.g. from the update() function.
-      /// \returns true if the list was successfully built, false otherwise.
-      bool tryBuildDisplayList( bool cache_broken ); 
+			/// When the event is propagated the display list is invalidated.
+			virtual void propagateEvent( Event e );
 
-    protected:
-      /// The fields that has generated an event since the last call to
-      /// update()
-      set< Field * > event_fields;
+			/// Calls the OpenGL call list for if it exists. If it does
+			/// not exist we try to build it and execute it. 
+			virtual void callList( bool build_list = true );
 
-      /// Display lists will not be built as long as this counter > 0.
-        unsigned int delay_cache_counter;
+			/// Gets the pointer to the last field that created an event to 
+			/// this field 
+			inline Field *getEventPointer() {
+				return event.ptr;
+			}
 
-      /// OpenGL display list identifier.
-      GLuint display_list;
+			/// Returns true if the Field given has generated an event to this
+			/// field since the last call to the update() function.
+			inline bool hasCausedEvent( Field *f ) {
+				return event_fields.find( f ) != event_fields.end();
+			}
 
-      /// The mode for caching. 
-      CacheMode cache_mode;
+			/// Returns true if the Field given has generated an event to this
+			/// field since the last call to the update() function.
+			template< class FieldType >
+			inline bool hasCausedEvent( auto_ptr< FieldType > &f ) {
+				return hasCausedEvent( f.get() );
+			}
 
-      /// The mode for view frustum culling. 
-      FrustumCullingMode frustum_culling_mode;
-      
-      /// True if the display list has been built successfully.
-      bool have_valid_display_list;
-      
-      /// The isActive field is true if the callList() function has been called
-      /// in the last scenegraph loop, and false otherwise.
-      auto_ptr< IsActive > isActive;
+			/// initialize previous graphic option
+			void initGraphicOption();
 
-      /// This field is routed to all instances of DisplayList and can be used 
-      /// to force a rebuild of all display lists.
-      static auto_ptr< Field > break_list_field; 
-      
-      /// previous graphic option
-      GraphicsOptions* graphic_options_previous;
-      
-      /// default cache delay value
-      static const int cache_delay_default = 3;
+		protected:
+			bool childrenCachesReady( bool consider_active_field );
 
-      /// flag to require resetting delay_cache_counter
-      bool reset_delay_cache_counter;
+			/// Returns true if we have a valid display list built that can
+			/// be called.
+			inline virtual bool haveValidDisplayList() {
+				return have_valid_display_list;
+			}
 
-      friend class H3DDisplayListObject;
-    };
-    
-    /// Constructor.
-    H3DDisplayListObject( Inst< DisplayList > _displayList = 0 );
-    
-    /// The DisplayList instance handling the OpenGL caching of this object. 
-    auto_ptr< DisplayList > displayList;
-  };
+			/// Try to build a display list. Requires that the display lists
+			/// of all H3DDisplayListNode instances that are routed to us
+			/// are valid in order to build the cache. 
+			/// \param cache_broken true if this call is made when the cache has just
+			/// been broken, e.g. from the update() function.
+			/// \returns true if the list was successfully built, false otherwise.
+			bool tryBuildDisplayList( bool cache_broken ); 
+
+		protected:
+			/// The fields that has generated an event since the last call to
+			/// update()
+			set< Field * > event_fields;
+
+			/// Display lists will not be built as long as this counter > 0.
+			unsigned int delay_cache_counter;
+
+			/// OpenGL display list identifier.
+			GLuint display_list;
+
+			/// The mode for caching. 
+			CacheMode cache_mode;
+
+			/// The mode for view frustum culling. 
+			FrustumCullingMode frustum_culling_mode;
+
+			/// True if the display list has been built successfully.
+			bool have_valid_display_list;
+
+			/// The isActive field is true if the callList() function has been called
+			/// in the last scenegraph loop, and false otherwise.
+			auto_ptr< IsActive > isActive;
+
+			/// This field is routed to all instances of DisplayList and can be used 
+			/// to force a rebuild of all display lists.
+			static auto_ptr< Field > break_list_field; 
+
+			/// previous graphic option
+			GraphicsOptions* graphic_options_previous;
+
+			/// default cache delay value
+			static const int cache_delay_default = 3;
+
+			/// flag to require resetting delay_cache_counter
+			bool reset_delay_cache_counter;
+
+			friend class H3DDisplayListObject;
+		};
+
+		/// Constructor.
+		H3DDisplayListObject( Inst< DisplayList > _displayList = 0 );
+
+		/// The DisplayList instance handling the OpenGL caching of this object. 
+		auto_ptr< DisplayList > displayList;
+	};
 }
 
 #endif

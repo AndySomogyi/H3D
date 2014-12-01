@@ -98,7 +98,8 @@ bool FogCoordinate::preRenderCheckFail ( ){
 
 void FogCoordinate::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*depth->begin ( ));
-  attrib_size = depth->size ( ) *sizeof(GLfloat);
+  element_size = sizeof(GLfloat);
+  attrib_size = depth->size ( ) * element_size;
 }
 
 void FogCoordinate::renderVBO ( ){

@@ -109,14 +109,17 @@ X3DLightNode::X3DLightNode(
   on->route( displayList );
 }
 
-void X3DLightNode::enableGraphicsState() {
+void X3DLightNode::enableGraphicsState() 
+{
   if ( ( act_global && graphics_state_counter < traverse_sg_counter ) ||
-       ( !global->getValue() && on->getValue() ) ) {
+       ( !global->getValue() && on->getValue() ) ) 
+			 {
 
     light_index = getLightIndex( getName() );
     had_light_index.push_back( true );
 
-    if( light_index < (GLuint)max_lights ) {
+    if( light_index < (GLuint)max_lights ) 
+		{
       GLLightInfo gl_light = getGLLightInfo();
       glPushAttrib( GL_LIGHTING_BIT );
       glEnable( GL_LIGHT0 +light_index );
@@ -140,7 +143,8 @@ void X3DLightNode::enableGraphicsState() {
         glLightf(GL_LIGHT0+light_index, GL_QUADRATIC_ATTENUATION, gl_light.quadraticAttenuation );
       } 
 
-      if( gl_light.isSpotLight() ) {
+      if( gl_light.isSpotLight() ) 
+			{
         GLfloat dir_v[3];
         fillGLArray( gl_light.spotDirection, dir_v );
         glLightfv( GL_LIGHT0+light_index, GL_SPOT_DIRECTION, dir_v );

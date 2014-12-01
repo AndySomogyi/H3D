@@ -117,7 +117,8 @@ bool FloatVertexAttribute::preRenderCheckFail ( ){
 
 void FloatVertexAttribute::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*value->begin ( ));
-  attrib_size = value->size ( )*sizeof(GLfloat);
+  element_size = sizeof(GLfloat);
+  attrib_size = value->size ( )*element_size;
 }
 
 void FloatVertexAttribute::renderVBO ( ){

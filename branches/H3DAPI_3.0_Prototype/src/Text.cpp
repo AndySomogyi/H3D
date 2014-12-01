@@ -415,9 +415,14 @@ void Text::DisplayList::callList( bool build_list ) {
   X3DFontStyleNode *font = 
     static_cast< X3DFontStyleNode * >(text_node->fontStyle->getValue());
   if( font && !font->fontsBuilt() ) {
-    try {
+    try 
+		{
       font->buildFonts();
-    } catch( const Exception::H3DException &e ) {
+    } 
+		catch(const Exception::H3DException& e) 
+		{
+			//Just do something to make the compiler warning go away, I guess.
+			e.message == "";
     }
   }
   X3DGeometryNode::DisplayList::callList( build_list );
@@ -441,10 +446,14 @@ void Text::SFBound::update() {
   if( !font_style ) font_style = default_font_style.get();
   
 
-  try {
+  try 
+	{
     font_style->buildFonts();
-  } catch( const Exception::H3DException &e ) {
-    // Not doing anything here.
+  } 
+	catch( const Exception::H3DException &e ) 
+	{
+			//Just do something to make the compiler warning go away, I guess.
+			e.message == "";
   }
 
   if( font_style->fontsBuilt() ) {

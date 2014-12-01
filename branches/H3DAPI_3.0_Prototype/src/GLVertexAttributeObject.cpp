@@ -31,81 +31,112 @@ using namespace H3D;
 
 GLVertexAttributeObject::GLVertexAttributeObject ( VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE type) :
 vboFieldsUpToDate ( new Field ),
-isDynamic(new SFBool),
-vbo_id ( NULL ),
-attrib_type( type ),
-attrib_size( 0 ),
-attrib_data( NULL ),
-vbo_GPUaddr( 0 ),
-use_bindless( false ){
-  vboFieldsUpToDate->setName ( "vboFieldsUpToDate" );
-  isDynamic->route ( vboFieldsUpToDate );
-  isDynamic->setValue ( false );
-  if ( GLEW_EXT_direct_state_access&&GL_NV_vertex_buffer_unified_memory )
-  {
-    use_bindless = true;
-  }
+	isDynamic(new SFBool),
+	vbo_id(0),
+	attrib_type(type),
+	attrib_size(0),
+	element_size(0),
+	attrib_data( NULL ),
+	vbo_GPUaddr( 0 ),
+	use_bindless( false )
+	{
+		vboFieldsUpToDate->setName ("vboFieldsUpToDate");
+		isDynamic->route (vboFieldsUpToDate);
+		isDynamic->setValue (false);
+
+		if(GLEW_EXT_direct_state_access && GL_NV_vertex_buffer_unified_memory)
+		{
+			use_bindless = true;
+		}
 }
 
-GLVertexAttributeObject::~GLVertexAttributeObject() {
-  if( vbo_id ) {
-    glDeleteBuffersARB( 1, vbo_id );
-    delete vbo_id;
-    vbo_id = NULL;
-  }
+GLVertexAttributeObject::~GLVertexAttributeObject() 
+{
+	if(vbo_id != 0) 
+	{
+		if(use_bindless)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+			glDeleteBuffersARB(1, &vbo_id);
+			vbo_id = 0;
+		}
+		else
+		{
+			glDeleteBuffersARB(1, &vbo_id);
+			vbo_id = 0;
+		}
+	}
 }
 
-bool GLVertexAttributeObject::preRenderCheckFail ( ){
-  return !GLEW_ARB_vertex_program;
+bool GLVertexAttributeObject::preRenderCheckFail()
+{
+	return (!GLEW_ARB_vertex_program);
 }
 
-void GLVertexAttributeObject::updateVertexBufferObject ( ){
-  
-  if ( !vboFieldsUpToDate->isUpToDate() ){
-    vboFieldsUpToDate->upToDate ( );
-    setAttributeData();
-    if ( !vbo_id ){
-      vbo_id = new GLuint;
-      glGenBuffersARB ( 1, vbo_id );
-    }
-    glBindBuffer ( GL_ARRAY_BUFFER, *vbo_id );
-    if ( isDynamic->getValue() )
-    {
-      glBufferData ( GL_ARRAY_BUFFER, attrib_size, attrib_data, GL_STREAM_DRAW );
-    } else
-    {
-      glBufferData ( GL_ARRAY_BUFFER, attrib_size, attrib_data, GL_STATIC_DRAW );
-    }
-    if ( use_bindless )
-    {
-      glGetBufferParameterui64vNV ( GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &vbo_GPUaddr );
-      glMakeBufferResidentNV ( GL_ARRAY_BUFFER, GL_READ_ONLY );
-      glBindBuffer ( GL_ARRAY_BUFFER, 0 );
-    }
-  } else
-  {
-    if ( !use_bindless )
-    {
-      glBindBuffer ( GL_ARRAY_BUFFER, *vbo_id );
-    }
-  }
+void GLVertexAttributeObject::updateVertexBufferObject()
+{
+	if(!vboFieldsUpToDate->isUpToDate())
+	{
+		vboFieldsUpToDate->upToDate();
+		setAttributeData();
+
+		if(vbo_id == 0)
+		{
+			glGenBuffersARB(1, &vbo_id);
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+
+		if(isDynamic->getValue())
+		{
+			glBufferData(GL_ARRAY_BUFFER, attrib_size, attrib_data, GL_STREAM_DRAW);
+		} 
+		else
+		{
+			glBufferData(GL_ARRAY_BUFFER, attrib_size, attrib_data, GL_STATIC_DRAW);
+		}
+
+		if(use_bindless)
+		{
+			glGetBufferParameterui64vNV(GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &vbo_GPUaddr);
+			glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+	} 
+	else
+	{
+		if(!use_bindless)
+		{
+			glBindBuffer (GL_ARRAY_BUFFER, vbo_id);
+		}
+	}
 }
 
-void GLVertexAttributeObject::renderVertexBufferObject ( ){
-  if ( preRenderCheckFail ( ) ) return;
-  updateVertexBufferObject ( );
-  renderVBO ( );
+void GLVertexAttributeObject::renderVertexBufferObject()
+{
+	if(preRenderCheckFail())
+	{ 
+		return;
+	}
 
+	updateVertexBufferObject();
+	renderVBO();
 }
 
-void GLVertexAttributeObject::disableVertexBufferObject ( ){
-  if ( preRenderCheckFail ( ) ) return;
-  disableVBO ( );
-  if ( !use_bindless )
-  {
-    glBindBufferARB ( GL_ARRAY_BUFFER_ARB, 0 );
-  }
-  
+void GLVertexAttributeObject::disableVertexBufferObject()
+{
+	if(preRenderCheckFail()) 
+	{
+		return;
+	}
+
+	disableVBO();
+
+	if (!use_bindless)
+	{
+		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+	}
 }
 
 

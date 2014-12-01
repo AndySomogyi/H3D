@@ -1989,21 +1989,21 @@ void FrameBufferTextureGenerator::setupScissor( bool needSinglePassStereo,
     int box_w = scissorBoxWidth->getValue();
     int box_h = scissorBoxHeight->getValue();
     for( int i = 0; i<3; ++i ) {
-      scissorBox_size[4*i] = viewports_size[4*i]+box_x;
-      scissorBox_size[4*i+1] = viewports_size[4*i+1]+box_y;
-      scissorBox_size[4*i+2] = box_w;
-      scissorBox_size[4*i+3] = box_h;
+      scissorBox_size[4*i]	=	static_cast<H3DUtil::H3DInt32>(viewports_size[4*i]+box_x);
+      scissorBox_size[4*i+1] = static_cast<H3DUtil::H3DInt32>(viewports_size[4*i+1]+box_y);
+      scissorBox_size[4*i+2] = static_cast<H3DUtil::H3DInt32>(box_w);
+      scissorBox_size[4*i+3] = static_cast<H3DUtil::H3DInt32>(box_h);
       if( box_x<0 ) {
-        scissorBox_size[4*i] = viewports_size[4*i]+viewports_size[4*i+2]*(-box_x/10000.0);
+        scissorBox_size[4*i] = static_cast<H3DUtil::H3DInt32>(viewports_size[4*i]+viewports_size[4*i+2]*(-box_x/10000.0));
       }
       if( box_y<0 ) {
-        scissorBox_size[4*i+1] = viewports_size[4*i+1]+viewports_size[4*i+3]*(-box_y/10000.0);
+        scissorBox_size[4*i+1] = static_cast<H3DUtil::H3DInt32>(viewports_size[4*i+1]+viewports_size[4*i+3]*(-box_y/10000.0));
       }
       if( box_w<0 ) {
-        scissorBox_size[4*i+2] = viewports_size[4*i+2]*(-box_w/10000.0);
+        scissorBox_size[4*i+2] = static_cast<H3DUtil::H3DInt32>(viewports_size[4*i+2]*(-box_w/10000.0));
       }
       if( box_h<0 ) {
-        scissorBox_size[4*i+3] = viewports_size[4*i+3]*(-box_h/10000.0);
+        scissorBox_size[4*i+3] = static_cast<H3DUtil::H3DInt32>(viewports_size[4*i+3]*(-box_h/10000.0));
       }
     }
     glScissorArrayv( 0, 3, scissorBox_size );
@@ -2015,16 +2015,16 @@ void FrameBufferTextureGenerator::setupScissor( bool needSinglePassStereo,
     int box_w = scissorBoxWidth->getValue();
     int box_h = scissorBoxHeight->getValue();
     if( box_x<0 ) {
-      box_x = (-box_x/10000.0)*desired_fbo_width;
+      box_x = static_cast<int>((-box_x/10000.0)*desired_fbo_width);
     }
     if( box_y<0 ) {
-      box_y = (-box_y/10000.0)*desired_fbo_height;
+      box_y = static_cast<int>((-box_y/10000.0)*desired_fbo_height);
     }
     if( box_w<0 ) {
-      box_w = (-box_w/10000.0)*desired_fbo_width;
+      box_w = static_cast<int>((-box_w/10000.0)*desired_fbo_width);
     }
     if( box_h<0 ) {
-      box_h = (-box_h/10000.0)*desired_fbo_height;
+      box_h = static_cast<int>((-box_h/10000.0)*desired_fbo_height);
     }
     glScissor( box_x, box_y, box_w, box_h  );
 #ifdef GL_ARB_viewport_array
