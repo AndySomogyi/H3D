@@ -32,10 +32,10 @@ using namespace H3D;
 
 
 Node *MFNode::getPrototypeNode( Node *n ) {
-  X3DPrototypeInstance *pi = dynamic_cast< X3DPrototypeInstance * >( n );
-  if( pi ) {
-    return pi->getPrototypedNode();
-  } else {
-    return NULL;
-  }
+	X3DPrototypeInstance *pi = dynamic_cast< X3DPrototypeInstance * >( n );
+	if( pi ) {
+		return pi->getPrototypedNode();
+	} else {
+		return NULL;
+	}
 }

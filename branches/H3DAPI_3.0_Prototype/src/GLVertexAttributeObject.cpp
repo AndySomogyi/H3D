@@ -35,9 +35,11 @@ vboFieldsUpToDate ( new Field ),
 	vbo_id(0),
 	attrib_type(type),
 	attrib_size(0),
-	element_size(0),
+	element_stride(0),
 	attrib_data( NULL ),
 	vbo_GPUaddr( 0 ),
+	primitiveType(GL_FLOAT),
+	normalized(false),
 	use_bindless( false )
 	{
 		vboFieldsUpToDate->setName ("vboFieldsUpToDate");

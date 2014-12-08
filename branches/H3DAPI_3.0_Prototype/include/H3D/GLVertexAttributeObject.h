@@ -31,11 +31,21 @@
 #include <H3D/H3DApi.h>
 #include <H3D/Node.h>
 #include <H3D/SFBool.h>
-#include <H3D/RenderData.h>
 #include <GL/glew.h>
 
 namespace H3D 
 {
+	namespace VERTEXATTRIBUTE {
+		enum VERTEXATTRIBUTETYPE {
+			VERTEX = 0,
+			NORMAL,
+			TEXCOORD,
+			FOGCOORD,
+			COLOR,
+			GENERIC
+		};
+	}
+
 	/// \ingroup AbstractInterface
 	/// \class GLVertexAttributeObject
 	/// \brief This abstract interface is inherited by all nodes that 
@@ -82,17 +92,14 @@ namespace H3D
 		auto_ptr<SFBool> isDynamic;
 
 		/// Returns whether this attribute is bindless or not
-		inline bool usesBindless()
-		{
+		inline bool usesBindless() {
 			return use_bindless;
 		}
 
 		/// Based on whether this attribute is bindless or not
 		/// it either returns the 64bit unsigned gpu addr or the normal vbo_id as a 32bit uint.
-		inline GLuint64 getVBO()
-		{
-			if(use_bindless)
-			{
+		inline GLuint64 getVBO() {
+			if(use_bindless) {
 				return vbo_GPUaddr;
 			}
 
@@ -101,15 +108,25 @@ namespace H3D
 		}
 		
 
-		inline GLsizei getAttribSize()
-		{
+		inline GLsizei getAttribSize() {
 			return attrib_size;
 		}
 
+		inline GLint getElementCount() {
+			return element_count;
+		}
+
+		inline GLenum getPrimitiveType() {
+			return primitiveType;
+		}
+
 		//Size of each individual element
-		inline GLsizei getElementSize()
-		{
-			return element_size;
+		inline GLsizei getStride() {
+			return element_stride;
+		}
+
+		inline bool isNormalized() {
+			return normalized;
 		}
 
 	protected:
@@ -120,7 +137,11 @@ namespace H3D
 		GLuint vbo_id;
 
 		/// Size of each individual element
-		GLsizei element_size;
+		GLsizei element_stride;
+		GLint element_count;
+
+		/// GL_FLOAT for example
+		GLenum primitiveType;
 
 		/// Total size of attrib_data
 		GLsizei attrib_size;
@@ -134,6 +155,7 @@ namespace H3D
 		/// the type of vertex attribute
 		VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE attrib_type;
 
+		bool normalized;
 		bool use_bindless;
 	};
 }

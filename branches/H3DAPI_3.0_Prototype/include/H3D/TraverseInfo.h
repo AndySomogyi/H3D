@@ -37,6 +37,8 @@
 #include <stack>
 #include <map>
 
+#include <H3D/OGLRenderStates.h>
+
 using namespace std;
 
 namespace H3D 
@@ -461,26 +463,18 @@ namespace H3D
 		const LightVector &getActiveLightNodes();
 
 		/// Get pointer to current Renderer
-		Renderer* const GetRenderer()
-		{
+		Renderer* const getRenderer() {
 			return renderer;
 		}
 
-		void SetCurrentRenderstate(unsigned int renderState)
-		{
-			current_renderstate_handle = renderState;
-		}
-
-		unsigned int GetCurrentRenderstate()
-		{
-			return current_renderstate_handle;
+		TotalRenderState& getCurrentRenderstate() {
+			return currentRenderState;
 		}
 
 	protected:
 		LightVector x3dlightnode_vector;
 
-		class TransformInfo 
-		{
+		class TransformInfo {
 		public:
 			TransformInfo( const Matrix4f &_acc_frw, const Matrix4f &_acc_inv )
 			:	acc_frw( _acc_frw ), acc_inv( _acc_inv ) 
@@ -511,10 +505,9 @@ namespace H3D
 		GeometryCountMap geometry_count;
 		std::map< string, void * > user_data;
 
-		unsigned int current_renderstate_handle;
+		TotalRenderState currentRenderState;
 		Renderer* const renderer;
 	};
 
-};
-
+}
 #endif

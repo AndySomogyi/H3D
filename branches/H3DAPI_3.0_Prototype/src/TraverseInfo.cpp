@@ -44,7 +44,8 @@ current_layer( 0 ),
 	haptic_effects( _haptics_devices.size() ),
 	graphics_enabled( true ),
 	multi_pass_transparency( false ), 
-	renderer(_renderer)
+	renderer(_renderer),
+	currentRenderState()
 {
 	initializeLayers( 1 );
 	haptics_enabled.reserve( haptics_devices.size() ); 
@@ -95,9 +96,9 @@ void TraverseInfo::addForceEffect( int device_index,
 				s.str(),
 				H3D_FULL_LOCATION );
 		}
-		if( hapticsEnabled(device_index) )
+		if( hapticsEnabled(device_index) ) {
 			haptic_effects[device_index].push_back( effect );
-		else {
+		} else {
 			effect->ref();
 			effect->unref();
 		}

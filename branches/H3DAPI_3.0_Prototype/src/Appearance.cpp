@@ -246,13 +246,16 @@ GLbitfield Appearance::getAffectedGLAttribs() {
 /// This function will be called by the X3DShapeNode before any rendering 
 /// of geometry in order to set up all OpenGL states that are needed to 
 /// for the appearance of the geometry.
-void Appearance::preRender() {
+void Appearance::preRender() 
+{
 	X3DAppearanceNode::preRender();     
 
 	X3DMaterialNode *m = material->getValue();
 	if ( m ) m->preRender();
-	else {
-		if( X3DShapeNode::disable_lighting_if_no_app ) {
+	else 
+	{
+		if( X3DShapeNode::disable_lighting_if_no_app ) 
+		{
 			glDisable( GL_LIGHTING );
 		}
 	}

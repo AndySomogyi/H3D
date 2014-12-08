@@ -250,8 +250,8 @@ namespace H3D {
     /// \dotfile ShaderCombiner_value.dot
     auto_ptr< SFFloat  > arg0Value;
 
-    /// The arg0Value field specifies a value that is used together with some
-    /// of the arg0Modifier functions.
+    /// The arg1Value field specifies a value that is used together with some
+    /// of the arg1Modifier functions.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b>0  \n

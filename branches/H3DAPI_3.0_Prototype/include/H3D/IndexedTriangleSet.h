@@ -37,7 +37,7 @@
 #include <H3D/CoordBoundField.h>
 #include <H3D/MFInt32.h>
 #include <H3D/SFInt32.h>
-#include <H3D/RenderData.h>
+#include <H3D/RenderMetaData.h>
 
 namespace H3D 
 {

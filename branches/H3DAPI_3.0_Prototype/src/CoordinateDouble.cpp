@@ -82,8 +82,10 @@ bool CoordinateDouble::preRenderCheckFail ( )  {
 
 void CoordinateDouble::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*point->begin ( ));
-  element_size = 3*sizeof(GLdouble);
-  attrib_size = point->size ( ) * element_size;
+  element_count = 3;
+  element_stride = 3*sizeof(GLdouble);
+  primitiveType = GL_DOUBLE;
+  attrib_size = point->size ( ) * element_stride;
 }
 
 void CoordinateDouble::renderVBO ( ){

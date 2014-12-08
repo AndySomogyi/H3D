@@ -374,57 +374,57 @@ void Scene::idle()
 #ifdef HAVE_PROFILER
 		H3DUtil::H3DTimer::stepEnd("Scene_traverse");
 #endif
-		/// traverse the stylus of all haptics devices
-		DeviceInfo *di = DeviceInfo::getActive();
-		if( di ) 
-		{
-			for( DeviceInfo::MFDevice::const_iterator i = di->device->begin();
-				i != di->device->end(); ++i ) 
-			{
-				H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
-				Node *stylus = hd->stylus->getValue();
-				if( stylus ) 
-				{
-					const Vec3f &pos = hd->weightedProxyPosition->getValue();
-					const Rotation &rot = hd->trackerOrientation->getValue();
-					Matrix4f m(rot);
-					m[0][3] = pos.x;
-					m[1][3] = pos.y;
-					m[2][3] = pos.z;
-					(*ti).pushMatrices( m,
-						m.inverse() );
-					stylus->traverseSG( *ti );
-					(*ti).popMatrices();
-				}
-			}
-		}
+		///// traverse the stylus of all haptics devices
+		//DeviceInfo *di = DeviceInfo::getActive();
+		//if( di ) 
+		//{
+		//	for( DeviceInfo::MFDevice::const_iterator i = di->device->begin();
+		//		i != di->device->end(); ++i ) 
+		//	{
+		//		H3DHapticsDevice *hd = static_cast< H3DHapticsDevice * >( *i );
+		//		Node *stylus = hd->stylus->getValue();
+		//		if( stylus ) 
+		//		{
+		//			const Vec3f &pos = hd->weightedProxyPosition->getValue();
+		//			const Rotation &rot = hd->trackerOrientation->getValue();
+		//			Matrix4f m(rot);
+		//			m[0][3] = pos.x;
+		//			m[1][3] = pos.y;
+		//			m[2][3] = pos.z;
+		//			(*ti).pushMatrices( m,
+		//				m.inverse() );
+		//			stylus->traverseSG( *ti );
+		//			(*ti).popMatrices();
+		//		}
+		//	}
+		//}
 
-		// render the HapticShapes and HapticForceEffets in the TraverseInfo 
-		// instance on the H3DHapticsDevices.
-		unsigned int nr_devices = (unsigned int) ti->getHapticsDevices().size();
-		for( unsigned int i = 0; i < nr_devices; ++i ) {
-			H3DHapticsDevice *hd = ti->getHapticsDevice( i );
-			// nr_of_layers is the biggest of the nr of layers in this traverseinfo
-			// and last_traverseinfo.
-			unsigned int nr_of_layers = ti->nrLayers();
-			if( last_traverseinfo && last_traverseinfo->nrLayers() > nr_of_layers )
-				nr_of_layers = last_traverseinfo->nrLayers();
-			if( hd->initialized->getValue() ) {
-				for( unsigned int l = 0; l < nr_of_layers; ++l ) {
-					if( l < ti->nrLayers() ) {
-						ti->setCurrentLayer( l );
-						hd->renderShapes( ti->getHapticShapes( i ), l );
-					} else {
-						// This layer no longer exists, set the shapes to an empty vector
-						// to remove from haptics loop.
-						HapticShapeVector tmp_vector;
-						hd->renderShapes( tmp_vector, l );
-					}
-				}
-				hd->renderEffects( ti->getForceEffects( i ) );
-				hd->postRender();
-			}
-		}
+		//// render the HapticShapes and HapticForceEffets in the TraverseInfo 
+		//// instance on the H3DHapticsDevices.
+		//unsigned int nr_devices = (unsigned int) ti->getHapticsDevices().size();
+		//for( unsigned int i = 0; i < nr_devices; ++i ) {
+		//	H3DHapticsDevice *hd = ti->getHapticsDevice( i );
+		//	// nr_of_layers is the biggest of the nr of layers in this traverseinfo
+		//	// and last_traverseinfo.
+		//	unsigned int nr_of_layers = ti->nrLayers();
+		//	if( last_traverseinfo && last_traverseinfo->nrLayers() > nr_of_layers )
+		//		nr_of_layers = last_traverseinfo->nrLayers();
+		//	if( hd->initialized->getValue() ) {
+		//		for( unsigned int l = 0; l < nr_of_layers; ++l ) {
+		//			if( l < ti->nrLayers() ) {
+		//				ti->setCurrentLayer( l );
+		//				hd->renderShapes( ti->getHapticShapes( i ), l );
+		//			} else {
+		//				// This layer no longer exists, set the shapes to an empty vector
+		//				// to remove from haptics loop.
+		//				HapticShapeVector tmp_vector;
+		//				hd->renderShapes( tmp_vector, l );
+		//			}
+		//		}
+		//		hd->renderEffects( ti->getForceEffects( i ) );
+		//		hd->postRender();
+		//	}
+		//}
 
 		// remove the TraverseInfo instance from the last loop. TraverseInfo 
 		// instances must be kept alive until its HapticShapes and 
@@ -492,6 +492,10 @@ void Scene::idle()
 			shadow_caster->light->push_back( light );
 		}
 	}
+
+	//Call update after traversing through the entire scene.
+	renderer->update();
+
 #ifdef HAVE_PROFILER
 	H3DUtil::H3DTimer::stepBegin("Graphic_rendering");
 #endif
@@ -506,8 +510,13 @@ void Scene::idle()
 			{
 				H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
 			}
+
 			window->render( scene_root );
 	}
+
+	//Call render after update has been called.
+	renderer->render();
+
 #ifdef HAVE_PROFILER
 	H3DUtil::H3DTimer::stepEnd("Graphic_rendering");
 #endif

@@ -184,7 +184,7 @@ bool ComposedShader::addField( const string &name,
     
     H3D::Shaders::UniformInfo ui = { field, 0 };
     uniformFields.insert( std::pair< string, H3D::Shaders::UniformInfo >( name , ui ) );
-    // if inserted node is a SFNode, or MFNode, need to handle the actul node inside
+    // if inserted node is a SFNode, or MFNode, need to handle the actual node inside
     // the field specially
     SFNode * sf_node_field = dynamic_cast< SFNode * >( field );
     MFNode * mf_node_field = dynamic_cast< MFNode * >( field );
@@ -279,7 +279,7 @@ void ComposedShader::postRender() {
 void ComposedShader::traverseSG ( TraverseInfo& ti ) {
   X3DShaderNode::traverseSG ( ti );
   Node* n;
-  for( H3DDynamicFieldsObject::field_iterator f = this->firstField();f != this->endField(); ++f ) 
+  for( H3DDynamicFieldsObject::field_iterator f = this->firstField(); f != this->endField(); ++f ) 
   {
     X3DTypes::X3DType x3d_type = (*f)->getX3DType();
     if(x3d_type==X3DTypes::SFNODE){
@@ -350,7 +350,7 @@ void ComposedShader::render() {
     for( MFShaderPart::const_iterator i = parts->begin();
          i != parts->end(); ++i ) {
       ShaderPart* s= static_cast< ShaderPart * >(*i);
-      re_link|= !s->isCompiled();
+      re_link |= !s->isCompiled();
       if( s->compileShader() == 0 ) {
         all_parts_valid = false;
       }

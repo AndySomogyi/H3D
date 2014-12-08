@@ -39,8 +39,8 @@
 #include <H3D/X3DShaderNode.h>
 #include <H3D/DependentNodeFields.h>
 
-namespace H3D {
-
+namespace H3D 
+{
   /// \ingroup X3DNodes 
   /// \class Appearance
   /// \brief The Appearance node specifies the visual properties of geometry.

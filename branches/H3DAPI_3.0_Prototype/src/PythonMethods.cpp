@@ -3013,7 +3013,7 @@ call the base class __init__ function." );
       H3DHapticsDevice *hdev = NULL;
       if( di ) {
         size_t nr_devices = di->device->size();
-        if( index >=0 && index < nr_devices ) {
+        if( index >= 0 && index < nr_devices ) {
           hdev = di->device->getValueByIndex( index );
         }
       }

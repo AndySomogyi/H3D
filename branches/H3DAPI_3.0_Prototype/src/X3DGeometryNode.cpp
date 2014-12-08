@@ -335,7 +335,8 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
 
 }
 
-unsigned int X3DGeometryNode::DisplayList::cachingDelay(){
+unsigned int X3DGeometryNode::DisplayList::cachingDelay()
+{
 	// use local graphic option first, if local graphic option is null, check global one
 	GraphicsOptions *options = NULL;
 	X3DGeometryNode *geom = static_cast< X3DGeometryNode * >( getOwner() );

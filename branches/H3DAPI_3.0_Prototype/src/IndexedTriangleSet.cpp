@@ -311,10 +311,6 @@ void IndexedTriangleSet::render()
 				{
 					// Only transfer data when it has been modified.
 					vboFieldsUpToDate->upToDate();
-					if(!ib_id) 
-					{
-						glGenBuffersARB(1, &ib_id);
-					}
 
 					unsigned int indexSize = indices.size() * sizeof(GLuint);
 
@@ -518,19 +514,21 @@ void IndexedTriangleSet::render()
 	} 
 }
 
-void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) 
-{
+void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
+	
+	//Here we're supposed to apply render state changes that are accessible here
+
+	//Here in traverseSG the render state might be changed again by child nodes
 	X3DComposedGeometryNode::traverseSG( ti );
 
-	Renderer* const renderer = ti.GetRenderer();
+	//When we're here, we have the render state that we want for this object, apply it
+
+	Renderer* const renderer = ti.getRenderer();
 
 	// use backface culling if solid is true
-	if( solid->getValue() ) 
-	{
+	if( solid->getValue() ) {
 		useBackFaceCulling( true );
-	}
-	else 
-	{
+	} else {
 		useBackFaceCulling( false );
 	}
 
@@ -543,8 +541,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 	bool * shader_requires_tangents = NULL;
 	if(!render_tangents && !ti.getUserData( "shaderRequiresTangents", 
 		(void **)&shader_requires_tangents) &&
-		*shader_requires_tangents ) 
-	{  
+		*shader_requires_tangents ) {  
 		render_tangents = true;
 		displayList->breakCache();
 	}
@@ -554,30 +551,26 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 	bool * shader_requires_patches = NULL;
 	bool render_patches_new= ti.getUserData( "shaderRequiresPatches", 
 		(void **)&shader_requires_patches)==0 && *shader_requires_patches;
-	if ( render_patches_new != render_patches ) 
-	{
+	if ( render_patches_new != render_patches ) {
 		render_patches = render_patches_new;
-		if ( !GLEW_ARB_tessellation_shader ) 
-		{
-			if ( render_patches_new ) 
-			{
+		if ( !GLEW_ARB_tessellation_shader ) {
+			if ( render_patches_new ) {
 				Console(4) << "Warning: Tessellation shaders are not supported by your graphics hardware! "
-					"IndexedTriangleSet " << getName() << " will not be rendered as GL_PATCHES." << endl;
+				<< "IndexedTriangleSet " << getName() << " will not be rendered as GL_PATCHES." << endl;
 			}
-		} 
-		else 
-		{
+		} else {
 			displayList->breakCache();
 		}
 	}
 
 	//Copy current transform
 	renderData.modelTransform = ti.getAccForwardMatrix();
-	renderData.renderState = ti.GetCurrentRenderstate();
+
+	vboFieldsUpToDate->upToDate();
 
 	//If necessary, update all vbo&ibo data
-	if(!vboFieldsUpToDate->isUpToDate() || (!attributeLayoutCached))
-	{
+	if(!vboFieldsUpToDate->isUpToDate() || (!attributeLayoutCached)) {
+
 		unsigned int attributeIndexCount = 0;
 		std::vector<VertexAttributeDescription> attributeLayout;
 
@@ -585,11 +578,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 		VertexAttributeDescription attribDescription;
 		
 		X3DCoordinateNode* coordinate_node = coord->getValue();
-		if(coordinate_node)
-		{
+		if(coordinate_node) {
 			coordinate_node->updateVertexBufferObject();
 
-			BindlessPtrNV coordinateAttribute;
+			IndirectRenderData coordinateAttribute;
 			coordinateAttribute.address = coordinate_node->getVBO();
 			coordinateAttribute.length = coordinate_node->getAttribSize();
 			coordinateAttribute.index = attributeIndexCount;
@@ -598,8 +590,11 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 			renderData.VBOs.push_back(coordinateAttribute);
 
 			attribDescription.index = attributeIndexCount;
-			attribDescription.size = coordinate_node->getElementSize();
-			attribDescription.type = VERTEXATTRIBUTE::VERTEX;
+			attribDescription.stride = coordinate_node->getStride();
+
+			attribDescription.primitiveType = coordinate_node->getPrimitiveType();
+			attribDescription.size = coordinate_node->getElementCount();
+			attribDescription.normalized = coordinate_node->isNormalized();
 
 			attributeLayout.push_back(attribDescription);
 
@@ -607,11 +602,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 		}
 
 		X3DTextureCoordinateNode* tex_coord_node = texCoord->getValue();
-		if(tex_coord_node)
-		{
+		if(tex_coord_node) {
 			tex_coord_node->updateVertexBufferObject();
 
-			BindlessPtrNV textureCoordinateAttribute;
+			IndirectRenderData textureCoordinateAttribute;
 			textureCoordinateAttribute.address = tex_coord_node->getVBO();
 			textureCoordinateAttribute.length = tex_coord_node->getAttribSize();
 			textureCoordinateAttribute.index = attributeIndexCount;
@@ -620,8 +614,11 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 			renderData.VBOs.push_back(textureCoordinateAttribute);
 
 			attribDescription.index = attributeIndexCount;
-			attribDescription.size = tex_coord_node->getElementSize();
-			attribDescription.type = VERTEXATTRIBUTE::TEXCOORD;
+			attribDescription.size = tex_coord_node->getStride();
+
+			attribDescription.primitiveType = tex_coord_node->getPrimitiveType();
+			attribDescription.size = tex_coord_node->getElementCount();
+			attribDescription.normalized = tex_coord_node->isNormalized();
 
 			attributeLayout.push_back(attribDescription);
 
@@ -629,11 +626,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 		}
 
 		FogCoordinate* fog_coord_node = fogCoord->getValue();
-		if(fog_coord_node)
-		{
+		if(fog_coord_node) {
 			fog_coord_node->updateVertexBufferObject();
 
-			BindlessPtrNV fogCoordinateAttribute;
+			IndirectRenderData fogCoordinateAttribute;
 			fogCoordinateAttribute.address = fog_coord_node->getVBO();
 			fogCoordinateAttribute.length = fog_coord_node->getAttribSize();
 			fogCoordinateAttribute.index = attributeIndexCount;
@@ -642,8 +638,11 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 			renderData.VBOs.push_back(fogCoordinateAttribute);
 
 			attribDescription.index = attributeIndexCount;
-			attribDescription.size = fog_coord_node->getElementSize();
-			attribDescription.type = VERTEXATTRIBUTE::FOGCOORD;
+			attribDescription.size = fog_coord_node->getStride();
+
+			attribDescription.primitiveType = fog_coord_node->getPrimitiveType();
+			attribDescription.size = fog_coord_node->getElementCount();
+			attribDescription.normalized = fog_coord_node->isNormalized();
 
 			attributeLayout.push_back(attribDescription);
 
@@ -651,11 +650,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 		}
 
 		X3DColorNode* color_node = color->getValue();
-		if(color_node)
-		{
+		if(color_node) {
 			color_node->updateVertexBufferObject();
 
-			BindlessPtrNV colorAttribute;
+			IndirectRenderData colorAttribute;
 			colorAttribute.address = color_node->getVBO();
 			colorAttribute.length = color_node->getAttribSize();
 			colorAttribute.index = attributeIndexCount;
@@ -664,8 +662,11 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 			renderData.VBOs.push_back(colorAttribute);
 
 			attribDescription.index = attributeIndexCount;
-			attribDescription.size = color_node->getElementSize();
-			attribDescription.type = VERTEXATTRIBUTE::COLOR;
+			attribDescription.size = color_node->getStride();
+
+			attribDescription.primitiveType = color_node->getPrimitiveType();
+			attribDescription.size = color_node->getElementCount();
+			attribDescription.normalized = color_node->isNormalized();
 
 			attributeLayout.push_back(attribDescription);
 
@@ -673,11 +674,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 		}
 
 		X3DNormalNode* normal_node = normal->getValue();
-		if(normal_node)
-		{
+		if(normal_node) {
 			normal_node->updateVertexBufferObject();
 
-			BindlessPtrNV normalAttribute;
+			IndirectRenderData normalAttribute;
 			normalAttribute.address = normal_node->getVBO();
 			normalAttribute.length = normal_node->getAttribSize();
 			normalAttribute.index = attributeIndexCount;
@@ -686,8 +686,11 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 			renderData.VBOs.push_back(normalAttribute);
 
 			attribDescription.index = attributeIndexCount;
-			attribDescription.size = normal_node->getElementSize();
-			attribDescription.type = VERTEXATTRIBUTE::NORMAL;
+			attribDescription.size = normal_node->getStride();
+
+			attribDescription.primitiveType = normal_node->getPrimitiveType();
+			attribDescription.size = normal_node->getElementCount();
+			attribDescription.normalized = normal_node->isNormalized();
 
 			attributeLayout.push_back(attribDescription);
 
@@ -701,8 +704,12 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 		const vector< int >& indices = index->getValue();
 		unsigned int indexSize = indices.size() * sizeof(GLuint);
 
-		if(use_bindless)
+		if(!ib_id) 
 		{
+			glGenBuffersARB(1, &ib_id);
+		}
+
+		if(use_bindless) {
 			//Does this need to be deleted? Look up to make sure....
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
 			glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &(*(indices.begin())), 0);
@@ -713,9 +720,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 			renderData.IBO.reserved = 0;
 			renderData.IBO.length = indexSize;
 			renderData.IBO.address = ib_GPUaddress;
-		}
-		else
-		{
+		} else {
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
 			glBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, indexSize, &(*(indices.begin()) ), GL_STATIC_DRAW_ARB );
 
@@ -724,6 +729,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti )
 			renderData.IBO.length = indexSize;
 			renderData.IBO.address = ib_id; //Implicitly cast from 64bit to 32bit uint........................ should be fine.... ;)
 		}
+
+		ti.getCurrentRenderstate().vertexLayoutDescription = renderData.vertexAttributeLayout;
+
+		renderData.renderState = renderer->insertNewTotalRenderState(ti.getCurrentRenderstate());
 	}
 
 	renderer->insertNewRenderData(&renderData);

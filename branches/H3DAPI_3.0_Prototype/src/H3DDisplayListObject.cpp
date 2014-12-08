@@ -48,28 +48,27 @@ void H3DDisplayListObject::DisplayList::rebuildAllDisplayLists() {
 
 /// Constructor
 H3DDisplayListObject::DisplayList::DisplayList():
-	display_list( 0 ),
+display_list( 0 ),
 	cache_mode( OPTIONS ),
 	frustum_culling_mode( OPTIONS ),
 	have_valid_display_list( false ),
-	isActive( new IsActive ){
-	initGraphicOption();
-	reset_delay_cache_counter = true;
-	delay_cache_counter = cachingDelay();
-	isActive->setValue( true );
-	isActive->setName( "H3DDisplayListObject::isActive" );
-	Scene::time->routeNoEvent( isActive );
+	isActive( new IsActive ) {
+		initGraphicOption();
+		reset_delay_cache_counter = true;
+		delay_cache_counter = cachingDelay();
+		isActive->setValue( true );
+		isActive->setName( "H3DDisplayListObject::isActive" );
+		Scene::time->routeNoEvent( isActive );
 
 #ifndef H3D_GENERATE_DOTROUTE_FILES
-	break_list_field->route( this );
+		break_list_field->route( this );
 #endif
 }
 
-H3DDisplayListObject::H3DDisplayListObject( 
-																			 Inst< DisplayList > _displayList ) :
-	displayList( _displayList ) {
-		displayList->setName( "displayList" );
-	}
+H3DDisplayListObject::H3DDisplayListObject( Inst< DisplayList > _displayList ) :
+displayList( _displayList ) {
+	displayList->setName( "displayList" );
+}
 
 
 void H3DDisplayListObject::DisplayList::update() 
@@ -89,7 +88,7 @@ bool H3DDisplayListObject::DisplayList::tryBuildDisplayList( bool cache_broken )
 
 	if( delay_cache_counter == 0 ) {
 		bool have_all_needed_display_lists = childrenCachesReady( cache_broken );
-	
+
 		// create the new display list if the displayLists we are dependent 
 		if( have_all_needed_display_lists ) {
 			//display_list = glGenLists( 1 ); 
@@ -97,7 +96,7 @@ bool H3DDisplayListObject::DisplayList::tryBuildDisplayList( bool cache_broken )
 			GLuint err = glGetError();
 			if( err != GL_NO_ERROR ) {
 				Console(4) << "OpenGL error in glNewList() Error: \"" << gluErrorString( err ) 
-									 << "\" when rendering " << getFullName() << endl;
+					<< "\" when rendering " << getFullName() << endl;
 				return false;
 			}
 			owner->render();
@@ -105,7 +104,7 @@ bool H3DDisplayListObject::DisplayList::tryBuildDisplayList( bool cache_broken )
 			err = glGetError();
 			if( err != GL_NO_ERROR ) {
 				Console(4) << "OpenGL error in glEndList() Error: \"" << gluErrorString( err ) 
-									 << "\" when rendering " << getFullName() << endl;
+					<< "\" when rendering " << getFullName() << endl;
 				return false;
 			}
 			return true;
@@ -135,7 +134,7 @@ void H3DDisplayListObject::DisplayList::callList( bool build_list ) {
 	GLuint err = glGetError();
 	if( err != GL_NO_ERROR ) {
 		Console(4) << "OpenGL error before H3DDisplayListObject::DisplayList::callList() Error: \"" << gluErrorString( err ) 
-							 << "\" when rendering parent of " << getFullName() << endl;
+			<< "\" when rendering parent of " << getFullName() << endl;
 	}
 
 	// if we are using frustum culling and bounding box is outside frustum
@@ -167,13 +166,13 @@ void H3DDisplayListObject::DisplayList::callList( bool build_list ) {
 			}
 		}
 	} 
-	
+
 	if ( using_caching && haveValidDisplayList() ) {
 		glCallList( display_list );
 		GLuint err = glGetError();
 		if( err != GL_NO_ERROR ) {
 			Console(4) << "OpenGL error in glCallList() Error: \"" << gluErrorString( err ) 
-								 << "\" when rendering " << getFullName() << endl;
+				<< "\" when rendering " << getFullName() << endl;
 			have_valid_display_list = false;
 		}
 	} else {
@@ -182,7 +181,7 @@ void H3DDisplayListObject::DisplayList::callList( bool build_list ) {
 		GLuint err = glGetError();
 		if( err != GL_NO_ERROR ) {
 			Console(4) << "OpenGL error in render() Error: \"" << gluErrorString( err ) 
-								 << "\" when rendering " << getFullName() << endl;
+				<< "\" when rendering " << getFullName() << endl;
 		} else {
 			if( delay_cache_counter > 0 ) 
 				--delay_cache_counter;
@@ -197,8 +196,8 @@ bool H3DDisplayListObject::DisplayList::childrenCachesReady( bool consider_activ
 	// a display list for this field based on the status of the 
 	// DisplayList field in the H3DDisplayListObjects.
 	for( FieldVector::iterator i = routes_in.begin();
-			 i != routes_in.end(); ++i ) 
-			 {
+		i != routes_in.end(); ++i ) 
+	{
 		SFNode *sfnode = 
 			dynamic_cast< SFNode* >( *i );
 		DisplayList *dl = dynamic_cast< DisplayList * >( *i );
@@ -220,16 +219,16 @@ bool H3DDisplayListObject::DisplayList::childrenCachesReady( bool consider_activ
 					// rebuilding cache.
 					if( consider_active_field ) {
 						if( !dl->haveValidDisplayList() ||
-								 dl->usingFrustumCulling()) {
-							have_all_needed_display_lists = false;
-							break;
+							dl->usingFrustumCulling()) {
+								have_all_needed_display_lists = false;
+								break;
 						}
 					} else {
 						if( dl->isActive->getValue() && 
-								( !dl->haveValidDisplayList() ||
-									 dl->usingFrustumCulling() ) ) {
-							have_all_needed_display_lists = false;
-							break;
+							( !dl->haveValidDisplayList() ||
+							dl->usingFrustumCulling() ) ) {
+								have_all_needed_display_lists = false;
+								break;
 						} 
 					}
 				}
@@ -239,33 +238,33 @@ bool H3DDisplayListObject::DisplayList::childrenCachesReady( bool consider_activ
 				dynamic_cast< MFNode* >( *i );
 			if( mfnode ) {
 				for( MFNode::const_iterator n = mfnode->begin();
-						 n != mfnode->end(); ++n ) {
-					H3DDisplayListObject *dlo = 
-						dynamic_cast< H3DDisplayListObject * >( *n );
-					if( dlo ) {
-						if( !dlo->displayList->usingCaching() ) { 
-							// child does not use caching, so it is not ready
-							return false;
-						} else {
-							// if the cache was just broken we cannot use the isActive field 
-							// any longer since a DisplayList can be activated when 
-							// rebuilding cache.
-							if( consider_active_field ) {
-								if( !dlo->displayList->haveValidDisplayList() || 
-										dlo->displayList->usingFrustumCulling() ) {
-									have_all_needed_display_lists = false;
-									break;
-								}
+					n != mfnode->end(); ++n ) {
+						H3DDisplayListObject *dlo = 
+							dynamic_cast< H3DDisplayListObject * >( *n );
+						if( dlo ) {
+							if( !dlo->displayList->usingCaching() ) { 
+								// child does not use caching, so it is not ready
+								return false;
 							} else {
-								if( dlo->displayList->isActive->getValue() && 
+								// if the cache was just broken we cannot use the isActive field 
+								// any longer since a DisplayList can be activated when 
+								// rebuilding cache.
+								if( consider_active_field ) {
+									if( !dlo->displayList->haveValidDisplayList() || 
+										dlo->displayList->usingFrustumCulling() ) {
+											have_all_needed_display_lists = false;
+											break;
+									}
+								} else {
+									if( dlo->displayList->isActive->getValue() && 
 										(!dlo->displayList->haveValidDisplayList() ||
-											dlo->displayList->usingFrustumCulling() ) ) {
-									have_all_needed_display_lists = false;
-									break;
-								} 
+										dlo->displayList->usingFrustumCulling() ) ) {
+											have_all_needed_display_lists = false;
+											break;
+									} 
+								}
 							}
 						}
-					}
 				}
 			}
 		}
@@ -280,13 +279,13 @@ namespace H3DDisplayListObjectInternal {
 		bool isBehind( const Vec3f &p ) {
 			return a*p.x + b*p.y + c*p.z + d < 0;
 		}
-		
+
 		H3DFloat a,b,c,d;
 	};
 }
 
 bool H3DDisplayListObject::DisplayList::usingFrustumCulling() {
-	
+
 	if( frustum_culling_mode == ON ) return true;
 	if( frustum_culling_mode == OFF ) return false;
 
@@ -375,7 +374,7 @@ bool H3DDisplayListObject::DisplayList::isOutsideViewFrustum() {
 
 	// the eight corner points of the bounding box.
 	Vec3f box_points[8];
-	
+
 	box_points[0] = center + half_size; 
 	box_points[1] = center + Vec3f( -half_size.x, half_size.y, half_size.z );
 	box_points[2] = center + Vec3f( half_size.x, -half_size.y, half_size.z );
@@ -384,23 +383,23 @@ bool H3DDisplayListObject::DisplayList::isOutsideViewFrustum() {
 	box_points[5] = center + Vec3f( -half_size.x, half_size.y, -half_size.z );
 	box_points[6] = center + Vec3f( half_size.x, -half_size.y, -half_size.z );
 	box_points[7] = center - half_size;
-	
+
 
 	// get the current matrices
 	GLfloat pm[16], mv[16];
 	glGetFloatv( GL_PROJECTION_MATRIX, pm );
 	glGetFloatv( GL_MODELVIEW_MATRIX, mv );
- 
+
 	// find the position of the near plane.
 	Matrix4f pm_matrix( pm[0], pm[4], pm[8],  pm[12],
-											pm[1], pm[5], pm[9],  pm[13],
-											pm[2], pm[6], pm[10], pm[14],
-											pm[3], pm[7], pm[11], pm[15] );
-	
+		pm[1], pm[5], pm[9],  pm[13],
+		pm[2], pm[6], pm[10], pm[14],
+		pm[3], pm[7], pm[11], pm[15] );
+
 	Matrix4f mv_matrix( mv[0], mv[4], mv[8],  mv[12],
-											mv[1], mv[5], mv[9],  mv[13],
-											mv[2], mv[6], mv[10], mv[14],
-											mv[3], mv[7], mv[11], mv[15] );
+		mv[1], mv[5], mv[9],  mv[13],
+		mv[2], mv[6], mv[10], mv[14],
+		mv[3], mv[7], mv[11], mv[15] );
 	Matrix4f pm_mv_matrix = pm_matrix * mv_matrix;
 
 	// find the view frustum planes.
@@ -456,7 +455,7 @@ bool H3DDisplayListObject::DisplayList::isOutsideViewFrustum() {
 bool H3DDisplayListObject::DisplayList::usingCaching() {
 	// geometry node will be have specific usingCaching(), no geometry node condition 
 	// will be considered here
-	
+
 	// if multi_pass_transparency is in use caching cannot be used
 	// for anything else than geometries since the scene will be 
 	// rendered thrice with different properties set and if e.g. a solid

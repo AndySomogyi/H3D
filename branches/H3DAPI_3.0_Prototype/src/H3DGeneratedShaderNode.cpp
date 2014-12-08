@@ -108,7 +108,6 @@ string H3DGeneratedShaderNode::addUniformFields( ComposedShader *shader ) {
   // add dynamic fields for uniform variables and return string for uniform
   // variable specification.
   return "";
-  
 }
 
 string H3DGeneratedShaderNode::getVertexShaderString(){

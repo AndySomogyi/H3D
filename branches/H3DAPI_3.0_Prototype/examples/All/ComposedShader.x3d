@@ -21,12 +21,11 @@
             <ImageTexture DEF="EARTH_CLOUDS" url="textures/Clouds.jpg" />
           </field>
           <field name="lightPosition" type="SFVec3f" value="0.45 0 -0.45" accessType="inputOutput" />
-          <field name="viewpointPosition" type="SFVec3f" value="0 0 0.6"
-                   accessType="inputOutput" />
+          <field name="viewpointPosition" type="SFVec3f" value="0 0 0.6" accessType="inputOutput" />
           <field name="viewpointOrn" type="SFMatrix4f" value="1 0 0 0
-                                                            0 1 0 0
-                                                            0 0 1 0
-                                                            0 0 0 1"
+                                                              0 1 0 0
+                                                              0 0 1 0
+                                                              0 0 0 1"
                  accessType="inputOutput" />
           <ShaderPart type="FRAGMENT" url="Shader/glsl_Earth.frag" />
           <ShaderPart type="VERTEX" url="Shader/glsl_Earth.vert" />

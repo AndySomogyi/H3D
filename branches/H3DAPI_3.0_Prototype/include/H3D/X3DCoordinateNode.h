@@ -65,7 +65,7 @@ namespace H3D {
     /// Disable the array state enabled in renderArray().
     virtual void disableArray() {}
 
-    /// Returns the default xml containerField attribute value.
+    /// Returns the default XML containerField attribute value.
     /// For this node it is "coord".
     ///
     virtual string defaultXMLContainerField() {
@@ -75,7 +75,7 @@ namespace H3D {
     /// Returns the number of coordinates this coordinate node can render.
     virtual unsigned int nrAvailableCoords() = 0; 
 
-    /// Implement the method to specify data and releated information
+    /// Implement the method to specify data and related information
     virtual void setAttributeData ( ){};
 
     /// VBO rendering implementation

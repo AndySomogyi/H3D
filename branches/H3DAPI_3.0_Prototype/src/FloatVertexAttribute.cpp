@@ -117,8 +117,10 @@ bool FloatVertexAttribute::preRenderCheckFail ( ){
 
 void FloatVertexAttribute::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*value->begin ( ));
-  element_size = sizeof(GLfloat);
-  attrib_size = value->size ( )*element_size;
+  element_count = 1;
+  primitiveType = GL_FLOAT;
+  element_stride = sizeof(GLfloat);
+  attrib_size = value->size ( )*element_stride;
 }
 
 void FloatVertexAttribute::renderVBO ( ){

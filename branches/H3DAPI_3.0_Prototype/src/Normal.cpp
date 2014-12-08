@@ -84,8 +84,10 @@ bool Normal::preRenderCheckFail ( ){
 
 void Normal::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*vector->begin ( ));
-  element_size = 3 * sizeof(GLfloat);
-  attrib_size = vector->size ( ) * element_size;
+  element_count = 3;
+  primitiveType = GL_FLOAT;
+  element_stride = 3 * sizeof(GLfloat);
+  attrib_size = vector->size ( ) * element_stride;
 }
 
 void Normal::renderVBO ( ){

@@ -833,7 +833,7 @@ void H3DWindowNode::renderChild( X3DChildNode *child_to_render ) {
 	} 
 	else 
 	{
-		// normal render mode, just render.
+		// Normal render mode, just render.
 		renderChild( child_to_render, false );
 	}
 }

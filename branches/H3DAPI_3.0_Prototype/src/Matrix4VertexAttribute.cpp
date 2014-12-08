@@ -150,8 +150,10 @@ void Matrix4VertexAttribute::setAttributeData ( ){
     data[i * 9 + 15] = m[3][3];
   }
   attrib_data = (GLvoid*)data;
-  element_size = 16 * sizeof(GLfloat);
-  attrib_size = value->size ( ) * element_size;
+  element_count = 16;
+  primitiveType = GL_FLOAT;
+  element_stride = 16 * sizeof(GLfloat);
+  attrib_size = value->size ( ) * element_stride;
 
 }
 

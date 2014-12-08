@@ -81,8 +81,10 @@ bool Coordinate::preRenderCheckFail ( ){
 
 void Coordinate::setAttributeData ( ){
   attrib_data =(GLvoid*) &(*point->begin ( ));
-  element_size = 3 * sizeof(GLfloat);
-  attrib_size = point->size ( ) * element_size;
+  element_count = 3;
+  primitiveType = GL_FLOAT;
+  element_stride = 3 * sizeof(GLfloat);
+  attrib_size = point->size ( ) * element_stride;
 }
 
 void Coordinate::renderVBO ( ){

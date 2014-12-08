@@ -236,20 +236,22 @@ void X3DShapeNode::traverseSG( TraverseInfo &ti )
 	{
 		Appearance* appearance = dynamic_cast<Appearance*>(a);
 
-		// If this either fails or sends in a totally default appearance/geometry setting, renderState will just be 0, and that's fine, 
-		// the Renderer can deal with a shape with a null handle.
-		if(appearance && g)
+		if(appearance)
 		{
-			renderStateHandle = ti.GetRenderer()->insertNewTotalRenderState(appearance, g);
+				ti.getCurrentRenderstate().ApplyChanges(appearance);
+		}
+
+		if(g)
+		{
+			ti.getCurrentRenderstate().ApplyChanges(g);
 		}
 
 		renderStateUpdated = true;
 	}
 
-	ti.SetCurrentRenderstate(renderStateHandle);
+	//ti.SetCurrentRenderstate(renderStateHandle);
 
-	if( ti.graphicsEnabled() && g && a && a->hasGeometryShadow()) 
-	{
+	if( ti.graphicsEnabled() && g && a && a->hasGeometryShadow()) {
 		// add shadow volume
 		ShadowCaster *shadow_caster = NULL;
 		if( !ti.getUserData( "ShadowCaster",  (void **)&shadow_caster) ) {
@@ -265,8 +267,7 @@ void X3DShapeNode::traverseSG( TraverseInfo &ti )
 		} 
 	}
 
-	if ( a ) 
-	{
+	if ( a ) {
 		a->traverseSG( ti );
 		traverse_multipass_transparency = traverse_multipass_transparency ||
 			( ti.graphicsEnabled() && a->isTransparent() &&
@@ -365,11 +366,12 @@ bool X3DShapeNode::movingSphereIntersect( H3DFloat radius,
 	NodeIntersectResult &result ) 
 {
 	X3DGeometryNode *tmp_geom = geometry->getValue();
-	if( tmp_geom )
+	if( tmp_geom ) {
 		return tmp_geom->movingSphereIntersect( radius, from, to,
-		result );
-	else
+			result );
+	} else {
 		return false;
+	}
 }
 
 bool X3DShapeNode::BugWorkaroundDisplayList::haveValidDisplayList() 

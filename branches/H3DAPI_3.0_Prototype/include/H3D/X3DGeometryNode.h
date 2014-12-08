@@ -196,12 +196,13 @@ namespace H3D {
     }
 
     /// Get which face will be culled if culling is enabled.
-    inline GLenum getCullFace() {
+    inline GLenum getCullFace() 
+	{
       return cull_face;
     }
 
     /// Get the first option node of the type of the pointer given as argument
-    /// from the renderOptions fieeld
+    /// from the renderOptions field
     /// The option argument will contain the node afterwards, or NULL if no
     /// option of that type exists.
     template< class OptionNodeType >

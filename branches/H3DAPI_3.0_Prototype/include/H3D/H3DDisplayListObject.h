@@ -78,8 +78,7 @@ namespace H3D {
 
 			protected:
 				/// Should be called from callList().
-				void callListCalled() 
-				{
+				void callListCalled() {
 					setValue( true );
 					active = true;
 				}

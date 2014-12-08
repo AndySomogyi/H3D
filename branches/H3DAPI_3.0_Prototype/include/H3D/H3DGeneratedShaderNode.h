@@ -229,7 +229,7 @@ namespace H3D {
     /// variables that are needed by the shader generator.
     virtual void getVaryingVariables( vector< VaryingVariable > &variables ) {}
 
-    /// Get the attribues used by the shader generator.
+    /// Get the attributes used by the shader generator.
     /// Should be implemented by subclasses to add all the varying
     /// variables that are needed by the shader generator.
     virtual void getAttributes( vector< Attribute > &attributes ) {}

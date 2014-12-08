@@ -34,27 +34,27 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase ColorRGBA::database( "ColorRGBA", 
-                                     &(newInstance<ColorRGBA>),
-                                     typeid( ColorRGBA ),
-                                     &X3DColorNode::database );
+	&(newInstance<ColorRGBA>),
+	typeid( ColorRGBA ),
+	&X3DColorNode::database );
 
 namespace ColorRGBAInternals {
-  FIELDDB_ELEMENT( ColorRGBA, color, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( ColorRGBA, color, INPUT_OUTPUT );
 }
 
 
 ColorRGBA::ColorRGBA( 
-                     Inst< MFColorRGBA>  _color,
-                     Inst< SFNode     >  _metadata ) :
-  X3DColorNode( _metadata ),
-  color   ( _color    ) {
+	Inst< MFColorRGBA>  _color,
+	Inst< SFNode     >  _metadata ) :
+X3DColorNode( _metadata ),
+	color   ( _color    ) {
 
-  type_name = "ColorRGBA";
-  database.initFields( this );
+		type_name = "ColorRGBA";
+		database.initFields( this );
 
-  color->route( propertyChanged );
-  vboFieldsUpToDate->setName( "vboFieldsUpToDate" );
-  color->route( vboFieldsUpToDate );
+		color->route( propertyChanged );
+		vboFieldsUpToDate->setName( "vboFieldsUpToDate" );
+		color->route( vboFieldsUpToDate );
 }
 
 ColorRGBA::~ColorRGBA() {
@@ -63,47 +63,54 @@ ColorRGBA::~ColorRGBA() {
 // Perform the OpenGL commands to render all vertices as a vertex
 // array.
 void ColorRGBA::renderArray() {
-  if( !color->empty() ) {
-    glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(4, GL_FLOAT, 0,
-                  &(*color->begin()) );
-  }
+	if( !color->empty() ) {
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(4, GL_FLOAT, 0,
+			&(*color->begin()) );
+	}
 }
 
 // Disable the array state enabled in renderArray().
 void ColorRGBA::disableArray() {
-  glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 }
 
 bool ColorRGBA::preRenderCheckFail ( ){
-  return GLVertexAttributeObject::preRenderCheckFail ( ) ||
-    color->empty ( );
+	return GLVertexAttributeObject::preRenderCheckFail ( ) ||
+		color->empty ( );
 }
 
 void ColorRGBA::setAttributeData ( ){
-  attrib_data = (GLvoid*)&(*color->begin ( ));
-  element_size = 4 * sizeof(GLfloat);
-  attrib_size = color->size ( ) * element_size;
+	attrib_data = (GLvoid*)&(*color->begin ( ));
+	element_count = 4;
+	primitiveType = GL_FLOAT;
+	element_stride = 4;
+	attrib_size = color->size ( ) * sizeof(GLfloat);
 }
 
-void ColorRGBA::renderVBO ( ){
-  glEnableClientState ( GL_COLOR_ARRAY );
-  if ( use_bindless )
-  {
-    glColorFormatNV ( 4, GL_FLOAT, 0 );
-    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
-    // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_COLOR_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
-  } else
-  {
-    glColorPointer ( 4, GL_FLOAT, 0, NULL );
-  }
+void ColorRGBA::renderVBO ( )
+{
+	glEnableClientState ( GL_COLOR_ARRAY );
+	if ( use_bindless )
+	{
+		glColorFormatNV ( 4, GL_FLOAT, 0 );
+		glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+
+		// vbo is dedicated for this vertex attribute, so there is no offset
+		glBufferAddressRangeNV ( GL_COLOR_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
+	} 
+	else
+	{
+		glColorPointer ( 4, GL_FLOAT, 0, NULL );
+	}
 }
 
-void ColorRGBA::disableVBO ( ){
-  if ( use_bindless )
-  {
-    glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
-  }
-  glDisableClientState ( GL_COLOR_ARRAY );
+void ColorRGBA::disableVBO ()
+{
+	if ( use_bindless )
+	{
+		glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+	}
+
+	glDisableClientState ( GL_COLOR_ARRAY );
 }

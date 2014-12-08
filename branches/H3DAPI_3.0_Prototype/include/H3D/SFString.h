@@ -29,6 +29,7 @@
 #define __SFSTRING_H__
 
 #include <H3D/SField.h>
+#include <string>
 
 namespace H3D {
 

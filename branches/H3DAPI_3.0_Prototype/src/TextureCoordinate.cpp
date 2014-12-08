@@ -92,8 +92,10 @@ bool TextureCoordinate::preRenderCheckFail ( ){
 void TextureCoordinate::setAttributeData ( )
 {
   attrib_data = (GLvoid*)&(*point->begin ( ));
-  element_size = 2 * sizeof(GLfloat);
-  attrib_size = point->size ( ) * element_size;
+  element_count = 2;
+  primitiveType = GL_FLOAT;
+  element_stride = 2 * sizeof(GLfloat);
+  attrib_size = point->size ( ) * element_stride;
 }
 
 void TextureCoordinate::renderVBO ( ){

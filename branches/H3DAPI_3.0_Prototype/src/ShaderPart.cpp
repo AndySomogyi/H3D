@@ -58,7 +58,7 @@ ShaderPart::ShaderPart( Inst< SFNode         > _metadata,
                         Inst< MFString       > _url ,
                         Inst< SFString       > _type,
                         Inst< SFShaderString > _shader_string,
-                        Inst< SFBool         > _forceReload):
+                        Inst< SFBool         > _forceReload) :
   X3DNode( _metadata ),
   X3DUrlObject( _url ),
   type( _type ),
@@ -141,6 +141,7 @@ GLhandleARB ShaderPart::compileShaderPart(){
     glCompileShaderARB( shader_handle );
 
     GLint compile_success;
+	/* For when we want to rewrite this: http://stackoverflow.com/questions/20717334/glgetobjectparameteriv-not-in-glew */
     glGetObjectParameterivARB( shader_handle,
       GL_OBJECT_COMPILE_STATUS_ARB,
       &compile_success );

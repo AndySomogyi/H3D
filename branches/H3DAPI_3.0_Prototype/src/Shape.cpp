@@ -60,5 +60,3 @@ Shape::Shape(
   type_name = "Shape";
 
 }
-
-

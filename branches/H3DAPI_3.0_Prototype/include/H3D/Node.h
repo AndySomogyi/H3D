@@ -45,7 +45,8 @@ namespace H3D {
   /// \class Node
   /// \brief Node is the base class for all classes that can be part of
   /// the H3D scene-graph.
-  class H3DAPI_API Node: public RefCountedClass {
+  class H3DAPI_API Node: public RefCountedClass 
+  {
   public:
  
     typedef HAPI::Collision::IntersectionInfo IntersectionInfo;
@@ -86,7 +87,7 @@ namespace H3D {
     }
 
     /// Set the X3DPrototypeInstance this node is the the root node
-    /// if applicaple.
+    /// if applicable.
     inline void setProtoInstanceParent( X3DPrototypeInstance *p) {
       proto_parent = p;
     }
@@ -390,7 +391,5 @@ namespace H3D {
     DestructCallbacks destruct_callbacks;
     X3DPrototypeInstance *proto_parent;
   };
-
 };
-
 #endif

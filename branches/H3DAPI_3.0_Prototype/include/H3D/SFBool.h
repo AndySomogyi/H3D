@@ -32,25 +32,26 @@
 
 namespace H3D {
 
-  // template specializations in order to get nicer type printouts.
-  template<>
-  inline string SField< bool >::classTypeName() { return "SFBool"; }
+	// template specializations in order to get nicer type printouts.
+	template<>
+	inline string SField< bool >::classTypeName() { return "SFBool"; }
 
-  /// \ingroup FieldTypes
-  /// The SFBool field contains a single boolean value.
-  class H3DAPI_API SFBool: public SField< bool > {
-  public:
-    SFBool( const bool &_value = false ): SField< bool >( _value ){}
-    virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFBOOL; }
-    
-    /// Get the value of the field as a string.
-    inline virtual string getValueAsString( const string& separator = " " ) {
-      if( getValue() )
-        return "true";
-      else
-        return "false";
-    }
-  };
+	/// \ingroup FieldTypes
+	/// The SFBool field contains a single boolean value.
+	class H3DAPI_API SFBool: public SField< bool > {
+	public:
+		SFBool( const bool &_value = false ): SField< bool >( _value ){}
+		virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFBOOL; }
+
+		/// Get the value of the field as a string.
+		inline virtual string getValueAsString( const string& separator = " " ) {
+			if( getValue() ) {
+				return "true";
+			} else {
+				return "false";
+			}
+		}
+	};
 }
 
 #endif
