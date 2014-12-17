@@ -309,13 +309,12 @@ namespace H3D
 		// The index for the index buffer object
 		GLuint ib_id;
 		GLuint64 ib_GPUaddress;
-
 		bool use_bindless;
-
 		bool attributeLayoutCached; //Starts off as false. If it's false, send in this vao to renderer and get a uint32 handle back.
 
 		//Should probably actually contain a Renderable here.
 		RenderData renderData;
+		ElementDrawData elementData;
 	};
 }
 

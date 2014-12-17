@@ -36,7 +36,6 @@
 #include <H3D/Renderer.h>
 #include <string>
 
-
 // HAPI includes
 #include <H3DUtil/Threads.h>
 #include <vector>
@@ -544,6 +543,7 @@ namespace H3D
 		// Each scene will own a renderer. 
 		// You might be able to guess what this class will do.
 		auto_ptr<Renderer> renderer;
+		auto_ptr<PrototypeShader> defaultShader;
 
 		bool active;
 

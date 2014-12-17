@@ -1716,6 +1716,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render)
 		nav_speed,
 		transition_type,
 		transition_time );
+
 	// Store previous mouse position
 	previous_mouse_position[0] = mouse_position[0];
 	previous_mouse_position[1] = mouse_position[1];
@@ -2117,3 +2118,34 @@ string H3DWindowNode::takeScreenShot( const string &url )
 #endif // HAVE_FREEIMAGE
 }
 
+
+void H3D::H3DWindowNode::navigate()
+{
+	string nav_type = default_nav;
+	bool use_collision = default_collision;
+	vector< H3DFloat > &avatar_size = default_avatar;
+	H3DFloat nav_speed = default_speed;
+	vector< string > &transition_type = default_transition_type;
+	H3DTime transition_time = default_transition_time;
+
+	NavigationInfo *nav_info = navigationInfo->getValue();
+	if( nav_info ) {
+		nav_type = nav_info->getUsedNavType();
+		use_collision = true;
+		std::vector<H3DFloat> avatar_size = nav_info->avatarSize->getValue();
+		nav_speed = nav_info->speed->getValue();
+		std::vector<std::string> transition_type = nav_info->transitionType->getValue();
+		transition_time = nav_info->transitionTime->getValue();
+	}
+
+	X3DViewpointNode *vp = X3DViewpointNode::getActive();
+
+	h3d_navigation->doNavigation(nav_type,
+		vp,
+		nullptr,
+		false,
+		avatar_size,
+		30.0f,
+		transition_type,
+		transition_time);
+}

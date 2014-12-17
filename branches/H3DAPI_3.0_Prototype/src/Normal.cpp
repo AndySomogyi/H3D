@@ -34,10 +34,10 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase Normal::database( 
-                                 "Normal", 
-                                 &(newInstance<Normal>), 
-                                 typeid( Normal ),
-                                 &X3DNormalNode::database );
+								 "Normal", 
+								 &(newInstance<Normal>), 
+								 typeid( Normal ),
+								 &X3DNormalNode::database );
 
 namespace NormalInternals {
   FIELDDB_ELEMENT( Normal, vector, INPUT_OUTPUT );
@@ -46,8 +46,8 @@ namespace NormalInternals {
 
 
 Normal::Normal( 
-               Inst< SFNode >  _metadata,
-               Inst< MFVec3f>  _vector ) :
+			   Inst< SFNode >  _metadata,
+			   Inst< MFVec3f>  _vector ) :
   X3DNormalNode( _metadata ),
   vector  ( _vector ) {
 
@@ -66,9 +66,9 @@ Normal::~Normal() {
 // array.
 void Normal::renderArray() {
   if( !vector->empty() ) {
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer( GL_FLOAT, 0,
-                   &(*vector->begin()) );
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glNormalPointer( GL_FLOAT, 0,
+				   &(*vector->begin()) );
   }
 }
 
@@ -79,28 +79,28 @@ void Normal::disableArray() {
 
 bool Normal::preRenderCheckFail ( ){
   return GLVertexAttributeObject::preRenderCheckFail ( ) ||
-    vector->empty ( );
+	vector->empty ( );
 }
 
 void Normal::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*vector->begin ( ));
-  element_count = 3;
-  primitiveType = GL_FLOAT;
-  element_stride = 3 * sizeof(GLfloat);
-  attrib_size = vector->size ( ) * element_stride;
+  VAD.elementCount = 3;
+  VAD.primitiveType = GL_FLOAT;
+  VAD.stride = VAD.elementCount * sizeof(GLfloat);
+  VAD.attributeSize = vector->size() * VAD.stride; // * sizeof(GLfloat);
 }
 
 void Normal::renderVBO ( ){
   glEnableClientState ( GL_NORMAL_ARRAY );
   if ( use_bindless )
   {
-    glNormalFormatNV ( GL_FLOAT, 0 );
-    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
-    // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_NORMAL_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
+	glNormalFormatNV ( GL_FLOAT, 0 );
+	glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+	// vbo is dedicated for this vertex attribute, so there is no offset
+	glBufferAddressRangeNV ( GL_NORMAL_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
   } else
   {
-    glNormalPointer ( GL_FLOAT, 0, NULL );
+	glNormalPointer ( GL_FLOAT, 0, NULL );
   }
   
 }
@@ -108,7 +108,7 @@ void Normal::renderVBO ( ){
 void Normal::disableVBO ( ){
   if ( use_bindless )
   {
-    glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+	glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
   }
   glDisableClientState ( GL_NORMAL_ARRAY );
 }

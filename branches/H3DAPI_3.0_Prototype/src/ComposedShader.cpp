@@ -48,10 +48,10 @@ map<GLhandleARB, int> ComposedShader::phandle_counts;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase ComposedShader::database( 
-                                   "ComposedShader", 
-                                   &(newInstance<ComposedShader>), 
-                                   typeid( ComposedShader ),
-                                   &X3DShaderNode::database );
+								   "ComposedShader", 
+								   &(newInstance<ComposedShader>), 
+								   typeid( ComposedShader ),
+								   &X3DShaderNode::database );
 
 namespace ComposedShaderInternals {
   FIELDDB_ELEMENT( ComposedShader, parts, INPUT_OUTPUT );
@@ -67,25 +67,25 @@ namespace ComposedShaderInternals {
 }
 
 ComposedShader::ComposedShader( Inst< DisplayList  > _displayList,
-                                Inst< SFNode       > _metadata,
-                                Inst< SFBool       > _isSelected ,
-                                Inst< SFBool       > _isValid,
-                                Inst< SFBool       > _activate,
-                                Inst< SFString     > _language,
-                                Inst< MFShaderPart > _parts,
-                                Inst< SFBool       > _suppressUniformWarnings,
-                                Inst< SFString     > _geometryInputType,
-                                Inst< SFString     > _geometryOutputType,
-                                Inst< SFInt32      > _geometryVerticesOut,
-                                Inst< SFString     > _transparencyDetectMode,
-                                Inst< MFString     > _transformFeedbackVaryings
+								Inst< SFNode       > _metadata,
+								Inst< SFBool       > _isSelected ,
+								Inst< SFBool       > _isValid,
+								Inst< SFBool       > _activate,
+								Inst< SFString     > _language,
+								Inst< MFShaderPart > _parts,
+								Inst< SFBool       > _suppressUniformWarnings,
+								Inst< SFString     > _geometryInputType,
+								Inst< SFString     > _geometryOutputType,
+								Inst< SFInt32      > _geometryVerticesOut,
+								Inst< SFString     > _transparencyDetectMode,
+								Inst< MFString     > _transformFeedbackVaryings
 #ifdef EXPORT_SHADER
-                                ,
-                                Inst< UpdateSaveShadersToUrl > _saveShadersToUrl
+								,
+								Inst< UpdateSaveShadersToUrl > _saveShadersToUrl
 #endif
-                                ) :
+								) :
   X3DShaderNode( _displayList, _metadata, _isSelected, 
-                 _isValid, _activate, _language),
+				 _isValid, _activate, _language),
   X3DProgrammableShaderObject( &database ),
   parts( _parts ),
   suppressUniformWarnings( _suppressUniformWarnings ),
@@ -151,21 +151,21 @@ bool ComposedShader::shader_support_checked = false;
 bool ComposedShader::isTransparent( X3DMaterialNode *material ) {
   const string &mode = transparencyDetectMode->getValue();
   if( mode == "TRANSPARENT" ) {
-    return true;
+	return true;
   } else if( mode == "OPAQUE" ) {
-    return false;
+	return false;
   } else {
-    if( mode != "AS_MATERIAL") {
-      Console(4) << "Warning: Invalid transparencyDetectMode \"" << mode << "\" in ComposedShader."
-     << " Must be one of \"AS_MATERIAL\", \"TRANSPARENT\" or \"OPAQUE\"." << endl;
-    }
-    if( material ) return material->isTransparent();
+	if( mode != "AS_MATERIAL") {
+	  Console(4) << "Warning: Invalid transparencyDetectMode \"" << mode << "\" in ComposedShader."
+	 << " Must be one of \"AS_MATERIAL\", \"TRANSPARENT\" or \"OPAQUE\"." << endl;
+	}
+	if( material ) return material->isTransparent();
   }
   return false;
 }
 
 bool ComposedShader::addField( const string &name, 
-                               const Field::AccessType &access, Field *field ){
+							   const Field::AccessType &access, Field *field ){
   // composed shader added field can be node field such as texture
   // or just field such as SFFloat, SFBool
   // as field name should be the same as they are in shaders, name will be used 
@@ -173,33 +173,33 @@ bool ComposedShader::addField( const string &name,
   // For shader program, the name in dynamic field will match the field in shader
   
   if( !field || uniformFields.find( name )!=uniformFields.end() ) {
-    // different shader part may add the same field with same name
-    // as uniformFields is a global dataset for the shader program
-      return false;
-    }
+	// different shader part may add the same field with same name
+	// as uniformFields is a global dataset for the shader program
+	  return false;
+	}
   // the field being added have a unique name never being used before in this shader
   bool success = X3DProgrammableShaderObject::addField( name, access, field  );
   if( success ) {
-    // insert a new entry for the newly added field
-    
-    H3D::Shaders::UniformInfo ui = { field, 0 };
-    uniformFields.insert( std::pair< string, H3D::Shaders::UniformInfo >( name , ui ) );
-    // if inserted node is a SFNode, or MFNode, need to handle the actual node inside
-    // the field specially
-    SFNode * sf_node_field = dynamic_cast< SFNode * >( field );
-    MFNode * mf_node_field = dynamic_cast< MFNode * >( field );
-    if( sf_node_field || mf_node_field ) {
-      field->route( setupDynamicRoutes, id );
-    } 
-    // no need to route field to displayList all the time, the routing will only be
-    // handle when caching is on
-    field->route( updateUniforms );
+	// insert a new entry for the newly added field
+	
+	H3D::Shaders::UniformInfo ui = { field, 0 };
+	uniformFields.insert( std::pair< string, H3D::Shaders::UniformInfo >( name , ui ) );
+	// if inserted node is a SFNode, or MFNode, need to handle the actual node inside
+	// the field specially
+	SFNode * sf_node_field = dynamic_cast< SFNode * >( field );
+	MFNode * mf_node_field = dynamic_cast< MFNode * >( field );
+	if( sf_node_field || mf_node_field ) {
+	  field->route( setupDynamicRoutes, id );
+	} 
+	// no need to route field to displayList all the time, the routing will only be
+	// handle when caching is on
+	field->route( updateUniforms );
   }else{
-    // can not add same field twice,even though it has different name.
-    // This is the limit of h3d dynamic field object. 
-    Console(4)<<"Warning: Failed to add field: "<<name<<" to shader "<< getName()
-      <<", either current node is invalid or the added field is already in the node database!"
-      <<endl;
+	// can not add same field twice,even though it has different name.
+	// This is the limit of h3d dynamic field object. 
+	Console(4)<<"Warning: Failed to add field: "<<name<<" to shader "<< getName()
+	  <<", either current node is invalid or the added field is already in the node database!"
+	  <<endl;
   }
   return success;
 }
@@ -210,36 +210,36 @@ bool ComposedShader::removeField ( const string& _name ) {
 
   // Remove from uniformFields map
   for( UniformFieldMap::iterator i = uniformFields.begin(); i != uniformFields.end(); ++i  ) {
-    const string &name = i->first;
-    if ( name == _name ) {
-      uniformFields.erase ( i );
-      break;
-    }
+	const string &name = i->first;
+	if ( name == _name ) {
+	  uniformFields.erase ( i );
+	  break;
+	}
   }
 
   // Fields containing nodes require special handling
   SFNode* sf_node_field = dynamic_cast< SFNode* >( f );
   MFNode* mf_node_field = dynamic_cast< MFNode* >( f );
   if( sf_node_field || mf_node_field ) {
-    f->unroute( setupDynamicRoutes );
+	f->unroute( setupDynamicRoutes );
 
-    // Unroute the displayList of all nodes contained from our displayList
-    map< Field*, NodeVector >::iterator in_map =
-      setupDynamicRoutes->fields_to_nodes.find( f );
+	// Unroute the displayList of all nodes contained from our displayList
+	map< Field*, NodeVector >::iterator in_map =
+	  setupDynamicRoutes->fields_to_nodes.find( f );
 
-    if ( in_map != setupDynamicRoutes->fields_to_nodes.end() ) {
-      const NodeVector& node_vector= (*in_map).second;
-      for( unsigned int i = 0; i < node_vector.size(); ++i ) {
-        H3DDisplayListObject* hdln =
-          dynamic_cast< H3DDisplayListObject * >( node_vector[i] );
-        if( hdln )
-          hdln->displayList->unroute( displayList );
-      }
-      setupDynamicRoutes->fields_to_nodes.erase( in_map );
-    }
+	if ( in_map != setupDynamicRoutes->fields_to_nodes.end() ) {
+	  const NodeVector& node_vector= (*in_map).second;
+	  for( unsigned int i = 0; i < node_vector.size(); ++i ) {
+		H3DDisplayListObject* hdln =
+		  dynamic_cast< H3DDisplayListObject * >( node_vector[i] );
+		if( hdln )
+		  hdln->displayList->unroute( displayList );
+	  }
+	  setupDynamicRoutes->fields_to_nodes.erase( in_map );
+	}
 
   } else {
-    f->unroute( displayList );
+	f->unroute( displayList );
   }
   f->unroute( updateUniforms );
 
@@ -250,7 +250,7 @@ GLbitfield ComposedShader::getAffectedGLAttribs() {
   GLbitfield res = X3DShaderNode::getAffectedGLAttribs();
   if( GLEW_ARB_shader_objects ) 
 	{
-    res |= Shaders::getAffectedGLAttribs( this );
+	res |= Shaders::getAffectedGLAttribs( this );
   }
   res |= GL_COLOR_BUFFER_BIT;
   return res;
@@ -258,10 +258,10 @@ GLbitfield ComposedShader::getAffectedGLAttribs() {
 
 void ComposedShader::preRender() {
   if( GLEW_ARB_shader_objects ) {
-    glUseProgramObjectARB( program_handle );
-    Shaders::preRenderTextures( this );
-    Shaders::preRenderShaderResources( this, program_handle );
-    X3DShaderNode::preRender();
+	glUseProgramObjectARB( program_handle );
+	Shaders::preRenderTextures( this );
+	Shaders::preRenderShaderResources( this, program_handle );
+	X3DShaderNode::preRender();
   }
 
   glEnable( GL_BLEND );
@@ -270,9 +270,9 @@ void ComposedShader::preRender() {
 
 void ComposedShader::postRender() {
   if( GLEW_ARB_shader_objects ) {
-    glUseProgramObjectARB( 0 );
-    Shaders::postRenderTextures( this );
-    X3DShaderNode::postRender();
+	glUseProgramObjectARB( 0 );
+	Shaders::postRenderTextures( this );
+	X3DShaderNode::postRender();
   }
 }
 
@@ -281,13 +281,13 @@ void ComposedShader::traverseSG ( TraverseInfo& ti ) {
   Node* n;
   for( H3DDynamicFieldsObject::field_iterator f = this->firstField(); f != this->endField(); ++f ) 
   {
-    X3DTypes::X3DType x3d_type = (*f)->getX3DType();
-    if(x3d_type==X3DTypes::SFNODE){
-      n = static_cast<SFNode*>(*f)->getValue();
-      if( ShaderAtomicCounter* sac = dynamic_cast<ShaderAtomicCounter*>(n) ) {
-        sac->traverseSG(ti);
-      }
-    }
+	X3DTypes::X3DType x3d_type = (*f)->getX3DType();
+	if(x3d_type==X3DTypes::SFNODE){
+	  n = static_cast<SFNode*>(*f)->getValue();
+	  if( ShaderAtomicCounter* sac = dynamic_cast<ShaderAtomicCounter*>(n) ) {
+		sac->traverseSG(ti);
+	  }
+	}
   }
 
   // Will be set to true if tessellation shader is present
@@ -296,35 +296,35 @@ void ComposedShader::traverseSG ( TraverseInfo& ti ) {
   // Look for tessellation shader
   require_patches = false;
   for( MFShaderPart::const_iterator i = parts->begin();
-        i != parts->end(); ++i ) {
-    ShaderPart* shader_part= static_cast< ShaderPart * >(*i);
-    if ( shader_part->type->getValue() == "TESS_CONTROL" || shader_part->type->getValue() == "TESS_EVALUATION" ) {
-      require_patches= true;
-      break;
-    }
+		i != parts->end(); ++i ) {
+	ShaderPart* shader_part= static_cast< ShaderPart * >(*i);
+	if ( shader_part->type->getValue() == "TESS_CONTROL" || shader_part->type->getValue() == "TESS_EVALUATION" ) {
+	  require_patches= true;
+	  break;
+	}
   }
 
   // Let the geometry know  if it should render patches
   if( require_patches ) {
-    if ( GLEW_ARB_tessellation_shader ) {
-      ti.setUserData( "shaderRequiresPatches", &require_patches );
-    } else if ( !tessellation_support_checked ) {
-      Console(4) << "Your graphic card driver does not support tessellation shaders."
-                 << " The ComposedShader node " << getName() << " will not be rendered correctly!" << endl;
-      tessellation_support_checked = true;
-    }
+	if ( GLEW_ARB_tessellation_shader ) {
+	  ti.setUserData( "shaderRequiresPatches", &require_patches );
+	} else if ( !tessellation_support_checked ) {
+	  Console(4) << "Your graphic card driver does not support tessellation shaders."
+				 << " The ComposedShader node " << getName() << " will not be rendered correctly!" << endl;
+	  tessellation_support_checked = true;
+	}
   }
 
   if( updateCache->getRoutesIn().size()==0 ) {
-    // if initially udpateCache is not routed in from useCaching, need to check
-    // if graphic options is dynamically added, if added route in its useCaching
-    GraphicsOptions *options = NULL;
-    GlobalSettings *default_settings = GlobalSettings::getActive();
-    if( default_settings&&default_settings->optionNodesUpdated() ) {
-      default_settings->getOptionNode( options );
-      size_t size = updateCache->getRoutesIn().size();
-      options->useCaching->route(updateCache);
-    }
+	// if initially udpateCache is not routed in from useCaching, need to check
+	// if graphic options is dynamically added, if added route in its useCaching
+	GraphicsOptions *options = NULL;
+	GlobalSettings *default_settings = GlobalSettings::getActive();
+	if( default_settings&&default_settings->optionNodesUpdated() ) {
+	  default_settings->getOptionNode( options );
+	  size_t size = updateCache->getRoutesIn().size();
+	  options->useCaching->route(updateCache);
+	}
   }
   updateCache->upToDate();
 }
@@ -336,122 +336,122 @@ void ComposedShader::traverseSG ( TraverseInfo& ti ) {
 
 void ComposedShader::render() {
   if( !GLEW_ARB_shader_objects ) {
-    if( !shader_support_checked ) {
-      Console(4) << "Your graphic card driver does not support shader objects( ARB_shader_objects) so you cannot"
-                 << " use the ComposedShader node. Shader will be disabled" << endl;
-      shader_support_checked = true;
-    } 
-    if( isValid->getValue() ) isValid->setValue( false, id );
+	if( !shader_support_checked ) {
+	  Console(4) << "Your graphic card driver does not support shader objects( ARB_shader_objects) so you cannot"
+				 << " use the ComposedShader node. Shader will be disabled" << endl;
+	  shader_support_checked = true;
+	} 
+	if( isValid->getValue() ) isValid->setValue( false, id );
   } else {
-    bool all_parts_valid = true;
-    
-    // compile all shader parts
-    bool re_link= false;
-    for( MFShaderPart::const_iterator i = parts->begin();
-         i != parts->end(); ++i ) {
-      ShaderPart* s= static_cast< ShaderPart * >(*i);
-      re_link |= !s->isCompiled();
-      if( s->compileShader() == 0 ) {
-        all_parts_valid = false;
-      }
-    }
+	bool all_parts_valid = true;
+	
+	// compile all shader parts
+	bool re_link= false;
+	for( MFShaderPart::const_iterator i = parts->begin();
+		 i != parts->end(); ++i ) {
+	  ShaderPart* s= static_cast< ShaderPart * >(*i);
+	  re_link |= !s->isCompiled();
+	  if( s->compileShader() == 0 ) {
+		all_parts_valid = false;
+	  }
+	}
 
-    if ( all_parts_valid && re_link ) {
-      activate->setValue ( true );
-    }
+	if ( all_parts_valid && re_link ) {
+	  activate->setValue ( true );
+	}
 
-    if( isValid->getValue() != all_parts_valid )
-      isValid->setValue( all_parts_valid, id );
-    
-    if( all_parts_valid )
-    {
-      // if the first time we run the shader and there is some part attached
-      if ( !program_handle && parts->size() ) {
-        std::string key = ComposedShader::genKeyFromShader( this );
+	if( isValid->getValue() != all_parts_valid )
+	  isValid->setValue( all_parts_valid, id );
+	
+	if( all_parts_valid )
+	{
+	  // if the first time we run the shader and there is some part attached
+	  if ( !program_handle && parts->size() ) {
+		std::string key = ComposedShader::genKeyFromShader( this );
 
-        if (phandles_map.find(key) != phandles_map.end()) {
-          // if a handle found, use that!
-          program_handle = phandles_map[key];
-          ++(phandle_counts[program_handle]);
-          //std::cout<< getName() << " use program handle " << program_handle
-          // << std::endl;
-          glUseProgramObjectARB( program_handle );
-        } else {
-          // if not, create one, link to shaderparts
-          GLhandleARB h = createHandle( this );
-          if (h != 0) {
-            // use that handle
-            program_handle = h;
-            glUseProgramObjectARB( h );
-            phandle_counts[h] = 1;
-            phandles_map[key] = h;
-            // register shader objects
-            for ( MFShaderPart::const_iterator i = parts->begin();
-                  i != parts->end(); ++i ) {
-              current_shaders.push_back(
-                static_cast< ShaderPart * >(*i)->getShaderHandle() );
-            }
-          }
-        }
-      }
+		if (phandles_map.find(key) != phandles_map.end()) {
+		  // if a handle found, use that!
+		  program_handle = phandles_map[key];
+		  ++(phandle_counts[program_handle]);
+		  //std::cout<< getName() << " use program handle " << program_handle
+		  // << std::endl;
+		  glUseProgramObjectARB( program_handle );
+		} else {
+		  // if not, create one, link to shaderparts
+		  GLhandleARB h = createHandle( this );
+		  if (h != 0) {
+			// use that handle
+			program_handle = h;
+			glUseProgramObjectARB( h );
+			phandle_counts[h] = 1;
+			phandles_map[key] = h;
+			// register shader objects
+			for ( MFShaderPart::const_iterator i = parts->begin();
+				  i != parts->end(); ++i ) {
+			  current_shaders.push_back(
+				static_cast< ShaderPart * >(*i)->getShaderHandle() );
+			}
+		  }
+		}
+	  }
 
-      // if a TRUE event has been sent to the activate field we 
-      // relink the program (without looking up)
-      else if( displayList->hasCausedEvent( activate ) &&
-               activate->getValue( id ) )
-      {
-        // deallocate old instance if not used anywhere
-        if (phandle_counts.find(program_handle) != phandle_counts.end()) {
-          --(phandle_counts[program_handle]);
-          if (phandle_counts[program_handle] == 0) {
-            // detach the old shaders from the program
-            for( vector< GLhandleARB >::iterator i = current_shaders.begin();
-              i != current_shaders.end(); ++i ) {
-              glDetachObjectARB( program_handle, *i );
-            }
-            current_shaders.clear();
-            // delete object
-            //std::cout<< this->getName() << " remove phandle "
-            //         << program_handle << std::endl;
-            glDeleteObjectARB( program_handle );
-            phandle_counts.erase( program_handle );
-          }
-        } else {
-          // if not, this is a floating program handle. delete it anyway
-          //std::cout<< this->getName() << " remove phandle " << program_handle
-          //         << std::endl;
-          glDeleteObjectARB( program_handle );
-        }
+	  // if a TRUE event has been sent to the activate field we 
+	  // relink the program (without looking up)
+	  else if( displayList->hasCausedEvent( activate ) &&
+			   activate->getValue( id ) )
+	  {
+		// deallocate old instance if not used anywhere
+		if (phandle_counts.find(program_handle) != phandle_counts.end()) {
+		  --(phandle_counts[program_handle]);
+		  if (phandle_counts[program_handle] == 0) {
+			// detach the old shaders from the program
+			for( vector< GLhandleARB >::iterator i = current_shaders.begin();
+			  i != current_shaders.end(); ++i ) {
+			  glDetachObjectARB( program_handle, *i );
+			}
+			current_shaders.clear();
+			// delete object
+			//std::cout<< this->getName() << " remove phandle "
+			//         << program_handle << std::endl;
+			glDeleteObjectARB( program_handle );
+			phandle_counts.erase( program_handle );
+		  }
+		} else {
+		  // if not, this is a floating program handle. delete it anyway
+		  //std::cout<< this->getName() << " remove phandle " << program_handle
+		  //         << std::endl;
+		  glDeleteObjectARB( program_handle );
+		}
 
-        // we can't use the old instance (because that forces other
-        // shaders to re-link)
+		// we can't use the old instance (because that forces other
+		// shaders to re-link)
 
-        GLhandleARB h = createHandle(this);
-        if (h != 0) {
-          program_handle = h;
-          glUseProgramObjectARB( h );
-          // register shader objects
-          for ( MFShaderPart::const_iterator i = parts->begin();
-                i != parts->end(); ++i ) {
-            current_shaders.push_back(
-              static_cast< ShaderPart * >(*i)->getShaderHandle() );
-          }
-        }
-      }
-    }
+		GLhandleARB h = createHandle(this);
+		if (h != 0) {
+		  program_handle = h;
+		  glUseProgramObjectARB( h );
+		  // register shader objects
+		  for ( MFShaderPart::const_iterator i = parts->begin();
+				i != parts->end(); ++i ) {
+			current_shaders.push_back(
+			  static_cast< ShaderPart * >(*i)->getShaderHandle() );
+		  }
+		}
+	  }
+	}
 
-    if( program_handle ) {
-      Shaders::renderTextures( this );
-      Shaders::renderShaderResources( this );
+	if( program_handle ) {
+	  Shaders::renderTextures( this );
+	  Shaders::renderShaderResources( this );
 //#ifdef HAVE_PROFILER
 //      H3DTimer::stepBegin("updateUniform");
 //#endif
-      // Lazily update uniform values, i.e., only those that have changed
-      updateUniforms->upToDate();
+	  // Lazily update uniform values, i.e., only those that have changed
+	  updateUniforms->upToDate();
 //#ifdef HAVE_PROFILER
 //      H3DTimer::stepEnd("updateUniform");
 //#endif
-    }
+	}
   }
 }
 
@@ -465,9 +465,9 @@ std::string ComposedShader::genKeyFromShader(ComposedShader* shader)
   vector<GLhandleARB> keys;
   keys.reserve( shader->parts->size() );
   for( MFShaderPart::const_iterator i = shader->parts->begin();
-       i != shader->parts->end(); ++i ) {
-    GLhandleARB handle = static_cast< ShaderPart * >(*i)->getShaderHandle();
-    keys.push_back( handle );
+	   i != shader->parts->end(); ++i ) {
+	GLhandleARB handle = static_cast< ShaderPart * >(*i)->getShaderHandle();
+	keys.push_back( handle );
   }
   sort( keys.begin(), keys.end() );
   stringstream ss;
@@ -480,15 +480,15 @@ std::string ComposedShader::genKeyFromShader(ComposedShader* shader)
 // Preclusion: parts > 0
 GLhandleARB ComposedShader::createHandle(ComposedShader* shader) {
   if ( !shader->parts->size() )
-    return 0;
+	return 0;
 
   GLhandleARB program_handle = glCreateProgramObjectARB();
 
   // add the shaders to program
   for ( MFShaderPart::const_iterator i = shader->parts->begin();
-        i != shader->parts->end(); ++i ) {
-    GLhandleARB handle = static_cast< ShaderPart * >(*i)->getShaderHandle();
-    glAttachObjectARB( program_handle, handle );
+		i != shader->parts->end(); ++i ) {
+	GLhandleARB handle = static_cast< ShaderPart * >(*i)->getShaderHandle();
+	glAttachObjectARB( program_handle, handle );
   }
 
   // set geometry shader values 
@@ -496,40 +496,40 @@ GLhandleARB ComposedShader::createHandle(ComposedShader* shader) {
 
   // Add transform feedback varyings before program is linked
   if ( !shader->transformFeedbackVaryings->empty() ) {
-    std::vector<const GLchar*> varyings ( shader->transformFeedbackVaryings->size() );
-    for ( size_t i= 0; i < shader->transformFeedbackVaryings->size(); ++i ) {
-      varyings[i]= shader->transformFeedbackVaryings->getValueByIndex ( i ).c_str();
-    }
-    glTransformFeedbackVaryings(program_handle, varyings.size(), &varyings[0], GL_INTERLEAVED_ATTRIBS);
+	std::vector<const GLchar*> varyings ( shader->transformFeedbackVaryings->size() );
+	for ( size_t i= 0; i < shader->transformFeedbackVaryings->size(); ++i ) {
+	  varyings[i]= shader->transformFeedbackVaryings->getValueByIndex ( i ).c_str();
+	}
+	glTransformFeedbackVaryings(program_handle, varyings.size(), &varyings[0], GL_INTERLEAVED_ATTRIBS);
   }
 
   // link shader program
   glLinkProgramARB( program_handle );
   GLint link_success;
   glGetObjectParameterivARB( program_handle, GL_OBJECT_LINK_STATUS_ARB,
-                             &link_success );
+							 &link_success );
   int print_error = 0;
   if( link_success == GL_FALSE ) print_error = 1;
   else if( shader->printShaderLog() ) print_error = 2;
   if( print_error != 0 ) {
-    // linking failed, print error message
-    GLint nr_characters;
-    glGetObjectParameterivARB( program_handle, GL_OBJECT_INFO_LOG_LENGTH_ARB,
-                               &nr_characters );
-    if( nr_characters > 1 ) {
-      GLcharARB *log = new GLcharARB[nr_characters];
-      glGetInfoLogARB( program_handle, nr_characters, NULL, log );
-      if( print_error == 1 ) Console(3) << "Warning: Error w";
-      else Console(3) << "Warning: W";
-      Console(3) << "hile linking shader parts in \""
-                 << const_cast<ComposedShader&>(*shader).getName() << "\" node. "
-                 << endl << log << endl;
-      if( print_error == 1 ) {
-        glDeleteObjectARB( program_handle );
-        program_handle = 0;
-      }
-      delete [] log;
-    }
+	// linking failed, print error message
+	GLint nr_characters;
+	glGetObjectParameterivARB( program_handle, GL_OBJECT_INFO_LOG_LENGTH_ARB,
+							   &nr_characters );
+	if( nr_characters > 1 ) {
+	  GLcharARB *log = new GLcharARB[nr_characters];
+	  glGetInfoLogARB( program_handle, nr_characters, NULL, log );
+	  if( print_error == 1 ) Console(3) << "Warning: Error w";
+	  else Console(3) << "Warning: W";
+	  Console(3) << "hile linking shader parts in \""
+				 << const_cast<ComposedShader&>(*shader).getName() << "\" node. "
+				 << endl << log << endl;
+	  if( print_error == 1 ) {
+		glDeleteObjectARB( program_handle );
+		program_handle = 0;
+	  }
+	  delete [] log;
+	}
   }
 
   //std::cout<< const_cast<ComposedShader&>(*shader).getName()
@@ -542,69 +542,69 @@ GLhandleARB ComposedShader::createHandle(ComposedShader* shader) {
 
 void ComposedShader::setGeometryShaderParameters( GLenum program_handle ) {
   if( GLEW_EXT_geometry_shader4 ) {
-    // Setting input type.
-    const string &input_type = geometryInputType->getValue();
-    if( input_type == "POINTS" ) {
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
-    } else if( input_type == "LINES" ) {
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_INPUT_TYPE_EXT,GL_LINES);
-    } else if( input_type == "TRIANGLES" ) {
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_INPUT_TYPE_EXT, GL_TRIANGLES);
-    } else if( input_type == "LINES_ADJACENCY" ) {
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_INPUT_TYPE_EXT,
-                             GL_LINES_ADJACENCY_EXT );
-    } else if( input_type == "TRIANGLES_ADJACENCY" ) {
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_INPUT_TYPE_EXT, 
-                             GL_TRIANGLES_ADJACENCY_EXT );
-    } else {
-      Console(4) << "Invalid geometryInputType \"" << input_type
-                 << "\" in ComposedShader. Using \"TRIANGLES\" instead." << endl;
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_INPUT_TYPE_EXT, 4/*GL_TRIANGLES*/);
-    }
+	// Setting input type.
+	const string &input_type = geometryInputType->getValue();
+	if( input_type == "POINTS" ) {
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
+	} else if( input_type == "LINES" ) {
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_INPUT_TYPE_EXT,GL_LINES);
+	} else if( input_type == "TRIANGLES" ) {
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_INPUT_TYPE_EXT, GL_TRIANGLES);
+	} else if( input_type == "LINES_ADJACENCY" ) {
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_INPUT_TYPE_EXT,
+							 GL_LINES_ADJACENCY_EXT );
+	} else if( input_type == "TRIANGLES_ADJACENCY" ) {
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_INPUT_TYPE_EXT, 
+							 GL_TRIANGLES_ADJACENCY_EXT );
+	} else {
+	  Console(4) << "Invalid geometryInputType \"" << input_type
+				 << "\" in ComposedShader. Using \"TRIANGLES\" instead." << endl;
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_INPUT_TYPE_EXT, 4/*GL_TRIANGLES*/);
+	}
 
-    // Setting output type.
-    const string &output_type = geometryOutputType->getValue();
-    if( output_type == "POINTS" ) {
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_POINTS);
-    } else if( output_type == "LINE_STRIP" ) {
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_LINE_STRIP );
-    } else if( output_type == "TRIANGLE_STRIP" ) {
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_OUTPUT_TYPE_EXT, 
-                             GL_TRIANGLE_STRIP );
-    } else {
-      Console(4) << "Invalid geometryOutputType \"" << output_type
-                 << "\" in ComposedShader. Using \"TRIANGLE_STRIP\" instead."
-                 << endl;
-      glProgramParameteriEXT(program_handle, 
-                             GL_GEOMETRY_OUTPUT_TYPE_EXT, 4/*GL_TRIANGLES*/);
-    } 
+	// Setting output type.
+	const string &output_type = geometryOutputType->getValue();
+	if( output_type == "POINTS" ) {
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_POINTS);
+	} else if( output_type == "LINE_STRIP" ) {
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_LINE_STRIP );
+	} else if( output_type == "TRIANGLE_STRIP" ) {
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_OUTPUT_TYPE_EXT, 
+							 GL_TRIANGLE_STRIP );
+	} else {
+	  Console(4) << "Invalid geometryOutputType \"" << output_type
+				 << "\" in ComposedShader. Using \"TRIANGLE_STRIP\" instead."
+				 << endl;
+	  glProgramParameteriEXT(program_handle, 
+							 GL_GEOMETRY_OUTPUT_TYPE_EXT, 4/*GL_TRIANGLES*/);
+	} 
 
-    int max_output_vertices;
-     glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT, &max_output_vertices);
+	int max_output_vertices;
+	 glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT, &max_output_vertices);
 
-    int nr_output_vertices = geometryVerticesOut->getValue();
+	int nr_output_vertices = geometryVerticesOut->getValue();
 
-    if( nr_output_vertices > max_output_vertices ) {
-      Console( 4 ) << "Invalid geomtryVerticesOut value " << nr_output_vertices
-                   << " in ComposedShader. Hardware supports a maximum of " 
-                   << max_output_vertices << "." << endl;
-      nr_output_vertices = max_output_vertices;
-    }
+	if( nr_output_vertices > max_output_vertices ) {
+	  Console( 4 ) << "Invalid geomtryVerticesOut value " << nr_output_vertices
+				   << " in ComposedShader. Hardware supports a maximum of " 
+				   << max_output_vertices << "." << endl;
+	  nr_output_vertices = max_output_vertices;
+	}
 
-    // number of output vertices for geometry shader.
-    glProgramParameteriEXT(program_handle,
-                           GL_GEOMETRY_VERTICES_OUT_EXT,
-                           nr_output_vertices );
-    
+	// number of output vertices for geometry shader.
+	glProgramParameteriEXT(program_handle,
+						   GL_GEOMETRY_VERTICES_OUT_EXT,
+						   nr_output_vertices );
+	
   }
 }
 
@@ -615,51 +615,51 @@ void ComposedShader::SetupDynamicRoutes::update() {
   MFNode * mf_node_field = dynamic_cast< MFNode * >( event.ptr );
 
   map< Field *, NodeVector >::iterator in_map =
-    fields_to_nodes.find( event.ptr );
+	fields_to_nodes.find( event.ptr );
 
   // Start by removing the entry in fields_to_nodes map. Since it might be
   // that the node added is not the same as the previous node, and it might
   // also be so that the new node does not inherit from H3DDisplayListObject.
   if( in_map != fields_to_nodes.end() ) {
-    const NodeVector &node_vector = (*in_map).second;
-    for( unsigned int i = 0; i < node_vector.size(); ++i ) {
-      H3DDisplayListObject *hdln =
-        dynamic_cast< H3DDisplayListObject * >( node_vector[i] );
-      if( hdln )
-        hdln->displayList->unroute( cs->displayList );
-    }
-    fields_to_nodes.erase( in_map );
+	const NodeVector &node_vector = (*in_map).second;
+	for( unsigned int i = 0; i < node_vector.size(); ++i ) {
+	  H3DDisplayListObject *hdln =
+		dynamic_cast< H3DDisplayListObject * >( node_vector[i] );
+	  if( hdln )
+		hdln->displayList->unroute( cs->displayList );
+	}
+	fields_to_nodes.erase( in_map );
   }
 
   if( sf_node_field ) {
-    // Setup route for the node contained in sf_node_field.
-    // Add entry to map to remove later.
-    Node * n = sf_node_field->getValue();
-    H3DDisplayListObject *hdln =
-      dynamic_cast< H3DDisplayListObject * >( n );
-    if( hdln ) {
-      hdln->displayList->route( cs->displayList, cs->id );
-      cs->activate->setValue( true );
-      NodeVector tmp_node_vector;
-      tmp_node_vector.push_back( n );
-      fields_to_nodes[ event.ptr ] = tmp_node_vector;
-    }
+	// Setup route for the node contained in sf_node_field.
+	// Add entry to map to remove later.
+	Node * n = sf_node_field->getValue();
+	H3DDisplayListObject *hdln =
+	  dynamic_cast< H3DDisplayListObject * >( n );
+	if( hdln ) {
+	  hdln->displayList->route( cs->displayList, cs->id );
+	  cs->activate->setValue( true );
+	  NodeVector tmp_node_vector;
+	  tmp_node_vector.push_back( n );
+	  fields_to_nodes[ event.ptr ] = tmp_node_vector;
+	}
   } else if( mf_node_field ) {
-    // Setup routes for all nodes contained in mf_node_field.
-    // Add entry to map to remove later.
-    const NodeVector &node_vector = mf_node_field->getValue();
-    NodeVector tmp_node_vector;
-    for( unsigned int i = 0; i < node_vector.size(); ++i ) {
-      H3DDisplayListObject *hdln =
-        dynamic_cast< H3DDisplayListObject * >( node_vector[i] );
-      if( hdln ) {
-        hdln->displayList->route( cs->displayList, cs->id );
-        cs->activate->setValue( true );
-        tmp_node_vector.push_back( node_vector[i] );
-      }
-    }
-    if( !tmp_node_vector.empty() )
-      fields_to_nodes[ event.ptr ] = tmp_node_vector;
+	// Setup routes for all nodes contained in mf_node_field.
+	// Add entry to map to remove later.
+	const NodeVector &node_vector = mf_node_field->getValue();
+	NodeVector tmp_node_vector;
+	for( unsigned int i = 0; i < node_vector.size(); ++i ) {
+	  H3DDisplayListObject *hdln =
+		dynamic_cast< H3DDisplayListObject * >( node_vector[i] );
+	  if( hdln ) {
+		hdln->displayList->route( cs->displayList, cs->id );
+		cs->activate->setValue( true );
+		tmp_node_vector.push_back( node_vector[i] );
+	  }
+	}
+	if( !tmp_node_vector.empty() )
+	  fields_to_nodes[ event.ptr ] = tmp_node_vector;
   }
 }
 
@@ -667,45 +667,45 @@ void ComposedShader::UpdateUniforms::update() {
   ComposedShader* node= static_cast<ComposedShader*>(getOwner());
   bool update_all= hasCausedEvent ( node->activate );
   if( update_all ) { // program re-linked, need to update all uniform
-    // update the uniform location information in uniformFields
+	// update the uniform location information in uniformFields
 
-    UniformFieldMap::iterator it;
-    for( it = node->uniformFields.begin(); it!= node->uniformFields.end(); ++it  ) {
-      const string &name = it->first;
-      GLint location = glGetUniformLocationARB( node->program_handle,
-        name.c_str() );
-      it->second.location = location;
-      if( !Shaders::setGLSLUniformVariableValue( node->program_handle, it->second.field, &(it->second), true /* force update */ ) 
-        && !node->suppressUniformWarnings->getValue() ) {
-        Console(4) << "Warning: Uniform variable \"" << it->first
-          << "\" not defined in shader source or field is of unsupported field type of the ShaderPart nodes "
-          << "in the node \"" << node->getName() << "\"" << endl;
-      }
-    }
-    // all fields are updated, clear the event to finish the update and return.
-    EventCollectingField < Field >::update();
-    return;
+	UniformFieldMap::iterator it;
+	for( it = node->uniformFields.begin(); it!= node->uniformFields.end(); ++it  ) {
+	  const string &name = it->first;
+	  GLint location = glGetUniformLocationARB( node->program_handle,
+		name.c_str() );
+	  it->second.location = location;
+	  if( !Shaders::setGLSLUniformVariableValue( node->program_handle, it->second.field, &(it->second), true /* force update */ ) 
+		&& !node->suppressUniformWarnings->getValue() ) {
+		Console(4) << "Warning: Uniform variable \"" << it->first
+		  << "\" not defined in shader source or field is of unsupported field type of the ShaderPart nodes "
+		  << "in the node \"" << node->getName() << "\"" << endl;
+	  }
+	}
+	// all fields are updated, clear the event to finish the update and return.
+	EventCollectingField < Field >::update();
+	return;
   }
   
   // no need to update all, check field one by one to update the one needs to be updated
   UniformFieldMap::iterator it;
   for( it = node->uniformFields.begin(); it!= node->uniformFields.end(); ++it ) {
-    Field* current_field = it->second.field;
-    if( hasCausedEvent( current_field ) ) {// current_field update since last time
-      //if( current_field->getTypeName()=="SFUniform" ) {
-      //  // this is a SFUniform value, check if its value actually changed
-      current_field->upToDate();
-      // within setGLSLUniformVariableValue, check if the updated value
-      // is the same as before to decide whether to reload uniform value to GPU
-      if( !Shaders::setGLSLUniformVariableValue( node->program_handle, 
-        it->second.field, &it->second ) &&
-        !node->suppressUniformWarnings->getValue() ) {
-          Console(4) << "Warning: Uniform variable \"" << it->first
-            << "\" not defined in shader source or field is of unsupported field type of the ShaderPart nodes "
-            << "in the node \"" << node->getName() << "\"" << endl;
-      }
-    }
-    // It is not the current_field caused the update event, skip uniform update
+	Field* current_field = it->second.field;
+	if( hasCausedEvent( current_field ) ) {// current_field update since last time
+	  //if( current_field->getTypeName()=="SFUniform" ) {
+	  //  // this is a SFUniform value, check if its value actually changed
+	  current_field->upToDate();
+	  // within setGLSLUniformVariableValue, check if the updated value
+	  // is the same as before to decide whether to reload uniform value to GPU
+	  if( !Shaders::setGLSLUniformVariableValue( node->program_handle, 
+		it->second.field, &it->second ) &&
+		!node->suppressUniformWarnings->getValue() ) {
+		  Console(4) << "Warning: Uniform variable \"" << it->first
+			<< "\" not defined in shader source or field is of unsupported field type of the ShaderPart nodes "
+			<< "in the node \"" << node->getName() << "\"" << endl;
+	  }
+	}
+	// It is not the current_field caused the update event, skip uniform update
   }
   EventCollectingField < Field >::update();
 }
@@ -721,45 +721,45 @@ void ComposedShader::UpdateSaveShadersToUrl::onNewValue( const std::string &v ){
   vector< GLhandleARB > handlers = cs->current_shaders;
   GLchar* shader_content;
   for( vector< GLhandleARB >::iterator it = handlers.begin(); it != handlers.end(); it++ ) {
-    GLint shader_type;
-    GLsizei shader_length;
-    glGetShaderiv ( *it, GL_SHADER_SOURCE_LENGTH , &shader_length);
+	GLint shader_type;
+	GLsizei shader_length;
+	glGetShaderiv ( *it, GL_SHADER_SOURCE_LENGTH , &shader_length);
 
-    
-    glGetShaderiv( *it, GL_SHADER_TYPE, &shader_type );
-    shader_content = new GLchar [shader_length+1];
-    glGetShaderSource ( *it, shader_length+1, NULL, shader_content );
-    // if
-    error = glGetError();
-    if( error!=GL_NO_ERROR ) {
-      Console(4)<<" Warning: extract shader information error: "<<gluErrorString(error)<<endl;
-      continue;
-    }
-    //glewGetString( shader_type );
-    if( shader_type==GL_VERTEX_SHADER_ARB ) {
-      ofstream   outFile( v+"_vertex_shader.txt", ofstream::out  );
-      outFile<< shader_content <<endl;
-      outFile.close();
-    }else if( shader_type==GL_GEOMETRY_SHADER_ARB ) {
-      ofstream   outFile( v+"_geometry_shader.txt", ofstream::out  );
-      outFile<< shader_content <<endl;
-      outFile.close();
-      break;
-    }else if( shader_type==GL_TESS_EVALUATION_SHADER ) {
-      ofstream   outFile( v+"_tessEva_shader.txt", ofstream::out  );
-      outFile<< shader_content <<endl;
-      outFile.close();
-    }else if( shader_type==GL_TESS_CONTROL_SHADER ) {
-      ofstream   outFile( v+"_tessControl_shader.txt", ofstream::out  );
-      outFile<< shader_content <<endl;
-      outFile.close();
-    }else if( shader_type==GL_FRAGMENT_SHADER_ARB ) {
-      ofstream   outFile( v+"_fragment_shader.txt", ofstream::out  );
-      outFile<< shader_content <<endl;
-      outFile.close();
-    }else{
-      Console(4)<<"shader type unsupported yet"<<endl;
-    }
+	
+	glGetShaderiv( *it, GL_SHADER_TYPE, &shader_type );
+	shader_content = new GLchar [shader_length+1];
+	glGetShaderSource ( *it, shader_length+1, NULL, shader_content );
+	// if
+	error = glGetError();
+	if( error!=GL_NO_ERROR ) {
+	  Console(4)<<" Warning: extract shader information error: "<<gluErrorString(error)<<endl;
+	  continue;
+	}
+	//glewGetString( shader_type );
+	if( shader_type==GL_VERTEX_SHADER_ARB ) {
+	  ofstream   outFile( v+"_vertex_shader.txt", ofstream::out  );
+	  outFile<< shader_content <<endl;
+	  outFile.close();
+	}else if( shader_type==GL_GEOMETRY_SHADER_ARB ) {
+	  ofstream   outFile( v+"_geometry_shader.txt", ofstream::out  );
+	  outFile<< shader_content <<endl;
+	  outFile.close();
+	  break;
+	}else if( shader_type==GL_TESS_EVALUATION_SHADER ) {
+	  ofstream   outFile( v+"_tessEva_shader.txt", ofstream::out  );
+	  outFile<< shader_content <<endl;
+	  outFile.close();
+	}else if( shader_type==GL_TESS_CONTROL_SHADER ) {
+	  ofstream   outFile( v+"_tessControl_shader.txt", ofstream::out  );
+	  outFile<< shader_content <<endl;
+	  outFile.close();
+	}else if( shader_type==GL_FRAGMENT_SHADER_ARB ) {
+	  ofstream   outFile( v+"_fragment_shader.txt", ofstream::out  );
+	  outFile<< shader_content <<endl;
+	  outFile.close();
+	}else{
+	  Console(4)<<"shader type unsupported yet"<<endl;
+	}
   }
   //Console(4)<<"will output shader uniform"<<endl;
   ofstream   outFile( v+"_shader_uniform.txt", ofstream::out  );
@@ -770,34 +770,34 @@ void ComposedShader::UpdateSaveShadersToUrl::onNewValue( const std::string &v ){
   glGetProgramiv( program_id , GL_ACTIVE_UNIFORMS, &total ); 
   outFile<<"current active uniform values:"<<endl;
   for(int i=0; i<total; ++i)  {
-    int name_len=-1, num=-1;
-    GLenum type = GL_ZERO;
-    char name[256];
-    glGetActiveUniform( program_id, GLuint(i), sizeof(name)-1,
-      &name_len, &num, &type, name );
-    name[name_len] = 0;
-    GLuint location = glGetUniformLocation( program_id, name );
-    float uniform_value[50];
-    glGetUniformfvARB( program_id, location, uniform_value  );
-    outFile<< name <<" : " ;
-    switch ( type )
-    {
-    case GL_FLOAT:
-    case GL_INT:
-    case GL_BOOL:
-    case GL_DOUBLE:
-      outFile<<uniform_value[0] <<endl;
-      break;
-    case GL_FLOAT_VEC3:
-    case GL_BOOL_VEC3:
-    case GL_INT_VEC3:
-    case GL_DOUBLE_VEC3_EXT:
-      outFile<<uniform_value[0] <<" , " << uniform_value[1] <<
-      " , " << uniform_value[2]<< endl;
-      break;
-    default:
-      outFile<<"unsupported uniform type!"<<endl;
-    }
+	int name_len=-1, num=-1;
+	GLenum type = GL_ZERO;
+	char name[256];
+	glGetActiveUniform( program_id, GLuint(i), sizeof(name)-1,
+	  &name_len, &num, &type, name );
+	name[name_len] = 0;
+	GLuint location = glGetUniformLocation( program_id, name );
+	float uniform_value[50];
+	glGetUniformfvARB( program_id, location, uniform_value  );
+	outFile<< name <<" : " ;
+	switch ( type )
+	{
+	case GL_FLOAT:
+	case GL_INT:
+	case GL_BOOL:
+	case GL_DOUBLE:
+	  outFile<<uniform_value[0] <<endl;
+	  break;
+	case GL_FLOAT_VEC3:
+	case GL_BOOL_VEC3:
+	case GL_INT_VEC3:
+	case GL_DOUBLE_VEC3_EXT:
+	  outFile<<uniform_value[0] <<" , " << uniform_value[1] <<
+	  " , " << uniform_value[2]<< endl;
+	  break;
+	default:
+	  outFile<<"unsupported uniform type!"<<endl;
+	}
   }
   outFile.close();
 }
@@ -807,27 +807,27 @@ bool ComposedShader::printShaderLog() {
   DebugOptions *debug_options = NULL;
   GlobalSettings *default_settings = GlobalSettings::getActive();
   if( default_settings&&default_settings->optionNodesUpdated() ) {
-    default_settings->getOptionNode( debug_options );
-    if( debug_options ) {// update debug options
-      debug_options_previous = debug_options;
-      return debug_options->printShaderWarnings->getValue();
-    }else{
-      // global setting change in last frame, but no debug options in it now
-      debug_options_previous = NULL;
-      return false;
-    }
+	default_settings->getOptionNode( debug_options );
+	if( debug_options ) {// update debug options
+	  debug_options_previous = debug_options;
+	  return debug_options->printShaderWarnings->getValue();
+	}else{
+	  // global setting change in last frame, but no debug options in it now
+	  debug_options_previous = NULL;
+	  return false;
+	}
   }
   else if( default_settings ) { 
-    // global setting option node exist but not updated
-    if( debug_options_previous!=NULL ) {
-      return debug_options_previous->printShaderWarnings->getValue();
-    }else{
-      return false;
-    }
+	// global setting option node exist but not updated
+	if( debug_options_previous!=NULL ) {
+	  return debug_options_previous->printShaderWarnings->getValue();
+	}else{
+	  return false;
+	}
   }else{
-    // no global settings at all now
-    debug_options_previous = NULL;
-    return false;
+	// no global settings at all now
+	debug_options_previous = NULL;
+	return false;
   }
 }
 
@@ -837,12 +837,12 @@ void ComposedShader::initialize() {
   GraphicsOptions *graphic_options = NULL;
   if( default_settings ) 
   {
-      default_settings->getOptionNode( debug_options_previous );
-      default_settings->getOptionNode( graphic_options );
+	  default_settings->getOptionNode( debug_options_previous );
+	  default_settings->getOptionNode( graphic_options );
   }
   if( graphic_options!=NULL ) {
-    // if initially graphic option exist, route its useCaching to updateCache
-    graphic_options->useCaching->route( updateCache );
+	// if initially graphic option exist, route its useCaching to updateCache
+	graphic_options->useCaching->route( updateCache );
   }
 }
 
@@ -851,26 +851,26 @@ void ComposedShader::UpdateCache::onValueChange( const bool &new_value ){
   ComposedShader::UniformFieldMap::const_iterator it;
   it = cs->uniformFields.begin();
   if( new_value==true ) {
-    //caching on
-    for( ; it!=cs->uniformFields.end(); ++it ) {
-      Field* f = it->second.field;
-      SFNode * sf_node_field = dynamic_cast< SFNode * >( f );
-      MFNode * mf_node_field = dynamic_cast< MFNode * >( f );
-      if( sf_node_field==NULL&&mf_node_field==NULL ) {
-        f->route(cs->displayList);
-      }
-    }
+	//caching on
+	for( ; it!=cs->uniformFields.end(); ++it ) {
+	  Field* f = it->second.field;
+	  SFNode * sf_node_field = dynamic_cast< SFNode * >( f );
+	  MFNode * mf_node_field = dynamic_cast< MFNode * >( f );
+	  if( sf_node_field==NULL&&mf_node_field==NULL ) {
+		f->route(cs->displayList);
+	  }
+	}
   }else{
-    for( ; it!=cs->uniformFields.end(); ++it ) {
-      Field* f = it->second.field;
-      SFNode * sf_node_field = dynamic_cast< SFNode * >( f );
-      MFNode * mf_node_field = dynamic_cast< MFNode * >( f );
-      if( sf_node_field==NULL&&mf_node_field==NULL ){
-        f->unroute(cs->displayList);
-      }
-      
-    }
-    
+	for( ; it!=cs->uniformFields.end(); ++it ) {
+	  Field* f = it->second.field;
+	  SFNode * sf_node_field = dynamic_cast< SFNode * >( f );
+	  MFNode * mf_node_field = dynamic_cast< MFNode * >( f );
+	  if( sf_node_field==NULL&&mf_node_field==NULL ){
+		f->unroute(cs->displayList);
+	  }
+	  
+	}
+	
   }
   
 }

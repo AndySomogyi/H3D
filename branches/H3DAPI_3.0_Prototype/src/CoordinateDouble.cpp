@@ -34,26 +34,26 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system
 H3DNodeDatabase CoordinateDouble::database( "CoordinateDouble",
-                                            &(newInstance<CoordinateDouble>),
-                                            typeid( CoordinateDouble ),
-                                            &X3DCoordinateNode::database );
+	&(newInstance<CoordinateDouble>),
+	typeid( CoordinateDouble ),
+	&X3DCoordinateNode::database );
 
 namespace CoordinateDoubleInternals {
-  FIELDDB_ELEMENT( CoordinateDouble, point, INPUT_OUTPUT );
-  FIELDDB_ELEMENT ( CoordinateDouble, isDynamic, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( CoordinateDouble, point, INPUT_OUTPUT );
+	FIELDDB_ELEMENT ( CoordinateDouble, isDynamic, INPUT_OUTPUT );
 }
 
 CoordinateDouble::CoordinateDouble( 
-                            Inst< SFNode  > _metadata,
-                            Inst< MFVec3d > _point ) :
-  X3DCoordinateNode( _metadata ),
-  point( _point ) {
+	Inst< SFNode  > _metadata,
+	Inst< MFVec3d > _point ) :
+X3DCoordinateNode( _metadata ),
+	point( _point ) {
 
-  type_name = "CoordinateDouble";
-  database.initFields( this );
+		type_name = "CoordinateDouble";
+		database.initFields( this );
 
-  point->route( propertyChanged );
-  point->route( vboFieldsUpToDate );
+		point->route( propertyChanged );
+		point->route( vboFieldsUpToDate );
 }
 
 CoordinateDouble::~CoordinateDouble() {
@@ -62,50 +62,50 @@ CoordinateDouble::~CoordinateDouble() {
 // Perform the OpenGL commands to render all vertices as a vertex
 /// array.
 void CoordinateDouble::renderArray() {
-  if ( !point->empty() ) {
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer( 3, GL_DOUBLE, 0,
-                     &(*point->begin()) );
+	if ( !point->empty() ) {
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer( 3, GL_DOUBLE, 0,
+			&(*point->begin()) );
 
-  }
+	}
 }
 
 // Disable the array state enabled in renderArray().
 void CoordinateDouble::disableArray() {
-  glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 bool CoordinateDouble::preRenderCheckFail ( )  {
-  return GLVertexAttributeObject::preRenderCheckFail ( ) ||
-    point->empty ( );
+	return GLVertexAttributeObject::preRenderCheckFail ( ) ||
+		point->empty ( );
 }
 
 void CoordinateDouble::setAttributeData ( ){
-  attrib_data = (GLvoid*)&(*point->begin ( ));
-  element_count = 3;
-  element_stride = 3*sizeof(GLdouble);
-  primitiveType = GL_DOUBLE;
-  attrib_size = point->size ( ) * element_stride;
+	attrib_data = (GLvoid*)&(*point->begin ( ));
+	VAD.elementCount = 3;
+	VAD.primitiveType = GL_DOUBLE;
+	VAD.stride = VAD.elementCount*sizeof(GLdouble);
+	VAD.attributeSize = point->size() * VAD.stride; // * sizeof(GLdouble);
 }
 
 void CoordinateDouble::renderVBO ( ){
-  glEnableClientState ( GL_VERTEX_ARRAY );
-  if ( use_bindless )
-  {
-    glVertexFormatNV ( 3, GL_DOUBLE, 0 );
-    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
-    // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_VERTEX_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
-  } else
-  {
-    glVertexPointer ( 3, GL_DOUBLE, 0, NULL );
-  }
+	glEnableClientState ( GL_VERTEX_ARRAY );
+	if ( use_bindless )
+	{
+		glVertexFormatNV ( 3, GL_DOUBLE, 0 );
+		glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+		// vbo is dedicated for this vertex attribute, so there is no offset
+		glBufferAddressRangeNV ( GL_VERTEX_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
+	} else
+	{
+		glVertexPointer ( 3, GL_DOUBLE, 0, NULL );
+	}
 }
 
 void CoordinateDouble::disableVBO ( ){
-  if ( use_bindless )
-  {
-    glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
-  }
-  glDisableClientState ( GL_VERTEX_ARRAY );
+	if ( use_bindless )
+	{
+		glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+	}
+	glDisableClientState ( GL_VERTEX_ARRAY );
 }

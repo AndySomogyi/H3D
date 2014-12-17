@@ -32,6 +32,7 @@
 #include <H3D/Node.h>
 #include <H3D/SFBool.h>
 #include <GL/glew.h>
+#include <H3D/VertexAttributeDescription.h>
 
 namespace H3D 
 {
@@ -98,53 +99,45 @@ namespace H3D
 
 		/// Based on whether this attribute is bindless or not
 		/// it either returns the 64bit unsigned gpu addr or the normal vbo_id as a 32bit uint.
-		inline GLuint64 getVBO() {
-			if(use_bindless) {
-				return vbo_GPUaddr;
-			}
-
-			//Implicit cast from 32bit to 64bit. Shouldn't 
-			return vbo_id;
+		inline GLuint64 getVBOPtr() {
+			return vbo_GPUaddr;
 		}
 		
+		inline GLuint getVBO(){
+			return VAD.bufferID;
+		}
 
 		inline GLsizei getAttribSize() {
-			return attrib_size;
+			return VAD.attributeSize;
 		}
 
 		inline GLint getElementCount() {
-			return element_count;
+			return VAD.elementCount;
 		}
 
 		inline GLenum getPrimitiveType() {
-			return primitiveType;
+			return VAD.primitiveType;
 		}
 
 		//Size of each individual element
 		inline GLsizei getStride() {
-			return element_stride;
+			return VAD.stride;
 		}
 
 		inline bool isNormalized() {
-			return normalized;
+			return VAD.normalized;
+		}
+
+		inline VertexAttributeDescription getVAD(){
+			return VAD;
 		}
 
 	protected:
 		/// Internal field used to know if vertex buffer object can be created.
 		auto_ptr<Field> vboFieldsUpToDate;
 
-		/// The index for the vertex buffer object
-		GLuint vbo_id;
-
-		/// Size of each individual element
-		GLsizei element_stride;
-		GLint element_count;
-
-		/// GL_FLOAT for example
-		GLenum primitiveType;
-
-		/// Total size of attrib_data
-		GLsizei attrib_size;
+		//Maybe just make a "build vertex attribute description" function...
+		VertexAttributeDescription VAD;
 
 		/// Do not be alarmed that we don't delete this object in our destructor. Its' lifetime is governed elsewhere.
 		GLvoid* attrib_data;
@@ -155,7 +148,6 @@ namespace H3D
 		/// the type of vertex attribute
 		VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE attrib_type;
 
-		bool normalized;
 		bool use_bindless;
 	};
 }

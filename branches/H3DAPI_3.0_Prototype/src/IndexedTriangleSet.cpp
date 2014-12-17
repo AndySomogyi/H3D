@@ -84,9 +84,10 @@ X3DComposedGeometryNode( _metadata, _bound, _displayList,
 	vboFieldsUpToDate( new Field ),
 	ib_id(0),
 	ib_GPUaddress(0),
-	attributeLayoutCached(false),
-	renderData()
+	attributeLayoutCached(false)
 {
+	renderData.VBOs.resize(0);
+	elementData.VBOs.resize(0);
 	type_name = "IndexedTriangleSet";
 	database.initFields( this );
 
@@ -114,14 +115,14 @@ X3DComposedGeometryNode( _metadata, _bound, _displayList,
 	index->route( vboFieldsUpToDate );
 
 
-	if(GLEW_EXT_direct_state_access && GL_NV_vertex_buffer_unified_memory)
-	{
+	//if(GLEW_EXT_direct_state_access && GL_NV_vertex_buffer_unified_memory)
+	//{
 		use_bindless = true;
-	}
-	else
-	{
-		use_bindless = false;
-	}
+	//}
+	//else
+	//{
+	//	use_bindless = false;
+	//}
 }
 
 IndexedTriangleSet::~IndexedTriangleSet() 
@@ -129,8 +130,18 @@ IndexedTriangleSet::~IndexedTriangleSet()
 	// Delete buffer if it was allocated.
 	if(ib_id != 0) 
 	{
-		glDeleteBuffersARB(1, &ib_id);
-		ib_id = NULL;
+		if(use_bindless)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib_id);
+			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+			glDeleteBuffersARB(1, &ib_id);
+			ib_id = 0;
+		}
+		else
+		{
+			glDeleteBuffersARB(1, &ib_id);
+			ib_id = NULL;
+		}
 	}
 }
 
@@ -141,9 +152,6 @@ void IndexedTriangleSet::render()
 	FogCoordinate* fog_coord_node = fogCoord->getValue();
 	X3DColorNode* color_node = color->getValue();
 	X3DNormalNode* normal_node = normal->getValue();
-
-	//Etc.
-	//coordinate_node->getVBO();
 
 	if( !normal_node ) 
 	{
@@ -199,6 +207,7 @@ void IndexedTriangleSet::render()
 					<< getName() << "\" node. ";
 				throw NotEnoughColors( color_node->nrAvailableColors(), s.str(), H3D_FULL_LOCATION );
 			}
+
 			color_node->preRender();
 		}
 
@@ -516,21 +525,21 @@ void IndexedTriangleSet::render()
 
 void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 	
-	//Here we're supposed to apply render state changes that are accessible here
-
-	//Here in traverseSG the render state might be changed again by child nodes
-	X3DComposedGeometryNode::traverseSG( ti );
-
-	//When we're here, we have the render state that we want for this object, apply it
-
 	Renderer* const renderer = ti.getRenderer();
 
 	// use backface culling if solid is true
 	if( solid->getValue() ) {
-		useBackFaceCulling( true );
+		ti.getCurrentRenderstate().rasterizerState.faceCullingEnabled = true;
+		ti.getCurrentRenderstate().rasterizerState.cullFace = GL_BACK;
 	} else {
-		useBackFaceCulling( false );
+		ti.getCurrentRenderstate().rasterizerState.faceCullingEnabled = false;
 	}
+
+	//Here in traverseSG the render state might be changed again by child nodes
+	X3DComposedGeometryNode::traverseSG( ti );
+
+
+	//ti.getCurrentRenderstate().rasterizerState.windingOrder = GL_CCW;
 
 	// In order to avoid problems with caching when the IndexedTriangleSet
 	// is reused in several places in the scene graph where some places
@@ -571,138 +580,11 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 	//If necessary, update all vbo&ibo data
 	if(!vboFieldsUpToDate->isUpToDate() || (!attributeLayoutCached)) {
 
-		unsigned int attributeIndexCount = 0;
-		std::vector<VertexAttributeDescription> attributeLayout;
-
-		//It's used several times, so I just declare it here.
-		VertexAttributeDescription attribDescription;
-		
-		X3DCoordinateNode* coordinate_node = coord->getValue();
-		if(coordinate_node) {
-			coordinate_node->updateVertexBufferObject();
-
-			IndirectRenderData coordinateAttribute;
-			coordinateAttribute.address = coordinate_node->getVBO();
-			coordinateAttribute.length = coordinate_node->getAttribSize();
-			coordinateAttribute.index = attributeIndexCount;
-			coordinateAttribute.reserved = 0;
-
-			renderData.VBOs.push_back(coordinateAttribute);
-
-			attribDescription.index = attributeIndexCount;
-			attribDescription.stride = coordinate_node->getStride();
-
-			attribDescription.primitiveType = coordinate_node->getPrimitiveType();
-			attribDescription.size = coordinate_node->getElementCount();
-			attribDescription.normalized = coordinate_node->isNormalized();
-
-			attributeLayout.push_back(attribDescription);
-
-			attributeIndexCount++;
-		}
-
-		X3DTextureCoordinateNode* tex_coord_node = texCoord->getValue();
-		if(tex_coord_node) {
-			tex_coord_node->updateVertexBufferObject();
-
-			IndirectRenderData textureCoordinateAttribute;
-			textureCoordinateAttribute.address = tex_coord_node->getVBO();
-			textureCoordinateAttribute.length = tex_coord_node->getAttribSize();
-			textureCoordinateAttribute.index = attributeIndexCount;
-			textureCoordinateAttribute.reserved = 0;
-
-			renderData.VBOs.push_back(textureCoordinateAttribute);
-
-			attribDescription.index = attributeIndexCount;
-			attribDescription.size = tex_coord_node->getStride();
-
-			attribDescription.primitiveType = tex_coord_node->getPrimitiveType();
-			attribDescription.size = tex_coord_node->getElementCount();
-			attribDescription.normalized = tex_coord_node->isNormalized();
-
-			attributeLayout.push_back(attribDescription);
-
-			attributeIndexCount++;
-		}
-
-		FogCoordinate* fog_coord_node = fogCoord->getValue();
-		if(fog_coord_node) {
-			fog_coord_node->updateVertexBufferObject();
-
-			IndirectRenderData fogCoordinateAttribute;
-			fogCoordinateAttribute.address = fog_coord_node->getVBO();
-			fogCoordinateAttribute.length = fog_coord_node->getAttribSize();
-			fogCoordinateAttribute.index = attributeIndexCount;
-			fogCoordinateAttribute.reserved = 0;
-
-			renderData.VBOs.push_back(fogCoordinateAttribute);
-
-			attribDescription.index = attributeIndexCount;
-			attribDescription.size = fog_coord_node->getStride();
-
-			attribDescription.primitiveType = fog_coord_node->getPrimitiveType();
-			attribDescription.size = fog_coord_node->getElementCount();
-			attribDescription.normalized = fog_coord_node->isNormalized();
-
-			attributeLayout.push_back(attribDescription);
-
-			attributeIndexCount++;
-		}
-
-		X3DColorNode* color_node = color->getValue();
-		if(color_node) {
-			color_node->updateVertexBufferObject();
-
-			IndirectRenderData colorAttribute;
-			colorAttribute.address = color_node->getVBO();
-			colorAttribute.length = color_node->getAttribSize();
-			colorAttribute.index = attributeIndexCount;
-			colorAttribute.reserved = 0;
-
-			renderData.VBOs.push_back(colorAttribute);
-
-			attribDescription.index = attributeIndexCount;
-			attribDescription.size = color_node->getStride();
-
-			attribDescription.primitiveType = color_node->getPrimitiveType();
-			attribDescription.size = color_node->getElementCount();
-			attribDescription.normalized = color_node->isNormalized();
-
-			attributeLayout.push_back(attribDescription);
-
-			attributeIndexCount++;
-		}
-
-		X3DNormalNode* normal_node = normal->getValue();
-		if(normal_node) {
-			normal_node->updateVertexBufferObject();
-
-			IndirectRenderData normalAttribute;
-			normalAttribute.address = normal_node->getVBO();
-			normalAttribute.length = normal_node->getAttribSize();
-			normalAttribute.index = attributeIndexCount;
-			normalAttribute.reserved = 0;
-
-			renderData.VBOs.push_back(normalAttribute);
-
-			attribDescription.index = attributeIndexCount;
-			attribDescription.size = normal_node->getStride();
-
-			attribDescription.primitiveType = normal_node->getPrimitiveType();
-			attribDescription.size = normal_node->getElementCount();
-			attribDescription.normalized = normal_node->isNormalized();
-
-			attributeLayout.push_back(attribDescription);
-
-			attributeIndexCount++;
-		}
-
-		renderData.vertexAttributeLayout = renderer->insertVertexAttributeLayout(attributeLayout);
-
-		attributeLayoutCached = true;
-
-		const vector< int >& indices = index->getValue();
-		unsigned int indexSize = indices.size() * sizeof(GLuint);
+		/************************************************************************/
+		/* Index/Element buffer stuff	                                        */
+		/************************************************************************/
+		const vector<int>& indices = index->getValue();
+		unsigned int indexSize = (indices.size() * sizeof(GLuint));
 
 		if(!ib_id) 
 		{
@@ -712,7 +594,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		if(use_bindless) {
 			//Does this need to be deleted? Look up to make sure....
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
-			glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &(*(indices.begin())), 0);
+			glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &*indices.begin(), 0);
 			glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &ib_GPUaddress);
 			glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
 
@@ -724,18 +606,156 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
 			glBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, indexSize, &(*(indices.begin()) ), GL_STATIC_DRAW_ARB );
 
+			//We shouldn't reach this place, quite sure this'll cause issues
 			renderData.IBO.index = 0;
 			renderData.IBO.reserved = 0;
 			renderData.IBO.length = indexSize;
-			renderData.IBO.address = ib_id; //Implicitly cast from 64bit to 32bit uint........................ should be fine.... ;)
+			renderData.IBO.address = ib_id;
 		}
 
-		ti.getCurrentRenderstate().vertexLayoutDescription = renderData.vertexAttributeLayout;
+		elementData.IBO = ib_id;
+		elementData.indexCount = indices.size();
+		elementData.VBOs.resize(0);
 
+		/************************************************************************/
+		/* Set up vertex attribute layout for this object                       */
+		/************************************************************************/
+		unsigned int attributeIndexCount = 0;
+		std::vector<VertexAttributeDescription> attributeLayout;
+
+		//Will be reused
+		VertexAttributeDescription attribDescription;
+
+		/*
+		Set up coordinate attribute description
+		*/
+		X3DCoordinateNode* coordinate_node = coord->getValue();
+		if(coordinate_node) {
+
+			coordinate_node->updateVertexBufferObject();
+			attribDescription = coordinate_node->getVAD();
+
+			IndirectRenderData attribute;
+			attribute.address =		coordinate_node->getVBOPtr();
+			attribute.length =		attribDescription.attributeSize;
+			attribute.index =		attributeIndexCount;
+			attribute.reserved =	0;
+
+			attribDescription.bufferIndex =			attributeIndexCount;
+
+			renderData.VBOs.push_back(attribute);
+			elementData.VBOs.push_back(attribDescription);
+			attributeLayout.push_back(attribDescription);
+
+			attributeIndexCount++;
+		}
+
+		/*
+		Set up texture coordinate attribute description
+		*/
+		X3DTextureCoordinateNode* tex_coord_node = texCoord->getValue();
+		if(tex_coord_node) {
+
+			tex_coord_node->updateVertexBufferObject();
+			attribDescription = tex_coord_node->getVAD();
+
+			IndirectRenderData attribute;
+			attribute.address =	tex_coord_node->getVBOPtr();
+			attribute.length =	attribDescription.attributeSize;
+			attribute.index =		attributeIndexCount;
+			attribute.reserved =	0;
+
+			attribDescription.bufferIndex =			attributeIndexCount;
+
+			renderData.VBOs.push_back(attribute);
+			elementData.VBOs.push_back(attribDescription);
+			attributeLayout.push_back(attribDescription);
+
+			attributeIndexCount++;
+		}
+
+		/*
+		Set up fog coordinate attribute description
+		*/
+		FogCoordinate* fog_coord_node = fogCoord->getValue();
+		if(fog_coord_node) {
+
+			fog_coord_node->updateVertexBufferObject();
+			attribDescription = fog_coord_node->getVAD();
+
+			IndirectRenderData attribute;
+			attribute.address =		fog_coord_node->getVBOPtr();
+			attribute.length =		attribDescription.attributeSize;
+			attribute.index =		attributeIndexCount;
+			attribute.reserved =	0;
+
+			attribDescription.bufferIndex =	attributeIndexCount;
+
+			renderData.VBOs.push_back(attribute);
+			elementData.VBOs.push_back(attribDescription);
+			attributeLayout.push_back(attribDescription);
+
+			attributeIndexCount++;
+		}
+
+		/*
+		Set up color attribute description
+		*/
+		X3DColorNode* color_node = color->getValue();
+		if(color_node) {
+
+			color_node->updateVertexBufferObject();
+			attribDescription = color_node->getVAD();
+
+			IndirectRenderData attribute;
+			attribute.address =		color_node->getVBOPtr();
+			attribute.length =		attribDescription.attributeSize;
+			attribute.index =		attributeIndexCount;
+			attribute.reserved =	0;
+
+			attribDescription.bufferIndex =	attributeIndexCount;
+
+			renderData.VBOs.push_back(attribute);
+			elementData.VBOs.push_back(attribDescription);
+			attributeLayout.push_back(attribDescription);
+
+			attributeIndexCount++;
+		}
+
+		/*
+		Set up normal attribute description
+		*/
+		X3DNormalNode* normal_node = normal->getValue();
+		if(normal_node) {
+
+			normal_node->updateVertexBufferObject();
+			attribDescription = normal_node->getVAD();
+
+			IndirectRenderData attribute;
+			attribute.address =		normal_node->getVBOPtr();
+			attribute.length =		attribDescription.attributeSize;
+			attribute.index =		attributeIndexCount;
+			attribute.reserved =	0;
+
+			attribDescription.bufferIndex =			attributeIndexCount;
+
+			renderData.VBOs.push_back(attribute);
+			elementData.VBOs.push_back(attribDescription);
+			attributeLayout.push_back(attribDescription);
+
+			attributeIndexCount++;
+		}
+
+		//Save all vertex attributes that describe a layout, then insert them into renderer, and get a handle back
+		renderData.vertexAttributeLayout = renderer->insertVertexAttributeLayout(attributeLayout, ib_id);
+		ti.getCurrentRenderstate().vertexLayoutDescription = renderData.vertexAttributeLayout;
 		renderData.renderState = renderer->insertNewTotalRenderState(ti.getCurrentRenderstate());
+
+		attributeLayoutCached = true;
 	}
 
 	renderer->insertNewRenderData(&renderData);
+	renderer->insertNewElementData(&elementData);
 }
 
 void IndexedTriangleSet::AutoNormal::update() 

@@ -34,10 +34,10 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase TextureCoordinate3D::database( 
-                                "TextureCoordinate3D", 
-                                &(newInstance<TextureCoordinate3D>), 
-                                typeid( TextureCoordinate3D ),
-                                &X3DTextureCoordinateNode::database );
+								"TextureCoordinate3D", 
+								&(newInstance<TextureCoordinate3D>), 
+								typeid( TextureCoordinate3D ),
+								&X3DTextureCoordinateNode::database );
 
 namespace TextureCoordinate3DInternals {
   FIELDDB_ELEMENT( TextureCoordinate3D, point, INPUT_OUTPUT );
@@ -46,8 +46,8 @@ namespace TextureCoordinate3DInternals {
 
 
 TextureCoordinate3D::TextureCoordinate3D( 
-                                     Inst< SFNode >  _metadata,
-                                     Inst< MFVec3f>  _point ) :
+									 Inst< SFNode >  _metadata,
+									 Inst< MFVec3f>  _point ) :
   X3DTextureCoordinateNode( _metadata ),
   point( _point ) {
 
@@ -66,16 +66,16 @@ void TextureCoordinate3D::render( int index ) {
 }
 
 void TextureCoordinate3D::renderForTextureUnit( int index,
-                                              unsigned int texture_unit ) {
+											  unsigned int texture_unit ) {
   const Vec3f &p = point->getValueByIndex( index );
   glMultiTexCoord3f( GL_TEXTURE0_ARB + texture_unit, p.x, p.y, p.z );
 }
 
 void TextureCoordinate3D::renderArray() {
   if( !point->empty() ) {
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(3, GL_FLOAT, 0,
-                    &(*point->begin()) );
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glTexCoordPointer(3, GL_FLOAT, 0,
+					&(*point->begin()) );
   }
 }
 
@@ -86,34 +86,35 @@ void TextureCoordinate3D::disableArray() {
 
 bool TextureCoordinate3D::preRenderCheckFail ( ){
   return GLVertexAttributeObject::preRenderCheckFail ( ) ||
-    point->empty ( );
+	point->empty ( );
 }
 
 void TextureCoordinate3D::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*point->begin ( ));
-  element_count = 3;
-  primitiveType = GL_FLOAT;
-  element_stride = 3*sizeof(GLfloat);
-  attrib_size = point->size ( ) * element_stride;
+  VAD.elementCount = 3;
+  VAD.primitiveType = GL_FLOAT;
+  VAD.stride = VAD.elementCount*sizeof(GLfloat);
+  VAD.attributeSize = point->size() * VAD.stride; // * sizeof(GLfloat);
 }
 
 void TextureCoordinate3D::renderVBO ( ){
   glEnableClientState ( GL_TEXTURE_COORD_ARRAY );
   if ( use_bindless )
   {
-    glTexCoordFormatNV ( 3, GL_FLOAT, 0 );
-    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
-    // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_TEXTURE_COORD_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
+	glTexCoordFormatNV (3, GL_FLOAT, 0 );
+	glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+	
+	// vbo is dedicated for this vertex attribute, so there is no offset
+	glBufferAddressRangeNV(GL_TEXTURE_COORD_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
   } else{
-    glTexCoordPointer ( 3, GL_FLOAT, 0, NULL );
+	glTexCoordPointer ( 3, GL_FLOAT, 0, NULL );
   }
 }
 
 void TextureCoordinate3D::disableVBO ( ){
   if ( use_bindless )
   {
-    glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+	glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
   }
   glDisableClientState ( GL_TEXTURE_COORD_ARRAY );
 }

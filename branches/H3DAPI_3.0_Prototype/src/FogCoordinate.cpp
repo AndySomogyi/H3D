@@ -98,11 +98,12 @@ bool FogCoordinate::preRenderCheckFail ( ){
 
 void FogCoordinate::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*depth->begin ( ));
-  element_stride = sizeof(GLfloat);
-  primitiveType = GL_FLOAT;
-  element_count = 1;
-  
-  attrib_size = depth->size ( ) * element_stride;
+
+  VAD.primitiveType = GL_FLOAT;
+  VAD.elementCount = 1;
+  VAD.stride = VAD.elementCount * sizeof(GLfloat);
+
+  VAD.attributeSize = depth->size() * VAD.stride; // * sizeof(GLfloat);
 }
 
 void FogCoordinate::renderVBO ( ){
@@ -112,7 +113,7 @@ void FogCoordinate::renderVBO ( ){
     glFogCoordFormatNV ( GL_FLOAT, 0 );
     glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_FOG_COORD_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
+    glBufferAddressRangeNV ( GL_FOG_COORD_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize);
   } else
   {
     glFogCoordPointerEXT ( GL_FLOAT, 0, NULL );

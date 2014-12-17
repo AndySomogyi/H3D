@@ -82,10 +82,10 @@ bool Color::preRenderCheckFail ( ){
 
 void Color::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*color->begin ( ));
-  element_count = 3;
-  primitiveType = GL_FLOAT;
-  element_stride = 3 * sizeof(GLfloat);
-  attrib_size = color->size ( ) * element_stride;
+  VAD.elementCount = 3;
+  VAD.primitiveType = GL_FLOAT;
+  VAD.stride = VAD.elementCount * sizeof(GLfloat);
+  VAD.attributeSize = color->size() * VAD.stride; // * sizeof(GLfloat);
 }
 
 void Color::renderVBO ( ){
@@ -95,7 +95,7 @@ void Color::renderVBO ( ){
     glColorFormatNV ( 3, GL_FLOAT, 0 );
     glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_COLOR_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
+    glBufferAddressRangeNV ( GL_COLOR_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
   } else
   {
     glColorPointer ( 3, GL_FLOAT, 0, NULL );

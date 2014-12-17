@@ -447,9 +447,13 @@ void Scene::idle()
 #ifdef HAVE_PROFILER
 		H3DUtil::H3DTimer::stepBegin("Scene_traverse");
 #endif
+
+		//Before traversing through the scene, we send traverseInfo into the default shader to queue up the default shader ID
+		defaultShader->traverseSG(*ti);
+
 		if( scene_root ) 
 		{
-			scene_root->traverseSG( *ti );
+			scene_root->traverseSG(*ti);
 		}
 #ifdef HAVE_PROFILER
 		H3DUtil::H3DTimer::stepEnd("Scene_traverse");
@@ -493,9 +497,6 @@ void Scene::idle()
 		}
 	}
 
-	//Call update after traversing through the entire scene.
-	renderer->update();
-
 #ifdef HAVE_PROFILER
 	H3DUtil::H3DTimer::stepBegin("Graphic_rendering");
 #endif
@@ -503,19 +504,83 @@ void Scene::idle()
 	for( MFWindow::const_iterator w = window->begin(); 
 		w != window->end(); ++w ) {
 			H3DWindowNode *window = static_cast< H3DWindowNode * >(*w);
-			bool used_mpt = window->getMultiPassTransparency();
-			window->setMultiPassTransparency( 
-				last_traverseinfo->getMultiPassTransparency() );
-			if( used_mpt != window->getMultiPassTransparency() ) 
-			{
-				H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
-			}
 
-			window->render( scene_root );
+			//bool used_mpt = window->getMultiPassTransparency();
+			//window->setMultiPassTransparency( 
+			//	last_traverseinfo->getMultiPassTransparency() );
+			//if( used_mpt != window->getMultiPassTransparency() ) 
+			//{
+			//	H3DDisplayListObject::DisplayList::rebuildAllDisplayLists();
+			//}
+
+			//if(!window->isInitialized())
+			//{
+			//	window->initialize(); //render( scene_root );
+			//}
 	}
+
+	X3DViewpointNode *vp = X3DViewpointNode::getActive();
+	if( vp ) {
+
+		H3DWindowNode* windowPtr = static_cast< H3DWindowNode * >(*window->begin());
+
+		windowPtr->navigate();
+
+		Vec3f direction = vp->accForwardMatrix->getValue().getRotationPart() * 
+			(vp->totalOrientation->getValue() * Vec3f( 0, 0, -1 ));
+
+		Vec3f up = vp->accForwardMatrix->getValue().getRotationPart() * 
+			(vp->totalOrientation->getValue() * Vec3f( 0, 1, 0));
+		
+		Vec3f position = vp->totalPosition->getValue();
+
+		renderer->setCurrentViewpoint(position, direction, up);
+	}
+
+	TimeStamp timer;
+
+	static double totalTimeSpentUpdating = 0.0;
+	static double totalTimeSpentRendering = 0.0;
+	static unsigned int callCount = 0;
+
+	//
+	double updateBegins = timer.now();
+
+	//Call update after traversing through the entire scene.
+	renderer->update();
+
+	double result = (timer.now() - updateBegins);
+
+	totalTimeSpentUpdating += result;
+	//
+
+	//
+	updateBegins = timer.now();
 
 	//Call render after update has been called.
 	renderer->render();
+
+	result = (timer.now() - updateBegins);
+
+	totalTimeSpentRendering += result;
+	//
+
+	callCount++;
+	double avgUpdateTime = totalTimeSpentUpdating*(1.0 / callCount);
+	double avgRenderTime = totalTimeSpentRendering*(1.0 / callCount);
+
+
+	auto itr = window->begin();
+
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) 
+	{
+		std::cout << "OpenGL error: " << err << endl;
+	}
+
+	static_cast< H3DWindowNode * >(*itr)->swapBuffers();
+
+
 
 #ifdef HAVE_PROFILER
 	H3DUtil::H3DTimer::stepEnd("Graphic_rendering");
@@ -682,7 +747,8 @@ void Scene::loadSceneRoot( const string &url )
 	// It needs to be called after an OpenGL context has been acquired.
 	if(renderer.get() == 0)
 	{
-		renderer = auto_ptr<Renderer>(new H3D::Renderer);
+		renderer = auto_ptr<Renderer>(new Renderer());
+		defaultShader = auto_ptr<PrototypeShader>(new PrototypeShader("testShader_vs.glsl", "testShader_fs.glsl"));
 	}
 }
 

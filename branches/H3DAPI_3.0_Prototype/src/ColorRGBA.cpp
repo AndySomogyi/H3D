@@ -82,10 +82,10 @@ bool ColorRGBA::preRenderCheckFail ( ){
 
 void ColorRGBA::setAttributeData ( ){
 	attrib_data = (GLvoid*)&(*color->begin ( ));
-	element_count = 4;
-	primitiveType = GL_FLOAT;
-	element_stride = 4;
-	attrib_size = color->size ( ) * sizeof(GLfloat);
+	VAD.elementCount = 4;
+	VAD.primitiveType = GL_FLOAT;
+	VAD.stride = VAD.elementCount * sizeof(GLfloat);
+	VAD.attributeSize = color->size() * VAD.stride; //* sizeof(GLfloat);
 }
 
 void ColorRGBA::renderVBO ( )
@@ -97,7 +97,7 @@ void ColorRGBA::renderVBO ( )
 		glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
 
 		// vbo is dedicated for this vertex attribute, so there is no offset
-		glBufferAddressRangeNV ( GL_COLOR_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
+		glBufferAddressRangeNV ( GL_COLOR_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize);
 	} 
 	else
 	{
