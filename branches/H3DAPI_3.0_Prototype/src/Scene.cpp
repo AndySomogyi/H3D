@@ -450,6 +450,7 @@ void Scene::idle()
 
 		//Before traversing through the scene, we send traverseInfo into the default shader to queue up the default shader ID
 		defaultShader->traverseSG(*ti);
+		renderer->setWorldUniformIndex(defaultShader->getMatrixUniformLocation());
 
 		if( scene_root ) 
 		{
@@ -532,7 +533,7 @@ void Scene::idle()
 		Vec3f up = vp->accForwardMatrix->getValue().getRotationPart() * 
 			(vp->totalOrientation->getValue() * Vec3f( 0, 1, 0));
 		
-		Vec3f position = vp->totalPosition->getValue();
+		Vec3f position = (vp->accForwardMatrix->getValue() * vp->totalPosition->getValue());
 
 		renderer->setCurrentViewpoint(position, direction, up);
 	}
@@ -749,6 +750,7 @@ void Scene::loadSceneRoot( const string &url )
 	{
 		renderer = auto_ptr<Renderer>(new Renderer());
 		defaultShader = auto_ptr<PrototypeShader>(new PrototypeShader("testShader_vs.glsl", "testShader_fs.glsl"));
+		defaultShader->setBindlessUsage(renderer->getBindlessUsage());
 	}
 }
 

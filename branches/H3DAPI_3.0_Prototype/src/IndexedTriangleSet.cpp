@@ -117,7 +117,7 @@ X3DComposedGeometryNode( _metadata, _bound, _displayList,
 
 	//if(GLEW_EXT_direct_state_access && GL_NV_vertex_buffer_unified_memory)
 	//{
-		use_bindless = true;
+		use_bindless = false;
 	//}
 	//else
 	//{
@@ -538,9 +538,6 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 	//Here in traverseSG the render state might be changed again by child nodes
 	X3DComposedGeometryNode::traverseSG( ti );
 
-
-	//ti.getCurrentRenderstate().rasterizerState.windingOrder = GL_CCW;
-
 	// In order to avoid problems with caching when the IndexedTriangleSet
 	// is reused in several places in the scene graph where some places
 	// require normals and some not, we always render tangents after 
@@ -572,7 +569,6 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		}
 	}
 
-	//Copy current transform
 	renderData.modelTransform = ti.getAccForwardMatrix();
 
 	vboFieldsUpToDate->upToDate();
@@ -586,17 +582,17 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		const vector<int>& indices = index->getValue();
 		unsigned int indexSize = (indices.size() * sizeof(GLuint));
 
-		if(!ib_id) 
-		{
+		if(!ib_id) {
 			glGenBuffersARB(1, &ib_id);
 		}
 
 		if(use_bindless) {
 			//Does this need to be deleted? Look up to make sure....
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
-			glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &*indices.begin(), 0);
+			glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &*indices.begin(), GL_MAP_WRITE_BIT|GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT);
 			glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &ib_GPUaddress);
 			glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+			LogOGLErrors("IndexedTriangleSet.cpp::traverseSG");
 
 			renderData.IBO.index = 0;
 			renderData.IBO.reserved = 0;
@@ -605,6 +601,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		} else {
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
 			glBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, indexSize, &(*(indices.begin()) ), GL_STATIC_DRAW_ARB );
+			LogOGLErrors("IndexedTriangleSet.cpp::traverseSG");
 
 			//We shouldn't reach this place, quite sure this'll cause issues
 			renderData.IBO.index = 0;

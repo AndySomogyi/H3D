@@ -26,6 +26,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <H3D/GLVertexAttributeObject.h>
+#include <H3D/OGLUtil.h>
 
 using namespace H3D;
 
@@ -45,10 +46,10 @@ vboFieldsUpToDate ( new Field ),
 	VAD.target = GL_ARRAY_BUFFER;
 	VAD.normalized = false;
 
-	if(GLEW_EXT_direct_state_access && GL_NV_vertex_buffer_unified_memory)
-	{
-		use_bindless = true;
-	}
+	//if(GLEW_EXT_direct_state_access && GL_NV_vertex_buffer_unified_memory)
+	//{
+	//	use_bindless = true;
+	//}
 }
 
 GLVertexAttributeObject::~GLVertexAttributeObject() 
@@ -76,6 +77,7 @@ bool GLVertexAttributeObject::preRenderCheckFail()
 }
 
 void GLVertexAttributeObject::updateVertexBufferObject() {
+	
 	if(!vboFieldsUpToDate->isUpToDate()) {
 		vboFieldsUpToDate->upToDate();
 		setAttributeData();
@@ -86,12 +88,13 @@ void GLVertexAttributeObject::updateVertexBufferObject() {
 
 		glBindBuffer(GL_ARRAY_BUFFER, VAD.bufferID);
 
-
 		if(use_bindless)
 		{
-			glBufferStorage(GL_ARRAY_BUFFER, VAD.attributeSize, attrib_data, 0);
+			glBufferStorage(GL_ARRAY_BUFFER, VAD.attributeSize, attrib_data, GL_MAP_WRITE_BIT|GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT);
 			glGetBufferParameterui64vNV(GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &vbo_GPUaddr);
 			glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+			LogOGLErrors("GLVertexAttributeObject::updateVertexBufferObject.");
 		}
 		else
 		{
@@ -103,6 +106,8 @@ void GLVertexAttributeObject::updateVertexBufferObject() {
 			{
 				glBufferData(GL_ARRAY_BUFFER, VAD.attributeSize, attrib_data, GL_STATIC_DRAW);
 			}
+
+			LogOGLErrors("GLVertexAttributeObject::updateVertexBufferObject.");
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
