@@ -41,6 +41,7 @@
 using namespace std;
 
 namespace H3D {
+
   // forward declaration
   class Node;
 

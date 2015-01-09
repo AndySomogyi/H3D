@@ -87,8 +87,10 @@ namespace H3D
 		/// send in an Appearance ptr, goes through it, looking at all the relevant values to see
 		/// if this Appearance makes up a unique total renderstate. 
 		/// If it doesn't we return the index to an identical one, and if it is unique, we insert it and return that index instead.
+		/*
 		virtual unsigned int insertNewTotalRenderState(const Appearance* const appearance, X3DGeometryNode* const geometry);
-		
+		*/
+
 		virtual unsigned int insertNewTotalRenderState(TotalRenderState& totalRenderState);
 
 		///	So we'll insert a vector describing an entire layout.

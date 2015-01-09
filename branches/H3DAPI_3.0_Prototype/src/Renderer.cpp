@@ -13,7 +13,7 @@ H3D::Renderer::Renderer()
 	lookAtVector(0.0f, 0.0f, 1.0f),
 	upVector(0.0f, 0.0f, 1.0f),
 	eyeVector(0.0f, 3.0f, 40.0f),
-	usingBindless(true)
+	usingBindless(USING_BINDLESS)
 {
 	time = time.now();
 	previousTime = time;
@@ -22,8 +22,8 @@ H3D::Renderer::Renderer()
 	rebuildCommandBuffer = true;
 	maxVertexAttribSlots = 16;
 
-	viewportHeight = 768.0f;
 	viewportWidth = 1024.0f;
+	viewportHeight = 768.0f;
 	setViewportSize(viewportWidth, viewportHeight);
 	updateViewMatrix();
 
@@ -40,9 +40,9 @@ H3D::Renderer::Renderer()
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribSlots);
 
 	//#ifdef GLEW_ARB_multi_draw_indirect
-	usingBindless = false;
+	//	usingBindless = true;
 	//#else
-	//	multidrawIndirectEnabled = false;
+	//	usingBindless = false;
 	//#endif
 
 	if(usingBindless)
@@ -193,7 +193,7 @@ void  H3D::Renderer::update() {
 				renderCommandBuffer.InsertNewCommand(new MultiDrawElementsIndirectCommand(renderCommandBuffer.GetBuffer(), 
 					renderBuckets[i].renderables, GL_TRIANGLES, GL_UNSIGNED_INT, 0, renderBuckets[i].elementRenderables[0].VBOs.size()));
 
-				renderCommandBuffer.InsertNewCommand(new CleanupCircularBufferCommand<Matrix4f>(&transformBuffer, transforms.size()));
+				renderCommandBuffer.InsertNewCommand(new CleanupCircularBufferCommand<Matrix4f>(&transformBuffer, transforms.size()*sizeof(Matrix4f)));
 
 			} else {
 				renderCommandBuffer.InsertNewCommand(new DrawElementsBaseVertexCommand(renderBuckets[i].elementRenderables, GL_TRIANGLES, GL_UNSIGNED_INT, 0, worldMatrixUniformLocation));
@@ -237,18 +237,18 @@ void  H3D::Renderer::render() {
 	/*
 	Fill up our persistent buffer matrix
 	*/
-	if(usingBindless) {
-		Matrix4f* dst = transformBuffer.Reserve(transforms.size());
-		memcpy(dst, &*transforms.begin(), sizeof(Matrix4f) * transforms.size());
+	//if(usingBindless) {
+	//	Matrix4f* dst = transformBuffer.Reserve(transforms.size());
+	//	memcpy(dst, &*transforms.begin(), sizeof(Matrix4f) * transforms.size());
 
-		transformBuffer.BindBufferRange(0, transforms.size());
-	}
+	//	transformBuffer.BindBufferRange(0, transforms.size());
+	//}
 
 	renderCommandBuffer.Render();
 
-	if(usingBindless) {
-		transformBuffer.OnUsageComplete(transforms.size());
-	}
+	//if(usingBindless) {
+	//	transformBuffer.OnUsageComplete(transforms.size());
+	//}
 
 	//Clear these out at the end of each frame...
 	renderables.clear();
@@ -265,7 +265,7 @@ void H3D::Renderer::insertNewElementData(ElementDrawData* const elementData) {
 	elementRenderables.push_back(elementData);
 }
 
-
+/*
 unsigned int H3D::Renderer::insertNewTotalRenderState(const Appearance* const appearance, X3DGeometryNode* const geometry) {
 	unsigned int retVal = 0;
 	RenderProperties* rp = appearance->renderProperties->getValue();
@@ -320,7 +320,7 @@ unsigned int H3D::Renderer::insertNewTotalRenderState(const Appearance* const ap
 	//totalRenderStates[0] contains a totally standard renderstate
 	return retVal;
 }
-
+*/
 
 unsigned int H3D::Renderer::insertNewTotalRenderState(TotalRenderState& newRenderState) {
 

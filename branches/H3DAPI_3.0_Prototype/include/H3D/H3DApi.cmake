@@ -213,6 +213,9 @@
 
 /// H3D API namespace
 namespace H3D {
+	
+  static const bool USING_BINDLESS = false;
+
   /// Initialize H3D API(only needed if using H3D API as a static library). 
   void initializeH3D();
 

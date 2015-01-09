@@ -8,7 +8,7 @@
 using namespace H3D;
 
 H3D::PrototypeShader::PrototypeShader(std::string _vertexShader, std::string _fragmentShader) {
-	usingBindless = false;
+	usingBindless = H3D::USING_BINDLESS;
 	usesViewProj = true;
 	isValid = false; 
 	vertexShaderString = _vertexShader; 

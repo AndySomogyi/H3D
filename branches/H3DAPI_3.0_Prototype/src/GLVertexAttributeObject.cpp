@@ -37,7 +37,7 @@ vboFieldsUpToDate ( new Field ),
 	attrib_type(type),
 	attrib_data( NULL ),
 	vbo_GPUaddr( 0 ),
-	use_bindless( false )
+	use_bindless( H3D::USING_BINDLESS )
 {
 	vboFieldsUpToDate->setName ("vboFieldsUpToDate");
 	isDynamic->route (vboFieldsUpToDate);
@@ -141,7 +141,7 @@ void GLVertexAttributeObject::disableVertexBufferObject()
 
 	disableVBO();
 
-	if (!use_bindless)
+	if(!use_bindless)
 	{
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 	}

@@ -75,6 +75,7 @@ X3DComposedGeometryNode( _metadata, _bound, _displayList,
 	_color, _coord, _normal, _texCoord, 
 	_ccw, _colorPerVertex, _normalPerVertex,
 	_solid, _attrib, _fogCoord ),
+	use_bindless(H3D::USING_BINDLESS),
 	autoNormal( _autoNormal ),   
 	set_index( _set_index ),
 	index( _index ),
@@ -117,7 +118,7 @@ X3DComposedGeometryNode( _metadata, _bound, _displayList,
 
 	//if(GLEW_EXT_direct_state_access && GL_NV_vertex_buffer_unified_memory)
 	//{
-		use_bindless = false;
+	//	use_bindless = true;
 	//}
 	//else
 	//{
