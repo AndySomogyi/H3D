@@ -32,12 +32,15 @@ namespace H3D {
 		bool usingBindless;
 		bool usesViewProj;
 		bool isValid;
-		GLuint program_ID;
 		GLuint viewProjUniformLocation;
 		GLuint worldMatrixUniformLocation;
 		std::string vertexShaderString;
 		std::string fragmentShaderString;
-		std::vector<UniformDescription> uniforms;
+
+
+		ShaderData program;
+		//GLuint program_ID;
+		//std::vector<UniformDescription> uniforms;
 	};
 }
 

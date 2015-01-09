@@ -529,10 +529,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 
 	// use backface culling if solid is true
 	if( solid->getValue() ) {
-		ti.getCurrentRenderstate().rasterizerState.faceCullingEnabled = true;
-		ti.getCurrentRenderstate().rasterizerState.cullFace = GL_BACK;
+		ti.getCurrentRenderstate().setFaceCullingEnabled(true);
+		ti.getCurrentRenderstate().setCullFace(GL_BACK);
 	} else {
-		ti.getCurrentRenderstate().rasterizerState.faceCullingEnabled = false;
+		ti.getCurrentRenderstate().setFaceCullingEnabled(false);
 	}
 
 	//Here in traverseSG the render state might be changed again by child nodes
@@ -745,7 +745,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 
 		//Save all vertex attributes that describe a layout, then insert them into renderer, and get a handle back
 		renderData.vertexAttributeLayout = renderer->insertVertexAttributeLayout(attributeLayout, ib_id);
-		ti.getCurrentRenderstate().vertexLayoutDescription = renderData.vertexAttributeLayout;
+		ti.getCurrentRenderstate().setVertexLayoutDescription(renderData.vertexAttributeLayout);
 		renderData.renderState = renderer->insertNewTotalRenderState(ti.getCurrentRenderstate());
 
 		attributeLayoutCached = true;

@@ -4,6 +4,7 @@
 #include <H3D/VertexAttributeDescription.h>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace H3D 
 {
@@ -11,6 +12,32 @@ namespace H3D
 	class RenderProperties;
 	class X3DGeometryNode;
 	class Appearance;
+	class RenderCommandBuffer;
+
+		//////////////////////////////////////////////////////////////////////////
+
+	//It's special because GLclampf array
+	struct OGLBlendColor
+	{
+		OGLBlendColor();
+		OGLBlendColor(GLclampf redBlend, GLclampf greenBlend, GLclampf blueBlend, GLclampf alphaBlend);
+		
+		bool operator==(const OGLBlendColor& rhs);
+
+		GLclampf color[4];
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+
+	struct OGLColorMask
+	{
+		OGLColorMask();
+		OGLColorMask(bool redMask, bool greenMask, bool blueMask, bool alphaMask);
+		
+		bool operator==(const OGLColorMask& rhs);
+
+		GLboolean mask[4];
+	};
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -19,7 +46,8 @@ namespace H3D
 		void defaultInit();
 
 	public:
-		DepthState(bool _depthTestingEnabled = true, bool _depthBufferWriteEnabled = true, GLenum _depthFunction = GL_LESS);
+		DepthState();
+		DepthState(bool _depthTestingEnabled, bool _depthBufferWriteEnabled, GLenum _depthFunction);
 		DepthState(RenderProperties* const rp);
 
 		bool operator==(const DepthState& rhs);
@@ -39,12 +67,13 @@ namespace H3D
 		void defaultInit();
 
 	public:
+		BlendState();
 
 		//Yes, writing this did in fact hurt my soul.
-		BlendState(bool _blendingEnabled = GL_TRUE, GLenum _alphaTestFunc = GL_ALWAYS, 
-			GLenum _srcFactorRGB = GL_SRC_ALPHA, GLenum _dstFactorRGB = GL_ONE_MINUS_SRC_ALPHA, 
-			GLenum	_equationRGB = GL_FUNC_ADD, GLenum	_srcFactorAlpha = GL_SRC_ALPHA, 
-			GLenum	_dstFactorAlpha = GL_ONE_MINUS_SRC_ALPHA, GLenum _equationAlpha = GL_FUNC_ADD);
+		BlendState(bool _blendingEnabled, GLenum _alphaTestFunc, 
+			GLenum _srcFactorRGB, GLenum _dstFactorRGB, 
+			GLenum	_equationRGB, GLenum	_srcFactorAlpha, 
+			GLenum	_dstFactorAlpha, GLenum _equationAlpha);
 
 		//Much easier
 		BlendState(RenderProperties* const rp);
@@ -64,8 +93,8 @@ namespace H3D
 		GLenum	blendEquationAlpha;
 
 		GLclampf	alphaFuncValue;
-		GLclampf	blendColor[4]; //0=R, 1=G, 2=B, 3=A
-		GLboolean	colorMask[4]; //0=R, 1=G, 2=B, 3=A
+		OGLBlendColor	blendColor; //0=R, 1=G, 2=B, 3=A
+		OGLColorMask	colorMask; //0=R, 1=G, 2=B, 3=A
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -75,8 +104,10 @@ namespace H3D
 		void defaultInit();
 
 	public:
-		RasterizerState(bool _faceCullingEnabled = true, bool _scissorTestEnabled = false, 
-			GLenum _cullFace = GL_FRONT, GLenum _windingOrder = GL_CCW);
+		RasterizerState();
+
+		RasterizerState(bool _faceCullingEnabled, bool _scissorTestEnabled, 
+			GLenum _cullFace, GLenum _windingOrder);
 
 		bool operator==(const RasterizerState& rhs);
 		bool operator!=(const RasterizerState& rhs);
@@ -126,6 +157,7 @@ namespace H3D
 		};
 
 		UniformDescription(UniformType _type = fv1, std::string _uniformName = "", GLint _location = 0, GLsizei _count = 0, GLboolean _normalize = GL_FALSE, GLvoid* _ptr = 0);
+		const bool operator==(const UniformDescription& rhs) const;
 
 		UniformType type;
 		std::string name;
@@ -151,6 +183,152 @@ namespace H3D
 	//They're all auto_ptrs because they can be null. If they're null, 
 	//it means they're completely default and we don't need to change the state.
 	struct TotalRenderState {
+	public:
+		//Enumerations of each kind of state change type we could have.
+		//We use these to identify what type of changes have occurred, and act according to these types.
+		enum StateChangeType
+		{
+			//Depth state
+			DepthTestingEnable = 0, //Probably not necessary, but just doing it for clarity and as a sanity check
+			DepthBufferWriteEnable,
+			DepthFunctionChange,
+			//Blend state
+			BlendingEnabled,
+			BlendFunctionChange,
+			BlendEquationChange,
+			AlphaFunctionChange,
+			ColorMaskChange,
+			BlendColorChange,
+			//Rasterizer state
+			FaceCullingEnable,
+			CullFaceChanged,
+			WindingOrderChange,
+			ScissorTestEnable,
+			//Shader state
+			ShaderChange,
+			STATE_CHANGE_TYPE_COUNT //Always keep this last! That way we have an automatic counter for how many enum definitions are contained within this list.
+		};
+
+	union StateChangeValue
+	{
+		struct BlendFactorBundle
+		{
+			GLenum srcRGB, srcAlpha, dstRGB, dstAlpha;
+		} blendFactorBundle;
+
+		struct BlendEquationBundle{
+			GLenum rgbEquation;
+			GLenum alphaEquation;
+		} blendEquationBundle;
+
+		struct AlphaFuncBundle
+		{
+			GLenum alphaTestFunc;
+			GLclampf testValue;
+		} alphaFuncBundle;
+
+		GLenum enumVal;
+		GLboolean colorMaskVal[4];
+		GLclampf blendColorVal[4];
+		GLclampf clampVal;
+		bool boolVal;
+		unsigned int uintVal;
+		int	intVal;
+	};
+
+	public: 
+		TotalRenderState();
+
+		//Set all values to default
+		void reset();
+
+		void applyChanges(Appearance* const appearance);
+		void applyChanges(X3DGeometryNode* const geometryNode);
+
+		bool operator==(TotalRenderState& rhs);
+		bool operator!=(TotalRenderState& rhs);
+
+		/* Get and set for DepthState */
+		DepthState&	getDepthState();
+		void		setDepthState(DepthState val);
+
+		bool		getDepthTestingEnabled();
+		void		setDepthTestingEnabled(bool val);
+
+		bool		getDepthBufferWriteEnabled();
+		void		setDepthBufferWriteEnabled(bool val);
+
+		GLenum		getDepthFunction();
+		void		setDepthFunction(GLenum val);
+
+		/* Get and set for BlendState */
+		BlendState&		getBlendState();
+		void			setBlendState(BlendState val);
+
+		bool			getBlendingEnabled();
+		void			setBlendingEnabled(bool val);
+
+		GLenum			getSrcFactorRGB();
+		void			setSrcFactorRGB(GLenum val);
+
+		GLenum			getDstFactorRGB();		
+		void			setDstFactorRGB(GLenum val);
+
+		GLenum			getBlendEquationRGB();
+		void			setBlendEquationRGB(GLenum val);
+
+		GLenum			getAlphaTestFunc();
+		void			setAlphaTestFunc(GLenum val);
+
+		GLenum			getSrcFactorAlpha();
+		void			setSrcFactorAlpha(GLenum val);
+
+		GLenum			getDstFactorAlpha();
+		void			setDstFactorAlpha(GLenum val);
+
+		GLenum			getBlendEquationAlpha();		
+		void			setBlendEquationAlpha(GLenum val);
+
+		GLclampf		getAlphaFuncValue();
+		void			setAlphaFuncValue(GLclampf val);
+
+		OGLBlendColor	getBlendColor();
+		void			setBlendColor(OGLBlendColor val);
+
+		OGLColorMask	getColorMask();
+		void			setColorMask(OGLColorMask val);
+
+		/* Get and set for RasterizerState */
+		RasterizerState&	getRasterizerState();
+		void				setRasterizerState(RasterizerState val);
+
+		bool			getFaceCullingEnabled();
+		void			setFaceCullingEnabled(bool val);
+
+		bool			getScissorTestEnabled();
+		void			setScissorTestEnabled(bool val);
+
+		GLenum			getCullFace();
+		void			setCullFace(GLenum val);
+
+		GLenum			getWindingOrder();
+		void			setWindingOrder(GLenum val);
+
+		/* Get and set for Shader */
+		ShaderData&		getShaderData();
+		void			setShaderData(ShaderData val);
+
+		/* Get and set for Vertex Layout Description */
+		unsigned int	getVertexLayoutDescription();
+		void			setVertexLayoutDescription(unsigned int val);
+
+		//It's in here that we actually process the state changes
+		void InsertRenderCommands(RenderCommandBuffer* buffer, TotalRenderState* previousRenderState);
+		
+		private:
+		// Set of different state changes. Each value in a set is unique, so we don't have to worry about duplicates.
+		std::set<StateChangeType> stateChanges;
+
 		DepthState depthState;
 		BlendState blendState;
 		RasterizerState rasterizerState;
@@ -161,24 +339,7 @@ namespace H3D
 
 		//Current shader.
 		ShaderData shader;
-
-		//Material.
-		 
-		TotalRenderState();
-		
-		void ApplyChanges(Appearance* const appearance);
-		void ApplyChanges(X3DGeometryNode* const geometryNode);
-
-		bool operator==(TotalRenderState& rhs);
-		bool operator!=(TotalRenderState& rhs);
-
-		//Set all values to default
-		void reset();
 	};
-
-	//////////////////////////////////////////////////////////////////////////
-
-
 }
 
 #endif

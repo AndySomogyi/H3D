@@ -13,18 +13,18 @@ H3D::PrototypeShader::PrototypeShader(std::string _vertexShader, std::string _fr
 	isValid = false; 
 	vertexShaderString = _vertexShader; 
 	fragmentShaderString = _fragmentShader;
-	program_ID = 0;
+	program.programID = 0;
 	viewProjUniformLocation = 0;
 	worldMatrixUniformLocation = 0;
 
-	uniforms.resize(0);
-	uniforms.push_back(UniformDescription(UniformDescription::fmat4x4, "ViewProjection", 0, 1, true, nullptr));
-	uniforms.push_back(UniformDescription(UniformDescription::f1, "timeVar", 1, 1, true, nullptr));
+	program.uniforms.resize(0);
+	program.uniforms.push_back(UniformDescription(UniformDescription::fmat4x4, "ViewProjection", 0, 1, true, nullptr));
+	program.uniforms.push_back(UniformDescription(UniformDescription::f1, "timeVar", 1, 1, true, nullptr));
 }
 
 H3D::PrototypeShader::~PrototypeShader() {
-	if(program_ID != 0) {
-		glDeleteProgram(program_ID);
+	if(program.programID != 0) {
+		glDeleteProgram(program.programID);
 	}
 }
 
@@ -41,15 +41,14 @@ void H3D::PrototypeShader::traverseSG(TraverseInfo& ti) {
 
 	//If shader compilation succeeded, or it's already been compiled successfully before
 	if(shaderCompilationSucceeded || isValid) {
-		uniforms[0].location = glGetUniformLocation(program_ID, "ViewProjection");
-		uniforms[1].location = glGetUniformLocation(program_ID, "timeVar");
+		program.uniforms[0].location = glGetUniformLocation(program.programID, "ViewProjection");
+		program.uniforms[1].location = glGetUniformLocation(program.programID, "timeVar");
 
 		if(!usingBindless) {
-			worldMatrixUniformLocation = glGetUniformLocation(program_ID, "World");
+			worldMatrixUniformLocation = glGetUniformLocation(program.programID, "World");
 		}
 
-		ti.getCurrentRenderstate().shader.uniforms = uniforms;
-		ti.getCurrentRenderstate().shader.programID = program_ID;
+		ti.getCurrentRenderstate().setShaderData(program);
 
 		isValid = true;
 	} else {
@@ -59,7 +58,7 @@ void H3D::PrototypeShader::traverseSG(TraverseInfo& ti) {
 }
 
 bool H3D::PrototypeShader::initializeShader(std::string _vertexShaderString, std::string _fragmentShaderString) {
-	if(program_ID == 0) {
+	if(program.programID == 0) {
 		//Read our shaders into the appropriate buffers
 		std::string vertexSource;
 
@@ -140,28 +139,28 @@ bool H3D::PrototypeShader::initializeShader(std::string _vertexShaderString, std
 		//Vertex and fragment shaders are successfully compiled.
 		//Now time to link them together into a program.
 		//Get a program object.
-		GLuint program = glCreateProgram();
+		GLuint programTemp = glCreateProgram();
 
 		//Attach our shaders to our program
-		glAttachShader(program, vertexShader);
-		glAttachShader(program, fragmentShader);
+		glAttachShader(programTemp, vertexShader);
+		glAttachShader(programTemp, fragmentShader);
 
 		//Link our program
-		glLinkProgram(program);
+		glLinkProgram(programTemp);
 
 		//Note the different functions here: glGetProgram* instead of glGetShader*.
 		GLint isLinked = 0;
-		glGetProgramiv(program, GL_LINK_STATUS, (int *)&isLinked);
+		glGetProgramiv(programTemp, GL_LINK_STATUS, (int *)&isLinked);
 		if(isLinked == GL_FALSE) {
 			GLint maxLength = 0;
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+			glGetProgramiv(programTemp, GL_INFO_LOG_LENGTH, &maxLength);
 
 			//The maxLength includes the NULL character
 			std::string infoLog(maxLength, ' ');
-			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+			glGetProgramInfoLog(programTemp, maxLength, &maxLength, &infoLog[0]);
 
 			//We don't need the program anymore.
-			glDeleteProgram(program);
+			glDeleteProgram(programTemp);
 			//Don't leak shaders either.
 			glDeleteShader(vertexShader);
 			glDeleteShader(fragmentShader);
@@ -175,11 +174,11 @@ bool H3D::PrototypeShader::initializeShader(std::string _vertexShaderString, std
 		}
 
 		//Always detach shaders after a successful link.
-		glDetachShader(program, vertexShader);
-		glDetachShader(program, fragmentShader);
+		glDetachShader(programTemp, vertexShader);
+		glDetachShader(programTemp, fragmentShader);
 
 		//Finally, save program ID
-		program_ID = program;
+		program.programID = programTemp;
 
 		return true;
 	}
@@ -209,7 +208,7 @@ void H3D::PrototypeShader::printShaderLog(GLuint shaderID) {
 
 GLuint H3D::PrototypeShader::getProgram()
 {
-	return program_ID;
+	return program.programID;
 }
 
 std::string H3D::PrototypeShader::readFileFromUrl(const std::string& url)

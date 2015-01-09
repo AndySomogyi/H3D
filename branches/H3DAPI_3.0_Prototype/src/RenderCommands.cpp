@@ -104,6 +104,124 @@ void H3D::DrawElementsBaseVertexCommand::execute() {
 	}
 }
 
+/************************************************************************/
+/*				Generic state change command test	                    */
+/************************************************************************/
+
+H3D::GenericStateChangeCommand::GenericStateChangeCommand(TotalRenderState::StateChangeType _stateType, TotalRenderState::StateChangeValue _stateValue)
+: stateType(_stateType), stateValue(_stateValue)
+{
+}
+
+void H3D::GenericStateChangeCommand::execute()
+{
+	//Act accordingly...
+	switch(stateType)
+	{
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::DepthTestingEnable:
+		if(stateValue.boolVal) {
+			glEnable(GL_DEPTH_TEST);
+		} else {
+			glDisable(GL_DEPTH_TEST);
+		}
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::DepthBufferWriteEnable:
+		if(stateValue.boolVal) {
+			glDepthMask( GL_TRUE );
+		} else {
+			glDepthMask( GL_FALSE );
+		}
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::DepthFunctionChange:
+		glDepthFunc(stateValue.enumVal);
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::BlendingEnabled:
+		if(stateValue.boolVal) {
+			glEnable( GL_BLEND );
+		} else {
+			glDisable( GL_BLEND );
+		}
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::BlendFunctionChange:
+		glBlendFuncSeparate(stateValue.blendFactorBundle.srcRGB, stateValue.blendFactorBundle.dstRGB, 
+							stateValue.blendFactorBundle.srcAlpha, stateValue.blendFactorBundle.dstAlpha);
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::BlendEquationChange:
+		glBlendEquationSeparate(stateValue.blendEquationBundle.rgbEquation, stateValue.blendEquationBundle.alphaEquation);
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::AlphaFunctionChange:
+		glAlphaFunc(stateValue.alphaFuncBundle.alphaTestFunc, stateValue.alphaFuncBundle.testValue);
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::ColorMaskChange:
+		glColorMask(stateValue.colorMaskVal[0],
+					stateValue.colorMaskVal[1],
+					stateValue.colorMaskVal[2],
+					stateValue.colorMaskVal[3]);
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::BlendColorChange:
+		glBlendColor(	stateValue.blendColorVal[0], 
+						stateValue.blendColorVal[1], 
+						stateValue.blendColorVal[2], 
+						stateValue.blendColorVal[3]);
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::FaceCullingEnable:
+		if(stateValue.boolVal){
+			glEnable(GL_CULL_FACE);
+		} else {
+			glDisable(GL_CULL_FACE);
+		}
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::CullFaceChanged:
+		glCullFace(stateValue.enumVal);
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::WindingOrderChange:
+		glFrontFace(stateValue.enumVal);
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::ScissorTestEnable:
+		if(stateValue.boolVal) {
+			glEnable(GL_SCISSOR_TEST);
+		} else {
+			glDisable(GL_SCISSOR_TEST);
+		}
+		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::ShaderChange:
+		glUseProgram(stateValue.uintVal);
+		break;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	LogOGLErrors("StateChangeCommand");
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 
 void H3D::ChangeRasterizerStateCommand::execute() {
@@ -134,10 +252,10 @@ H3D::ChangeRasterizerStateCommand::ChangeRasterizerStateCommand(RasterizerState 
 
 void H3D::ChangeBlendStateCommand::execute()
 {
-	glColorMask( blendState.colorMask[0],
-		blendState.colorMask[1],
-		blendState.colorMask[2],
-		blendState.colorMask[3]);
+	glColorMask(	blendState.colorMask.mask[0],
+					blendState.colorMask.mask[1],
+					blendState.colorMask.mask[2],
+					blendState.colorMask.mask[3]);
 
 	LogOGLErrors("ChangeBlendStateCommand");
 
@@ -149,18 +267,19 @@ void H3D::ChangeBlendStateCommand::execute()
 
 	LogOGLErrors("ChangeBlendStateCommand");
 
-	glBlendFuncSeparate( blendState.srcFactorRGB, blendState.dstFactorRGB, 
-		blendState.srcFactorAlpha, blendState.dstFactorAlpha);
+	glBlendFuncSeparate(	blendState.srcFactorRGB, blendState.dstFactorRGB, 
+							blendState.srcFactorAlpha, blendState.dstFactorAlpha);
 
 	LogOGLErrors("ChangeBlendStateCommand");
 
-	//Broken.
 	glBlendEquationSeparate(blendState.blendEquationRGB, blendState.blendEquationAlpha);
 
 	LogOGLErrors("ChangeBlendStateCommand");
 
-	glBlendColor(blendState.blendColor[0], blendState.blendColor[1], 
-		blendState.blendColor[2], blendState.blendColor[3]);
+	glBlendColor(	blendState.blendColor.color[0], 
+					blendState.blendColor.color[1], 
+					blendState.blendColor.color[2], 
+					blendState.blendColor.color[3]);
 
 	LogOGLErrors("ChangeBlendStateCommand");
 
@@ -376,39 +495,6 @@ void H3D::BindUniformCommand::execute() {
 H3D::BindUniformCommand::BindUniformCommand(UniformDescription _description) 
 	: description(_description) {
 
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-template<class T>
-H3D::UpdateCircularBufferCommand<T>::UpdateCircularBufferCommand(CircularBuffer<T>* _buffer, std::vector<T>* _objects)
-{
-	buffer = _buffer;
-	objects = _objects;
-}
-
-template<class T>
-void H3D::UpdateCircularBufferCommand<T>::execute()
-{
-	T* dst = buffer->Reserve(objects->size());
-	memcpy(dst, &*objects->begin(), sizeof(T) * objects->size());
-
-	buffer->BindBufferRange(0, objects->size());
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-template<class T>
-H3D::CleanupCircularBufferCommand<T>::CleanupCircularBufferCommand(CircularBuffer<T>* _buffer, unsigned int _size)
-{
-	buffer = _buffer;
-	size = _size;
-}
-
-template<class T>
-void H3D::CleanupCircularBufferCommand<T>::execute()
-{
-	buffer->OnUsageComplete(size);
 }
 
 //////////////////////////////////////////////////////////////////////////

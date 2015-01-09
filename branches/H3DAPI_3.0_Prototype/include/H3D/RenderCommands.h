@@ -15,7 +15,10 @@ namespace H3D {
 		virtual void execute() = 0;
 	};
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/************************************************************************/
+	/*							Draw commands                               */
+	/************************************************************************/
 
 	//Command for multidraw elements indirect
 	class MultiDrawElementsIndirectCommand : public RenderCommand {
@@ -54,7 +57,24 @@ namespace H3D {
 		std::vector<ElementDrawData> objects;
 	};
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/************************************************************************/
+	/*				Generic state change command test                       */
+	/************************************************************************/
+
+	class GenericStateChangeCommand : public RenderCommand {
+	public:
+		GenericStateChangeCommand(TotalRenderState::StateChangeType stateType, TotalRenderState::StateChangeValue stateValue);
+
+		virtual void execute();
+
+	private:
+		TotalRenderState::StateChangeType stateType;
+		TotalRenderState::StateChangeValue stateValue;
+	};
+
+	/************************************************************************/
+	/*                      Rasterizer state commands		                */
+	/************************************************************************/
 
 	class ChangeRasterizerStateCommand : public RenderCommand {
 	public:
@@ -65,6 +85,38 @@ namespace H3D {
 	private:
 		RasterizerState rasterizerState;
 	};
+
+	/*
+	class ChangeFaceCullingStateCommand : public RenderCommand {
+	public:
+		ChangeFaceCullingStateCommand(bool val);
+
+		virtual void execute();
+
+	private:
+		bool enable;
+	};
+
+	class ChangeScissorTestStateCommand : public RenderCommand {
+	public:
+		ChangeScissorTestStateCommand(bool val);
+
+		virtual void execute();
+
+	private:
+		bool enable;
+	};
+
+	class ChangeCullFaceCommand : public RenderCommand {
+	public:
+		ChangeCullFaceCommand(GLenum cullFace);
+
+		virtual void execute();
+
+	private:
+		GLenum face;
+	};
+	*/
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -167,9 +219,19 @@ namespace H3D {
 	template<class T>
 	class UpdateCircularBufferCommand : public RenderCommand {
 	public:
-		UpdateCircularBufferCommand(CircularBuffer<T>* _buffer, std::vector<T>* _objects);
+		UpdateCircularBufferCommand(CircularBuffer<T>* _buffer, std::vector<T>* _objects)
+		{
+			buffer = _buffer;
+			objects = _objects;
+		}
 
-		virtual void execute();
+		virtual void execute()
+		{
+			T* dst = buffer->Reserve(objects->size());
+			memcpy(dst, &*objects->begin(), sizeof(T) * objects->size());
+
+			buffer->BindBufferRange(0, objects->size());
+		}
 
 	private:
 		CircularBuffer<T>* buffer;
@@ -181,9 +243,16 @@ namespace H3D {
 	template<class T>
 	class CleanupCircularBufferCommand : public RenderCommand {
 	public:
-		CleanupCircularBufferCommand(CircularBuffer<T>* _buffer, unsigned int _size);
+		CleanupCircularBufferCommand(CircularBuffer<T>* _buffer, unsigned int _size)
+		{
+			buffer = _buffer;
+			size = _size;
+		}
 
-		virtual void execute();
+		virtual void execute()
+		{
+			buffer->OnUsageComplete(size);
+		}
 
 	private:
 		CircularBuffer<T>* buffer;

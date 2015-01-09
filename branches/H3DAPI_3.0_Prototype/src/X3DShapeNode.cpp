@@ -238,12 +238,12 @@ void X3DShapeNode::traverseSG( TraverseInfo &ti )
 
 		if(appearance)
 		{
-				ti.getCurrentRenderstate().ApplyChanges(appearance);
+				ti.getCurrentRenderstate().applyChanges(appearance);
 		}
 
 		if(g)
 		{
-			ti.getCurrentRenderstate().ApplyChanges(g);
+			ti.getCurrentRenderstate().applyChanges(g);
 		}
 
 		renderStateUpdated = true;

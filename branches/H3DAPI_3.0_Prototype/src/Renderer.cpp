@@ -70,7 +70,7 @@ H3D::Renderer::~Renderer() {
 void  H3D::Renderer::update() {
 
 	time = TimeStamp::now();
-	elapsedTime += (time - previousTime);
+	elapsedTime += static_cast<float>(time - previousTime);
 	previousTime = time;
 
 	if(elapsedTime >= 10.0f) {
@@ -91,7 +91,9 @@ void  H3D::Renderer::update() {
 
 	if(rebuildCommandBuffer) {
 		//Turn on all enabled client states
-		renderCommandBuffer.InsertNewCommand(new ChangeClientStateCommand(clientStatesToEnable));
+		if(clientStatesToEnable.size() > 0) {
+			renderCommandBuffer.InsertNewCommand(new ChangeClientStateCommand(clientStatesToEnable));
+		}
 
 		/************************************************************************/
 		/* Pre-process all the data so that we can sort it properly.	        */
@@ -183,13 +185,15 @@ void  H3D::Renderer::update() {
 			compareRenderStates(previousState, renderBuckets[i], renderCommandBuffer);
 
 			//Insert the actual render command
-			if(usingBindless) {		
-				//renderCommandBuffer.InsertNewCommand(new UpdateCircularBufferCommand<Matrix4f>(&transformBuffer, &transforms));
+			if(usingBindless) {
+
+				//TODO: Just do a.. sizeof instead? I guess? Uh.
+				renderCommandBuffer.InsertNewCommand(new UpdateCircularBufferCommand<Matrix4f>(&transformBuffer, &transforms));
 
 				renderCommandBuffer.InsertNewCommand(new MultiDrawElementsIndirectCommand(renderCommandBuffer.GetBuffer(), 
 					renderBuckets[i].renderables, GL_TRIANGLES, GL_UNSIGNED_INT, 0, renderBuckets[i].elementRenderables[0].VBOs.size()));
 
-				//renderCommandBuffer.InsertNewCommand(new CleanupCircularBufferCommand<Matrix4f>(&transformBuffer, transforms.size()));
+				renderCommandBuffer.InsertNewCommand(new CleanupCircularBufferCommand<Matrix4f>(&transformBuffer, transforms.size()));
 
 			} else {
 				renderCommandBuffer.InsertNewCommand(new DrawElementsBaseVertexCommand(renderBuckets[i].elementRenderables, GL_TRIANGLES, GL_UNSIGNED_INT, 0, worldMatrixUniformLocation));
@@ -201,12 +205,13 @@ void  H3D::Renderer::update() {
 			}
 		}
 
-		////Turn off all the enabled client states....
-		for(unsigned int i = 0; i < clientStatesToEnable.size(); ++i) {
-			clientStatesToEnable[i].second = false;
+		//If we have enabled any client states, we want to make sure that we also disable them at the end of the frame.
+		if(clientStatesToEnable.size() > 0) {
+			for(unsigned int i = 0; i < clientStatesToEnable.size(); ++i) {
+				clientStatesToEnable[i].second = false;
+			}
+			renderCommandBuffer.InsertNewCommand(new ChangeClientStateCommand(clientStatesToEnable));
 		}
-
-		renderCommandBuffer.InsertNewCommand(new ChangeClientStateCommand(clientStatesToEnable));
 
 		//Important, set flag so that we don't rebuild next update unless it's changed externally
 		rebuildCommandBuffer = false;
@@ -221,7 +226,7 @@ void  H3D::Renderer::render() {
 	/*
 	Set up necessary basic settings and do a clear
 	*/
-	glViewport(0, 0, viewportWidth, viewportHeight);
+	glViewport(0, 0, static_cast<GLsizei>(viewportWidth), static_cast<GLsizei>(viewportHeight));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//Clear to a beautiful, relaxing purple color...?
@@ -232,7 +237,6 @@ void  H3D::Renderer::render() {
 	/*
 	Fill up our persistent buffer matrix
 	*/
-
 	if(usingBindless) {
 		Matrix4f* dst = transformBuffer.Reserve(transforms.size());
 		memcpy(dst, &*transforms.begin(), sizeof(Matrix4f) * transforms.size());
@@ -281,17 +285,19 @@ unsigned int H3D::Renderer::insertNewTotalRenderState(const Appearance* const ap
 
 		//Compare render properties to each render state apart from the first (the first IS standard)
 		for(unsigned int i = 1; i < totalRenderStates.size(); ++i) {
-			if(rp != NULL && (depthState != totalRenderStates[i].depthState)) {
-				isUnique = true;
-				break;
+			if(rp != NULL) {
+				if(depthState != totalRenderStates[i].getDepthState()) {
+					isUnique = true;
+					break;
+				}
+
+				if(blendState != totalRenderStates[i].getBlendState()) {
+					isUnique = true;
+					break;
+				}
 			}
 
-			if(rp != NULL && (blendState != totalRenderStates[i].blendState)) {
-				isUnique = true;
-				break;
-			}
-
-			if(rasterizerState != totalRenderStates[i].rasterizerState) {
+			if(rasterizerState != totalRenderStates[i].getRasterizerState()) {
 				isUnique = true;
 				break;
 			}
@@ -299,9 +305,9 @@ unsigned int H3D::Renderer::insertNewTotalRenderState(const Appearance* const ap
 
 		if(isUnique) {
 			TotalRenderState newState;
-			newState.blendState = blendState;
-			newState.depthState = depthState;
-			newState.rasterizerState = rasterizerState;
+			newState.setBlendState(blendState);
+			newState.setDepthState(depthState);
+			newState.setRasterizerState(rasterizerState);
 
 			totalRenderStates.push_back(newState);
 
@@ -343,46 +349,55 @@ unsigned int H3D::Renderer::insertNewTotalRenderState(TotalRenderState& newRende
 
 void H3D::Renderer::compareRenderStates(TotalRenderState& previousRenderState, const RenderBucket& renderBucket, RenderCommandBuffer& commandBuffer) {
 
+	/************************************************************************/
+	/* 
+	* Här ska TotalRenderState::InsertRenderCommands användas ist för det nedanför. TODO.
+	*/ 
+	/************************************************************************/
+
 	TotalRenderState& rs = totalRenderStates[renderBucket.renderState];
+	rs.getShaderData().uniforms[0].ptr = viewProjection[0];
+	rs.getShaderData().uniforms[1].ptr = &elapsedTime;
 
-	if(previousRenderState.shader.programID != rs.shader.programID) {
-		rs.shader.uniforms[0].ptr = viewProjection[0];
-		rs.shader.uniforms[1].ptr = &elapsedTime;
+	rs.InsertRenderCommands(&commandBuffer, &previousRenderState);
 
-		commandBuffer.InsertNewCommand(new ChangeShaderCommand(rs.shader.programID));
+	/*
+	if(previousRenderState.getShaderData().programID != rs.getShaderData().programID) {
+		commandBuffer.InsertNewCommand(new ChangeShaderCommand(rs.getShaderData().programID));
 
-		for(unsigned int i = 0; i < rs.shader.uniforms.size(); ++i) {
-			commandBuffer.InsertNewCommand(new BindUniformCommand(rs.shader.uniforms[i]));
+		for(unsigned int i = 0; i < rs.getShaderData().uniforms.size(); ++i) {
+			commandBuffer.InsertNewCommand(new BindUniformCommand(rs.getShaderData().uniforms[i]));
 		}
 	}
 
-	if(previousRenderState.blendState != rs.blendState) {
-		commandBuffer.InsertNewCommand(new ChangeBlendStateCommand(rs.blendState));
-		previousRenderState.blendState = rs.blendState; //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
+	if(previousRenderState.getBlendState() != rs.getBlendState()) {
+		commandBuffer.InsertNewCommand(new ChangeBlendStateCommand(rs.getBlendState()));
+		previousRenderState.setBlendState(rs.getBlendState()); //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
 	}
 
-	if(previousRenderState.depthState != rs.depthState) {
-		commandBuffer.InsertNewCommand(new ChangeDepthStateCommand(rs.depthState));
-		previousRenderState.depthState = rs.depthState; //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
+	if(previousRenderState.getDepthState() != rs.getDepthState()) {
+		commandBuffer.InsertNewCommand(new ChangeDepthStateCommand(rs.getDepthState()));
+		previousRenderState.setDepthState(rs.getDepthState()); //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
 	}
 
-	if(previousRenderState.rasterizerState != rs.rasterizerState) {
-		commandBuffer.InsertNewCommand(new ChangeRasterizerStateCommand(rs.rasterizerState));
-		previousRenderState.rasterizerState = rs.rasterizerState; //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
+	if(previousRenderState.getRasterizerState() != rs.getRasterizerState()) {
+		commandBuffer.InsertNewCommand(new ChangeRasterizerStateCommand(rs.getRasterizerState()));
+		previousRenderState.setRasterizerState(rs.getRasterizerState()); //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
 	}
+	*/
 
-	if(previousRenderState.vertexLayoutDescription != rs.vertexLayoutDescription) {
+	if(previousRenderState.getVertexLayoutDescription() != rs.getVertexLayoutDescription()) {
 
-		std::vector<VertexAttributeDescription>& layout = vertexAttributeLayouts[rs.vertexLayoutDescription].first;
+		std::vector<VertexAttributeDescription>& layout = vertexAttributeLayouts[rs.getVertexLayoutDescription()].first;
 
-		//This code is just so that I can keep track of what vertex attribute slots will be bound / unbound between state changes, so that I know which to clean up.
-		if(previousRenderState.vertexLayoutDescription == 0) {
+		//This code is just so that I can keep track of what vertex attribute slots will be bound / unbound between shader changes, so that I know which to clean up and which to keep open.
+		if(previousRenderState.getVertexLayoutDescription() == 0) {
 			attributeSlotsToBeFreed.clear();
 			for(unsigned int i = 0; i < layout.size(); ++i) {
 				attributeSlotsToBeFreed.push_back(i);
 			}
 		} else {
-			std::vector<VertexAttributeDescription>& previousLayout = vertexAttributeLayouts[previousRenderState.vertexLayoutDescription].first;
+			std::vector<VertexAttributeDescription>& previousLayout = vertexAttributeLayouts[previousRenderState.getVertexLayoutDescription()].first;
 
 			//If the previous layout left extra attribute slots enabled, we want to queue those slots up for disabling
 			if(previousLayout.size() > layout.size()) {
@@ -394,7 +409,7 @@ void H3D::Renderer::compareRenderStates(TotalRenderState& previousRenderState, c
 
 		//, false, vertexAttributeLayouts[rs.vertexLayoutDescription].second));
 		commandBuffer.InsertNewCommand(new ChangeVertexAttributeSetupCommand(layout, usingBindless));
-		previousRenderState.vertexLayoutDescription = rs.vertexLayoutDescription; //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
+		previousRenderState.setVertexLayoutDescription(rs.getVertexLayoutDescription()); //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
 	}
 
 	//Last of all, we overwrite previousRenderState for next time we want to do a comparison
@@ -405,11 +420,11 @@ void H3D::Renderer::compareRenderStates(TotalRenderState& previousRenderState, c
 void H3D::Renderer::InsertDefaultRenderstate(RenderCommandBuffer& commandBuffer) {
 	TotalRenderState& rs = totalRenderStates[0];
 
-	commandBuffer.InsertNewCommand(new ChangeBlendStateCommand(rs.blendState));
-	commandBuffer.InsertNewCommand(new ChangeDepthStateCommand(rs.depthState));
-	commandBuffer.InsertNewCommand(new ChangeRasterizerStateCommand(rs.rasterizerState));
+	commandBuffer.InsertNewCommand(new ChangeBlendStateCommand(rs.getBlendState()));
+	commandBuffer.InsertNewCommand(new ChangeDepthStateCommand(rs.getDepthState()));
+	commandBuffer.InsertNewCommand(new ChangeRasterizerStateCommand(rs.getRasterizerState()));
 
-	std::vector<VertexAttributeDescription>& layout = vertexAttributeLayouts[rs.vertexLayoutDescription].first;
+	std::vector<VertexAttributeDescription>& layout = vertexAttributeLayouts[rs.getVertexLayoutDescription()].first;
 
 	attributeSlotsToBeFreed.clear();
 	for(unsigned int i = 0; i < layout.size(); ++i) {
@@ -461,13 +476,13 @@ void H3D::Renderer::setViewportSize(float width, float height)
 	viewportWidth = width;
 	viewportHeight = height;
 
-	projection = MathUtil::CreatePerspectiveProjection(MathUtil::Radians(45.0f), (viewportWidth/viewportHeight), 0.01f, 500.0f);
+	projection = MathUtil::CreatePerspectiveProjection(45.0f, (viewportWidth/viewportHeight), 0.001f, 100.0f);
 }
 
 void H3D::Renderer::updateViewMatrix()
 {
 	view = MathUtil::CreateLookAt(eyeVector, lookAtVector, upVector);
-	viewProjection = (view * projection);
+	viewProjection = (projection * view);
 }
 
 void H3D::Renderer::setCurrentViewpoint(Vec3f position, Vec3f direction, Vec3f up)
@@ -476,9 +491,9 @@ void H3D::Renderer::setCurrentViewpoint(Vec3f position, Vec3f direction, Vec3f u
 	upVector = up;
 	eyeVector = position;
 
-	//lookAtVector = Vec3f(0.0f, 0.0f, 0.0f);
-	//upVector = Vec3f(0.0f, 1.0f, 0.0f);
-	//eyeVector = Vec3f(0.0f, 3.0f, 8.0f);
+	//lookAtVector =	Vec3f(0.1f, 0.1f, 0.1f);
+	//upVector =		Vec3f(0.0f, 1.0f, 0.0f);
+	//eyeVector =		Vec3f(0.0f, 0.0f, 5.0f);
 
 	updateViewMatrix();
 }
