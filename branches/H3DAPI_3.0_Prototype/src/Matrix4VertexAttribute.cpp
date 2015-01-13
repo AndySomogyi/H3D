@@ -84,7 +84,7 @@ void Matrix4VertexAttribute::render( int value_index ) {
 // as a an vertex attribute array.
 void Matrix4VertexAttribute::renderArray() {
   if( GLEW_ARB_vertex_program && attrib_index >= 0 ) {
-    glEnableVertexAttribArrayARB( attrib_index );
+    // glEnableVertexAttribArrayARB( attrib_index );
     GLfloat *data = new GLfloat[ 16 * value->size() ];
     for( unsigned int i = 0; i < value->size(); ++i ) {
       const Matrix4f &m = value->getValueByIndex( i );
@@ -158,11 +158,11 @@ void Matrix4VertexAttribute::setAttributeData ( ){
 }
 
 void Matrix4VertexAttribute::renderVBO ( ){
-  glEnableVertexAttribArrayARB ( attrib_index );
+  // glEnableVertexAttribArrayARB ( attrib_index );
   if ( use_bindless )
   {
     glVertexAttribFormatNV ( attrib_index, 4, GL_FLOAT, GL_FALSE, 0 );
-    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+    // glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
     glBufferAddressRangeNV ( GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, attrib_index, vbo_GPUaddr, VAD.attributeSize );
   } else

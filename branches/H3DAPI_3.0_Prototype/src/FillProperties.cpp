@@ -91,7 +91,7 @@ void FillProperties::render() {
       const RGB &c = hatchColor->getValue();
       glColor3f( c.r, c.g, c.b );
       glDisable( GL_LIGHTING );
-      glEnable (GL_POLYGON_STIPPLE);
+      // glEnable (GL_POLYGON_STIPPLE);
 
       if( hatch_style == 1 ) {
         // horizontal, equally spaced lines

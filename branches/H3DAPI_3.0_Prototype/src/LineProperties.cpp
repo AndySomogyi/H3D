@@ -81,7 +81,7 @@ void LineProperties::render() {
    
     if( line_type != 1 ) { 
       // not solid
-      glEnable( GL_LINE_STIPPLE );
+     // glEnable( GL_LINE_STIPPLE );
       if( line_type == 2 )
         // dashed
         glLineStipple( (GLint)width, 0x7777 );

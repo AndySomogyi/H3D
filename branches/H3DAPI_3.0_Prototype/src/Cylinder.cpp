@@ -283,9 +283,9 @@ void Cylinder::render() {
     }
 
     // Enable vertex buffer objects.
-    glEnableClientState(GL_VERTEX_ARRAY);
+    // glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 9 * sizeof(GLfloat), NULL );
-    glEnableClientState(GL_NORMAL_ARRAY);
+    // glEnableClientState(GL_NORMAL_ARRAY);
     glNormalPointer( GL_FLOAT, 9 * sizeof(GLfloat),
                      (GLvoid*)(3*sizeof(GLfloat)) );
     X3DTextureCoordinateNode::renderVertexBufferObjectForActiveTexture(

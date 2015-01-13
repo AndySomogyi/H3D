@@ -129,7 +129,7 @@ void Polyline2D::render() {
     // Enable all states for vertex buffer objects.
     // Note that the data is interleaved since this supposedly should be
     // faster on some systems.
-    glEnableClientState(GL_VERTEX_ARRAY);
+    // glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 0, NULL );
     glDrawArrays( GL_LINE_STRIP, 0, lineSegments->size() );
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -146,8 +146,9 @@ void Polyline2D::render() {
     glEnd();
   }
   // reenable lighting if it was enabled before
-  if( lighting_enabled )
-    glEnable( GL_LIGHTING );
+  if( lighting_enabled ) {
+   // glEnable( GL_LIGHTING );
+   }
 }
 
 

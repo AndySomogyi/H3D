@@ -73,7 +73,7 @@ void TextureCoordinate3D::renderForTextureUnit( int index,
 
 void TextureCoordinate3D::renderArray() {
   if( !point->empty() ) {
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	// glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glTexCoordPointer(3, GL_FLOAT, 0,
 					&(*point->begin()) );
   }
@@ -98,11 +98,11 @@ void TextureCoordinate3D::setAttributeData ( ){
 }
 
 void TextureCoordinate3D::renderVBO ( ){
-  glEnableClientState ( GL_TEXTURE_COORD_ARRAY );
+  // glEnableClientState ( GL_TEXTURE_COORD_ARRAY );
   if ( use_bindless )
   {
 	glTexCoordFormatNV (3, GL_FLOAT, 0 );
-	glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+	// glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
 	
 	// vbo is dedicated for this vertex attribute, so there is no offset
 	glBufferAddressRangeNV(GL_TEXTURE_COORD_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );

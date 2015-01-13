@@ -8,11 +8,11 @@
 using namespace H3D;
 
 H3D::Renderer::Renderer()
-	: transformBuffer(true),
+	: transformBuffer(USING_BINDLESS),
 	renderCommandBuffer(128),
 	lookAtVector(0.0f, 0.0f, 1.0f),
 	upVector(0.0f, 0.0f, 1.0f),
-	eyeVector(0.0f, 3.0f, 40.0f),
+	eyeVector(0.0f, 3.0f, 10.0f),
 	usingBindless(USING_BINDLESS)
 {
 	time = time.now();
@@ -47,8 +47,8 @@ H3D::Renderer::Renderer()
 
 	if(usingBindless)
 	{
-		clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_ELEMENT_ARRAY_UNIFIED_NV, true));
-		clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV, true));
+		//clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_ELEMENT_ARRAY_UNIFIED_NV, true));
+		//clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV, true));
 	}
 
 	const GLbitfield mapFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
@@ -77,18 +77,7 @@ void  H3D::Renderer::update() {
 		elapsedTime = 0.0f;
 	}
 
-	/*
-	So this function will look something like this:
-
-	At the beginning of update, we'll have a big bunch of renderables, containing stuff like VBOs, VAOs, Renderstates(?), a transform, possibly other things
-
-	Then we will go through all of this data and sort it and put everything in render buckets if they have the same format and settings.
-
-	When everything is sorted, we will build up a series of draw commands (if this is supported), else we'll just move on to the render function
-	*/
-
-	//Copy construct into a raw float[4][4] format that can be sent to the GPU without problems.
-
+	//So when this happens, we do a big re-sort and re-build of the entire RenderCommandBuffer.
 	if(rebuildCommandBuffer) {
 		//Turn on all enabled client states
 		if(clientStatesToEnable.size() > 0) {
@@ -108,7 +97,13 @@ void  H3D::Renderer::update() {
 		drawCommand.cmd.instanceCount = 1;
 		drawCommand.reserved = 0;
 
-		//Stride through all of the renderables and gather everything interesting and put it in the right place
+		/************************************************************************/
+		/*  Go through each renderable. 
+			Construct a draw command and insert it into a render bucket.
+			If the renderable has a unique render state or vertex 
+			attribute layout, we create a new render bucket to hold this renderable.                                                                                                                   
+		*/
+		/************************************************************************/
 		for(unsigned int i = 0; i < renderables.size(); ++i) {
 
 			//Insert the transform for this particular renderable
@@ -138,7 +133,13 @@ void  H3D::Renderer::update() {
 				}
 			}
 
-			//The bunch of code below this point might be the source of a problem. The renderbucket with 4 renderables has the vertexAttributeLayout == 0 which is totally wrong.
+			
+			/************************************************************************/
+			/*	Insert create a new renderBucket if this renderable has a unique 
+			 	state / vertexAttributeLayout. then insert the renderable into 
+				the bucket.
+			 */	
+			/************************************************************************/
 
 			//If none of the renderbuckets match, we create a new renderbucket and insert it.
 			if(drawCmdIsUnique) {
@@ -176,7 +177,8 @@ void  H3D::Renderer::update() {
 			}
 		}
 
-		InsertDefaultRenderstate(renderCommandBuffer);
+		//We need to make sure that there is a base layout of render states set up.
+		//InsertDefaultRenderstate(renderCommandBuffer);
 
 		//Go through all render buckets and queue up state changes + render calls for each one.
 		for(unsigned int i = 0; i < renderBuckets.size(); ++i) {

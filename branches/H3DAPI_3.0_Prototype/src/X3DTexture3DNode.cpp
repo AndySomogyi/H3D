@@ -377,15 +377,17 @@ void X3DTexture3DNode::renderSubImage( Image *image,
 
 void X3DTexture3DNode::enableTexturing() {
  // texture 2d arrays cannot be enabled, only be used with shaders.
-  if( texture_target != GL_TEXTURE_2D_ARRAY_EXT ) 
-    glEnable( texture_target );
+  if( texture_target != GL_TEXTURE_2D_ARRAY_EXT ) {
+   // glEnable( texture_target ); 
+   }
+
   Image * i = static_cast< Image * >(image->getValue());
   if( i ) {
     Image::PixelType pixel_type = i->pixelType();
     if( pixel_type == Image::LUMINANCE_ALPHA ||
       pixel_type == Image::RGBA ||
       pixel_type == Image::BGRA ) {
-        glEnable( GL_BLEND );
+       // glEnable( GL_BLEND );
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
   }

@@ -177,7 +177,7 @@ void ParticleSystem::render() {
         } else {
           // not geometry so use OpenGL directly to do face culling
           glCullFace( GL_BACK );
-          glEnable( GL_CULL_FACE );
+         // glEnable( GL_CULL_FACE );
           for( Particles::iterator p = particles.begin(); 
             p != particles.end(); ++p ) {
               (*p).render( this );
@@ -203,7 +203,7 @@ void ParticleSystem::render() {
         } else {
           // not geometry so use OpenGL directly to do face culling
           glCullFace( GL_FRONT );
-          glEnable( GL_CULL_FACE );
+         // glEnable( GL_CULL_FACE );
           for( Particles::iterator p = particles.begin(); 
             p != particles.end(); ++p ) {
               (*p).render( this );

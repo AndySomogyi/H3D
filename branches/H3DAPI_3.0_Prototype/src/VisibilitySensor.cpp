@@ -225,7 +225,7 @@ void VisibilitySensor::traverseSG( TraverseInfo &ti ) {
     glDepthMask(GL_TRUE);
 
   if( viewFrustumMode->getValue() && depthTestEnabled )
-    glEnable(GL_DEPTH_TEST);
+   // glEnable(GL_DEPTH_TEST);
       
     glGetQueryObjectuivARB(queryId, GL_QUERY_RESULT_ARB,
                 &sampleCount);

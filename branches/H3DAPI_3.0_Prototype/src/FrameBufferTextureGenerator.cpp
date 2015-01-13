@@ -1795,7 +1795,7 @@ void FrameBufferTextureGenerator::clearBuffers(GLenum src, int x, int y,
     //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, src);
     glPushAttrib( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_SCISSOR_BIT );
     glScissor( x, y, width, height );
-    glEnable( GL_SCISSOR_TEST );
+   // glEnable( GL_SCISSOR_TEST );
     glClear( mask );
     glDisable( GL_SCISSOR_TEST );
     glPopAttrib();
@@ -1807,7 +1807,7 @@ void FrameBufferTextureGenerator::clearColorBuffer( GLenum src, int x, int y,
     //glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, src );
     glPushAttrib( GL_COLOR_BUFFER_BIT | GL_SCISSOR_BIT );
     glScissor( x, y, width, height );
-    glEnable( GL_SCISSOR_TEST );
+   // glEnable( GL_SCISSOR_TEST );
     glClearBufferfv( GL_COLOR, index, value );
     glDisable( GL_SCISSOR_TEST );
     glPopAttrib();
@@ -1982,7 +1982,7 @@ void FrameBufferTextureGenerator::setupScissor( bool needSinglePassStereo,
   float* viewports_size, int desired_fbo_width, int desired_fbo_height ){
 #ifdef GL_ARB_viewport_array
   if( needSinglePassStereo ) {
-    glEnable(GL_SCISSOR_TEST);
+   // glEnable(GL_SCISSOR_TEST);
     H3DInt32 scissorBox_size[12];
     int box_x  = scissorBoxX->getValue();
     int box_y = scissorBoxY->getValue();
@@ -2009,7 +2009,7 @@ void FrameBufferTextureGenerator::setupScissor( bool needSinglePassStereo,
     glScissorArrayv( 0, 3, scissorBox_size );
   }else{
 #endif
-    glEnable(GL_SCISSOR_TEST);
+   // glEnable(GL_SCISSOR_TEST);
     int box_x  = scissorBoxX->getValue();
     int box_y = scissorBoxY->getValue();
     int box_w = scissorBoxWidth->getValue();

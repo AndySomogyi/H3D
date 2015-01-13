@@ -64,7 +64,7 @@ Color::~Color() {
 // array.
 void Color::renderArray() {
   if( !color->empty() ) {
-    glEnableClientState(GL_COLOR_ARRAY);
+    // glEnableClientState(GL_COLOR_ARRAY);
     glColorPointer(3, GL_FLOAT, 0,
                   &(*color->begin()) );
   }
@@ -89,11 +89,11 @@ void Color::setAttributeData ( ){
 }
 
 void Color::renderVBO ( ){
-  glEnableClientState ( GL_COLOR_ARRAY );
+  // glEnableClientState ( GL_COLOR_ARRAY );
   if ( use_bindless )
   {
     glColorFormatNV ( 3, GL_FLOAT, 0 );
-    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+    // glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
     glBufferAddressRangeNV ( GL_COLOR_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
   } else

@@ -45,7 +45,7 @@ X3DColorNode::X3DColorNode(
 }
 
 void X3DColorNode::preRender() {
-  glEnable( GL_COLOR_MATERIAL );
+ // glEnable( GL_COLOR_MATERIAL );
 }
 
 void X3DColorNode::postRender() {

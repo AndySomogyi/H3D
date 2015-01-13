@@ -92,8 +92,10 @@ H3DShadowObjectNode *Sphere::getShadowObject() {
 
 void Sphere::render() {
   GLboolean norm= glIsEnabled( GL_NORMALIZE );
-  if ( !norm ) 
-    glEnable( GL_NORMALIZE );
+  if ( !norm ) {
+   // glEnable( GL_NORMALIZE );
+   }
+
   bool prefer_vertex_buffer_object = false;
   if( GLEW_ARB_vertex_buffer_object ) {
     GraphicsOptions * go = NULL;
@@ -224,9 +226,9 @@ void Sphere::render() {
   // Enable all states for vertex buffer objects.
   // Note that the data is interleaved since this supposedly should be
   // faster on some systems.
-  glEnableClientState(GL_VERTEX_ARRAY);
+  // glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_FLOAT, 9 * sizeof(GLfloat), vertex_pointer );
-  glEnableClientState(GL_NORMAL_ARRAY);
+  // glEnableClientState(GL_NORMAL_ARRAY);
   glNormalPointer( GL_FLOAT, 9 * sizeof(GLfloat),
                    normal_pointer );
   X3DTextureCoordinateNode::renderVertexBufferObjectForActiveTexture(
@@ -251,8 +253,9 @@ void Sphere::render() {
     glBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
     glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );
   }
-  if ( !norm ) 
-    glEnable( GL_NORMALIZE );
+  if ( !norm ) {
+   // glEnable( GL_NORMALIZE );
+   }
 }
 
 void Sphere::traverseSG( TraverseInfo &ti ) {

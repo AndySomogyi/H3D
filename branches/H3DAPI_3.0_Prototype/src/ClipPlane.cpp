@@ -130,7 +130,7 @@ void ClipPlane::enableGraphicsState() {
     const Vec4d &v = plane->getValue();
     GLdouble e[] = { v.x, v.y, v.z, v.w };
     glClipPlane( GL_CLIP_PLANE0 + plane_index, e );
-    glEnable( GL_CLIP_PLANE0 + plane_index );
+   // glEnable( GL_CLIP_PLANE0 + plane_index );
   } 
 };
 

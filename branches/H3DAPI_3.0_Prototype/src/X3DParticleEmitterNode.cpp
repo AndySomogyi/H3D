@@ -87,9 +87,9 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
   
   glPushAttrib( GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT );
 
-  glEnable( GL_BLEND ); 
+ // glEnable( GL_BLEND ); 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) ;
-  glEnable( GL_ALPHA_TEST );
+ // glEnable( GL_ALPHA_TEST );
   glAlphaFunc( GL_NOTEQUAL, 0 );
   //glDisable( GL_DEPTH_TEST );
   RGBA color(1,1,1,1);
@@ -157,15 +157,18 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
     if( material ) {  
       material->render(); 
     } else if( have_color_value ) {
-      glEnable( GL_COLOR_MATERIAL );
+     // glEnable( GL_COLOR_MATERIAL );
     }
     
-    glEnable( GL_BLEND );
+   // glEnable( GL_BLEND );
     glBegin( GL_POINTS );
     glVertex3f( position.x, position.y, position.z );
     glEnd();
-    if( lighting_enabled ) glEnable( GL_LIGHTING );
-    if( texture ) texture->enableTexturing();
+    if( lighting_enabled ) {// glEnable( GL_LIGHTING );
+	}
+    if( texture ) {
+	texture->enableTexturing();
+	}
   } else if( type == LINE ) {
     
     // Save the old state of GL_LIGHTING 
@@ -173,14 +176,14 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
     glGetBooleanv( GL_LIGHTING, &lighting_enabled );
     glDisable( GL_LIGHTING );
 
-    glEnable( GL_BLEND );
+   // glEnable( GL_BLEND );
 
     // if material node is specified, use properties from there
     // otherwise, use colorRamp if specified
     if( material ) {  
       material->render(); 
     } else if( have_color_value ) {
-      glEnable( GL_COLOR_MATERIAL );
+     // glEnable( GL_COLOR_MATERIAL );
     }
     
     Vec3f line_dir = velocity;
@@ -223,7 +226,8 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
     }
     glVertex3f( p1.x, p1.y, p1.z );
     glEnd();
-    if( lighting_enabled ) glEnable( GL_LIGHTING );
+    if( lighting_enabled ) {// glEnable( GL_LIGHTING );
+	}
     if( texture && !specify_tex_coord ) texture->enableTexturing();
   } else if( type == QUAD || type == TRIANGLE ) {
 
@@ -248,7 +252,7 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
     if( material ) {  
       material->render(); 
     } else if( have_color_value ) {
-      glEnable( GL_COLOR_MATERIAL );
+     // glEnable( GL_COLOR_MATERIAL );
     }
     glBegin( GL_QUADS );
     if( specify_tex_coord ) renderTexCoord( tex_coord_index * 4, tex_coord_ramp );
@@ -313,7 +317,7 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
     if( material ) {  
       material->render(); 
     } else if( have_color_value ) {
-      glEnable( GL_COLOR_MATERIAL );     
+     // glEnable( GL_COLOR_MATERIAL );     
     }
     glBegin( GL_QUADS );
     renderTexCoord( Vec3f( 1, 1, 0 ) );

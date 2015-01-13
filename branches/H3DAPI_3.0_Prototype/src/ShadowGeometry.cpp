@@ -526,7 +526,7 @@ void ShadowGeometry::renderShadowGeometryShader( X3DGeometryNode *g,
   }
 
   // draw shadow geometry using vertex arrays
-  glEnableClientState(GL_VERTEX_ARRAY);
+  // glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_DOUBLE, 0,
                   &(*triangle_points.begin()) );
   glDrawElements( GL_TRIANGLES_ADJACENCY_EXT,

@@ -106,16 +106,16 @@ void TriangleSet2D::render() {
         glTexGend( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
         glTexGenfv( GL_S, GL_OBJECT_PLANE, sparams );
         glTexGenfv( GL_T, GL_OBJECT_PLANE, tparams );
-        glEnable( GL_TEXTURE_GEN_S );
-        glEnable( GL_TEXTURE_GEN_T );
+       // glEnable( GL_TEXTURE_GEN_S );
+       // glEnable( GL_TEXTURE_GEN_T );
       }
     } else {
       glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
       glTexGend( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
       glTexGenfv( GL_S, GL_OBJECT_PLANE, sparams );
       glTexGenfv( GL_T, GL_OBJECT_PLANE, tparams );
-      glEnable( GL_TEXTURE_GEN_S );
-      glEnable( GL_TEXTURE_GEN_T );
+     // glEnable( GL_TEXTURE_GEN_S );
+     // glEnable( GL_TEXTURE_GEN_T );
     }
   }
 
@@ -154,7 +154,7 @@ void TriangleSet2D::render() {
     // Enable all states for vertex buffer objects.
     // Note that the data is interleaved since this supposedly should be
     // faster on some systems.
-    glEnableClientState(GL_VERTEX_ARRAY);
+    // glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 0, NULL );
     glDrawArrays( GL_TRIANGLES, 0, (GLsizei) v.size() );
     glDisableClientState(GL_VERTEX_ARRAY);

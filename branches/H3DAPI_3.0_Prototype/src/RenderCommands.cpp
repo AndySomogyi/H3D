@@ -69,39 +69,48 @@ H3D::DrawElementsBaseVertexCommand::DrawElementsBaseVertexCommand(std::vector<El
 }
 
 void H3D::DrawElementsBaseVertexCommand::execute() {
-	
-	for(std::vector<ElementDrawData>::iterator it = objects.begin(); it != objects.end(); ++it) {
-		static unsigned int count = 0;
-		count++;
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, it->IBO);
+	const unsigned int repetitions = 1000;
 
-		for(unsigned int i = 0; i < it->VBOs.size(); ++i) {
-			const VertexAttributeDescription& VAD = it->VBOs[i];
+	for(unsigned int i = 0; i < 100; ++i)
+	{
 
-			glBindBuffer(GL_ARRAY_BUFFER, VAD.bufferID);
+		for(std::vector<ElementDrawData>::iterator it = objects.begin(); it != objects.end(); ++it) {
+			static unsigned int count = 0;
+			count++;
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, it->IBO);
+
+			for(unsigned int i = 0; i < it->VBOs.size(); ++i) {
+				const VertexAttributeDescription& VAD = it->VBOs[i];
+
+				glBindBuffer(GL_ARRAY_BUFFER, VAD.bufferID);
+				LogOGLErrors("DrawElementsBaseVertexCommand", count);
+
+				//glEnableVertexAttribArray(it->VBOs[i].bufferIndex);
+				//LogOGLErrors("DrawElementsBaseVertexCommand", count);
+
+				glVertexAttribPointer(VAD.bufferIndex, VAD.elementCount, VAD.primitiveType, (VAD.normalized ? GL_TRUE : GL_FALSE), 0, 0);
+				LogOGLErrors("DrawElementsBaseVertexCommand", count);
+			}
+
+			*it->transform[0][2] += 0.07f;
+
+			glUniformMatrix4fv(transformUniformIndex, 1, GL_TRUE, (*it->transform)[0]);
+
 			LogOGLErrors("DrawElementsBaseVertexCommand", count);
 
-			glEnableVertexAttribArray(it->VBOs[i].bufferIndex);
-			LogOGLErrors("DrawElementsBaseVertexCommand", count);
+			// Draw the triangles !
+			glDrawElements(
+				GL_TRIANGLES,      // mode
+				it->indexCount,    // count
+				GL_UNSIGNED_INT,   // type
+				nullptr);          // element array buffer offset
 
-			glVertexAttribPointer(VAD.bufferIndex, VAD.elementCount, VAD.primitiveType, (VAD.normalized ? GL_TRUE : GL_FALSE), 0, 0);
 			LogOGLErrors("DrawElementsBaseVertexCommand", count);
 		}
-
-		glUniformMatrix4fv(transformUniformIndex, 1, GL_TRUE, (*it->transform)[0]);
-
-		LogOGLErrors("DrawElementsBaseVertexCommand", count);
-
-		// Draw the triangles !
-		glDrawElements(
-			GL_TRIANGLES,      // mode
-			it->indexCount,    // count
-			GL_UNSIGNED_INT,   // type
-			nullptr);          // element array buffer offset
-
-		LogOGLErrors("DrawElementsBaseVertexCommand", count);
 	}
+
 }
 
 /************************************************************************/
@@ -109,7 +118,7 @@ void H3D::DrawElementsBaseVertexCommand::execute() {
 /************************************************************************/
 
 H3D::GenericStateChangeCommand::GenericStateChangeCommand(TotalRenderState::StateChangeType _stateType, TotalRenderState::StateChangeValue _stateValue)
-: stateType(_stateType), stateValue(_stateValue)
+	: stateType(_stateType), stateValue(_stateValue)
 {
 }
 
@@ -118,7 +127,7 @@ void H3D::GenericStateChangeCommand::execute()
 	//Act accordingly...
 	switch(stateType)
 	{
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::DepthTestingEnable:
 		if(stateValue.boolVal) {
 			glEnable(GL_DEPTH_TEST);
@@ -127,7 +136,7 @@ void H3D::GenericStateChangeCommand::execute()
 		}
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::DepthBufferWriteEnable:
 		if(stateValue.boolVal) {
 			glDepthMask( GL_TRUE );
@@ -136,12 +145,12 @@ void H3D::GenericStateChangeCommand::execute()
 		}
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::DepthFunctionChange:
 		glDepthFunc(stateValue.enumVal);
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::BlendingEnabled:
 		if(stateValue.boolVal) {
 			glEnable( GL_BLEND );
@@ -150,39 +159,39 @@ void H3D::GenericStateChangeCommand::execute()
 		}
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::BlendFunctionChange:
 		glBlendFuncSeparate(stateValue.blendFactorBundle.srcRGB, stateValue.blendFactorBundle.dstRGB, 
-							stateValue.blendFactorBundle.srcAlpha, stateValue.blendFactorBundle.dstAlpha);
+			stateValue.blendFactorBundle.srcAlpha, stateValue.blendFactorBundle.dstAlpha);
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::BlendEquationChange:
 		glBlendEquationSeparate(stateValue.blendEquationBundle.rgbEquation, stateValue.blendEquationBundle.alphaEquation);
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::AlphaFunctionChange:
 		glAlphaFunc(stateValue.alphaFuncBundle.alphaTestFunc, stateValue.alphaFuncBundle.testValue);
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::ColorMaskChange:
 		glColorMask(stateValue.colorMaskVal[0],
-					stateValue.colorMaskVal[1],
-					stateValue.colorMaskVal[2],
-					stateValue.colorMaskVal[3]);
+			stateValue.colorMaskVal[1],
+			stateValue.colorMaskVal[2],
+			stateValue.colorMaskVal[3]);
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::BlendColorChange:
 		glBlendColor(	stateValue.blendColorVal[0], 
-						stateValue.blendColorVal[1], 
-						stateValue.blendColorVal[2], 
-						stateValue.blendColorVal[3]);
+			stateValue.blendColorVal[1], 
+			stateValue.blendColorVal[2], 
+			stateValue.blendColorVal[3]);
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::FaceCullingEnable:
 		if(stateValue.boolVal){
 			glEnable(GL_CULL_FACE);
@@ -191,17 +200,17 @@ void H3D::GenericStateChangeCommand::execute()
 		}
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::CullFaceChanged:
 		glCullFace(stateValue.enumVal);
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::WindingOrderChange:
 		glFrontFace(stateValue.enumVal);
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::ScissorTestEnable:
 		if(stateValue.boolVal) {
 			glEnable(GL_SCISSOR_TEST);
@@ -210,7 +219,7 @@ void H3D::GenericStateChangeCommand::execute()
 		}
 		break;
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::ShaderChange:
 		glUseProgram(stateValue.uintVal);
 		break;
@@ -253,9 +262,9 @@ H3D::ChangeRasterizerStateCommand::ChangeRasterizerStateCommand(RasterizerState 
 void H3D::ChangeBlendStateCommand::execute()
 {
 	glColorMask(	blendState.colorMask.mask[0],
-					blendState.colorMask.mask[1],
-					blendState.colorMask.mask[2],
-					blendState.colorMask.mask[3]);
+		blendState.colorMask.mask[1],
+		blendState.colorMask.mask[2],
+		blendState.colorMask.mask[3]);
 
 	LogOGLErrors("ChangeBlendStateCommand");
 
@@ -268,7 +277,7 @@ void H3D::ChangeBlendStateCommand::execute()
 	LogOGLErrors("ChangeBlendStateCommand");
 
 	glBlendFuncSeparate(	blendState.srcFactorRGB, blendState.dstFactorRGB, 
-							blendState.srcFactorAlpha, blendState.dstFactorAlpha);
+		blendState.srcFactorAlpha, blendState.dstFactorAlpha);
 
 	LogOGLErrors("ChangeBlendStateCommand");
 
@@ -277,9 +286,9 @@ void H3D::ChangeBlendStateCommand::execute()
 	LogOGLErrors("ChangeBlendStateCommand");
 
 	glBlendColor(	blendState.blendColor.color[0], 
-					blendState.blendColor.color[1], 
-					blendState.blendColor.color[2], 
-					blendState.blendColor.color[3]);
+		blendState.blendColor.color[1], 
+		blendState.blendColor.color[2], 
+		blendState.blendColor.color[3]);
 
 	LogOGLErrors("ChangeBlendStateCommand");
 

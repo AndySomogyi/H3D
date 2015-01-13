@@ -112,7 +112,7 @@ namespace H3D {
     virtual void preRender() {
       X3DEnvironmentTextureNode::preRender();
       if( generating_textures ) {
-        glEnable( GL_ALPHA_TEST );
+       // glEnable( GL_ALPHA_TEST );
         glAlphaFunc( GL_NEVER, 0 );
       }
     }

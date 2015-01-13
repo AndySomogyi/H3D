@@ -360,7 +360,7 @@ void X3DNurbsSurfaceGeometryNode::render( ) {
       texKnotV[3] = (GLfloat)v_knots[ vSizeToUse - 1 ];
     }
 
-    glEnable( GL_AUTO_NORMAL );
+   // glEnable( GL_AUTO_NORMAL );
 
     gluNurbsProperty( nurbs_object, GLU_DISPLAY_MODE, GLU_FILL );
     gluBeginSurface( nurbs_object );

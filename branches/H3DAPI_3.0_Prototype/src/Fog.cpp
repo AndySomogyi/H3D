@@ -81,6 +81,6 @@ void Fog::renderFog() {
     glFogfv( GL_FOG_COLOR, gl_fog_color );
     glFogf( GL_FOG_START, 0.0f );
     glFogf( GL_FOG_END, scale_local_to_global * visibility_range );
-    glEnable( GL_FOG );
+   // glEnable( GL_FOG );
   }
 }

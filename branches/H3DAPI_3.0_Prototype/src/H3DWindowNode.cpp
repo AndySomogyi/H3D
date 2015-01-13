@@ -293,22 +293,21 @@ void H3DWindowNode::initialize()
 	GraphicsHardwareInfo::initializeInfo();
 
 	// configure OpenGL context for rendering.
-	glEnable( GL_DEPTH_TEST );
+	 glEnable( GL_DEPTH_TEST );
 	glGetError(); // Clear error flag caused by bug in glewInit()
 	glDepthFunc( GL_LESS );
 	glDepthMask( GL_TRUE );
-	glEnable( GL_LIGHTING );
-	glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
-	glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
+	// glEnable( GL_LIGHTING );
+	//glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
+	//glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
 	GLfloat no_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, no_ambient);
+	//glLightModelfv( GL_LIGHT_MODEL_AMBIENT, no_ambient);
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 
 	if( GLEW_EXT_separate_specular_color ) 
 	{
-		glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL_EXT, 
-			GL_SEPARATE_SPECULAR_COLOR_EXT );
+		//glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL_EXT, GL_SEPARATE_SPECULAR_COLOR_EXT );
 	}
 	Node::initialize();
 	last_render_mode = renderMode->getRenderMode();
@@ -904,12 +903,12 @@ void H3DWindowNode::render( X3DChildNode *child_to_render)
 
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-	glEnable( GL_DEPTH_TEST ); 
-	glEnable( GL_LIGHTING );
-	glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
-	glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
+	 glEnable( GL_DEPTH_TEST ); 
+	// glEnable( GL_LIGHTING );
+	//glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
+	//glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
 	GLfloat no_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, no_ambient);
+	//glLightModelfv( GL_LIGHT_MODEL_AMBIENT, no_ambient);
 
 	X3DShapeNode::disable_lighting_if_no_app = true;
 
@@ -928,7 +927,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render)
 		glPushAttrib( GL_LIGHTING_BIT );
 		headlight_index =
 			X3DLightNode::getLightIndex( "Headlight in H3DWindowNode" );
-		glEnable( GL_LIGHT0 + (GLuint)(headlight_index) );
+		// glEnable( GL_LIGHT0 + (GLuint)(headlight_index) );
 	}
 
 	// add headlight shadows if specified in NavigationInfo
@@ -1178,7 +1177,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render)
 					glDrawPixels( stencil_mask_width, stencil_mask_height, 
 					GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_mask );
 				// render only every second line
-				glEnable(GL_STENCIL_TEST);
+				// glEnable(GL_STENCIL_TEST);
 				glStencilFunc(GL_EQUAL,1,1);
 				glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 				fbo_current_x = 0;
@@ -1284,7 +1283,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render)
 			stereo_mode == RenderMode::HORIZONTAL_INTERLACED ||
 			stereo_mode == RenderMode::CHECKER_INTERLACED ||
 			stereo_mode == RenderMode::VERTICAL_INTERLACED_GREEN_SHIFT ) {
-				glEnable(GL_STENCIL_TEST);
+				// glEnable(GL_STENCIL_TEST);
 				glStencilFunc(GL_NOTEQUAL,1,1);
 				glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 		}else{// set viewport for right eye when it is not covering the full window
@@ -1413,7 +1412,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render)
 		} else if( stereo_mode == RenderMode::HDMI_FRAME_PACKED_720P ) {
 			// set 30 lines to black as per hdmi standard 
 			glScissor( 0, 719, 1280, 30 );
-			glEnable( GL_SCISSOR_TEST );
+			// glEnable( GL_SCISSOR_TEST );
 			glPushAttrib( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 			glClearColor( 0.0, 0.0, 0.0, 1.0 );
 			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -1422,7 +1421,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render)
 		} else if( stereo_mode == RenderMode::HDMI_FRAME_PACKED_1080P ) {
 			// set 45 lines to black as per hdmi standard 
 			glScissor( 0, 1079, 1920, 45 );
-			glEnable( GL_SCISSOR_TEST );
+			// glEnable( GL_SCISSOR_TEST );
 			glPushAttrib( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 			glClearColor( 0.0, 0.0, 0.0, 1.0 );
 			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -1557,7 +1556,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render)
 
 		GLboolean norm= glIsEnabled( GL_NORMALIZE );
 		if ( !norm ) 
-			glEnable( GL_NORMALIZE );
+			// glEnable( GL_NORMALIZE );
 
 		// add viewmatrix to model view matrix.
 		vp->setupViewMatrix( eye_mode );

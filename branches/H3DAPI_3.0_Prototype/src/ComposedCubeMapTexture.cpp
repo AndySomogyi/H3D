@@ -225,7 +225,7 @@ void ComposedCubeMapTexture::render() {
 }
 
 void ComposedCubeMapTexture::enableTexturing() {
-  glEnable( GL_TEXTURE_CUBE_MAP_ARB );
+ // glEnable( GL_TEXTURE_CUBE_MAP_ARB );
 }
 
 void ComposedCubeMapTexture::disableTexturing() {

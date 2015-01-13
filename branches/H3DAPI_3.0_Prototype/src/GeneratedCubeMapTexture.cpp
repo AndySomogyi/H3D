@@ -160,7 +160,7 @@ void GeneratedCubeMapTexture::render() {
 }
 
 void GeneratedCubeMapTexture::enableTexturing() {
-  glEnable( GL_TEXTURE_CUBE_MAP_ARB );
+ // glEnable( GL_TEXTURE_CUBE_MAP_ARB );
 }
 
 void GeneratedCubeMapTexture::disableTexturing() {

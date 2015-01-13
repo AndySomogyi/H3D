@@ -80,7 +80,7 @@ void FogCoordinate::render( int depth_index ) {
 // the whole fog array.
 void FogCoordinate::renderArray() {
   if( GLEW_EXT_fog_coord  && !depth->empty() ) {
-    glEnableClientState(GL_FOG_COORD_ARRAY);
+    // glEnableClientState(GL_FOG_COORD_ARRAY);
     glFogCoordPointerEXT(GL_FLOAT, 0,
                      &(*depth->begin()) );
   }
@@ -107,11 +107,11 @@ void FogCoordinate::setAttributeData ( ){
 }
 
 void FogCoordinate::renderVBO ( ){
-  glEnableClientState ( GL_FOG_COORD_ARRAY );
+  // glEnableClientState ( GL_FOG_COORD_ARRAY );
   if ( use_bindless )
   {
     glFogCoordFormatNV ( GL_FLOAT, 0 );
-    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+    // glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
     glBufferAddressRangeNV ( GL_FOG_COORD_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize);
   } else

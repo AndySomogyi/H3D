@@ -89,7 +89,7 @@ namespace H3D {
     /// Enable state needed before rendering the color.
     virtual void preRender() {
       X3DColorNode::preRender();
-      glEnable( GL_BLEND );
+     // glEnable( GL_BLEND );
       glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 

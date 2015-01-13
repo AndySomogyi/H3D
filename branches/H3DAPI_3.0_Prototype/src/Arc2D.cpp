@@ -131,8 +131,9 @@ void Arc2D::render() {
   glEnd ();
 
   // reenable lighting if it was enabled before
-  if( lighting_enabled )
-    glEnable( GL_LIGHTING );
+  if( lighting_enabled ) {
+   // glEnable( GL_LIGHTING );
+   }
 }
 
 

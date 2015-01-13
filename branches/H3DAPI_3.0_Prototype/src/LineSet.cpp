@@ -254,7 +254,7 @@ void LineSet::render() {
 
     // reenable lighting if it was enabled before
     if( lighting_enabled )
-      glEnable( GL_LIGHTING );
+     // glEnable( GL_LIGHTING );
 
     if( texture ) texture->enableTexturing();
   }

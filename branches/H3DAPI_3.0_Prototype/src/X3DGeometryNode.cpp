@@ -268,9 +268,9 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
 	glGetIntegerv( GL_CULL_FACE_MODE, &cull_face );
 
 	if( geom->usingCulling() && geom->allowingCulling() ) {
-		glEnable( GL_CULL_FACE );
+		// glEnable( GL_CULL_FACE );
 	} else {
-		glDisable( GL_CULL_FACE );
+		// glDisable( GL_CULL_FACE );
 	}
 
 	glCullFace( geom->getCullFace() );
@@ -328,8 +328,12 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
 	}
 	
 	// restore previous values for culling
-	if( culling_enabled ) glEnable( GL_CULL_FACE );
-	else glDisable( GL_CULL_FACE );
+	if( culling_enabled ) {
+		// glEnable( GL_CULL_FACE );
+	}
+	else {
+		glDisable( GL_CULL_FACE );
+	}
 	
 	glCullFace( cull_face );
 

@@ -73,7 +73,7 @@ namespace H3D
 
 					unsigned int bufferSize = sizeof(Atom) * _atomCount;
 
-					glBufferStorage(target, bufferSize, nullptr, _createFlags);
+					//glBufferStorage(target, bufferSize, nullptr, _createFlags);
 					bufferContents = reinterpret_cast<Atom*>(glMapBufferRange(target, 0, bufferSize, _mapFlags));
 
 					if(!bufferContents) 

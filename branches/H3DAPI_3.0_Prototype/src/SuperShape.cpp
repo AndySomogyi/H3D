@@ -416,9 +416,9 @@ void SuperShape::startTexGen() {
         glTexGenfv( GL_S, GL_OBJECT_PLANE, sparams );
         glTexGenfv( GL_T, GL_OBJECT_PLANE, tparams );
         glTexGenfv( GL_R, GL_OBJECT_PLANE, rparams );
-        glEnable( GL_TEXTURE_GEN_S );
-        glEnable( GL_TEXTURE_GEN_T );
-        glEnable( GL_TEXTURE_GEN_R );
+       // glEnable( GL_TEXTURE_GEN_S );
+       // glEnable( GL_TEXTURE_GEN_T );
+       // glEnable( GL_TEXTURE_GEN_R );
       }
     } else {
       glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
@@ -427,9 +427,9 @@ void SuperShape::startTexGen() {
       glTexGenfv( GL_S, GL_OBJECT_PLANE, sparams );
       glTexGenfv( GL_T, GL_OBJECT_PLANE, tparams );
       glTexGenfv( GL_R, GL_OBJECT_PLANE, rparams );
-      glEnable( GL_TEXTURE_GEN_S );
-      glEnable( GL_TEXTURE_GEN_T );
-      glEnable( GL_TEXTURE_GEN_R );
+     // glEnable( GL_TEXTURE_GEN_S );
+     // glEnable( GL_TEXTURE_GEN_T );
+     // glEnable( GL_TEXTURE_GEN_R );
     }
   } else {
     stringstream s;

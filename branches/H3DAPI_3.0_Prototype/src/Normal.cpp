@@ -66,7 +66,7 @@ Normal::~Normal() {
 // array.
 void Normal::renderArray() {
   if( !vector->empty() ) {
-	glEnableClientState(GL_NORMAL_ARRAY);
+	// glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer( GL_FLOAT, 0,
 				   &(*vector->begin()) );
   }
@@ -91,11 +91,11 @@ void Normal::setAttributeData ( ){
 }
 
 void Normal::renderVBO ( ){
-  glEnableClientState ( GL_NORMAL_ARRAY );
+  // glEnableClientState ( GL_NORMAL_ARRAY );
   if ( use_bindless )
   {
 	glNormalFormatNV ( GL_FLOAT, 0 );
-	glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+	// glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
 	// vbo is dedicated for this vertex attribute, so there is no offset
 	glBufferAddressRangeNV ( GL_NORMAL_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
   } else

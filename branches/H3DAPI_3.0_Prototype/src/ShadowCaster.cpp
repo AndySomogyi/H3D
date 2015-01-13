@@ -211,10 +211,10 @@ void ShadowCaster::renderShadows( FrameBufferTextureGenerator *fbo, int i, void 
     glDepthMask( GL_FALSE );// Turn Off Writing To The Depth-Buffer
     glDepthFunc( GL_LESS );
     glDisable( GL_ALPHA_TEST );
-    glEnable( GL_STENCIL_TEST );// Turn On Stencil Buffer Testing
+   // glEnable( GL_STENCIL_TEST );// Turn On Stencil Buffer Testing
     glColorMask( GL_FALSE, GL_FALSE, 
                  GL_FALSE, GL_FALSE );// Don't Draw Into The Colour Buffer
-    glEnable( GL_CULL_FACE );
+   // glEnable( GL_CULL_FACE );
     
     const string &alg = shadow_caster->algorithm->getValue();
     glStencilFunc( GL_ALWAYS, 1, 0xFFFFFFFFL );
@@ -248,7 +248,7 @@ void ShadowCaster::renderShadows( FrameBufferTextureGenerator *fbo, int i, void 
     // shadow volumes(look like the gaps between edges) so instead we
     // do not use the scale and have a default offset of 6 to compensate.
     glPolygonOffset( 0, shadow_caster->shadowDepthOffset->getValue() );
-    glEnable( GL_POLYGON_OFFSET_FILL );
+   // glEnable( GL_POLYGON_OFFSET_FILL );
 
     // First Pass. Increase Stencil Value In The Shadow 
     for( MFShadowObjectNode::const_iterator o = shadow_caster->object->begin(); 
@@ -282,7 +282,7 @@ void ShadowCaster::renderShadows( FrameBufferTextureGenerator *fbo, int i, void 
       // here
       glDisable( GL_BLEND );
     } else {
-      glEnable( GL_BLEND );
+     // glEnable( GL_BLEND );
       glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
     }

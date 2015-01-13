@@ -590,7 +590,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		if(use_bindless) {
 			//Does this need to be deleted? Look up to make sure....
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
-			glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &*indices.begin(), GL_MAP_WRITE_BIT|GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT);
+			//glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &*indices.begin(), GL_MAP_WRITE_BIT|GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT);
 			glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &ib_GPUaddress);
 			glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
 			LogOGLErrors("IndexedTriangleSet.cpp::traverseSG");

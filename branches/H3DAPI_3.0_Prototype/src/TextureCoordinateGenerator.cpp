@@ -79,8 +79,8 @@ void TextureCoordinateGenerator::startTexGen() {
       gen_mode == "SPHERE" ) {
     glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
     glTexGend( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
-    glEnable( GL_TEXTURE_GEN_S );
-    glEnable( GL_TEXTURE_GEN_T );
+   // glEnable( GL_TEXTURE_GEN_S );
+   // glEnable( GL_TEXTURE_GEN_T );
   } else if( gen_mode == "MATRIX" ) {
     if( params.size() < 12 ) {
       stringstream s;
@@ -98,9 +98,9 @@ void TextureCoordinateGenerator::startTexGen() {
     glTexGenfv( GL_S, GL_OBJECT_PLANE, sparams );
     glTexGenfv( GL_T, GL_OBJECT_PLANE, tparams );
     glTexGenfv( GL_R, GL_OBJECT_PLANE, rparams );
-    glEnable( GL_TEXTURE_GEN_S );
-    glEnable( GL_TEXTURE_GEN_T );
-    glEnable( GL_TEXTURE_GEN_R );
+   // glEnable( GL_TEXTURE_GEN_S );
+   // glEnable( GL_TEXTURE_GEN_T );
+   // glEnable( GL_TEXTURE_GEN_R );
   } else if( gen_mode == "CAMERASPACEPOSITION" ||
              gen_mode == "COORD-EYE" ) {
     H3DFloat sparams[4] = {1,0,0,0};
@@ -116,9 +116,9 @@ void TextureCoordinateGenerator::startTexGen() {
     glTexGenfv( GL_T, GL_EYE_PLANE, tparams );
     glTexGenfv( GL_R, GL_EYE_PLANE, rparams );
     glPopMatrix();
-    glEnable( GL_TEXTURE_GEN_S );
-    glEnable( GL_TEXTURE_GEN_T );
-    glEnable( GL_TEXTURE_GEN_R );
+   // glEnable( GL_TEXTURE_GEN_S );
+   // glEnable( GL_TEXTURE_GEN_T );
+   // glEnable( GL_TEXTURE_GEN_R );
   } else if( gen_mode == "COORD" ) {
     H3DFloat sparams[4] = {1,0,0,0};
     H3DFloat tparams[4] = {0,1,0,0};
@@ -129,9 +129,9 @@ void TextureCoordinateGenerator::startTexGen() {
     glTexGenfv( GL_S, GL_OBJECT_PLANE, sparams );
     glTexGenfv( GL_T, GL_OBJECT_PLANE, tparams );
     glTexGenfv( GL_R, GL_OBJECT_PLANE, rparams );
-    glEnable( GL_TEXTURE_GEN_S );
-    glEnable( GL_TEXTURE_GEN_T );
-    glEnable( GL_TEXTURE_GEN_R );
+   // glEnable( GL_TEXTURE_GEN_S );
+   // glEnable( GL_TEXTURE_GEN_T );
+   // glEnable( GL_TEXTURE_GEN_R );
   } else if( gen_mode == "CAMERASPACEREFLECTIONVECTOR" ) {
     if( !GLEW_ARB_texture_cube_map ) {
       Console(4) << "Warning: ARB_texture_cube_map extension not supported "
@@ -142,9 +142,9 @@ void TextureCoordinateGenerator::startTexGen() {
     glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB );
     glTexGend( GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB );
     glTexGend( GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB );
-    glEnable( GL_TEXTURE_GEN_S );
-    glEnable( GL_TEXTURE_GEN_T );
-    glEnable( GL_TEXTURE_GEN_R );
+   // glEnable( GL_TEXTURE_GEN_S );
+   // glEnable( GL_TEXTURE_GEN_T );
+   // glEnable( GL_TEXTURE_GEN_R );
   } else if( gen_mode == "CAMERASPACENORMAL" ) {
     if( !GLEW_ARB_texture_cube_map ) {
       Console(4) << "Warning: ARB_texture_cube_map extension not supported "
@@ -155,9 +155,9 @@ void TextureCoordinateGenerator::startTexGen() {
     glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_NORMAL_MAP_ARB );
     glTexGend( GL_T, GL_TEXTURE_GEN_MODE, GL_NORMAL_MAP_ARB );
     glTexGend( GL_R, GL_TEXTURE_GEN_MODE, GL_NORMAL_MAP_ARB );
-    glEnable( GL_TEXTURE_GEN_S );
-    glEnable( GL_TEXTURE_GEN_T );
-    glEnable( GL_TEXTURE_GEN_R );
+   // glEnable( GL_TEXTURE_GEN_S );
+   // glEnable( GL_TEXTURE_GEN_T );
+   // glEnable( GL_TEXTURE_GEN_R );
   } else {
     stringstream s;
     s << "Unsupported mode \"" << gen_mode << "\" (in "

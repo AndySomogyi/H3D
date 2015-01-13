@@ -224,9 +224,9 @@ void FullscreenRectangle::render() {
     index_pointer = &(*fullscreenRectangle_index_data.begin());
   }
 
-  glEnableClientState(GL_VERTEX_ARRAY);
+  // glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_FLOAT, 9 * sizeof(GLfloat), vertex_pointer);
-  glEnableClientState(GL_NORMAL_ARRAY);
+  // glEnableClientState(GL_NORMAL_ARRAY);
   glNormalPointer(GL_FLOAT, 9*sizeof(GLfloat),normal_pointer);
   X3DTextureCoordinateNode::renderVertexBufferObjectForActiveTexture(3,GL_FLOAT,9*sizeof(GLfloat),texture_pointer);
 

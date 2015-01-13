@@ -94,7 +94,7 @@ void Material::render()  {
   H3DFloat t = transparency->getValue();
   material[3] = 1 - t;
   if( t > 0 ) {
-    glEnable( GL_BLEND );
+   // glEnable( GL_BLEND );
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
     

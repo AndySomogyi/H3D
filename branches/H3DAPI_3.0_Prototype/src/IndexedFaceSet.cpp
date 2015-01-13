@@ -162,7 +162,7 @@ void IndexedFaceSet::render() {
   const vector< int > &normal_index    = normalIndex->getValue();
   const vector< int > &tex_coord_index = texCoordIndex->getValue();
 
-  //  glEnable( GL_AUTO_NORMAL );
+  // glEnable( GL_AUTO_NORMAL );
 
   // we need coordinates to render 
   if( coords ) {

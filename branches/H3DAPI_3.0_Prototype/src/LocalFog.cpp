@@ -88,7 +88,7 @@ void LocalFog::enableGraphicsState() {
     glFogfv( GL_FOG_COLOR, gl_localFog_color );
     glFogf( GL_FOG_START, 0.0f );
     glFogf( GL_FOG_END, visibilityRange->getValue() );
-    glEnable( GL_FOG );
+   // glEnable( GL_FOG );
   }
 }
 

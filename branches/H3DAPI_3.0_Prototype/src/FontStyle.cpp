@@ -577,8 +577,8 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
    glScalef( scale_factor, scale_factor, scale_factor );
    
    if( renderType->getValue() == "TEXTURE" ) {
-     glEnable( GL_TEXTURE_2D);
-     glEnable( GL_ALPHA_TEST );
+    // glEnable( GL_TEXTURE_2D);
+    // glEnable( GL_ALPHA_TEST );
      glAlphaFunc (GL_GREATER, 0);
    }
    
@@ -614,8 +614,8 @@ void FontStyle::renderChar( unsigned char c ) {
   glScalef( scale_factor, scale_factor, scale_factor );
   
   if( renderType->getValue() == "TEXTURE" ) {
-    glEnable( GL_TEXTURE_2D);
-    glEnable( GL_ALPHA_TEST );
+   // glEnable( GL_TEXTURE_2D);
+   // glEnable( GL_ALPHA_TEST );
     glAlphaFunc (GL_GREATER, 0);
   }
   

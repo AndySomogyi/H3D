@@ -117,7 +117,7 @@ void Background::render() {
     glPushAttrib( GL_ALL_ATTRIB_BITS );
     H3DFloat s = (H3DFloat)0.05;
     glCullFace( GL_BACK );
-    glEnable( GL_CULL_FACE );
+   // glEnable( GL_CULL_FACE );
     glDisable( GL_LIGHTING );
 
     Matrix4d pm = projectionMatrix->getValue();

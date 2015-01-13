@@ -168,7 +168,7 @@ namespace H3D {
 		// Returns:   
 		// Qualifier:
 		// Parameter: std::vector<std::pair<GLenum, bool>> targetsAndValues. Okay, so the pairs are specified in this format because
-		// of the way openGL handles "binary" settings; you either need to call glEnableClientState or glDisableClientState. Hence we need a bool to know which one.
+		// of the way openGL handles "binary" settings; you either need to call // glEnableClientState or glDisableClientState. Hence we need a bool to know which one.
 		//************************************
 		ChangeClientStateCommand(std::vector<std::pair<GLenum, bool>> _targetsAndValues);
 

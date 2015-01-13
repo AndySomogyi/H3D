@@ -378,10 +378,10 @@ void ElevationGrid::render() {
       int nr_data_items = 3;
       if( !tex_coord_node )
         nr_data_items += 3;
-      glEnableClientState(GL_VERTEX_ARRAY);
+      // glEnableClientState(GL_VERTEX_ARRAY);
       glVertexPointer( 3, GL_FLOAT, nr_data_items * sizeof(GLfloat), NULL );
       if( !tex_coord_node ) {
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        // glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glTexCoordPointer( 3, GL_FLOAT, nr_data_items * sizeof(GLfloat),
                            (GLvoid*)( 3 * sizeof(GLfloat) ) );
       } else if( !tex_coord_gen ) {
@@ -676,9 +676,9 @@ void ElevationGrid::startTexGen(
           glTexGenfv( GL_S, GL_OBJECT_PLANE, sparams );
           glTexGenfv( GL_T, GL_OBJECT_PLANE, tparams );
           glTexGenfv( GL_R, GL_OBJECT_PLANE, rparams );
-          glEnable( GL_TEXTURE_GEN_S );
-          glEnable( GL_TEXTURE_GEN_T );
-          glEnable( GL_TEXTURE_GEN_R );
+         // glEnable( GL_TEXTURE_GEN_S );
+         // glEnable( GL_TEXTURE_GEN_T );
+         // glEnable( GL_TEXTURE_GEN_R );
         }
       } else {
         glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
@@ -687,9 +687,9 @@ void ElevationGrid::startTexGen(
         glTexGenfv( GL_S, GL_OBJECT_PLANE, sparams );
         glTexGenfv( GL_T, GL_OBJECT_PLANE, tparams );
         glTexGenfv( GL_R, GL_OBJECT_PLANE, rparams );
-        glEnable( GL_TEXTURE_GEN_S );
-        glEnable( GL_TEXTURE_GEN_T );
-        glEnable( GL_TEXTURE_GEN_R );
+       // glEnable( GL_TEXTURE_GEN_S );
+       // glEnable( GL_TEXTURE_GEN_T );
+       // glEnable( GL_TEXTURE_GEN_R );
       }
     } else {
       stringstream s;

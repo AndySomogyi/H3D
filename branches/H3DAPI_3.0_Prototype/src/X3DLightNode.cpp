@@ -122,7 +122,7 @@ void X3DLightNode::enableGraphicsState()
 		{
       GLLightInfo gl_light = getGLLightInfo();
       glPushAttrib( GL_LIGHTING_BIT );
-      glEnable( GL_LIGHT0 +light_index );
+     // glEnable( GL_LIGHT0 +light_index );
       
       GLfloat col_d[4], col_a[4], col_s[4];
       fillGLArray( gl_light.diffuse, col_d );

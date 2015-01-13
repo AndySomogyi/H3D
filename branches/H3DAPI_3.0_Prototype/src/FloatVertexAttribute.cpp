@@ -92,7 +92,7 @@ void FloatVertexAttribute::render( int value_index ) {
 void FloatVertexAttribute::renderArray() {
   if( !value->empty() ) {
     if( GLEW_ARB_vertex_program && attrib_index >= 0 ) {
-      glEnableVertexAttribArrayARB( attrib_index );
+      // glEnableVertexAttribArrayARB( attrib_index );
       glVertexAttribPointerARB( attrib_index,
         numComponents->getValue(),
         GL_FLOAT,
@@ -124,11 +124,11 @@ void FloatVertexAttribute::setAttributeData ( ){
 }
 
 void FloatVertexAttribute::renderVBO ( ){
-  glEnableVertexAttribArrayARB ( attrib_index );
+  // glEnableVertexAttribArrayARB ( attrib_index );
   if ( use_bindless )
   {
     glVertexAttribFormatNV ( attrib_index, numComponents->getValue(), GL_FLOAT, GL_FALSE, 0 );
-    glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+    // glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
     glBufferAddressRangeNV ( GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, attrib_index, vbo_GPUaddr, VAD.attributeSize );
   } else{

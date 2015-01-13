@@ -114,7 +114,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   // geometry
   glStencilOp( GL_REPLACE, GL_REPLACE, GL_REPLACE );
   glStencilFunc( GL_ALWAYS, 1, 1 );
-  glEnable( GL_STENCIL_TEST );
+ // glEnable( GL_STENCIL_TEST );
   // don't write to frame buffer or depth buffer
   glColorMask( 0, 0, 0, 0 );
   glDisable( GL_DEPTH_TEST );
@@ -125,7 +125,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   
   // reset to frite to frame and depth buffer again
   glColorMask( 1, 1, 1, 1 );
-  glEnable( GL_DEPTH_TEST );
+ // glEnable( GL_DEPTH_TEST );
 
   glPopMatrix();
 
@@ -206,7 +206,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
     GLdouble e[] = {  normal.x, normal.y, normal.z, 
                    -normal.x*point.x - normal.y*point.y - normal.z*point.z };
     glClipPlane( GL_CLIP_PLANE0 + plane_index, e );
-    glEnable( GL_CLIP_PLANE0 + plane_index );
+   // glEnable( GL_CLIP_PLANE0 + plane_index );
     
     // draw scene
     glLoadMatrixf( rm );
@@ -244,7 +244,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   glClear( GL_DEPTH_BUFFER_BIT );
   glPushMatrix();
   glMultMatrixf( t );
-  glEnable( GL_BLEND );
+ // glEnable( GL_BLEND );
   glDisable( GL_LIGHTING );
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
@@ -252,7 +252,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
 
   glColor4f( c.r, c.g, c.b, 1 - reflectivity->getValue() );
   if( g ) g->render();
-  glEnable( GL_LIGHTING );
+ // glEnable( GL_LIGHTING );
   glPopMatrix();
 
   glFrontFace( front_face );
@@ -271,7 +271,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   glClear( GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
   glStencilOp( GL_REPLACE, GL_REPLACE, GL_REPLACE );
   glStencilFunc( GL_ALWAYS, 1, 1 );
-  glEnable( GL_STENCIL_TEST );
+ // glEnable( GL_STENCIL_TEST );
 
   glColorMask( 0, 0, 0, 0 );
   

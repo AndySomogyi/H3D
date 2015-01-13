@@ -71,7 +71,7 @@ void BoxBound::render() {
   glVertex3f( max.x, max.y, max.z );
   glVertex3f( max.x, max.y, min.z );
   glEnd();
-  glEnable( GL_LIGHTING );
+ // glEnable( GL_LIGHTING );
 }
 
 bool BoxBound::movingSphereIntersect( const Vec3f &from,

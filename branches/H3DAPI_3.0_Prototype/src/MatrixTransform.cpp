@@ -96,8 +96,9 @@ void MatrixTransform::multiplyGLMatrix() {
 
 void MatrixTransform::render() { 
   GLboolean norm= glIsEnabled( GL_NORMALIZE );
-  if ( !norm ) 
-    glEnable( GL_NORMALIZE );
+  if ( !norm ) {
+   // glEnable( GL_NORMALIZE );
+   }
   
   GLint front_face;
 

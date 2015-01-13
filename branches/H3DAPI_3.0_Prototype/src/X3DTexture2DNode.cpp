@@ -369,7 +369,7 @@ void X3DTexture2DNode::renderSubImage( Image *image, GLenum texture_target,
 
 
 void X3DTexture2DNode::enableTexturing() {
-  glEnable( texture_target );
+ // glEnable( texture_target );
   Image * i = static_cast< Image * >(image->getValue());
   if( i ) {
     // update blend state when image exist and image needs update
@@ -377,7 +377,7 @@ void X3DTexture2DNode::enableTexturing() {
     if( pixel_type == Image::LUMINANCE_ALPHA ||
       pixel_type == Image::RGBA || 
       pixel_type == Image::BGRA ) {
-        glEnable( GL_BLEND );
+       // glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     }
   }

@@ -1,9 +1,10 @@
 #include <H3D/RenderCommandBuffer.h>
+#include <H3D/H3DApi.h>
 
 using namespace H3D;
 
 H3D::RenderCommandBuffer::RenderCommandBuffer(unsigned int numCommands)
-: commandQueue(), commandBuffer(true)
+: commandQueue(), commandBuffer(USING_BINDLESS)
 {
 	const GLbitfield mapFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
 	const GLbitfield createFlags = mapFlags | GL_DYNAMIC_STORAGE_BIT;

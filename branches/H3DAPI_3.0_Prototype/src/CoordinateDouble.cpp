@@ -63,7 +63,7 @@ CoordinateDouble::~CoordinateDouble() {
 /// array.
 void CoordinateDouble::renderArray() {
 	if ( !point->empty() ) {
-		glEnableClientState(GL_VERTEX_ARRAY);
+		// glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer( 3, GL_DOUBLE, 0,
 			&(*point->begin()) );
 
@@ -89,11 +89,11 @@ void CoordinateDouble::setAttributeData ( ){
 }
 
 void CoordinateDouble::renderVBO ( ){
-	glEnableClientState ( GL_VERTEX_ARRAY );
+	// glEnableClientState ( GL_VERTEX_ARRAY );
 	if ( use_bindless )
 	{
 		glVertexFormatNV ( 3, GL_DOUBLE, 0 );
-		glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+		// glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
 		// vbo is dedicated for this vertex attribute, so there is no offset
 		glBufferAddressRangeNV ( GL_VERTEX_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
 	} else
