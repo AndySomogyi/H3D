@@ -192,278 +192,280 @@ namespace H3D {
   /// \par Internal routes:
   /// \dotfile TextureProperties.dot  
   class H3DAPI_API TextureProperties : 
-    public X3DNode {
+	public X3DNode {
   public:
-    
-    /// Constructor.
-    TextureProperties( Inst< SFNode  > _metadata              = 0,
-                       Inst< SFFloat  > _anisotropicDegree    = 0,
-                       Inst< SFColorRGBA > _borderColor       = 0,
-                       Inst< SFInt32  > _borderWidth          = 0,
-                       Inst< SFString > _boundaryModeS        = 0,
-                       Inst< SFString > _boundaryModeT        = 0,
-                       Inst< SFString > _boundaryModeR        = 0,
-                       Inst< SFString  > _magnificationFilter = 0,
-                       Inst< SFString  > _minificationFilter  = 0,
-                       Inst< SFString > _textureCompression   = 0,
-                       Inst< SFFloat > _texturePriority        = 0,
-                       Inst< SFBool  > _generateMipMaps      = 0,
-                       Inst< SFVec4f > _textureTransferScale = 0,
-                       Inst< SFVec4f > _textureTransferBias  = 0,
-                       Inst< SFString > _textureCompareMode = 0,
-                       Inst< SFFloat  > _textureCompareFailValue = 0,
-                       Inst< SFString > _textureType        = 0,
-                       Inst< SFString > _textureFormat      = 0 );
+	
+	/// Constructor.
+	TextureProperties( Inst< SFNode  > _metadata              = 0,
+					   Inst< SFFloat  > _anisotropicDegree    = 0,
+					   Inst< SFColorRGBA > _borderColor       = 0,
+					   Inst< SFInt32  > _borderWidth          = 0,
+					   Inst< SFString > _boundaryModeS        = 0,
+					   Inst< SFString > _boundaryModeT        = 0,
+					   Inst< SFString > _boundaryModeR        = 0,
+					   Inst< SFString  > _magnificationFilter = 0,
+					   Inst< SFString  > _minificationFilter  = 0,
+					   Inst< SFString > _textureCompression   = 0,
+					   Inst< SFFloat > _texturePriority        = 0,
+					   Inst< SFBool  > _generateMipMaps      = 0,
+					   Inst< SFVec4f > _textureTransferScale = 0,
+					   Inst< SFVec4f > _textureTransferBias  = 0,
+					   Inst< SFString > _textureCompareMode = 0,
+					   Inst< SFFloat  > _textureCompareFailValue = 0,
+					   Inst< SFString > _textureType        = 0,
+					   Inst< SFString > _textureFormat      = 0 );
 
-    /// Returns the default xml containerField attribute value.
-    /// For this node it is "textureProperties".
-    virtual string defaultXMLContainerField() {
-      return "textureProperties";
-    }
+	bool operator==(const TextureProperties& rhs);
 
-    /// Render all OpenGL texture properties that are set by glTexParamter
-    /// calls for the given texture_target.
-    virtual void renderTextureProperties( GLenum texture_target );
+	/// Returns the default xml containerField attribute value.
+	/// For this node it is "textureProperties".
+	virtual string defaultXMLContainerField() {
+	  return "textureProperties";
+	}
 
-
-    /// The anisotropicDegree field describes the minimum degree of anisotropy
-    /// to account for in texture filtering. A value of 1 implies no
-    /// anisotropic filtering. Values above the system's maximum supported
-    /// value will be clamped to the maximum allowed. 
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 1.0 \n
-    ///
-    /// \dotfile TextureProperties_anisotropicDegree.dot 
-    auto_ptr< SFFloat >  anisotropicDegree;
-
-    /// The borderColor field describes the color to use for border pixels.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0 0 0 0  \n
-    ///
-    /// \dotfile TextureProperties_borderColor.dot 
-    auto_ptr< SFColorRGBA >  borderColor;
-
-    /// The borderWidth field describes the color to use for border pixels.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0 \n
-    ///
-    /// \dotfile TextureProperties_borderWidth.dot 
-    auto_ptr< SFInt32 >  borderWidth;
-
-    /// The boundaryModeS field describes the way S texture coordinate 
-    /// boundaries are handled
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> "REPEAT" \n
-    ///
-    /// \dotfile TextureProperties_boundaryModeS.dot 
-    auto_ptr< SFString > boundaryModeS;
-
-    /// The boundaryModeT field describes the way T texture coordinate 
-    /// boundaries are handled
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> "REPEAT" \n
-    ///
-    /// \dotfile TextureProperties_boundaryModeT.dot 
-    auto_ptr< SFString > boundaryModeT;
-
-    /// The boundaryModeR field describes the way R texture coordinate 
-    /// boundaries are handled
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> "REPEAT" \n
-    ///
-    /// \dotfile TextureProperties_boundaryModeR.dot 
-    auto_ptr< SFString > boundaryModeR;
-    
-    /// The magnificationFilter field describes the way textures are filtered
-    /// when the image is smaller then the screen space representation.   
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> "FASTEST" \n
-    ///
-    /// \dotfile TextureProperties_magnificationFilter.dot 
-    auto_ptr< SFString >  magnificationFilter;
-
-    /// The minificationFilter field describes the way textures are filtered
-    /// when the image is larger then the screen space representation.   
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> "FASTEST" \n
-    ///
-    /// \dotfile TextureProperties_minificationFilter.dot 
-    auto_ptr< SFString >  minificationFilter;
-
-    /// The textureCompression fields describes if/how a texture should be 
-    /// compressed.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> "FASTEST" \n
-    ///
-    /// \dotfile TextureProperties_textureCompression.dot 
-    auto_ptr< SFString >  textureCompression;
-
-    /// The texturePriority field describes the texture residence priority for
-    /// allocating texture memory. Zero indicates the lowest priority and 1
-    /// indicates the highest priority. Values are clamped to the range [0,1].
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0 \n
-    ///
-    /// \dotfile TextureProperties_texturePriority.dot 
-    auto_ptr< SFFloat >  texturePriority;
-
-    /// The generateMipMaps field describes whether mipmaps should be generated
-    /// for the texture. Mipmaps are required for filtering modes with MIPMAP
-    /// in their value.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> false \n
-    ///
-    /// \dotfile TextureProperties_generateMipMaps.dot 
-    auto_ptr< SFBool >  generateMipMaps;
+	/// Render all OpenGL texture properties that are set by glTexParamter
+	/// calls for the given texture_target.
+	virtual void renderTextureProperties( GLenum texture_target );
 
 
-    /// The textureTransferScale field defines the scale component of the 
-    /// transfer function from image value to texture memory value.
-    ///
-    /// When the image data is transferred to texture memory a scaling factor
-    /// and bias value can be added to each pixel value before putting it into 
-    /// texture space. The four values are mapped to r, g, b and alpha 
-    /// components respectively. This does not affect the values in the 
-    /// image field of the texture, but only the values in texture memory.
-    /// E.g.
-    /// texture_memory_value.r = 
-    ///       (image_value.r * textureTransferScale.x) + textureTransferBias.x 
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 1 1 1 1 \n
-    ///
-    /// \dotfile TextureProperties_textureTransferScale.dot  
-    auto_ptr< SFVec4f > textureTransferScale;
+	/// The anisotropicDegree field describes the minimum degree of anisotropy
+	/// to account for in texture filtering. A value of 1 implies no
+	/// anisotropic filtering. Values above the system's maximum supported
+	/// value will be clamped to the maximum allowed. 
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> 1.0 \n
+	///
+	/// \dotfile TextureProperties_anisotropicDegree.dot 
+	auto_ptr< SFFloat >  anisotropicDegree;
 
-    /// The textureTransferBias field defines the bias component of the 
-    /// transfer function from image value to texture memory value.
-    ///
-    /// When the image data is transferred to texture memory a scaling factor
-    /// and bias value can be added to each pixel value before putting it into 
-    /// texture space. The four values are mapped to r, g, b and alpha 
-    /// components respectively. This does not affect the values in the 
-    /// image field of the texture, but only the values in texture memory.
-    /// E.g.
-    /// texture_memory_value.r = 
-    ///       (image_value.r * textureTransferScale.x) + textureTransferBias.x 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0 0 0 0 \n
-    ///
-    /// \dotfile TextureProperties_textureTransferBias.dot  
-    auto_ptr< SFVec4f > textureTransferBias;
+	/// The borderColor field describes the color to use for border pixels.
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> 0 0 0 0  \n
+	///
+	/// \dotfile TextureProperties_borderColor.dot 
+	auto_ptr< SFColorRGBA >  borderColor;
+
+	/// The borderWidth field describes the color to use for border pixels.
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> 0 \n
+	///
+	/// \dotfile TextureProperties_borderWidth.dot 
+	auto_ptr< SFInt32 >  borderWidth;
+
+	/// The boundaryModeS field describes the way S texture coordinate 
+	/// boundaries are handled
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> "REPEAT" \n
+	///
+	/// \dotfile TextureProperties_boundaryModeS.dot 
+	auto_ptr< SFString > boundaryModeS;
+
+	/// The boundaryModeT field describes the way T texture coordinate 
+	/// boundaries are handled
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> "REPEAT" \n
+	///
+	/// \dotfile TextureProperties_boundaryModeT.dot 
+	auto_ptr< SFString > boundaryModeT;
+
+	/// The boundaryModeR field describes the way R texture coordinate 
+	/// boundaries are handled
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> "REPEAT" \n
+	///
+	/// \dotfile TextureProperties_boundaryModeR.dot 
+	auto_ptr< SFString > boundaryModeR;
+	
+	/// The magnificationFilter field describes the way textures are filtered
+	/// when the image is smaller then the screen space representation.   
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> "FASTEST" \n
+	///
+	/// \dotfile TextureProperties_magnificationFilter.dot 
+	auto_ptr< SFString >  magnificationFilter;
+
+	/// The minificationFilter field describes the way textures are filtered
+	/// when the image is larger then the screen space representation.   
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> "FASTEST" \n
+	///
+	/// \dotfile TextureProperties_minificationFilter.dot 
+	auto_ptr< SFString >  minificationFilter;
+
+	/// The textureCompression fields describes if/how a texture should be 
+	/// compressed.
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> "FASTEST" \n
+	///
+	/// \dotfile TextureProperties_textureCompression.dot 
+	auto_ptr< SFString >  textureCompression;
+
+	/// The texturePriority field describes the texture residence priority for
+	/// allocating texture memory. Zero indicates the lowest priority and 1
+	/// indicates the highest priority. Values are clamped to the range [0,1].
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> 0 \n
+	///
+	/// \dotfile TextureProperties_texturePriority.dot 
+	auto_ptr< SFFloat >  texturePriority;
+
+	/// The generateMipMaps field describes whether mipmaps should be generated
+	/// for the texture. Mipmaps are required for filtering modes with MIPMAP
+	/// in their value.
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> false \n
+	///
+	/// \dotfile TextureProperties_generateMipMaps.dot 
+	auto_ptr< SFBool >  generateMipMaps;
 
 
-    /// Field that gets an event when any of the X3D fields in the
-    /// TextureProperties generates an event
-    auto_ptr< Field > propertyChanged;
+	/// The textureTransferScale field defines the scale component of the 
+	/// transfer function from image value to texture memory value.
+	///
+	/// When the image data is transferred to texture memory a scaling factor
+	/// and bias value can be added to each pixel value before putting it into 
+	/// texture space. The four values are mapped to r, g, b and alpha 
+	/// components respectively. This does not affect the values in the 
+	/// image field of the texture, but only the values in texture memory.
+	/// E.g.
+	/// texture_memory_value.r = 
+	///       (image_value.r * textureTransferScale.x) + textureTransferBias.x 
+	/// 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> 1 1 1 1 \n
+	///
+	/// \dotfile TextureProperties_textureTransferScale.dot  
+	auto_ptr< SFVec4f > textureTransferScale;
 
-    /// The textureCompareMode field specifies what texture compare
-    /// function to use. Texture compare is used to compare the 
-    /// R texture coordinates to the texture value and return 
-    /// 1 if the test succeeds and textureCompareFailValue on fail.
-    /// The output of a texture lookup with this enabled will 
-    /// there for only return 1 or textureCompareFailValue depending
-    /// on the test. The original texture value is only used for the
-    /// test. The normal usage of this is when using shadow mapping
-    /// to determine if a fragment is in shadow or not.
-    /// 
-    /// The valid values are:
-    /// <table>
-    /// <tr><td>"NONE"</td><td>No texture compare is done. Texture works as 
-    /// normal.</td></tr>
-    /// <tr><td>"GEQUAL"</td><td>Output texture value is 1 if R texture 
-    /// coordinate >= original texture value, textureCompareFailValue otherwise.</td> 
-    /// <tr><td>"LEQUAL"</td><td>Output texture value is 1 if R texture 
-    /// coordinate <= original texture value, textureCompareFailValue otherwise.</td> 
-    /// </table>
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Valid values:</b> "NONE", "GEQUAL", "LEQUAL" \n
-    /// <b>Default value:</b> "NONE" \n
-    ///
-    /// \dotfile TextureProperties_textureCompareMode.dot   
-    auto_ptr< SFString > textureCompareMode;
-
-    /// The textureCompareFailValue contains the value to use as texture
-    /// output when the test in textureCompareMode fails.
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0 \n
-    ///
-    /// \dotfile TextureProperties_textureCompareMode.dot  
-    auto_ptr< SFFloat > textureCompareFailValue;
+	/// The textureTransferBias field defines the bias component of the 
+	/// transfer function from image value to texture memory value.
+	///
+	/// When the image data is transferred to texture memory a scaling factor
+	/// and bias value can be added to each pixel value before putting it into 
+	/// texture space. The four values are mapped to r, g, b and alpha 
+	/// components respectively. This does not affect the values in the 
+	/// image field of the texture, but only the values in texture memory.
+	/// E.g.
+	/// texture_memory_value.r = 
+	///       (image_value.r * textureTransferScale.x) + textureTransferBias.x 
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> 0 0 0 0 \n
+	///
+	/// \dotfile TextureProperties_textureTransferBias.dot  
+	auto_ptr< SFVec4f > textureTransferBias;
 
 
-    /// The textureType specifies what texture target type
-    /// should be used for the texture. This can affect how texture
-    /// values are interpolated and how texture coordinates are 
-    /// used to look up into the texture.
-    /// 
-    /// The valid values are:
-    /// <table>
-    /// <tr><td>"NORMAL"</td><td>GL_TEXTURE_2D for 2d textures and GL_TEXTURE_3D for 3d 
-    /// textures.</td></tr>
-    /// <tr><td>"2D_RECTANGLE"</td><td>GL_TEXTURE_RECTANGLE. Only valid for 2D textures. 
-    /// Make the texture lookup in pixel space instead of as normal with normalized
-    /// coordinates. E.g. tex coord (4,5) will look up the pixel with that index directly</td> </tr>
-    /// <tr><td>"2D_ARRAY"</td><td>GL_TEXTURE_2D_ARRAY. Only valid for 3D textures and together with shaders. 
-    /// Texture is a stack of 2D images where the R component specifies the
-    /// index of the 2D image to use. </td> </tr>
-    /// </table>
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Valid values:</b> "NORMAL", "2D_RECTANGLE"(if 2d texture), "2D_ARRAY"(if 3d texture) \n
-    /// <b>Default value:</b> "NORMAL" \n
-    ///
-    /// \dotfile TextureProperties_textureType.dot
-    auto_ptr< SFString > textureType;
+	/// Field that gets an event when any of the X3D fields in the
+	/// TextureProperties generates an event
+	auto_ptr< Field > propertyChanged;
 
-    /// The H3DNodeDatabase for this node.
-    static H3DNodeDatabase database;
+	/// The textureCompareMode field specifies what texture compare
+	/// function to use. Texture compare is used to compare the 
+	/// R texture coordinates to the texture value and return 
+	/// 1 if the test succeeds and textureCompareFailValue on fail.
+	/// The output of a texture lookup with this enabled will 
+	/// there for only return 1 or textureCompareFailValue depending
+	/// on the test. The original texture value is only used for the
+	/// test. The normal usage of this is when using shadow mapping
+	/// to determine if a fragment is in shadow or not.
+	/// 
+	/// The valid values are:
+	/// <table>
+	/// <tr><td>"NONE"</td><td>No texture compare is done. Texture works as 
+	/// normal.</td></tr>
+	/// <tr><td>"GEQUAL"</td><td>Output texture value is 1 if R texture 
+	/// coordinate >= original texture value, textureCompareFailValue otherwise.</td> 
+	/// <tr><td>"LEQUAL"</td><td>Output texture value is 1 if R texture 
+	/// coordinate <= original texture value, textureCompareFailValue otherwise.</td> 
+	/// </table>
+	///
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Valid values:</b> "NONE", "GEQUAL", "LEQUAL" \n
+	/// <b>Default value:</b> "NONE" \n
+	///
+	/// \dotfile TextureProperties_textureCompareMode.dot   
+	auto_ptr< SFString > textureCompareMode;
 
-    /// The textureType specifies the format of the texture. Can be used to set a
-    /// specific sized internal format and pixel format used by glTexImageXX calls,
-    /// This field is ignored if the textureCompression is not DEFAULT.
-    /// 
-    /// The valid values are:
-    /// <table>
-    /// <tr><td>"NORMAL"</td><td> Format is decided by the internal Image data read from file
-    /// or by default settings for a texture type.</td></tr>
-    /// <tr><td>"INTEGER"</td><td>internal format and pixel format are as defined in the
-    /// OpenGL extension EXT_texture_integer. The image (if there is one) decides number
-    /// of bytes, number of channels and whether the data is unsigned or signed.</td> </tr>
-    /// <tr><td>"FLOAT"</td><td>internal format and pixel format are as defined in the
-    /// OpenGL extension ARB_texture_float. The internal Image class (if there is one) decides number
-    /// of bytes and number of channels.</td> </tr>
-    /// </table>
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Valid values:</b> "NORMAL", "INTEGER", "FLOAT" \n
-    /// <b>Default value:</b> "NORMAL" \n
-    /// \todo Perhaps add "NORMALIZED" value to force that type of behaviour. Also test this
-    /// feature when mixing RATIONAL image with INTEGER set textureFormat. Does that even work?
-    /// Finally, set up tests for all cases. I assume future me will hate past me because
-    /// he did not have time for full proper tests when adding this feature.
-    ///
-    /// \dotfile TextureProperties_textureFormat.dot
-    auto_ptr< SFString > textureFormat;
+	/// The textureCompareFailValue contains the value to use as texture
+	/// output when the test in textureCompareMode fails.
+	///
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Default value:</b> 0 \n
+	///
+	/// \dotfile TextureProperties_textureCompareMode.dot  
+	auto_ptr< SFFloat > textureCompareFailValue;
 
-    /// Function that returns true if internal_format input is set.
-    virtual bool glInternalFormat( Image *image, GLint &internal_format );
 
-    /// Function that returns true if pixel_format input is set.
-    virtual bool glPixelFormat( Image *image, GLenum &pixel_format );
+	/// The textureType specifies what texture target type
+	/// should be used for the texture. This can affect how texture
+	/// values are interpolated and how texture coordinates are 
+	/// used to look up into the texture.
+	/// 
+	/// The valid values are:
+	/// <table>
+	/// <tr><td>"NORMAL"</td><td>GL_TEXTURE_2D for 2d textures and GL_TEXTURE_3D for 3d 
+	/// textures.</td></tr>
+	/// <tr><td>"2D_RECTANGLE"</td><td>GL_TEXTURE_RECTANGLE. Only valid for 2D textures. 
+	/// Make the texture lookup in pixel space instead of as normal with normalized
+	/// coordinates. E.g. tex coord (4,5) will look up the pixel with that index directly</td> </tr>
+	/// <tr><td>"2D_ARRAY"</td><td>GL_TEXTURE_2D_ARRAY. Only valid for 3D textures and together with shaders. 
+	/// Texture is a stack of 2D images where the R component specifies the
+	/// index of the 2D image to use. </td> </tr>
+	/// </table>
+	///
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Valid values:</b> "NORMAL", "2D_RECTANGLE"(if 2d texture), "2D_ARRAY"(if 3d texture) \n
+	/// <b>Default value:</b> "NORMAL" \n
+	///
+	/// \dotfile TextureProperties_textureType.dot
+	auto_ptr< SFString > textureType;
+
+	/// The H3DNodeDatabase for this node.
+	static H3DNodeDatabase database;
+
+	/// The textureType specifies the format of the texture. Can be used to set a
+	/// specific sized internal format and pixel format used by glTexImageXX calls,
+	/// This field is ignored if the textureCompression is not DEFAULT.
+	/// 
+	/// The valid values are:
+	/// <table>
+	/// <tr><td>"NORMAL"</td><td> Format is decided by the internal Image data read from file
+	/// or by default settings for a texture type.</td></tr>
+	/// <tr><td>"INTEGER"</td><td>internal format and pixel format are as defined in the
+	/// OpenGL extension EXT_texture_integer. The image (if there is one) decides number
+	/// of bytes, number of channels and whether the data is unsigned or signed.</td> </tr>
+	/// <tr><td>"FLOAT"</td><td>internal format and pixel format are as defined in the
+	/// OpenGL extension ARB_texture_float. The internal Image class (if there is one) decides number
+	/// of bytes and number of channels.</td> </tr>
+	/// </table>
+	///
+	/// <b>Access type:</b> inputOutput \n
+	/// <b>Valid values:</b> "NORMAL", "INTEGER", "FLOAT" \n
+	/// <b>Default value:</b> "NORMAL" \n
+	/// \todo Perhaps add "NORMALIZED" value to force that type of behaviour. Also test this
+	/// feature when mixing RATIONAL image with INTEGER set textureFormat. Does that even work?
+	/// Finally, set up tests for all cases. I assume future me will hate past me because
+	/// he did not have time for full proper tests when adding this feature.
+	///
+	/// \dotfile TextureProperties_textureFormat.dot
+	auto_ptr< SFString > textureFormat;
+
+	/// Function that returns true if internal_format input is set.
+	virtual bool glInternalFormat( Image *image, GLint &internal_format );
+
+	/// Function that returns true if pixel_format input is set.
+	virtual bool glPixelFormat( Image *image, GLenum &pixel_format );
   };
 }
 

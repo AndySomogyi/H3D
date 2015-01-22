@@ -7,11 +7,13 @@
 
 #include <GL/glew.h>
 
+	static const GLbitfield defaultMapFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
+	static const GLbitfield defaultCreateFlags = defaultMapFlags | GL_DYNAMIC_STORAGE_BIT;
+
 namespace H3D
 {
 	// --------------------------------------------------------------------------------------------------------------------
-	enum BufferStorage 
-	{
+	enum BufferStorage {
 		SystemMemory = 0,
 		PersistentlyMappedBuffer
 	};
@@ -26,23 +28,19 @@ namespace H3D
 		{ 
 		}
 
-		~Buffer()
-		{
+		~Buffer() {
 			Destroy();
 		}
 
 		bool Create(BufferStorage _storage, GLenum _target, GLuint _atomCount, 
-			GLbitfield _createFlags, GLbitfield _mapFlags)
-		{
+			GLbitfield _createFlags = defaultCreateFlags, GLbitfield _mapFlags = defaultMapFlags) {
 			//If we already had data, clean that up first
-			if(bufferContents) 
-			{
+			if(bufferContents) {
 				Destroy();        
 			}
 
 			//Sanity check :)
-			if(bufferStorage == PersistentlyMappedBuffer)
-			{
+			if(bufferStorage == PersistentlyMappedBuffer) {
 #ifndef GLEW_ARB_buffer_storage
 				std::cout << "Creating a persistently mapped buffer failed because ARB_buffer_storage is not supported.";
 				return false;
@@ -73,7 +71,7 @@ namespace H3D
 
 					unsigned int bufferSize = sizeof(Atom) * _atomCount;
 
-					//glBufferStorage(target, bufferSize, nullptr, _createFlags);
+					glBufferStorage(target, bufferSize, nullptr, _createFlags);
 					bufferContents = reinterpret_cast<Atom*>(glMapBufferRange(target, 0, bufferSize, _mapFlags));
 
 					if(!bufferContents) 
@@ -157,7 +155,7 @@ namespace H3D
 		{ 
 		}
 
-		bool Create(BufferStorage _storage, GLenum _target, GLuint _atomCount, GLbitfield _createFlags, GLbitfield _mapFlags)
+		bool Create(BufferStorage _storage, GLenum _target, GLuint _atomCount, GLbitfield _createFlags = defaultCreateFlags, GLbitfield _mapFlags = defaultMapFlags)
 		{
 			head = 0;
 			sizeAtoms = _atomCount;

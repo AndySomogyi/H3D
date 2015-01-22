@@ -39,28 +39,28 @@
 namespace {
   /// X3D string containing frame buffer object used to save texture to file
   const std::string save_to_url_x3d= 
-    "<FrameBufferTextureGenerator DEF='GENERATOR' outputTextureType='2D' generateColorTextures='RGBA' update='NONE'>"
-    "  <Shape>"
-    "    <Appearance DEF='APP' />"
-    "    <FullscreenRectangle zValue='0.99' screenAligned='true' /> "
-    "  </Shape>"
-    "</FrameBufferTextureGenerator>";
+	"<FrameBufferTextureGenerator DEF='GENERATOR' outputTextureType='2D' generateColorTextures='RGBA' update='NONE'>"
+	"  <Shape>"
+	"    <Appearance DEF='APP' />"
+	"    <FullscreenRectangle zValue='0.99' screenAligned='true' /> "
+	"  </Shape>"
+	"</FrameBufferTextureGenerator>";
   const std::string save_to_url_floating_point_x3d=
-    "<FrameBufferTextureGenerator DEF='GENERATOR' outputTextureType='2D' generateColorTextures='RGBA32F' update='NONE'>"
-    "  <Shape>"
-    "    <Appearance DEF='APP' />"
-    "    <FullscreenRectangle zValue='0.99' screenAligned='true' /> "
-    "  </Shape>"
-    "</FrameBufferTextureGenerator>";
+	"<FrameBufferTextureGenerator DEF='GENERATOR' outputTextureType='2D' generateColorTextures='RGBA32F' update='NONE'>"
+	"  <Shape>"
+	"    <Appearance DEF='APP' />"
+	"    <FullscreenRectangle zValue='0.99' screenAligned='true' /> "
+	"  </Shape>"
+	"</FrameBufferTextureGenerator>";
 }
 
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase X3DTextureNode::database( "X3DTextureNode", 
-                                          NULL, 
-                                          typeid( X3DTextureNode ),
-                                          &(X3DAppearanceChildNode::database) );
+										  NULL, 
+										  typeid( X3DTextureNode ),
+										  &(X3DAppearanceChildNode::database) );
 
 namespace X3DTextureNodeInternals {
   FIELDDB_ELEMENT( X3DTextureNode, saveToUrl, INPUT_OUTPUT );
@@ -78,68 +78,68 @@ X3DTextureNode *X3DTextureNode::active_texture = NULL;
 GLint X3DTextureNode::glInternalFormat( Image *i ) {
   switch( i->pixelType() ) {
   case Image::LUMINANCE: 
-    if( GLEW_ARB_texture_float && 
-        i->pixelComponentType() == Image::RATIONAL ) {
-      if( i->bitsPerPixel() <= 16 ) return GL_LUMINANCE16F_ARB;
-      else return GL_LUMINANCE32F_ARB;
-    } else {
-      switch( i->bitsPerPixel() ) {
-      case 4:  return GL_LUMINANCE4;
-      case 8:  return GL_LUMINANCE8;
-      case 12: return GL_LUMINANCE12;
-      case 16: return GL_LUMINANCE16;
-      default: return GL_LUMINANCE;
-      }
-    }
+	if( GLEW_ARB_texture_float && 
+		i->pixelComponentType() == Image::RATIONAL ) {
+	  if( i->bitsPerPixel() <= 16 ) return GL_LUMINANCE16F_ARB;
+	  else return GL_LUMINANCE32F_ARB;
+	} else {
+	  switch( i->bitsPerPixel() ) {
+	  case 4:  return GL_LUMINANCE4;
+	  case 8:  return GL_LUMINANCE8;
+	  case 12: return GL_LUMINANCE12;
+	  case 16: return GL_LUMINANCE16;
+	  default: return GL_LUMINANCE;
+	  }
+	}
   case Image::LUMINANCE_ALPHA:
-    if( GLEW_ARB_texture_float && 
-        i->pixelComponentType() == Image::RATIONAL ) {
-      if( i->bitsPerPixel() <= 32 ) return GL_LUMINANCE_ALPHA16F_ARB;
-      else return GL_LUMINANCE_ALPHA32F_ARB;
-    } else {
-      switch( i->bitsPerPixel() ) {
-      case 8:  return GL_LUMINANCE4_ALPHA4;
-      case 16: return GL_LUMINANCE8_ALPHA8;
-      case 32: return GL_LUMINANCE16_ALPHA16;
-      default: return GL_LUMINANCE_ALPHA;
-      }
-    }
+	if( GLEW_ARB_texture_float && 
+		i->pixelComponentType() == Image::RATIONAL ) {
+	  if( i->bitsPerPixel() <= 32 ) return GL_LUMINANCE_ALPHA16F_ARB;
+	  else return GL_LUMINANCE_ALPHA32F_ARB;
+	} else {
+	  switch( i->bitsPerPixel() ) {
+	  case 8:  return GL_LUMINANCE4_ALPHA4;
+	  case 16: return GL_LUMINANCE8_ALPHA8;
+	  case 32: return GL_LUMINANCE16_ALPHA16;
+	  default: return GL_LUMINANCE_ALPHA;
+	  }
+	}
   case Image::RGB:
   case Image::BGR:
-    if( GLEW_ARB_texture_float && 
-        i->pixelComponentType() == Image::RATIONAL ) {
-      if( i->bitsPerPixel() <= 48 ) return GL_RGB16F_ARB;
-      else return GL_RGB32F_ARB;
-    } else {
-      switch( i->bitsPerPixel() ) {
-      case 12: return GL_RGB4;
-      case 15: return GL_RGB5;
-      case 24: return GL_RGB8;
-      case 30: return GL_RGB10;
-      case 36: return GL_RGB12;
-      case 48: return GL_RGB16;
-      default: return GL_RGB;
-      }
-    }
+	if( GLEW_ARB_texture_float && 
+		i->pixelComponentType() == Image::RATIONAL ) {
+	  if( i->bitsPerPixel() <= 48 ) return GL_RGB16F_ARB;
+	  else return GL_RGB32F_ARB;
+	} else {
+	  switch( i->bitsPerPixel() ) {
+	  case 12: return GL_RGB4;
+	  case 15: return GL_RGB5;
+	  case 24: return GL_RGB8;
+	  case 30: return GL_RGB10;
+	  case 36: return GL_RGB12;
+	  case 48: return GL_RGB16;
+	  default: return GL_RGB;
+	  }
+	}
   case Image::RGBA:
   case Image::BGRA:
-    if( GLEW_ARB_texture_float && 
-        i->pixelComponentType() == Image::RATIONAL ) {
-      if( i->bitsPerPixel() <= 64 ) return GL_RGBA16F_ARB;
-      else return GL_RGBA32F_ARB;
-    } else {
-      switch( i->bitsPerPixel() ) {
-      case 16: return GL_RGBA4;
-      case 32: return GL_RGBA8;
-      case 48: return GL_RGBA12;
-      case 64: return GL_RGBA16;
-      default: return GL_RGBA;
-      }
-    }
+	if( GLEW_ARB_texture_float && 
+		i->pixelComponentType() == Image::RATIONAL ) {
+	  if( i->bitsPerPixel() <= 64 ) return GL_RGBA16F_ARB;
+	  else return GL_RGBA32F_ARB;
+	} else {
+	  switch( i->bitsPerPixel() ) {
+	  case 16: return GL_RGBA4;
+	  case 32: return GL_RGBA8;
+	  case 48: return GL_RGBA12;
+	  case 64: return GL_RGBA16;
+	  default: return GL_RGBA;
+	  }
+	}
   default:
-    throw UnsupportedPixelType( i->pixelType() );
+	throw UnsupportedPixelType( i->pixelType() );
   }
-    
+	
 }
 
 GLenum X3DTextureNode::glPixelFormat( Image *i ) {
@@ -157,173 +157,173 @@ GLenum X3DTextureNode::glPixelFormat( Image *i ) {
 GLenum X3DTextureNode::glPixelComponentType( Image *i ) {
   switch( i->pixelType() ) {
   case Image::LUMINANCE: 
-    switch( i->pixelComponentType() ) {
-    case Image::UNSIGNED: 
-      switch( i->bitsPerPixel() ) {
-      case 8:  return GL_UNSIGNED_BYTE;
-      case 16: return GL_UNSIGNED_SHORT;
-      case 32: return GL_UNSIGNED_INT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit UNSIGNED LUMINANCE value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION ); 
-      }
-    case Image::SIGNED:
-      switch( i->bitsPerPixel() ) {
-      case 8:  return GL_BYTE;
-      case 16: return GL_SHORT;
-      case 32: return GL_INT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit SIGNED LUMINANCE value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION ); 
-      }
-    case Image::RATIONAL:
-      switch( i->bitsPerPixel() ) {
-      case 32: return GL_FLOAT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit RATIONAL LUMINANCE value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION ); 
-      }
-    }
+	switch( i->pixelComponentType() ) {
+	case Image::UNSIGNED: 
+	  switch( i->bitsPerPixel() ) {
+	  case 8:  return GL_UNSIGNED_BYTE;
+	  case 16: return GL_UNSIGNED_SHORT;
+	  case 32: return GL_UNSIGNED_INT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit UNSIGNED LUMINANCE value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION ); 
+	  }
+	case Image::SIGNED:
+	  switch( i->bitsPerPixel() ) {
+	  case 8:  return GL_BYTE;
+	  case 16: return GL_SHORT;
+	  case 32: return GL_INT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit SIGNED LUMINANCE value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION ); 
+	  }
+	case Image::RATIONAL:
+	  switch( i->bitsPerPixel() ) {
+	  case 32: return GL_FLOAT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit RATIONAL LUMINANCE value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION ); 
+	  }
+	}
   case Image::LUMINANCE_ALPHA:
-    switch( i->pixelComponentType() ) {
-    case Image::UNSIGNED: 
-      switch( i->bitsPerPixel() ) {
-      case 16:  return GL_UNSIGNED_BYTE;
-      case 32: return GL_UNSIGNED_SHORT;
-      case 64: return GL_UNSIGNED_INT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit UNSIGNED LUMINANCE_ALPHA value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
-      }
-    case Image::SIGNED:
-      switch( i->bitsPerPixel() ) {
-      case 16:  return GL_BYTE;
-      case 32: return GL_SHORT;
-      case 64: return GL_INT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit SIGNED LUMINANCE_ALPHA value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
-      }
-    case Image::RATIONAL:
-      switch( i->bitsPerPixel() ) {
-      case 64: return GL_FLOAT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit RATIONAL LUMINANCE_ALPHA value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	switch( i->pixelComponentType() ) {
+	case Image::UNSIGNED: 
+	  switch( i->bitsPerPixel() ) {
+	  case 16:  return GL_UNSIGNED_BYTE;
+	  case 32: return GL_UNSIGNED_SHORT;
+	  case 64: return GL_UNSIGNED_INT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit UNSIGNED LUMINANCE_ALPHA value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	  }
+	case Image::SIGNED:
+	  switch( i->bitsPerPixel() ) {
+	  case 16:  return GL_BYTE;
+	  case 32: return GL_SHORT;
+	  case 64: return GL_INT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit SIGNED LUMINANCE_ALPHA value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	  }
+	case Image::RATIONAL:
+	  switch( i->bitsPerPixel() ) {
+	  case 64: return GL_FLOAT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit RATIONAL LUMINANCE_ALPHA value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
 
-      }
-    }
+	  }
+	}
   case Image::RGB:
   case Image::BGR:
-    switch( i->pixelComponentType() ) {
-    case Image::UNSIGNED: 
-      switch( i->bitsPerPixel() ) {
-      case 24:  return GL_UNSIGNED_BYTE;
-      case 48: return GL_UNSIGNED_SHORT;
-      case 96: return GL_UNSIGNED_INT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit UNSIGNED RGB value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
-      }
-    case Image::SIGNED:
-      switch( i->bitsPerPixel() ) {
-      case 24:  return GL_BYTE;
-      case 48: return GL_SHORT;
-      case 96: return GL_INT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit SIGNED RGB value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	switch( i->pixelComponentType() ) {
+	case Image::UNSIGNED: 
+	  switch( i->bitsPerPixel() ) {
+	  case 24:  return GL_UNSIGNED_BYTE;
+	  case 48: return GL_UNSIGNED_SHORT;
+	  case 96: return GL_UNSIGNED_INT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit UNSIGNED RGB value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	  }
+	case Image::SIGNED:
+	  switch( i->bitsPerPixel() ) {
+	  case 24:  return GL_BYTE;
+	  case 48: return GL_SHORT;
+	  case 96: return GL_INT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit SIGNED RGB value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
 
-      }
-    case Image::RATIONAL:
-      switch( i->bitsPerPixel() ) {
-      case 96: return GL_FLOAT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit RATIONAL RGB value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	  }
+	case Image::RATIONAL:
+	  switch( i->bitsPerPixel() ) {
+	  case 96: return GL_FLOAT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit RATIONAL RGB value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
 
-      }
-    }       
+	  }
+	}       
 
   case Image::RGBA:
   case Image::BGRA:
-    switch( i->pixelComponentType() ) {
-    case Image::UNSIGNED: 
-      switch( i->bitsPerPixel() ) {
-      case 32:  return GL_UNSIGNED_BYTE;
-      case 64:  return GL_UNSIGNED_SHORT;
-      case 128: return GL_UNSIGNED_INT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit UNSIGNED RGBA value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
-      }
-    case Image::SIGNED:
-      switch( i->bitsPerPixel() ) {
-      case 32:  return GL_BYTE;
-      case 64: return GL_SHORT;
-      case 128: return GL_INT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit SIGNED RGBA value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
-      }
-    case Image::RATIONAL:
-      switch( i->bitsPerPixel() ) {
-      case 64: return GL_HALF_FLOAT;
-      case 128: return GL_FLOAT;
-      default: 
-        stringstream s;
-        s << "Cannot find OpenGL type for "
-          << i->bitsPerPixel() 
-          << " bit RATIONAL RGBA value.";
-        throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
-      }
-    }
+	switch( i->pixelComponentType() ) {
+	case Image::UNSIGNED: 
+	  switch( i->bitsPerPixel() ) {
+	  case 32:  return GL_UNSIGNED_BYTE;
+	  case 64:  return GL_UNSIGNED_SHORT;
+	  case 128: return GL_UNSIGNED_INT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit UNSIGNED RGBA value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	  }
+	case Image::SIGNED:
+	  switch( i->bitsPerPixel() ) {
+	  case 32:  return GL_BYTE;
+	  case 64: return GL_SHORT;
+	  case 128: return GL_INT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit SIGNED RGBA value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	  }
+	case Image::RATIONAL:
+	  switch( i->bitsPerPixel() ) {
+	  case 64: return GL_HALF_FLOAT;
+	  case 128: return GL_FLOAT;
+	  default: 
+		stringstream s;
+		s << "Cannot find OpenGL type for "
+		  << i->bitsPerPixel() 
+		  << " bit RATIONAL RGBA value.";
+		throw UnsupportedPixelComponentType( s.str(), H3D_FULL_LOCATION );
+	  }
+	}
   default:
-    throw UnsupportedPixelType( i->pixelType() );
+	throw UnsupportedPixelType( i->pixelType() );
   }
 
 }
 
 X3DTextureNode::X3DTextureNode( 
-                               Inst< DisplayList > _displayList,
-                               Inst< SFNode>  _metadata,
-                               Inst< UpdateSaveToURL > _saveToUrl,
-                               Inst< SFBool > _saveSuccess,
-                               Inst< SFInt32 > _saveHeight,
-                               Inst< SFInt32 > _saveWidth ):
+							   Inst< DisplayList > _displayList,
+							   Inst< SFNode>  _metadata,
+							   Inst< UpdateSaveToURL > _saveToUrl,
+							   Inst< SFBool > _saveSuccess,
+							   Inst< SFInt32 > _saveHeight,
+							   Inst< SFInt32 > _saveWidth ):
   X3DAppearanceChildNode( _displayList, _metadata ),
   saveToUrl ( _saveToUrl ),
   saveSuccess ( _saveSuccess ),
@@ -338,65 +338,74 @@ X3DTextureNode::X3DTextureNode(
   saveWidth->setValue ( -1 );
 }
 
-GLuint X3DTextureNode::renderImage( Image *image, 
-                                    GLenum texture_target, 
-                                    bool scale_to_power_of_two ) {
+TextureHandle X3DTextureNode::renderImage( Image *image, 
+									GLenum texture_target, 
+									bool scale_to_power_of_two,
+									TextureProperties* texture_properties) {
   if( image ) {
-    GLuint texture_id;
-    glGenTextures( 1, &texture_id );
-    glBindTexture( texture_target, texture_id );
+	TextureHandle texHandle;
+	GLint internal_format = 0;
+	texture_properties->glInternalFormat(image, internal_format);
 
-    while( glGetError() != GL_NO_ERROR )
-      ;
-    glTexImage( image, texture_target, scale_to_power_of_two );
+	TextureManager::getInstance().createTextureHandle(texture_target, image->width(), image->height(), image->depth(), 
+		internal_format, image->pixelType(), image->pixelComponentType(), texture_properties, scale_to_power_of_two, texHandle); 
 
-    GLenum error = glGetError();
-    if( error != GL_NO_ERROR ) {
+	glBindTexture( texture_target, texHandle.ogl_texture_id );
 
-      stringstream msg;
+	while( glGetError() != GL_NO_ERROR ){
+		//Fix...
+	}
 
-      GLint border_width;
-      glGetTexLevelParameteriv( texture_target, 0, GL_TEXTURE_BORDER, &border_width );
-      
-      string m;
-      if( border_width == 0 ) {
-        m = "(expecting power of 2)";
-      } else {
-        m = "(must be 2^k + 2*border_width for some integer k)(border_width=1)";
-      }
+	/* Actually fills up the texture ... Polymorphic base function, gets overloaded and defined by children. */
+	glTexImage( image, texture_target, scale_to_power_of_two );
 
-      H3DInt32 total_border = border_width * 2;
+	GLenum error = glGetError();
+	if( error != GL_NO_ERROR ) {
 
-      // check that the dimensions of the image is a power of 2.
-      bool invalid_dimensions = false;
-      if( !isPowerOfTwo( image->width() - total_border ) ) {
-        msg <<" Width " <<image->width() 
-            << m;
-        invalid_dimensions = true;
-      }
-      if( !isPowerOfTwo( image->height() - total_border ) ) {
-        msg <<" Height " <<image->height() 
-            << m;
-        invalid_dimensions = true;
-      }
-      if( !isPowerOfTwo( image->depth() - total_border ) ) {
-        msg <<" Depth " <<image->depth() 
-            <<m ;
-        invalid_dimensions = true;
-      }
-      if( invalid_dimensions ) {
-        msg << " in " << name;
-        throw InvalidTextureDimensions( msg.str(),
-                                        H3D_FULL_LOCATION );
-      }
-      msg << (char*) gluErrorString( error ) << " in " << name;
-      throw OpenGLTextureError( (char*) gluErrorString( error ),
-                                H3D_FULL_LOCATION );
-    } 
+	  stringstream msg;
 
-    return texture_id;
+	  GLint border_width;
+	  glGetTexLevelParameteriv( texture_target, 0, GL_TEXTURE_BORDER, &border_width );
+	  
+	  string m;
+	  if( border_width == 0 ) {
+		m = "(expecting power of 2)";
+	  } else {
+		m = "(must be 2^k + 2*border_width for some integer k)(border_width=1)";
+	  }
+
+	  H3DInt32 total_border = border_width * 2;
+
+	  // check that the dimensions of the image is a power of 2.
+	  bool invalid_dimensions = false;
+	  if( !isPowerOfTwo( image->width() - total_border ) ) {
+		msg <<" Width " <<image->width() 
+			<< m;
+		invalid_dimensions = true;
+	  }
+	  if( !isPowerOfTwo( image->height() - total_border ) ) {
+		msg <<" Height " <<image->height() 
+			<< m;
+		invalid_dimensions = true;
+	  }
+	  if( !isPowerOfTwo( image->depth() - total_border ) ) {
+		msg <<" Depth " <<image->depth() 
+			<<m ;
+		invalid_dimensions = true;
+	  }
+	  if( invalid_dimensions ) {
+		msg << " in " << name;
+		throw InvalidTextureDimensions( msg.str(),
+										H3D_FULL_LOCATION );
+	  }
+	  msg << (char*) gluErrorString( error ) << " in " << name;
+	  throw OpenGLTextureError( (char*) gluErrorString( error ),
+								H3D_FULL_LOCATION );
+	}
+
+	return texHandle;
   } else { 
-    return 0;
+	return TextureHandle(); //Return null handle...
   }
 
 }
@@ -409,9 +418,9 @@ Image* X3DTextureNode::renderToImage ( H3DInt32 _width, H3DInt32 _height, bool o
   X3D::DEFNodes dn;
   AutoRef<FrameBufferTextureGenerator> fbo;
   if( output_float_texture ) {
-    fbo.reset( static_cast<FrameBufferTextureGenerator*>(X3D::createX3DNodeFromString ( save_to_url_floating_point_x3d, &dn ).get() ) );
+	fbo.reset( static_cast<FrameBufferTextureGenerator*>(X3D::createX3DNodeFromString ( save_to_url_floating_point_x3d, &dn ).get() ) );
   }else{
-    fbo.reset( static_cast<FrameBufferTextureGenerator*>(X3D::createX3DNodeFromString ( save_to_url_x3d, &dn ).get() ) );
+	fbo.reset( static_cast<FrameBufferTextureGenerator*>(X3D::createX3DNodeFromString ( save_to_url_x3d, &dn ).get() ) );
   }
 
   // Set texture save dimensions
@@ -428,41 +437,41 @@ Image* X3DTextureNode::renderToImage ( H3DInt32 _width, H3DInt32 _height, bool o
 
   // Check that FrameBufferTextureGenerator succeeded.
   if( fbo->isFBOInitialized() ) {
-    // frame buffer size, width was set earlier in the code.
-    int buffer_width = fbo->width->getValue();
-    int buffer_height = fbo->height->getValue();
+	// frame buffer size, width was set earlier in the code.
+	int buffer_width = fbo->width->getValue();
+	int buffer_height = fbo->height->getValue();
 
-    int bpp;
+	int bpp;
 
-    // Create container for image data, then bind buffer and read from it.
-    Image* image;
-    if( output_float_texture ) {
-      bpp = sizeof(float)*8*4;
-      image= new PixelImage ( buffer_width, buffer_height, 1, bpp, Image::RGBA, Image::RATIONAL );
-    }else{
-      bpp = 32;
-      image= new PixelImage ( buffer_width, buffer_height, 1, bpp, Image::BGRA, Image::UNSIGNED );
-    }
-    
-    
+	// Create container for image data, then bind buffer and read from it.
+	Image* image;
+	if( output_float_texture ) {
+	  bpp = sizeof(float)*8*4;
+	  image= new PixelImage ( buffer_width, buffer_height, 1, bpp, Image::RGBA, Image::RATIONAL );
+	}else{
+	  bpp = 32;
+	  image= new PixelImage ( buffer_width, buffer_height, 1, bpp, Image::BGRA, Image::UNSIGNED );
+	}
+	
+	
 
-    // Save current FBO
-    GLint previous_fbo_id;
-    glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &previous_fbo_id );
+	// Save current FBO
+	GLint previous_fbo_id;
+	glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &previous_fbo_id );
 
-    glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, fbo->getFBOId() );
-    if( output_float_texture ) {
-      glReadPixels( 0, 0, buffer_width, buffer_height, GL_RGBA, GL_FLOAT, image->getImageData() );
-    }else{
-      glReadPixels( 0, 0, buffer_width, buffer_height, GL_BGRA, GL_UNSIGNED_BYTE, image->getImageData() );
-    }
-    
-    
+	glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, fbo->getFBOId() );
+	if( output_float_texture ) {
+	  glReadPixels( 0, 0, buffer_width, buffer_height, GL_RGBA, GL_FLOAT, image->getImageData() );
+	}else{
+	  glReadPixels( 0, 0, buffer_width, buffer_height, GL_BGRA, GL_UNSIGNED_BYTE, image->getImageData() );
+	}
+	
+	
 
-    // Restore previous FBO
-    glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, previous_fbo_id );
+	// Restore previous FBO
+	glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, previous_fbo_id );
 
-    return image;
+	return image;
   }
 
   return NULL;
@@ -478,26 +487,26 @@ void X3DTextureNode::UpdateSaveToURL::onNewValue( const std::string &v ) {
   std::pair<H3DInt32,H3DInt32> default_size= node->getDefaultSaveDimensions ();
   AutoRef<Image> image;
   ( node->renderToImage (
-     node->saveWidth->getValue()  == -1 ? default_size.first  : node->saveWidth->getValue(),
-     node->saveHeight->getValue() == -1 ? default_size.second : node->saveHeight->getValue()) );
+	 node->saveWidth->getValue()  == -1 ? default_size.first  : node->saveWidth->getValue(),
+	 node->saveHeight->getValue() == -1 ? default_size.second : node->saveHeight->getValue()) );
   if( v.find(".exr")!=string::npos ) {
-    image.reset( node->renderToImage (
-      node->saveWidth->getValue()  == -1 ? default_size.first  : node->saveWidth->getValue(),
-      node->saveHeight->getValue() == -1 ? default_size.second : node->saveHeight->getValue(), true) );
+	image.reset( node->renderToImage (
+	  node->saveWidth->getValue()  == -1 ? default_size.first  : node->saveWidth->getValue(),
+	  node->saveHeight->getValue() == -1 ? default_size.second : node->saveHeight->getValue(), true) );
 #ifdef HAVE_OPENEXR
-    if( image.get() ) {
-      node->saveSuccess->setValue(H3DUtil::saveOpenEXRImage(v, *image), node->id );
-    }
+	if( image.get() ) {
+	  node->saveSuccess->setValue(H3DUtil::saveOpenEXRImage(v, *image), node->id );
+	}
 #else
-    Console(4) << "Warning: Could not save texture to file! Compiled without the required OpenEXR library." << endl;
+	Console(4) << "Warning: Could not save texture to file! Compiled without the required OpenEXR library." << endl;
 #endif
   }else{
-    image.reset(node->renderToImage (
-      node->saveWidth->getValue()  == -1 ? default_size.first  : node->saveWidth->getValue(),
-      node->saveHeight->getValue() == -1 ? default_size.second : node->saveHeight->getValue()) );
-    if ( image.get() ) {
-      node->saveSuccess->setValue ( H3DUtil::saveFreeImagePNG ( v, *image ), node->id );
-    }
+	image.reset(node->renderToImage (
+	  node->saveWidth->getValue()  == -1 ? default_size.first  : node->saveWidth->getValue(),
+	  node->saveHeight->getValue() == -1 ? default_size.second : node->saveHeight->getValue()) );
+	if ( image.get() ) {
+	  node->saveSuccess->setValue ( H3DUtil::saveFreeImagePNG ( v, *image ), node->id );
+	}
   }
   
 #else // HAVE_FREEIMAGE

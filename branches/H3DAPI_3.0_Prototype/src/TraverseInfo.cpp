@@ -45,7 +45,8 @@ current_layer( 0 ),
 	graphics_enabled( true ),
 	multi_pass_transparency( false ), 
 	renderer(_renderer),
-	currentRenderState()
+	currentRenderState(),
+	transformDirtyFlag(false)
 {
 	initializeLayers( 1 );
 	haptics_enabled.reserve( haptics_devices.size() ); 

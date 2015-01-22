@@ -84,6 +84,8 @@ FitToBoxTransform::FitToBoxTransform(
   bound->route( matrix );
   uniformScalingOnly->route( matrix );
   active->route( matrix );
+
+  matrix->routeNoEvent(isDirty);
 }
 
 void FitToBoxTransform::SFMatrix4f::update() {

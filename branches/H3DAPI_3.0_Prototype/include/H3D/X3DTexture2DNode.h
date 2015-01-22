@@ -35,160 +35,161 @@
 #include <H3D/DependentNodeFields.h>
 
 namespace H3D {
-  /// \ingroup AbstractNodes
-  /// \brief This abstract node type is the base type for all node types which
-  /// specify 2D sources for texture images. 
-  ///
-  /// \par Internal routes:
-  /// \dotfile X3DTexture2DNode.dot  
-  class H3DAPI_API X3DTexture2DNode : 
-    public H3DSingleTextureNode,
-    public H3DImageObject {
-  public:
-    /// A SFNode encapsulating an Image class
-    class H3DAPI_API SFImage: public H3DImageObject::SFImage {
-    public:
-      virtual void setValueFromString( const string &s );
+	/// \ingroup AbstractNodes
+	/// \brief This abstract node type is the base type for all node types which
+	/// specify 2D sources for texture images. 
+	///
+	/// \par Internal routes:
+	/// \dotfile X3DTexture2DNode.dot  
+	class H3DAPI_API X3DTexture2DNode : 
+		public H3DSingleTextureNode,
+		public H3DImageObject {
+	public:
+		/// A SFNode encapsulating an Image class
+		class H3DAPI_API SFImage: public H3DImageObject::SFImage {
+		public:
+			virtual void setValueFromString( const string &s );
 
-      virtual string getValueAsString(const string& separator = " ");
+			virtual string getValueAsString(const string& separator = " ");
 
-      virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFIMAGE; }
-     };
-        
-    /// The SFTextureProperties is dependent on the propertyChanged field of
-    /// the contained TextureProperties.
-    typedef  DependentSFNode< FieldRef<TextureProperties,
-                                       Field,
-                                       &TextureProperties::propertyChanged > > 
-    SFTextureProperties;
-    
-    /// Constructor.
-    X3DTexture2DNode( Inst< DisplayList > _displayList = 0,
-                      Inst< SFNode  > _metadata  = 0,
-                      Inst< SFBool  > _repeatS   = 0,
-                      Inst< SFBool  > _repeatT   = 0,
-                      Inst< SFBool  > _scaleToP2 = 0,
-                      Inst< SFImage > _image     = 0,
-                      Inst< SFTextureProperties > _textureProperties = 0 );
+			virtual X3DTypes::X3DType getX3DType() { return X3DTypes::SFIMAGE; }
+		};
 
-    /// Destructor.
-    ~X3DTexture2DNode() {
-      if( texture_id ) glDeleteTextures( 1, &texture_id );
-    }
+		/// The SFTextureProperties is dependent on the propertyChanged field of
+		/// the contained TextureProperties.
+		typedef  DependentSFNode< FieldRef<TextureProperties,
+			Field,
+			&TextureProperties::propertyChanged > > 
+			SFTextureProperties;
 
-    /// Performs the OpenGL rendering required to install the image
-    /// as a texture.
-    virtual void render();
+		/// Constructor.
+		X3DTexture2DNode( Inst< DisplayList > _displayList = 0,
+			Inst< SFNode  > _metadata  = 0,
+			Inst< SFBool  > _repeatS   = 0,
+			Inst< SFBool  > _repeatT   = 0,
+			Inst< SFBool  > _scaleToP2 = 0,
+			Inst< SFImage > _image     = 0,
+			Inst< SFTextureProperties > _textureProperties = 0 );
 
-    /// Render all OpenGL texture properties.
-    virtual void renderTextureProperties();
+		/// Destructor.
+		~X3DTexture2DNode() {
+			//Lifetime of textures is now handled by TextureManager
+			//if( texture_id ) glDeleteTextures( 1, &texture_id );
+		}
 
-    /// Get the OpenGL texture id that is used for this texture.
-     virtual GLuint getTextureId() {
-      return texture_id;
-    }
+		/// Performs the OpenGL rendering required to install the image
+		/// as a texture.
+		virtual void render();
 
-    /// Get the OpenGL texture unit that is used for this texture.
-    virtual GLuint getTextureUnit() {
-      return texture_unit;
-    }
+		/// Render all OpenGL texture properties.
+		virtual void renderTextureProperties();
 
-    /// Get the OpenGL texture target that is used for this texture.
-    virtual GLenum getTextureTarget();
+		/// Get the OpenGL texture id that is used for this texture.
+		virtual GLuint getTextureId() {
+			return texture_handle.ogl_texture_id;
+		}
 
-    /// Get the bindless texture handle
-    virtual GLuint64 getTextureHandle();
+		/// Get the OpenGL texture unit that is used for this texture.
+		virtual GLuint getTextureUnit() {
+			return texture_unit;
+		}
 
-    /// Virtual function for making all OpenGL calls that are needed to
-    /// enable texturing for the texture.
-    ///
-    virtual void enableTexturing();
-      
-    /// Virtual function for making all OpenGL calls that are needed to
-    /// disable texturing for the texture.
-    ///
-    virtual void disableTexturing();
+		/// Get the OpenGL texture target that is used for this texture.
+		virtual GLenum getTextureTarget();
 
-    /// Returns the internal OpenGL format to use given an Image
-    virtual GLint glInternalFormat( Image *image );
+		/// Get the bindless texture handle
+		virtual GLuint64 getTextureHandle();
 
-    /// Installs the given image as a OpenGL texture with a call to 
-    /// the glTexImage2D function. This function is used by renderImage ()
-    /// and uses the glInternalFormat (), glPixelFormat () and
-    /// glPixelComponentType () functions to get the arguments to the
-    /// glTexImage2D call.
-    ///
-    virtual void glTexImage( Image *image, GLenum texture_target, 
-                             bool scale_to_power_of_two );
-      
-    /// Replaces part of the current texture from an image. 
-    virtual void renderSubImage( Image *image, GLenum texture_target, 
-                                 int xoffset, int yoffset,
-                                 int width, int height );
+		/// Virtual function for making all OpenGL calls that are needed to
+		/// enable texturing for the texture.
+		///
+		virtual void enableTexturing();
 
-    /// If true the texture will repeat itself when the s texture coordinate
-    /// is outside the range [0,1]. If false the texture will be clamped if
-    /// outside the same range.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> TRUE \n
-    ///
-    /// \dotfile X3DTexture2DNode_repeatS.dot 
-    auto_ptr< SFBool >  repeatS;
+		/// Virtual function for making all OpenGL calls that are needed to
+		/// disable texturing for the texture.
+		///
+		virtual void disableTexturing();
 
-    /// If true the texture will repeat itself when the t texture coordinate
-    /// is outside the range [0,1]. If false the texture will be clamped if
-    /// outside the same range.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> TRUE \n
-    ///
-    /// \dotfile X3DTexture2DNode_repeatT.dot 
-    auto_ptr< SFBool >  repeatT;
+		/// Returns the internal OpenGL format to use given an Image
+		virtual GLint glInternalFormat( Image *image );
 
-    /// If true the image used will be scaled so that the dimensions are a 
-    /// power of two if they are not. This will however take up more memory
-    /// and might cause some unwanted strething effects on the texture. The
-    /// new texture values will be linearly interpolated from the original 
-    /// ones.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> TRUE \n
-    ///
-    /// \dotfile X3DTexture2DNode_image.dot 
-    auto_ptr< SFBool > scaleToPowerOfTwo;
-    
-    /// The textureProperties field contains a TextureProperties node
-    /// which allows fine control over a texture's application.
-    /// 
-    /// <b>Access type:</b> inputOutput \n
-    ///
-    /// \dotfile X3DTexture2DNode_textureProperties.dot 
-    auto_ptr< SFTextureProperties >  textureProperties;
+		/// Installs the given image as a OpenGL texture with a call to 
+		/// the glTexImage2D function. This function is used by renderImage ()
+		/// and uses the glInternalFormat (), glPixelFormat () and
+		/// glPixelComponentType () functions to get the arguments to the
+		/// glTexImage2D call.
+		///
+		virtual void glTexImage( Image *image, GLenum texture_target, 
+			bool scale_to_power_of_two );
 
-    /// The H3DNodeDatabase for this node.
-    static H3DNodeDatabase database;
-  protected:
+		/// Replaces part of the current texture from an image. 
+		virtual void renderSubImage( Image *image, GLenum texture_target, 
+			int xoffset, int yoffset,
+			int width, int height );
 
-    /// Returns the default dimensions to use when this texture is saved to file.
-    ///
-    /// Returns the dimensions of the Image object
-    ///
-    virtual std::pair<H3DInt32,H3DInt32> getDefaultSaveDimensions ();
+		/// If true the texture will repeat itself when the s texture coordinate
+		/// is outside the range [0,1]. If false the texture will be clamped if
+		/// outside the same range.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> TRUE \n
+		///
+		/// \dotfile X3DTexture2DNode_repeatS.dot 
+		auto_ptr< SFBool >  repeatS;
 
-    /// The OpenGL texture id of the installed texture, 0 if not installed.
-    GLuint texture_id;
-    /// The OpenGL texture unit that is used to render this texture.
-    GLint texture_unit;
-    /// The OpenGL texture target that is used to render this texture.
-    GLenum texture_target;  
+		/// If true the texture will repeat itself when the t texture coordinate
+		/// is outside the range [0,1]. If false the texture will be clamped if
+		/// outside the same range.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> TRUE \n
+		///
+		/// \dotfile X3DTexture2DNode_repeatT.dot 
+		auto_ptr< SFBool >  repeatT;
 
-    /// Field to indicate image will change
-    auto_ptr< Field > imageNeedsUpdate;
-  public:
-    /// Returns the OpenGL pixel format to use given an Image, e.g. 
-    virtual GLenum glPixelFormat( Image *image );
-  };
+		/// If true the image used will be scaled so that the dimensions are a 
+		/// power of two if they are not. This will however take up more memory
+		/// and might cause some unwanted strething effects on the texture. The
+		/// new texture values will be linearly interpolated from the original 
+		/// ones.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> TRUE \n
+		///
+		/// \dotfile X3DTexture2DNode_image.dot 
+		auto_ptr< SFBool > scaleToPowerOfTwo;
+
+		/// The textureProperties field contains a TextureProperties node
+		/// which allows fine control over a texture's application.
+		/// 
+		/// <b>Access type:</b> inputOutput \n
+		///
+		/// \dotfile X3DTexture2DNode_textureProperties.dot 
+		auto_ptr< SFTextureProperties >  textureProperties;
+
+		/// The H3DNodeDatabase for this node.
+		static H3DNodeDatabase database;
+	protected:
+
+		/// Returns the default dimensions to use when this texture is saved to file.
+		///
+		/// Returns the dimensions of the Image object
+		///
+		virtual std::pair<H3DInt32,H3DInt32> getDefaultSaveDimensions ();
+
+		/// The OpenGL texture id of the installed texture, 0 if not installed.
+		TextureHandle texture_handle;
+		/// The OpenGL texture unit that is used to render this texture.
+		GLint texture_unit;
+		/// The OpenGL texture target that is used to render this texture.
+		GLenum texture_target;  
+
+		/// Field to indicate image will change
+		auto_ptr< Field > imageNeedsUpdate;
+	public:
+		/// Returns the OpenGL pixel format to use given an Image, e.g. 
+		virtual GLenum glPixelFormat( Image *image );
+	};
 }
 
 #endif

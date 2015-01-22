@@ -47,8 +47,7 @@ H3DNodeDatabase IndexedTriangleSet::database(
 	typeid( IndexedTriangleSet ),
 	&X3DComposedGeometryNode::database );
 
-namespace IndexedTriangleSetInternals 
-{
+namespace IndexedTriangleSetInternals {
 	FIELDDB_ELEMENT( IndexedTriangleSet, set_index, INPUT_ONLY );
 	FIELDDB_ELEMENT( IndexedTriangleSet, index, INPUT_OUTPUT );
 }
@@ -85,8 +84,7 @@ X3DComposedGeometryNode( _metadata, _bound, _displayList,
 	vboFieldsUpToDate( new Field ),
 	ib_id(0),
 	ib_GPUaddress(0),
-	attributeLayoutCached(false)
-{
+	attributeLayoutCached(false) {
 	renderData.VBOs.resize(0);
 	elementData.VBOs.resize(0);
 	type_name = "IndexedTriangleSet";
@@ -126,36 +124,29 @@ X3DComposedGeometryNode( _metadata, _bound, _displayList,
 	//}
 }
 
-IndexedTriangleSet::~IndexedTriangleSet() 
-{
+IndexedTriangleSet::~IndexedTriangleSet() {
 	// Delete buffer if it was allocated.
-	if(ib_id != 0) 
-	{
-		if(use_bindless)
-		{
+	if(ib_id != 0) {
+		if(use_bindless) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib_id);
 			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 			glDeleteBuffersARB(1, &ib_id);
 			ib_id = 0;
-		}
-		else
-		{
+		} else {
 			glDeleteBuffersARB(1, &ib_id);
 			ib_id = NULL;
 		}
 	}
 }
 
-void IndexedTriangleSet::render() 
-{
+void IndexedTriangleSet::render() {
 	X3DCoordinateNode* coordinate_node = coord->getValue();
 	X3DTextureCoordinateNode* tex_coord_node = texCoord->getValue();
 	FogCoordinate* fog_coord_node = fogCoord->getValue();
 	X3DColorNode* color_node = color->getValue();
 	X3DNormalNode* normal_node = normal->getValue();
 
-	if( !normal_node ) 
-	{
+	if( !normal_node ) {
 		normal_node = autoNormal->getValue();
 	}
 
@@ -165,8 +156,7 @@ void IndexedTriangleSet::render()
 
 	const vector< int >& indices = index->getValue();
 
-	if( coordinate_node && !indices.empty() ) 
-	{
+	if( coordinate_node && !indices.empty() ) {
 		// Check that the number of available coords are not 0 since we use
 		// "coordinate_node->nrAvailableCoords() - 1" as argument to
 		// glDrawRangeElements and we do not want some strange error. Besides
@@ -177,16 +167,13 @@ void IndexedTriangleSet::render()
 
 		// no X3DTextureCoordinateNode, so we generate texture coordinates
 		// based on the bounding box according to the X3D specification.
-		if( tex_coord_gen ) 
-		{
+		if( tex_coord_gen ) {
 			startTexGen( tex_coord_node );
 		} 
 
-		if( tex_coords_per_vertex && coordinate_node->nrAvailableCoords() > tex_coord_node->nrAvailableTexCoords() ) 
-		{
+		if( tex_coords_per_vertex && coordinate_node->nrAvailableCoords() > tex_coord_node->nrAvailableTexCoords() ) {
 			// check if texture coordinate generator
-			if( tex_coord_node->nrAvailableTexCoords() != -1 ) 
-			{
+			if( tex_coord_node->nrAvailableTexCoords() != -1 ) {
 				stringstream s;
 				s << "Must contain at least as many elements as coord (" 
 					<< coordinate_node->nrAvailableCoords() << ") in \"" 
@@ -197,11 +184,9 @@ void IndexedTriangleSet::render()
 
 		// if we have a color node we use the color from that instead
 		// of the previously installed Material node.
-		if( color_node ) 
-		{
+		if( color_node ) {
 			// Make sure we have enough colors      
-			if( coordinate_node->nrAvailableCoords() > color_node->nrAvailableColors() ) 
-			{
+			if( coordinate_node->nrAvailableCoords() > color_node->nrAvailableColors() ) {
 				stringstream s;
 				s << "Must contain at least as many elements as coord (" 
 					<< coordinate_node->nrAvailableCoords() << ") in \"" 
@@ -213,37 +198,30 @@ void IndexedTriangleSet::render()
 		}
 
 		// set fog to get fog depth from fog coordinates if available
-		if( GLEW_EXT_fog_coord && fog_coord_node ) 
-		{
+		if( GLEW_EXT_fog_coord && fog_coord_node ) {
 			glPushAttrib( GL_FOG_BIT );
 			glFogi(GL_FOG_COORDINATE_SOURCE_EXT, GL_FOG_COORDINATE_EXT);  
 		}
 
 		GLhandleARB shader_program = 0;
 		// Set the attribute index to use for all vertex attributes
-		if( GLEW_ARB_shader_objects && GLEW_ARB_vertex_shader ) 
-		{
+		if( GLEW_ARB_shader_objects && GLEW_ARB_vertex_shader ) {
 			shader_program = glGetHandleARB( GL_PROGRAM_OBJECT_ARB );
-			if( shader_program ) 
-			{
-				for( unsigned int i = 0; i < attrib->size(); ++i ) 
-				{
+			if( shader_program ) {
+				for( unsigned int i = 0; i < attrib->size(); ++i ) {
 					X3DVertexAttributeNode *attr = attrib->getValueByIndex( i );
-					if( attr ) 
-					{
+					if( attr ) {
 						GLint loc = glGetAttribLocationARB( shader_program, attr->name->getValue().c_str()); 
 						attr->setAttribIndex( loc );
 					}
 				}
 
 				// render tangents as an attribute if needed.
-				if( render_tangents ) 
-				{
-					for( unsigned int i = 0; i < autoTangent->size(); ++i ) 
-					{
+				if( render_tangents ) {
+					for( unsigned int i = 0; i < autoTangent->size(); ++i ) {
 						X3DVertexAttributeNode *attr = autoTangent->getValueByIndex( i );
-						if( attr ) 
-						{
+						
+						if( attr ) {
 							GLint loc = glGetAttribLocationARB( shader_program, attr->name->getValue().c_str()); 
 							attr->setAttribIndex( loc );
 						}
@@ -253,24 +231,19 @@ void IndexedTriangleSet::render()
 		}
 
 		unsigned int nr_triangles = (unsigned int)indices.size() / 3;
-		if( normalPerVertex->getValue() ) 
-		{
+		if( normalPerVertex->getValue() ) {
 			bool prefer_vertex_buffer_object = false;
-			if( GLEW_ARB_vertex_buffer_object ) 
-			{
+			if( GLEW_ARB_vertex_buffer_object ) {
 				GraphicsOptions * go = NULL;
 				getOptionNode( go );
-				if( !go ) 
-				{
+				if( !go ) {
 					GlobalSettings * gs = GlobalSettings::getActive();
 
-					if( gs ) 
-					{
+					if( gs ) {
 						gs->getOptionNode( go );
 					}
 				}
-				if( go ) 
-				{
+				if( go ) {
 					prefer_vertex_buffer_object = go->preferVertexBufferObject->getValue();
 				}
 			}
@@ -279,57 +252,50 @@ void IndexedTriangleSet::render()
 
 			// if normal per vertex we can use arrays or vertex buffer objects
 			// to render the geometry, they all use the same indices.
-			if( prefer_vertex_buffer_object ) 
-			{
+			if( prefer_vertex_buffer_object ) {
 				// Create and bind vertex buffer objects for all the different
 				// features.
 				coordinate_node->renderVertexBufferObject();
 				normal_node->renderVertexBufferObject();
 
-				if(color_node) 
-				{
+				if(color_node) {
 					color_node->renderVertexBufferObject();
 				}
 
-				if(tex_coords_per_vertex) 
-				{
+				if(tex_coords_per_vertex) {
 					renderTexCoordVertexBufferObject( tex_coord_node );
 				}
 
-				if(fog_coord_node)
-				{
+				if(fog_coord_node) {
 					fog_coord_node->renderVertexBufferObject();
 				}
 
-				if(render_tangents) 
-				{
-					for( unsigned int attrib_index = 0; attrib_index < autoTangent->size(); ++attrib_index ) 
-					{
+				if(render_tangents) {
+					for( unsigned int attrib_index = 0; attrib_index < autoTangent->size(); ++attrib_index ) {
 						X3DVertexAttributeNode *attr = autoTangent->getValueByIndex( attrib_index );
-						if( attr ) attr->renderVertexBufferObject();
+						if( attr ) {
+							attr->renderVertexBufferObject();
+						}
 					}
 				}
 
 				for( unsigned int attrib_index = 0;
 					attrib_index < attrib->size(); ++attrib_index ) {
-						X3DVertexAttributeNode *attr = 
-							attrib->getValueByIndex( attrib_index );
-						if( attr ) attr->renderVertexBufferObject();
+						X3DVertexAttributeNode *attr = attrib->getValueByIndex( attrib_index );
+						if( attr ) {
+							attr->renderVertexBufferObject();
+						}
 				}
 
-				if( !vboFieldsUpToDate->isUpToDate()) 
-				{
+				if( !vboFieldsUpToDate->isUpToDate()) {
 					// Only transfer data when it has been modified.
 					vboFieldsUpToDate->upToDate();
 
 					unsigned int indexSize = indices.size() * sizeof(GLuint);
 
-
 					glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
 					glBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, indexSize, &(*(indices.begin()) ), GL_STATIC_DRAW_ARB );
-				} 
-				else 
-				{
+				} else {
 					glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
 				}
 
@@ -570,7 +536,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		}
 	}
 
-	renderData.modelTransform = ti.getAccForwardMatrix();
+	//Update the transform.
+	//if(ti.transformParentDirty()) {
+		renderData.modelTransform = ti.getAccForwardMatrix();
+	//}
 
 	vboFieldsUpToDate->upToDate();
 
@@ -588,9 +557,12 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		}
 
 		if(use_bindless) {
+			const GLbitfield mapFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
+			const GLbitfield createFlags = mapFlags | GL_DYNAMIC_STORAGE_BIT;
+
 			//Does this need to be deleted? Look up to make sure....
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
-			//glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &*indices.begin(), GL_MAP_WRITE_BIT|GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT);
+			glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &*indices.begin(), createFlags);
 			glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &ib_GPUaddress);
 			glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
 			LogOGLErrors("IndexedTriangleSet.cpp::traverseSG");
@@ -600,8 +572,8 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 			renderData.IBO.length = indexSize;
 			renderData.IBO.address = ib_GPUaddress;
 		} else {
-			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
-			glBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, indexSize, &(*(indices.begin()) ), GL_STATIC_DRAW_ARB );
+			glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, ib_id);
+			glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, indexSize, &(*(indices.begin()) ), GL_STATIC_DRAW);
 			LogOGLErrors("IndexedTriangleSet.cpp::traverseSG");
 
 			//We shouldn't reach this place, quite sure this'll cause issues
@@ -756,8 +728,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 	renderer->insertNewElementData(&elementData);
 }
 
-void IndexedTriangleSet::AutoNormal::update() 
-{
+void IndexedTriangleSet::AutoNormal::update() {
 	// Console(4) << "Calculating normals" << endl;
 	bool normals_per_vertex = 
 		static_cast< SFBool * >( routes_in[0] )->getValue();
@@ -765,18 +736,14 @@ void IndexedTriangleSet::AutoNormal::update()
 	const vector<int> &index = static_cast< MFInt32 * >( routes_in[2] )->getValue();
 	bool ccw = static_cast< SFBool * >(routes_in[3] )->getValue();
 
-	if( normals_per_vertex )
-	{
+	if( normals_per_vertex ) {
 		value = generateNormalsPerVertex( coord, index, ccw );
-	}
-	else
-	{
+	} else {
 		value = generateNormalsPerFace( coord, index, ccw );
 	}
 }
 
-void IndexedTriangleSet::AutoTangent::update() 
-{
+void IndexedTriangleSet::AutoTangent::update() {
 	bool normals_per_vertex = static_cast< SFBool * >( routes_in[0] )->getValue();
 
 	X3DCoordinateNode* coord = 
@@ -792,19 +759,16 @@ void IndexedTriangleSet::AutoTangent::update()
 	bool have_tangents_in_attrib = false; 
 	bool have_binormals_in_attrib = false; 
 
-	for( unsigned int i = 0; i < its->attrib->size(); ++i ) 
-	{
+	for( unsigned int i = 0; i < its->attrib->size(); ++i ) {
 		X3DVertexAttributeNode *attr = its->attrib->getValueByIndex( i );
-		if( attr ) 
-		{
+		if( attr ) {
 			const string &name = attr->name->getValue();
 			if( name == "tangent" ) have_tangents_in_attrib = true; 
 			if( name == "binormal" ) have_binormals_in_attrib = true; 
 		}
 	}
 
-	if( have_tangents_in_attrib ) 
-	{
+	if( have_tangents_in_attrib ) {
 		value.clear();
 		return;
 	}
@@ -814,14 +778,10 @@ void IndexedTriangleSet::AutoTangent::update()
 
 	unsigned int nr_attribs_used = 0;
 
-	if( !have_tangents_in_attrib ) 
-	{
-		if( value.size() > 0 ) 
-		{
+	if( !have_tangents_in_attrib ) {
+		if( value.size() > 0 ) {
 			tangent = static_cast< FloatVertexAttribute * >(value[0]);
-		} 
-		else 
-		{
+		} else {
 			tangent = new FloatVertexAttribute;
 			value.push_back( tangent );
 		}
@@ -830,16 +790,12 @@ void IndexedTriangleSet::AutoTangent::update()
 		//Console(4) << "Calculating tangents" << endl;
 	}
 
-	if( !have_binormals_in_attrib ) 
-	{
+	if( !have_binormals_in_attrib ) {
 		unsigned int i = nr_attribs_used;
 
-		if( value.size() > i ) 
-		{
+		if( value.size() > i ) {
 			binormal = static_cast< FloatVertexAttribute * >(value[i]);
-		} 
-		else 
-		{
+		} else {
 			binormal = new FloatVertexAttribute;
 			value.push_back( binormal );
 		}

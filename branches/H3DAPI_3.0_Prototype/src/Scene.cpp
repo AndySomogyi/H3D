@@ -176,6 +176,7 @@ void Scene::idle()
 	H3DUtil::H3DTimer::begin("H3D_scene");
 	H3DUtil::H3DTimer::stepBegin("H3D_scene_loop");
 
+
 #endif // HAVE_PROFILER
 
 	H3DFloat max_fr= maxFrameRate->getValue();
@@ -236,7 +237,6 @@ void Scene::idle()
 		last_update_time = t;
 	}
 #endif
-
 #endif
 
 #ifdef THREAD_LOCK_DEBUG
@@ -299,6 +299,7 @@ void Scene::idle()
 	}
 #endif
 #endif
+
 	DefaultAppearance *def_app = NULL;
 
 	GlobalSettings *default_settings = GlobalSettings::getActive();
@@ -363,6 +364,9 @@ void Scene::idle()
 		TraverseInfo *ti = new TraverseInfo(hds, renderer.get());
 
 		ti->setUserData( "ShadowCaster", shadow_caster.get() );
+
+		defaultShader->traverseSG(*ti);
+		renderer->setWorldUniformIndex(defaultShader->getMatrixUniformLocation());
 
 #ifdef HAVE_PROFILER
 		H3DUtil::H3DTimer::stepBegin("Scene_traverse");
@@ -447,7 +451,6 @@ void Scene::idle()
 #ifdef HAVE_PROFILER
 		H3DUtil::H3DTimer::stepBegin("Scene_traverse");
 #endif
-
 		//Before traversing through the scene, we send traverseInfo into the default shader to queue up the default shader ID
 		defaultShader->traverseSG(*ti);
 		renderer->setWorldUniformIndex(defaultShader->getMatrixUniformLocation());
@@ -527,61 +530,36 @@ void Scene::idle()
 
 		windowPtr->navigate();
 
-		Vec3f direction = vp->accForwardMatrix->getValue().getRotationPart() * 
-			(vp->totalOrientation->getValue() * Vec3f( 0, 0, -1 ));
+		Vec3f direction = Vec3f(0,0,0) - (vp->accForwardMatrix->getValue().getRotationPart() * 
+			(vp->totalOrientation->getValue() * Vec3f( 0, 0, -1 )));
 
 		Vec3f up = vp->accForwardMatrix->getValue().getRotationPart() * 
 			(vp->totalOrientation->getValue() * Vec3f( 0, 1, 0));
 		
-		Vec3f position = (vp->accForwardMatrix->getValue() * vp->totalPosition->getValue());
+		Vec3f position = (vp->accForwardMatrix->getValue().getTranslationPart() + vp->totalPosition->getValue());
 
 		renderer->setCurrentViewpoint(position, direction, up);
 	}
 
-	TimeStamp timer;
-
-	static double totalTimeSpentUpdating = 0.0;
-	static double totalTimeSpentRendering = 0.0;
-	static unsigned int callCount = 0;
-
-	//
-	double updateBegins = timer.now();
-
+#ifdef HAVE_PROFILER
+	H3DTIMER_BEGIN("Renderer Update")
+#endif
 	//Call update after traversing through the entire scene.
 	renderer->update();
 
-	double result = (timer.now() - updateBegins);
+#ifdef HAVE_PROFILER
+	H3DTIMER_END("Renderer Update")
 
-	totalTimeSpentUpdating += result;
-	//
-
-	//
-	updateBegins = timer.now();
-
+	H3DTIMER_BEGIN("Renderer Render")
+#endif
 	//Call render after update has been called.
 	renderer->render();
-
-	result = (timer.now() - updateBegins);
-
-	totalTimeSpentRendering += result;
-	//
-
-	callCount++;
-	double avgUpdateTime = totalTimeSpentUpdating*(1.0 / callCount);
-	double avgRenderTime = totalTimeSpentRendering*(1.0 / callCount);
-
+#ifdef HAVE_PROFILER
+	H3DTIMER_END("Renderer Render")
+#endif
 
 	auto itr = window->begin();
-
-	GLenum err;
-	while ((err = glGetError()) != GL_NO_ERROR) 
-	{
-		std::cout << "OpenGL error: " << err << endl;
-	}
-
 	static_cast< H3DWindowNode * >(*itr)->swapBuffers();
-
-
 
 #ifdef HAVE_PROFILER
 	H3DUtil::H3DTimer::stepEnd("Graphic_rendering");
@@ -641,6 +619,9 @@ void Scene::idle()
 			last_unused_texture_check= cur_time;
 		}
 	}
+
+	//At end of update, set global traverse as clean, aka don't traverse through scene if nothing re-flags it as dirty.
+	//MatrixTransform::globalTraverseFlag->upToDate();
 }
 
 

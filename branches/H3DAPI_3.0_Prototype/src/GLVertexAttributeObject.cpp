@@ -33,7 +33,7 @@ using namespace H3D;
 GLVertexAttributeObject::GLVertexAttributeObject ( VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE type) :
 vboFieldsUpToDate ( new Field ),
 	VAD(),
-	isDynamic(new SFBool),
+	isDynamic(new SFBool(false)),
 	attrib_type(type),
 	attrib_data( NULL ),
 	vbo_GPUaddr( 0 ),
@@ -41,7 +41,6 @@ vboFieldsUpToDate ( new Field ),
 {
 	vboFieldsUpToDate->setName ("vboFieldsUpToDate");
 	isDynamic->route (vboFieldsUpToDate);
-	isDynamic->setValue (false);
 
 	VAD.target = GL_ARRAY_BUFFER;
 	VAD.normalized = false;
@@ -90,7 +89,7 @@ void GLVertexAttributeObject::updateVertexBufferObject() {
 
 		if(use_bindless)
 		{
-			//glBufferStorage(GL_ARRAY_BUFFER, VAD.attributeSize, attrib_data, GL_MAP_WRITE_BIT|GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT);
+			glBufferStorage(GL_ARRAY_BUFFER, VAD.attributeSize, attrib_data, GL_MAP_WRITE_BIT|GL_MAP_COHERENT_BIT|GL_MAP_PERSISTENT_BIT);
 			glGetBufferParameterui64vNV(GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &vbo_GPUaddr);
 			glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
@@ -98,12 +97,9 @@ void GLVertexAttributeObject::updateVertexBufferObject() {
 		}
 		else
 		{
-			if(isDynamic->getValue())
-			{
+			if(isDynamic->getValue()) {
 				glBufferData(GL_ARRAY_BUFFER, VAD.attributeSize, attrib_data, GL_STREAM_DRAW);
-			} 
-			else
-			{
+			} else {
 				glBufferData(GL_ARRAY_BUFFER, VAD.attributeSize, attrib_data, GL_STATIC_DRAW);
 			}
 

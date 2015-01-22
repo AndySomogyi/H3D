@@ -66,7 +66,7 @@ void H3DVideoTextureNode::render() {
     X3DTexture2DNode::render();
   } else {
     PixelImage *pi = dynamic_cast< PixelImage * >( image->getValue() );
-    glBindTexture( GL_TEXTURE_2D, texture_id );
+    glBindTexture( GL_TEXTURE_2D, texture_handle.ogl_texture_id);
     enableTexturing();
     if( decoder->haveNewFrame() ) {
       decoder->getNewFrame( (unsigned char *)pi->getImageData() );

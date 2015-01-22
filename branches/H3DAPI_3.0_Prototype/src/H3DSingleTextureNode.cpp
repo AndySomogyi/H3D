@@ -57,7 +57,7 @@ bool H3DSingleTextureNode::makeResident () {
 #ifdef GL_ARB_bindless_texture
   if ( !is_resident ) {
     if ( !texture_handle ) {
-      texture_handle= glGetTextureHandleARB ( getTextureId() );
+      texture_handle = glGetTextureHandleARB ( getTextureId() );
     }
     glMakeTextureHandleResidentARB ( texture_handle );
     if ( glGetError() == GL_NO_ERROR ) {

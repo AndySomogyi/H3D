@@ -38,245 +38,268 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase ImageTexture::database( "ImageTexture", 
-                                        &(newInstance<ImageTexture>), 
-                                        typeid( ImageTexture ),
-                                        &X3DTexture2DNode::database );
+	&(newInstance<ImageTexture>), 
+	typeid( ImageTexture ),
+	&X3DTexture2DNode::database );
 
 namespace ImageTextureInternals {
-  FIELDDB_ELEMENT( ImageTexture, url, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( ImageTexture, imageLoader, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( ImageTexture, loadInThread, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( ImageTexture, url, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( ImageTexture, imageLoader, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( ImageTexture, loadInThread, INPUT_OUTPUT );
 }
 
 
 ImageTexture::ImageTexture( 
-                           Inst< DisplayList > _displayList,
-                           Inst< SFNode        > _metadata,
-                           Inst< MFString      > _url,
-                           Inst< SFBool        > _repeatS,
-                           Inst< SFBool        > _repeatT,
-                           Inst< SFBool        > _scaleToP2,
-                           Inst< SFImage       > _image,
-                           Inst< MFImageLoader > _imageLoader,
-                           Inst< SFTextureProperties > _textureProperties,
-                           Inst< SFString      > _loadInThread ) :
-  X3DTexture2DNode( _displayList, _metadata, _repeatS, _repeatT,
-                    _scaleToP2, _image, _textureProperties ),
-  X3DUrlObject( _url ),
-  imageLoader( _imageLoader ),
-  loadInThread ( _loadInThread ),
-  load_thread( NULL ) {
+	Inst< DisplayList > _displayList,
+	Inst< SFNode        > _metadata,
+	Inst< MFString      > _url,
+	Inst< SFBool        > _repeatS,
+	Inst< SFBool        > _repeatT,
+	Inst< SFBool        > _scaleToP2,
+	Inst< SFImage       > _image,
+	Inst< MFImageLoader > _imageLoader,
+	Inst< SFTextureProperties > _textureProperties,
+	Inst< SFString      > _loadInThread ) :
+X3DTexture2DNode( _displayList, _metadata, _repeatS, _repeatT,
+	_scaleToP2, _image, _textureProperties ),
+	X3DUrlObject( _url ),
+	imageLoader( _imageLoader ),
+	loadInThread ( _loadInThread ),
+	load_thread( NULL ) {
 
-  type_name = "ImageTexture";
-  database.initFields( this );
+		type_name = "ImageTexture";
+		database.initFields( this );
 
-  loadInThread->addValidValue ( "DEFAULT" );
-  loadInThread->addValidValue ( "MAIN" );
-  loadInThread->addValidValue ( "SEPARATE" );
-  loadInThread->setValue ( "DEFAULT" );
+		loadInThread->addValidValue ( "DEFAULT" );
+		loadInThread->addValidValue ( "MAIN" );
+		loadInThread->addValidValue ( "SEPARATE" );
+		loadInThread->setValue ( "DEFAULT" );
 
-  url->route( image );
-  imageLoader->route( image );
+		url->route( image );
+		imageLoader->route( image );
 }
 
 Image* ImageTexture::SFImage::loadImage( ImageTexture *texture,
-                                         const vector< string > &urls,
-                                         const NodeVector &image_loaders ) {
-  // First try the image loader nodes specified
-  if( image_loaders.size() ) { 
-    for( vector<string>::const_iterator i = urls.begin(); 
-         i != urls.end(); ++i ) {
-      for( NodeVector::const_iterator il = image_loaders.begin();
-           il != image_loaders.end();
-           ++il ) {
-        // First try to resolve the url to file contents and load via string buffer
-        // Otherwise fallback on using temp files
-        string url_contents= ResourceResolver::resolveURLAsString ( *i );
-        if ( url_contents != "" ) {
-          istringstream tmp_istream( url_contents );
-          Image *image = 
-            static_cast< H3DImageLoaderNode * >(*il)->loadImage ( tmp_istream );
-          if( image ) {
-            texture->setURLUsed( *i );
-            return image;
-          }
-        }
+	const vector< string > &urls,
+	const NodeVector &image_loaders ) 
+{
+	Image* image;
+	TextureManager& tm = TextureManager::getInstance();
 
-        bool is_tmp_file;
-        string url = texture->resolveURLAsFile( *i, &is_tmp_file );
-        if( !url.empty() ) {
-          Image *image = 
-            static_cast< H3DImageLoaderNode * >(*il)->loadImage( url );
-          if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
-          if( image ) {
-            texture->setURLUsed( *i );
-            return image;
-          }
-        }
-      }
-    }
-  }
-  
-  // Now try to find any image loader that can handle the format
-  for( vector<string>::const_iterator i = urls.begin(); 
-       i != urls.end(); ++i ) {
-    // First try to resolve the url to file contents and load via string buffer
-    // Otherwise fallback on using temp files
-    string url_contents= ResourceResolver::resolveURLAsString ( *i );
-    if ( url_contents != "" ) {
-      istringstream iss ( url_contents, ios_base::binary );
-      auto_ptr< H3DImageLoaderNode > 
-        il( H3DImageLoaderNode::getSupportedFileReader( iss ) );
+	//Before we do any loading, iterate over all URLs and make sure that we haven't already loaded this image before
+	for( vector<string>::const_iterator i = urls.begin(); i != urls.end(); ++i ) {
+		image = tm.lookForDuplicateImage(*i);
 
-      if( il.get() ) {
-        texture->setURLUsed( *i );
-        Image *image = il->loadImage( iss );
-        return image;
-      }
-    }
+		if(image != 0) {
+			return image;
+		}
+	}
 
-    bool is_tmp_file;
-    string url = texture->resolveURLAsFile( *i, &is_tmp_file );
-    if( !url.empty() ) {
-      auto_ptr< H3DImageLoaderNode > 
-        il( H3DImageLoaderNode::getSupportedFileReader( url ) );
+	// First try the image loader nodes specified
+	if( image_loaders.size() ) { 
+		for( vector<string>::const_iterator i = urls.begin(); 
+			i != urls.end(); ++i ) {
+				for( NodeVector::const_iterator il = image_loaders.begin();
+					il != image_loaders.end(); ++il ) {
+						// First try to resolve the url to file contents and load via string buffer
+						// Otherwise fallback on using temp files
+						string url_contents= ResourceResolver::resolveURLAsString ( *i );
+						if ( url_contents != "" ) {
+							istringstream tmp_istream( url_contents );
+							image = static_cast< H3DImageLoaderNode * >(*il)->loadImage ( tmp_istream );
+							if( image ) {
+								texture->setURLUsed( *i );
+								//Save the image for future lookups to save on texture load time.
+								tm.insertNewImageURLPairing(*i, image);
+								return image;
+							}
+						}
 
-      // special case for if we have a DicomImageLoader. Since DICOM 3d image
-      // files often are distributed over several files the default behavior
-      // is to combine all these files into one image. In this case we want
-      // to use only the file the url points to so we modify the reader
-      // to do that.
+						bool is_tmp_file;
+						string url = texture->resolveURLAsFile( *i, &is_tmp_file );
+						if( !url.empty() ) {
+							image = static_cast< H3DImageLoaderNode * >(*il)->loadImage( url );
+							if( is_tmp_file ) {
+								ResourceResolver::releaseTmpFileName( url );
+							}
+							if( image ) {
+								texture->setURLUsed( *i );
+								//Save the image for future lookups to save on texture load time.
+								tm.insertNewImageURLPairing(*i, image);
+								return image;
+							}
+						}
+				}
+		}
+	}
+
+	// Now try to find any image loader that can handle the format
+	for( vector<string>::const_iterator i = urls.begin(); 
+		i != urls.end(); ++i ) {
+			// First try to resolve the url to file contents and load via string buffer
+			// Otherwise fallback on using temp files
+			string url_contents= ResourceResolver::resolveURLAsString ( *i );
+			if ( url_contents != "" ) {
+				istringstream iss ( url_contents, ios_base::binary );
+				auto_ptr< H3DImageLoaderNode > il( H3DImageLoaderNode::getSupportedFileReader( iss ) );
+
+				if( il.get() ) {
+					texture->setURLUsed( *i );
+					//Save the image for future lookups to save on texture load time.
+					tm.insertNewImageURLPairing(*i, image);
+					image = il->loadImage( iss );
+					return image;
+				}
+			}
+
+			bool is_tmp_file;
+			string url = texture->resolveURLAsFile( *i, &is_tmp_file );
+			if( !url.empty() ) {
+				auto_ptr< H3DImageLoaderNode > 
+					il( H3DImageLoaderNode::getSupportedFileReader( url ) );
+
+				// special case for if we have a DicomImageLoader. Since DICOM 3d image
+				// files often are distributed over several files the default behavior
+				// is to combine all these files into one image. In this case we want
+				// to use only the file the url points to so we modify the reader
+				// to do that.
 #ifdef HAVE_DCMTK
-      DicomImageLoader *dicom_loader = 
-        dynamic_cast< DicomImageLoader * >( il.get() );
-      if( dicom_loader ) dicom_loader->loadSingleFile->setValue( true );
+				DicomImageLoader *dicom_loader = 
+					dynamic_cast< DicomImageLoader * >( il.get() );
+				if( dicom_loader )  {
+					dicom_loader->loadSingleFile->setValue( true );
+				}
 #endif
 
-      if( il.get() ) {
-        texture->setURLUsed( *i );
-        Image *image = il->loadImage( url );
-        if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
-        return image;
-      }
-      if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
-    }
-  }
+				if( il.get() ) {
+					texture->setURLUsed( *i );
+					image = il->loadImage( url );
+					//Save the image for future lookups to save on texture load time.
+					tm.insertNewImageURLPairing(*i, image);
+					if( is_tmp_file )  {
+						ResourceResolver::releaseTmpFileName( url );
+					}
+					return image;
+				}
+				if( is_tmp_file ) ResourceResolver::releaseTmpFileName( url );
+			}
+	}
 
-  Console(4) << "Warning: None of the urls in ImageTexture with url [";
-  for( vector<string>::const_iterator i = urls.begin(); 
-       i != urls.end(); ++i ) {  
-    Console(4) << " \"" << *i << "\"";
-  }
-  Console(4) << "] could be loaded. Either they don't exist or the file format "
-             << "is not supported by any H3DImageLoaderNode that is available "
-             << "(in " << getOwner()->getName() << ")" << endl;
+	Console(4) << "Warning: None of the urls in ImageTexture with url [";
+	for( vector<string>::const_iterator i = urls.begin(); 
+		i != urls.end(); ++i ) {  
+			Console(4) << " \"" << *i << "\"";
+	}
+	Console(4) << "] could be loaded. Either they don't exist or the file format "
+		<< "is not supported by any H3DImageLoaderNode that is available "
+		<< "(in " << getOwner()->getName() << ")" << endl;
 
-  texture->setURLUsed( "" );
-  return( NULL );
+	texture->setURLUsed( "" );
+	return( NULL );
 }
 
 Scene::CallbackCode ImageTexture::SFImage::loadImageCB( void *data ) {
-  CBData *input = static_cast< CBData * >( data );
-  input->texture->image->setValue( input->image );
-  input->texture = NULL;
-  input->image = NULL;
-  return Scene::CALLBACK_DONE;
+	CBData *input = static_cast< CBData * >( data );
+	input->texture->image->setValue( input->image );
+	input->texture = NULL;
+	input->image = NULL;
+	return Scene::CALLBACK_DONE;
 }
 
 void *ImageTexture::SFImage::loadImageThreadFunc( void * data ) {
-  ThreadFuncData *input = static_cast< ThreadFuncData * >( data );
-  input->load_thread_mutex.lock();
-  SFImage *sfimage = static_cast< SFImage * >( input->texture->image.get() );
-  Image *image = sfimage->loadImage( input->texture,
-                                     input->urls,
-                                     input->image_loaders );
-                                  
-  sfimage->cb_data.texture = input->texture;
-  sfimage->cb_data.image = image;
-  Scene::addCallback( loadImageCB, &sfimage->cb_data );
-  input->load_thread_mutex.unlock();
-  return NULL;
+	ThreadFuncData *input = static_cast< ThreadFuncData * >( data );
+	input->load_thread_mutex.lock();
+	SFImage *sfimage = static_cast< SFImage * >( input->texture->image.get() );
+	Image *image = sfimage->loadImage( input->texture,
+		input->urls,
+		input->image_loaders );
+
+	sfimage->cb_data.texture = input->texture;
+	sfimage->cb_data.image = image;
+	Scene::addCallback( loadImageCB, &sfimage->cb_data );
+	input->load_thread_mutex.unlock();
+	return NULL;
 }
 
 void ImageTexture::SFImage::update() {
-  ImageTexture *texture = static_cast< ImageTexture * >( getOwner() );
-  MFImageLoader *image_loaders = static_cast< MFImageLoader * >( routes_in[1] );
-  MFString *urls = static_cast< MFString * >( routes_in[0] );
+	ImageTexture *texture = static_cast< ImageTexture * >( getOwner() );
+	MFString *urls = static_cast< MFString * >( routes_in[0] );
+	MFImageLoader *image_loaders = static_cast< MFImageLoader * >( routes_in[1] );
 
-  bool load_in_thread = X3DTextureNode::load_images_in_separate_thread;
-  
-  const string& load_in_thread_local= texture->loadInThread->getValue();
-  if ( load_in_thread_local == "DEFAULT" ) {
-    GlobalSettings *gs = GlobalSettings::getActive();
-    if( gs ) load_in_thread = gs->loadTexturesInThread->getValue();
-  } else {
-    load_in_thread= load_in_thread_local == "SEPARATE";
-  }
+	bool load_in_thread = X3DTextureNode::load_images_in_separate_thread;
 
-  if( load_in_thread ) {
-    value = NULL;
-    // delete the old thread
-    texture->load_thread.reset( NULL );
-    
-    thread_data.texture = texture;
-    thread_data.urls = urls->getValue();
-    thread_data.image_loaders = image_loaders->getValue();
+	const string& load_in_thread_local= texture->loadInThread->getValue();
+	if ( load_in_thread_local == "DEFAULT" ) {
+		GlobalSettings *gs = GlobalSettings::getActive();
+		if( gs ) load_in_thread = gs->loadTexturesInThread->getValue();
+	} else {
+		load_in_thread= load_in_thread_local == "SEPARATE";
+	}
 
-    texture->load_thread.reset( new H3DUtil::SimpleThread( &loadImageThreadFunc, 
-                                                   (void *)&thread_data ) );
-    texture->load_thread->setThreadName( "ImageTexture load thread" );
-  } else {
-    value = loadImage( texture, urls->getValue(), image_loaders->getValue() );
-  }
+	if( load_in_thread ) {
+		value = NULL;
+		// delete the old thread
+		texture->load_thread.reset( NULL );
 
-  // reset the editing variables since we are doing a full load of a new
-  // texture
-  resetChanges();
+		thread_data.texture = texture;
+		thread_data.urls = urls->getValue();
+		thread_data.image_loaders = image_loaders->getValue();
 
-  if ( X3DProgrammableShaderObject::use_bindless_textures ) {
-    // We must make the texture non-resident before the image is swapped
-    // so that a new texture handle can be created.
-    texture->invalidateTextureHandle ();
-  }
+		texture->load_thread.reset( new H3DUtil::SimpleThread( &loadImageThreadFunc, 
+			(void *)&thread_data ) );
+		texture->load_thread->setThreadName( "ImageTexture load thread" );
+	} else {
+		value = loadImage( texture, urls->getValue(), image_loaders->getValue() );
+	}
+
+	// reset the editing variables since we are doing a full load of a new
+	// texture
+	resetChanges();
+
+	if ( X3DProgrammableShaderObject::use_bindless_textures ) {
+		// We must make the texture non-resident before the image is swapped
+		// so that a new texture handle can be created.
+		texture->invalidateTextureHandle ();
+	}
 }
 
 void ImageTexture::render() {
-  if( url->size() > 0 ) {
-    try {
-      X3DTexture2DNode::render();
-    } catch( InvalidTextureDimensions &e ) {
-      stringstream s;
-      s << e.message << " with url [" ;
-      for( MFString::const_iterator i = url->begin(); i != url->end(); ++i ) { 
-        s << " \"" << *i << "\"";
-      }
-      s << "].";
-      e.message = s.str();
-      throw e;
-    } catch( OpenGLTextureError &e ) {
-      stringstream s;
-      s << e.message << " with url [" ;
-      for( MFString::const_iterator i = url->begin(); i != url->end(); ++i ) { 
-        s << " \"" << *i << "\"";
-      }
-      s << "].";
-      e.message = s.str();
-      throw e;
-    }
-  } else {
-    texture_target = getTextureTarget();
-    disableTexturing();
-  }
+	if( url->size() > 0 ) {
+		try {
+			X3DTexture2DNode::render();
+		} catch( InvalidTextureDimensions &e ) {
+			stringstream s;
+			s << e.message << " with url [" ;
+			for( MFString::const_iterator i = url->begin(); i != url->end(); ++i ) { 
+				s << " \"" << *i << "\"";
+			}
+			s << "].";
+			e.message = s.str();
+			throw e;
+		} catch( OpenGLTextureError &e ) {
+			stringstream s;
+			s << e.message << " with url [" ;
+			for( MFString::const_iterator i = url->begin(); i != url->end(); ++i ) { 
+				s << " \"" << *i << "\"";
+			}
+			s << "].";
+			e.message = s.str();
+			throw e;
+		}
+	} else {
+		texture_target = getTextureTarget();
+		disableTexturing();
+	}
 }
 
 ImageTexture::SFImage::~SFImage() {
-  thread_data.load_thread_mutex.lock();
-  if( cb_data.texture ) {
-    Scene::removeCallback( &cb_data );
-    if( cb_data.image )
-      delete cb_data.image;
-    cb_data.texture = NULL;
-    cb_data.image = NULL;
-  }
-  thread_data.load_thread_mutex.unlock();
+	thread_data.load_thread_mutex.lock();
+	if( cb_data.texture ) {
+		Scene::removeCallback( &cb_data );
+		if( cb_data.image )
+			delete cb_data.image;
+		cb_data.texture = NULL;
+		cb_data.image = NULL;
+	}
+	thread_data.load_thread_mutex.unlock();
 }

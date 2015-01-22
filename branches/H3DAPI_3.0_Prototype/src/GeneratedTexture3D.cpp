@@ -60,7 +60,7 @@ void GeneratedTexture3D::render() {
   glGetIntegerv( GL_ACTIVE_TEXTURE_ARB, &texture_unit );
 
   ensureInitialized();
-  glBindTexture(  texture_target, texture_id );
+  glBindTexture(  texture_target, texture_handle.ogl_texture_id );
   renderTextureProperties();
   enableTexturing();
 }
@@ -69,7 +69,7 @@ void GeneratedTexture3D::render() {
 bool GeneratedTexture3D::ensureInitialized( GLenum tex_target ) {
  if( !texture_id_initialized ) {
     // initialized texture parameters
-    glGenTextures( 1, &texture_id );
+    glGenTextures( 1, &texture_handle.ogl_texture_id);
     texture_id_initialized = true;
     texture_target = tex_target;
  }
@@ -77,7 +77,7 @@ bool GeneratedTexture3D::ensureInitialized( GLenum tex_target ) {
 }
 
 void GeneratedTexture3D::reinitialize () {
-  glDeleteTextures ( 1, &texture_id );
+  glDeleteTextures ( 1, &texture_handle.ogl_texture_id);
   texture_id_initialized= false;
   ensureInitialized ( texture_target );
 }

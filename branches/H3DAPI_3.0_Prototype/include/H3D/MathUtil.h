@@ -16,7 +16,7 @@ namespace MathUtil
 	*/
 	//Create a row-major lookat(world-to-view) matrix.
 	H3D::Matrix4f CreateLookAt(Vec3f eye, Vec3f lookAt, Vec3f up) {
-		Vec3f zAxis = eye - lookAt;
+		Vec3f zAxis = lookAt; //eye - lookAt;
 		zAxis.normalizeSafe();
 
 		up.normalizeSafe();

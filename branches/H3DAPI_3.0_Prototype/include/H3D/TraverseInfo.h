@@ -471,6 +471,14 @@ namespace H3D
 			return currentRenderState;
 		}
 
+		bool transformParentDirty() {
+			return transformDirtyFlag;
+		}
+
+		void setDirtyTransformFlag(bool val = true) {
+			transformDirtyFlag = val;
+		}
+
 	protected:
 		LightVector x3dlightnode_vector;
 
@@ -504,7 +512,7 @@ namespace H3D
 		typedef std::map< X3DGeometryNode *, int > GeometryCountMap;
 		GeometryCountMap geometry_count;
 		std::map< string, void * > user_data;
-
+		bool transformDirtyFlag;
 		TotalRenderState currentRenderState;
 		Renderer* const renderer;
 	};

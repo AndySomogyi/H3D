@@ -30,6 +30,15 @@ void H3D::MultiDrawElementsIndirectCommand::execute() {
 	//Fill the reserved memory
 	memcpy(commandPtr, &*drawcommands.begin(), (sizeof(DrawCommand)*drawcommands.size()));
 
+	/*
+	In the future when we want to expand this to using more VBOs and dont want to be 
+	limited by a static array size, we can do a few extra analyzing steps and split it up into several memCpys.
+	We can easily find out how many VBOs there are per object, then just size the memcpy based on that.
+	First memcpy the "static" data.
+	Then memcpy the VBO vector or w/e. Does mean that we have to build this buffer blob on the spot...
+	Or we do it earlier as a preprocessing step, that might work just as easily. Just need to set up a function for it.
+	*/
+
 	if(LogOGLErrors("MultiDrawElementsIndirectCommand", counter)) {
 		//If we've come here, something has gone wrong
 	}
@@ -69,48 +78,38 @@ H3D::DrawElementsBaseVertexCommand::DrawElementsBaseVertexCommand(std::vector<El
 }
 
 void H3D::DrawElementsBaseVertexCommand::execute() {
+	for(std::vector<ElementDrawData>::iterator it = objects.begin(); it != objects.end(); ++it) {
+		static unsigned int count = 0;
+		count++;
 
-	const unsigned int repetitions = 1000;
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, it->IBO);
 
-	for(unsigned int i = 0; i < 100; ++i)
-	{
+		for(unsigned int i = 0; i < it->VBOs.size(); ++i) {
+			const VertexAttributeDescription& VAD = it->VBOs[i];
 
-		for(std::vector<ElementDrawData>::iterator it = objects.begin(); it != objects.end(); ++it) {
-			static unsigned int count = 0;
-			count++;
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, it->IBO);
-
-			for(unsigned int i = 0; i < it->VBOs.size(); ++i) {
-				const VertexAttributeDescription& VAD = it->VBOs[i];
-
-				glBindBuffer(GL_ARRAY_BUFFER, VAD.bufferID);
-				LogOGLErrors("DrawElementsBaseVertexCommand", count);
-
-				//glEnableVertexAttribArray(it->VBOs[i].bufferIndex);
-				//LogOGLErrors("DrawElementsBaseVertexCommand", count);
-
-				glVertexAttribPointer(VAD.bufferIndex, VAD.elementCount, VAD.primitiveType, (VAD.normalized ? GL_TRUE : GL_FALSE), 0, 0);
-				LogOGLErrors("DrawElementsBaseVertexCommand", count);
-			}
-
-			*it->transform[0][2] += 0.07f;
-
-			glUniformMatrix4fv(transformUniformIndex, 1, GL_TRUE, (*it->transform)[0]);
-
+			glBindBuffer(GL_ARRAY_BUFFER, VAD.bufferID);
 			LogOGLErrors("DrawElementsBaseVertexCommand", count);
 
-			// Draw the triangles !
-			glDrawElements(
-				GL_TRIANGLES,      // mode
-				it->indexCount,    // count
-				GL_UNSIGNED_INT,   // type
-				nullptr);          // element array buffer offset
+			//glEnableVertexAttribArray(it->VBOs[i].bufferIndex);
+			//LogOGLErrors("DrawElementsBaseVertexCommand", count);
 
+			glVertexAttribPointer(VAD.bufferIndex, VAD.elementCount, VAD.primitiveType, (VAD.normalized ? GL_TRUE : GL_FALSE), 0, 0);
 			LogOGLErrors("DrawElementsBaseVertexCommand", count);
 		}
-	}
 
+		glUniformMatrix4fv(transformUniformIndex, 1, GL_TRUE, (*it->transform)[0]);
+
+		LogOGLErrors("DrawElementsBaseVertexCommand", count);
+
+		// Draw the triangles !
+		glDrawElements(
+			GL_TRIANGLES,      // mode
+			it->indexCount,    // count
+			GL_UNSIGNED_INT,   // type
+			nullptr);          // element array buffer offset
+
+		LogOGLErrors("DrawElementsBaseVertexCommand", count);
+	}
 }
 
 /************************************************************************/

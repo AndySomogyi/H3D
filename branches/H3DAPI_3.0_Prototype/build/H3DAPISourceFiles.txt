@@ -19,6 +19,8 @@ SET( ALL_BUILD_FILES "GLUTWindow.cpp"
 # These are the files that are not part of a unity build solution. They
 # will all be included in the UnityBuild.cpp file instead.
 SET( NON_UNITYBUILD_FILES 
+                 "TextureArrayContainer.cpp"
+                 "TextureManager.cpp"
                  "Renderer.cpp"
                  "OGLBufferLock.cpp"
                  "RenderCommandBuffer.cpp"
@@ -30,7 +32,6 @@ SET( NON_UNITYBUILD_FILES
                  "OGLBuffer.cpp"
                  "VertexAttributeDescription.cpp"
                  "OGLUtil.cpp"
-                 "FlyweightManager.cpp"
                  
                  "Anchor.cpp"
                  "AnyDevice.cpp"
@@ -402,7 +403,11 @@ SET( NON_UNITYBUILD_FILES
 
 
 
-SET( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
+SET( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/TextureHandle.h"
+                    "${H3DAPI_SOURCE_DIR}/../include/H3D/TextureManager.h"
+                    "${H3DAPI_SOURCE_DIR}/../include/H3D/TextureArrayContainer.h"
+                    "${H3DAPI_SOURCE_DIR}/../include/H3D/FlyweightManager.h"
+                    "${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/AnyDevice.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Appearance.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Arc2D.h"

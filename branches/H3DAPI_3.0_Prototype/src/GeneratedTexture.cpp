@@ -58,7 +58,7 @@ GeneratedTexture::GeneratedTexture(
 void GeneratedTexture::render() {
   glGetIntegerv( GL_ACTIVE_TEXTURE_ARB, &texture_unit );
   ensureInitialized();
-  glBindTexture(  texture_target, texture_id );
+  glBindTexture(  texture_target, texture_handle.ogl_texture_id );
   renderTextureProperties();
   if (this->texture_target!=GL_TEXTURE_2D_MULTISAMPLE){
     // GL_TEXTURE_2D_MULTISAMPLE do not need to be enabled
@@ -66,7 +66,7 @@ void GeneratedTexture::render() {
   }
 }
 
-void GeneratedTexture::renderTextureProperties(){
+void GeneratedTexture::renderTextureProperties() {
   // If the texture is resident (see bindless textures), then we can no longer change the texture properties
   // and attempting to do so will result in an error state
   if ( getTextureHandle() != 0 ) return;
@@ -93,7 +93,7 @@ void GeneratedTexture::renderTextureProperties(){
 bool GeneratedTexture::ensureInitialized( GLenum tex_target ) {
  if( !texture_id_initialized ) {
     // initialized texture paramters
-    glGenTextures( 1, &texture_id );
+    glGenTextures( 1, &texture_handle.ogl_texture_id);
     texture_id_initialized = true;
     texture_target = tex_target;
   }
@@ -101,8 +101,8 @@ bool GeneratedTexture::ensureInitialized( GLenum tex_target ) {
 }
 
 void GeneratedTexture::reinitialize () {
-  glDeleteTextures ( 1, &texture_id );
-  texture_id_initialized= false;
+  glDeleteTextures( 1, &texture_handle.ogl_texture_id);
+  texture_id_initialized = false;
   ensureInitialized ( texture_target );
 }
 

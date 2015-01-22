@@ -80,7 +80,7 @@ void ComposedCubeMapTexture::render() {
   if( !GLEW_ARB_texture_cube_map ) {
     Console(4) << "Warning: ARB_texture_cube_map extension not supported "
                << "by your graphics card. ComposedCubeMapTexture node cannot "
-               << "be used." << endl; 
+               << "be used." << endl;
   } else {
     glGetIntegerv( GL_ACTIVE_TEXTURE_ARB, &texture_unit );
     if( !cube_map_id ) {
@@ -167,6 +167,7 @@ void ComposedCubeMapTexture::render() {
 
       if( !invalid_dims ) {
         glBindTexture( GL_TEXTURE_CUBE_MAP_ARB, cube_map_id );
+
         if( displayList->hasCausedEvent( back ) && 
             back_tex->image->getValue() ) {
           back_tex->glTexImage( back_tex->image->getValue(), 

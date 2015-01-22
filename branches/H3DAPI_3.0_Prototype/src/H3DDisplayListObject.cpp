@@ -139,8 +139,10 @@ void H3DDisplayListObject::DisplayList::callList( bool build_list ) {
 
 	// if we are using frustum culling and bounding box is outside frustum
 	// return.
-	if( usingFrustumCulling() && isOutsideViewFrustum() ) 
+	if( usingFrustumCulling() && isOutsideViewFrustum() ) {
 		return;
+	}
+
 	bool using_caching = usingCaching(); 
 
 	if( using_caching && build_list ) { 
@@ -183,8 +185,9 @@ void H3DDisplayListObject::DisplayList::callList( bool build_list ) {
 			Console(4) << "OpenGL error in render() Error: \"" << gluErrorString( err ) 
 				<< "\" when rendering " << getFullName() << endl;
 		} else {
-			if( delay_cache_counter > 0 ) 
+			if( delay_cache_counter > 0 ) {
 				--delay_cache_counter;
+			}
 		}
 	}  
 }
@@ -195,8 +198,7 @@ bool H3DDisplayListObject::DisplayList::childrenCachesReady( bool consider_activ
 	// H3DDisplayListObject then we check if it is possible to build
 	// a display list for this field based on the status of the 
 	// DisplayList field in the H3DDisplayListObjects.
-	for( FieldVector::iterator i = routes_in.begin();
-		i != routes_in.end(); ++i ) 
+	for( FieldVector::iterator i = routes_in.begin(); i != routes_in.end(); ++i ) 
 	{
 		SFNode *sfnode = 
 			dynamic_cast< SFNode* >( *i );
@@ -464,8 +466,12 @@ bool H3DDisplayListObject::DisplayList::usingCaching() {
 	if( H3DWindowNode::getMultiPassTransparency() ) {
 		return false;
 	}
-	if( cache_mode == ON ) return true;
-	if( cache_mode == OFF ) return false;
+	if( cache_mode == ON ) {
+		return true;
+	}
+	if( cache_mode == OFF ) {
+		return false;
+	}
 
 	GraphicsOptions *options = NULL;
 	// as no geometry node condition will be considered, only check global option
@@ -515,8 +521,7 @@ void H3DDisplayListObject::DisplayList::initGraphicOption()
 	GlobalSettings *default_settings = GlobalSettings::getActive();
 	if( default_settings ) {
 		default_settings->getOptionNode( options );
-		if( options ) 
-		{
+		if( options ) {
 			graphic_options_previous = options;
 			return;
 		}

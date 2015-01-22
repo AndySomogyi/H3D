@@ -466,8 +466,7 @@ BlendState& H3D::TotalRenderState::getBlendState()
 }
 
 
-void H3D::TotalRenderState::setBlendState(BlendState val)
-{
+void H3D::TotalRenderState::setBlendState(BlendState val) {
 	//I do this because each individual set function does some checks to make sure that the values are actually different. 
 	//If any value is different we set a flag to indicate that something has actually changed.
 	setBlendingEnabled(val.blendingEnabled);
@@ -483,33 +482,33 @@ void H3D::TotalRenderState::setBlendState(BlendState val)
 	setColorMask(val.colorMask);
 }
 
-bool H3D::TotalRenderState::getBlendingEnabled(){
+bool H3D::TotalRenderState::getBlendingEnabled() {
 	return blendState.blendingEnabled;
 }
 
-void H3D::TotalRenderState::setBlendingEnabled(bool val){
-	if(blendState.blendingEnabled != val){
+void H3D::TotalRenderState::setBlendingEnabled(bool val) {
+	if(blendState.blendingEnabled != val) {
 		blendState.blendingEnabled = val;
 		stateChanges.insert(BlendingEnabled);
 	}
 }
 
-GLenum H3D::TotalRenderState::getSrcFactorRGB(){
+GLenum H3D::TotalRenderState::getSrcFactorRGB() {
 	return blendState.srcFactorRGB;
 }
 
-void H3D::TotalRenderState::setSrcFactorRGB(GLenum val){
+void H3D::TotalRenderState::setSrcFactorRGB(GLenum val) {
 	if(blendState.srcFactorRGB != val){
 		blendState.srcFactorRGB = val;
 		stateChanges.insert(BlendFunctionChange);
 	}
 }
 
-GLenum H3D::TotalRenderState::getDstFactorRGB(){
+GLenum H3D::TotalRenderState::getDstFactorRGB() {
 	return blendState.dstFactorRGB;
 }
 
-void H3D::TotalRenderState::setDstFactorRGB(GLenum val){
+void H3D::TotalRenderState::setDstFactorRGB(GLenum val) {
 	if(blendState.dstFactorRGB != val){
 		blendState.dstFactorRGB = val;
 		stateChanges.insert(BlendFunctionChange);
@@ -658,7 +657,7 @@ GLenum H3D::TotalRenderState::getWindingOrder(){
 	return rasterizerState.windingOrder;
 }
 
-void H3D::TotalRenderState::setWindingOrder(GLenum val){
+void H3D::TotalRenderState::setWindingOrder(GLenum val) {
 	if(	rasterizerState.windingOrder != val){
 		rasterizerState.windingOrder = val;
 		stateChanges.insert(WindingOrderChange);

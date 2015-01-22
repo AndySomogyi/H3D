@@ -76,6 +76,8 @@ Billboard::Billboard(
   axisOfRotation->route( matrix );
   vpPosition->route( matrix );
   vpUp->route( matrix );
+
+  matrix->routeNoEvent(isDirty);
 }
 
 void Billboard::SFMatrix4f::update() {

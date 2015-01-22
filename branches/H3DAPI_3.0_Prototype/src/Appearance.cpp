@@ -376,6 +376,7 @@ void Appearance::traverseSG( TraverseInfo &ti ) {
 				sn->traverseSG( ti );
 			}
 	}
+
 	RenderProperties *rp = renderProperties->getValue();
 	if (rp) 
 	{

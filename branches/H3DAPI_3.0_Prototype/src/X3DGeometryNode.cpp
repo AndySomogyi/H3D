@@ -259,8 +259,7 @@ HAPI::HAPIHapticShape *X3DGeometryNode::getOpenGLHapticShape(
 
 void X3DGeometryNode::DisplayList::callList( bool build_list ) {
 		
-	X3DGeometryNode *geom = 
-		static_cast< X3DGeometryNode * >( owner );
+	X3DGeometryNode *geom = static_cast< X3DGeometryNode * >( owner );
 	GLboolean culling_enabled;
 	glGetBooleanv( GL_CULL_FACE, &culling_enabled );
 

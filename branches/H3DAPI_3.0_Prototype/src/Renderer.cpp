@@ -51,10 +51,7 @@ H3D::Renderer::Renderer()
 		//clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV, true));
 	}
 
-	const GLbitfield mapFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
-	const GLbitfield createFlags = mapFlags | GL_DYNAMIC_STORAGE_BIT;
-
-	transformBuffer.Create(PersistentlyMappedBuffer, GL_SHADER_STORAGE_BUFFER, 3*objectCount, createFlags, mapFlags);
+	transformBuffer.Create(PersistentlyMappedBuffer, GL_SHADER_STORAGE_BUFFER, 3*objectCount);
 
 	glGenVertexArrays(1, &dummyVAO);
 	glBindVertexArray(dummyVAO);
@@ -362,31 +359,6 @@ void H3D::Renderer::compareRenderStates(TotalRenderState& previousRenderState, c
 	rs.getShaderData().uniforms[1].ptr = &elapsedTime;
 
 	rs.InsertRenderCommands(&commandBuffer, &previousRenderState);
-
-	/*
-	if(previousRenderState.getShaderData().programID != rs.getShaderData().programID) {
-		commandBuffer.InsertNewCommand(new ChangeShaderCommand(rs.getShaderData().programID));
-
-		for(unsigned int i = 0; i < rs.getShaderData().uniforms.size(); ++i) {
-			commandBuffer.InsertNewCommand(new BindUniformCommand(rs.getShaderData().uniforms[i]));
-		}
-	}
-
-	if(previousRenderState.getBlendState() != rs.getBlendState()) {
-		commandBuffer.InsertNewCommand(new ChangeBlendStateCommand(rs.getBlendState()));
-		previousRenderState.setBlendState(rs.getBlendState()); //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
-	}
-
-	if(previousRenderState.getDepthState() != rs.getDepthState()) {
-		commandBuffer.InsertNewCommand(new ChangeDepthStateCommand(rs.getDepthState()));
-		previousRenderState.setDepthState(rs.getDepthState()); //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
-	}
-
-	if(previousRenderState.getRasterizerState() != rs.getRasterizerState()) {
-		commandBuffer.InsertNewCommand(new ChangeRasterizerStateCommand(rs.getRasterizerState()));
-		previousRenderState.setRasterizerState(rs.getRasterizerState()); //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
-	}
-	*/
 
 	if(previousRenderState.getVertexLayoutDescription() != rs.getVertexLayoutDescription()) {
 
