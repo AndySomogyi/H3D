@@ -128,8 +128,8 @@ void H3DSingleTextureNode::inUse () {
 
 void H3DSingleTextureNode::makeUnusedTexturesNonResident ( H3DTime _unusedTime ) {
   TextureVector unused;
-  for ( TextureVector::iterator i= resident_textures.begin(); i != resident_textures.end(); ++i ) {
-    H3DSingleTextureNode* t= *i;
+  for ( TextureVector::iterator i = resident_textures.begin(); i != resident_textures.end(); ++i ) {
+    H3DSingleTextureNode* t = *i;
     if ( TimeStamp() - t->last_used > _unusedTime ) {
       unused.push_back ( t );
     }

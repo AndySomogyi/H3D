@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <H3D/OGLRenderStates.h>
+#include <H3D/TotalRenderState.h>
 
 namespace H3D {
 	class PrototypeShader {

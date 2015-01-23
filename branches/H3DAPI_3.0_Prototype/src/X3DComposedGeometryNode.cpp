@@ -114,27 +114,18 @@ void X3DComposedGeometryNode::DisplayList::callList( bool build_list ) {
 	// will be. This can also happen if a Transform node has negative scaling.
 	GLint front_face;
 	glGetIntegerv( GL_FRONT_FACE, &front_face );
-	if( front_face == GL_CW ) 
-	{
+	if( front_face == GL_CW ) {
 		// we are in mirrored mode, so we have to set the front face
 		// to the opposite in order for it to be right when mirrored.
-		if( ccw )
-		{
+		if( ccw ) {
 			glFrontFace( GL_CW );
-		}
-		else
-		{
+		} else {
 			glFrontFace( GL_CCW );
 		}
-	} 
-	else 
-	{
-		if( ccw )
-		{
+	} else {
+		if( ccw ) {
 			glFrontFace( GL_CCW );
-		}
-		else 
-		{ 
+		} else { 
 			glFrontFace( GL_CW );
 		}
 	}
@@ -148,8 +139,7 @@ void X3DComposedGeometryNode::DisplayList::callList( bool build_list ) {
 Matrix4f X3DComposedGeometryNode::getDefaultTexGenMatrix() 
 {
 	BoxBound *box_bound = dynamic_cast< BoxBound * >( bound->getValue() );
-	if( box_bound ) 
-	{
+	if( box_bound ) {
 		const Vec3f &center = box_bound->center->getValue();
 		const Vec3f &size = box_bound->size->getValue();
 
@@ -166,51 +156,37 @@ Matrix4f X3DComposedGeometryNode::getDefaultTexGenMatrix()
 		// and 2 the z-axis.
 		int largest_side, middle_side, smallest_side;
 
-		if( size.x >= size.y ) 
-		{
-			if( size.x >= size.z ) 
-			{
+		if( size.x >= size.y ) {
+			if( size.x >= size.z ) {
 				largest_side = 0;
 
-				if( size.y >= size.z ) 
-				{
+				if( size.y >= size.z ) {
 					// size.x >= size.y >= size.z
 					middle_side   = 1;
 					smallest_side = 2;
-				} 
-				else 
-				{ 
+				} else { 
 					// size.x >= size.z > size.y
 					middle_side   = 2;
 					smallest_side = 1;
 				}
-			} 
-			else 
-			{
+			} else {
 				// size.z > size.x >= size.y
 				largest_side  = 2; 
 				middle_side   = 0;
 				smallest_side = 1;
 			}
-		} 
-		else 
-		{
-			if( size.z >= size.y ) 
-			{
+		} else {
+			if( size.z >= size.y ) {
 				// size.z >= size.y > size.x
 				largest_side  = 2; 
 				middle_side   = 1;
 				smallest_side = 0;
-			} 
-			else if( size.x >= size.z ) 
-			{
+			} else if( size.x >= size.z ) {
 				// size.y > size.x >=size.z
 				largest_side  = 1; 
 				middle_side   = 0;
 				smallest_side = 2;
-			} 
-			else 
-			{
+			} else {
 				// size.y > size.z > size.x
 				largest_side  = 1; 
 				middle_side   = 2;
@@ -219,8 +195,7 @@ Matrix4f X3DComposedGeometryNode::getDefaultTexGenMatrix()
 		}
 
 		H3DFloat largest_length = size_vec[largest_side];
-		if( H3DAbs( largest_length ) > Constants::f_epsilon ) 
-		{
+		if( H3DAbs( largest_length ) > Constants::f_epsilon ) {
 			// parameters for the s coordinate
 			H3DFloat length_inv = 1/largest_length;
 			sparams[ largest_side ] = length_inv;
@@ -235,17 +210,13 @@ Matrix4f X3DComposedGeometryNode::getDefaultTexGenMatrix()
 			rparams[ smallest_side ] = -length_inv;
 			H3DFloat rcenter = size_vec[ smallest_side ] / (2*largest_length);
 			rparams[3] = rcenter + center_vec[ smallest_side ] / largest_length;
-		} 
-		else 
-		{
+		} else {
 			sparams[3] = 0.5;
 			tparams[3] = size_vec[ middle_side ] / (2*largest_length);
 			rparams[3] = size_vec[ smallest_side ] / (2*largest_length);
 		}
 		return m;
-	} 
-	else 
-	{
+	} else {
 		stringstream s;
 		s << "Could not calculate default  texture coordinate generation in IndexedFaceSet. "
 			<< "Requires bound object of BoxBound type. ";
@@ -253,10 +224,8 @@ Matrix4f X3DComposedGeometryNode::getDefaultTexGenMatrix()
 	}
 }
 
-void X3DComposedGeometryNode::startTexGen(X3DTextureCoordinateNode *tex_coord_node) 
-{
-	if( !tex_coord_node ) 
-	{
+void X3DComposedGeometryNode::startTexGen(X3DTextureCoordinateNode *tex_coord_node) {
+	if( !tex_coord_node ) {
 		Matrix4f m = getDefaultTexGenMatrix();
 
 		H3DFloat *sparams = m[0];
@@ -268,11 +237,9 @@ void X3DComposedGeometryNode::startTexGen(X3DTextureCoordinateNode *tex_coord_no
 		// before deciding on how to do it.
 		MultiTexture *mt = 
 			dynamic_cast< MultiTexture * >( X3DTextureNode::getActiveTexture() );
-		if( mt ) 
-		{
+		if( mt ) {
 			size_t texture_units = mt->texture->size();
-			for( size_t i = 0; i < texture_units; ++i ) 
-			{
+			for( size_t i = 0; i < texture_units; ++i ) {
 				glActiveTexture( GL_TEXTURE0_ARB + (unsigned int) i );
 				glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 				glTexGend( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
@@ -284,9 +251,7 @@ void X3DComposedGeometryNode::startTexGen(X3DTextureCoordinateNode *tex_coord_no
 				// glEnable( GL_TEXTURE_GEN_T );
 				// glEnable( GL_TEXTURE_GEN_R );
 			}
-		} 
-		else 
-		{
+		} else {
 			glTexGend( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 			glTexGend( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 			glTexGend( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
@@ -297,42 +262,31 @@ void X3DComposedGeometryNode::startTexGen(X3DTextureCoordinateNode *tex_coord_no
 			// glEnable( GL_TEXTURE_GEN_T );
 			// glEnable( GL_TEXTURE_GEN_R );
 		}
-	} 
-	else 
-	{
+	} else {
 		tex_coord_node->startTexGenForActiveTexture();
 	}    
 }
 
 void X3DComposedGeometryNode::stopTexGen( 
-	X3DTextureCoordinateNode *tex_coord_node ) 
-	{
-		if( !tex_coord_node ) 
-		{
-			MultiTexture *mt = 
-				dynamic_cast< MultiTexture * >( X3DTextureNode::getActiveTexture() );
-			if( mt ) 
-			{
-				size_t texture_units = mt->texture->size();
-				for( size_t i = 0; i < texture_units; ++i ) 
-				{
-					glActiveTexture( GL_TEXTURE0_ARB + (unsigned int) i );
-					glDisable( GL_TEXTURE_GEN_S );
-					glDisable( GL_TEXTURE_GEN_T );
-					glDisable( GL_TEXTURE_GEN_R );
-				}
-			} 
-			else 
-			{
+	X3DTextureCoordinateNode *tex_coord_node ) {
+	if( !tex_coord_node ) {
+		MultiTexture *mt = dynamic_cast< MultiTexture * >( X3DTextureNode::getActiveTexture());
+		if( mt ) {
+			size_t texture_units = mt->texture->size();
+			for( size_t i = 0; i < texture_units; ++i ) {
+				glActiveTexture( GL_TEXTURE0_ARB + (unsigned int) i );
 				glDisable( GL_TEXTURE_GEN_S );
 				glDisable( GL_TEXTURE_GEN_T );
 				glDisable( GL_TEXTURE_GEN_R );
 			}
-		} 
-		else 
-		{
-			tex_coord_node->stopTexGenForActiveTexture();
+		} else {
+			glDisable( GL_TEXTURE_GEN_S );
+			glDisable( GL_TEXTURE_GEN_T );
+			glDisable( GL_TEXTURE_GEN_R );
 		}
+	} else {
+		tex_coord_node->stopTexGenForActiveTexture();
+	}
 }
 
 void X3DComposedGeometryNode::renderTexCoord( int index, 

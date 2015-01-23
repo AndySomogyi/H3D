@@ -183,6 +183,51 @@ namespace H3D
 	//They're all auto_ptrs because they can be null. If they're null, 
 	//it means they're completely default and we don't need to change the state.
 	struct TotalRenderState {
+
+	/*
+	//What I want to do here is remove all the *type*V calls and replace them with stuff like Vec3f, Vec4f, int4. 
+	//So that people don't have to use some vector or something like that every time they want to get a value. 
+	//
+	//The first problem I'm facing with this approach is that I need to figure out exactly what types of objects CAN be returned.
+	
+	void glGetBooleanv( 	GLenum pname,
+	GLboolean * data);
+
+	void glGetDoublev( 	GLenum pname,
+	GLdouble * data);
+
+	void glGetFloatv( 	GLenum pname,
+	GLfloat * data);
+
+	void glGetIntegerv( 	GLenum pname,
+	GLint * data);
+
+	void glGetInteger64v( 	GLenum pname,
+	GLint64 * data);
+
+	void glGetBooleani_v( 	GLenum target,
+	GLuint index,
+	GLboolean * data);
+
+	void glGetIntegeri_v( 	GLenum target,
+	GLuint index,
+	GLint * data);
+
+	void glGetFloati_v( 	GLenum target,
+	GLuint index,
+	GLfloat * data);
+
+	void glGetDoublei_v( 	GLenum target,
+	GLuint index,
+	GLdouble * data);
+
+	void glGetInteger64i_v( 	GLenum target,
+	GLuint index,
+	GLint64 * data);
+	*/
+
+
+
 	public:
 		//Enumerations of each kind of state change type we could have.
 		//We use these to identify what type of changes have occurred, and act according to these types.

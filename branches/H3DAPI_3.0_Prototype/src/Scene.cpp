@@ -615,7 +615,7 @@ void Scene::idle()
 
 		H3DTime cur_time= time->getValue();
 		if ( cur_time - last_unused_texture_check > unused_texture_time ) {
-			H3DSingleTextureNode::makeUnusedTexturesNonResident ( unused_texture_time );
+			H3DSingleTextureNode::makeUnusedTexturesNonResident(unused_texture_time);
 			last_unused_texture_check= cur_time;
 		}
 	}

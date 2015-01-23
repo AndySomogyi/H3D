@@ -34,82 +34,82 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase Circle2D::database( "Circle2D", 
-                               &(newInstance<Circle2D>), 
-                               typeid( Circle2D ),
-                               &X3DGeometryNode::database );
+	&(newInstance<Circle2D>), 
+	typeid( Circle2D ),
+	&X3DGeometryNode::database );
 
 namespace Circle2DInternals {
-  FIELDDB_ELEMENT( Circle2D, radius, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( Circle2D, radius, INPUT_OUTPUT );
 }
 
 
 Circle2D::Circle2D( Inst< SFNode      > _metadata,
-                    Inst< SFBound     > _bound,
-                    Inst< DisplayList > _displayList,
-                    Inst< MFBool      > _isTouched,
-                    Inst< MFVec3f     > _force,
-                    Inst< MFVec3f     > _contactPoint,
-                    Inst< MFVec3f     > _contactNormal,
-                    Inst< SFFloat     > _radius ):
-  X3DGeometryNode( _metadata, _bound, _displayList, _isTouched,
-                   _force, _contactPoint, _contactNormal ),
-  radius( _radius ) {
+	Inst< SFBound     > _bound,
+	Inst< DisplayList > _displayList,
+	Inst< MFBool      > _isTouched,
+	Inst< MFVec3f     > _force,
+	Inst< MFVec3f     > _contactPoint,
+	Inst< MFVec3f     > _contactNormal,
+	Inst< SFFloat     > _radius ):
+X3DGeometryNode( _metadata, _bound, _displayList, _isTouched,
+	_force, _contactPoint, _contactNormal ),
+	radius( _radius ) {
 
-  type_name = "Circle2D";
-  database.initFields( this );
+		type_name = "Circle2D";
+		database.initFields( this );
 
-  radius->setValue( 1.f );
-  radius->route( bound );
-  radius->route( displayList );
+		radius->setValue( 1.f );
+		radius->route( bound );
+		radius->route( displayList );
 }
 
 
 void Circle2D::DisplayList::callList( bool build_list ) {
-  Circle2D *circle = 
-   static_cast< Circle2D * >( owner );
+	Circle2D *circle = 
+		static_cast< Circle2D * >( owner );
 
-  glPushAttrib( GL_CURRENT_BIT );
-  float v[4];
-  glGetMaterialfv( GL_FRONT, GL_EMISSION, v );
-  glColor3f( v[0], v[1], v[2] );
+	glPushAttrib( GL_CURRENT_BIT );
+	float v[4];
+	glGetMaterialfv( GL_FRONT, GL_EMISSION, v );
+	glColor3f( v[0], v[1], v[2] );
 
-  X3DGeometryNode::DisplayList::callList( build_list );
+	X3DGeometryNode::DisplayList::callList( build_list );
 
-  glPopAttrib();
+	glPopAttrib();
 }
 
 void Circle2D::render() {
-  // Save the old state of GL_LIGHTING 
-  GLboolean lighting_enabled;
-  glGetBooleanv( GL_LIGHTING, &lighting_enabled );
-  glDisable( GL_LIGHTING );
+	// Save the old state of GL_LIGHTING 
+	GLboolean lighting_enabled;
+	glGetBooleanv( GL_LIGHTING, &lighting_enabled );
+	glDisable( GL_LIGHTING );
 
-  H3DFloat theta, angle_increment;
-  H3DFloat nr_segments = 40;
-  angle_increment = (H3DFloat) Constants::pi*2 / nr_segments;
-  H3DFloat r = radius->getValue();
+	H3DFloat theta, angle_increment;
+	H3DFloat nr_segments = nrLines();
+	angle_increment = (H3DFloat) Constants::pi*2 / nr_segments;
+	H3DFloat r = radius->getValue();
 
-  // draw a circle with lines
-  H3DFloat x, y;
-  glBegin( GL_LINE_STRIP );
-  int i = 0;
-  for ( ; i < nr_segments; ++i ) {
-    theta = i * angle_increment;
-    x = r * H3DCos(theta);
-    y = r * H3DSin(theta);
-    glVertex2f (x, y);
-  }
-  
-  theta = 0;
-  x = r * H3DCos(theta);
-  y = r * H3DSin(theta);
-  
-  glVertex2f(x, y);
-  glEnd ();
+	// draw a circle with lines
+	H3DFloat x, y;
+	glBegin( GL_LINE_STRIP );
+	int i = 0;
+	for ( ; i < nr_segments; ++i ) {
+		theta = i * angle_increment;
+		x = r * H3DCos(theta);
+		y = r * H3DSin(theta);
+		glVertex2f (x, y);
+	}
 
-  // reenable lighting if it was enabled before
-  if( lighting_enabled ) {
-   // glEnable( GL_LIGHTING );
-   }
+	theta = 0;
+	x = r * H3DCos(theta);
+	y = r * H3DSin(theta);
+
+	glVertex2f(x, y);
+	glEnd ();
+
+	// reenable lighting if it was enabled before
+	if( lighting_enabled ) {
+		// glEnable( GL_LIGHTING );
+	}
 }
 

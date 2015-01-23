@@ -34,106 +34,111 @@ using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase Arc2D::database( "Arc2D", 
-                               &(newInstance<Arc2D>), 
-                               typeid( Arc2D ),
-                               &X3DGeometryNode::database );
+	&(newInstance<Arc2D>), 
+	typeid( Arc2D ),
+	&X3DGeometryNode::database );
 
 namespace Arc2DInternals {
-  FIELDDB_ELEMENT( Arc2D, endAngle, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( Arc2D, startAngle, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( Arc2D, radius, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( Arc2D, endAngle, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( Arc2D, startAngle, INPUT_OUTPUT );
+	FIELDDB_ELEMENT( Arc2D, radius, INPUT_OUTPUT );
 }
 
 
 Arc2D::Arc2D( Inst< SFNode      > _metadata,
-              Inst< SFBound     > _bound,
-              Inst< DisplayList > _displayList,
-              Inst< MFBool      > _isTouched,
-              Inst< MFVec3f     > _force,
-              Inst< MFVec3f     > _contactPoint,
-              Inst< MFVec3f     > _contactNormal,
-              Inst< SFFloat     > _endAngle,
-              Inst< SFFloat     > _startAngle,
-              Inst< SFFloat     > _radius ):
-  X3DGeometryNode( _metadata, _bound, _displayList, _isTouched,
-                   _force, _contactPoint, _contactNormal ),
-  endAngle( _endAngle ),
-  startAngle( _startAngle ),
-  radius( _radius ) {
+	Inst< SFBound     > _bound,
+	Inst< DisplayList > _displayList,
+	Inst< MFBool      > _isTouched,
+	Inst< MFVec3f     > _force,
+	Inst< MFVec3f     > _contactPoint,
+	Inst< MFVec3f     > _contactNormal,
+	Inst< SFFloat     > _endAngle,
+	Inst< SFFloat     > _startAngle,
+	Inst< SFFloat     > _radius ):
+X3DGeometryNode( _metadata, _bound, _displayList, _isTouched,
+	_force, _contactPoint, _contactNormal ),
+	endAngle( _endAngle ),
+	startAngle( _startAngle ),
+	radius( _radius ) {
 
-  type_name = "Arc2D";
-  database.initFields( this );
+		type_name = "Arc2D";
+		database.initFields( this );
 
-  endAngle->setValue( (H3DFloat) Constants::pi/2 );
-  startAngle->setValue( 0.f );
-  radius->setValue( 1.f );
+		endAngle->setValue( (H3DFloat) Constants::pi/2 );
+		startAngle->setValue( 0.f );
+		radius->setValue( 1.f );
 
-  radius->route( bound );
+		radius->route( bound );
 
-  endAngle->route( displayList );
-  startAngle->route( displayList );
-  radius->route( displayList );
+		endAngle->route( displayList );
+		startAngle->route( displayList );
+		radius->route( displayList );
 }
 
 void Arc2D::DisplayList::callList( bool build_list ) {
-  Arc2D *arc = 
-   static_cast< Arc2D * >( owner );
+	Arc2D *arc = 
+		static_cast< Arc2D * >( owner );
 
-  glPushAttrib( GL_CURRENT_BIT );
+	glPushAttrib( GL_CURRENT_BIT );
 
-  float v[4];
-  glGetMaterialfv( GL_FRONT, GL_EMISSION, v );
-  glColor3f( v[0], v[1], v[2] );
+	float v[4];
+	glGetMaterialfv( GL_FRONT, GL_EMISSION, v );
+	glColor3f( v[0], v[1], v[2] );
 
-  X3DGeometryNode::DisplayList::callList( build_list );
+	X3DGeometryNode::DisplayList::callList( build_list );
 
-  glPopAttrib();
+	glPopAttrib();
 }
 
 void Arc2D::render() {
-  // Save the old state of GL_LIGHTING 
-  GLboolean lighting_enabled;
-  glGetBooleanv( GL_LIGHTING, &lighting_enabled );
-  glDisable( GL_LIGHTING );
+	// Save the old state of GL_LIGHTING 
+	GLboolean lighting_enabled;
+	glGetBooleanv( GL_LIGHTING, &lighting_enabled );
+	glDisable( GL_LIGHTING );
 
-  H3DFloat start_angle = startAngle->getValue();
-  H3DFloat end_angle = endAngle->getValue();
-  H3DFloat r = radius->getValue();
+	H3DFloat start_angle = startAngle->getValue();
+	H3DFloat end_angle = endAngle->getValue();
+	H3DFloat r = radius->getValue();
 
-  if( start_angle == end_angle ) {
-    start_angle = 0.f;
-    end_angle = (H3DFloat)Constants::pi * 2;
-  }
+	if( start_angle == end_angle ) {
+		start_angle = 0.f;
+		end_angle = (H3DFloat)Constants::pi * 2;
+	}
 
-  H3DFloat theta, angle_increment;
-  H3DFloat x, y;
-  H3DFloat nr_segments = 40;
+	H3DFloat theta, angle_increment;
+	H3DFloat x, y;
+	H3DFloat nr_segments = nrLines();
 
-  angle_increment = (H3DFloat) Constants::pi*2 / nr_segments;
+	angle_increment = (H3DFloat) Constants::pi*2 / nr_segments;
 
-  glBegin( GL_LINE_STRIP );
-  
-  for ( theta = start_angle; 
-        theta < end_angle;
-        theta += angle_increment ) {
-    x = r * H3DCos(theta);
-    y = r * H3DSin(theta);
-    
-    glVertex2f (x, y);
-  }
+	/*
+	In this class we'll instead have a traverseSG that has the functionality of callList and render combined. We'll have an 
+	"if(vbo == 0) { build vbo using the code used between glBegin and glEnd }" The VBO will be contained in one of the objects that 
+	*/
 
-  theta = end_angle;
-  x = r * H3DCos(theta);
-  y = r * H3DSin(theta);
-  
-  glVertex2f(x, y);
- 
-  glEnd ();
+	glBegin( GL_LINE_STRIP );
 
-  // reenable lighting if it was enabled before
-  if( lighting_enabled ) {
-   // glEnable( GL_LIGHTING );
-   }
+	for ( theta = start_angle; 
+		theta < end_angle;
+		theta += angle_increment ) {
+			x = r * H3DCos(theta);
+			y = r * H3DSin(theta);
+
+			glVertex2f (x, y);
+	}
+
+	theta = end_angle;
+	x = r * H3DCos(theta);
+	y = r * H3DSin(theta);
+
+	glVertex2f(x, y);
+
+	glEnd ();
+
+	// reenable lighting if it was enabled before
+	if( lighting_enabled ) {
+		// glEnable( GL_LIGHTING );
+	}
 }
 
 

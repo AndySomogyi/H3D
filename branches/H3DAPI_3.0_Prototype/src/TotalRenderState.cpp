@@ -1,4 +1,4 @@
-#include <H3D/OGLRenderStates.h>
+#include <H3D/TotalRenderState.h>
 #include <H3D/RenderProperties.h>
 
 #include <H3D/X3DGeometryNode.h>

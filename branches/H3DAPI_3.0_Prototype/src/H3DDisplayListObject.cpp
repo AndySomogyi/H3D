@@ -84,7 +84,9 @@ void H3DDisplayListObject::DisplayList::update()
 
 bool H3DDisplayListObject::DisplayList::tryBuildDisplayList( bool cache_broken ) {
 	// do not build a display list if we are not using caching.
-	if( !usingCaching() ) return false;
+	if( !usingCaching()) {
+		return false;
+	}
 
 	if( delay_cache_counter == 0 ) {
 		bool have_all_needed_display_lists = childrenCachesReady( cache_broken );

@@ -1,7 +1,7 @@
 #ifndef __RENDERCOMMANDS_H__
 #define __RENDERCOMMANDS_H__
 
-#include <H3D/OGLRenderStates.h>
+#include <H3D/TotalRenderState.h>
 #include <H3D/RenderMetaData.h>
 #include <H3D/OGLBuffer.h>
 
