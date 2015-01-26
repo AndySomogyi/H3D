@@ -116,112 +116,116 @@ void H3D::DrawElementsBaseVertexCommand::execute() {
 /*				Generic state change command test	                    */
 /************************************************************************/
 
-H3D::GenericStateChangeCommand::GenericStateChangeCommand(TotalRenderState::StateChangeType _stateType, TotalRenderState::StateChangeValue _stateValue)
-	: stateType(_stateType), stateValue(_stateValue)
+H3D::GenericStateChangeCommand::GenericStateChangeCommand(auto_ptr<StateChangeValue> _stateValue)
+	: stateValue(_stateValue)
 {
 }
 
 void H3D::GenericStateChangeCommand::execute()
 {
 	//Act accordingly...
-	switch(stateType)
+	switch(stateValue->type)
 	{
 		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::DepthTestingEnable:
-		if(stateValue.boolVal) {
+	case TotalRenderState::DepthTestingEnable: {
+		if(static_cast<BoolStateValue*>(stateValue.get())->value) {
 			glEnable(GL_DEPTH_TEST);
 		} else {
 			glDisable(GL_DEPTH_TEST);
-		}
-		break;
+		} }
+																						 break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::DepthBufferWriteEnable:
-		if(stateValue.boolVal) {
+																						 //////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::DepthBufferWriteEnable: {
+		if(static_cast<BoolStateValue*>(stateValue.get())->value) {
 			glDepthMask( GL_TRUE );
 		} else {
 			glDepthMask( GL_FALSE );
-		}
-		break;
+		} }
+																								 break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::DepthFunctionChange:
-		glDepthFunc(stateValue.enumVal);
+																								 //////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::DepthFunctionChange: {
+		glDepthFunc(static_cast<UintStateValue*>(stateValue.get())->value);
 		break;
 
 		//////////////////////////////////////////////////////////////////////////
 	case TotalRenderState::BlendingEnabled:
-		if(stateValue.boolVal) {
+		if(static_cast<BoolStateValue*>(stateValue.get())->value) {
 			glEnable( GL_BLEND );
 		} else {
 			glDisable( GL_BLEND );
-		}
-		break;
+		} }
+																							break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::BlendFunctionChange:
-		glBlendFuncSeparate(stateValue.blendFactorBundle.srcRGB, stateValue.blendFactorBundle.dstRGB, 
-			stateValue.blendFactorBundle.srcAlpha, stateValue.blendFactorBundle.dstAlpha);
-		break;
+																							//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::BlendFunctionChange: {
+		BlendFunctionStateBundle* blendFuncPtr = static_cast<BlendFunctionStateBundle*>(stateValue.get());
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::BlendEquationChange:
-		glBlendEquationSeparate(stateValue.blendEquationBundle.rgbEquation, stateValue.blendEquationBundle.alphaEquation);
-		break;
+		glBlendFuncSeparate(blendFuncPtr->srcRGB, blendFuncPtr->dstRGB, 
+			blendFuncPtr->srcAlpha, blendFuncPtr->dstAlpha); }
+																							break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::AlphaFunctionChange:
-		glAlphaFunc(stateValue.alphaFuncBundle.alphaTestFunc, stateValue.alphaFuncBundle.testValue);
-		break;
+																							//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::BlendEquationChange: {
+		BlendEquationStateBundle* ptr = static_cast<BlendEquationStateBundle*>(stateValue.get());
+		glBlendEquationSeparate(ptr->rgbEquation, ptr->alphaEquation); }
+																							break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::ColorMaskChange:
-		glColorMask(stateValue.colorMaskVal[0],
-			stateValue.colorMaskVal[1],
-			stateValue.colorMaskVal[2],
-			stateValue.colorMaskVal[3]);
-		break;
+																							//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::AlphaFunctionChange: {
+		AlphaFuncStateBundle* alphaFuncPtr = static_cast<AlphaFuncStateBundle*>(stateValue.get());
+		glAlphaFunc(alphaFuncPtr->alphaTestFunc, alphaFuncPtr->testValue); }
+																							break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::BlendColorChange:
-		glBlendColor(	stateValue.blendColorVal[0], 
-			stateValue.blendColorVal[1], 
-			stateValue.blendColorVal[2], 
-			stateValue.blendColorVal[3]);
-		break;
+																							//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::ColorMaskChange: {
+		ColorMaskStateValue* colorMaskPtr = static_cast<ColorMaskStateValue*>(stateValue.get());
+		glColorMask(colorMaskPtr->value.mask[0],
+			colorMaskPtr->value.mask[1],
+			colorMaskPtr->value.mask[2],
+			colorMaskPtr->value.mask[3]); }
+																					break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::FaceCullingEnable:
-		if(stateValue.boolVal){
+																					//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::BlendColorChange: {
+		BlendColorStateValue* blendColorPtr = static_cast<BlendColorStateValue*>(stateValue.get());
+		glBlendColor(blendColorPtr->value.color[0], blendColorPtr->value.color[1], 
+			blendColorPtr->value.color[2], blendColorPtr->value.color[3]); }
+																					 break;
+
+																					 //////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::FaceCullingEnable: {
+		if(static_cast<BoolStateValue*>(stateValue.get())->value){
 			glEnable(GL_CULL_FACE);
 		} else {
 			glDisable(GL_CULL_FACE);
-		}
-		break;
+		} }
+																						break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::CullFaceChanged:
-		glCullFace(stateValue.enumVal);
-		break;
+																						//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::CullFaceChanged: {
+		glCullFace(static_cast<UintStateValue*>(stateValue.get())->value); }
+																					break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::WindingOrderChange:
-		glFrontFace(stateValue.enumVal);
-		break;
+																					//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::WindingOrderChange: {
+		glFrontFace(static_cast<UintStateValue*>(stateValue.get())->value); }
+																						 break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::ScissorTestEnable:
-		if(stateValue.boolVal) {
+																						 //////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::ScissorTestEnable: {
+		if(static_cast<BoolStateValue*>(stateValue.get())->value) {
 			glEnable(GL_SCISSOR_TEST);
 		} else {
 			glDisable(GL_SCISSOR_TEST);
-		}
-		break;
+		} }
+																						break;
 
-		//////////////////////////////////////////////////////////////////////////
-	case TotalRenderState::ShaderChange:
-		glUseProgram(stateValue.uintVal);
-		break;
+																						//////////////////////////////////////////////////////////////////////////
+	case TotalRenderState::ShaderChange: {
+		glUseProgram(static_cast<UintStateValue*>(stateValue.get())->value);
+		break; }
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -489,20 +489,20 @@ bool H3DDisplayListObject::DisplayList::usingCaching() {
 			if( options->useCaching->getValue() ) {
 				// for non-geometry object, caching is determined by cacheOnlyGeometry also
 				return !options->cacheOnlyGeometries->getValue();
-			}else{
+			} else {
 				return false;
 			}
-		}else{// global setting update, but no option in global setting, return true by default
+		} else {// global setting update, but no option in global setting, return true by default
 			graphic_options_previous = NULL;
 			return true;
 		}
-	}else if( default_settings ) {// global setting exist, but not update since last frame
+	} else if( default_settings ) {// global setting exist, but not update since last frame
 		if( graphic_options_previous!=NULL ) {
 			return graphic_options_previous->useCaching->getValue();
-		}else{ // no previous graphic options exist, return true by default.
+		} else { // no previous graphic options exist, return true by default.
 			return true;
 		}
-	}else{// no default settings at all, return true by default, set previous to null
+	} else {// no default settings at all, return true by default, set previous to null
 		graphic_options_previous = NULL;
 		return true;
 	}

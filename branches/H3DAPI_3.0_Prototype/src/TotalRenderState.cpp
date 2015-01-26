@@ -7,6 +7,7 @@
 #include <H3D/RenderCommandBuffer.h>
 
 #include <limits> //for std::numeric_limits::epsilon that I use when comparing two floats
+#include <H3D/OGLUtil.h> //For OGL error reporting
 
 using namespace H3D;
 
@@ -58,56 +59,6 @@ void H3D::DepthState::defaultInit()
 void H3D::DepthState::reset()
 {
 	defaultInit();
-}
-
-/************************************************************************/
-/*					OGLBlendColor definitions	                        */
-/************************************************************************/
-
-H3D::OGLBlendColor::OGLBlendColor() {
-	color[0] = 0.0f;
-	color[1] = 0.0f;
-	color[2] = 0.0f;
-	color[3] = 1.0f;
-}
-
-H3D::OGLBlendColor::OGLBlendColor(GLclampf redBlend, GLclampf greenBlend, GLclampf blueBlend, GLclampf alphaBlend) {
-	color[0] = redBlend;
-	color[1] = greenBlend;
-	color[2] = blueBlend;
-	color[3] = alphaBlend;
-}
-
-bool H3D::OGLBlendColor::operator==(const OGLBlendColor& rhs) {
-	return (rhs.color[0] == color[0] &&
-		rhs.color[1] ==	color[1] && 
-		rhs.color[2] ==	color[2] && 
-		rhs.color[3] ==	color[3] );
-}
-
-/************************************************************************/
-/*					OGLColorMask definitions	                        */
-/************************************************************************/
-
-H3D::OGLColorMask::OGLColorMask() {
-	mask[0]	= true;
-	mask[1]	= true;
-	mask[2]	= true;
-	mask[3]	= true;
-}
-
-H3D::OGLColorMask::OGLColorMask(bool redMask, bool greenMask, bool blueMask, bool alphaMask) {
-	mask[0] = redMask;
-	mask[1] = greenMask;
-	mask[2] = blueMask;
-	mask[3] = alphaMask;
-}
-
-bool H3D::OGLColorMask::operator==(const OGLColorMask& rhs) {
-	return (mask[0] ==	rhs.mask[0] &&
-		mask[1] ==	rhs.mask[1] && 
-		mask[2] ==	rhs.mask[2] && 
-		mask[3] ==	rhs.mask[3] );
 }
 
 /************************************************************************/
@@ -673,7 +624,7 @@ H3D::ShaderData& H3D::TotalRenderState::getShaderData(){
 }
 
 void H3D::TotalRenderState::setShaderData(ShaderData val){
-	if(shader.programID != val.programID || shader.uniforms != val.uniforms){
+	if(shader.programID != val.programID || shader.uniforms != val.uniforms) {
 		shader = val;
 		stateChanges.insert(ShaderChange);
 	}
@@ -684,25 +635,22 @@ void H3D::TotalRenderState::setShaderData(ShaderData val){
 /* VertexLayoutDescription get&set	                                    */
 /************************************************************************/
 
-unsigned int H3D::TotalRenderState::getVertexLayoutDescription(){
+unsigned int H3D::TotalRenderState::getVertexLayoutDescription() {
 	return vertexLayoutDescription;
 }
 
-void H3D::TotalRenderState::setVertexLayoutDescription(unsigned int val){
+void H3D::TotalRenderState::setVertexLayoutDescription(unsigned int val) {
 	vertexLayoutDescription = val;
 }
 
-void H3D::TotalRenderState::InsertRenderCommands(RenderCommandBuffer* buffer, TotalRenderState* previousRenderState)
-{
+void H3D::TotalRenderState::InsertRenderCommands(RenderCommandBuffer* buffer, TotalRenderState* previousRenderState) {
 	/* For each custom state change. */
-	for(std::set<StateChangeType>::iterator it = stateChanges.begin(); it != stateChanges.end(); ++it)
-	{
+	for(std::set<StateChangeType>::iterator it = stateChanges.begin(); it != stateChanges.end(); ++it) {
 		bool previousStateHasMatch = false;
 		bool stateChangeIsValid = false;
 
 		/* Compare against previous render state... */
-		if(previousRenderState)
-		{
+		if(previousRenderState) {
 			for(std::set<StateChangeType>::iterator prevIt = previousRenderState->stateChanges.begin(); prevIt != previousRenderState->stateChanges.end(); ++prevIt) {
 				//If these match it means that both the previous state and the current state have a non-default state of the same type, 
 				// and we need to compare to make sure that we don't insert two identical state changes.
@@ -712,253 +660,246 @@ void H3D::TotalRenderState::InsertRenderCommands(RenderCommandBuffer* buffer, To
 			}
 		}
 
-		StateChangeValue stateChangeVal;
+		auto_ptr<StateChangeValue> stateChangeVal;
 
 		//Act accordingly...
 		switch(*it)
 		{
 			//////////////////////////////////////////////////////////////////////////
-		case DepthTestingEnable:
-			if(previousStateHasMatch){
+		case DepthTestingEnable: {
+			BoolStateValue* depthTest = new BoolStateValue;
+			if(previousStateHasMatch) {
 				if(getDepthTestingEnabled() != previousRenderState->getDepthTestingEnabled()) {
-					stateChangeVal.boolVal = getDepthTestingEnabled(); 
+
+					depthTest->value = getDepthTestingEnabled(); 
 				}
 			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.boolVal = getDepthTestingEnabled(); 
+				depthTest->value = getDepthTestingEnabled(); 
 			}
+			stateChangeVal.reset(depthTest); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case DepthBufferWriteEnable:
+		case DepthBufferWriteEnable: {
+			BoolStateValue* depthBufferWrite = new BoolStateValue;
 			if(previousStateHasMatch) {
 				if(getDepthBufferWriteEnabled() != previousRenderState->getDepthBufferWriteEnabled()) {
-					stateChangeVal.boolVal = getDepthBufferWriteEnabled();
+					depthBufferWrite->value = getDepthBufferWriteEnabled();
 				}
 			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.boolVal = getDepthBufferWriteEnabled();
+				depthBufferWrite->value = getDepthBufferWriteEnabled();
 			}
+			stateChangeVal.reset(depthBufferWrite); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case DepthFunctionChange:
+		case DepthFunctionChange: {
+			UintStateValue* depthFunc = new UintStateValue;
 			if(previousStateHasMatch) {
 				if(getDepthFunction() != previousRenderState->getDepthFunction()){
 					stateChangeIsValid = true;
-					stateChangeVal.boolVal = getDepthFunction();
+					depthFunc->value = getDepthFunction();
 				}
 			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.enumVal = getDepthFunction();
+				depthFunc->value = getDepthFunction();
 			}
+			stateChangeVal.reset(depthFunc); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case BlendingEnabled:
+		case BlendingEnabled: {
+			BoolStateValue* blendEnable = new BoolStateValue;
 			if(previousStateHasMatch) {
 				if(getBlendingEnabled() != previousRenderState->getBlendingEnabled()){
 					stateChangeIsValid = true;
-					stateChangeVal.boolVal = getBlendingEnabled();
+					blendEnable->value = getBlendingEnabled();
 				}
 			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.boolVal = getBlendingEnabled();
+				blendEnable->value = getBlendingEnabled();
 			}
+			stateChangeVal.reset(blendEnable); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case BlendFunctionChange:
-			if(previousStateHasMatch){
+		case BlendFunctionChange: {
+			BlendFunctionStateBundle* blendFuncBundle = new BlendFunctionStateBundle;
+			if(previousStateHasMatch) { 
 				if(	getSrcFactorRGB() != previousRenderState->getSrcFactorRGB() ||
 					getDstFactorRGB() != previousRenderState->getDstFactorRGB() ||
 					getSrcFactorAlpha() != previousRenderState->getSrcFactorAlpha() ||
 					getDstFactorAlpha() != previousRenderState->getDstFactorAlpha()) {
-					stateChangeIsValid = true;
-					stateChangeVal.blendFactorBundle.srcRGB = getSrcFactorRGB();
-					stateChangeVal.blendFactorBundle.dstRGB = getDstFactorRGB();
-					stateChangeVal.blendFactorBundle.srcAlpha = getSrcFactorAlpha();
-					stateChangeVal.blendFactorBundle.dstAlpha = getDstFactorAlpha();
+						stateChangeIsValid = true;			
+						blendFuncBundle->srcRGB = getSrcFactorRGB();
+						blendFuncBundle->dstRGB = getDstFactorRGB();
+						blendFuncBundle->srcAlpha = getSrcFactorAlpha();
+						blendFuncBundle->dstAlpha = getDstFactorAlpha();
 				}
 			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.blendFactorBundle.srcRGB = getSrcFactorRGB();
-				stateChangeVal.blendFactorBundle.dstRGB = getDstFactorRGB();
-				stateChangeVal.blendFactorBundle.srcAlpha = getSrcFactorAlpha();
-				stateChangeVal.blendFactorBundle.dstAlpha = getDstFactorAlpha();
+				blendFuncBundle->srcRGB = getSrcFactorRGB();
+				blendFuncBundle->dstRGB = getDstFactorRGB();
+				blendFuncBundle->srcAlpha = getSrcFactorAlpha();
+				blendFuncBundle->dstAlpha = getDstFactorAlpha();
 			}
+			stateChangeVal.reset(blendFuncBundle); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case BlendEquationChange:
-			if(previousStateHasMatch)
-			{
+		case BlendEquationChange: {
+			BlendEquationStateBundle* blendEqBundle = new BlendEquationStateBundle;
+			if(previousStateHasMatch) {
 				if(	getBlendEquationRGB() != previousRenderState->getBlendEquationRGB() ||
 					getBlendEquationAlpha() != previousRenderState->getBlendEquationAlpha()) {
-					stateChangeIsValid = true;
-					stateChangeVal.blendEquationBundle.rgbEquation = getBlendEquationRGB();
-					stateChangeVal.blendEquationBundle.alphaEquation = getBlendEquationAlpha();
+						stateChangeIsValid = true;
+						blendEqBundle->rgbEquation = getBlendEquationRGB();
+						blendEqBundle->alphaEquation = getBlendEquationAlpha();
 				}
-			} 
-			else
-			{
+			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.blendEquationBundle.rgbEquation = getBlendEquationRGB();
-				stateChangeVal.blendEquationBundle.alphaEquation = getBlendEquationAlpha();
+				blendEqBundle->rgbEquation = getBlendEquationRGB();
+				blendEqBundle->alphaEquation = getBlendEquationAlpha();
 			}
+			stateChangeVal.reset(blendEqBundle); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case AlphaFunctionChange:
-			if(previousStateHasMatch)
-			{
+		case AlphaFunctionChange: {
+			AlphaFuncStateBundle* alphaFuncBundle = new AlphaFuncStateBundle;
+			if(previousStateHasMatch) {
 				if(getAlphaTestFunc() != previousRenderState->getAlphaTestFunc() ||
 					getAlphaFuncValue() != previousRenderState->getAlphaFuncValue()) {
-					stateChangeIsValid = true;
-					stateChangeVal.alphaFuncBundle.alphaTestFunc = getAlphaTestFunc();
-					stateChangeVal.alphaFuncBundle.testValue = getAlphaFuncValue();
-				}
-			} 
-			else
-			{
-				stateChangeIsValid = true;
-				stateChangeVal.alphaFuncBundle.alphaTestFunc = getAlphaTestFunc();
-				stateChangeVal.alphaFuncBundle.testValue = getAlphaFuncValue();
-			}
-			break;
-
-			//////////////////////////////////////////////////////////////////////////
-		case ColorMaskChange:
-			if(previousStateHasMatch)
-			{
-				if(!(getColorMask() == previousRenderState->getColorMask())) {
 						stateChangeIsValid = true;
-						stateChangeVal.colorMaskVal[0] = getColorMask().mask[0];
-						stateChangeVal.colorMaskVal[1] = getColorMask().mask[1];
-						stateChangeVal.colorMaskVal[2] = getColorMask().mask[2];
-						stateChangeVal.colorMaskVal[3] = getColorMask().mask[3];
+						alphaFuncBundle->alphaTestFunc = getAlphaTestFunc();
+						alphaFuncBundle->testValue = getAlphaFuncValue();
 				}
-			} 
-			else
-			{
+			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.colorMaskVal[0] = getColorMask().mask[0];
-				stateChangeVal.colorMaskVal[1] = getColorMask().mask[1];
-				stateChangeVal.colorMaskVal[2] = getColorMask().mask[2];
-				stateChangeVal.colorMaskVal[3] = getColorMask().mask[3];
+				alphaFuncBundle->alphaTestFunc = getAlphaTestFunc();
+				alphaFuncBundle->testValue = getAlphaFuncValue();
 			}
+			stateChangeVal.reset(alphaFuncBundle); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case BlendColorChange:
-			if(previousStateHasMatch)
-			{
-				if(!(getBlendColor() == previousRenderState->getBlendColor())) {
+		case ColorMaskChange: {
+			ColorMaskStateValue* colorMask = new ColorMaskStateValue;
+			if(previousStateHasMatch) {
+				if(!(getColorMask() == previousRenderState->getColorMask())) {
 					stateChangeIsValid = true;
-					stateChangeVal.blendColorVal[0] = getBlendColor().color[0];
-					stateChangeVal.blendColorVal[1] = getBlendColor().color[1];
-					stateChangeVal.blendColorVal[2] = getBlendColor().color[2];
-					stateChangeVal.blendColorVal[3] = getBlendColor().color[3];
+					colorMask->value = getColorMask();
 				}
-			} 
-			else
-			{
+			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.blendColorVal[0] = getBlendColor().color[0];
-				stateChangeVal.blendColorVal[1] = getBlendColor().color[1];
-				stateChangeVal.blendColorVal[2] = getBlendColor().color[2];
-				stateChangeVal.blendColorVal[3] = getBlendColor().color[3];
+				colorMask->value = getColorMask();
 			}
+			stateChangeVal.reset(colorMask); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case FaceCullingEnable:
-			if(previousStateHasMatch)
-			{
+		case BlendColorChange: {
+			BlendColorStateValue* blendColor = new BlendColorStateValue;
+			if(previousStateHasMatch) {
+				if(!(getBlendColor() == previousRenderState->getBlendColor())) {
+					stateChangeIsValid = true;			
+					blendColor->value = getBlendColor();
+				}
+			} else {
+				stateChangeIsValid = true;			
+				blendColor->value = getBlendColor();
+			}
+			stateChangeVal.reset(blendColor); }
+			break;
+
+			//////////////////////////////////////////////////////////////////////////
+		case FaceCullingEnable: {
+			BoolStateValue* faceCull = new BoolStateValue;
+			if(previousStateHasMatch) {
 				if(getFaceCullingEnabled() != previousRenderState->getFaceCullingEnabled()) {
 					stateChangeIsValid = true;
-					stateChangeVal.boolVal = getFaceCullingEnabled();
+					faceCull->value = getFaceCullingEnabled();
 				}
-			} 
-			else
-			{
+			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.boolVal = getFaceCullingEnabled();
+				faceCull->value = getFaceCullingEnabled();
 			}
+			stateChangeVal.reset(faceCull); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case CullFaceChanged:
-			if(previousStateHasMatch)
-			{
+		case CullFaceChanged: {
+			UintStateValue* cullFace = new UintStateValue;
+			if(previousStateHasMatch) {
 				if(getCullFace() != previousRenderState->getCullFace()){
 					stateChangeIsValid = true;
-					stateChangeVal.enumVal = getCullFace();
+					cullFace->value = getCullFace();
 				}
-			} 
-			else
-			{
+			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.enumVal = getCullFace();
+				cullFace->value = getCullFace();
 			}
+			stateChangeVal.reset(cullFace); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case WindingOrderChange:
-			if(previousStateHasMatch)
-			{
+		case WindingOrderChange: {
+			UintStateValue* windingOrder = new UintStateValue;
+			if(previousStateHasMatch) {
 				if(getWindingOrder() != previousRenderState->getWindingOrder()) {
-				stateChangeIsValid = true;
-				stateChangeVal.enumVal = getWindingOrder();
+					stateChangeIsValid = true;
+					windingOrder->value = getWindingOrder();
 				}
-			} 
-			else
-			{
+			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.enumVal = getWindingOrder();
+				windingOrder->value = getWindingOrder();
+			}
+			stateChangeVal.reset(windingOrder);
 			}
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case ScissorTestEnable:
-			if(previousStateHasMatch)
-			{
+		case ScissorTestEnable: {
+			BoolStateValue* scissorTest = new BoolStateValue;
+			if(previousStateHasMatch) {
 				if(getScissorTestEnabled() != previousRenderState->getScissorTestEnabled()) {
 					stateChangeIsValid = true;
-					stateChangeVal.boolVal = getScissorTestEnabled();
+					scissorTest->value = getScissorTestEnabled();
 				}
-			} 
-			else
-			{
+			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.boolVal = getScissorTestEnabled();
+				scissorTest->value = getScissorTestEnabled();
 			}
+			stateChangeVal.reset(scissorTest); }
 			break;
 
 			//////////////////////////////////////////////////////////////////////////
-		case ShaderChange:
-			if(previousStateHasMatch)
-			{
+		case ShaderChange: {
+			UintStateValue* shaderValue = new UintStateValue;
+			if(previousStateHasMatch) {
 				const ShaderData& prevShader = previousRenderState->getShaderData();
 
 				if(getShaderData().programID != prevShader.programID ||
 					getShaderData().uniforms != prevShader.uniforms) {
-					stateChangeIsValid = true;
-					stateChangeVal.uintVal = getShaderData().programID;
+						stateChangeIsValid = true;
+						shaderValue->value = getShaderData().programID;
 				}
-			} 
-			else
-			{
+			} else {
 				stateChangeIsValid = true;
-				stateChangeVal.uintVal = getShaderData().programID;
+				shaderValue->value = getShaderData().programID;
 			}
+			stateChangeVal.reset(shaderValue); }
 			break;
 		}
 		//////////////////////////////////////////////////////////////////////////
 
-		if(stateChangeIsValid)
-		{
-			buffer->InsertNewCommand(new GenericStateChangeCommand(*it, stateChangeVal));
+		if(stateChangeIsValid) {
+			//After we've new-ed the stateChangeVal, remember to add the type.
+			stateChangeVal->type = *it;
+
+			buffer->InsertNewCommand(new GenericStateChangeCommand(stateChangeVal));
 
 			//If it happens to be a shader, we also want to insert some bindUniform commands!
 			if(*it == ShaderChange){
@@ -969,3 +910,101 @@ void H3D::TotalRenderState::InsertRenderCommands(RenderCommandBuffer* buffer, To
 		}
 	}
 }
+
+
+/*The stuff below: 
+We need setters too.
+
+Also: I need to make a new std::set that contains all of the deviating values. 
+Whenever we call a get, we look through the set to see if there's a deviating value floating around here, 
+else we do an actual glGet to fetch the default value. */
+GLboolean H3D::TotalRenderState::getGLBoolean(GLenum target, GLuint index/*= 0*/) {
+	GLboolean val;
+	glGetBooleani_v(target, index, &val);
+	LogOGLErrors("TotalRenderState::getGLBoolean");
+	return val;
+}
+
+//void H3D::TotalRenderState::setGLBoolean(GLenum target, GLboolean val, GLuint index /*= 0*/) {
+//	//.. Hm
+//}
+
+GLint H3D::TotalRenderState::getGLInteger(GLenum target, GLuint index/*= 0*/) {
+	GLint val;
+	glGetIntegeri_v(target, index, &val);
+	LogOGLErrors("TotalRenderState::getGLInteger");
+	return val;
+}
+
+//void H3D::TotalRenderState::setGLInteger(GLenum target, GLint val, GLuint index /*= 0*/) {
+//
+//}
+
+GLint64 H3D::TotalRenderState::getGLInteger64(GLenum target, GLuint index/*= 0*/) {
+	GLint64 val;
+	glGetInteger64i_v(target, index, &val);
+	LogOGLErrors("TotalRenderState::getGLInteger64");
+	return val;
+}
+
+//void H3D::TotalRenderState::setGLInteger64(GLenum target, GLint64 val, GLuint index /*= 0*/) {
+//
+//}
+
+GLfloat H3D::TotalRenderState::getGLFloat(GLenum target, GLuint index/*= 0*/) {
+	GLfloat val;
+	glGetFloati_v(target, index, &val);
+	LogOGLErrors("TotalRenderState::getGLFloat");
+	return val;
+}
+
+//void H3D::TotalRenderState::setGLFloat(GLenum target, GLfloat val, GLuint index /*= 0*/) {
+//
+//}
+
+GLdouble H3D::TotalRenderState::getGLDouble(GLenum target, GLuint index/*= 0*/) {
+	GLdouble val;
+	glGetDoublei_v(target, index, &val);
+	LogOGLErrors("TotalRenderState::getGLDouble");
+	return val;
+}
+
+//void H3D::TotalRenderState::setGLDouble(GLenum target, GLdouble val, GLuint index /*= 0*/) {
+//
+//}
+
+H3DUtil::Vec2f H3D::TotalRenderState::getGLFloat2(GLenum target/*= 0*/) {
+	Vec2f val;
+	glGetFloati_v(target, 0, &val.x);
+	LogOGLErrors("TotalRenderState::getGLFloat2");
+	return val;
+}
+
+//void H3D::TotalRenderState::setGLFloat2(GLenum target, Vec2f val)
+//{
+//}
+
+H3DUtil::Vec3f H3D::TotalRenderState::getGLFloat3(GLenum target/*= 0*/) {
+	Vec3f val;
+	glGetFloati_v(target, 0, &val.x);
+	LogOGLErrors("TotalRenderState::getGLFloat3");
+	return val;
+}
+
+//void H3D::TotalRenderState::setGLFloat3(GLenum target, Vec3f val) {
+//
+//}
+
+H3DUtil::Vec4f H3D::TotalRenderState::getGLFloat4(GLenum target/*= 0*/) {
+	Vec4f val;
+	glGetFloati_v(target, 0, &val.x);
+	LogOGLErrors("TotalRenderState::getGLFloat4");
+	return val;
+}
+
+//void H3D::TotalRenderState::setGLFloat4(GLenum target, Vec4f val) {
+//
+//}
+
+
+

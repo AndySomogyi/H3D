@@ -81,22 +81,22 @@ X3DAppearanceNode( _displayList, _metadata, _surface ),
 	shaders          ( _shaders           ),
 	renderProperties( _renderProperties ),
 	shadow          ( _shadow )  
-	{
+{
 
-		type_name = "Appearance";
+	type_name = "Appearance";
 
-		database.initFields( this );
+	database.initFields( this );
 
-		shadow->setValue( false );
+	shadow->setValue( false );
 
-		fillProperties->route( displayList );
-		lineProperties->route( displayList );
-		material->route( displayList );
-		texture->route( displayList );
-		textureTransform->route( displayList );
-		shaders->route( displayList );
-		renderProperties->route( displayList );
-		shadow->route( displayList );
+	fillProperties->route( displayList );
+	lineProperties->route( displayList );
+	material->route( displayList );
+	texture->route( displayList );
+	textureTransform->route( displayList );
+	shaders->route( displayList );
+	renderProperties->route( displayList );
+	shadow->route( displayList );
 
 }
 
@@ -105,8 +105,11 @@ void Appearance::render()
 	X3DAppearanceNode::render();     
 
 	X3DMaterialNode *m = material->getValue();
-	if ( m ) m->displayList->callList();
-	else glColor4f( 1, 1, 1, 1 );
+	if ( m ) { 
+		m->displayList->callList();
+	} else {
+		glColor4f( 1, 1, 1, 1 );
+	}
 
 	/// If an RGB, BGR, RGBA or BGRA texture the texture values should not be
 	/// modulated with diffuseColor according to the X3D spec. So we set the 
@@ -118,11 +121,9 @@ void Appearance::render()
 	X3DTexture3DNode *texture3d = dynamic_cast< X3DTexture3DNode * >( texture_pt );
 
 	Image *image = NULL;
-	if( texture2d ) 
-	{
+	if( texture2d ) {
 		image = texture2d->image->getValue();
-	} else if( texture3d ) 
-	{
+	} else if( texture3d ) {
 		image = texture3d->image->getValue();
 	}
 
@@ -161,13 +162,19 @@ void Appearance::render()
 	}
 
 	X3DTextureNode *t = texture->getValue();
-	if ( t ) t->displayList->callList();
+	if ( t ) {
+		t->displayList->callList();
+	}
 
 	LineProperties *lp = lineProperties->getValue();
-	if ( lp ) lp->displayList->callList();
+	if ( lp ) {
+		lp->displayList->callList();
+	}
 
 	FillProperties *fp = fillProperties->getValue();
-	if ( fp ) fp->displayList->callList();
+	if ( fp ) {
+		fp->displayList->callList();
+	}
 
 	// the render() function of the texture transform
 	// must be called after the texture has been rendered
@@ -177,10 +184,11 @@ void Appearance::render()
 	X3DTextureTransformNode *tt = textureTransform->getValue();
 	if ( tt ) {
 		MultiTexture *mt = dynamic_cast< MultiTexture * >( t );
-		if( mt && mt->texture->size() > 0 ) 
+		if( mt && mt->texture->size() > 0 ) {
 			tt->renderForTextureUnits( 0, mt->texture->size() - 1 );
-		else
+		} else {
 			tt->renderForTextureUnit( 0 );
+		}
 	} else {
 		GLint saved_mode;
 		glGetIntegerv( GL_MATRIX_MODE, &saved_mode );
@@ -208,28 +216,36 @@ GLbitfield Appearance::getAffectedGLAttribs() {
 	GLbitfield res = X3DAppearanceNode::getAffectedGLAttribs();     
 
 	X3DMaterialNode *m = material->getValue();
-	if ( m ) res |= m->getAffectedGLAttribs();
-	else {
+	if ( m ) {
+		res |= m->getAffectedGLAttribs();
+	} else {
 		if( X3DShapeNode::disable_lighting_if_no_app ) {
 			res |= GL_LIGHTING_BIT;
 		}
 	}
 
 	X3DTextureNode *t = texture->getValue();
-	if ( t ) res |= t->getAffectedGLAttribs();
+	if ( t ) {
+		res |= t->getAffectedGLAttribs();
+	}
 
 	LineProperties *lp = lineProperties->getValue();
-	if ( lp ) res |= lp->getAffectedGLAttribs();
+	if ( lp ) {
+		res |= lp->getAffectedGLAttribs();
+	}
 
 	FillProperties *fp = fillProperties->getValue();
-	if ( fp ) res |= fp->getAffectedGLAttribs();
+	if ( fp ) {
+		res |= fp->getAffectedGLAttribs();
+	}
 
 	X3DTextureTransformNode *tt = textureTransform->getValue();
-	if ( tt ) res |= tt->getAffectedGLAttribs();
+	if ( tt ) {
+		res |= tt->getAffectedGLAttribs();
+	}
 
 	for( MFShaderNode::const_iterator i = shaders->begin();
-		i != shaders->end();
-		++i ) {
+		i != shaders->end(); ++i ) {
 			X3DShaderNode *s = static_cast< X3DShaderNode * >( *i );
 			if ( s ) {
 				if( s->isSupported() ) {
@@ -239,7 +255,10 @@ GLbitfield Appearance::getAffectedGLAttribs() {
 			}
 	}
 	RenderProperties *rp = renderProperties->getValue();
-	if ( rp ) res |= rp->getAffectedGLAttribs();
+	if ( rp ) {
+		res |= rp->getAffectedGLAttribs();
+	}
+
 	return res;
 }
 
@@ -370,11 +389,11 @@ void Appearance::traverseSG( TraverseInfo &ti ) {
 
 	for( MFShaderNode::const_iterator i = shaders->begin(); i != shaders->end(); ++i ) 
 	{
-			X3DShaderNode *sn = static_cast< X3DShaderNode * >( *i );
-			if(sn) 
-			{
-				sn->traverseSG( ti );
-			}
+		X3DShaderNode *sn = static_cast< X3DShaderNode * >( *i );
+		if(sn) 
+		{
+			sn->traverseSG( ti );
+		}
 	}
 
 	RenderProperties *rp = renderProperties->getValue();

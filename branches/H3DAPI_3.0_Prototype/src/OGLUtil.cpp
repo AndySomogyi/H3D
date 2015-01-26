@@ -8,6 +8,7 @@ namespace H3D
 
 	bool LogOGLErrors(std::string functionName, unsigned int functionCall /*= 0*/)
 	{
+		#ifdef HAVE_PROFILER
 		static unsigned int timeSinceLast = 0;
 
 		GLenum err;
@@ -22,6 +23,7 @@ namespace H3D
 
 			return true;
 		}
+		#endif
 
 		return false;
 	}
