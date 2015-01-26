@@ -63,13 +63,12 @@ namespace H3D {
 
 	class GenericStateChangeCommand : public RenderCommand {
 	public:
-		GenericStateChangeCommand(TotalRenderState::StateChangeType stateType, TotalRenderState::StateChangeValue stateValue);
+		GenericStateChangeCommand(auto_ptr<StateChangeValue> _stateValue);
 
 		virtual void execute();
 
 	private:
-		TotalRenderState::StateChangeType stateType;
-		TotalRenderState::StateChangeValue stateValue;
+		auto_ptr<StateChangeValue> stateValue;
 	};
 
 	/************************************************************************/

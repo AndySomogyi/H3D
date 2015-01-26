@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <H3D/OGLStateChangeValues.h>
 
 namespace H3D 
 {
@@ -13,31 +14,6 @@ namespace H3D
 	class X3DGeometryNode;
 	class Appearance;
 	class RenderCommandBuffer;
-
-		//////////////////////////////////////////////////////////////////////////
-
-	//It's special because GLclampf array
-	struct OGLBlendColor
-	{
-		OGLBlendColor();
-		OGLBlendColor(GLclampf redBlend, GLclampf greenBlend, GLclampf blueBlend, GLclampf alphaBlend);
-		
-		bool operator==(const OGLBlendColor& rhs);
-
-		GLclampf color[4];
-	};
-
-	//////////////////////////////////////////////////////////////////////////
-
-	struct OGLColorMask
-	{
-		OGLColorMask();
-		OGLColorMask(bool redMask, bool greenMask, bool blueMask, bool alphaMask);
-		
-		bool operator==(const OGLColorMask& rhs);
-
-		GLboolean mask[4];
-	};
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -183,51 +159,6 @@ namespace H3D
 	//They're all auto_ptrs because they can be null. If they're null, 
 	//it means they're completely default and we don't need to change the state.
 	struct TotalRenderState {
-
-	/*
-	//What I want to do here is remove all the *type*V calls and replace them with stuff like Vec3f, Vec4f, int4. 
-	//So that people don't have to use some vector or something like that every time they want to get a value. 
-	//
-	//The first problem I'm facing with this approach is that I need to figure out exactly what types of objects CAN be returned.
-	
-	void glGetBooleanv( 	GLenum pname,
-	GLboolean * data);
-
-	void glGetDoublev( 	GLenum pname,
-	GLdouble * data);
-
-	void glGetFloatv( 	GLenum pname,
-	GLfloat * data);
-
-	void glGetIntegerv( 	GLenum pname,
-	GLint * data);
-
-	void glGetInteger64v( 	GLenum pname,
-	GLint64 * data);
-
-	void glGetBooleani_v( 	GLenum target,
-	GLuint index,
-	GLboolean * data);
-
-	void glGetIntegeri_v( 	GLenum target,
-	GLuint index,
-	GLint * data);
-
-	void glGetFloati_v( 	GLenum target,
-	GLuint index,
-	GLfloat * data);
-
-	void glGetDoublei_v( 	GLenum target,
-	GLuint index,
-	GLdouble * data);
-
-	void glGetInteger64i_v( 	GLenum target,
-	GLuint index,
-	GLint64 * data);
-	*/
-
-
-
 	public:
 		//Enumerations of each kind of state change type we could have.
 		//We use these to identify what type of changes have occurred, and act according to these types.
@@ -254,22 +185,22 @@ namespace H3D
 			STATE_CHANGE_TYPE_COUNT //Always keep this last! That way we have an automatic counter for how many enum definitions are contained within this list.
 		};
 
-	union StateChangeValue
-	{
+		/*union StateChangeValue
+		{
 		struct BlendFactorBundle
 		{
-			GLenum srcRGB, srcAlpha, dstRGB, dstAlpha;
+		GLenum srcRGB, srcAlpha, dstRGB, dstAlpha;
 		} blendFactorBundle;
 
 		struct BlendEquationBundle{
-			GLenum rgbEquation;
-			GLenum alphaEquation;
+		GLenum rgbEquation;
+		GLenum alphaEquation;
 		} blendEquationBundle;
 
 		struct AlphaFuncBundle
 		{
-			GLenum alphaTestFunc;
-			GLclampf testValue;
+		GLenum alphaTestFunc;
+		GLclampf testValue;
 		} alphaFuncBundle;
 
 		GLenum enumVal;
@@ -279,7 +210,7 @@ namespace H3D
 		bool boolVal;
 		unsigned int uintVal;
 		int	intVal;
-	};
+		};*/
 
 	public: 
 		TotalRenderState();
@@ -292,6 +223,41 @@ namespace H3D
 
 		bool operator==(TotalRenderState& rhs);
 		bool operator!=(TotalRenderState& rhs);
+
+		/*
+		Right so I could use some form of Dictionary with GLenums and a union for each.. value. That'd use up an immense amount of memory once I start getting many different instances of totalrenderstate.
+		Problem with this entire thing is that I don't use the glSet and stuff in traverseSG because I queue it all up in totalRenderState right. 
+		So I need to do my own thing with storing every single value? Or at least the ones that deviate...?
+
+
+		//GL_INVALID_ENUM is generated if pname is not an accepted value.
+		//GL_INVALID_VALUE is generated on any of glGetBooleani_v, glGetIntegeri_v, or glGetInteger64i_v if index is outside of the valid range for the indexed state target. 
+		*/
+
+		/* Generic get&set functions to expose OGL functionality */
+		GLboolean getGLBoolean(GLenum target, GLuint index = 0);
+		//void setGLBoolean(GLenum target, GLboolean val, GLuint index = 0);
+
+		GLint getGLInteger(GLenum target, GLuint index = 0);
+		//void setGLInteger(GLenum target, GLint val, GLuint index = 0);
+
+		GLint64 getGLInteger64(GLenum target, GLuint index = 0);
+		//void setGLInteger64(GLenum target, GLint64 val, GLuint index = 0);
+
+		GLfloat getGLFloat(GLenum target, GLuint index = 0);
+		//void setGLFloat(GLenum target, GLfloat val, GLuint index = 0);
+
+		GLdouble getGLDouble(GLenum target, GLuint index = 0);
+		//void setGLDouble(GLenum target, GLdouble val, GLuint index = 0);
+
+		H3DUtil::Vec2f getGLFloat2(GLenum target);
+		//void setGLFloat2(GLenum target, Vec2f val);
+
+		H3DUtil::Vec3f getGLFloat3(GLenum target);
+		//void setGLFloat3(GLenum target, Vec3f val);
+
+		H3DUtil::Vec4f getGLFloat4(GLenum target);
+		//void setGLFloat4(GLenum target, Vec4f val);
 
 		/* Get and set for DepthState */
 		DepthState&	getDepthState();
@@ -369,9 +335,19 @@ namespace H3D
 
 		//It's in here that we actually process the state changes
 		void InsertRenderCommands(RenderCommandBuffer* buffer, TotalRenderState* previousRenderState);
-		
-		private:
+
+	private:
+		typedef std::pair<GLenum, auto_ptr<StateChangeValue>> StateKeyValuePair;
+
+		struct KeyValPairComparator {
+			bool operator() (const StateKeyValuePair& lhs, const StateKeyValuePair& rhs) const{
+				//Just compare their key value.
+				return lhs.first < rhs.first;
+			}
+		};
+
 		// Set of different state changes. Each value in a set is unique, so we don't have to worry about duplicates.
+		//std::set<StateKeyValuePair, KeyValPairComparator> stateChanges;
 		std::set<StateChangeType> stateChanges;
 
 		DepthState depthState;

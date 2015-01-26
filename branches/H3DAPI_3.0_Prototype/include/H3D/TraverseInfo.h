@@ -37,7 +37,7 @@
 #include <stack>
 #include <map>
 
-#include <H3D/OGLRenderStates.h>
+#include <H3D/TotalRenderState.h>
 
 using namespace std;
 
