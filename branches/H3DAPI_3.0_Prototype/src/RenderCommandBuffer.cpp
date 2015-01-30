@@ -10,7 +10,7 @@ H3D::RenderCommandBuffer::RenderCommandBuffer(unsigned int numCommands)
 	const GLbitfield createFlags = mapFlags | GL_DYNAMIC_STORAGE_BIT;
 
 	//Command buffer needs to be accessible from inside the DrawCommands struct. Also idk if need several, might be dumb.
-	commandBuffer.Create(BufferStorage::PersistentlyMappedBuffer, GL_DRAW_INDIRECT_BUFFER, numCommands, createFlags, mapFlags);
+	commandBuffer.Create(BufferStorage::PersistentlyMappedBuffer, GL_DRAW_INDIRECT_BUFFER, numCommands*sizeof(RenderCommand), createFlags, mapFlags);
 
 	commandQueue.reserve(numCommands);
 }
@@ -28,7 +28,6 @@ void H3D::RenderCommandBuffer::Clear()
 	}
 
 	commandQueue.clear();
-
 	commandBuffer.Destroy();
 }
 

@@ -3,7 +3,6 @@
 #include <H3D/X3DGeometryNode.h>
 #include <H3D/OGLUtil.h>
 #include <H3D/MathUtil.h>
-#include <H3DUtil/Vec3f.h>
 
 using namespace H3D;
 
@@ -13,12 +12,11 @@ H3D::Renderer::Renderer()
 	lookAtVector(0.0f, 0.0f, 1.0f),
 	upVector(0.0f, 0.0f, 1.0f),
 	eyeVector(0.0f, 3.0f, 10.0f),
-	usingBindless(USING_BINDLESS)
-{
+	usingBindless(USING_BINDLESS) {
 	time = time.now();
 	previousTime = time;
 	elapsedTime = 0.0f;
-	objectCount = 128;
+	objectCount = 64;
 	rebuildCommandBuffer = true;
 	maxVertexAttribSlots = 16;
 
@@ -39,19 +37,13 @@ H3D::Renderer::Renderer()
 	//Read max amount of concurrent vertex attributes
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribSlots);
 
-	//#ifdef GLEW_ARB_multi_draw_indirect
-	//	usingBindless = true;
-	//#else
-	//	usingBindless = false;
-	//#endif
-
-	if(usingBindless)
-	{
-		//clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_ELEMENT_ARRAY_UNIFIED_NV, true));
-		//clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV, true));
+	if(usingBindless) {
+		clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_ELEMENT_ARRAY_UNIFIED_NV, true));
+		clientStatesToEnable.push_back(std::pair<GLenum, bool>(GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV, true));
 	}
 
-	transformBuffer.Create(PersistentlyMappedBuffer, GL_SHADER_STORAGE_BUFFER, 3*objectCount);
+																																							//64*64 bytes = 4096 bytes = 4kB
+	transformBuffer.Create(PersistentlyMappedBuffer, GL_SHADER_STORAGE_BUFFER, objectCount*sizeof(Matrix4f));
 
 	glGenVertexArrays(1, &dummyVAO);
 	glBindVertexArray(dummyVAO);
@@ -65,7 +57,6 @@ H3D::Renderer::~Renderer() {
 }
 
 void  H3D::Renderer::update() {
-
 	time = TimeStamp::now();
 	elapsedTime += static_cast<float>(time - previousTime);
 	previousTime = time;
@@ -95,58 +86,40 @@ void  H3D::Renderer::update() {
 		drawCommand.reserved = 0;
 
 		/************************************************************************/
-		/*  Go through each renderable. 
+		/*  
+			Go through each renderable. 
 			Construct a draw command and insert it into a render bucket.
 			If the renderable has a unique render state or vertex 
-			attribute layout, we create a new render bucket to hold this renderable.                                                                                                                   
+			attribute layout, we create a new render bucket to hold it.                                                                                                                   
 		*/
 		/************************************************************************/
 		for(unsigned int i = 0; i < renderables.size(); ++i) {
 
-			//Insert the transform for this particular renderable
-			transforms.push_back(renderables[i]->modelTransform);
-
-			//Save ptr to this transform for element renderable
-			elementRenderables[i]->transform = &transforms[transforms.size()-1];
-
-			//Fill up the draw command parameters
-			drawCommand.cmd.count = static_cast<GLuint>(renderables[i]->IBO.length);
-			drawCommand.indexBuffer = renderables[i]->IBO;
-			drawCommand.vertexBuffers[0] = renderables[i]->VBOs[0];
-			drawCommand.vertexBuffers[1] = renderables[i]->VBOs[1];
-			//drawCommand.vertexBuffers = &(*renderables[i]->VBOs.begin());
+			if(usingBindless) {
+				transforms.push_back(renderables[i]->transform);
+			}
 
 			//Go through each render bucket and see if any of them has a total render state that matches the one of this renderable.
 			//If we don't find a render bucket that matches, we create another bucket and insert the renderable there instead.
 			for(unsigned int k = 0; k < renderBuckets.size(); ++k) {
-
 				//If this renderable's render state and attribute layout matches this renderbucket, insert the renderable and break inner loop
-				if(	renderables[i]->renderState == renderBuckets[k].renderState && 
-					renderables[i]->vertexAttributeLayout == renderBuckets[k].vertexAttributeLayout) {
+				if(	renderables[i]->totalRenderStateHandle == renderBuckets[k].renderState && 
+						renderables[i]->vertexAttributeLayout == renderBuckets[k].vertexAttributeLayout) {
 						drawCmdIsUnique = false;
-						renderBuckets[k].renderables.push_back(drawCommand);
-						renderBuckets[k].elementRenderables.push_back(*(elementRenderables[i]));
+						renderBuckets[k].renderables.push_back(renderables[i]);
 						break;
 				}
 			}
-
-			
-			/************************************************************************/
-			/*	Insert create a new renderBucket if this renderable has a unique 
-			 	state / vertexAttributeLayout. then insert the renderable into 
-				the bucket.
-			 */	
-			/************************************************************************/
 
 			//If none of the renderbuckets match, we create a new renderbucket and insert it.
 			if(drawCmdIsUnique) {
 				//Create a new renderbucket with the right state and vertex layout
 				RenderBucket newBucket;
-				newBucket.renderState = renderables[i]->renderState;
+				newBucket.renderState = renderables[i]->totalRenderStateHandle;
 				newBucket.vertexAttributeLayout = renderables[i]->vertexAttributeLayout;
 
 				//Sort of a clunky way to figure out the number of VBOs we have for this particular render bucket, but it works and isn't super slow
-				std::vector<VertexAttributeDescription>& vboVec = vertexAttributeLayouts[newBucket.vertexAttributeLayout].first;
+				std::vector<VertexAttributeDescription>& vboVec = vertexAttributeLayouts[newBucket.vertexAttributeLayout];
 				newBucket.numVBOs = vboVec.size();
 
 				//Insert it into renderbuckets.... inefficient copy construct, but don't think there's any way around it.
@@ -154,8 +127,7 @@ void  H3D::Renderer::update() {
 
 				// Get furthest out renderbucket, aka the one we just inserted. Then into that renderbucket, 
 				// insert the newest drawcommand that we tried to insert into the other renderbuckets (but failed because of no match)
-				renderBuckets[renderBuckets.size()-1].renderables.push_back(drawCommand);
-				renderBuckets[renderBuckets.size()-1].elementRenderables.push_back(*elementRenderables[i]);
+				renderBuckets[renderBuckets.size()-1].renderables.push_back(renderables[i]);
 			}
 		}
 
@@ -186,16 +158,55 @@ void  H3D::Renderer::update() {
 			//Insert the actual render command
 			if(usingBindless) {
 
-				//TODO: Just do a.. sizeof instead? I guess? Uh.
-				renderCommandBuffer.InsertNewCommand(new UpdateCircularBufferCommand<Matrix4f>(&transformBuffer, &transforms));
+				//Measure up all of the sizes
+				unsigned int staticObjectSize = sizeof(DrawElementsIndirectCommand) + sizeof(GLuint) + sizeof(IndirectRenderData);
+				unsigned int dynamicObjectSize = renderBuckets[i].numVBOs * sizeof(IndirectRenderData);
+				unsigned int totalBlobSizeInBytes = renderBuckets[i].renderables.size() * (staticObjectSize + dynamicObjectSize);
 
-				renderCommandBuffer.InsertNewCommand(new MultiDrawElementsIndirectCommand(renderCommandBuffer.GetBuffer(), 
-					renderBuckets[i].renderables, GL_TRIANGLES, GL_UNSIGNED_INT, 0, renderBuckets[i].elementRenderables[0].VBOs.size()));
+				std::vector<IndirectRenderData> vboDrawCommands(renderBuckets[i].numVBOs);
 
-				renderCommandBuffer.InsertNewCommand(new CleanupCircularBufferCommand<Matrix4f>(&transformBuffer, transforms.size()*sizeof(Matrix4f)));
+				BlobContainer blob(0, totalBlobSizeInBytes);
+				void* blobPtr = blob.getDataHeadPtr();
+				unsigned int index = 0;
+
+				//Now we step through the entire blob data and insert stuff with memcpy
+				for(std::vector<Renderable*>::iterator renderableIter = renderBuckets[i].renderables.begin(); 
+					renderableIter != renderBuckets[i].renderables.end(); ++renderableIter) {
+
+					//Fill static part of drawCommand with data
+					drawCommand.indexBuffer.index = 0;
+					drawCommand.indexBuffer.address = (*renderableIter)->IBO.getBufferGPUPtr();
+					drawCommand.indexBuffer.length = (*renderableIter)->IBO.getBufferSize();
+					
+					//And insert into blob
+					memcpy(((char*)blobPtr+index), &drawCommand, staticObjectSize);
+					index += staticObjectSize;
+
+					//Now for the tricky part, let's do the dynamic data
+					for(unsigned int k = 0; k < vboDrawCommands.size(); ++k) {
+						vboDrawCommands[k].address = (*renderableIter)->VBOs[k].getBufferGPUPointer();
+						vboDrawCommands[k].length = (*renderableIter)->VBOs[k].getBufferSize();
+						vboDrawCommands[k].index = (*renderableIter)->VBOs[k].getVAD().attributeIndex; //I think this is right.
+					}
+
+					//And insert into the blob
+					memcpy(((char*)blobPtr+index), &vboDrawCommands[0], dynamicObjectSize);
+
+					index += dynamicObjectSize;
+				}
+
+				//Now we're done. The blob should have been filled with all of the data in the correct order.
+
+				renderCommandBuffer.InsertNewCommand(new UpdateCircularBufferCommand(&transformBuffer, &transforms[0], transforms.size()*sizeof(Matrix4f)));
+
+				renderCommandBuffer.InsertNewCommand(new MultiDrawElementsIndirectCommand(renderCommandBuffer.GetBuffer(),
+					vertexAttributeLayouts[renderBuckets[i].vertexAttributeLayout], blob, GL_TRIANGLES, GL_UNSIGNED_INT, 
+					0, renderBuckets[i].renderables.size(), renderBuckets[i].renderables[0]->VBOs.size()));
+
+				renderCommandBuffer.InsertNewCommand(new CleanupCircularBufferCommand(&transformBuffer, transforms.size()*sizeof(Matrix4f)));
 
 			} else {
-				renderCommandBuffer.InsertNewCommand(new DrawElementsBaseVertexCommand(renderBuckets[i].elementRenderables, GL_TRIANGLES, GL_UNSIGNED_INT, 0, worldMatrixUniformLocation));
+				renderCommandBuffer.InsertNewCommand(new DrawElementsBaseVertexCommand(renderBuckets[i].renderables, GL_TRIANGLES, GL_UNSIGNED_INT, 0, worldMatrixUniformLocation));
 			}
 
 			//And insert cleanup command afterwards
@@ -214,10 +225,6 @@ void  H3D::Renderer::update() {
 
 		//Important, set flag so that we don't rebuild next update unless it's changed externally
 		rebuildCommandBuffer = false;
-	} else {
-		for(unsigned int i = 0; i < renderables.size(); ++i) {
-			transforms.push_back(renderables[i]->modelTransform);
-		}
 	}
 }
 
@@ -252,16 +259,10 @@ void  H3D::Renderer::render() {
 	//Clear these out at the end of each frame...
 	renderables.clear();
 	transforms.clear();
-	elementRenderables.clear();
 }
 
-void  H3D::Renderer::insertNewRenderData(RenderData* const renderData) {
+void H3D::Renderer::insertNewRenderable(Renderable* renderData) {
 	renderables.push_back(renderData);
-}
-
-
-void H3D::Renderer::insertNewElementData(ElementDrawData* const elementData) {
-	elementRenderables.push_back(elementData);
 }
 
 /*
@@ -362,7 +363,7 @@ void H3D::Renderer::compareRenderStates(TotalRenderState& previousRenderState, c
 
 	if(previousRenderState.getVertexLayoutDescription() != rs.getVertexLayoutDescription()) {
 
-		std::vector<VertexAttributeDescription>& layout = vertexAttributeLayouts[rs.getVertexLayoutDescription()].first;
+		std::vector<VertexAttributeDescription>& layout = vertexAttributeLayouts[rs.getVertexLayoutDescription()];
 
 		//This code is just so that I can keep track of what vertex attribute slots will be bound / unbound between shader changes, so that I know which to clean up and which to keep open.
 		if(previousRenderState.getVertexLayoutDescription() == 0) {
@@ -371,7 +372,7 @@ void H3D::Renderer::compareRenderStates(TotalRenderState& previousRenderState, c
 				attributeSlotsToBeFreed.push_back(i);
 			}
 		} else {
-			std::vector<VertexAttributeDescription>& previousLayout = vertexAttributeLayouts[previousRenderState.getVertexLayoutDescription()].first;
+			std::vector<VertexAttributeDescription>& previousLayout = vertexAttributeLayouts[previousRenderState.getVertexLayoutDescription()];
 
 			//If the previous layout left extra attribute slots enabled, we want to queue those slots up for disabling
 			if(previousLayout.size() > layout.size()) {
@@ -382,7 +383,7 @@ void H3D::Renderer::compareRenderStates(TotalRenderState& previousRenderState, c
 		}
 
 		//, false, vertexAttributeLayouts[rs.vertexLayoutDescription].second));
-		commandBuffer.InsertNewCommand(new ChangeVertexAttributeSetupCommand(layout, usingBindless));
+		//commandBuffer.InsertNewCommand(new ChangeVertexAttributeSetupCommand(layout, usingBindless));
 		previousRenderState.setVertexLayoutDescription(rs.getVertexLayoutDescription()); //Copy value to make sure comparison for next CompareRenderStates call will work as intended.
 	}
 
@@ -398,7 +399,7 @@ void H3D::Renderer::InsertDefaultRenderstate(RenderCommandBuffer& commandBuffer)
 	commandBuffer.InsertNewCommand(new ChangeDepthStateCommand(rs.getDepthState()));
 	commandBuffer.InsertNewCommand(new ChangeRasterizerStateCommand(rs.getRasterizerState()));
 
-	std::vector<VertexAttributeDescription>& layout = vertexAttributeLayouts[rs.getVertexLayoutDescription()].first;
+	std::vector<VertexAttributeDescription>& layout = vertexAttributeLayouts[rs.getVertexLayoutDescription()];
 
 	attributeSlotsToBeFreed.clear();
 	for(unsigned int i = 0; i < layout.size(); ++i) {
@@ -407,15 +408,14 @@ void H3D::Renderer::InsertDefaultRenderstate(RenderCommandBuffer& commandBuffer)
 }
 
 
-unsigned int H3D::Renderer::insertVertexAttributeLayout(std::vector<VertexAttributeDescription> layout, GLuint IBO) {
+unsigned int H3D::Renderer::insertVertexAttributeLayout(std::vector<VertexAttributeDescription> layout) {
 
 	// Normal for-loop instead of iterator because I need the index...
 	// Loop through all our layouts and see if any of them match the one we just sent in
 	for(unsigned int i = 0; i < vertexAttributeLayouts.size(); ++i) {
-
 		// First do size comparison to break early
-		if(vertexAttributeLayouts[i].first.size() == layout.size()) {
-			std::vector<VertexAttributeDescription>& vec = vertexAttributeLayouts[i].first;
+		if(vertexAttributeLayouts[i].size() == layout.size()) {
+			std::vector<VertexAttributeDescription>& vec = vertexAttributeLayouts[i];
 			bool isUnique = false;
 
 			// For each attribute element in the layout
@@ -438,7 +438,7 @@ unsigned int H3D::Renderer::insertVertexAttributeLayout(std::vector<VertexAttrib
 
 	// If we've reached this point, it means that none of the layouts have matched,
 	// meaning that we have a new, unique layout to insert.
-	vertexAttributeLayouts.push_back(std::pair<std::vector<VertexAttributeDescription>, GLuint>(layout, IBO));
+	vertexAttributeLayouts.push_back(layout);
 
 	// Return the furthest out index, because that's 
 	// where the newest layout is stored.
@@ -464,10 +464,6 @@ void H3D::Renderer::setCurrentViewpoint(Vec3f position, Vec3f direction, Vec3f u
 	lookAtVector = direction;
 	upVector = up;
 	eyeVector = position;
-
-	//lookAtVector =	Vec3f(0.1f, 0.1f, 0.1f);
-	//upVector =		Vec3f(0.0f, 1.0f, 0.0f);
-	//eyeVector =		Vec3f(0.0f, 0.0f, 5.0f);
 
 	updateViewMatrix();
 }

@@ -1,43 +1,28 @@
 #include <H3D/VertexAttributeDescription.h>
 
-H3D::VertexAttributeDescription::VertexAttributeDescription()
-{
-	attributeSize = 0;	
-	bufferIndex = 0;		
-	normalized = false;		
-	stride = 0;	
-	primitiveType = GL_FLOAT;
-	bufferID = 0;
-	target = 0;	
+H3D::VertexAttributeDescription::VertexAttributeDescription(const GLuint _attributeIndex, const GLint _size, const GLenum _type, 
+	const GLboolean _normalized, const GLsizei _stride, const GLuint _startOffset) :
+attributeIndex(_attributeIndex), size(_size), type(_type), normalized(_normalized), stride(_stride), startOffset(_startOffset) {
 }
 
-H3D::VertexAttributeDescription& H3D::VertexAttributeDescription::operator=(VertexAttributeDescription& rhs)
-{
-	attributeSize	= rhs.attributeSize;		
-	bufferIndex		= rhs.bufferIndex;	
-	normalized		= rhs.normalized;
-	stride			= rhs.stride;
-	primitiveType	= rhs.primitiveType;
-	bufferID		= rhs.bufferID;
-	target			= rhs.target;
-	elementCount    = rhs.elementCount;
+H3D::VertexAttributeDescription& H3D::VertexAttributeDescription::operator=(VertexAttributeDescription& rhs) {
+	attributeIndex	= rhs.attributeIndex;		
+	size						= rhs.size;	
+	type						= rhs.type;
+	normalized			= rhs.normalized;
+	stride					= rhs.stride;
+	startOffset			= rhs.startOffset;
 
-	return *this;
+	return (*this);
 }
 
-
-
-bool H3D::VertexAttributeDescription::operator==(const VertexAttributeDescription& rhs)
-{
+bool H3D::VertexAttributeDescription::operator==(const VertexAttributeDescription& rhs) {
 	return (
-		rhs.attributeSize			== attributeSize			&&
-		rhs.bufferIndex			== bufferIndex		&&
-		rhs.normalized		== normalized	&&
-		rhs.stride			== stride		&&
-		rhs.primitiveType	== primitiveType); 
-		/*
-		&&
-		rhs.bufferID		== bufferID &&
-		rhs.target			== target
-		*/
+		attributeIndex	== rhs.attributeIndex &&		
+		size						== rhs.size &&	
+		type						== rhs.type &&
+		normalized			== rhs.normalized &&
+		stride					== rhs.stride &&
+		startOffset			== rhs.startOffset
+		);
 }

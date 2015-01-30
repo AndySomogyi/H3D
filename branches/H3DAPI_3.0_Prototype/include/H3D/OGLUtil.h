@@ -16,15 +16,26 @@ namespace H3D
 	// Parameter: std::string functionName <- Send in a qualifying string so that we know where the errors happened.
 	// Parameter: unsigned int functionCall <- Optional counter so that we know how how often the errors happen, or which frame it happened, depending entirely on how you're keeping count.
 	//************************************
-	bool LogOGLErrors(std::string functionName, unsigned int functionCall = 0);;
+	bool LogOGLErrors(std::string functionName, unsigned int functionCall = 0);
+
+
+	//************************************
+	// Method:    sizeOfOGLType
+	// FullName:  H3D::sizeOfOGLType
+	// Access:    public 
+	// Returns:   unsigned int
+	// Description: Simple utility function for figuring out byte size of OGL primitive types
+	// Parameter: GLenum type
+	//************************************
+	unsigned int sizeOfOGLType(GLenum type);
 
 	template <typename T>
-	void bufferData(GLenum _target, const std::vector<T>& _data, GLenum _usage);;
+	void bufferData(GLenum _target, const std::vector<T>& _data, GLenum _usage);
 
 	template <typename T>
-	void bufferDataArray(GLenum _target, const T* _data, GLint _count, GLenum _usage);;
+	void bufferDataArray(GLenum _target, const T* _data, GLint _count, GLenum _usage);
 
 	template <typename T>
-	GLuint newBufferFromVector(GLenum _target, const std::vector<T>& _data, GLenum _usage);;
+	GLuint newBufferFromVector(GLenum _target, const std::vector<T>& _data, GLenum _usage);
 }
 #endif

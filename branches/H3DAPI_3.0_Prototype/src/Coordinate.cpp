@@ -81,10 +81,10 @@ bool Coordinate::preRenderCheckFail ( ){
 
 void Coordinate::setAttributeData ( ){
   attrib_data =(GLvoid*) &(*point->begin ( ));
-  VAD.elementCount = 3;
-  VAD.primitiveType = GL_FLOAT;
-  VAD.stride = VAD.elementCount * sizeof(GLfloat);
-  VAD.attributeSize = point->size() * VAD.stride; // * sizeof(GLfloat);
+  VAD.elements_per_vertex = 3;
+  VAD.primitive_type = GL_FLOAT;
+  VAD.stride = VAD.elements_per_vertex * sizeof(GLfloat);
+  attrib_size = point->size() * sizeof(GLfloat); // * sizeof(GLfloat);
 }
 
 void Coordinate::renderVBO ( ){
@@ -94,7 +94,7 @@ void Coordinate::renderVBO ( ){
     glVertexFormatNV ( 3, GL_FLOAT, 0 );
      glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_VERTEX_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
+    glBufferAddressRangeNV ( GL_VERTEX_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
   } else
   {
     glVertexPointer ( 3, GL_FLOAT, 0, NULL );

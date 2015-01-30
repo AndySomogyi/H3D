@@ -206,13 +206,16 @@ void IndexedTriangleSet::render() {
 		GLhandleARB shader_program = 0;
 		// Set the attribute index to use for all vertex attributes
 		if( GLEW_ARB_shader_objects && GLEW_ARB_vertex_shader ) {
+			/* ti.getCurrentShader()	*/
 			shader_program = glGetHandleARB( GL_PROGRAM_OBJECT_ARB );
 			if( shader_program ) {
 				for( unsigned int i = 0; i < attrib->size(); ++i ) {
 					X3DVertexAttributeNode *attr = attrib->getValueByIndex( i );
 					if( attr ) {
+						/* currentShader.bind() ? */
 						GLint loc = glGetAttribLocationARB( shader_program, attr->name->getValue().c_str()); 
 						attr->setAttribIndex( loc );
+						/* currentShader.unbind() ? */
 					}
 				}
 
@@ -538,7 +541,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 
 	//Update the transform.
 	//if(ti.transformParentDirty()) {
-		renderData.modelTransform = ti.getAccForwardMatrix();
+		renderable.transform = ti.getAccForwardMatrix();
 	//}
 
 	vboFieldsUpToDate->upToDate();
@@ -552,40 +555,7 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		const vector<int>& indices = index->getValue();
 		unsigned int indexSize = (indices.size() * sizeof(GLuint));
 
-		if(!ib_id) {
-			glGenBuffersARB(1, &ib_id);
-		}
-
-		if(use_bindless) {
-			const GLbitfield mapFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
-			const GLbitfield createFlags = mapFlags | GL_DYNAMIC_STORAGE_BIT;
-
-			//Does this need to be deleted? Look up to make sure....
-			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, ib_id);
-			glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, indexSize, &*indices.begin(), createFlags);
-			glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, &ib_GPUaddress);
-			glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
-			LogOGLErrors("IndexedTriangleSet.cpp::traverseSG");
-
-			renderData.IBO.index = 0;
-			renderData.IBO.reserved = 0;
-			renderData.IBO.length = indexSize;
-			renderData.IBO.address = ib_GPUaddress;
-		} else {
-			glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, ib_id);
-			glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, indexSize, &(*(indices.begin()) ), GL_STATIC_DRAW);
-			LogOGLErrors("IndexedTriangleSet.cpp::traverseSG");
-
-			//We shouldn't reach this place, quite sure this'll cause issues
-			renderData.IBO.index = 0;
-			renderData.IBO.reserved = 0;
-			renderData.IBO.length = indexSize;
-			renderData.IBO.address = ib_id;
-		}
-
-		elementData.IBO = ib_id;
-		elementData.indexCount = indices.size();
-		elementData.VBOs.resize(0);
+		renderable.IBO.buildBufferObject(&indices[0], indexSize, indices.size(), GL_UNSIGNED_INT);
 
 		/************************************************************************/
 		/* Set up vertex attribute layout for this object                       */
@@ -603,15 +573,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		if(coordinate_node) {
 
 			coordinate_node->updateVertexBufferObject();
+
+			IndirectRenderData attribute(attributeIndexCount, 0, coordinate_node->getVBOPtr(), attribDescription.attribute_size);
 			attribDescription = coordinate_node->getVAD();
-
-			IndirectRenderData attribute;
-			attribute.address =		coordinate_node->getVBOPtr();
-			attribute.length =		attribDescription.attributeSize;
-			attribute.index =		attributeIndexCount;
-			attribute.reserved =	0;
-
-			attribDescription.bufferIndex =			attributeIndexCount;
+			attribDescription.buffer_index =	attributeIndexCount;
 
 			renderData.VBOs.push_back(attribute);
 			elementData.VBOs.push_back(attribDescription);
@@ -627,15 +592,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		if(tex_coord_node) {
 
 			tex_coord_node->updateVertexBufferObject();
+
+			IndirectRenderData attribute(attributeIndexCount, 0, tex_coord_node->getVBOPtr(), attribDescription.attribute_size);
 			attribDescription = tex_coord_node->getVAD();
-
-			IndirectRenderData attribute;
-			attribute.address =	tex_coord_node->getVBOPtr();
-			attribute.length =	attribDescription.attributeSize;
-			attribute.index =		attributeIndexCount;
-			attribute.reserved =	0;
-
-			attribDescription.bufferIndex =			attributeIndexCount;
+			attribDescription.buffer_index =	attributeIndexCount;
 
 			renderData.VBOs.push_back(attribute);
 			elementData.VBOs.push_back(attribDescription);
@@ -651,15 +611,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		if(fog_coord_node) {
 
 			fog_coord_node->updateVertexBufferObject();
+
+			IndirectRenderData attribute(attributeIndexCount, 0, fog_coord_node->getVBOPtr(), attribDescription.attribute_size);
 			attribDescription = fog_coord_node->getVAD();
-
-			IndirectRenderData attribute;
-			attribute.address =		fog_coord_node->getVBOPtr();
-			attribute.length =		attribDescription.attributeSize;
-			attribute.index =		attributeIndexCount;
-			attribute.reserved =	0;
-
-			attribDescription.bufferIndex =	attributeIndexCount;
+			attribDescription.buffer_index =	attributeIndexCount;
 
 			renderData.VBOs.push_back(attribute);
 			elementData.VBOs.push_back(attribDescription);
@@ -675,15 +630,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		if(color_node) {
 
 			color_node->updateVertexBufferObject();
+
+			IndirectRenderData attribute(attributeIndexCount, 0, color_node->getVBOPtr(), attribDescription.attribute_size);
 			attribDescription = color_node->getVAD();
-
-			IndirectRenderData attribute;
-			attribute.address =		color_node->getVBOPtr();
-			attribute.length =		attribDescription.attributeSize;
-			attribute.index =		attributeIndexCount;
-			attribute.reserved =	0;
-
-			attribDescription.bufferIndex =	attributeIndexCount;
+			attribDescription.buffer_index =	attributeIndexCount;
 
 			renderData.VBOs.push_back(attribute);
 			elementData.VBOs.push_back(attribDescription);
@@ -699,15 +649,10 @@ void IndexedTriangleSet::traverseSG( TraverseInfo &ti ) {
 		if(normal_node) {
 
 			normal_node->updateVertexBufferObject();
+			
+			IndirectRenderData attribute(attributeIndexCount, 0, normal_node->getVBOPtr(), attribDescription.attribute_size);
 			attribDescription = normal_node->getVAD();
-
-			IndirectRenderData attribute;
-			attribute.address =		normal_node->getVBOPtr();
-			attribute.length =		attribDescription.attributeSize;
-			attribute.index =		attributeIndexCount;
-			attribute.reserved =	0;
-
-			attribDescription.bufferIndex =			attributeIndexCount;
+			attribDescription.buffer_index =	attributeIndexCount;
 
 			renderData.VBOs.push_back(attribute);
 			elementData.VBOs.push_back(attribDescription);

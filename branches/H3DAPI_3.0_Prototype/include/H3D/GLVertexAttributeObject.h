@@ -104,19 +104,19 @@ namespace H3D
 		}
 		
 		inline GLuint getVBO(){
-			return VAD.bufferID;
+			return vbo_ID;
 		}
 
 		inline GLsizei getAttribSize() {
-			return VAD.attributeSize;
+			return attrib_size;
 		}
 
 		inline GLint getElementCount() {
-			return VAD.elementCount;
+			return VAD.size;
 		}
 
 		inline GLenum getPrimitiveType() {
-			return VAD.primitiveType;
+			return VAD.type;
 		}
 
 		//Size of each individual element
@@ -124,7 +124,7 @@ namespace H3D
 			return VAD.stride;
 		}
 
-		inline bool isNormalized() {
+		inline GLboolean isNormalized() {
 			return VAD.normalized;
 		}
 
@@ -136,19 +136,7 @@ namespace H3D
 		/// Internal field used to know if vertex buffer object can be created.
 		auto_ptr<Field> vboFieldsUpToDate;
 
-		//Maybe just make a "build vertex attribute description" function...
-		VertexAttributeDescription VAD;
-
-		/// Do not be alarmed that we don't delete this object in our destructor. Its' lifetime is governed elsewhere.
-		GLvoid* attrib_data;
-
-		/// If we use bindless rendering, this variable will contain the actual pointer into the GPU memory where this buffer is stored.
-		GLuint64EXT vbo_GPUaddr;
-
-		/// the type of vertex attribute
-		VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE attrib_type;
-
-		bool use_bindless;
+		VertexBufferContainer vbo;
 	};
 }
 

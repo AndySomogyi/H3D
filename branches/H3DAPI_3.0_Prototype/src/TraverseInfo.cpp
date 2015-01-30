@@ -28,15 +28,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <H3D/TraverseInfo.h>
 #include <H3D/H3DSurfaceNode.h>
 #include <H3D/X3DGeometryNode.h>
 #include <H3D/H3DHapticsDevice.h>
-#include <H3D/TraverseInfo.h>
 #include <H3D/X3DLightNode.h>
+
+#include <H3D/Renderer.h>
 
 using namespace H3D;
 
-TraverseInfo::TraverseInfo( const vector< H3DHapticsDevice * > &_haptics_devices, Renderer* const _renderer ) :
+TraverseInfo::TraverseInfo( const vector< H3DHapticsDevice * > &_haptics_devices, Renderer* _renderer ) :
 current_layer( 0 ),
 	current_surface( NULL ),
 	haptics_devices( _haptics_devices ),

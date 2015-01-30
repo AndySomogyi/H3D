@@ -35,33 +35,9 @@
 #include <string>
 #include <GL/glew.h>
 #include <H3D/H3DTypes.h>
-#include <H3D/VertexAttributeDescription.h>
+#include <H3D/Renderable.h>
 
 namespace H3D {
-	/// Struct used to draw one object consisting of several VBOs, one IBO and some other stuff
-	struct ElementDrawData
-	{
-		ElementDrawData();
-
-		Matrix4f* transform;
-		GLuint indexCount;
-		GLuint IBO;
-		std::vector<VertexAttributeDescription> VBOs;
-	};
-
-	/// Struct used for indirect rendering. 
-	/// Contains all the data needed for the GPU to parse a draw call.
-	struct IndirectRenderData {
-		IndirectRenderData()
-		:	index(0), reserved(0), 
-			address(0), length(0)
-		{}
-		GLuint   index;
-		GLuint   reserved; 
-		GLuint64 address;
-		GLuint64 length;
-	};
-
 	//Struct used to queue up draw commands.
 	//Part of the multidraw indirect technique
 	//Might be referred to as DEICmd in some places because long name
@@ -78,48 +54,37 @@ namespace H3D {
 		GLuint baseInstance;
 	};
 
+	/// Struct used for indirect rendering. 
+	/// Contains all the data needed for the GPU to parse a draw call.
+	struct IndirectRenderData {
+		IndirectRenderData(GLuint _index = 0, GLuint _reserved = 0, 
+			GLuint64 _address = 0, GLuint _length = 0)
+			:	index(_index), reserved(_reserved), 
+			address(_address), length(_length)
+		{}
+
+		GLuint   index; //Attribute index I think?
+		GLuint   reserved;  // .. Should be 0
+		GLuint64 address; // 64bit buffer ptr
+		GLuint64 length; // size of the persistent buffer in bytes
+	};
+
 	struct DrawCommand {
 		DrawCommand()
 		: cmd(), reserved(0), indexBuffer(), vertexBuffers()
 		{}
 
-		DrawElementsIndirectCommand		cmd;
-		GLuint							reserved; 
-		IndirectRenderData              indexBuffer;
-		IndirectRenderData				vertexBuffers[2]; //vector ptr from Renderable
-	};
-
-	/// Temporary object that should hold everything relevant for rendering an object.
-	/// Each object that you want to render will have to create one of these during traverseSG 
-	/// and send it to the Renderer. Use Renderer::insertNewRenderable
-	struct RenderData {
-
-		RenderData();
-
-		/// One per VBO. One for coordinates, one for normals, one for texcoords etc.
-		/// We have no guarantees of what this is, so it needs to be as flexible as possible
-		std::vector<IndirectRenderData> VBOs;
-
-		/// Index buffer object.
-		IndirectRenderData IBO;
-
-		/// Transform for this renderable. At the moment I think it will need to be copied by value. A ptr would be subject to change.
-		Matrix4f modelTransform;
-
-		/// Vertex Attribute Object... Sort of. Will be used when sorting objects.
-		unsigned int vertexAttributeLayout;
-
-		/// Renderstate for this Renderable. We'll sort based on this.
-		unsigned int renderState;
-
+		DrawElementsIndirectCommand	cmd;
+		GLuint											reserved; 
+		IndirectRenderData					indexBuffer;
+		IndirectRenderData					vertexBuffers[2]; //vector ptr from Renderable
 	};
 
 	//These are the ones we will send in for rendering
 	struct RenderBucket {
 		RenderBucket();
 
-		std::vector<DrawCommand> renderables;
-		std::vector<ElementDrawData> elementRenderables;
+		std::vector<Renderable*> renderables;
 
 		unsigned int numVBOs;
 

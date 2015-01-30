@@ -30,6 +30,8 @@
 
 #include <H3D/Circle2D.h>
 
+#include <H3D/Renderer.h>
+
 using namespace H3D;
 
 // Add this node to the H3DNodeDatabase system.
@@ -60,56 +62,89 @@ X3DGeometryNode( _metadata, _bound, _displayList, _isTouched,
 
 		radius->setValue( 1.f );
 		radius->route( bound );
-		radius->route( displayList );
+		radius->route( dirtyFlag );
+
+		renderable.renderMode = GL_LINE_STRIP;
+		renderable.VBOs.resize(ATTRIBUTE_COUNT);
 }
 
 
 void Circle2D::DisplayList::callList( bool build_list ) {
-	Circle2D *circle = 
-		static_cast< Circle2D * >( owner );
-
-	glPushAttrib( GL_CURRENT_BIT );
-	float v[4];
-	glGetMaterialfv( GL_FRONT, GL_EMISSION, v );
-	glColor3f( v[0], v[1], v[2] );
-
-	X3DGeometryNode::DisplayList::callList( build_list );
-
-	glPopAttrib();
+	//Circle2D *circle = 
+	//	static_cast< Circle2D * >( owner );
+	//
+	//glPushAttrib( GL_CURRENT_BIT );
+	//float v[4];
+	//glGetMaterialfv( GL_FRONT, GL_EMISSION, v );
+	//glColor3f( v[0], v[1], v[2] );
+	//
+	//X3DGeometryNode::DisplayList::callList( build_list );
+	//
+	//glPopAttrib();
 }
 
 void Circle2D::render() {
 	// Save the old state of GL_LIGHTING 
-	GLboolean lighting_enabled;
-	glGetBooleanv( GL_LIGHTING, &lighting_enabled );
-	glDisable( GL_LIGHTING );
+	//GLboolean lighting_enabled;
+	//glGetBooleanv( GL_LIGHTING, &lighting_enabled );
+	//glDisable( GL_LIGHTING );
+
+
+}
+
+void H3D::Circle2D::traverseSG(TraverseInfo &ti) {
+	X3DGeometryNode::traverseSG(ti);
+
+	if(!dirtyFlag->isUpToDate()) {
+		buildVBO(ti);
+
+		renderable.transform = ti.getAccForwardMatrix();
+		renderable.totalRenderStateHandle = ti.getRenderer()->insertNewTotalRenderState(ti.getCurrentRenderstate());
+		ti.getRenderer()->insertNewRenderable(&renderable);
+
+		dirtyFlag->upToDate();
+	}
+}
+
+void H3D::Circle2D::buildVBO(TraverseInfo &ti)
+{
+	//This is supposed to be fetched from some form of material struct thing in traverseinfo. For now it's white.
+	Vec3f color(1.0f, 1.0f, 1.0f);
 
 	H3DFloat theta, angle_increment;
-	H3DFloat nr_segments = nrLines();
-	angle_increment = (H3DFloat) Constants::pi*2 / nr_segments;
+	H3DFloat nr_segments = static_cast<float>(nrLines());
+	angle_increment = (H3DFloat)Constants::pi*2 / nr_segments;
 	H3DFloat r = radius->getValue();
+
+	std::vector<Vec2f> positions;
 
 	// draw a circle with lines
 	H3DFloat x, y;
-	glBegin( GL_LINE_STRIP );
+	//glBegin( GL_LINE_STRIP );
 	int i = 0;
 	for ( ; i < nr_segments; ++i ) {
 		theta = i * angle_increment;
 		x = r * H3DCos(theta);
 		y = r * H3DSin(theta);
-		glVertex2f (x, y);
+		positions.push_back(Vec2f (x, y));
 	}
 
 	theta = 0;
 	x = r * H3DCos(theta);
 	y = r * H3DSin(theta);
 
-	glVertex2f(x, y);
-	glEnd ();
+	positions.push_back(Vec2f (x, y));
+	//glEnd ();
 
 	// reenable lighting if it was enabled before
-	if( lighting_enabled ) {
-		// glEnable( GL_LIGHTING );
-	}
+	//if( lighting_enabled ) {
+	//	// glEnable( GL_LIGHTING );
+	//}
+
+	std::vector<Vec3f> colors(positions.size(), color);
+
+	//Build the individual attributes
+	renderable.VBOs[COORDINATE].buildBufferObjectSingleAttribute(GL_FLOAT, &positions[0],	positions.size()*sizeof(Vec2f), positions.size(), GL_FALSE, COORDINATE);
+	renderable.VBOs[COLOR].buildBufferObjectSingleAttribute(GL_FLOAT,	&colors[0],	colors.size()*sizeof(Vec3f), colors.size(), GL_FALSE, COLOR);
 }
 

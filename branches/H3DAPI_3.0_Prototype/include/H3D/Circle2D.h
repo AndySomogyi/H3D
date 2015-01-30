@@ -31,6 +31,8 @@
 
 #include <H3D/X3DGeometryNode.h>
 #include <H3D/SFFloat.h>
+#include <H3D/RenderMetaData.h>
+#include <H3D/Renderable.h>
 
 namespace H3D {
 
@@ -50,6 +52,13 @@ namespace H3D {
 
 	class H3DAPI_API Circle2D : 
 		public X3DGeometryNode {
+	private:
+		enum AttributeIndices {
+			COORDINATE,
+			COLOR,
+			ATTRIBUTE_COUNT
+		};
+
 	public:
 
 		/// SFBound is specialized update itself from the radius field 
@@ -95,6 +104,21 @@ namespace H3D {
 		virtual int nrLines() {
 			return 40;
 		}
+
+		/// Traverse the scenegraph. See X3DGeometryNode::traverseSG
+		/// for more info.
+		virtual void traverseSG( TraverseInfo& ti );  
+
+	private:
+		/// Simple helper function to make the traverseSG easier.
+		void buildVBO(TraverseInfo& ti);
+
+		Renderable renderable;
+
+		/// Boolean flag to keep track of all of the other fields. If anything changes, dirtyFlag will be flagged as out of date and we will rebuild everything.
+		auto_ptr<Field> dirtyFlag;
+
+	public:
 
 		/// The radius field specifies the radius of the circle.
 		///

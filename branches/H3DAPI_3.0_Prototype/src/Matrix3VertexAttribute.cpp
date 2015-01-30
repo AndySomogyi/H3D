@@ -134,10 +134,10 @@ void Matrix3VertexAttribute::setAttributeData ( ) {
     data[i * 9 + 8] = m[2][2];
   }
   attrib_data = (GLvoid*)data;
-  VAD.elementCount = 9;
-  VAD.primitiveType = GL_FLOAT;
-  VAD.stride = VAD.elementCount * sizeof(GLfloat);
-  VAD.attributeSize = value->size() * VAD.stride; // * sizeof(GLfloat);
+  VAD.elements_per_vertex = 9;
+  VAD.primitive_type = GL_FLOAT;
+  VAD.stride = VAD.elements_per_vertex * sizeof(GLfloat);
+  attrib_size = value->size() * sizeof(GLfloat); // * sizeof(GLfloat);
 }
 
 void Matrix3VertexAttribute::renderVBO ( ){
@@ -147,7 +147,7 @@ void Matrix3VertexAttribute::renderVBO ( ){
     glVertexAttribFormatNV ( attrib_index, 3, GL_FLOAT, GL_FALSE, 0 );
     // glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, attrib_index, vbo_GPUaddr, VAD.attributeSize );
+    glBufferAddressRangeNV ( GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, attrib_index, vbo_GPUaddr, attrib_size );
   } else{
     glVertexAttribPointerARB ( attrib_index,
       3,

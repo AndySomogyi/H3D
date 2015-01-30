@@ -270,26 +270,33 @@ void Appearance::preRender()
 	X3DAppearanceNode::preRender();     
 
 	X3DMaterialNode *m = material->getValue();
-	if ( m ) m->preRender();
-	else 
-	{
-		if( X3DShapeNode::disable_lighting_if_no_app ) 
-		{
+	if ( m ) {
+		m->preRender();
+	} else {
+		if( X3DShapeNode::disable_lighting_if_no_app ) {
 			glDisable( GL_LIGHTING );
 		}
 	}
 
 	X3DTextureNode *t = texture->getValue();
-	if ( t ) t->preRender();
+	if ( t ) {
+		t->preRender();
+	}
 
 	LineProperties *lp = lineProperties->getValue();
-	if ( lp ) lp->preRender();
+	if ( lp ) {
+		lp->preRender();
+	}
 
 	FillProperties *fp = fillProperties->getValue();
-	if ( fp ) fp->preRender();
+	if ( fp ) {
+		fp->preRender();
+	}
 
 	X3DTextureTransformNode *tt = textureTransform->getValue();
-	if ( tt ) tt->preRender();
+	if ( tt ) {
+		tt->preRender();
+	}
 
 	for( MFShaderNode::const_iterator i = shaders->begin();
 		i != shaders->end();
@@ -333,16 +340,24 @@ void Appearance::postRender() {
 	if ( tt ) tt->postRender();
 
 	FillProperties *fp = fillProperties->getValue();
-	if ( fp ) fp->postRender();
+	if ( fp ) {
+		fp->postRender();
+	}
 
 	LineProperties *lp = lineProperties->getValue();
-	if ( lp ) lp->postRender();
+	if ( lp ) {
+		lp->postRender();
+	}
 
 	X3DTextureNode *t = texture->getValue();
-	if ( t ) t->postRender();
+	if ( t ) {
+		t->postRender();
+	}
 
 	X3DMaterialNode *m = material->getValue();
-	if ( m ) m->postRender();
+	if ( m ) {
+		m->postRender();
+	}
 
 	X3DAppearanceNode::postRender();     
 }
@@ -351,54 +366,45 @@ void Appearance::traverseSG( TraverseInfo &ti ) {
 	X3DAppearanceNode::traverseSG( ti );     
 
 	X3DMaterialNode *m = material->getValue();
-	if ( m ) 
-	{
+	if ( m ) {
 		//Add material info for shape [i] to Renderer
 		m->traverseSG( ti );
 	}
 
 	X3DTextureNode *t = texture->getValue();
-	if ( t )
-	{ 
+	if ( t ) { 
 		t->traverseSG( ti );
 	}
 
 	LineProperties *lp = lineProperties->getValue();
-	if ( lp ) 
-	{
+	if ( lp ) {
 		lp->traverseSG( ti );
 	}
 
 	FillProperties *fp = fillProperties->getValue();
-	if ( fp ) 
-	{
+	if ( fp ) {
 		fp->traverseSG( ti );
 	}
 
 	X3DTextureTransformNode *tt = textureTransform->getValue();
-	if ( tt ) 
-	{
+	if ( tt ) {
 		tt->traverseSG( ti );
 	}
 
 	H3DSurfaceNode *s = surface->getValue();
-	if( s ) 
-	{
+	if( s ) {
 		s->traverseSG( ti );
 	}
 
-	for( MFShaderNode::const_iterator i = shaders->begin(); i != shaders->end(); ++i ) 
-	{
+	for( MFShaderNode::const_iterator i = shaders->begin(); i != shaders->end(); ++i ) {
 		X3DShaderNode *sn = static_cast< X3DShaderNode * >( *i );
-		if(sn) 
-		{
+		if(sn) {
 			sn->traverseSG( ti );
 		}
 	}
 
 	RenderProperties *rp = renderProperties->getValue();
-	if (rp) 
-	{
+	if (rp) {
 		rp->traverseSG(ti);
 	}
 
@@ -428,9 +434,9 @@ bool Appearance::isTransparent() {
 		return false; 
 	}
 
-	if ( m )
+	if ( m ) {
 		return m->isTransparent();
-	else
+	} else {
 		return false;
-
+	}
 }

@@ -82,10 +82,10 @@ bool CoordinateDouble::preRenderCheckFail ( )  {
 
 void CoordinateDouble::setAttributeData ( ){
 	attrib_data = (GLvoid*)&(*point->begin ( ));
-	VAD.elementCount = 3;
-	VAD.primitiveType = GL_DOUBLE;
-	VAD.stride = VAD.elementCount*sizeof(GLdouble);
-	VAD.attributeSize = point->size() * VAD.stride; // * sizeof(GLdouble);
+	VAD.elements_per_vertex = 3;
+	VAD.primitive_type = GL_DOUBLE;
+	VAD.stride = VAD.elements_per_vertex*sizeof(GLdouble);
+	attrib_size = point->size() * sizeof(GLdouble); // * sizeof(GLdouble);
 }
 
 void CoordinateDouble::renderVBO ( ){
@@ -95,7 +95,7 @@ void CoordinateDouble::renderVBO ( ){
 		glVertexFormatNV ( 3, GL_DOUBLE, 0 );
 		// glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
 		// vbo is dedicated for this vertex attribute, so there is no offset
-		glBufferAddressRangeNV ( GL_VERTEX_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
+		glBufferAddressRangeNV ( GL_VERTEX_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
 	} else
 	{
 		glVertexPointer ( 3, GL_DOUBLE, 0, NULL );

@@ -41,7 +41,7 @@ namespace H3D {
   /// 
   class H3DAPI_API X3DColorNode : 
     public X3DGeometricPropertyNode,
-    public GLVertexAttributeObject{
+    public GLVertexAttributeObject {
   public:
     /// Constructor.
     X3DColorNode( Inst< SFNode>  _metadata = 0 );

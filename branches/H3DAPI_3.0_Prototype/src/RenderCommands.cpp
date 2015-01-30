@@ -9,39 +9,37 @@ H3D::RenderCommand::~RenderCommand() {
 
 //////////////////////////////////////////////////////////////////////////
 
-void H3D::MultiDrawElementsIndirectCommand::execute() {
+H3D::MultiDrawElementsIndirectCommand::MultiDrawElementsIndirectCommand(CircularBuffer& _commandBuffer, std::vector<VertexAttributeDescription> _VAD, BlobContainer _blob, 
+	GLenum _mode, GLenum _type, GLsizei _stride, unsigned int _drawCount, unsigned int _vboCount) 
+	: commandBuffer(_commandBuffer), VAD(_VAD), blob(_blob), mode(_mode), type(_type), stride(_stride), drawCount(_drawCount), vboCount(_vboCount) {
+}
 
+void H3D::MultiDrawElementsIndirectCommand::execute() {
 	/*
-	TODO: Instead of a persistent command buffer, I can just use a std::vector<DrawCommand>
+	TODO: Instead of a persistent command buffer, I can just use a std::vector<DrawCommand> ...?
 	*/
+
+	//glVertexAttribFormatNV(layout[i].attributeIndex, layout[i].attribute_size, layout[i].primitive_type, layout[i].normalized, layout[i].stride);
 
 	static unsigned long counter = 0;
 	++counter;
 
-	//commandBuffer.BindBuffer();
+	//Set up all the vertex attribute formats...
+	for(unsigned int i = 0; i < VAD.size(); ++i) {
+		glVertexAttribFormatNV(VAD[i].attributeIndex, VAD[i].size, VAD[i].type, VAD[i].normalized, VAD[i].stride);
+	}
+
+	unsigned int dataSizeInBytes = blob.getSize();
 
 	//Reserve memory in the persistently mapped command buffer
-	GLvoid* commandPtr = commandBuffer.Reserve(drawcommands.size());
+	GLvoid* commandPtr = commandBuffer.Reserve(dataSizeInBytes);
 
 	if(LogOGLErrors("MultiDrawElementsIndirectCommand", counter)) {
 		//If we've come here, something has gone wrong
 	}
 
 	//Fill the reserved memory
-	memcpy(commandPtr, &*drawcommands.begin(), (sizeof(DrawCommand)*drawcommands.size()));
-
-	/*
-	In the future when we want to expand this to using more VBOs and dont want to be 
-	limited by a static array size, we can do a few extra analyzing steps and split it up into several memCpys.
-	We can easily find out how many VBOs there are per object, then just size the memcpy based on that.
-	First memcpy the "static" data.
-	Then memcpy the VBO vector or w/e. Does mean that we have to build this buffer blob on the spot...
-	Or we do it earlier as a preprocessing step, that might work just as easily. Just need to set up a function for it.
-	*/
-
-	if(LogOGLErrors("MultiDrawElementsIndirectCommand", counter)) {
-		//If we've come here, something has gone wrong
-	}
+	memcpy(commandPtr, blob.getDataHeadPtr(), dataSizeInBytes);
 
 	glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 
@@ -51,69 +49,77 @@ void H3D::MultiDrawElementsIndirectCommand::execute() {
 
 	//I can access the VBO for drawcommands[0], because my layout sorting algorithm guarantees that
 	//All of the drawcommands in the same drawcommand bucket have the same amount of VBOs
-	glMultiDrawElementsIndirectBindlessNV(GL_TRIANGLES, GL_UNSIGNED_INT, (GLvoid*)0, static_cast<GLsizei>(drawcommands.size()), 0, vboCount);
+	glMultiDrawElementsIndirectBindlessNV(mode, type, (GLvoid*)0, drawCount, 0, vboCount);
 
 	if(LogOGLErrors("MultiDrawElementsIndirectCommand", counter)) {
 		//If we've come here, something has gone wrong
 	}
 
 	//Afterwards we let the buffer do internal stuff to clean up / handle memory locks
-	commandBuffer.OnUsageComplete(drawcommands.size());
+	commandBuffer.OnUsageComplete(dataSizeInBytes);
 
 	if(LogOGLErrors("MultiDrawElementsIndirectCommand", counter)) {
 		//If we've come here, something has gone wrong
 	}
 }
 
-H3D::MultiDrawElementsIndirectCommand::MultiDrawElementsIndirectCommand(CircularBuffer<DrawCommand>& _commandBuffer, std::vector<DrawCommand>& _drawcommands, 
-	GLenum _mode, GLenum _type, GLsizei _stride, int _vboCount) 
-	: commandBuffer(_commandBuffer), drawcommands(_drawcommands), mode(_mode), type(_type), stride(_stride), vboCount(_vboCount) {
-}
-
 //////////////////////////////////////////////////////////////////////////
 
-H3D::DrawElementsBaseVertexCommand::DrawElementsBaseVertexCommand(std::vector<ElementDrawData>& _drawcommands, GLenum _mode, GLenum _type, GLsizei _stride, GLuint _transformUniformIndex)
+H3D::DrawElementsBaseVertexCommand::DrawElementsBaseVertexCommand(std::vector<Renderable*> _drawcommands, GLenum _mode, GLenum _type, GLsizei _stride, GLuint _transformUniformIndex)
 	: objects(_drawcommands), mode(_mode), type(_type), stride(_stride), transformUniformIndex(_transformUniformIndex) {
 
 }
 
 void H3D::DrawElementsBaseVertexCommand::execute() {
-	for(std::vector<ElementDrawData>::iterator it = objects.begin(); it != objects.end(); ++it) {
+
+	//Iterate over all objects in bucket
+	for(std::vector<Renderable*>::iterator it = objects.begin(); it != objects.end(); ++it) {
 		static unsigned int count = 0;
 		count++;
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, it->IBO);
+		//There's only one index buffer, so bind that now
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*it)->IBO.getBufferID());
 
-		for(unsigned int i = 0; i < it->VBOs.size(); ++i) {
-			const VertexAttributeDescription& VAD = it->VBOs[i];
+		//Now iterate over each VBO for each object
+		for(std::vector<VertexBufferContainer>::iterator vboIt = (*it)->VBOs.begin(); vboIt < (*it)->VBOs.end(); ++vboIt) {
 
-			glBindBuffer(GL_ARRAY_BUFFER, VAD.bufferID);
+			unsigned int index = 0;
+
+			//Necessary? Should be.
+			glBindBuffer(GL_ARRAY_BUFFER, vboIt->getBufferID());
 			LogOGLErrors("DrawElementsBaseVertexCommand", count);
 
-			//glEnableVertexAttribArray(it->VBOs[i].bufferIndex);
-			//LogOGLErrors("DrawElementsBaseVertexCommand", count);
+			const std::vector<VertexAttributeDescription> VADs = (*vboIt).getVADContainer();
 
-			glVertexAttribPointer(VAD.bufferIndex, VAD.elementCount, VAD.primitiveType, (VAD.normalized ? GL_TRUE : GL_FALSE), 0, 0);
-			LogOGLErrors("DrawElementsBaseVertexCommand", count);
+			for(unsigned int i = 0; i < VADs.size(); ++i) {
+
+				++index;
+
+				//Do we actually want vad.attributeIndex here or is uint i just fine?
+				glVertexAttribPointer(index, VADs[i].size, VADs[i].type, VADs[i].normalized, VADs[i].stride, (GLvoid*)VADs[i].startOffset);
+				LogOGLErrors("DrawElementsBaseVertexCommand", count);
+
+				glEnableVertexAttribArray(index);
+			}
 		}
 
-		glUniformMatrix4fv(transformUniformIndex, 1, GL_TRUE, (*it->transform)[0]);
+		glUniformMatrix4fv(transformUniformIndex, 1, GL_TRUE, (*it)->transform[0]);
 
 		LogOGLErrors("DrawElementsBaseVertexCommand", count);
 
-		// Draw the triangles !
+		// Draw the triangles
 		glDrawElements(
-			GL_TRIANGLES,      // mode
-			it->indexCount,    // count
-			GL_UNSIGNED_INT,   // type
-			nullptr);          // element array buffer offset
+			(*it)->renderMode,								// mode
+			(*it)->IBO.getIndexCount(),			// count
+			(*it)->IBO.getPrimitiveType(),   // type
+			nullptr);												// element array buffer offset
 
 		LogOGLErrors("DrawElementsBaseVertexCommand", count);
 	}
 }
 
 /************************************************************************/
-/*				Generic state change command test	                    */
+/*				Generic state change command test															*/
 /************************************************************************/
 
 H3D::GenericStateChangeCommand::GenericStateChangeCommand(auto_ptr<StateChangeValue> _stateValue)
@@ -236,6 +242,11 @@ void H3D::GenericStateChangeCommand::execute()
 
 //////////////////////////////////////////////////////////////////////////
 
+H3D::ChangeRasterizerStateCommand::ChangeRasterizerStateCommand(RasterizerState _rasterizerState) 
+	: rasterizerState(_rasterizerState) {
+
+}
+
 void H3D::ChangeRasterizerStateCommand::execute() {
 	if(rasterizerState.faceCullingEnabled) {
 		glEnable(GL_CULL_FACE);
@@ -255,12 +266,11 @@ void H3D::ChangeRasterizerStateCommand::execute() {
 	LogOGLErrors("ChangeRasterizerStateCommand");
 }
 
-H3D::ChangeRasterizerStateCommand::ChangeRasterizerStateCommand(RasterizerState _rasterizerState) 
-	: rasterizerState(_rasterizerState) {
+//////////////////////////////////////////////////////////////////////////
+
+H3D::ChangeBlendStateCommand::ChangeBlendStateCommand(BlendState _blendState) : RenderCommand(), blendState(_blendState) {
 
 }
-
-//////////////////////////////////////////////////////////////////////////
 
 void H3D::ChangeBlendStateCommand::execute()
 {
@@ -303,12 +313,11 @@ void H3D::ChangeBlendStateCommand::execute()
 	LogOGLErrors("ChangeBlendStateCommand");
 }
 
-H3D::ChangeBlendStateCommand::ChangeBlendStateCommand(BlendState _blendState) : RenderCommand(), blendState(_blendState)
-{
+//////////////////////////////////////////////////////////////////////////
+
+H3D::ChangeDepthStateCommand::ChangeDepthStateCommand(DepthState _depthState) : RenderCommand(), depthState(_depthState) {
 
 }
-
-//////////////////////////////////////////////////////////////////////////
 
 void H3D::ChangeDepthStateCommand::execute()
 {
@@ -329,61 +338,12 @@ void H3D::ChangeDepthStateCommand::execute()
 	LogOGLErrors("ChangeDepthStateCommand");
 }
 
-H3D::ChangeDepthStateCommand::ChangeDepthStateCommand(DepthState _depthState) : RenderCommand(), depthState(_depthState)
-{
-
-}
-
 //////////////////////////////////////////////////////////////////////////
 
-H3D::ChangeVertexAttributeSetupCommand::ChangeVertexAttributeSetupCommand(std::vector<VertexAttributeDescription> _layout, bool _bindless)
-	: bindless(_bindless) {
-		layout.resize(_layout.size());
+H3D::ChangeClientStateCommand::ChangeClientStateCommand(std::vector<std::pair<GLenum, bool>> _targetsAndValues) 
+	: targetsAndValues(_targetsAndValues) {
 
-		//Temp.
-		bindless = false;
-
-		for(unsigned int i = 0; i < _layout.size(); ++i) {
-			//Insert this specific attribute description in the right index
-			layout[_layout[i].bufferIndex] = _layout[i];
-		}
 }
-
-void H3D::ChangeVertexAttributeSetupCommand::execute() {
-	if(bindless) {
-
-		for(unsigned int i = 0; i < layout.size(); ++i) {
-			//glVertexAttribFormat(layout[i].index, layout[i].size, layout[i].primitiveType, (layout[i].normalized ? GL_TRUE : GL_FALSE), layout[i].stride);
-			glVertexAttribFormatNV(layout[i].bufferIndex, layout[i].attributeSize, layout[i].primitiveType, (layout[i].normalized ? GL_TRUE : GL_FALSE), layout[i].stride);
-			//glVertexAttribPointer(layout[i].index, layout[i].size, layout[i].primitiveType, (layout[i].normalized ? GL_TRUE : GL_FALSE), layout[i].stride, (GLvoid*)0);
-			glEnableVertexAttribArray(layout[i].bufferIndex);
-
-			LogOGLErrors("ChangeVertexAttributeSetupCommand in bindless: "+i);
-		}
-	} else {
-		/*
-		gl.glBindBuffer(GL::GL_ARRAY_BUFFER, @vertexVBO[0])
-
-		vertexLocation = @dummyShader.attribLocation(gl, "vertex")
-		gl.glVertexAttribPointer(vertexLocation, 3, GL::GL_FLOAT, false, 0, 0)
-		gl.glEnableVertexAttribArray(vertexLocation)
-
-		gl.glBindBuffer(GL::GL_ARRAY_BUFFER, @normalVBO[0])	
-		normalLocation = @dummyShader.attribLocation(gl, "normal")
-		gl.glVertexAttribPointer(normalLocation, 3, GL::GL_FLOAT, false, 0, 0)
-		gl.glEnableVertexAttribArray(normalLocation)
-		*/
-
-		for(unsigned int i = 0; i < layout.size(); ++i) {
-			//glVertexAttribPointer(layout[i].index, layout[i].size, layout[i].primitiveType, layout[i].normalized, layout[i].stride, 0);
-			glEnableVertexAttribArray(layout[i].bufferIndex);
-
-			LogOGLErrors("ChangeVertexAttributeSetupCommand in non-bindless: "+i);
-		}
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////
 
 void H3D::ChangeClientStateCommand::execute() {
 
@@ -403,24 +363,24 @@ void H3D::ChangeClientStateCommand::execute() {
 	LogOGLErrors("ChangeClientStateCommand");
 }
 
-H3D::ChangeClientStateCommand::ChangeClientStateCommand(std::vector<std::pair<GLenum, bool>> _targetsAndValues) 
-	: targetsAndValues(_targetsAndValues) {
-
-}
-
 //////////////////////////////////////////////////////////////////////////
-
-void H3D::ChangeShaderCommand::execute() {
-	glUseProgram(programID);
-	LogOGLErrors("ChangeShaderCommand");
-}
 
 H3D::ChangeShaderCommand::ChangeShaderCommand(GLuint _programID) 
 	: programID(_programID) {
 
 }
 
+void H3D::ChangeShaderCommand::execute() {
+	glUseProgram(programID);
+	LogOGLErrors("ChangeShaderCommand");
+}
+
 //////////////////////////////////////////////////////////////////////////
+
+H3D::CleanupAttributeSlotsCommand::CleanupAttributeSlotsCommand(std::vector<GLuint> _slots) 
+	: slots(_slots) {
+
+}
 
 void H3D::CleanupAttributeSlotsCommand::execute() {
 	for(unsigned int i = 0; i < slots.size(); ++i) {
@@ -430,12 +390,12 @@ void H3D::CleanupAttributeSlotsCommand::execute() {
 	LogOGLErrors("CleanupAttributeSlotsCommand");
 }
 
-H3D::CleanupAttributeSlotsCommand::CleanupAttributeSlotsCommand(std::vector<GLuint> _slots) 
-	: slots(_slots) {
+//////////////////////////////////////////////////////////////////////////
+
+H3D::BindUniformCommand::BindUniformCommand(UniformDescription _description) 
+	: description(_description) {
 
 }
-
-//////////////////////////////////////////////////////////////////////////
 
 void H3D::BindUniformCommand::execute() {
 
@@ -504,9 +464,18 @@ void H3D::BindUniformCommand::execute() {
 	LogOGLErrors("Error in BindUniformCommand: " + description.name);
 }
 
-H3D::BindUniformCommand::BindUniformCommand(UniformDescription _description) 
-	: description(_description) {
+//////////////////////////////////////////////////////////////////////////
 
+H3D::CleanupCircularBufferCommand::CleanupCircularBufferCommand(CircularBuffer* _buffer, unsigned int _sizeInBytes)
+{
+	buffer = _buffer;
+	sizeInBytes = _sizeInBytes;
+}
+
+
+void H3D::CleanupCircularBufferCommand::execute()
+{
+	buffer->OnUsageComplete(sizeInBytes);
 }
 
 //////////////////////////////////////////////////////////////////////////

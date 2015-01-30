@@ -24,7 +24,6 @@ SET( NON_UNITYBUILD_FILES
                  "Renderer.cpp"
                  "OGLBufferLock.cpp"
                  "RenderCommandBuffer.cpp"
-                 "VertexContainerObject.cpp"
                  "RenderMetaData.cpp"
                  "OGLRenderStates.cpp"
                  "PrototypeShader.cpp"

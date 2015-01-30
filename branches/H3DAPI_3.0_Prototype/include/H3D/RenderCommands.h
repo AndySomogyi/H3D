@@ -4,6 +4,7 @@
 #include <H3D/TotalRenderState.h>
 #include <H3D/RenderMetaData.h>
 #include <H3D/OGLBuffer.h>
+#include <H3D/BlobContainer.h> //For MultiDrawElementsIndirectCommand
 
 namespace H3D {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,8 +24,8 @@ namespace H3D {
 	//Command for multidraw elements indirect
 	class MultiDrawElementsIndirectCommand : public RenderCommand {
 	public:
-		MultiDrawElementsIndirectCommand(CircularBuffer<DrawCommand>& _commandBuffer, std::vector<DrawCommand>& _drawcommands, 
-			GLenum _mode, GLenum _type, GLsizei _stride, int _vboCount);
+		MultiDrawElementsIndirectCommand(CircularBuffer& _commandBuffer, std::vector<VertexAttributeDescription> _VAD, BlobContainer _blob, 
+			GLenum _mode, GLenum _type, GLsizei _stride, unsigned int _drawCount, unsigned int _vboCount);
 
 		virtual void execute();
 
@@ -34,9 +35,11 @@ namespace H3D {
 		GLsizei stride;
 
 		/* TODO: ... A blob instead of a std::vector<DrawCommand> */
-		std::vector<DrawCommand>&  drawcommands;
-		CircularBuffer<DrawCommand>& commandBuffer;
-		int vboCount;
+		BlobContainer blob;
+		std::vector<VertexAttributeDescription> VAD;
+		CircularBuffer& commandBuffer;
+		unsigned int vboCount;
+		unsigned int drawCount;
 	};
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +47,7 @@ namespace H3D {
 	//Command for normal "non-bindless" rendering
 	class DrawElementsBaseVertexCommand : public RenderCommand {
 	public:
-		DrawElementsBaseVertexCommand(std::vector<ElementDrawData>& _drawcommands, 
+		DrawElementsBaseVertexCommand(std::vector<Renderable*> _drawcommands, 
 			GLenum _mode, GLenum _type, GLsizei _stride, GLuint transformUniformIndex);
 
 		virtual void execute();
@@ -54,7 +57,7 @@ namespace H3D {
 		GLenum mode;
 		GLenum type;
 		GLsizei stride;
-		std::vector<ElementDrawData> objects;
+		std::vector<Renderable*> objects;
 	};
 
 	/************************************************************************/
@@ -143,17 +146,17 @@ namespace H3D {
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	class ChangeVertexAttributeSetupCommand : public RenderCommand {
-	public:
-		ChangeVertexAttributeSetupCommand(std::vector<VertexAttributeDescription> _layout, bool _bindless = false);
-
-		virtual void execute();
-
-	private:
-		//I'm assuming these were put in the right order.
-		std::vector<VertexAttributeDescription> layout;
-		bool bindless;
-	};
+	//class ChangeVertexAttributeSetupCommand : public RenderCommand {
+	//public:
+	//	ChangeVertexAttributeSetupCommand(std::vector<VertexAttributeDescription> _layout, bool _bindless = false);
+	//
+	//	virtual void execute();
+	//
+	//private:
+	//	//I'm assuming these were put in the right order.
+	//	std::vector<VertexAttributeDescription> layout;
+	//	bool bindless;
+	//};
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -215,47 +218,39 @@ namespace H3D {
 
 	//////////////////////////////////////////////////////////////////////////
 
-	template<class T>
 	class UpdateCircularBufferCommand : public RenderCommand {
 	public:
-		UpdateCircularBufferCommand(CircularBuffer<T>* _buffer, std::vector<T>* _objects)
+		UpdateCircularBufferCommand(CircularBuffer* _buffer, void* _objectArray, unsigned int _sizeInBytes)
 		{
 			buffer = _buffer;
-			objects = _objects;
+			objectArray = _objectArray;
+			sizeInBytes = _sizeInBytes;
 		}
 
 		virtual void execute()
 		{
-			T* dst = buffer->Reserve(objects->size());
-			memcpy(dst, &*objects->begin(), sizeof(T) * objects->size());
-
-			buffer->BindBufferRange(0, objects->size());
+			char* dst = buffer->Reserve(sizeInBytes);
+			memcpy(dst, objectArray, sizeInBytes);
+			buffer->BindBufferRange(0, sizeInBytes); //BindBufferBase instead??
 		}
 
 	private:
-		CircularBuffer<T>* buffer;
-		std::vector<T>* objects;
+		CircularBuffer* buffer;
+		void* objectArray;
+		unsigned int sizeInBytes;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 
-	template<class T>
 	class CleanupCircularBufferCommand : public RenderCommand {
 	public:
-		CleanupCircularBufferCommand(CircularBuffer<T>* _buffer, unsigned int _size)
-		{
-			buffer = _buffer;
-			size = _size;
-		}
+		CleanupCircularBufferCommand(CircularBuffer* _buffer, unsigned int _sizeInBytes);
 
-		virtual void execute()
-		{
-			buffer->OnUsageComplete(size);
-		}
+		virtual void execute();
 
 	private:
-		CircularBuffer<T>* buffer;
-		unsigned int size;
+		CircularBuffer* buffer;
+		unsigned int sizeInBytes;
 	};
 	
 	//////////////////////////////////////////////////////////////////////////

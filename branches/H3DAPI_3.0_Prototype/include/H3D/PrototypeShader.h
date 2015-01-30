@@ -1,12 +1,14 @@
 #ifndef __PROTOTYPESHADER_H__
 #define __PROTOTYPESHADER_H__
 
-#include <GL/glew.h>
+#include <H3D/TotalRenderState.h>
 #include <H3D/Node.h>
+
+#include <GL/glew.h>
+#include <H3DUtil/Console.h>
 #include <string>
 #include <vector>
-
-#include <H3D/TotalRenderState.h>
+#include <fstream>
 
 namespace H3D {
 	class PrototypeShader {
@@ -14,7 +16,7 @@ namespace H3D {
 		PrototypeShader(std::string _vertexShader, std::string _fragmentShader);
 		~PrototypeShader();
 
-		virtual void traverseSG(TraverseInfo& ti);
+		void traverseSG(TraverseInfo& ti);
 		GLuint getProgram();
 		GLuint getMatrixUniformLocation();
 
@@ -36,7 +38,6 @@ namespace H3D {
 		GLuint worldMatrixUniformLocation;
 		std::string vertexShaderString;
 		std::string fragmentShaderString;
-
 
 		ShaderData program;
 		//GLuint program_ID;

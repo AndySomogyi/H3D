@@ -51,13 +51,13 @@ namespace H3D
 		//And this is how we render the entire scene...
 		void Render();
 
-		CircularBuffer<DrawCommand>& GetBuffer() {
+		CircularBuffer& GetBuffer() {
 			return commandBuffer;
 		}
 
 	private:
 		std::vector<RenderCommand*> commandQueue;
-		CircularBuffer<DrawCommand> commandBuffer;
+		CircularBuffer commandBuffer;
 	};
 }
 #endif

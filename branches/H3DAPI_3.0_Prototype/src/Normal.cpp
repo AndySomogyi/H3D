@@ -84,10 +84,10 @@ bool Normal::preRenderCheckFail ( ){
 
 void Normal::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*vector->begin ( ));
-  VAD.elementCount = 3;
-  VAD.primitiveType = GL_FLOAT;
-  VAD.stride = VAD.elementCount * sizeof(GLfloat);
-  VAD.attributeSize = vector->size() * VAD.stride; // * sizeof(GLfloat);
+  VAD.elements_per_vertex = 3;
+  VAD.primitive_type = GL_FLOAT;
+  VAD.stride = VAD.elements_per_vertex * sizeof(GLfloat);
+  attrib_size = vector->size() * sizeof(GLfloat); // * sizeof(GLfloat);
 }
 
 void Normal::renderVBO ( ){
@@ -97,7 +97,7 @@ void Normal::renderVBO ( ){
 	glNormalFormatNV ( GL_FLOAT, 0 );
 	// glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
 	// vbo is dedicated for this vertex attribute, so there is no offset
-	glBufferAddressRangeNV ( GL_NORMAL_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, VAD.attributeSize );
+	glBufferAddressRangeNV ( GL_NORMAL_ARRAY_ADDRESS_NV, 0, vbo_GPUaddr, attrib_size );
   } else
   {
 	glNormalPointer ( GL_FLOAT, 0, NULL );

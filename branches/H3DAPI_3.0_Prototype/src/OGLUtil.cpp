@@ -1,11 +1,9 @@
-#include <H3D/OGLUtil.h>
+﻿#include <H3D/OGLUtil.h>
 
 #include <iostream>
 
 namespace H3D
 {
-	
-
 	bool LogOGLErrors(std::string functionName, unsigned int functionCall /*= 0*/)
 	{
 		#ifdef HAVE_PROFILER
@@ -70,6 +68,30 @@ namespace H3D
 		//assert(GLRenderer::GetApiError() == GL_NO_ERROR);
 
 		return retVal;
+	}
+
+	unsigned int sizeOfOGLType(GLenum type)
+	{
+		switch(type)
+		{
+			case GL_BYTE: {return sizeof(GLbyte);}
+			case GL_UNSIGNED_BYTE: {return sizeof(GLubyte);}
+			case GL_SHORT: {return sizeof(GLshort);}
+			case GL_UNSIGNED_SHORT: {return sizeof(GLushort);}
+			case GL_INT: {return sizeof(GLint);}
+			case GL_UNSIGNED_INT: {return sizeof(GLuint);}
+			case GL_HALF_FLOAT: {return sizeof(GLhalf);}
+			case GL_FLOAT: {return sizeof(GLfloat);}
+			case GL_DOUBLE: {return sizeof(GLdouble);}
+			case GL_FIXED: {return sizeof(GLfixed);}
+			case GL_INT_2_10_10_10_REV: {return sizeof(GLint);}
+			case GL_UNSIGNED_INT_2_10_10_10_REV: {return sizeof(GLuint);}
+			case GL_UNSIGNED_INT_10F_11F_11F_REV: {return sizeof(GLuint);}
+			default: {
+			 std::cout << "Unrecognized type sent in to OGLUtil::sizeOfOGLType().";
+			 return 1; //I'd return 0 but I don't want any division by zero to happen anywhere...
+			 }
+		}
 	}
 
 }

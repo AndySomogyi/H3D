@@ -32,136 +32,158 @@
 #include <H3D/X3DGeometryNode.h>
 #include <H3D/SFFloat.h>
 #include <H3D/SFString.h>
+#include <H3D/VertexBufferContainer.h>
+#include <H3D/Renderable.h>
 
 namespace H3D {
 
-  /// \ingroup X3DNodes
-  /// \class ArcClose2D
-  /// \brief The ArcClose node specifies a portion of a circle whose center 
-  /// is at (0,0) and whose angles are measured starting at the positive 
-  /// x-axis and sweeping towards the positive y-axis. 
-  ///
-  /// The end points of the arc specified are connected as defined by the
-  /// closureType field. The radius field specifies the radius of the circle
-  /// of which the arc is a portion. The arc extends from the startAngle 
-  /// counterclockwise to the endAngle. The value of radius shall be greater
-  /// than zero. The values of startAngle and endAngle shall be in the range
-  /// (0, 2pi). If startAngle and endAngle have the same value, a circle is
-  /// specified and closureType is ignored.
-  ///
-  /// A closureType of "PIE" connects the end point to the start point by
-  /// defining two straight line segments first from the end point to the
-  /// center and then the center to the start point. 
-  ///
-  /// A closureType of "CHORD" connects the end point to the start point
-  /// by defining a straight line segment from the end point to the start point.
-  /// 
-  ///
-  /// <b>Examples:</b>
-  ///   - <a href="../../../H3DAPI/examples/All/ArcClose2D.x3d">ArcClose2D.x3d</a>
-  ///     ( <a href="examples/ArcClose2D.x3d.html">Source</a> )
-  ///
-  /// \par Internal routes:
-  /// \dotfile ArcClose2D.dot
-  
-  class H3DAPI_API ArcClose2D : 
-    public X3DGeometryNode {
-  public:
+	/// \ingroup X3DNodes
+	/// \class ArcClose2D
+	/// \brief The ArcClose node specifies a portion of a circle whose center 
+	/// is at (0,0) and whose angles are measured starting at the positive 
+	/// x-axis and sweeping towards the positive y-axis. 
+	///
+	/// The end points of the arc specified are connected as defined by the
+	/// closureType field. The radius field specifies the radius of the circle
+	/// of which the arc is a portion. The arc extends from the startAngle 
+	/// counterclockwise to the endAngle. The value of radius shall be greater
+	/// than zero. The values of startAngle and endAngle shall be in the range
+	/// (0, 2pi). If startAngle and endAngle have the same value, a circle is
+	/// specified and closureType is ignored.
+	///
+	/// A closureType of "PIE" connects the end point to the start point by
+	/// defining two straight line segments first from the end point to the
+	/// center and then the center to the start point. 
+	///
+	/// A closureType of "CHORD" connects the end point to the start point
+	/// by defining a straight line segment from the end point to the start point.
+	/// 
+	///
+	/// <b>Examples:</b>
+	///   - <a href="../../../H3DAPI/examples/All/ArcClose2D.x3d">ArcClose2D.x3d</a>
+	///     ( <a href="examples/ArcClose2D.x3d.html">Source</a> )
+	///
+	/// \par Internal routes:
+	/// \dotfile ArcClose2D.dot
+	
+	class H3DAPI_API ArcClose2D : 
+		public X3DGeometryNode {
+		private:
+			enum AttributeIndices {
+				COORDINATE = 0,
+				COLOR,
+				TEXCOORD,
+				NORMAL,
+				ATTRIBUTE_COUNT //Always keep last!
+			};
 
-    /// SFBound is specialized update itself from the radius field 
-    /// of the Box node.
-    ///
-    /// routes_in[0] is the size field of the Box node.  
-    ///
-    class SFBound: public TypedField< X3DGeometryNode::SFBound,
-    SFFloat > {
-      /// Update the bound from the radius field. 
-      virtual void update() {
-        H3DFloat d = 2 * static_cast< SFFloat * >( routes_in[0] )->getValue();
-        BoxBound *bb = new BoxBound;
-        bb->size->setValue( Vec3f( d, d, 0.f ) );
-        value = bb;
-      }
-    };
+	public:
 
-    /// Constructor.
-    ArcClose2D( Inst< SFNode      > _metadata = 0,
-                Inst< SFBound     > _bound = 0,
-                Inst< DisplayList > _displayList = 0,
-                Inst< MFBool      > _isTouched = 0,
-                Inst< MFVec3f     > _force = 0,
-                Inst< MFVec3f     > _contactPoint = 0,
-                Inst< MFVec3f     > _contactNormal = 0,
-                Inst< SFFloat     > _endAngle = 0,
-                Inst< SFFloat     > _startAngle = 0,
-                Inst< SFFloat     > _radius = 0,
-                Inst< SFString    > _closureType = 0,
-                Inst< SFBool      > _solid = 0 );
-   
-    /// Renders the ArcClose2D using OpenGL.
-    virtual void render();
+		/// SFBound is specialized update itself from the radius field 
+		/// of the Box node.
+		///
+		/// routes_in[0] is the size field of the Box node.  
+		///
+		class SFBound: public TypedField< X3DGeometryNode::SFBound,
+		SFFloat > {
+			/// Update the bound from the radius field. 
+			virtual void update() {
+				H3DFloat d = 2 * static_cast< SFFloat * >( routes_in[0] )->getValue();
+				BoxBound *bb = new BoxBound;
+				bb->size->setValue( Vec3f( d, d, 0.f ) );
+				value = bb;
+			}
+		};
 
-    /// The number of triangles rendered by this geometry.
-    virtual int nrTriangles() {
-      return 40;
-    }
+		/// Constructor.
+		ArcClose2D( Inst< SFNode      > _metadata = 0,
+								Inst< SFBound     > _bound = 0,
+								Inst< DisplayList > _displayList = 0,
+								Inst< MFBool      > _isTouched = 0,
+								Inst< MFVec3f     > _force = 0,
+								Inst< MFVec3f     > _contactPoint = 0,
+								Inst< MFVec3f     > _contactNormal = 0,
+								Inst< SFFloat     > _endAngle = 0,
+								Inst< SFFloat     > _startAngle = 0,
+								Inst< SFFloat     > _radius = 0,
+								Inst< SFString    > _closureType = 0,
+								Inst< SFBool      > _solid = 0 );
+	 
+		/// Renders the ArcClose2D using OpenGL.
+		virtual void render();
 
-    // Traverse the scenegraph. See X3DGeometryNode::traverseSG
-    // for more info.
-    virtual void traverseSG( TraverseInfo &ti );  
+		/// The number of triangles rendered by this geometry.
+		virtual int nrTriangles() {
+			return 40;
+		}
 
-    /// The end angle for the ArcClose.  The ArcClose extends from the startAngle
-    /// counterclockwise to the endAngle. 
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> pi/2 \n
-    /// 
-    /// \dotfile ArcClose2D_endAngle.dot
-    auto_ptr< SFFloat > endAngle;
+		/// Traverse the scenegraph. See X3DGeometryNode::traverseSG
+		/// for more info.
+		virtual void traverseSG( TraverseInfo &ti );  
 
-    /// The start angle for the ArcClose.  The ArcClose extends from the startAngle
-    /// counterclockwise to the endAngle. 
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0 \n
-    /// 
-    /// \dotfile ArcClose2D_startAngle.dot
-    auto_ptr< SFFloat > startAngle;
+		private:
+			/// Simple helper function to make the traverseSG easier.
+			void buildVBO(TraverseInfo &ti);
 
-    /// The radius field specifies the radius of the circle of which 
-    /// the ArcClose is a portion.
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 1 \n
-    /// 
-    /// \dotfile ArcClose2D_radius.dot
-    auto_ptr< SFFloat > radius;
+			Renderable renderable;
 
-    /// A closureType of "PIE" connects the end point to the start point
-    /// by defining two straight line segments first from the end point to
-    /// the center and then the center to the start point.
-    /// A closureType of "CHORD" connects the end point to the start point
-    /// by defining a straight line segment from the end point to the start point.
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> PIE \n
-    /// 
-    /// \dotfile ArcClose2D_closureType.dot
-    auto_ptr< SFString > closureType;
+			/// Boolean flag to keep track of all of the other fields. If anything changes, dirtyFlag will be flagged as out of date and we will rebuild everything.
+			auto_ptr<Field> dirtyFlag;
+
+		public:
+
+		/// The end angle for the ArcClose.  The ArcClose extends from the startAngle
+		/// counterclockwise to the endAngle. 
+		///
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> pi/2 \n
+		/// 
+		/// \dotfile ArcClose2D_endAngle.dot
+		auto_ptr< SFFloat > endAngle;
+
+		/// The start angle for the ArcClose.  The ArcClose extends from the startAngle
+		/// counterclockwise to the endAngle. 
+		///
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> 0 \n
+		/// 
+		/// \dotfile ArcClose2D_startAngle.dot
+		auto_ptr< SFFloat > startAngle;
+
+		/// The radius field specifies the radius of the circle of which 
+		/// the ArcClose is a portion.
+		///
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> 1 \n
+		/// 
+		/// \dotfile ArcClose2D_radius.dot
+		auto_ptr< SFFloat > radius;
+
+		/// A closureType of "PIE" connects the end point to the start point
+		/// by defining two straight line segments first from the end point to
+		/// the center and then the center to the start point.
+		/// A closureType of "CHORD" connects the end point to the start point
+		/// by defining a straight line segment from the end point to the start point.
+		///
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> PIE \n
+		/// 
+		/// \dotfile ArcClose2D_closureType.dot
+		auto_ptr< SFString > closureType;
 
 
-    /// The solid field specifies if both sides of the closed arc should be 
-    /// rendered. If solid is FALSE then both sides will be rendered.
-    ///
-    /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> FALSE
-    /// 
-    /// \dotfile ArcClose2D_solid.dot
-    auto_ptr< SFBool > solid;
-    
-    /// The H3DNodeDatabase for this node.
-    static H3DNodeDatabase database;
-  };
+		/// The solid field specifies if both sides of the closed arc should be 
+		/// rendered. If solid is FALSE then both sides will be rendered.
+		///
+		/// <b>Access type:</b> inputOutput \n
+		/// <b>Default value:</b> FALSE
+		/// 
+		/// \dotfile ArcClose2D_solid.dot
+		auto_ptr< SFBool > solid;
+		
+		/// The H3DNodeDatabase for this node.
+		static H3DNodeDatabase database;
+	};
 }
 
 #endif

@@ -38,6 +38,7 @@
 #include <H3D/MFInt32.h>
 #include <H3D/SFInt32.h>
 #include <H3D/RenderMetaData.h>
+#include <H3D/Renderable.h>
 
 namespace H3D 
 {
@@ -238,8 +239,8 @@ namespace H3D
 		/// Destructor
 		virtual ~IndexedTriangleSet();
 
-		// Traverse the scenegraph. See X3DGeometryNode::traverseSG
-		// for more info.
+		/// Traverse the scenegraph. See X3DGeometryNode::traverseSG
+		/// for more info.
 		virtual void traverseSG( TraverseInfo &ti );
 
 		/// Renders the IndexedTriangleSet with OpenGL.
@@ -306,15 +307,8 @@ namespace H3D
 		// Internal field used to know if vertex buffer object can be created.
 		auto_ptr< Field > vboFieldsUpToDate;
 		
-		// The index for the index buffer object
-		GLuint ib_id;
-		GLuint64 ib_GPUaddress;
-		bool use_bindless;
 		bool attributeLayoutCached; //Starts off as false. If it's false, send in this vao to renderer and get a uint32 handle back.
-
-		//Should probably actually contain a Renderable here.
-		RenderData renderData;
-		ElementDrawData elementData;
+		Renderable renderable;
 	};
 }
 

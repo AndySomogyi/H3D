@@ -92,10 +92,10 @@ bool TextureCoordinate::preRenderCheckFail ( ){
 void TextureCoordinate::setAttributeData ( )
 {
   attrib_data = (GLvoid*)&(*point->begin ( ));
-  VAD.elementCount = 2;
-  VAD.primitiveType = GL_FLOAT;
-  VAD.stride = VAD.elementCount * sizeof(GLfloat);
-  VAD.attributeSize = point->size() * VAD.stride; // * sizeof(GLfloat);
+  VAD.elements_per_vertex = 2;
+  VAD.primitive_type = GL_FLOAT;
+  VAD.stride = VAD.elements_per_vertex * sizeof(GLfloat);
+  attrib_size = point->size() * sizeof(GLfloat); // * sizeof(GLfloat);
 }
 
 void TextureCoordinate::renderVBO ( ){
@@ -105,7 +105,7 @@ void TextureCoordinate::renderVBO ( ){
     glTexCoordFormatNV ( 2, GL_FLOAT, 0 );
     // glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_TEXTURE_COORD_ARRAY_ADDRESS_NV, texture_index, vbo_GPUaddr, VAD.attributeSize );
+    glBufferAddressRangeNV ( GL_TEXTURE_COORD_ARRAY_ADDRESS_NV, texture_index, vbo_GPUaddr, attrib_size );
   } else{
     glTexCoordPointer ( 2, GL_FLOAT, 0, NULL );
   }

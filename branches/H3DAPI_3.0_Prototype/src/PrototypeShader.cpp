@@ -1,14 +1,11 @@
 #include <H3D/PrototypeShader.h>
 
-#include <string>
-#include <fstream>
-
-#include <H3DUtil/Console.h>
+#include <H3D/H3DApi.h>
 
 using namespace H3D;
 
 H3D::PrototypeShader::PrototypeShader(std::string _vertexShader, std::string _fragmentShader) {
-	usingBindless = H3D::USING_BINDLESS;
+	usingBindless = USING_BINDLESS;
 	usesViewProj = true;
 	isValid = false; 
 	vertexShaderString = _vertexShader; 

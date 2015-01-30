@@ -1,14 +1,13 @@
 #ifndef __OGLRENDERSTATES_H__
 #define	__OGLRENDERSTATES_H__
 
-#include <H3D/VertexAttributeDescription.h>
 #include <string>
 #include <vector>
 #include <set>
+#include <memory>
 #include <H3D/OGLStateChangeValues.h>
 
-namespace H3D 
-{
+namespace H3D {
 	// Forward declarations...
 	class RenderProperties;
 	class X3DGeometryNode;

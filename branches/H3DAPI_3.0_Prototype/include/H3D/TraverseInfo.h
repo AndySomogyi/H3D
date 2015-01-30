@@ -75,7 +75,7 @@ namespace H3D
 		/// \param _renderer Pointer to our renderer. Every time we traverse through any object that 
 		/// has anything to do with rendering, we send the info to the renderer through the pointer.
 		/// 
-		TraverseInfo(const vector<H3DHapticsDevice*> &_haptics_devices, Renderer* const _renderer = 0);
+		TraverseInfo(const vector<H3DHapticsDevice*> &_haptics_devices, Renderer* _renderer);
 
 		/// Returns the number of haptics layers that are available and initialized.
 		/// If you need more you will have to use the initializeLayers() function
@@ -463,7 +463,7 @@ namespace H3D
 		const LightVector &getActiveLightNodes();
 
 		/// Get pointer to current Renderer
-		Renderer* const getRenderer() {
+		Renderer* getRenderer() {
 			return renderer;
 		}
 
@@ -514,7 +514,7 @@ namespace H3D
 		std::map< string, void * > user_data;
 		bool transformDirtyFlag;
 		TotalRenderState currentRenderState;
-		Renderer* const renderer;
+		Renderer* renderer;
 	};
 
 }

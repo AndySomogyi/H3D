@@ -117,10 +117,10 @@ bool FloatVertexAttribute::preRenderCheckFail ( ){
 
 void FloatVertexAttribute::setAttributeData ( ){
   attrib_data = (GLvoid*)&(*value->begin ( ));
-  VAD.elementCount = 1;
-  VAD.primitiveType = GL_FLOAT;
-  VAD.stride = VAD.elementCount * sizeof(GLfloat);
-  VAD.attributeSize = value->size() * VAD.stride; // * sizeof(GLfloat);
+  VAD.elements_per_vertex = 1;
+  VAD.primitive_type = GL_FLOAT;
+  VAD.stride = VAD.elements_per_vertex * sizeof(GLfloat);
+  attrib_size = value->size() * sizeof(GLfloat); // * sizeof(GLfloat);
 }
 
 void FloatVertexAttribute::renderVBO ( ){
@@ -130,7 +130,7 @@ void FloatVertexAttribute::renderVBO ( ){
     glVertexAttribFormatNV ( attrib_index, numComponents->getValue(), GL_FLOAT, GL_FALSE, 0 );
     // glEnableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
     // vbo is dedicated for this vertex attribute, so there is no offset
-    glBufferAddressRangeNV ( GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, attrib_index, vbo_GPUaddr, VAD.attributeSize );
+    glBufferAddressRangeNV ( GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, attrib_index, vbo_GPUaddr, attrib_size );
   } else{
     glVertexAttribPointerARB ( attrib_index,
       numComponents->getValue ( ),

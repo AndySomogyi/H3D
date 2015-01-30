@@ -30,35 +30,16 @@
 #ifndef __RENDERER_H__
 #define __RENDERER_H__
 
-#include <H3D/PrototypeShader.h>
-#include <H3D/GLVertexAttributeObject.h>
-#include <H3D/RenderMetaData.h>
-#include <H3D/Appearance.h>
-#include <H3D/H3DTypes.h>
-#include <H3D/OGLBuffer.h>
-#include <H3D/RenderCommandBuffer.h>
 #include <GL/glew.h>
+#include <H3D/Renderable.h>
+#include <H3D/RenderMetaData.h>
+#include <H3D/RenderCommandBuffer.h>
+#include <H3D/OGLBuffer.h>
 #include <vector>
 #include <utility> //For std::pair
 
-#ifdef HAVE_GLUT
-
-#ifdef MACOSX
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
-#ifdef FREEGLUT
-#include <GL/freeglut.h>
-#endif
-
-#endif // HAVE_GLUT
-
-namespace H3D
-{
-	class H3DAPI_API Renderer
-	{
+namespace H3D {
+	class Renderer {
 	public:
 		/******************************************************************************/
 		/*										Public functions					  */
@@ -79,24 +60,19 @@ namespace H3D
 		/// Render the entire scene in as few drawcalls as possible. Uses the drawCommands vector if we have support for multi indirect extension, else we just operate on the renderables vector. 
 		virtual void render();
 
+
+		//TODO ON WEDNESDAY: Remove the two below and replace with a single unified "insertVertexBufferContainers" thingy or insertRenderable.
+
 		/// Should be called every frame if you want something rendered.
-		virtual void insertNewRenderData(RenderData* const renderable);
-		virtual void insertNewElementData(ElementDrawData* const elementData);
+		void insertNewRenderable(Renderable* renderable);
 
-		/// Okay, so this might be slightly misleading, but what this actually does is 
-		/// send in an Appearance ptr, goes through it, looking at all the relevant values to see
-		/// if this Appearance makes up a unique total renderstate. 
-		/// If it doesn't we return the index to an identical one, and if it is unique, we insert it and return that index instead.
-		/*
-		virtual unsigned int insertNewTotalRenderState(const Appearance* const appearance, X3DGeometryNode* const geometry);
-		*/
-
-		virtual unsigned int insertNewTotalRenderState(TotalRenderState& totalRenderState);
+		/// Inserts a total render state, compares against the others that are already inside, and returns a handle to where the state is stored for future reference.
+		unsigned int insertNewTotalRenderState(TotalRenderState& totalRenderState);
 
 		///	So we'll insert a vector describing an entire layout.
 		/// Internally it'll actually do a comparison to the others. 
 		/// If we find an identical one already in the vector, we just return the index to that one.
-		virtual unsigned int insertVertexAttributeLayout(std::vector<VertexAttributeDescription> layout, GLuint IBO = 0);
+		unsigned int insertVertexAttributeLayout(std::vector<VertexAttributeDescription> layout);
 
 		void setViewportSize(float width, float height);
 		void setCurrentViewpoint(Vec3f position, Vec3f direction, Vec3f up = Vec3f(0.0f, 1.0f, 0.0f));
@@ -130,7 +106,6 @@ namespace H3D
 
 		void updateViewMatrix();
 	private:
-
 		/******************************************************************************/
 		/*								Private members								  */
 		/******************************************************************************/
@@ -144,12 +119,11 @@ namespace H3D
 		float viewportHeight, viewportWidth;
 
 		///	Container for all the renderables used each frame
-		std::vector<RenderData*> renderables;
-		std::vector<ElementDrawData*> elementRenderables;
+		std::vector<Renderable*> renderables;
 		std::vector<Matrix4f> transforms;
 
 		/// Wrapper for our openGL buffer for transforms
-		CircularBuffer<Matrix4f> transformBuffer;
+		CircularBuffer transformBuffer;
 
 		/// Container for all of the render buckets that we will be calling each frame.
 		std::vector<RenderBucket> renderBuckets;
@@ -159,7 +133,7 @@ namespace H3D
 
 		/// Vector of vectors. Each vector will contain a bunch of attribute layouts 
 		/// to describe what an object will look like when sent to the vertex shader.
-		std::vector<std::pair<std::vector<VertexAttributeDescription>, GLuint>> vertexAttributeLayouts;
+		std::vector<std::vector<VertexAttributeDescription>> vertexAttributeLayouts;
 		std::vector<GLuint> attributeSlotsToBeFreed;
 
 		/// Container for all the different render state setups.

@@ -1,13 +1,10 @@
 #include <H3D/TotalRenderState.h>
 #include <H3D/RenderProperties.h>
-
 #include <H3D/X3DGeometryNode.h>
 #include <H3D/Appearance.h>
-
 #include <H3D/RenderCommandBuffer.h>
-
-#include <limits> //for std::numeric_limits::epsilon that I use when comparing two floats
 #include <H3D/OGLUtil.h> //For OGL error reporting
+#include <limits> //for std::numeric_limits::epsilon that I use when comparing two floats
 
 using namespace H3D;
 

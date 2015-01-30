@@ -19,7 +19,6 @@ namespace H3D
 	};
 
 	// --------------------------------------------------------------------------------------------------------------------
-	template <typename Atom>
 	class Buffer
 	{
 	public:
@@ -32,7 +31,7 @@ namespace H3D
 			Destroy();
 		}
 
-		bool Create(BufferStorage _storage, GLenum _target, GLuint _atomCount, 
+		bool Create(BufferStorage _storage, GLenum _target, GLuint _sizeInBytes, 
 			GLbitfield _createFlags = defaultCreateFlags, GLbitfield _mapFlags = defaultMapFlags) {
 			//If we already had data, clean that up first
 			if(bufferContents) {
@@ -54,7 +53,7 @@ namespace H3D
 			{
 			case SystemMemory: 
 				{
-					bufferContents = new Atom[_atomCount];                
+					bufferContents = new char[_sizeInBytes];                
 					break;
 				}
 
@@ -69,10 +68,10 @@ namespace H3D
 					glGenBuffers(1, &name);
 					glBindBuffer(target, name);
 
-					unsigned int bufferSize = sizeof(Atom) * _atomCount;
+					unsigned int bufferSize = _sizeInBytes;
 
 					glBufferStorage(target, bufferSize, nullptr, _createFlags);
-					bufferContents = reinterpret_cast<Atom*>(glMapBufferRange(target, 0, bufferSize, _mapFlags));
+					bufferContents = static_cast<char*>(glMapBufferRange(target, 0, bufferSize, _mapFlags));
 
 					if(!bufferContents) 
 					{
@@ -125,19 +124,18 @@ namespace H3D
 		}
 
 		void WaitForLockedRange(size_t _lockBegin, size_t _lockLength) { lockManager.WaitForLockedRange(_lockBegin, _lockLength); }
-		Atom* GetContents() { return bufferContents; }
+		char* GetContents() { return bufferContents; }
 		void LockRange(size_t _lockBegin, size_t _lockLength) { lockManager.LockRange(_lockBegin, _lockLength); }
 
 		void BindBuffer() { glBindBuffer(target, name); }
 		void BindBufferBase(GLuint _index) { glBindBufferBase(target, _index, name); }
-		void BindBufferRange(GLuint _index, GLsizeiptr _head, GLsizeiptr _atomCount) 
-		{ 
-			glBindBufferRange(target, _index, name, _head * sizeof(Atom), _atomCount * sizeof(Atom)); 
+		void BindBufferRange(GLuint _index, GLsizeiptr _head, GLsizeiptr _sizeInBytes) { 
+			glBindBufferRange(target, _index, name, _head, _sizeInBytes); 
 		}
 
 	private:
 		OGLBufferLockManager lockManager;
-		Atom* bufferContents;
+		char* bufferContents;
 
 		GLuint name;
 		GLenum target;
@@ -146,7 +144,6 @@ namespace H3D
 	};
 
 	// --------------------------------------------------------------------------------------------------------------------
-	template <typename Atom>
 	class CircularBuffer
 	{
 	public:
@@ -155,59 +152,58 @@ namespace H3D
 		{ 
 		}
 
-		bool Create(BufferStorage _storage, GLenum _target, GLuint _atomCount, GLbitfield _createFlags = defaultCreateFlags, GLbitfield _mapFlags = defaultMapFlags)
+		bool Create(BufferStorage _storage, GLenum _target, GLuint _sizeInBytes, GLbitfield _createFlags = defaultCreateFlags, GLbitfield _mapFlags = defaultMapFlags)
 		{
 			head = 0;
-			sizeAtoms = _atomCount;
+			totalBufferSizeInBytes = _sizeInBytes;
 
-			return buffer.Create(_storage, _target, _atomCount, _createFlags, _mapFlags);
+			return buffer.Create(_storage, _target, _sizeInBytes, _createFlags, _mapFlags);
 		}
 
 		void Destroy() 
 		{
 			buffer.Destroy();
-			sizeAtoms = 0;
+			totalBufferSizeInBytes = 0;
 			head = 0;
 		}
 
-		Atom* Reserve(GLsizeiptr _atomCount)
+		char* Reserve(GLsizeiptr _sizeInBytes)
 		{
-			if(_atomCount >= sizeAtoms) 
+			if(_sizeInBytes >= totalBufferSizeInBytes) 
 			{
-				std::cout << "Requested an update of size " << _atomCount << " for a buffer of size " << sizeAtoms << " atoms." << std::endl;
+				std::cout << "Requested an update of size " << _sizeInBytes << " for a buffer of size " << totalBufferSizeInBytes << " atoms." << std::endl;
 			}
 
 			//GLsizeiptr lockStart = head;
 
-			if(head + _atomCount >= sizeAtoms) 
+			if(head + _sizeInBytes >= totalBufferSizeInBytes) 
 			{
 				// Need to wrap here.
 				head = 0;
 			}
 
-			buffer.WaitForLockedRange(head, _atomCount);
+			buffer.WaitForLockedRange(head, _sizeInBytes);
 			return &buffer.GetContents()[head];
 		}
 
-		void OnUsageComplete(GLsizeiptr _atomCount)
+		void OnUsageComplete(GLsizeiptr _sizeInBytes)
 		{
-			buffer.LockRange(head, _atomCount);
-			head = (head + _atomCount) % sizeAtoms;
+			buffer.LockRange(head, _sizeInBytes);
+			head = (head + _sizeInBytes) % totalBufferSizeInBytes;
 		}
 
 		void BindBuffer() { buffer.BindBuffer(); }
 		void BindBufferBase(GLuint _index) { buffer.BindBufferBase(_index); }
-		void BindBufferRange(GLuint _index, GLsizeiptr _atomCount) { buffer.BindBufferRange(_index, head, _atomCount); }
+		void BindBufferRange(GLuint _index, GLsizeiptr _sizeInBytes) { buffer.BindBufferRange(_index, head, _sizeInBytes); }
 
 		GLsizeiptr GetHead() const { return head; }
-		void* GetHeadOffset() const { return (void*)(head * sizeof(Atom)); }
-		GLsizeiptr GetSize() const { return sizeAtoms; }
+		void* GetHeadOffset() const { return (void*)head; }
+		GLsizeiptr GetSize() const { return totalBufferSizeInBytes; }
 
 	private:
-		Buffer<Atom> buffer;
-
+		Buffer buffer;
 		GLsizeiptr head;
-		GLsizeiptr sizeAtoms;
+		GLsizeiptr totalBufferSizeInBytes;
 	};
 }
 #endif
