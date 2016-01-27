@@ -129,7 +129,8 @@ namespace H3D {
               Inst< SFColorNode           > _color          = 0,
               Inst< SFCoordinateNode      > _coord          = 0,
               Inst< SFFogCoordinate       > _fogCoord       = 0,
-              Inst< MFVertexAttributeNode > _attrib         = 0 );
+              Inst< MFVertexAttributeNode > _attrib         = 0,
+              Inst< SFFloat               > _pointSize      = 0);
 
     /// Render the LineSet with OpenGL
     virtual void render();
@@ -196,6 +197,12 @@ namespace H3D {
     ///
     /// \dotfile PointSet_attrib.dot 
     auto_ptr< MFVertexAttributeNode > attrib;
+
+    /// point size 
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> 1 \n
+    /// \dotfile PointSet_pointSize.dot
+    auto_ptr< SFFloat > pointSize;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

@@ -47,6 +47,7 @@ namespace PointSetInternals {
   FIELDDB_ELEMENT( PointSet, coord, INPUT_OUTPUT );
   FIELDDB_ELEMENT( PointSet, fogCoord, INPUT_OUTPUT );
   FIELDDB_ELEMENT( PointSet, attrib, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( PointSet, pointSize, INPUT_OUTPUT );
 }
 
 PointSet::PointSet(  Inst< SFNode                > _metadata,
@@ -55,23 +56,26 @@ PointSet::PointSet(  Inst< SFNode                > _metadata,
                      Inst< SFColorNode           > _color,
                      Inst< SFCoordinateNode      > _coord,
                      Inst< SFFogCoordinate       > _fogCoord,
-                     Inst< MFVertexAttributeNode > _attrib ):
+                     Inst< MFVertexAttributeNode > _attrib,
+                     Inst< SFFloat               > _pointSize ):
   X3DGeometryNode( _metadata, _bound, _displayList ),
   color   ( _color    ),
   coord   ( _coord    ),
   fogCoord( _fogCoord ),
-  attrib ( _attrib ) {
+  attrib ( _attrib ),
+  pointSize ( _pointSize ){
 
   type_name = "PointSet";
   database.initFields( this );
-
+  pointSize->setValue( 1 );
   color->route( displayList );
   coord->route( displayList );
   fogCoord->route( displayList );
   attrib->route( displayList );
+  pointSize->route( displayList );
 
   coord->route( bound );
-
+ 
 }
 
 void PointSet::DisplayList::callList( bool build_list ) {
@@ -101,6 +105,8 @@ void PointSet::render() {
   FogCoordinate *fog_coord_node = fogCoord->getValue();
 
   if( coordinate_node ) {
+    glPushAttrib( GL_POINT_BIT );
+    glPointSize( pointSize->getValue() );
     // Save the old state of GL_LIGHTING 
     GLboolean lighting_enabled;
     glGetBooleanv( GL_LIGHTING, &lighting_enabled );
@@ -229,6 +235,7 @@ void PointSet::render() {
       glEnable( GL_LIGHTING );
     
     if( texture ) texture->enableTexturing();
+    glPopAttrib();
   }
 }
 
