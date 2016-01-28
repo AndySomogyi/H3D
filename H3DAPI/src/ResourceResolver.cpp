@@ -44,11 +44,13 @@ using namespace H3DUtil;
 
 string ResourceResolver::baseURL( "" );
 ResourceResolver::TmpFileNameList ResourceResolver::tmp_files;
+MutexLock ResourceResolver::tmp_files_lock;
 
 string ResourceResolver::resolveURLAs( const string &urn,
                                        bool *is_tmp_file,
                                        bool folder,
-                                       bool return_contents ) {
+                                       bool return_contents,
+                                       const string& _base_url ) {
   if( urn == "" ) return "";
   string filename = urn;
   if( urn_resolver().get() ) {
@@ -56,8 +58,9 @@ string ResourceResolver::resolveURLAs( const string &urn,
   }
   
   // first try as relative path
-  if( baseURL != "" ) {
-    string full_url = baseURL + filename;
+  string cur_base_url = _base_url.empty() ? baseURL : _base_url;
+  if( cur_base_url != "" ) {
+    string full_url = cur_base_url + filename;
     
     // Only return file contents if a resolver explicitly supports it
     // i.e. if it implements resolveURLAsStringInternal()
@@ -136,15 +139,19 @@ string ResourceResolver::getTmpFileName() {
   string tmp_file( tmp_file_ptr );
   delete tmp_file_ptr;
   if( tmp_file.length() > 0 ) {
-      tmp_files.push_back( tmp_file );
-      return tmp_file;
+    tmp_files_lock.lock();
+    tmp_files.push_back( tmp_file );
+    tmp_files_lock.unlock();
+    return tmp_file;
   } else {
       return "";
   }
 #else
   char tmp_file[ L_tmpnam ];
   if( tmpnam( tmp_file ) ) {
+    tmp_files_lock.lock();
     tmp_files.push_back( tmp_file );
+    tmp_files_lock.unlock();
     return tmp_file;
   } else {
     return "";
@@ -153,14 +160,17 @@ string ResourceResolver::getTmpFileName() {
 }
 
 bool ResourceResolver::releaseTmpFileName( const string &file ) {
+  tmp_files_lock.lock();
   for( list< string >::iterator i = tmp_files.begin();
        i != tmp_files.end(); ++i ) {
     if( file == (*i) ) {
       remove( (*i).c_str() );
       tmp_files.erase( i );
+      tmp_files_lock.unlock();
       return true;
     }
   }
+  tmp_files_lock.unlock();
   return false;
 }
 

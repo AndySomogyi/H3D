@@ -35,6 +35,7 @@
 #include <list>
 #include <H3D/URNResolver.h>
 #include <H3DUtil/AutoPtrVector.h>
+#include <H3DUtil/Threads.h>
 #include <memory>
 
 
@@ -101,8 +102,9 @@ namespace H3D {
     /// by urn. The boolean pointed to by the is_tmp_file argument 
     /// is set to true if the resolved file is a temporary file.
     static string resolveURLAsFile( const string &urn,
-                                    bool *is_tmp_file = NULL ){
-      return resolveURLAs(urn,is_tmp_file,false,false);
+                                    bool *is_tmp_file = NULL,
+                                    const string& _base_url = "" ){
+      return resolveURLAs(urn,is_tmp_file,false,false,_base_url);
     }
 
     /// Returns a local filename that contains the resource specified
@@ -119,8 +121,8 @@ namespace H3D {
     /// extract file data and wish to avoid the use of temporary files
     ///
     /// \param[in]   urn     The URL to resolve
-    static string resolveURLAsString ( const string &urn ) {
-      return resolveURLAs(urn,NULL,false,true);
+    static string resolveURLAsString ( const string &urn, const string& _base_url = "" ) {
+      return resolveURLAs(urn,NULL,false,true,_base_url);
     }
 
     /// Returns a new unique filename that can be used to create a temporary
@@ -158,7 +160,8 @@ namespace H3D {
     static string resolveURLAs( const string &urn,
                                 bool *is_tmp_file,
                                 bool folder,
-                                bool return_contents= false );
+                                bool return_contents= false,
+                                const string& _base_url = "" );
     
     static auto_ptr< URNResolver > & urn_resolver();
     
@@ -169,6 +172,7 @@ namespace H3D {
     
     static string baseURL;
     static TmpFileNameList tmp_files;
+    static H3DUtil::MutexLock tmp_files_lock;
   };
 }
 
