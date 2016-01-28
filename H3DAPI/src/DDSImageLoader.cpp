@@ -41,8 +41,8 @@ H3DImageLoaderNode::FileReaderRegistration
 DDSImageLoader::reader_registration(
                             "DDSImageLoader",
                             &(newImageLoaderNode< DDSImageLoader >),
-                            &DDSImageLoader::supportsFileType
-                            );
+                            &DDSImageLoader::supportsFileType,
+                            &DDSImageLoader::supportsStreamType);
 
 bool DDSImageLoader::supportsFileType( const string &url ) {
   // We could check the magic number, but keep it simple
