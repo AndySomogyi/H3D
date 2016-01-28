@@ -75,15 +75,12 @@ string X3DUrlObject::resolveURL ( const string& _url, bool return_contents, bool
     }
   }
 
-  string old_base = ResourceResolver::getBaseURL();
-  ResourceResolver::setBaseURL( url_base );
   string result;
   if ( return_contents ) {
-    result= ResourceResolver::resolveURLAsString ( _url );
+    result= ResourceResolver::resolveURLAsString ( _url, url_base );
   } else {
-    result= ResourceResolver::resolveURLAsFile ( _url, is_tmp_file );
+    result= ResourceResolver::resolveURLAsFile ( _url, is_tmp_file, url_base );
   }
-  ResourceResolver::setBaseURL( old_base );
   return result;
 }
 
