@@ -3172,7 +3172,7 @@ self, deepCopy )" );
     PyObject *q = PyTuple_GetItem( args, 0 );
     PyObject *t = PyTuple_GetItem( args, 1 );
 
-    if( !PyRotation_Check( q ) || !PyFloat_Check( t ) ) {
+    if( !PyRotation_Check( q ) || !( PyFloat_Check( t ) || PyInt_Check( t ) ) ) {
       PyErr_SetString(PyExc_TypeError, 
            "invalid type given as arguments to Rotation::slerp( Rot, t )." );
       return 0;
@@ -3510,7 +3510,7 @@ self, deepCopy )" );
     PyObject *q = PyTuple_GetItem( args, 0 );
     PyObject *t = PyTuple_GetItem( args, 1 );
 
-    if( !PyQuaternion_Check( q ) || !PyFloat_Check( t ) ) {
+    if( !PyQuaternion_Check( q ) || !( PyFloat_Check( t ) || PyInt_Check( t ) ) ) {
       PyErr_SetString(PyExc_TypeError, 
          "invalid type given as arguments to Quaternion::slerp( Quat, t )." );
       return 0;

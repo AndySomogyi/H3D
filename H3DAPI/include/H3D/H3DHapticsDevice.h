@@ -419,7 +419,7 @@ namespace H3D {
     auto_ptr< SFVec3f >   proxyPosition;
 
     /// A weighted position between proxyPosition and trackerPosition.
-    /// The weighting factor is the proxyWeigting field. By default
+    /// The weighting factor is the proxyWeighting field. By default
     /// this is the field that is used to display the stylus graphically.
     ///
     /// <b>Access type:</b> outputOnly \n
