@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<X3D profile='Full' version='3.2'>
+  <head>
+    <meta name='title' content='C:\Users\Michael\Documents\Dev\H3D Trunk\H3DAPI/examples/TestSuite/geometries/IndexedTriangleSet2Triangles.x3d' />
+    <meta name='description' content='A file containing an IndexedTriangleSet with 2 triangles.' />
+    <meta name='author' content='SenseGraphics AB, 2012' />
+  </head>
+  <Scene>
+    <Transform translation="0.0 0.0 0.302509" >
+      <Shape>
+          <Appearance>
+            <Material/>
+          </Appearance>
+          <IndexedTriangleSet index="0 3 1, 0 2 3" >
+            <Coordinate point="-0.2 -0.2 0.049138, -0.2 0.2 0.029815, 0.2 -0.2 0.030793, 0.2 0.2 0.098836" />
+            <TextureCoordinate point="0.0 0.0, 0.0 1.0, 1.0 0.0, 1.0 1.0" />
+          </IndexedTriangleSet>
+      </Shape>
+    </Transform>
+    <Viewpoint DEF='VP' position='0 0 0.565685424949' />
+  </Scene>
+</X3D>

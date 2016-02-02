@@ -1,10 +1,7 @@
 <?php
 require('DB/mysqli.php');
 
-$db = mysqli_connect("localhost", "ResultReader", "results", "testserver");
-if(mysqli_connect_errno($db)) {
-  echo "Failed to connect to MySQL: " . mysqli_connect_error();
-}
+require('mysql_conf.php');
 
 $query = sprintf("
 SELECT test_runs.*, 

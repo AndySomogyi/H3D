@@ -19,8 +19,6 @@ class UnitTestHelper :
     self.early_shutdown_file = early_shutdown_file
     self.output_file_prefix = output_file_prefix
     self.screenshot_counter = 0    
-#    self.screenshot_queue.put("Startup")
-    self.fps_counter = StoreFPS()
     self.screenshot_filename_prefix = screenshot_filename_prefix
     self.validation_file = output_file_prefix + "/validation.txt"
     self.last_func = None
@@ -107,30 +105,6 @@ class UnitTestHelper :
       self.customPrintHelper(self, value)
 
 
-
-
-class StoreFPS( AutoUpdate( SFFloat ) ):
-  def __init__( self):
-    AutoUpdate( SFFloat ).__init__(self)
-    self.running = False
-
-  def update( self, event ):
-    if self.running:
-      self.fps_string = self.fps_string + str(event.getValue()) + " "
-    return 0
-
-  def start( self ):
-    self.fps_string = ""
-    self.running = True
-    scene = getCurrentScenes()[0]
-    scene.frameRate.routeNoEvent( self )
-    scene = None
-
-  def stop( self ):
-    self.running = False
-    return self.fps_string
-
-
 TestCaseScriptFolder = getNamedNode('TestCaseScriptFolder').getField('value').getValueAsString().replace('"', '')
 TestCaseDefFolder = getNamedNode('TestCaseDefFolder').getField('value').getValueAsString().replace('"', '')
 TestBaseFolder = getNamedNode('TestBaseFolder').getField('value').getValueAsString().replace('"', '')
@@ -151,4 +125,4 @@ testHelper = UnitTestHelper(TestBaseFolder+"/test_complete", os.path.abspath(os.
 testHelper.addTests(testfunctions_list)
 res.printCustom = testHelper.printCustom
 
-timer_callback.addCallback(time.getValue()+StartTime, UnitTestHelper.doTesting, (testHelper,))       
+timer_callback.addCallback(time.getValue()+StartTime, UnitTestHelper.doTesting, (testHelper,))

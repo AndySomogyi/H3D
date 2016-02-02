@@ -138,14 +138,14 @@ class TestCaseRunner ( object ):
     test_results.url= orig_url
 
     self.startup_time = test_case.starttime
-    self.shutdown_time = test_case.runtime + 5
+    self.shutdown_time = test_case.runtime
     cwd= os.path.abspath(os.path.split ( orig_url )[0])
     filename= os.path.abspath ( url )
     
     if os.path.isfile( self.early_shutdown_file ):
       os.remove( self.early_shutdown_file )
     process= self.launchTest ( url, cwd )
-    for i in range( 0, int(test_case.runtime) ):
+    for i in range( 0, int(self.startup_time )):
       time.sleep(1)
       if os.path.isfile( self.early_shutdown_file ) or not process.isRunning():
         break
@@ -158,7 +158,7 @@ class TestCaseRunner ( object ):
    
     self.shutdown_timeout = 10
     time_slept = 0.0
-    while time_slept < self.shutdown_timeout and process.isRunning():
+    while time_slept < self.shutdown_time and process.isRunning():
       time.sleep(0.5)
       time_slept += 0.5
     
@@ -425,7 +425,12 @@ class TestCaseRunner ( object ):
         elif type(result).__name__ == 'PerformanceResult':
           # Insert the performance results, but only if all the tests in this step succeeded!
           if step.success:
-            curs.execute("INSERT INTO performance_results (test_run_id, file_id, case_id, step_id, min_fps, max_fps, avg_fps, mean_fps, full_case_data) VALUES (%d, %d, %d, %d, %s, %s, %s, %s, '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, result.fps_min, result.fps_max, result.fps_avg, result.fps_mean, result.fps_full))
+#            curs.execute("INSERT INTO performance_results (test_run_id, file_id, case_id, step_id, min_fps, max_fps, avg_fps, mean_fps, full_case_data) VALUES (%d, %d, %d, %d, %s, %s, %s, %s, '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, result.fps_min, result.fps_max, result.fps_avg, result.fps_mean, result.fps_full))
+            curs.execute("INSERT INTO performance_results (test_run_id, file_id, case_id, step_id, full_profiling_data) VALUES (%d, %d, %d, %d, '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, result.profiling_data_full))
+            perf_res_id = curs.lastrowid
+            for data in result.profiling_data_lines:
+              curs.execute("INSERT INTO performance_result_data (performance_result_id, level, identifier, mean, percent) VALUES (%d, %d, '%s', %f, %f)" % (perf_res_id, int(data.level), data.id, float(data.mean), float(data.percent)) )
+
         elif type(result).__name__ == 'RenderingResult':
             step_name = step.step_name
             # Fetch the current baseline so we can compare it to the one in the database
@@ -757,7 +762,7 @@ print "Running these tests using: " + subprocess.check_output('where.exe ' + h3d
 
 
 tester= TestCaseRunner( os.path.join(args.workingdir, ""), startup_time= 5, shutdown_time= 5, testable_callback= isTestable, error_reporter=None)
-nresults = tester.processAllTestDefinitions(directory=args.workingdir, output_dir=args.output)
+results = tester.processAllTestDefinitions(directory=args.workingdir, output_dir=args.output)
 
 #reporter= TestReport()
 #print reporter.reportResults ( results )
