@@ -12,4 +12,4 @@
 x3d=TestExample.x3d
 script=TestExample.py
 baseline folder=baseline
-timeout=30
+timeout=40

@@ -5,7 +5,8 @@
 # post(testHelper, validator, validation_output_file) a function that stores validation data. This will be run the next scene graph iteration after run_time has passed. If run_time is undefined then or 0 then it will be run the next iteration after the test function is called.
 
 import os
-from H3DInterface import takeScreenshot
+from H3DInterface import *
+from H3DUtils import *
 
 def screenshot(start_time = None, run_time = None):
   def _screenshot(func):
@@ -38,14 +39,15 @@ def screenshot(start_time = None, run_time = None):
 def performance(start_time = None, run_time = None):
   def _performance(func):
     def init(testHelper, validator, validation_output_file):
-      testHelper.fps_counter.start()
+      pass
 
     def post(testHelper, validator, validation_output_file):
       try:
-        fps_data = testHelper.fps_counter.stop()
+        profiling_data = getCurrentScenes()[0].getField("profiledResult").getValue()[0]
         f = open(validation_output_file, 'a')
-        f.write('performance\n')
-        f.write(fps_data + '\n')
+        f.write('performance_start\n')
+        f.write(profiling_data + '\n')
+        f.write('performance_end\n')
         f.flush()
         f.close()
       except Exception as e:

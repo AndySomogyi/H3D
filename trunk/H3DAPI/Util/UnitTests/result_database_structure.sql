@@ -10,12 +10,12 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping database structure for testserver
-CREATE DATABASE IF NOT EXISTS `testserver` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `testserver`;
+-- Dumping database structure for testserver_new
+CREATE DATABASE IF NOT EXISTS `testserver_new` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `testserver_new`;
 
 
--- Dumping structure for table testserver.console_results
+-- Dumping structure for table testserver_new.console_results
 CREATE TABLE IF NOT EXISTS `console_results` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `test_run_id` int(10) unsigned NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `console_results` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.custom_results
+-- Dumping structure for table testserver_new.custom_results
 CREATE TABLE IF NOT EXISTS `custom_results` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `test_run_id` int(10) unsigned NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `custom_results` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.error_results
+-- Dumping structure for table testserver_new.error_results
 CREATE TABLE IF NOT EXISTS `error_results` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `test_run_id` int(10) unsigned NOT NULL,
@@ -64,25 +64,35 @@ CREATE TABLE IF NOT EXISTS `error_results` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.performance_results
+-- Dumping structure for table testserver_new.performance_results
 CREATE TABLE IF NOT EXISTS `performance_results` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `test_run_id` int(10) unsigned NOT NULL,
   `file_id` int(10) unsigned NOT NULL,
   `case_id` int(10) unsigned NOT NULL,
   `step_id` int(10) unsigned NOT NULL,
-  `min_fps` float unsigned NOT NULL,
-  `max_fps` float unsigned NOT NULL,
-  `avg_fps` float unsigned NOT NULL,
-  `mean_fps` float unsigned NOT NULL,
-  `full_case_data` text NOT NULL,
+  `full_profiling_data` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.rendering_baselines
+-- Dumping structure for table testserver_new.performance_result_data
+CREATE TABLE IF NOT EXISTS `performance_result_data` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `performance_result_id` int(10) unsigned NOT NULL,
+  `level` int(10) unsigned NOT NULL,
+  `identifier` tinytext NOT NULL,
+  `mean` float NOT NULL,
+  `percent` float NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table testserver_new.rendering_baselines
 CREATE TABLE IF NOT EXISTS `rendering_baselines` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `file_id` int(10) unsigned NOT NULL,
@@ -95,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `rendering_baselines` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.rendering_results
+-- Dumping structure for table testserver_new.rendering_results
 CREATE TABLE IF NOT EXISTS `rendering_results` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `test_run_id` int(10) unsigned NOT NULL,
@@ -111,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `rendering_results` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.servers
+-- Dumping structure for table testserver_new.servers
 CREATE TABLE IF NOT EXISTS `servers` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `server_name` tinytext NOT NULL,
@@ -121,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `servers` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.test_cases
+-- Dumping structure for table testserver_new.test_cases
 CREATE TABLE IF NOT EXISTS `test_cases` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `case_name` text NOT NULL,
@@ -131,7 +141,7 @@ CREATE TABLE IF NOT EXISTS `test_cases` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.test_files
+-- Dumping structure for table testserver_new.test_files
 CREATE TABLE IF NOT EXISTS `test_files` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `filename` text NOT NULL,
@@ -141,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `test_files` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.test_runs
+-- Dumping structure for table testserver_new.test_runs
 CREATE TABLE IF NOT EXISTS `test_runs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -152,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `test_runs` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table testserver.test_steps
+-- Dumping structure for table testserver_new.test_steps
 CREATE TABLE IF NOT EXISTS `test_steps` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `step_name` tinytext NOT NULL,

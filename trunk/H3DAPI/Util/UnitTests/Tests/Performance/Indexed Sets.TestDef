@@ -1,0 +1,126 @@
+[500IndexedFaceSet1000Faces]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\500IndexedFaceSet1000Faces.x3d
+
+
+[500IndexedTriangleSet2Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\500IndexedTriangleSet2Triangles.x3d
+
+
+[500IndexedTriangleSet100Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\500IndexedTriangleSet100Triangles.x3d
+
+
+[500IndexedTriangleSet1000Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\500IndexedTriangleSet1000Triangles.x3d
+
+
+[500IndexedTriangleSet10000Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=40
+runtime=100
+x3d=x3d\500IndexedTriangleSet10000Triangles.x3d
+
+
+[IndexedFaceSet1000Faces]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedFaceSet1000Faces.x3d
+
+
+[IndexedFaceSet10000Faces]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedFaceSet10000Faces.x3d
+
+
+[IndexedFaceSet100000Faces]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedFaceSet100000Faces.x3d
+
+
+[IndexedTriangleSet2Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedTriangleSet2Triangles.x3d
+
+
+[IndexedTriangleSet100Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedTriangleSet100Triangles.x3d
+
+
+[IndexedTriangleSet1000Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedTriangleSet1000Triangles.x3d
+
+
+[IndexedTriangleSet10000Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedTriangleSet10000Triangles.x3d
+
+
+[IndexedTriangleSet100000Triangles]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedTriangleSet100000Triangles.x3d
+
+
+[IndexedTriangleSet100000TrianglesPhongStatic]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedTriangleSet100000TrianglesPhongStatic.x3d
+
+
+[IndexedTriangleSet100000TrianglesPhongTouchedPointField]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedTriangleSet100000TrianglesPhongTouchedPointField.x3d
+
+
+[IndexedTriangleSet100000TrianglesTouchedPointField]
+baseline folder=baseline
+script=BasicPerformance.py
+starttime=10
+runtime=100
+x3d=x3d\IndexedTriangleSet100000TrianglesTouchedPointField.x3d

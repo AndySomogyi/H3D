@@ -42,16 +42,39 @@ function LoadSQLModel(test_run_id, result_callback) {
    
 var all_graphs = [];
 var display_options =  {
+  displayFramerate: false,
   properties: {
-    available: ["min_fps", "avg_fps", "mean_fps", "max_fps"],
-    selected: ["avg_fps", "mean_fps"],
-    ignore: ["name", "time", "history", "server_id", "server_name", "test_run_id", "filename", "result_type", "step_name", "stdout", "stderr", "console_output", "console_baseline", "console_diff", "id", "success"],
+    available: ["mean", "percent"],
+    selected: "mean",
+    ignore: ["id", "level", "children", "data"],
   },
   servers:  {
     available: [],
     selected: [],
   }
 };
+
+function getSelectedUnit() {
+  if(display_options.properties.selected == "mean") {
+    if(!display_options.displayFramerate)
+      return "ms";
+    else
+      return "fps";
+  } else {
+    return "%";
+  }
+}
+
+function getSelectedProperty(obj) {
+  if(display_options.properties.selected == "mean" && display_options.displayFramerate) {
+    if(parseFloat(obj["mean"]) != 0)
+      return (1000/parseFloat(obj["mean"])).toString();
+    else
+      return 0;
+  } else
+    return obj[display_options.properties.selected];
+}
+
 
 function generateDisplayOptionsList(model) {
   if(model) {
@@ -69,25 +92,30 @@ function generateDisplayOptionsList(model) {
               if(display_options.servers.selected.length == 0) {
                 display_options.servers.selected.push(testcase.server_name);
               }
-              for(var propertyName in testcase) {
+              for(var propertyName in testcase.profiler_data) {
                 if ($.inArray(propertyName, display_options.properties.ignore) < 0) {
                   if($.inArray(propertyName, display_options.properties.available) < 0) {
                     display_options.properties.available.push(propertyName);
                   }             
                 }
               }
-              for(var k = 0; k < testcase.history.length; k++) {
-                if($.inArray(testcase.history[k].server_name, display_options.servers.available) < 0) {
-                  display_options.servers.available.push(testcase.history[k].server_name);
-                }        
-                for(var propertyName in testcase.history[k]) {
-                  if ($.inArray(propertyName, display_options.properties.ignore) < 0) {
-                    if($.inArray(propertyName, display_options.properties.available) < 0) {
-                      display_options.properties.available.push(propertyName);
-                    }             
-                  }
+              for(var k = 0; k < testcase.profiler_data.data.length; ++k) {
+                if($.inArray(testcase.profiler_data.data[k].server_name, display_options.servers.available) < 0) {
+                  display_options.servers.available.push(testcase.profiler_data.data[k].server_name);
                 }
               }
+//              for(var k = 0; k < testcase.history.length; k++) {
+//                if($.inArray(testcase.history[k].server_name, display_options.servers.available) < 0) {
+//                  display_options.servers.available.push(testcase.history[k].server_name);
+//                }        
+//                for(var propertyName in testcase.history[k].profiler_data) {
+//                  if ($.inArray(propertyName, display_options.properties.ignore) < 0) {
+//                    if($.inArray(propertyName, display_options.properties.available) < 0) {
+//                      display_options.properties.available.push(propertyName);
+//                    }             
+//                  }
+//                }
+//              }
             }
           }
         }               
@@ -103,37 +131,27 @@ function refreshDisplayOptions(model) {
   $('#Option_Properties').append('<h3 class="Options_Header">Properties:</h3>');
   $('#Option_Servers').append('<h3 class="Options_Header">Servers:</h3>');
   for(var i = 0; i < display_options.properties.available.length; i++) {
-    var cb = $('<input>');
-    cb.attr('type', 'checkbox');    
-    if($.inArray(display_options.properties.available[i], display_options.properties.selected) > -1)
-      cb.prop('checked', true);
+    var rb = $('<input>');
+    rb.attr('type', 'radio');    
+    rb.attr('name', 'Property_RadioButton');
+    if(display_options.properties.available[i] == display_options.properties.selected)
+      rb.prop('checked', true);
       
-    cb.data('propName', display_options.properties.available[i]);
+    rb.data('propName', display_options.properties.available[i]);
     
-    $('#Option_Properties').append(cb);
+    $('#Option_Properties').append(rb);
     $('#Option_Properties').append(display_options.properties.available[i] + "<br/>")
     
-    cb.change(function() {
-      if(!$(this).prop('checked')) {
-        if(display_options.properties.selected.length > 1) {
-         var index = $.inArray($(this).data('propName'), display_options.properties.selected);
-          if(index > -1) { // If it's in the selected list then remove it from the list
-            display_options.properties.selected.splice(index, 1); // This just removes this one element from the list.
-          }
-        } else {
-          $(this).prop('checked', true);
-          return;
+    rb.change(function() {
+      if($(this).prop('checked')) {
+        if(display_options.properties.selected != $(this).data('propName')) {
+          display_options.properties.selected = $(this).data('propName');
+          $('.TestResult').each(function() { if($(this).data('model').result_type=="performance") generateGraph($(this));}); // regenerates all the graphs          
         }
-      } else {
-       var index = $.inArray($(this).data('propName'), display_options.properties.selected);
-        if(index < 0) { // If it isn't in the selected list then add it
-          display_options.properties.selected.push($(this).data('propName'));
-        }     
       }
-      $('.TestResult').each(function() { if($(this).data('model').result_type=="performance") generateGraph($(this));}); // regenerates all the graphs
-    });    
-    
+    });        
   }
+  
   for(var i = 0; i < display_options.servers.available.length; i++) {
     var cb = $('<input>');
     cb.attr('type', 'checkbox');
@@ -166,6 +184,18 @@ function refreshDisplayOptions(model) {
     });
   }
   
+  var cbFPS = $("<input>");
+  cbFPS.attr('type', 'checkbox');
+  cbFPS.click(function(){
+    if($(this).prop('checked'))
+      display_options.displayFramerate = true;
+    else
+      display_options.displayFramerate = false;
+    $('.TestResult').each(function() { if($(this).data('model').result_type=="performance") generateGraph($(this));}); // regenerates all the graphs      
+  });
+  $('#Option_Properties').append(cbFPS);
+  $('#Option_Properties').append("Display perf data as framerate");
+  
 }
 
 
@@ -177,39 +207,56 @@ var highest_time = 0;
 var highest_y = 0;
 function generateDatasets(testcase) {
   var stack_count = 0;
+  lowest_time = 0;
+  highest_time = 0;
+  for(var s = 0; s < display_options.servers.selected.length; s++) {
   var datasets = [];
-    for(var s = 0; s < display_options.servers.selected.length; s++) {
     var server = display_options.servers.selected[s];
-    for(var propertyName in testcase) {
-      if(($.inArray(propertyName, display_options.properties.selected) > -1)) {
-    ++stack_count;
-        var new_dataset = [];
-        if(testcase.hasOwnProperty("history")) {
-          for(var j = 0; j < testcase.history.length; j++) {
-            if((testcase.history[j].server_name == server)) {
-              if(lowest_time == 0 || new Date(testcase.history[j].time) < new Date(lowest_time)) {
-                lowest_time = testcase.history[j].time;
-              }
-              if(highest_time == 0 || testcase.history[j].time > highest_time) {
-                highest_time = testcase.history[j].time;
-              }              
-              new_dataset.push([new Date(testcase.history[j].time).getTime(), testcase.history[j][propertyName]]);
-            }
-          } 
-        }
-        if(!isNaN(testcase[propertyName])) {
-          if(lowest_time == 0 || new Date( testcase.time) < new Date(lowest_time)) {
-            lowest_time = testcase.time;
-          }
-          if(highest_time == 0 || new Date(testcase.time) > new Date(highest_time)) {
-            highest_time = testcase.time;
-          }           
-          new_dataset.push([new Date(testcase.time).getTime(), testcase[propertyName]]);
-        }
-      datasets.push({label: propertyName, stack: stack_count, data: new_dataset, server_name: testcase['server_name']});
-      }
+    var recur = function(level, arr) {
+    if(level >= 1 && display_options.displayFramerate) {
+      return;
     }
+//      arr.children.sort(function(a, b) { return a.data[a.data.length-1].mean > b.data[b.data.length-1].mean; });
+      if(arr.hasOwnProperty("children"))
+        for(var i = 0; i < arr.children.length; ++i) {
+          var dataset = [];
+          if(level < 3) {
+            for(var j = 0; j < arr.children[i].data.length; ++j) {
+              if(arr.children[i].data[j].server_name == server) {           
+                if(parseFloat(getSelectedProperty(arr.children[i].data[j])) <= 0) {
+                  dataset.push([new Date(arr.children[i].data[j].timestamp).getTime(), null, arr.children[i].data[j]]);
+                } else {
+                  dataset.push([new Date(arr.children[i].data[j].timestamp).getTime(), parseFloat(getSelectedProperty(arr.children[i].data[j])), arr.children[i].data[j]]);
+                  if(lowest_time == 0 || new Date(arr.children[i].data[j].timestamp) < new Date(lowest_time)) {
+                    lowest_time = arr.children[i].data[j].timestamp;
+                  }
+                  if(highest_time == 0 || arr.children[i].data[j].timestamp > highest_time) {
+                    highest_time = arr.children[i].data[j].timestamp;
+                  }                   
+                }
+              }
+            }
+            if(dataset.length > 0)    
+              datasets.push({label: arr.children[i].id, stack: level, data: dataset, server_name: testcase.server_name, prof_data: arr.children[i]});
+          }
+          if(arr.children[i].hasOwnProperty("children"))
+            recur(level+1, arr.children[i]);
+        }
+
+    };
+    if(testcase.hasOwnProperty("profiler_data")) {
+      var root = {'children':[testcase.profiler_data]};
+      recur(0, root);
+    }
+      
   }
+  
+  if(lowest_time == 0 || new Date(testcase.time) < new Date(lowest_time)) {
+    lowest_time = testcase.time;
+  }
+  if(highest_time == 0 || new Date(testcase.time) > new Date(highest_time)) {
+    highest_time = testcase.time;
+  }                
   return datasets;
 }
 
@@ -223,13 +270,23 @@ function generateGraph(div) {
   var graph_div = $('<div>');
   graph_div.addClass('TestResult_graph');
   
+  
   if(lowest_time == highest_time) {
     highest_time = (new Date(lowest_time).getTime()+1)
   }
   highest_time = (new Date(highest_time).getTime())
   lowest_time = (new Date(lowest_time).getTime())
   
+   
+  var data_div = $('<div>');
+  data_div.addClass('TestResult_data');
+  var data_list = $('<ul>');
+  data_list.addClass('TestResult_data_list');
+  data_list.append('Latest:');
+  data_div.append(data_list);
+  div.append(data_div);
   
+   
   var graph_options = {
     series: {
       lines: {
@@ -245,36 +302,61 @@ function generateGraph(div) {
     tooltip: {
       show: true,
       content: function(label, xval, yval, flotItem) {
-        return flotItem.series.server_name + "<br/>" + label + ": " + yval;
+        var total = 0;//parseFloat(yval);
+        var res = flotItem.series.server_name + "<br/>" + label + ": " + getSelectedProperty(flotItem.series.prof_data.data[flotItem.dataIndex]) + getSelectedUnit() + "<br/>";
+        if(flotItem.series.prof_data.hasOwnProperty("children")) {
+          for(var i = 0; i < flotItem.series.prof_data.children.length; ++i) {
+            var val = parseFloat(getSelectedProperty(flotItem.series.prof_data.children[i].data[flotItem.dataIndex]));
+            total += val;
+            res += flotItem.series.prof_data.children[i].id + ": " + val + getSelectedUnit() +"<br/>";
+          }
+        }
+        res += "stack: " + flotItem.series.stack;
+        return res;
       }
     },
     xaxis: {
       mode: "time",
       min: lowest_time,
       max: highest_time,
+      zoomRange: [(highest_time-lowest_time)/2, highest_time-lowest_time],
+      panRange: [lowest_time, highest_time],
       tickFormatter: function (val, axis) {
           var d = new Date(val);
           return d.toISOString().split("T")[0];
       }
     },
     yaxis: {
-      min: 0
+      min: 0,
+      panRange: [0, (display_options.properties.selected == 'percent') ? 100 : null],
+      zoomRange: [0, (display_options.properties.selected == 'percent') ? 100 : null],
     },
     zoom: {
       interactive: true
     },
     pan: {
       interactive: true
-    }    
+    },    
+    legend: {
+      show: true,
+      container: data_list,
+      sorted: false,
+      labelFormatter: function(label, item) {
+        return label + " - " + getSelectedProperty(item.data[item.data.length-1][2]) + getSelectedUnit();
+      }
+    }
   }
 		
   $('body').append(graph_div);
+
 
   // Options can be set globally. 
  
   $.plot(graph_div, graph_data, graph_options);
   
+  data_div.detach();
   div.append(graph_div); 
+  div.append(data_div);
 
            
 }
@@ -481,7 +563,15 @@ function ConstructTestCases(model, target) {
       }
       step_div.append(name_div);
       step_div.data('model', model.testcases[i]); // Store the associated testCase with the div
-      case_div.append(step_div);
+      if(!(model.testcases[i].result_type == "performance" && !model.testcases[i].hasOwnProperty("profiler_data")))
+        case_div.append(step_div);
+      else {
+        case_name.removeClass("test_successful");
+        case_name.addClass("test_failed");
+        container.removeClass("test_successful");
+        container.addClass("test_failed");
+        case_name.append(" - Missing performance data");
+      }
     }
   }  
   target.append(container);
@@ -655,19 +745,10 @@ function SetTestRun(test_run_id) {
   });  
   
   });
-}
-
-
-
-var model = null;
-
-$(document).ready(function(){
-  GetServerList();
-  
   // Set up the toggle buttons.
   $('#Options_Toggle_Categories').data('collapsed', true);
   $('#Options_Toggle_Categories').prop('value', 'Expand All Categories');
-  $('#Options_Toggle_Categories').click(function(){
+  $('#Options_Toggle_Categories').unbind().click(function(){
     if($(this).data('collapsed')) {
       $('.category_list_checkbox').prop('checked', true);
       $(this).data('collapsed', false);
@@ -683,7 +764,7 @@ $(document).ready(function(){
   
   $('#Options_Toggle_Cases').data('collapsed', true);
   $('#Options_Toggle_Cases').prop('value', 'Expand Visible Cases');
-  $('#Options_Toggle_Cases').click(function(){
+  $('#Options_Toggle_Cases').unbind().click(function(){
     if($(this).data('collapsed')) {
       $('.TestResult_name:visible').removeClass('minimized');
       $(this).data('collapsed', false);
@@ -697,7 +778,7 @@ $(document).ready(function(){
 
   $('#Options_Toggle_Steps').data('collapsed', true);
   $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
-  $('#Options_Toggle_Steps').click(function(){
+  $('#Options_Toggle_Steps').unbind().click(function(){
     if($(this).data('collapsed')) {
       $('.TestStep_name:visible').removeClass('minimized');
       $(this).data('collapsed', false);
@@ -707,7 +788,16 @@ $(document).ready(function(){
       $(this).data('collapsed', true);
       $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
     }
-  });
+  });  
+}
+
+
+
+var model = null;
+
+$(document).ready(function(){
+  GetServerList();
+ 
   
 });    
 
