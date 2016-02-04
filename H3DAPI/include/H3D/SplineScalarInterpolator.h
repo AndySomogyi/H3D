@@ -27,7 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #ifndef __SPLINESCALARINTERPOLATOR_H__
-#define __SPLINESCALARINTORPOLATOR_H__
+#define __SPLINESCALARINTERPOLATOR_H__
 
 #include <H3D/X3DInterpolatorNode.h>
 #include <H3D/SFVec2f.h>

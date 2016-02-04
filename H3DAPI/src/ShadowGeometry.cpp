@@ -467,11 +467,11 @@ void ShadowGeometry::updateAdjacenctVertexArray( const vector< HAPI::Collision::
     //    continue;
     // Triangle adjacency specification order
     // 1 - - - 2 - - - 3    
-    //          ^\            
+    //          ^\
     //    \     | \     |      
-    //          |  \           
+    //          |  \
     //      \   |   \   |       
-    //          |    \        
+    //          |    \
     //        \ |     \ |      
     //          |      v          
     //          0<------4           
