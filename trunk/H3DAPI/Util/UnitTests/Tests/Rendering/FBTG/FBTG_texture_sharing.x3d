@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<X3D profile='H3DAPI' version='1.4'>
+	<head>
+		<meta name='title' content='FrameBufferTextureGenerator.x3d'/>
+		<meta name='description' content='H3DAPI FrameBufferTextureGenerator example. It shows how to copy depth buffer from one FrameBufferTextureGenerator and use it to clip certain area while rendering another FrameBufferTextureGenerator. This example uses H3DAPI node(s) and runs on H3DAPI-supported browsers only. Visit http://www.h3d.org for more information and to download an H3DAPI-
+      compatible browser. '/>
+		<meta name='author' content='SenseGraphics AB, 2006-2014'/>
+	</head>
+
+	<Scene>
+		<Viewpoint position='0 0 0.7' />
+		<Group>
+			<!-- Generate depth texture -->
+			<FrameBufferTextureGenerator DEF="DEPTH" outputTextureType="2D" samples="4" generateDepthTexture = 'true' clearColor="0.2 0 0 1" useSpecifiedClearColor="true"  >
+				<Viewpoint DEF='V2' position='0 0.1 0.3' orientation="-0.5 0.25 1.25 1" containerField = 'viewpoint' />
+				<NavigationInfo visibilityLimit='8' nearVisibilityLimit='0.01' containerField ='navigationInfo' />
+				<Shape>
+					<Appearance>
+						<Material diffuseColor='0 1 1' />
+					</Appearance>
+					<Box size="0.1 0.1 0.1" />
+				</Shape>
+			</FrameBufferTextureGenerator>
+
+			<!-- Generate color texture 0 -->
+			<FrameBufferTextureGenerator DEF="COLOR0" outputTextureType="2D" samples="12" generateColorTextures = '"RGBA","RGBA"' splitScene="true" clearColor="0 0 0.3 1" useSpecifiedClearColor="true" >
+				<Shape>
+					<Appearance>
+						<RenderProperties depthTestEnabled="false" />
+					</Appearance>
+					<Sphere radius="0.1" />
+				</Shape>
+				<Transform translation = '0.0 0.0 -2.2' rotation='0.2 0.2 0.2 1.0'>
+					<Shape>
+						<Appearance>
+							<Material diffuseColor='0.1 0.6 0.1' />
+						</Appearance>
+						<Box size="0.3 0.3 0.3"/>
+					</Shape>
+				</Transform>
+
+			</FrameBufferTextureGenerator>
+
+			<!-- Generate color texture 1 -->
+			<FrameBufferTextureGenerator DEF="COLOR1" outputTextureType="2D" samples="0" generateColorTextures = 'RGBA' >
+				<Background containerField="background" skyColor="0.1 0.7 0.1 0.5 0.1 0.4" skyAngle="1.4" />
+				<Transform translation = '0.1 0.0 -1.2' rotation='0.2 0.2 0.2 1.0'>
+					<Shape>
+						<Appearance>
+							<Material diffuseColor='1.0 0.0 0.1' />
+						</Appearance>
+						<Sphere radius="0.2"/>
+					</Shape>
+				</Transform>
+			</FrameBufferTextureGenerator>
+
+			<!-- Collector FBTG. Gathers all of the other FBTG in the same place. -->
+			<FrameBufferTextureGenerator DEF="GEN" depthBufferStorage = 'FBO_COPY' colorBufferStorages='"FBO_COPY_0","FBO_COPY_0","FBO_COPY_1"' outputTextureType="2D" samples="0" generateDepthTexture = 'true' generateColorTextures='"RGBA","RGBA","RGBA"'>
+				<FrameBufferTextureGenerator USE = 'DEPTH' containerField = "externalFBODepthBuffer"/>
+				<FrameBufferTextureGenerator USE = 'COLOR0' containerField = "externalFBOColorBuffers"/>
+				<FrameBufferTextureGenerator USE = 'COLOR1' containerField = "externalFBOColorBuffers"/>
+				<FrameBufferTextureGenerator USE = 'COLOR0' containerField = "externalFBOColorBuffers"/>
+			</FrameBufferTextureGenerator>
+
+			<!-- Render the textures -->
+			<Transform translation = '-0.1 0 0'>
+				<Shape>
+					<Appearance DEF="APP" >
+						<Material diffuseColor='0.1 0.1 0.1' />
+						<ComposedShader DEF="DEPTH_SHADER" language="GLSL" suppressUniformWarnings="true">
+							<field name="texture" type="SFNode" accessType="inputOutput" />
+							<ShaderPart type="VERTEX" url="shaders/passthrough.vert" />
+							<ShaderPart type="FRAGMENT" url="shaders/passthrough.frag" />
+						</ComposedShader>
+					</Appearance>
+					<Rectangle2D size="0.1 0.1" />
+				</Shape>
+			</Transform>
+
+			<Transform translation="0.0 0 0">
+				<Shape>
+					<Appearance DEF="COL_APP_0" >
+						<RenderTargetTexture index="0">
+							<FrameBufferTextureGenerator USE="GEN" containerField="generator" />
+						</RenderTargetTexture>
+					</Appearance>
+					<Rectangle2D size="0.1 0.1"/>
+				</Shape>
+			</Transform>
+
+			<Transform translation="0.1 0 0">
+				<Shape>
+					<Appearance DEF="COL_APP_1" >
+						<RenderTargetTexture index="1">
+							<FrameBufferTextureGenerator USE="GEN" containerField="generator" />
+						</RenderTargetTexture>
+					</Appearance>
+					<Rectangle2D size="0.1 0.1"/>
+				</Shape>
+			</Transform>
+
+			<Transform translation="0.2 0 0">
+				<Shape>
+					<Appearance DEF="COL_APP_2" >
+						<RenderTargetTexture index="2">
+							<FrameBufferTextureGenerator USE="GEN" containerField="generator" />
+						</RenderTargetTexture>
+					</Appearance>
+					<Rectangle2D size="0.1 0.1"/>
+				</Shape>
+			</Transform>
+
+		</Group>
+		<ROUTE fromNode="GEN" fromField="depthTexture" toNode="DEPTH_SHADER" toField="texture" />
+	</Scene>
+</X3D>
