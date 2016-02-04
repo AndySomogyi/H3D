@@ -43,7 +43,11 @@ def performance(start_time = None, run_time = None):
 
     def post(testHelper, validator, validation_output_file):
       try:
-        profiling_data = getCurrentScenes()[0].getField("profiledResult").getValue()[0]
+        try:
+          profiling_data = getCurrentScenes()[0].getField("profiledResult").getValue()[0]
+        except:
+          print "Error: getting profiledResult failed! This build of h3d might not have ENABLE_PROFILER set."
+          return
         f = open(validation_output_file, 'a')
         f.write('performance_start\n')
         f.write(profiling_data + '\n')

@@ -13,20 +13,20 @@
 x3d=FBTG\FBTG_32_layers.x3d
 script=FBTG\FBTG_32_layers.py
 baseline folder=FBTG\baseline
-starttime=5
-timeout=30
+starttime=10
+timeout=50
 
 [FBTG_8_clear_colors]
 x3d=FBTG\FBTG_8_clear_colors.x3d
 script=FBTG\FBTG_8_clear_colors.py
 baseline folder=FBTG\baseline
-starttime=5
-timeout=30
+starttime=10
+timeout=50
 
 [FBTG_texture_sharing]
 x3d=FBTG\FBTG_texture_sharing.x3d
 script=FBTG\FBTG_texture_sharing.py
 baseline folder=FBTG\baseline
-starttime=5
-timeout=30
+starttime=10
+timeout=50
 

@@ -721,12 +721,16 @@ function GetServerList() {
           div.data("server_id", res[i].id);
           div.data("server_name", res[i].name);
           div.click(function(){
+              hash_run = null;
             SetServer($(this).data("server_id"), $(this).data("server_name"));
                 $(".Selected_Server").removeClass('Selected_Server');
                 $(this).addClass('Selected_Server');
+              window.location.hash = encodeURI("#server=" + display_options.servers.current);
           });
           if(hash_server == res[i].name) {
-            div.trigger("click");
+            SetServer($(div).data("server_id"), $(div).data("server_name"));
+                $(".Selected_Server").removeClass('Selected_Server');
+                $(div).addClass('Selected_Server');
             }
           target.append(div);
         }
@@ -772,10 +776,13 @@ function GetTestRunList(server_id) {
               $(".Selected_TestRun").removeClass('Selected_TestRun');
               $(this).addClass('Selected_TestRun');
               display_options.testruns.selected = $(this).data("test_run_id");
-             // $('#Categories_List').empty();
+              window.location.hash = encodeURI("#server=" + display_options.servers.current + "&testrun=" + display_options.testruns.selected);
             });
             if(hash_server == display_options.servers.current && hash_run == res[i].id) {
-              div.trigger("click");
+              SetTestRun($(div).data("test_run_id"));
+              $(".Selected_TestRun").removeClass('Selected_TestRun');
+              $(div).addClass('Selected_TestRun');
+              display_options.testruns.selected = $(div).data("test_run_id");
             }
           } else {
             div.addClass('TestRun_NoResults');
