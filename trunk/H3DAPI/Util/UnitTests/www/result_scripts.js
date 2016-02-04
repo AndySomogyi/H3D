@@ -51,6 +51,7 @@ var display_options =  {
   servers:  {
     available: [],
     selected: [],
+    current: "" // servers.current is the server that the test run we are looking at is from
   }
 };
 
@@ -67,7 +68,7 @@ function getSelectedUnit() {
 
 function getSelectedProperty(obj) {
   if(display_options.properties.selected == "mean" && display_options.displayFramerate) {
-    if(parseFloat(obj["mean"]) != 0)
+    if(obj && parseFloat(obj["mean"]) != 0)
       return (1000/parseFloat(obj["mean"])).toString();
     else
       return 0;
@@ -146,7 +147,14 @@ function refreshDisplayOptions(model) {
       if($(this).prop('checked')) {
         if(display_options.properties.selected != $(this).data('propName')) {
           display_options.properties.selected = $(this).data('propName');
-          $('.TestResult').each(function() { if($(this).data('model').result_type=="performance") generateGraph($(this));}); // regenerates all the graphs          
+          $('.TestResult').each(function() {
+        var model = $(this);
+        if($(this).data('model').result_type=="performance") {
+          setTimeout(function() {
+              generateGraph(model);
+          }, 0);
+        }
+      });
         }
       }
     });        
@@ -180,7 +188,14 @@ function refreshDisplayOptions(model) {
           display_options.servers.selected.push($(this).data('propName'));
         }     
       }
-      $('.TestResult').each(function() { if($(this).data('model').result_type=="performance") generateGraph($(this));}); // regenerates all the graphs
+      $('.TestResult').each(function() {
+        var model = $(this);
+        if($(this).data('model').result_type=="performance") {
+          setTimeout(function() {
+              generateGraph(model);
+          }, 0);
+        }
+      });
     });
   }
   
@@ -191,7 +206,14 @@ function refreshDisplayOptions(model) {
       display_options.displayFramerate = true;
     else
       display_options.displayFramerate = false;
-    $('.TestResult').each(function() { if($(this).data('model').result_type=="performance") generateGraph($(this));}); // regenerates all the graphs      
+    $('.TestResult').each(function() {
+        var model = $(this);
+        if($(this).data('model').result_type=="performance") {
+          setTimeout(function() {
+              generateGraph(model);
+          }, 0);
+        }
+      });
   });
   $('#Option_Properties').append(cbFPS);
   $('#Option_Properties').append("Display perf data as framerate");
@@ -209,8 +231,8 @@ function generateDatasets(testcase) {
   var stack_count = 0;
   lowest_time = 0;
   highest_time = 0;
-  for(var s = 0; s < display_options.servers.selected.length; s++) {
   var datasets = [];
+  for(var s = 0; s < display_options.servers.selected.length; s++) {
     var server = display_options.servers.selected[s];
     var recur = function(level, arr) {
     if(level >= 1 && display_options.displayFramerate) {
@@ -237,7 +259,7 @@ function generateDatasets(testcase) {
               }
             }
             if(dataset.length > 0)    
-              datasets.push({label: arr.children[i].id, stack: level, data: dataset, server_name: testcase.server_name, prof_data: arr.children[i]});
+              datasets.push({label: arr.children[i].id, stack: level + (s*4), data: dataset, server_name: server, prof_data: arr.children[i]});
           }
           if(arr.children[i].hasOwnProperty("children"))
             recur(level+1, arr.children[i]);
@@ -292,12 +314,13 @@ function generateGraph(div) {
       lines: {
         show: true,
         fill: true,
-        steps: false
+        steps: false,
       },
       points: {
         show: true
       }
     },
+    colors: ["#7AD65C", "#5CD0D6", "#765CD6", "#D25CD6", "#D65C5C", "#D68F5C", "#D65C7E"],
     grid:  { hoverable: true }, //important! flot.tooltip requires this
     tooltip: {
       show: true,
@@ -306,9 +329,14 @@ function generateGraph(div) {
         var res = flotItem.series.server_name + "<br/>" + label + ": " + getSelectedProperty(flotItem.series.prof_data.data[flotItem.dataIndex]) + getSelectedUnit() + "<br/>";
         if(flotItem.series.prof_data.hasOwnProperty("children")) {
           for(var i = 0; i < flotItem.series.prof_data.children.length; ++i) {
-            var val = parseFloat(getSelectedProperty(flotItem.series.prof_data.children[i].data[flotItem.dataIndex]));
-            total += val;
-            res += flotItem.series.prof_data.children[i].id + ": " + val + getSelectedUnit() +"<br/>";
+            for(var d = 0; d < flotItem.series.prof_data.children[i].data.length; ++d) {
+              if(flotItem.series.prof_data.children[i].data[d].timestamp == flotItem.series.data[flotItem.dataIndex][2].timestamp) {              
+                var val = parseFloat(getSelectedProperty(flotItem.series.prof_data.children[i].data[d]));
+                total += val;
+                res += flotItem.series.prof_data.children[i].id + ": " + val + getSelectedUnit() +"<br/>";
+                break;
+              }
+            }
           }
         }
         res += "stack: " + flotItem.series.stack;
@@ -342,7 +370,10 @@ function generateGraph(div) {
       container: data_list,
       sorted: false,
       labelFormatter: function(label, item) {
-        return label + " - " + getSelectedProperty(item.data[item.data.length-1][2]) + getSelectedUnit();
+        if(item.server_name == display_options.servers.current)
+          return label + " - " + getSelectedProperty(item.data[item.data.length-1][2]) + getSelectedUnit();
+        else
+          return null;
       }
     }
   }
@@ -666,6 +697,8 @@ function GetServerList() {
         div.data("server_name", res[i].name);
         div.click(function(){
           SetServer($(this).data("server_id"), $(this).data("server_name"));
+              $(".Selected_Server").removeClass('Selected_Server');
+              $(this).addClass('Selected_Server');
         });
         target.append(div);
       }
@@ -681,6 +714,7 @@ function SetServer(server_id, server_name) {
   $('#Categories_List').empty();
   display_options.servers.available = [server_name];
   display_options.servers.selected = [server_name];
+  display_options.servers.current = server_name;
   refreshDisplayOptions();
 }
 
@@ -722,8 +756,11 @@ function GetTestRunList(server_id) {
 }
 
 function SetTestRun(test_run_id) {
+  $('#Categories_List').empty();
+  $('#loading_spinner_container').show();
+
   LoadSQLModel(test_run_id, function(data) {
-    $('#Categories_List').empty();
+    $('#loading_spinner_container').hide();
     model = data;
     refreshDisplayOptions(model);
     $('#Options_Toggle').show();
@@ -742,53 +779,55 @@ function SetTestRun(test_run_id) {
       } else if (testResult.result_type=='error') {
         generateError($(this));
       }
-  });  
-  
-  });
-  // Set up the toggle buttons.
-  $('#Options_Toggle_Categories').data('collapsed', true);
-  $('#Options_Toggle_Categories').prop('value', 'Expand All Categories');
-  $('#Options_Toggle_Categories').unbind().click(function(){
-    if($(this).data('collapsed')) {
-      $('.category_list_checkbox').prop('checked', true);
-      $(this).data('collapsed', false);
-      $('#Options_Toggle_Categories').prop('value', 'Collapse All Categories');
-    } else {
-      $('.category_list_checkbox').prop('checked', false);
-      $(this).data('collapsed', true);
-      $('#Options_Toggle_Categories').prop('value', 'Expand All Categories');
-    }
-  });
-  
-  
-  
-  $('#Options_Toggle_Cases').data('collapsed', true);
-  $('#Options_Toggle_Cases').prop('value', 'Expand Visible Cases');
-  $('#Options_Toggle_Cases').unbind().click(function(){
-    if($(this).data('collapsed')) {
-      $('.TestResult_name:visible').removeClass('minimized');
-      $(this).data('collapsed', false);
-      $('#Options_Toggle_Cases').prop('value', 'Collapse Visible Cases');
-    } else {
-      $('.TestResult_name:visible').addClass('minimized');
-      $(this).data('collapsed', true);
-      $('#Options_Toggle_Cases').prop('value', 'Expand Visible Cases');
-    }
-  });
+    });  
 
-  $('#Options_Toggle_Steps').data('collapsed', true);
-  $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
-  $('#Options_Toggle_Steps').unbind().click(function(){
-    if($(this).data('collapsed')) {
-      $('.TestStep_name:visible').removeClass('minimized');
-      $(this).data('collapsed', false);
-      $('#Options_Toggle_Steps').prop('value', 'Collapse Visible Steps');
-    } else {
-      $('.TestStep_name:visible').addClass('minimized');
-      $(this).data('collapsed', true);
-      $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
-    }
-  });  
+    // Set up the toggle buttons.
+    $('#Options_Toggle_Categories').data('collapsed', true);
+    $('#Options_Toggle_Categories').prop('value', 'Expand All Categories');
+    $('#Options_Toggle_Categories').unbind().click(function(){
+      if($(this).data('collapsed')) {
+        $('.category_list_checkbox').prop('checked', true);
+        $(this).data('collapsed', false);
+        $('#Options_Toggle_Categories').prop('value', 'Collapse All Categories');
+      } else {
+        $('.category_list_checkbox').prop('checked', false);
+        $(this).data('collapsed', true);
+        $('#Options_Toggle_Categories').prop('value', 'Expand All Categories');
+      }
+    });
+    
+    
+    
+    $('#Options_Toggle_Cases').data('collapsed', true);
+    $('#Options_Toggle_Cases').prop('value', 'Expand Visible Cases');
+    $('#Options_Toggle_Cases').unbind().click(function(){
+      if($(this).data('collapsed')) {
+        $('.TestResult_name:visible').removeClass('minimized');
+        $(this).data('collapsed', false);
+        $('#Options_Toggle_Cases').prop('value', 'Collapse Visible Cases');
+      } else {
+        $('.TestResult_name:visible').addClass('minimized');
+        $(this).data('collapsed', true);
+        $('#Options_Toggle_Cases').prop('value', 'Expand Visible Cases');
+      }
+    });
+
+    $('#Options_Toggle_Steps').data('collapsed', true);
+    $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
+    $('#Options_Toggle_Steps').unbind().click(function(){
+      if($(this).data('collapsed')) {
+        $('.TestStep_name:visible').removeClass('minimized');
+        $(this).data('collapsed', false);
+        $('#Options_Toggle_Steps').prop('value', 'Collapse Visible Steps');
+      } else {
+        $('.TestStep_name:visible').addClass('minimized');
+        $(this).data('collapsed', true);
+        $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
+      }
+    });  
+
+  
+  });
 }
 
 

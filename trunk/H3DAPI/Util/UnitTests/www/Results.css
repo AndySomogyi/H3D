@@ -271,3 +271,17 @@ input:checked + label > .glyph {
   -webkit-transform: rotate(90deg); 
   -moz-transform: rotate(90deg);      
 }
+
+#loading_spinner_container {
+  display: none;
+  position:absolute;
+  z-index: 9000;
+  left: 50%;
+}
+
+#loading_spinner {
+  opacity: 1;
+  width:200px;
+  height: 200px;
+  left: -100px;
+}
