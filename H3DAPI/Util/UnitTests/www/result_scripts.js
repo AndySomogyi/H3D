@@ -52,8 +52,18 @@ var display_options =  {
     available: [],
     selected: [],
     current: "" // servers.current is the server that the test run we are looking at is from
+  },
+  testruns: {
+    selected: -1
   }
 };
+
+        
+var hash_server = decodeURI(location.hash.substr(location.hash.indexOf('server=')).split('&')[0].split('=')[1]);
+var hash_run = location.hash.substr(location.hash.indexOf('testrun=')).split('&')[0].split('=')[1];
+var hash_category = decodeURI(location.hash.substr(location.hash.indexOf('category=')).split('&')[0].split('=')[1]);
+var hash_case = decodeURI(location.hash.substr(location.hash.indexOf('case=')).split('&')[0].split('=')[1]);
+
 
 function getSelectedUnit() {
   if(display_options.properties.selected == "mean") {
@@ -535,9 +545,10 @@ function generateError(div) {
 }
 
 
-function ConstructTestCases(model, target) {
+function ConstructTestCases(model, target, path) {
   var container = $('<div>');
   container.addClass('Test_Container');
+  target.append(container);
 
   if(model.testcases.length > 0) {
     var current_case_name = 'placeholder that shouldn\'t ever match';
@@ -548,13 +559,22 @@ function ConstructTestCases(model, target) {
         case_div.addClass('Category_Item'); 
         var case_name = $('<div>');
         case_name.addClass("TestResult_name");
+
         
-        case_name.addClass("minimized");
+        if(hash_server == display_options.servers.current && hash_category.startsWith(path) && hash_case == model.testcases[i].name) {
+          $("input", $(target).parent()).prop("checked", true)
+        } else {
+          case_name.addClass("minimized");
+        }
+          
         case_name.click(function(){ // onclick function for toggling the presence of a minimized-class
           $(this).toggleClass("minimized");
         });
         
-        case_name.append("Case: " + model.testcases[i].name);
+        var case_name_link = $("<a>");
+        case_name_link.append("Case: " + model.testcases[i].name);
+        case_name_link.attr('href', encodeURI("#server=" + display_options.servers.current + "&testrun=" + display_options.testruns.selected + "&category=" + path + model.name + "&case=" + model.testcases[i].name));
+        case_name.append(case_name_link);
         if(model.testcases[i].success == 'Y') {
           case_name.addClass("test_successful");
         } else {
@@ -605,18 +625,18 @@ function ConstructTestCases(model, target) {
       }
     }
   }  
-  target.append(container);
 }
 
 
 var CategoryCount = 0;
 
 var first = false;
-function ConstructList(model, target) {
+function ConstructList(model, target, path) {
 
   for (var i = 0; i < model.length; i++) {
     if(model[i]) {
       var ul = $('<ul>');
+      target.append(ul);
       ul.attr('class', 'Category_Item');
       
       var label = $('<label>');
@@ -626,7 +646,11 @@ function ConstructList(model, target) {
       glyph.html('▶');
         
       label.append(glyph);
-      var name = $('<h3>'+model[i].name+'</h3>');
+      var name = $('<a><h3>'+model[i].name+'</h3></a>');
+      name.data('category_name', path + model[i].name + "/");
+      name.click(function(){
+        window.location.hash = encodeURI("#server=" + display_options.servers.current + "&testrun=" + display_options.testruns.selected + "&category=" + $(this).data('category_name'));
+      });
       label.append(name);
 
       label.attr('for', 'category'+CategoryCount);
@@ -635,17 +659,19 @@ function ConstructList(model, target) {
       input.attr('type', 'checkbox');
       input.attr('id', 'category'+CategoryCount);
       input.addClass('category_list_checkbox');
-      if(first) {
+      if(first || (hash_server == display_options.servers.current && hash_category.startsWith(path + model[i].name))) {
         input.prop('checked', true);
         first = false;
       }
+      
+      
       ul.append(input);
       ul.append(label);
       
       CategoryCount++;
       
       if(model[i].hasOwnProperty('children')) {
-        ConstructList(model[i].children, ul);
+        ConstructList(model[i].children, ul, path + model[i].name + "/");
         if($('.test_failed', ul).length > 0)
           name.addClass('test_failed');                
         else
@@ -656,7 +682,7 @@ function ConstructList(model, target) {
           name.addClass('test_successful');
         else
           name.addClass('test_failed');
-        ConstructTestCases(model[i], ul);
+        ConstructTestCases(model[i], ul, path + model[i].name + "/");
         if($('.test_failed', ul).length > 0)
           name.addClass('test_failed');                
         else
@@ -665,7 +691,6 @@ function ConstructList(model, target) {
         first = false;
       }
              
-      target.append(ul);
     }
   }      
 }
@@ -682,27 +707,30 @@ function GetServerList() {
       url: 'get_servers.php',
       dataType: 'json',
       success: function(data) { 
-      var res = data; 
-      var target = $('#Servers_List');
-      target.empty();
-      for(var i = 0; i < res.length; ++i) {
-        var div = $('<div>');
-        div.addClass('TestServer');
-        div.addClass("noselect");
-        if(!res[i].success) {
-          div.addClass('test_failed');
+        var res = data; 
+        var target = $('#Servers_List');
+        target.empty();
+        for(var i = 0; i < res.length; ++i) {
+          var div = $('<div>');
+          div.addClass('TestServer');
+          div.addClass("noselect");
+          if(!res[i].success) {
+            div.addClass('test_failed');
+          }
+          div.append(res[i].name);
+          div.data("server_id", res[i].id);
+          div.data("server_name", res[i].name);
+          div.click(function(){
+            SetServer($(this).data("server_id"), $(this).data("server_name"));
+                $(".Selected_Server").removeClass('Selected_Server');
+                $(this).addClass('Selected_Server');
+          });
+          if(hash_server == res[i].name) {
+            div.trigger("click");
+            }
+          target.append(div);
         }
-        div.append(res[i].name);
-        div.data("server_id", res[i].id);
-        div.data("server_name", res[i].name);
-        div.click(function(){
-          SetServer($(this).data("server_id"), $(this).data("server_name"));
-              $(".Selected_Server").removeClass('Selected_Server');
-              $(this).addClass('Selected_Server');
-        });
-        target.append(div);
       }
-      },
   });
 }
 
@@ -743,8 +771,12 @@ function GetTestRunList(server_id) {
               SetTestRun($(this).data("test_run_id"));
               $(".Selected_TestRun").removeClass('Selected_TestRun');
               $(this).addClass('Selected_TestRun');
+              display_options.testruns.selected = $(this).data("test_run_id");
              // $('#Categories_List').empty();
             });
+            if(hash_server == display_options.servers.current && hash_run == res[i].id) {
+              div.trigger("click");
+            }
           } else {
             div.addClass('TestRun_NoResults');
           }
@@ -765,7 +797,7 @@ function SetTestRun(test_run_id) {
     refreshDisplayOptions(model);
     $('#Options_Toggle').show();
     first = true;
-    ConstructList(model, $('#Categories_List'));
+    ConstructList(model, $('#Categories_List'), "");
     $('.TestResult').each(function() {
     var testResult = $(this).data('model');
       if(testResult.result_type=="performance") {
