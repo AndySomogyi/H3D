@@ -871,7 +871,7 @@ void X3DSAX2Handlers::protoStartElement( const XMLCh* const uri,
       defining_proto_body = 1;
     }
   } else if( proto_declaration.get() && !defining_proto_interface && 
-             !defining_proto_body == 0 && !defining_extern_proto ) {
+             !defining_proto_body && !defining_extern_proto ) {
     // Element in ProtoDeclare proto declare that is not ProtoInterface 
     // or ProtoBody.
     Console(LogLevel::Warning) << "Warning: Only ProtoBody and ProtoInterface elements allowed in ProtoDeclare element "

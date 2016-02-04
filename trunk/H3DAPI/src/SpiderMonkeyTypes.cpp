@@ -128,7 +128,7 @@ template< class FieldType >
 const typename FieldType::value_type getValueNoAccessCheck( FieldType *field ) {
   bool access = field->isAccessCheckOn();
   field->setAccessCheck( false );
-  const typename FieldType::value_type &b = field->getValue();
+  const typename FieldType::value_type b = field->getValue();
   field->setAccessCheck( access );
   return b;
 }

@@ -27,7 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #ifndef __HANIMHUMANOID_H__
-#define __HANIMHUMANOOID_H__
+#define __HANIMHUMANOID_H__
 
 #include <H3D/X3DChildNode.h>
 #include <H3D/X3DBoundedObject.h>

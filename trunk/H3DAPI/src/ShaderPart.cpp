@@ -236,8 +236,8 @@ std::string ShaderPart::preProcess ( const std::string& input, const std::string
       // Strip white space and quotes
       size_t a, b;
       for ( a= 0; a < path.size() && (isspace ( path[a] ) || path[a] == '\"'); ++a );
-      for ( b= path.size()-1; b >= 0 && (isspace ( path[b] ) || path[b] == '\"'); --b );
-      path= path.substr ( a, b-a+1 );
+      for ( b= 1; b <= path.size()  && (isspace ( path[path.size() - b] ) || path[path.size() - b] == '\"'); ++b );
+      path= path.substr ( a, path.size()-b-a+1 );
 
       // change url resolver base
       string old_base= getURLBase ();
