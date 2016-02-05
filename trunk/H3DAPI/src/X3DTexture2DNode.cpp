@@ -175,6 +175,8 @@ void X3DTexture2DNode::glTexImage( Image *i, GLenum _texture_target,
   if( scale_to_power_of_two && !GLEW_ARB_texture_non_power_of_two || max_dimension > 0 ) {
     // check if any scaling is required and if so scale the image.
     bool needs_scaling = false;
+    bool needs_scale_to_power_of_two = (scale_to_power_of_two && !GLEW_ARB_texture_non_power_of_two);
+
     unsigned int new_width  = i->width();
     unsigned int new_height = i->height(); 
 
@@ -187,13 +189,13 @@ void X3DTexture2DNode::glTexImage( Image *i, GLenum _texture_target,
       new_height= (unsigned int)max_dimension;
       needs_scaling= true;
     }
-
-    if( !isPowerOfTwo( new_width ) ) {
+    
+    if( needs_scale_to_power_of_two && !isPowerOfTwo( new_width ) ) {
       new_width = nextPowerOfTwo( new_width );
       needs_scaling = true;
     } 
 
-    if( !isPowerOfTwo( new_height ) ) {
+    if( needs_scale_to_power_of_two && !isPowerOfTwo( new_height ) ) {
       new_height = nextPowerOfTwo( new_height );
       needs_scaling = true;
     } 
