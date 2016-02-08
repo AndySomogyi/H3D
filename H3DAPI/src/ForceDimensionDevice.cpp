@@ -46,6 +46,7 @@ namespace ForceDimensionDeviceInternals {
   FIELDDB_ELEMENT( ForceDimensionDevice, endEffectorMass, INPUT_ONLY );
   FIELDDB_ELEMENT( ForceDimensionDevice, useBrakes, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ForceDimensionDevice, deviceType, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( ForceDimensionDevice, enableForce, INPUT_OUTPUT );
 }
 
 /// Constructor.
@@ -57,7 +58,7 @@ ForceDimensionDevice::ForceDimensionDevice(
                Inst< SFMatrix4f      > _positionCalibration,
                Inst< SFRotation      > _orientationCalibration,
                Inst< SFVec3f         > _proxyPosition,
-               Inst< WeightedProxy   > _weightedProxyPosition,     
+               Inst< WeightedProxy   > _weightedProxyPosition,
                Inst< SFFloat         > _proxyWeighting,
                Inst< SFBool          > _mainButton,
                Inst< SFBool          > _secondaryButton,
@@ -77,7 +78,8 @@ ForceDimensionDevice::ForceDimensionDevice(
                Inst< WaitReset       > _waitForReset,
                Inst< EffectorMass    > _endEffectorMass,
                Inst< Brakes          > _useBrakes,
-               Inst< SFInt32         > _deviceType ) :
+               Inst< SFInt32         > _deviceType,
+               Inst< EnableForce        > _enableForce ) :
   H3DHapticsDevice( _devicePosition, _deviceOrientation, _trackerPosition,
               _trackerOrientation, _positionCalibration, 
               _orientationCalibration, _proxyPosition,
@@ -91,7 +93,8 @@ ForceDimensionDevice::ForceDimensionDevice(
   waitForReset( _waitForReset ),
   endEffectorMass( _endEffectorMass ),
   useBrakes( _useBrakes ),
-  deviceType( _deviceType ) {
+  deviceType( _deviceType ),
+  enableForce( _enableForce ) {
 
   type_name = "ForceDimensionDevice";  
   database.initFields( this );
@@ -107,6 +110,7 @@ ForceDimensionDevice::ForceDimensionDevice(
   useGravityCompensation->setValue( true );
   useBrakes->setValue( false );
   deviceType->setValue( -1, id );
+  enableForce->setValue( false );
 }
 
 
@@ -160,6 +164,15 @@ void ForceDimensionDevice::Brakes::onValueChange( const bool &v ) {
 #endif
 }
 
+void ForceDimensionDevice::EnableForce::onValueChange( const bool &v ) {
+#ifdef HAVE_DHDAPI
+  ForceDimensionDevice *fd = 
+    static_cast< ForceDimensionDevice * >( getOwner() );
+  HAPI::ForceDimensionHapticsDevice * dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
+  dhd->enableForce( v );
+#endif
+}
 
 H3DHapticsDevice::ErrorCode ForceDimensionDevice::initDevice() {
   HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::initDevice();
