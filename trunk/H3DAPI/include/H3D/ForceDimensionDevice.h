@@ -76,6 +76,12 @@ namespace H3D {
       virtual void onValueChange( const bool &v );
     };
 
+    /// EnableForce specializes SFBool to toggle forces
+    /// on and off.
+    class EnableForce: public OnValueChangeSField< SFBool > {
+      virtual void onValueChange( const bool &v );
+    };
+
     /// Constructor.
     ForceDimensionDevice( 
             Inst< SFVec3f            > _devicePosition         = 0,
@@ -105,7 +111,8 @@ namespace H3D {
             Inst< WaitReset          > _waitForReset           = 0,
             Inst< EffectorMass       > _endEffectorMass        = 0,
             Inst< Brakes             > _useBrakes              = 0,
-            Inst< SFInt32            > _deviceType             = 0 );
+            Inst< SFInt32            > _deviceType             = 0,
+            Inst< EnableForce        > _enableForce            = 0 );
     
     /// Does all the initialization needed for the device before starting to
     /// use it.
@@ -173,6 +180,18 @@ namespace H3D {
     ///
     /// <b>Access type:</b> outputOnly \n
     auto_ptr< SFInt32 > deviceType;
+
+    /// On some (custom) devices from force dimension there is no
+    /// button to enable/disable forces on the device. Therefore it might
+    /// be useful to be able to do this programatically to be able
+    /// to use the device. This is the field to use in that case. Note that
+    /// this field will not be kept accurate if there is a button on the
+    /// device to enable/disable forces and might in such cases be
+    /// out of sync with the actual state.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> false \n
+    auto_ptr< EnableForce > enableForce;
 
     /// Node database entry
     static H3DNodeDatabase database;
