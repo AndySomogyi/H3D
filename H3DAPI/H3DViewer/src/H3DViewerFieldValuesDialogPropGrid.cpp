@@ -497,7 +497,7 @@ void H3DViewerFieldValuesPanelPropGrid::PropertyUpdater::update() {
     wxVectorProperty *p = static_cast< wxVectorProperty * >( property );
     const Vec4d &v = sfvec4d->getValue();
     H3DwxVector wx_v(4);
-    wx_v.setValue(0, v.x); wx_v.setValue(1, v.y); wx_v.setValue(2, v.z); wx_v.setValue(3, v.z);
+    wx_v.setValue(0, v.x); wx_v.setValue(1, v.y); wx_v.setValue(2, v.z); wx_v.setValue(3, v.w);
     p->SetValue( WXVARIANT(wx_v) );
   } else if ( x3d_type == X3DTypes::SFROTATION ) {
     SFRotation *sfrotation = static_cast< SFRotation * >( f );
