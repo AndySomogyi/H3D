@@ -151,23 +151,23 @@ HapticTexturesSurface::HapticTexturesSurface(
 void HapticTexturesSurface::initialize() {
   H3DFrictionalSurfaceNode::initialize();
   
-  X3DTexture2DNode * a_map = 
-     static_cast< X3DTexture2DNode * >( stiffnessMap->getValue() );
+  H3DImageObject * a_map = 
+     dynamic_cast< H3DImageObject * >( stiffnessMap->getValue() );
   Image * stiffness_image = 0;
   if( a_map )
     stiffness_image = a_map->image->getValue();
 
-  a_map = static_cast< X3DTexture2DNode * >( dampingMap->getValue() );
+  a_map = dynamic_cast< H3DImageObject * >( dampingMap->getValue() );
   Image * damping_image = 0;
   if( a_map )
     damping_image = a_map->image->getValue();
 
-  a_map = static_cast< X3DTexture2DNode * >( staticFrictionMap->getValue() );
+  a_map = dynamic_cast< H3DImageObject * >( staticFrictionMap->getValue() );
   Image * static_friction_image = 0;
   if( a_map )
     static_friction_image = a_map->image->getValue();
 
-  a_map = static_cast< X3DTexture2DNode * >( dynamicFrictionMap->getValue() );
+  a_map = dynamic_cast< H3DImageObject * >( dynamicFrictionMap->getValue() );
   Image * dynamic_friction_image = 0;
   if( a_map )
     dynamic_friction_image = a_map->image->getValue();
