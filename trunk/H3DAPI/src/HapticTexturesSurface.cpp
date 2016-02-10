@@ -60,16 +60,16 @@ HapticTexturesSurface::HapticTexturesSurface(
         Inst< UpdateStaticFriction   > _staticFriction,
         Inst< UpdateDynamicFriction  > _dynamicFriction,
         Inst< SFBool                 > _useRelativeValues,
-        Inst< SFTexture2DNode        > _stiffnessMap,
+        Inst< SFImageObjectNode      > _stiffnessMap,
         Inst< UpdateMinMaxParamValue > _maxStiffness,
         Inst< UpdateMinMaxParamValue > _minStiffness,
-        Inst< SFTexture2DNode        > _dampingMap,
+        Inst< SFImageObjectNode      > _dampingMap,
         Inst< UpdateMinMaxParamValue > _maxDamping,
         Inst< UpdateMinMaxParamValue > _minDamping,
-        Inst< SFTexture2DNode        > _staticFrictionMap,
+        Inst< SFImageObjectNode      > _staticFrictionMap,
         Inst< UpdateMinMaxParamValue > _maxStaticFriction,
         Inst< UpdateMinMaxParamValue > _minStaticFriction,
-        Inst< SFTexture2DNode        > _dynamicFrictionMap,
+        Inst< SFImageObjectNode      > _dynamicFrictionMap,
         Inst< UpdateMinMaxParamValue > _maxDynamicFriction,
         Inst< UpdateMinMaxParamValue > _minDynamicFriction ):
   H3DFrictionalSurfaceNode( _stiffness,
@@ -174,39 +174,15 @@ void HapticTexturesSurface::initialize() {
 
   H3DFloat max_stiffness = maxStiffness->getValue();
   H3DFloat min_stiffness = minStiffness->getValue();
-  if( max_stiffness < min_stiffness ) {
-    min_stiffness = max_stiffness;
-    Console(LogLevel::Warning) << "Warning: Value of maxStiffness is smaller than value of "
-               << "minStiffness in node " << getName() << ". Node will not "
-               << "behave as intended." << endl;
-  }
 
   H3DFloat max_damping = maxDamping->getValue();
   H3DFloat min_damping = minDamping->getValue();
-  if( max_damping < min_damping ) {
-    min_damping = max_damping;
-    Console(LogLevel::Warning) << "Warning: Value of maxDamping is smaller than value of "
-               << "minDamping in node " << getName() << ". Node will not "
-               << "behave as intended." << endl;
-  }
 
   H3DFloat max_static_friction = maxStaticFriction->getValue();
   H3DFloat min_static_friction = minStaticFriction->getValue();
-  if( max_static_friction < min_static_friction ) {
-    min_static_friction = max_static_friction;
-    Console(LogLevel::Warning) << "Warning: Value of maxStaticFriction is smaller than value "
-               << "of minStaticFriction in node " << getName() << ". Node "
-               << "will not behave as intended." << endl;
-  }
-  
+
   H3DFloat max_dynamic_friction = maxDynamicFriction->getValue();
   H3DFloat min_dynamic_friction = minDynamicFriction->getValue();
-  if( max_dynamic_friction < min_dynamic_friction ) {
-    min_dynamic_friction = max_dynamic_friction;
-    Console(LogLevel::Warning) << "Warning: Value of maxDynamicFriction is smaller than value "
-               << "of minDynamicFriction in node " << getName() << ". Node "
-               << "will not behave as intended." << endl;
-  }
 
   hapi_surface.reset(
     new HAPI::HapticTexturesSurface( stiffness->getValue(),
@@ -230,7 +206,7 @@ void HapticTexturesSurface::initialize() {
 
 void HapticTexturesSurface::SetImagePtr::update() {
    Image *image =
-     static_cast< X3DTexture2DNode::SFImage * >(event.ptr)->getValue();
+     static_cast< H3DImageObject::SFImage * >(event.ptr)->getValue();
    HapticTexturesSurface *hms = 
      static_cast< HapticTexturesSurface * >( getOwner() );
    HAPI::HapticTexturesSurface * _hapi_surface = 
@@ -240,9 +216,9 @@ void HapticTexturesSurface::SetImagePtr::update() {
    }
  }
 
- void HapticTexturesSurface::SFTexture2DNode::onAdd( Node *n ) {
-   SFTexture2DNodeBase::onAdd( n );
-   X3DTexture2DNode *c = static_cast< X3DTexture2DNode* >( n );
+ void HapticTexturesSurface::SFImageObjectNode::onAdd( Node *n ) {
+   SFImageObjectNodeBase::onAdd( n );
+   H3DImageObject *c = dynamic_cast< H3DImageObject* >( n );
    HapticTexturesSurface *o = static_cast< HapticTexturesSurface* >( owner );
    if( c ) {
      switch( parameter_type ) {
@@ -267,8 +243,8 @@ void HapticTexturesSurface::SetImagePtr::update() {
    }
  }
 
- void HapticTexturesSurface::SFTexture2DNode::onRemove( Node *n ) {
-   X3DTexture2DNode *c = static_cast< X3DTexture2DNode* >( n );
+ void HapticTexturesSurface::SFImageObjectNode::onRemove( Node *n ) {
+   H3DImageObject *c = dynamic_cast< H3DImageObject* >( n );
    HapticTexturesSurface *o = static_cast< HapticTexturesSurface* >( owner );
    if( c ) {
      switch( parameter_type ) {
@@ -295,7 +271,7 @@ void HapticTexturesSurface::SetImagePtr::update() {
      if( _hapi_surface )
        _hapi_surface->setParameterImage( 0, parameter_type );
    }
-   SFTexture2DNodeBase::onRemove( n );
+   SFImageObjectNodeBase::onRemove( n );
  }
 
 void HapticTexturesSurface::UpdateMinMaxParamValue::
@@ -306,109 +282,56 @@ void HapticTexturesSurface::UpdateMinMaxParamValue::
     // Can this part cause problems with updating?
     // Because of circular updates? It should not since
     // AutoUpdate should "prevent" this.
-
-    // This is only used to not clutter the code with many Console(LogLevel::Warning)
-    // warning strings.
-    string error_first = "";
-    string error_second = "";
     switch( parameter_type ) {
       case HAPI::HapticTexturesSurface::STIFFNESS: {
         if( max_value ) {
-          if( v >= hts->minStiffness->getValue() )
-            static_cast< HAPI::HapticTexturesSurface * >
-              ( hts->hapi_surface.get() )
-              ->setParameterMaxValue( v, parameter_type );
-          else {
-            error_first = "maxStiffness";
-            error_second = "below the minStiffness";
-          }
+          static_cast< HAPI::HapticTexturesSurface * >
+            ( hts->hapi_surface.get() )
+            ->setParameterMaxValue( v, parameter_type );
         } else {
-          if( v <= hts->maxStiffness->getValue() )
-            static_cast< HAPI::HapticTexturesSurface * >
-              ( hts->hapi_surface.get() )
-              ->setParameterMinValue( v, parameter_type );
-          else {
-            error_first = "minStiffness";
-            error_second = "above the maxStiffness";
-          }
+          static_cast< HAPI::HapticTexturesSurface * >
+            ( hts->hapi_surface.get() )
+            ->setParameterMinValue( v, parameter_type );
         }
         break;
       }
       case HAPI::HapticTexturesSurface::DAMPING: {
         if( max_value ) {
-          if( v >= hts->minDamping->getValue() )
-            static_cast< HAPI::HapticTexturesSurface * >
-              ( hts->hapi_surface.get() )
-              ->setParameterMaxValue( v, parameter_type );
-          else {
-            error_first = "maxDamping";
-            error_second = "below the minDamping";
-          }
+          static_cast< HAPI::HapticTexturesSurface * >
+            ( hts->hapi_surface.get() )
+            ->setParameterMaxValue( v, parameter_type );
         } else {
-          if( v <= hts->maxDamping->getValue() )
-            static_cast< HAPI::HapticTexturesSurface * >
-              ( hts->hapi_surface.get() )
-              ->setParameterMinValue( v, parameter_type );
-          else {
-            error_first = "minDamping";
-            error_second = "above the maxDamping";
-          }
+          static_cast< HAPI::HapticTexturesSurface * >
+            ( hts->hapi_surface.get() )
+            ->setParameterMinValue( v, parameter_type );
         }
         break;
       }
       case HAPI::HapticTexturesSurface::STATIC_FRICTION: {
         if( max_value ) {
-          if( v >= hts->minStaticFriction->getValue() )
-            static_cast< HAPI::HapticTexturesSurface * >
-              ( hts->hapi_surface.get() )
-              ->setParameterMaxValue( v, parameter_type );
-          else {
-            error_first = "maxStaticFriction";
-            error_second = "below the minStaticFriction";
-          }
+          static_cast< HAPI::HapticTexturesSurface * >
+            ( hts->hapi_surface.get() )
+            ->setParameterMaxValue( v, parameter_type );
         } else {
-          if( v <= hts->maxStaticFriction->getValue() )
-            static_cast< HAPI::HapticTexturesSurface * >
-              ( hts->hapi_surface.get() )
-              ->setParameterMinValue( v, parameter_type );
-          else {
-            error_first = "minStaticFriction";
-            error_second = "above the maxStaticFriction";
-          }
+          static_cast< HAPI::HapticTexturesSurface * >
+            ( hts->hapi_surface.get() )
+            ->setParameterMinValue( v, parameter_type );
         }
         break;
       }
       case HAPI::HapticTexturesSurface::DYNAMIC_FRICTION: {
         if( max_value ) {
-          if( v >= hts->minDynamicFriction->getValue() )
-            static_cast< HAPI::HapticTexturesSurface * >
-              ( hts->hapi_surface.get() )
-              ->setParameterMaxValue( v, parameter_type );
-          else {
-            error_first = "maxDynamicFriction";
-            error_second = "below the minDynamicFriction";
-          }
+          static_cast< HAPI::HapticTexturesSurface * >
+            ( hts->hapi_surface.get() )
+            ->setParameterMaxValue( v, parameter_type );
         } else {
-          if( v <= hts->maxDynamicFriction->getValue() )
-            static_cast< HAPI::HapticTexturesSurface * >
-              ( hts->hapi_surface.get() )
-              ->setParameterMinValue( v, parameter_type );
-          else {
-            error_first = "minDynamicFriction";
-            error_second = "above the maxDynamicFriction";
-          }
+          static_cast< HAPI::HapticTexturesSurface * >
+            ( hts->hapi_surface.get() )
+            ->setParameterMinValue( v, parameter_type );
         }
         break;
       }
       default: {}
-    }
-
-    if( error_first != "" ) {
-      Console(LogLevel::Warning) << "Warning: Trying to set the value of the field "
-                 << error_first << " to a value which is " << error_second
-                 << " value. In node named " << hts->getName()
-                 << ". Value will not be transferred "
-                 << "to the haptic loop." << endl;
     }
   }
 }
