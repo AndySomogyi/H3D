@@ -31,6 +31,7 @@
 
 #include <H3D/H3DFrictionalSurfaceNode.h>
 #include <H3D/H3DImageObject.h>
+#include <H3D/DependentNodeFields.h>
 
 #include <HAPI/HapticTexturesSurface.h>
 
