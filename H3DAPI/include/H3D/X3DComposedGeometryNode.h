@@ -97,7 +97,7 @@ namespace H3D {
     typedef  DependentSFNode< X3DColorNode,
                               FieldRef< X3DGeometricPropertyNode,
                                         Field,
-                                        &X3DColorNode::propertyChanged > >  
+                                        &X3DColorNode::propertyChanged > >
     SFColorNode;
     
     /// The SFCoordinateNode is dependent on the propertyChanged field of the 
@@ -105,7 +105,7 @@ namespace H3D {
     typedef DependentSFNode< X3DCoordinateNode,
                              FieldRef< X3DGeometricPropertyNode,
                                        Field,
-                                       &X3DCoordinateNode::propertyChanged > > 
+                                       &X3DCoordinateNode::propertyChanged > >
     SFCoordinateNode;
     
     /// The SFNormalNode is dependent on the propertyChanged field of the 
@@ -113,7 +113,7 @@ namespace H3D {
     typedef DependentSFNode< X3DNormalNode,
                              FieldRef< X3DGeometricPropertyNode,
                                        Field,
-                                       &X3DNormalNode::propertyChanged > > 
+                                       &X3DNormalNode::propertyChanged > >
     SFNormalNode;
 
     /// The SFTextureCoordinteNode is dependent on the propertyChanged 
@@ -122,12 +122,12 @@ namespace H3D {
                 X3DTextureCoordinateNode,
                 FieldRef< X3DGeometricPropertyNode,
                           Field,
-                          &X3DTextureCoordinateNode::propertyChanged > > 
-    SFTextureCoordinateNode;   
+                          &X3DTextureCoordinateNode::propertyChanged > >
+    SFTextureCoordinateNode;
 
     /// The MFVertexAttributeNode is dependent on the propertyChanged
     /// field of the contained X3DVertexAttributeNode.
-    class H3DAPI_API MFVertexAttributeNode : public DependentMFNode< 
+    class H3DAPI_API MFVertexAttributeNode : public DependentMFNode<
                 X3DVertexAttributeNode,
                 FieldRef< X3DGeometricPropertyNode,
                           Field,
@@ -141,8 +141,8 @@ namespace H3D {
                 FogCoordinate,
                 FieldRef< X3DGeometricPropertyNode,
                           Field,
-                          &FogCoordinate::propertyChanged > > 
-    SFFogCoordinate;   
+                          &FogCoordinate::propertyChanged > >
+    SFFogCoordinate;
 
     /// Display list is extended in order to set front sidedness of 
     /// triangles outside the display list. This is due to that the 
@@ -212,7 +212,7 @@ namespace H3D {
                              Inst< SFBool           > _normalPerVertex = 0,
                              Inst< SFBool           > _solid           = 0,
                              Inst< MFVertexAttributeNode > _attrib     = 0,
-                             Inst< SFFogCoordinate     > _fogCoord     =0 );
+                             Inst< SFFogCoordinate     > _fogCoord     = 0 );
 
     /// Contains an X3DColorNode whose colors are applied to the
     /// X3DComposedGeometryNode. If the color field is NULL, the
@@ -222,16 +222,16 @@ namespace H3D {
     /// <b>Access type:</b> inputOutput \n
     ///
     /// \dotfile X3DComposedGeometryNode_color.dot 
-    auto_ptr< SFColorNode >  color;
+    auto_ptr< SFColorNode > color;
 
     /// An X3DCoordinate node with the coordinates to use.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// 
     /// \dotfile X3DComposedGeometryNode_coord.dot 
-    auto_ptr< SFCoordinateNode >  coord;
+    auto_ptr< SFCoordinateNode > coord;
     
-    /// Contains an X3DNormalNode which colors are applied to the
+    /// Contains an X3DNormalNode which normals are applied to the
     /// X3DComposedGeometryNode. If the normal field is NULL, the
     /// normals are automatically generated in accordance with the
     /// node's definition. If the node does not define a behaviour,
@@ -241,15 +241,15 @@ namespace H3D {
     /// <b>Access type:</b> inputOutput \n
     ///
     /// \dotfile X3DComposedGeometryNode_normal.dot 
-    auto_ptr< SFNormalNode >  normal;
+    auto_ptr< SFNormalNode > normal;
     
-    /// Contains an X3DTextureCoordinateNode which colors are applied
+    /// Contains an X3DTextureCoordinateNode which texture coordinates are applied
     /// to the X3DComposedGeometryNode.
     /// 
     /// <b>Access type:</b> inputOutput \n
     ///
     /// \dotfile X3DComposedGeometryNode_texCoord.dot 
-    auto_ptr< SFTextureCoordinateNode >  texCoord;
+    auto_ptr< SFTextureCoordinateNode > texCoord;
     
     /// The ccw field defines the ordering of the vertex coordinates of 
     /// the geometry with respect to user-given or automatically generated
@@ -268,7 +268,7 @@ namespace H3D {
     /// <b>Default value:</b> TRUE \n
     /// 
     /// \dotfile X3DComposedGeometryNode_ccw.dot 
-    auto_ptr< SFBool >  ccw;
+    auto_ptr< SFBool > ccw;
     
     /// If TRUE the colors in the color field is applied per vertex,
     /// otherwise it is applied per face.
@@ -277,7 +277,7 @@ namespace H3D {
     /// <b>Default value:</b> TRUE \n
     /// 
     /// \dotfile X3DComposedGeometryNode_colorPerVertex.dot 
-    auto_ptr< SFBool >  colorPerVertex;
+    auto_ptr< SFBool > colorPerVertex;
 
     /// If TRUE the normals in the normal field is applied per vertex,
     /// otherwise it is applied per face.
@@ -286,7 +286,7 @@ namespace H3D {
     /// <b>Default value:</b> TRUE \n
     /// 
     /// \dotfile X3DComposedGeometryNode_normalPerVertex.dot 
-    auto_ptr< SFBool >  normalPerVertex;
+    auto_ptr< SFBool > normalPerVertex;
 
     /// The solid field determines whether one or both sides of each polygon
     /// shall be displayed. If solid is FALSE, each polygon shall be visible
@@ -299,7 +299,7 @@ namespace H3D {
     /// <b>Default value:</b> TRUE \n
     ///
     /// \dotfile X3DComposedGeometryNode_ccw.dot 
-    auto_ptr< SFBool >  solid;
+    auto_ptr< SFBool > solid;
     
     /// If the attrib field is not empty it shall contain a list of
     /// X3DVertexAttributeNode instances with per-vertex attribute

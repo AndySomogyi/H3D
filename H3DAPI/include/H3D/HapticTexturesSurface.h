@@ -30,7 +30,7 @@
 #define __HAPTICTEXTURESSURFACE_H__
 
 #include <H3D/H3DFrictionalSurfaceNode.h>
-#include <H3D/X3DTexture2DNode.h>
+#include <H3D/H3DImageObject.h>
 
 #include <HAPI/HapticTexturesSurface.h>
 
@@ -40,7 +40,7 @@ namespace H3D {
   /// \class HapticTexturesSurface
   /// Surface in which textures can be used to control the values of the
   /// parameters stiffness, damping, staticFriction and dynamicFriction.
-  /// It is optimized for once channel gray scale images using unsigned
+  /// It is optimized for one channel gray scale images using unsigned
   /// integers from 0 to 255. Black (0) corresponds
   /// to the lowest allowed value and White(255) corresponds to the highest
   /// allowed value.
@@ -54,28 +54,27 @@ namespace H3D {
   class H3DAPI_API HapticTexturesSurface: public H3DFrictionalSurfaceNode {
   public:
 
-    /// Field class that contains an X3DTexture2DNode. Need to override onAdd
-    /// and onRemove in order to update the Image used by HAPI.
-    class SFTexture2DNode : public DependentSFNode< X3DTexture2DNode, 
-                                    FieldRef< H3DDisplayListObject,
-                                       H3DDisplayListObject::DisplayList,
-                                       &H3DDisplayListObject::displayList >,
-                                    true > {
-    public:
-
-      typedef DependentSFNode< X3DTexture2DNode, 
-                               FieldRef< H3DDisplayListObject,
-                               H3DDisplayListObject::DisplayList,
-                               &H3DDisplayListObject::displayList >, 
-                               true >
-        SFTexture2DNodeBase;
-
-      /// Set up the routes we want to maintain.
+    /// An SFNode where we make sure the type of the nodes contained
+    /// is a subclass of H3DImageObject.
+    class H3DAPI_API SFImageObjectNode : public DependentSFNodeObject< H3DImageObject,
+                             FieldRef< H3DImageObject,
+                                       H3DImageObject::SFImage,
+                                       &H3DImageObject::image >,
+                                   true > {
+    typedef DependentSFNodeObject< H3DImageObject, 
+                             FieldRef< H3DImageObject,
+                                       H3DImageObject::SFImage,
+                                       &H3DImageObject::image >,
+                                   true > SFImageObjectNodeBase;
+    protected:
+      /// Sets up a route between the added node's image field and the
+      /// owners image field.
       virtual void onAdd( Node *n );
 
       /// Remove the routes we want to maintain.
       virtual void onRemove( Node *n );
 
+    public:
       HAPI::HapticTexturesSurface::ParameterType parameter_type;
     };
 
@@ -85,8 +84,8 @@ namespace H3D {
     /// any of the fields stiffnessMap, dampingMap, staticFrictionMap
     /// and dynamicFrictionMap.
     class SetImagePtr : public AutoUpdate< 
-      TypedField< SFBool, X3DTexture2DNode::SFImage,
-                  AnyNumber< X3DTexture2DNode::SFImage > > > {
+      TypedField< SFBool, H3DImageObject::SFImage,
+                  AnyNumber< H3DImageObject::SFImage > > > {
     public:
       HAPI::HapticTexturesSurface::ParameterType parameter_type;
     protected:
@@ -111,16 +110,16 @@ namespace H3D {
                      Inst< UpdateStaticFriction   > _staticFriction     = 0,
                      Inst< UpdateDynamicFriction  > _dynamicFriction    = 0,
                      Inst< SFBool                 > _useRelativeValues  = 0,
-                     Inst< SFTexture2DNode        > _stiffnessMap       = 0,
+                     Inst< SFImageObjectNode        > _stiffnessMap       = 0,
                      Inst< UpdateMinMaxParamValue > _maxStiffness       = 0,
                      Inst< UpdateMinMaxParamValue > _minStiffness       = 0,
-                     Inst< SFTexture2DNode        > _dampingMap         = 0,
+                     Inst< SFImageObjectNode        > _dampingMap         = 0,
                      Inst< UpdateMinMaxParamValue > _maxDamping         = 0,
                      Inst< UpdateMinMaxParamValue > _minDamping         = 0,
-                     Inst< SFTexture2DNode        > _staticFrictionMap  = 0,
+                     Inst< SFImageObjectNode        > _staticFrictionMap  = 0,
                      Inst< UpdateMinMaxParamValue > _maxStaticFriction  = 0,
                      Inst< UpdateMinMaxParamValue > _minStaticFriction  = 0,
-                     Inst< SFTexture2DNode        > _dynamicFrictionMap = 0,
+                     Inst< SFImageObjectNode        > _dynamicFrictionMap = 0,
                      Inst< UpdateMinMaxParamValue > _maxDynamicFriction = 0,
                      Inst< UpdateMinMaxParamValue > _minDynamicFriction = 0 );
 
@@ -133,28 +132,28 @@ namespace H3D {
     /// <b>Access type:</b> inputOutput
     /// 
     /// \dotfile HapticTexturesSurface_stiffnessMap.dot
-    auto_ptr< SFTexture2DNode > stiffnessMap;
+    auto_ptr< SFImageObjectNode > stiffnessMap;
 
     /// The texture used to map damping values.
     ///
     /// <b>Access type:</b> inputOutput
     /// 
     /// \dotfile HapticTexturesSurface_dampingMap.dot
-    auto_ptr< SFTexture2DNode > dampingMap;
+    auto_ptr< SFImageObjectNode > dampingMap;
 
     /// The texture used to map static friction values.
     ///
     /// <b>Access type:</b> inputOutput
     /// 
     /// \dotfile HapticTexturesSurface_staticFrictionMap.dot
-    auto_ptr< SFTexture2DNode > staticFrictionMap;
+    auto_ptr< SFImageObjectNode > staticFrictionMap;
 
     /// The texture used to map dynamic friction values.
     ///
     /// <b>Access type:</b> inputOutput
     /// 
     /// \dotfile HapticTexturesSurface_dynamicFrictionMap.dot
-    auto_ptr< SFTexture2DNode > dynamicFrictionMap;
+    auto_ptr< SFImageObjectNode > dynamicFrictionMap;
 
     /// The maximum allowed value of the stiffness. Only used to calculate
     /// the stiffness if stiffnessMap is not null. The white in the texture
