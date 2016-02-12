@@ -258,8 +258,11 @@ class TestCaseRunner ( object ):
       result.name= testCase.name
       result.url= os.path.join(directory, testCase.x3d)
 
-    if not args.only_validate:
+    #if not args.only_validate:
+    try:
       os.remove ( variation_path )
+    except:
+      pass
 
     return result
 
@@ -316,7 +319,8 @@ class TestCaseRunner ( object ):
     
     orig_file= open ( file_path, 'r' )
     
-    variation_file= tempfile.NamedTemporaryFile(suffix='.x3d', delete= False )
+    
+    variation_file= tempfile.NamedTemporaryFile(dir=os.path.dirname(file_path), suffix='.x3d', delete= False )
     original_contents= orig_file.read()
     variation_contents= variation.parse ( original_contents )
     variation_file.write ( variation_contents )

@@ -772,11 +772,14 @@ function GetTestRunList(server_id) {
           div.data("test_run_id", res[i].id);
           if(res[i].has_results) {
             div.click(function(){
+              if(display_options.testruns.selected != $(this).data("test_run_id")) {
+                window.location.hash = encodeURI("#server=" + display_options.servers.current + "&testrun=" + $(this).data("test_run_id"));
+                hash_run = $(this).data("test_run_id");
+              }
               SetTestRun($(this).data("test_run_id"));
               $(".Selected_TestRun").removeClass('Selected_TestRun');
               $(this).addClass('Selected_TestRun');
               display_options.testruns.selected = $(this).data("test_run_id");
-              window.location.hash = encodeURI("#server=" + display_options.servers.current + "&testrun=" + display_options.testruns.selected);
             });
             if(hash_server == display_options.servers.current && hash_run == res[i].id) {
               SetTestRun($(div).data("test_run_id"));
