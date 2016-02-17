@@ -533,11 +533,13 @@ void H3DHapticsDevice::renderStylus() {
   if( stylus_node && initialized->getValue() ) {
     const Vec3f &pos = weightedProxyPosition->getValue();
     const Rotation &rot = trackerOrientation->getValue();
+    glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
     glTranslatef( pos.x, pos.y, pos.z );
     glRotatef( (GLfloat)(rot.angle * 180 / Constants::pi), 
                rot.axis.x, rot.axis.y, rot.axis.z );
     stylus_node->render();
+    glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
   }
 }
