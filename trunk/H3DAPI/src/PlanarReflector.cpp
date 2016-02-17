@@ -127,6 +127,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   glColorMask( 1, 1, 1, 1 );
   glEnable( GL_DEPTH_TEST );
 
+  glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
 
   // set up test to only render the parts where the mirror geometry was
@@ -136,7 +137,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   glClear( GL_DEPTH_BUFFER_BIT );
 
   glPushMatrix();
-  
+
   // calculate reflection matrix
   Matrix4f full_vp = vp_transform * local_to_global;
   Vec3f P = full_vp * Vec3f( 0, 0, 0 );
@@ -188,6 +189,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
     background->renderBackground();
     glDepthMask( GL_TRUE );
 
+    glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glFrontFace( front_face );
   }
@@ -237,6 +239,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
     glDisable( GL_CLIP_PLANE0 + plane_index );
     --ClipPlane::nr_active_clip_planes;
   }
+  glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
   glDisable( GL_STENCIL_TEST );
 
@@ -253,6 +256,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   glColor4f( c.r, c.g, c.b, 1 - reflectivity->getValue() );
   if( g ) g->render();
   glEnable( GL_LIGHTING );
+  glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
 
   glFrontFace( front_face );

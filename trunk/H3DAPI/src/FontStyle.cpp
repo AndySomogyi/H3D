@@ -602,6 +602,7 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
      glDisable( GL_ALPHA_TEST );
      glDisable( GL_TEXTURE_2D);
    }
+   glMatrixMode(GL_MODELVIEW);
    glPopMatrix();
  }
 

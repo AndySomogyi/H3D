@@ -336,6 +336,7 @@ void X3DParticleEmitterNode::Particle::render( ParticleSystem *ps ) {
       glTranslatef( position.x, position.y, position.z );
       glRotatef( rotation_angle, rotation_axis.x, rotation_axis.y, rotation_axis.z );
       geometry->displayList->callList();
+      glMatrixMode( GL_MODELVIEW );
       glPopMatrix();
     }
   }

@@ -451,6 +451,7 @@ Matrix4f X3DViewpointNode::getViewMatrix( EyeMode eye_mode,
                    mv[1], mv[5], mv[9], mv[13],
                    mv[2], mv[6], mv[10], mv[14],
                    mv[3], mv[7], mv[11], mv[15] );
+  glMatrixMode( GL_MODELVIEW );
   glPopMatrix();
   return m;
 }
@@ -478,6 +479,7 @@ Matrix4f X3DViewpointNode::getProjectionMatrix( EyeMode eye_mode,
                    pm[1], pm[5], pm[9],  pm[13],
                    pm[2], pm[6], pm[10], pm[14],
                    pm[3], pm[7], pm[11], pm[15] );
+  glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   return m;
 }

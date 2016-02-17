@@ -373,6 +373,7 @@ void renderHapticTriangles() {
           glColor3f( 1, 1, 1 );
           (*i)->glRender();
           glPopAttrib();
+          glMatrixMode(GL_MODELVIEW);
           glPopMatrix();
         }
       }
@@ -830,6 +831,12 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       initWindowWithContext();
     }
     last_render_mode = renderMode->getRenderMode();
+    if( stereo_mode == RenderMode::VERTICAL_INTERLACED ||
+        stereo_mode == RenderMode::HORIZONTAL_INTERLACED ||
+        stereo_mode == RenderMode::CHECKER_INTERLACED ||
+        stereo_mode == RenderMode::VERTICAL_INTERLACED_GREEN_SHIFT ) {
+      rebuild_stencil_mask = true;
+    }
   }
   
   // make this the active window
@@ -1169,6 +1176,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glDepthMask( GL_FALSE );
       background->renderBackground();
       glDepthMask( GL_TRUE );
+      glMatrixMode(GL_MODELVIEW);
       glPopMatrix();
     }
 
@@ -1290,6 +1298,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glDepthMask( GL_FALSE );
       background->renderBackground();
       glDepthMask( GL_TRUE );
+      glMatrixMode(GL_MODELVIEW);
       glPopMatrix();
     }
 
@@ -1422,6 +1431,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
                            (H3DFloat)height->getValue(),
                            clip_near, clip_far );
       glGetDoublev( GL_PROJECTION_MATRIX, mono_projmatrix );
+      glMatrixMode(GL_PROJECTION);
       glPopMatrix();
 
       glMatrixMode(GL_MODELVIEW);
@@ -1432,6 +1442,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       vp->setupViewMatrix( X3DViewpointNode::MONO );
 
       glGetDoublev( GL_MODELVIEW_MATRIX, mono_mvmatrix );
+      glMatrixMode(GL_MODELVIEW);
       glPopMatrix();
     }
   } else {
@@ -1505,6 +1516,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glDepthMask( GL_FALSE );
       background->renderBackground();
       glDepthMask( GL_TRUE );
+      glMatrixMode(GL_MODELVIEW);
       glPopMatrix();
     }
 

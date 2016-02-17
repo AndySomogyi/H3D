@@ -804,6 +804,7 @@ void FrameBufferTextureGenerator::render()     {
           glDepthMask( GL_FALSE );
           bg->renderBackground();
           glDepthMask( GL_TRUE );
+          glMatrixMode(GL_MODELVIEW);
           glPopMatrix();
         }
       }else{

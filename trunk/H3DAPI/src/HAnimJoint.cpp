@@ -166,14 +166,15 @@ void HAnimJoint::renderSkeleton( RenderType type ) {
 
 
   // render sphere at joint center
+  glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   const Vec3f &ctr = center->getValue();
   glTranslatef( ctr.x, ctr.y,ctr.z );
   joint_shape->render();
+  glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
 
   // render children
-  glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
   multiplyGLMatrix();
  
@@ -181,7 +182,8 @@ void HAnimJoint::renderSkeleton( RenderType type ) {
   for( unsigned int i = 0; i < c.size(); ++i ) {
     HAnimJoint *joint = dynamic_cast< HAnimJoint* >( c[i]);
     if( joint ) joint->renderSkeleton( type );
-  }    
+  }
+  glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
 
   // render lines if in skeleton mode
