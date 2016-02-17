@@ -421,6 +421,7 @@ void HAnimHumanoid::render()     {
       HAnimJoint *joint = dynamic_cast< HAnimJoint* >( skel[i]);
       if( joint ) joint->renderSkeleton( type );
     }
+    glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
   } else {
     // render skinned version
