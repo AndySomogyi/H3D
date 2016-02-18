@@ -23,7 +23,7 @@ namespace H3D {
   /// \brief ClutchedDevice is a wrapper for a H3DHapticsDevice which adds clutching
   /// functionality. 
   ///
-  /// The clucthing can be useful when the workspace and calibration of the haptic device
+  /// The clutching can be useful when the workspace and calibration of the haptic device
   /// does not allow comfortable control.
   ///
   /// <b>Examples:</b>

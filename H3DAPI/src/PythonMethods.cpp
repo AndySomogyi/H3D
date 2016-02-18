@@ -2994,7 +2994,7 @@ call the base class __init__ function." );
         name = PyString_AsString( py_name2 );
       }
 
-      if (name!="")
+      if( node && name!="" )
         node->setName(name);
       return PyNode_FromNode( node );
     }
