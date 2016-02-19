@@ -1,6 +1,4 @@
 <?php
-require('DB/mysqli.php');
-
 require('mysql_conf.php');
 
 $query = sprintf("
