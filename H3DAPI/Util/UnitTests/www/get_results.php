@@ -1,5 +1,4 @@
 <?php
-require('DB/mysqli.php');
 
 error_reporting(E_ALL);
 
