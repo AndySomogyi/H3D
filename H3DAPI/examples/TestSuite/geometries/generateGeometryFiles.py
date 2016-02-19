@@ -425,9 +425,9 @@ touchField = TouchField(the_node.%s)
         nr_index_sixlets = nr_index_sixlets + 1
         if nr_index_sixlets < ( columns - 1 ) * ( rows - 1 ):
           if nr_index_sixlets % 8 == 0:
-            file_handle.write( "-1,\n" + line_prefix + "                            " )
+            file_handle.write( " -1, \n" + line_prefix + "                            " )
           else:
-            file_handle.write( "-1, " )
+            file_handle.write( " -1, " )
     
     file_handle.write( "\" creaseAngle='4' normalPerVertex='true' >\n" + line_prefix + "  <Coordinate point=\"" )
 
