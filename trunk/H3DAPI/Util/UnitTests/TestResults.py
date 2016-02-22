@@ -85,8 +85,8 @@ class TestResults ( object ):
     #  fps_list_float.sort()
     #  return TestResults.PerformanceResultTuple("%.2f" % fps_list_float[0], "%.2f" % fps_list_float[len( fps_list_float ) - 1], "%.2f" % (math.fsum( fps_list_float ) / float( len( fps_list_float ) ) ), "%.2f" % float( fps_list_float[len( fps_list_float ) / 2] ), fps_data)
   
-  def getRenderingResult(self, baseline_path, output_path):
-    valid, diff_path, error = self._validate_rendering(baseline_path.replace('\\', '/'), output_path.replace('\\', '/'))
+  def getRenderingResult(self, baseline_path, output_path, fuzz, threshold):
+    valid, diff_path, error = self._validate_rendering(baseline_path.replace('\\', '/'), output_path.replace('\\', '/'), fuzz, threshold)
     for line in error:
       print line
     return TestResults.RenderingResultTuple(valid, baseline_path, output_path, diff_path)      
@@ -103,15 +103,14 @@ class TestResults ( object ):
       print line
     return TestResults.ConsoleResultTuple(valid, baseline_path, output, diff)
 
-  def _validate_rendering(self, baseline_path='.', rendering_path='.'):
+  def _validate_rendering(self, baseline_path='.', rendering_path='.', fuzz=2, threshold=20):
     """ Compare renderings """
     valid = False
     diff_path = ''
     error = []
 
     # Comparison thresholds
-    fuzz= 6               # % of fuzz (increase to ignore small differences)
-    error_threshold= 10   # Number of pixels that must differ in order to trigger a warning
+    error_threshold= threshold  # Number of pixels that must differ in order to trigger a warning
 
     g= glob.glob(baseline_path)
     if g:
@@ -189,7 +188,7 @@ class TestResults ( object ):
       line = file.readline()
     return line.strip()
 
-  def parseValidationFile(self, file_path='validation.txt', baseline_folder='', text_output_folder=''):
+  def parseValidationFile(self, file_path='validation.txt', baseline_folder='', text_output_folder='', fuzz=0, threshold=0):
     self.step_list = []
     if (self.errors > 0):
       self.step_list.append(self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest returned errors", self.std_err)]))
@@ -212,7 +211,7 @@ class TestResults ( object ):
         if line == 'screenshot':
           # Screenshot format: One line that says screenshot, one line with output screenshot path
           screenshot_path = self.getNextLine(f)
-          res = self.getRenderingResult(baseline_folder + '\\' + os.path.split(screenshot_path)[1], screenshot_path)
+          res = self.getRenderingResult(baseline_folder + '\\' + os.path.split(screenshot_path)[1], screenshot_path, fuzz, threshold)
           success = success and res.success
           results.append(res)
           

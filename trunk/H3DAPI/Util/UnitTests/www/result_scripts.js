@@ -1,3 +1,4 @@
+
 function LoadSQLModel(test_run_id, result_callback) {
   // The model is a tree implemented with nested arrays
   // Every node is a category and every leaf is a test file.
@@ -794,14 +795,15 @@ function GetTestRunList(server_id) {
         }      
       }
   });
-
 }
+
 
 function SetTestRun(test_run_id) {
   $('#Categories_List').empty();
   $('#loading_spinner_container').show();
 
   LoadSQLModel(test_run_id, function(data) {
+    $('#Categories_List').empty();
     $('#loading_spinner_container').hide();
     model = data;
     refreshDisplayOptions(model);
@@ -868,8 +870,8 @@ function SetTestRun(test_run_id) {
       }
     });  
 
-  
   });
+  
 }
 
 
