@@ -34,7 +34,7 @@ An example test script
       Will wait the specified start_time, execute the function, and then record performance data during the specified run_time.
       Performance data is not in itself validated and as such is not output anywhere except the results database.
       The recorded performance data WILL BE IGNORED unless there is also another decorator that is validated successfully.
-      On other words we will not store and display performance data for a test that has not been verified to give the expected output. @screenshot is recommended for this since we typically will only want to record performance data for a test that also rendered correctly.
+      In other words we will not store and display performance data for a test that has not been verified to give the expected output. @screenshot is recommended for this since we typically will only want to record performance data for a test that also rendered correctly.
     
   """
 

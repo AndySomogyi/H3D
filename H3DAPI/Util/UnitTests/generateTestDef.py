@@ -68,7 +68,7 @@ parser.add_argument('--testDefName', dest='testDefName',
                     default="",
                     help='The name of the TestDef file (without file ending) to generate')
 parser.add_argument('--generateEmptyScripts', dest='generateEmptyScripts', 
-                    default=False,
+                    default=True,
                     help='Whether all the x3d files that do not have .py files with the same name should have sample .py files generated for them or not.')
 args = parser.parse_known_args()[0]
 
@@ -96,14 +96,16 @@ for file in os.listdir(os.path.join(args.workingdir, args.x3ddir)):
         has_script = True
         scripts_generated += 1
     
+    files_found += 1
+    defFile.write("[" + base + "]\n")
+    defFile.write("x3d=" +  os.path.join(args.x3ddir, file) + "\n")
     if has_script:
-      files_found += 1
-      defFile.write("[" + base + "]\n")
-      defFile.write("x3d=" +  os.path.join(args.x3ddir, file) + "\n")
       defFile.write("script=" + os.path.join(args.x3ddir, base) + ".py\n")
-      defFile.write("baseline folder=baseline\n")
-      defFile.write("starttime=5\n")
-      defFile.write("timeout=30\n\n")
+    else:
+      defFile.write("script=")
+    defFile.write("baseline folder=baseline\n")
+    defFile.write("starttime=5\n")
+    defFile.write("timeout=30\n\n")
 
 defFile.flush()
 defFile.close()

@@ -190,7 +190,7 @@ class TestCaseRunner ( object ):
       All of these values default to None
     The list will contain one namedtuple for each Section in the specified definition file
     """
-    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1}, allow_no_value=True)
+    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20}, allow_no_value=True)
     try:
       confParser.read(file_path)
     except:
@@ -212,6 +212,14 @@ class TestCaseRunner ( object ):
           test_case.starttime = confParser.getfloat(sect, 'starttime')
         except:
           test_case.starttime = 1
+        try:
+          test_case.fuzz = confParser.getfloat(sect, 'fuzz')
+        except:
+          test_case.fuzz = 2
+        try:
+          test_case.threshold = confParser.getfloat(sect, 'threshold')
+        except:
+          test_case.threshold = 20
 
         result.append(test_case)
     return result
@@ -251,7 +259,7 @@ class TestCaseRunner ( object ):
       print result.std_err
       print result.std_out
 #      print os.path.abspath(output_dir + '\\validation.txt')
-      result.parseValidationFile(os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'))
+      result.parseValidationFile(os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'), testCase.fuzz, testCase.threshold)
     else:
       result = TestResults('')
       result.filename= file
