@@ -211,7 +211,8 @@ WxConsoleDialog::WxConsoleDialog ( wxWindow *parent,
   H3DUtil::Console.setOutputStream( *console_stream_w, H3DUtil::LogLevel::Warning );
 
   // Errors
-  console_stream_buf_e = new ConsoleStreamBuf( *this, logText, logTextErrors, wxTextAttr( *wxRED ) );
+  wxColour redorange( 255, 25, 0 );
+  console_stream_buf_e = new ConsoleStreamBuf( *this, logText, logTextErrors, wxTextAttr( redorange ) );
   console_stream_e.reset( new ostream( console_stream_buf_e ) );
   H3DUtil::Console.setOutputStream( *console_stream_e, H3DUtil::LogLevel::Error );
 
