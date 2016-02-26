@@ -145,9 +145,12 @@ class TestCaseRunner ( object ):
     if os.path.isfile( self.early_shutdown_file ):
       os.remove( self.early_shutdown_file )
     process= self.launchTest ( url, cwd )
-    for i in range( 0, int(self.startup_time )):
-      time.sleep(1)
-      if os.path.isfile( self.early_shutdown_file ) or not process.isRunning():
+
+    time_slept = 0.0
+    while time_slept < (self.startup_time ):
+      time.sleep(0.5)
+      time_slept += 0.5
+      if not process.isRunning():
         break
     if not process.isRunning ():
       test_results.std_out= process.getStdOut()
@@ -156,12 +159,13 @@ class TestCaseRunner ( object ):
       test_results.terminates_ok = os.path.isfile(self.early_shutdown_file)
       return test_results
    
-    self.shutdown_timeout = 60
+    # We continue only if the process is still running after the startup time and sleep until the runtime runs out or until the process stops running
     time_slept = 0.0
     while time_slept < self.shutdown_time and process.isRunning():
       time.sleep(0.5)
       time_slept += 0.5
-    
+
+    self.shutdown_timeout = 60
     if not process.isRunning ():
       test_results.terminates_ok= True
       test_results.std_out= process.getStdOut()
@@ -172,7 +176,7 @@ class TestCaseRunner ( object ):
       print "Shutdown timeout hit, test looks like it crashed or froze."
       process.kill ()
       time_slept = 0
-      while time_slept < self.shutdown_time and process.isRunning():
+      while time_slept < self.shutdown_timeout and process.isRunning():
         time.sleep(0.5)
         time_slept += 0.5
       test_results.std_out= process.getStdOut()
