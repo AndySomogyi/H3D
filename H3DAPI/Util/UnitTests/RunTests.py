@@ -259,7 +259,7 @@ class TestCaseRunner ( object ):
       print result.std_err
       print result.std_out
 #      print os.path.abspath(output_dir + '\\validation.txt')
-      result.parseValidationFile(os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'), testCase.fuzz, testCase.threshold)
+      result.parseValidationFile(testCase, os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'), testCase.fuzz, testCase.threshold)
     else:
       result = TestResults('')
       result.filename= file
