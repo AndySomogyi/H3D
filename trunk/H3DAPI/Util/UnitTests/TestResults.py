@@ -188,7 +188,7 @@ class TestResults ( object ):
       line = file.readline()
     return line.strip()
 
-  def parseValidationFile(self, file_path='validation.txt', baseline_folder='', text_output_folder='', fuzz=0, threshold=0):
+  def parseValidationFile(self, testcase, file_path='validation.txt', baseline_folder='', text_output_folder='', fuzz=0, threshold=0):
     self.step_list = []
     if (self.errors > 0):
       self.step_list.append(self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest returned errors", self.std_err)]))
@@ -238,11 +238,11 @@ class TestResults ( object ):
               break
             else:
               output.append(err_line + '\n')
-          console_f = open(text_output_folder +'\\' + step_name + '_console.txt', 'w')
+          console_f = open(text_output_folder +'\\' + testcase.name + '_' + step_name + '_console.txt', 'w')
           console_f.writelines(output)
           console_f.flush()
           console_f.close()            
-          res = self.getConsoleResult(baseline_folder + '\\' + step_name+"_console.txt", output)
+          res = self.getConsoleResult(baseline_folder + '\\' + testcase.name + '_' + step_name + "_console.txt", output)
           success = success and res.success
           results.append(res)
         elif line == 'custom_start':
@@ -251,7 +251,7 @@ class TestResults ( object ):
           while line != 'custom_end':
             output.append(line + '\n')
             line = self.getNextLine(f)
-          res = self.getCustomResult(baseline_folder + '\\' + step_name+"_custom.txt", output)
+          res = self.getCustomResult(baseline_folder + '\\' + testcase.name + '_' + step_name+"_custom.txt", output)
           success = success and res.success
           results.append(res)
         else: # If we get anything else then we've reached the end of the current step and the start of the next one!
