@@ -156,7 +156,7 @@ class TestCaseRunner ( object ):
       test_results.terminates_ok = os.path.isfile(self.early_shutdown_file)
       return test_results
    
-    self.shutdown_timeout = 10
+    self.shutdown_timeout = 60
     time_slept = 0.0
     while time_slept < self.shutdown_time and process.isRunning():
       time.sleep(0.5)
@@ -169,6 +169,7 @@ class TestCaseRunner ( object ):
       test_results.warnings, test_results.errors= self._countWarnings ( test_results )
       return test_results
     else:
+      print "Shutdown timeout hit, test looks like it crashed or froze."
       process.kill ()
       time_slept = 0
       while time_slept < self.shutdown_time and process.isRunning():
