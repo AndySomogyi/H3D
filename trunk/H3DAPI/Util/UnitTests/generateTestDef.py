@@ -59,11 +59,12 @@ def firstStep():
 
 """
 
-parser = argparse.ArgumentParser(description='Runs python tests')
+parser = argparse.ArgumentParser(description='Generates UnitTest .TestDef files')
 parser.add_argument('--workingdir', dest='workingdir', 
-                    help='The directory that any relative paths start from and where you want the output file to end up')
+                    help='The directory that any relative paths start from and where you want the output file to end up',
+                    default="")
 parser.add_argument('--x3ddir', dest='x3ddir', 
-                    help='The directory the x3d files are in')
+                    help='The directory the x3d files are in', default=".")
 parser.add_argument('--testDefName', dest='testDefName', 
                     default="",
                     help='The name of the TestDef file (without file ending) to generate')
