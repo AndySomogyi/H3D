@@ -37,7 +37,7 @@ from ProcessWrapper import *
 parser = argparse.ArgumentParser(
   description='Runs python tests')
 parser.add_argument('--workingdir', dest='workingdir', 
-                    default=os.getcwd().replace('\\', '/'),
+                    default=os.getcwd().replace('', ''),
                     help='The directory containing the unit tests.')
 parser.add_argument('--output', dest='output',
                    default='output',
@@ -246,7 +246,7 @@ class TestCaseRunner ( object ):
     <PythonScript DEF='TestScript' url='%s'></PythonScript>""" % (testCase.name,
                                                                   os.path.split(os.path.abspath(os.path.join(directory, testCase.script)))[0].replace('\\', '/'),
                                                                   os.path.splitext(os.path.split(testCase.script)[1])[0],
-                                                                  os.path.abspath(directory),
+                                                                  os.path.abspath(directory).replace('\\', '/'),
                                                                   args.RunTestsDir,
                                                                   testCase.starttime,
                                                                   os.path.join(args.RunTestsDir, 'UnitTestBoilerplate.py'))

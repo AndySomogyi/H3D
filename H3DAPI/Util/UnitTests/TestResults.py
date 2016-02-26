@@ -143,7 +143,7 @@ class TestResults ( object ):
           valid = False
           error.append(
             'WARNING: The rendering ' +
-            'is significantly different to the baseline. The differences are attached as ' + (os.path.split(rendering_path)[0] + '/diff_' + os.path.split(rendering_path)[1]) + '\n' )
+            'is significantly (' + str(metric) + ' pixels compared to threshold of ' + str(error_threshold) +' pixels) different to the baseline. The differences are attached as ' + (os.path.split(rendering_path)[0] + '/diff_' + os.path.split(rendering_path)[1]) + '\n' )
           diff_path = ( (os.path.split(rendering_path)[0] + '/diff_' + os.path.split(rendering_path)[1]) )
 
         else:

@@ -751,6 +751,18 @@ function SetServer(server_id, server_name) {
   refreshDisplayOptions();
 }
 
+function OnTestRunClick(){
+  $(".TestRun").unbind("click");
+  if(display_options.testruns.selected != $(this).data("test_run_id")) {
+    window.location.hash = encodeURI("#server=" + display_options.servers.current + "&testrun=" + $(this).data("test_run_id"));
+    hash_run = $(this).data("test_run_id");
+  }
+  SetTestRun($(this).data("test_run_id"));
+  $(".Selected_TestRun").removeClass('Selected_TestRun');
+  $(this).addClass('Selected_TestRun');
+  display_options.testruns.selected = $(this).data("test_run_id");
+}
+
 function GetTestRunList(server_id) {
   // Connect database
   $.ajax({
@@ -772,16 +784,7 @@ function GetTestRunList(server_id) {
           div.append(res[i].timestamp);
           div.data("test_run_id", res[i].id);
           if(res[i].has_results) {
-            div.click(function(){
-              if(display_options.testruns.selected != $(this).data("test_run_id")) {
-                window.location.hash = encodeURI("#server=" + display_options.servers.current + "&testrun=" + $(this).data("test_run_id"));
-                hash_run = $(this).data("test_run_id");
-              }
-              SetTestRun($(this).data("test_run_id"));
-              $(".Selected_TestRun").removeClass('Selected_TestRun');
-              $(this).addClass('Selected_TestRun');
-              display_options.testruns.selected = $(this).data("test_run_id");
-            });
+            div.click(OnTestRunClick);
             if(hash_server == display_options.servers.current && hash_run == res[i].id) {
               SetTestRun($(div).data("test_run_id"));
               $(".Selected_TestRun").removeClass('Selected_TestRun');
@@ -792,7 +795,7 @@ function GetTestRunList(server_id) {
             div.addClass('TestRun_NoResults');
           }
           target.append(div);
-        }      
+        }
       }
   });
 }
@@ -869,7 +872,8 @@ function SetTestRun(test_run_id) {
         $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
       }
     });  
-
+    $(".TestRun").unbind("click");
+    $(".TestRun").click(OnTestRunClick);      
   });
   
 }
