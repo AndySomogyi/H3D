@@ -33,6 +33,9 @@
 #include <H3D/MatrixTransform.h>
 #include <H3D/X3DPointingDeviceSensorNode.h>
 #include <H3D/X3DShapeNode.h>
+#ifdef HAVE_PROFILER
+#include <H3D/Inline.h>
+#endif
 
 using namespace H3D;
 
