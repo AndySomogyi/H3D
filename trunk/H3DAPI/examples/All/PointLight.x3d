@@ -10,21 +10,23 @@
   </head>
 
   <Scene>
-    <Viewpoint position='0 0 0.6' />
+    <Viewpoint position='0 0 1' />
     <NavigationInfo headlight="false" />
     <IMPORT inlineDEF='H3D_EXPORTS' exportedDEF='HDEV' AS='H' />
 
     <PointLight DEF='L'
-        ambientIntensity='0.9' color='1 1 0' global='true'
-        intensity='0.7' on='true' attenuation='1 1 1' />
-
-    <Shape>
-      <Sphere radius='0.1'/>
-      <Appearance>
-        <Material diffuseColor='0.25 0.25 0.3' shininess='0.8' />
-        <SmoothSurface />
-      </Appearance>
-    </Shape>
+        ambientIntensity='0.0' color='1 1 0' global='true'
+        intensity='1.0' on='true' attenuation='1 0.6 0.15' />
+		
+	<Transform translation='0 -0.25 -0.25' >
+		<Shape>
+		<Sphere radius='0.15'/>
+		<Appearance>
+			<Material emissiveColor='0.3 0.3 0.3' ambientIntensity='0.5' shininess='0.8' />
+			<SmoothSurface />
+		</Appearance>
+		</Shape>
+	</Transform>
 
     <ROUTE
         fromNode='H' fromField='trackerPosition'
