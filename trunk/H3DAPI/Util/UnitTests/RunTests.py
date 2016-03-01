@@ -420,9 +420,10 @@ class TestCaseRunner ( object ):
               f = open(result.baseline_path)
               baseline_string = f.read()
               f.close()
+              curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff) VALUES (%d, %d, %d, %d, 'N', '%s', '%s', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string), self.db.escape_string(baseline_string), self.db.escape_string(result.diff)))
             else:
-              baseline_string = 'Baseline not found'
-            curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff) VALUES (%d, %d, %d, %d, 'N', '%s', '%s', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string), self.db.escape_string(baseline_string), self.db.escape_string(result.diff)))
+              curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff) VALUES (%d, %d, %d, %d, 'N', '%s', NULL, NULL)" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string)))
+            
         elif type(result).__name__ == 'CustomResult':
           output_string = ''
           for line in result.output:

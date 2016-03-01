@@ -205,6 +205,8 @@ class TestResults ( object ):
       success = True
       line = self.getNextLine(f)
       if line == '':
+        if step_name != '':
+          self.step_list.append(self.StepResultTuple(step_name, False, [self.ErrorResultTuple("Test never finished executing the step " + step_name, self.std_err)]))
         break;
       results = []
       while line != None:

@@ -114,12 +114,18 @@ sys.path.append(TestCaseScriptFolder)
 TestCaseName = getNamedNode('TestCaseName').getField('value').getValueAsString().replace('"', '')
 StartTime = getNamedNode('StartTime').getField('value').getValue()[0]
 res = import_module(TestCaseScriptFilename)
-res.__scriptnode__ = globals()['__scriptnode__']   
+res.__scriptnode__ = globals()['__scriptnode__']
+
+def linenumber_of_member(m):
+    try:
+        return m[1].func_code.co_firstlineno
+    except AttributeError:
+        return -1
 
 # import all the functions that have our validator decorators attached. We identify them by the presence of a validation array.
 # the result is a list of tuples containing (function name, function address), so we sort by the latter to ensure the test functions will be executed in the same order as they appear in the file
 testfunctions_list = [o for o in getmembers(res) if isfunction(o[1]) and hasattr(o[1], "validation")]
-testfunctions_list.sort(key=operator.itemgetter(1))
+testfunctions_list.sort(key=linenumber_of_member)
 
 testHelper = UnitTestHelper(TestBaseFolder+"/test_complete", os.path.abspath(os.path.join(TestCaseDefFolder, "output").replace("\\", '/')), TestCaseName + '_')
 testHelper.addTests(testfunctions_list)
