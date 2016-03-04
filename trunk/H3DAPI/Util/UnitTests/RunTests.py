@@ -33,7 +33,6 @@ from ProcessWrapper import *
 
 
 
-
 parser = argparse.ArgumentParser(
   description='Runs python tests')
 parser.add_argument('--workingdir', dest='workingdir', 
@@ -60,6 +59,7 @@ parser.add_argument('--RunTestsDir', dest='RunTestsDir', help='The location of U
                     default=os.path.dirname(os.path.realpath(__file__)).replace('\\', '/'))
 args = parser.parse_known_args()[0]
 
+all_tests_successful = True
 
 def createFilename(orig_url, var_name):
   """ Returns a valid file name based on the provided path and variable name. """
@@ -153,6 +153,7 @@ class TestCaseRunner ( object ):
       if not process.isRunning():
         break
     if not process.isRunning ():
+      print "Test finished successfully after " + str(time_slept) + "s"
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
       test_results.warnings, test_results.errors= self._countWarnings ( test_results )
@@ -166,6 +167,7 @@ class TestCaseRunner ( object ):
       time_slept += 0.5
 
     if not process.isRunning ():
+      print "Test finished successfully after " + str(self.startup_time + time_slept) + "s"
       test_results.terminates_ok= True
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
@@ -265,6 +267,7 @@ class TestCaseRunner ( object ):
       print result.std_out
 #      print os.path.abspath(output_dir + '\\validation.txt')
       result.parseValidationFile(testCase, os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'), testCase.fuzz, testCase.threshold)
+      exitcode = result.success and all_tests_successful
     else:
       result = TestResults('')
       result.filename= file
@@ -301,6 +304,7 @@ class TestCaseRunner ( object ):
       return
     self.server_id = res[0]
 
+    all_tests_successful = True
     
     for root, dirs, files in os.walk(directory):
       for file in files:
@@ -314,12 +318,13 @@ class TestCaseRunner ( object ):
               print "Testing: " + testCase.name
               case_results = self.processTestDef(file, testCase, results, root)
               results.append(case_results)
+              all_tests_successful = case_results.success and all_tests_successful
               testCase.filename = (os.path.relpath(file_path, directory)).replace('\'', '/') # This is used to set up the tree structure for the results page. It will store this parameter in the database as a unique identifier of this specific file of tests.
               if case_results != None:  
                 self.UploadResultsToSQL(testCase, case_results, root)            
                 
               
-    return results
+    return results, all_tests_successful
   
 
   def _isTestable ( self, file_path ):
@@ -780,7 +785,14 @@ print "Running these tests using: " + subprocess.check_output('where.exe ' + h3d
 
 
 tester= TestCaseRunner( os.path.join(args.workingdir, ""), startup_time= 5, shutdown_time= 5, testable_callback= isTestable, error_reporter=None)
-results = tester.processAllTestDefinitions(directory=args.workingdir, output_dir=args.output)
+results, all_tests_successful = tester.processAllTestDefinitions(directory=args.workingdir, output_dir=args.output)
+
+if not all_tests_successful:
+  print "Error: One or more tests failed!"
+  exitCode = -1
+
+
+exit(exitCode)
 
 #reporter= TestReport()
 #print reporter.reportResults ( results )

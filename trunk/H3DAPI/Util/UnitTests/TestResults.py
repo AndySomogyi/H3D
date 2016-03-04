@@ -34,6 +34,7 @@ class TestResults ( object ):
     self.warnings= 0
     self.errors= 0
     self.skipped= False
+    self.success = True
 
   def addStepResults(step_name, success, results):
     self.step_results.append(self.StepResult(step_name, success, results))
@@ -192,10 +193,13 @@ class TestResults ( object ):
     self.step_list = []
     if (self.errors > 0):
       self.step_list.append(self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest returned errors", self.std_err)]))
+      self.success = False
     elif not self.terminates_ok:
       self.step_list.append(self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest didn't finish successfully (crashed, froze, or was otherwise interrupted.)", self.std_err)]))
+      self.success = False
     if not os.path.exists(file_path):
       self.step_list.append(self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest didn't output validation data, it probably crashed.", self.std_err)]))
+      self.success = False
       return
     
     
@@ -207,6 +211,7 @@ class TestResults ( object ):
       if line == '':
         if step_name != '':
           self.step_list.append(self.StepResultTuple(step_name, False, [self.ErrorResultTuple("Test never finished executing the step " + step_name, self.std_err)]))
+          self.success = False
         break;
       results = []
       while line != None:
@@ -259,6 +264,7 @@ class TestResults ( object ):
         else: # If we get anything else then we've reached the end of the current step and the start of the next one!
           step = TestResults.StepResultTuple(step_name, success, results)
           self.step_list.append(step)
+          self.success = self.success and success
           break # goes out to the while step_name != True loop,
         line = self.getNextLine(f)
       step_name = line
