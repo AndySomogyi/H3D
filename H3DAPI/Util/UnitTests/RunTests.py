@@ -165,7 +165,6 @@ class TestCaseRunner ( object ):
       time.sleep(0.5)
       time_slept += 0.5
 
-    self.shutdown_timeout = 60
     if not process.isRunning ():
       test_results.terminates_ok= True
       test_results.std_out= process.getStdOut()
@@ -176,6 +175,7 @@ class TestCaseRunner ( object ):
       print "Shutdown timeout hit, test looks like it crashed or froze."
       process.kill ()
       time_slept = 0
+      self.shutdown_timeout = 60
       while time_slept < self.shutdown_timeout and process.isRunning():
         time.sleep(0.5)
         time_slept += 0.5

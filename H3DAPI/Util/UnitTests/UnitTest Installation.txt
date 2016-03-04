@@ -7,7 +7,7 @@ Python 2.7 (https://www.python.org/downloads/release/python-2711/)
 MySQL Connector C 6.0.2 (https://dev.mysql.com/downloads/connector/c/, make sure you install version 6.0.2 and that it installs into "Program Files (x86)" rather than "Program Files", as the installer for the MySQL-python package might fail otherwise.)
 Microsoft Visual C++ Compiler for Python 2.7 (https://www.microsoft.com/en-us/download/details.aspx?id=44266)
 Python for Windows Extensions (http://sourceforge.net/projects/pywin32/)
-
+Psutil
 Required path entries:
 
 system path:
@@ -20,3 +20,6 @@ Installing the MySQL-python package (provides the MySQLdb module):
 MySQLdb (https://pypi.python.org/pypi/MySQL-python/)
 Can be installed by opening python and running "python -m pip install MySQL-python" from anywhere
 You must ensure you installed the right version of MySQL Connector C and that you installed it into Program Files (x86)
+
+Installing psutil in python:
+Just use pip, you can get it with "python -m pip install psutil"
