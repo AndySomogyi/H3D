@@ -70,7 +70,6 @@ x3d_template = '''<?xml version="1.0" encoding="utf-8"?>
   </head>
 
   <Scene>
-    <Viewpoint position='0 0 0' />
     <%s DEF='N'/>
   </Scene>
 </X3D>
@@ -96,12 +95,15 @@ parser.add_argument('--caseDir', dest='caseDir',
                     default='.')
 args = parser.parse_known_args()[0]
 
-
-
 inf = sys.float_info.max
 neginf = sys.float_info.min
 
-def writeFloatField(py, field_name, name_suffix, field_value, should_write_color=False, color=None):
+global func_count
+
+
+def writeFloatField(py, field_name, name_suffix, field_value, should_write_color=False, color=None, color_field=None):
+  global func_count
+  func_count += 1
 #  print "Writing function " + "def test" + field_name + name_suffix + "():\n"
   py.write("@screenshot(start_time=0.1)\n")
   py.write("def test" + field_name + name_suffix + "():\n")
@@ -111,29 +113,29 @@ def writeFloatField(py, field_name, name_suffix, field_value, should_write_color
     py.write("  #Also initiates the color " + color[0] + " for this series of tests \n")
   py.write("  node = getNamedNode('N')\n")
   if color and should_write_color:
-    py.write("  node.getField('color').setValueFromString('" + color[1] + "')\n\n")
+    py.write("  node.getField('" + color_field + "').setValueFromString('" + color[1] + "')\n\n")
   py.write("  node.getField('" + field_name + "').setValue(" + str(eval(field_value)) + ")\n\n")
 
 
-def parseFloatField(py, node, field, should_write_color, color=None):
+def parseFloatField(py, node, field, should_write_color, color=None, color_field=None):
   value = field['values']
   if value[0] != field['default']:
     if color:
-      writeFloatField(py, field['name'], "_" + color[0] + "_lowest", value[0], should_write_color, color)
+      writeFloatField(py, field['name'], "_" + color[0] + "_lowest", value[0], should_write_color, color, color_field)
       should_write_color = False
     else:
       writeFloatField(py, field['name'], "_lowest", value[0])
   
   if value[1] != field['default']:
     if color:
-      writeFloatField(py, field['name'], "_" + color[0] + "_highest", value[1], should_write_color, color)
+      writeFloatField(py, field['name'], "_" + color[0] + "_highest", value[1], should_write_color, color, color_field)
       should_write_color = False
     else:
       writeFloatField(py, field['name'], "_highest", value[1])
 
  
   if color:
-    writeFloatField(py, field['name'], "_" + color[0] + "_default", field['default'], should_write_color, color)
+    writeFloatField(py, field['name'], "_" + color[0] + "_default", field['default'], should_write_color, color, color_field)
     should_write_color = False
   else:
     writeFloatField(py, field['name'], "_default", field['default'])
@@ -142,6 +144,8 @@ def parseFloatField(py, node, field, should_write_color, color=None):
 
 
 def writeVec3fField(py, name, name_suffix, x, y, z):
+  global func_count
+  func_count += 1
   py.write("@screenshot(start_time=0.1)\n")
   py.write("def test" + name + name_suffix + "():\n")
   
@@ -202,14 +206,21 @@ def parseVec3fField(py, node, field):
   writeVec3fField(py, field['name'], "_highest_y", default[0] , default[1],  value[1])
   
   writeVec3fField(py, field['name'], "_default", default[0], default[1], default[2])
+
+
+def parseStringField(py, node, field):
+  value = field['values']
+  
+  
+
     
 
 def next_line(file):
   line = file.readline()
-  print "reading line: " + line
+ # print "reading line: " + line
   while line and (line.strip() == '' or line[0] == '#'):
     line = file.readline()
-    print "reading line: " + line
+   # print "reading line: " + line
   if line == '':
     return None
   else:
@@ -221,7 +232,7 @@ def next_line(file):
 for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseDir)):
   base, ext= os.path.splitext(file)
   if ext.lower() == '.casedef':
-    print base
+    #print base
     excepted = False
     try:
       file = open(os.path.join(os.path.abspath(args.workingDir), args.caseDir, file), 'r')
@@ -239,7 +250,8 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
         
         line = next_line(file)
         if line.split('=')[0] == 'color':
-          generate_colors = line.split('=')[1].lower() == 'true'
+          generate_colors = True
+          color_field = line.split('=')[1]
           line = next_line(file)
         
         fields_to_generate = []
@@ -284,11 +296,12 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
         node['name'] = node_name[1]
         node['fields'] = fields_to_generate
         node['generate_colors'] = generate_colors
+        if generate_colors:
+          node['color_field'] = color_field
         nodes_to_generate.append( node )      
       
       file.close()
-#      print base + " contained: \r\n"
-#      print nodes_to_generate
+      print base + " contained: "
       for node in nodes_to_generate:
         if not os.path.exists(os.path.join(os.path.abspath(args.workingDir), node['name'] + '.x3d')):
           x3d = open(os.path.join(os.path.abspath(args.workingDir), node['name'] + '.x3d'), 'w')
@@ -297,18 +310,22 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
         py = open(os.path.join(os.path.abspath(args.workingDir), node['name'] + '.py'), 'w')
         py.write(test_script_header)
      
+        func_count = 0
         if node['generate_colors']:
           for color in color_list:
             first = True
             for field in node['fields']:
-#              print "writing " + ", ".join(color)
+              #print "writing " + ", ".join(color)
               value = field['values']
               type = field['type'].lower()
               if type == 'float':
-                parseFloatField(py, node, field, first, color)
+                parseFloatField(py, node, field, first, color, color_field)
                 first = False
               elif type == 'vec3f':
                 parseVec3fField(py, node, field)
+              elif type == 'string':
+                parseStringField(py, node, field, first, color, color_field)
+                first = False
         else:
           for field in node['fields']:
             type = field['type'].lower()
@@ -316,6 +333,10 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
               parseFloatField(py, node, field, False)
             elif type == 'vec3f':
               parseVec3fField(py, node, field)
+            elif type == 'string':
+              parseStringField(py, node, field, False)
+        print node['name'] + ' - ' + str(func_count) + ", runtime " + str(func_count*0.1) + 's'
+        
           
         py.close()
         

@@ -141,6 +141,11 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
   float:left;
 }
 
+.image_download_link {
+  float:left;
+  clear:both;
+}
+
 
 .test_successful {
   background-color: hsla(143, 100%, 68%, 1);

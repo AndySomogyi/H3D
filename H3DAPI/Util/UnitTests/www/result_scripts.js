@@ -414,16 +414,20 @@ function getImageBlobURL(blob, download_name) {
   var blob = new Blob( [ arrayBufferView ], { type: "image/png" } );
   var urlCreator = window.URL || window.webkitURL;
   var imageUrl = urlCreator.createObjectURL( blob );
-  
+  var container = $('<div>');
   var link = $("<a>");
+  link.addClass("image_download_link");
   link.attr("href", imageUrl);
   link.attr("target", imageUrl);
   link.attr("download", download_name);
+  link.append("(Download)");
   var img = $("<img>");
   img.attr("src", imageUrl);
   img.addClass("TestResult_image");
-  link.append(img);
-  return link;
+  container.append(img);
+  container.append(link);
+  
+  return container;
 }
 
 function generateImages(div) {
@@ -483,7 +487,7 @@ function generateImages(div) {
       var image_container = $('<div>');
       image_container.addClass('TestResult_image_div'); 
       image_container.append("Diff:</br>");
-      image_container.append(getImageBlobURL(testcase.diff_image, download_name));
+      image_container.append(getImageBlobURL(testcase.diff_image, diff_download_name));
       container.append(image_container);
     } 
   }
