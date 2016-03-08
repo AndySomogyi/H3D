@@ -101,7 +101,19 @@ neginf = sys.float_info.min
 global func_count
 
 
-def writeFloatField(py, field_name, name_suffix, field_value, should_write_color=False, color=None, color_field=None):
+def writeDefaultValues(py, node):
+  py.write("  # Writing default field values\n")
+  for field in node['fields']:
+    if field['type'] == 'float':
+      py.write("  node.getField('" + field['name'] + "').setValue(" + str(eval(field['default'])) + ")\n")
+    elif field['type'] == 'Vec3f':
+      default = [eval(val) for val in field['default'].split(" ")]
+      py.write("  node.getField('" + field['name'] + "').setValueFromString('" + str(eval(default[0])) + " " + str(eval(default[1])) + " " + str(eval(default[2])) + "')\n")  
+      
+  py.write("  # Writing test value\n")
+      
+
+def writeFloatField(py, node, field_name, name_suffix, field_value, should_write_color=False, color=None, color_field=None):
   global func_count
   func_count += 1
 #  print "Writing function " + "def test" + field_name + name_suffix + "():\n"
@@ -114,6 +126,8 @@ def writeFloatField(py, field_name, name_suffix, field_value, should_write_color
   py.write("  node = getNamedNode('N')\n")
   if color and should_write_color:
     py.write("  node.getField('" + color_field + "').setValueFromString('" + color[1] + "')\n\n")
+  
+  writeDefaultValues(py, node)
   py.write("  node.getField('" + field_name + "').setValue(" + str(eval(field_value)) + ")\n\n")
 
 
@@ -121,29 +135,29 @@ def parseFloatField(py, node, field, should_write_color, color=None, color_field
   value = field['values']
   if value[0] != field['default']:
     if color:
-      writeFloatField(py, field['name'], "_" + color[0] + "_lowest", value[0], should_write_color, color, color_field)
+      writeFloatField(py, node, field['name'], "_" + color[0] + "_lowest", value[0], should_write_color, color, color_field)
       should_write_color = False
     else:
-      writeFloatField(py, field['name'], "_lowest", value[0])
+      writeFloatField(py, node, field['name'], "_lowest", value[0])
   
   if value[1] != field['default']:
     if color:
-      writeFloatField(py, field['name'], "_" + color[0] + "_highest", value[1], should_write_color, color, color_field)
+      writeFloatField(py, node, field['name'], "_" + color[0] + "_highest", value[1], should_write_color, color, color_field)
       should_write_color = False
     else:
-      writeFloatField(py, field['name'], "_highest", value[1])
+      writeFloatField(py, node, field['name'], "_highest", value[1])
 
  
   if color:
-    writeFloatField(py, field['name'], "_" + color[0] + "_default", field['default'], should_write_color, color, color_field)
+    writeFloatField(py, node, field['name'], "_" + color[0] + "_default", field['default'], should_write_color, color, color_field)
     should_write_color = False
   else:
-    writeFloatField(py, field['name'], "_default", field['default'])
+    writeFloatField(py, node, field['name'], "_default", field['default'])
           
   py.write("\n\n\n")
 
 
-def writeVec3fField(py, name, name_suffix, x, y, z):
+def writeVec3fField(py, node, name, name_suffix, x, y, z):
   global func_count
   func_count += 1
   py.write("@screenshot(start_time=0.1)\n")
@@ -151,6 +165,7 @@ def writeVec3fField(py, name, name_suffix, x, y, z):
   
   py.write("  #Code that sets " + name + " to value " + str(x) + " " + str(y) + " " + str(z) + "\n")
   py.write("  node = getNamedNode('N')\n")
+  writeDefaultValues(py, node)
   py.write("  node.getField('" + name + "').setValueFromString('" + str(x) + " " + str(y) + " " + str(z) + "')\n\n")  
 
 
@@ -158,54 +173,54 @@ def parseVec3fField(py, node, field):
   value = [eval(val) for val in field['values']]
   default = [eval(val) for val in field['default'].split(" ")]
   if value[0] <= 1 and value[1] >= 1:
-    writeVec3fField(py, field['name'], "_normal_x",      1,  0,  0)
-    writeVec3fField(py, field['name'], "_normal_y",      0,  1,  0)
-    writeVec3fField(py, field['name'], "_normal_z",      0 , 0,  1)
-    writeVec3fField(py, field['name'], "_normal_xy",     1,  1,  0)
-    writeVec3fField(py, field['name'], "_normal_xz",     1,  0,  1)
-    writeVec3fField(py, field['name'], "_normal_yz",     0,  1,  1)
-    writeVec3fField(py, field['name'], "_normal_xyz",    1,  1,  1)  
+    writeVec3fField(py, node, field['name'], "_normal_x",      1,  0,  0)
+    writeVec3fField(py, node, field['name'], "_normal_y",      0,  1,  0)
+    writeVec3fField(py, node, field['name'], "_normal_z",      0 , 0,  1)
+    writeVec3fField(py, node, field['name'], "_normal_xy",     1,  1,  0)
+    writeVec3fField(py, node, field['name'], "_normal_xz",     1,  0,  1)
+    writeVec3fField(py, node, field['name'], "_normal_yz",     0,  1,  1)
+    writeVec3fField(py, node, field['name'], "_normal_xyz",    1,  1,  1)  
   
   if value[0] <= -1 and value[1] >= -1:
-    writeVec3fField(py, field['name'], "_normal_Invx",    -1,  0,  0)
-    writeVec3fField(py, field['name'], "_normal_Invxy",   -1,  1,  0)
-    writeVec3fField(py, field['name'], "_normal_xInvy",    1, -1,  0)
-    writeVec3fField(py, field['name'], "_normal_InvxInvy",  -1, -1,  0)
-    writeVec3fField(py, field['name'], "_normal_Invxz",   -1,  0,  1)
-    writeVec3fField(py, field['name'], "_normal_xInvz",    1,  0, -1)
-    writeVec3fField(py, field['name'], "_normal_InvxInvz",  -1,  0, -1)
-    writeVec3fField(py, field['name'], "_normal_Invxyz",  -1,  1,  1)
-    writeVec3fField(py, field['name'], "_normal_xInvyz",   1,  -1, 1)
-    writeVec3fField(py, field['name'], "_normal_xyInvz",   1,  1, -1)
-    writeVec3fField(py, field['name'], "_normal_InvxInvyz", -1, -1,  1)
-    writeVec3fField(py, field['name'], "_normal_InvxyInvz", -1,  1, -1)
-    writeVec3fField(py, field['name'], "_normal_xInvyInvz",  1, -1, -1)
-    writeVec3fField(py, field['name'], "_normal_InvxInvyInvz",-1, -1, -1)
-    writeVec3fField(py, field['name'], "_normal_Invy",     0, -1,  0)
-    writeVec3fField(py, field['name'], "_normal_Invyz",    0, -1,  1)
-    writeVec3fField(py, field['name'], "_normal_yInvz",    0,  1, -1)
-    writeVec3fField(py, field['name'], "_normal_InvyInvz",   0, -1, -1)
-    writeVec3fField(py, field['name'], "_normal_Invz",      0 , 0,  -1)
+    writeVec3fField(py, node, field['name'], "_normal_Invx",    -1,  0,  0)
+    writeVec3fField(py, node, field['name'], "_normal_Invxy",   -1,  1,  0)
+    writeVec3fField(py, node, field['name'], "_normal_xInvy",    1, -1,  0)
+    writeVec3fField(py, node, field['name'], "_normal_InvxInvy",  -1, -1,  0)
+    writeVec3fField(py, node, field['name'], "_normal_Invxz",   -1,  0,  1)
+    writeVec3fField(py, node, field['name'], "_normal_xInvz",    1,  0, -1)
+    writeVec3fField(py, node, field['name'], "_normal_InvxInvz",  -1,  0, -1)
+    writeVec3fField(py, node, field['name'], "_normal_Invxyz",  -1,  1,  1)
+    writeVec3fField(py, node, field['name'], "_normal_xInvyz",   1,  -1, 1)
+    writeVec3fField(py, node, field['name'], "_normal_xyInvz",   1,  1, -1)
+    writeVec3fField(py, node, field['name'], "_normal_InvxInvyz", -1, -1,  1)
+    writeVec3fField(py, node, field['name'], "_normal_InvxyInvz", -1,  1, -1)
+    writeVec3fField(py, node, field['name'], "_normal_xInvyInvz",  1, -1, -1)
+    writeVec3fField(py, node, field['name'], "_normal_InvxInvyInvz",-1, -1, -1)
+    writeVec3fField(py, node, field['name'], "_normal_Invy",     0, -1,  0)
+    writeVec3fField(py, node, field['name'], "_normal_Invyz",    0, -1,  1)
+    writeVec3fField(py, node, field['name'], "_normal_yInvz",    0,  1, -1)
+    writeVec3fField(py, node, field['name'], "_normal_InvyInvz",   0, -1, -1)
+    writeVec3fField(py, node, field['name'], "_normal_Invz",      0 , 0,  -1)
   
   
-  writeVec3fField(py, field['name'], "_lowest_x", value[0], default[1],   default[2])
-  writeVec3fField(py, field['name'], "_lowest_xy", value[0], value[0],   default[2])
-  writeVec3fField(py, field['name'], "_lowest_xz", value[0], default[1],  value[0])
-  writeVec3fField(py, field['name'], "_lowest_xyz", value[0], value[0],   value[0])
-  writeVec3fField(py, field['name'], "_lowest_y", default[0] , value[0],  default[2])
-  writeVec3fField(py, field['name'], "_lowest_yz", default[0] , value[0],  value[0])
-  writeVec3fField(py, field['name'], "_lowest_y", default[0] , default[1],  value[0])
+  writeVec3fField(py, node, field['name'], "_lowest_x", value[0], default[1],   default[2])
+  writeVec3fField(py, node, field['name'], "_lowest_xy", value[0], value[0],   default[2])
+  writeVec3fField(py, node, field['name'], "_lowest_xz", value[0], default[1],  value[0])
+  writeVec3fField(py, node, field['name'], "_lowest_xyz", value[0], value[0],   value[0])
+  writeVec3fField(py, node, field['name'], "_lowest_y", default[0] , value[0],  default[2])
+  writeVec3fField(py, node, field['name'], "_lowest_yz", default[0] , value[0],  value[0])
+  writeVec3fField(py, node, field['name'], "_lowest_y", default[0] , default[1],  value[0])
   
   
-  writeVec3fField(py, field['name'], "_highest_x", value[1], default[1],   default[2])
-  writeVec3fField(py, field['name'], "_highest_xy", value[1], value[1],   default[2])
-  writeVec3fField(py, field['name'], "_highest_xz", value[1], default[1],  value[1])
-  writeVec3fField(py, field['name'], "_highest_xyz", value[1], value[1],   value[1])
-  writeVec3fField(py, field['name'], "_highest_y", default[0] , value[1],  default[2])
-  writeVec3fField(py, field['name'], "_highest_yz", default[0] , value[1],  value[1])
-  writeVec3fField(py, field['name'], "_highest_y", default[0] , default[1],  value[1])
+  writeVec3fField(py, node, field['name'], "_highest_x", value[1], default[1],   default[2])
+  writeVec3fField(py, node, field['name'], "_highest_xy", value[1], value[1],   default[2])
+  writeVec3fField(py, node, field['name'], "_highest_xz", value[1], default[1],  value[1])
+  writeVec3fField(py, node, field['name'], "_highest_xyz", value[1], value[1],   value[1])
+  writeVec3fField(py, node, field['name'], "_highest_y", default[0] , value[1],  default[2])
+  writeVec3fField(py, node, field['name'], "_highest_yz", default[0] , value[1],  value[1])
+  writeVec3fField(py, node, field['name'], "_highest_y", default[0] , default[1],  value[1])
   
-  writeVec3fField(py, field['name'], "_default", default[0], default[1], default[2])
+  writeVec3fField(py, node, field['name'], "_default", default[0], default[1], default[2])
 
 
 def parseStringField(py, node, field):
