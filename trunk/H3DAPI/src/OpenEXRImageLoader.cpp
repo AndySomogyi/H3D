@@ -32,9 +32,6 @@
 
 #ifdef HAVE_OPENEXR
 #include <OpenEXR/ImfTestFile.h>
-#include <OpenEXR/ImfNamespace.h>
-namespace IMF = OPENEXR_IMF_NAMESPACE;
-using namespace IMF;
 
 using namespace H3D;
 
@@ -51,7 +48,7 @@ OpenEXRImageLoader::reader_registration(
                             );
 
 bool OpenEXRImageLoader::supportsFileType( const string &url ) {
-  return isOpenExrFile ( url.c_str() );
+  return Imf::isOpenExrFile ( url.c_str() );
 }
 
 #endif // HAVE_FREEIMAGE
