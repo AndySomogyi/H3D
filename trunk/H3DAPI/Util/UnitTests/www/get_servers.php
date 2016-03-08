@@ -3,7 +3,7 @@
 
 require('mysql_conf.php');
 
-$query = "SELECT * FROM servers";
+$query = "SELECT * FROM servers ORDER BY server_name ASC";
 
 $data = generate_results($db, $query);
 

@@ -236,6 +236,8 @@ class TestCaseRunner ( object ):
         
     """
     output_dir = os.path.abspath(os.path.join(directory, "output"))
+    if os.path.exists(output_dir):
+      shutil.rmtree(output_dir, True)
     rendering_dir = os.path.join(directory, output_dir, 'renderings')
     text_dir = os.path.join(directory, output_dir, 'text')
     for dir in [output_dir, rendering_dir, text_dir]:
