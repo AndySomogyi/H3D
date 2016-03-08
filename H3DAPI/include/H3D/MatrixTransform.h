@@ -189,7 +189,7 @@ namespace H3D {
     /// constant for a constant scene graph if the DEF/USE feature is used for
     /// instances of this node.
     /// 
-    /// <b>Access type:</b> inputOutput \n
+    /// <b>Access type:</b> outputOnly \n
     /// <b>Default value:</b> Unit matrix \n
     auto_ptr< SFMatrix4f > accumulatedForward;
     
@@ -199,7 +199,7 @@ namespace H3D {
     /// constant for a constant scene graph if the DEF/USE feature is used for
     /// instances of this node.
     /// 
-    /// <b>Access type:</b> inputOutput \n
+    /// <b>Access type:</b> outputOnly \n
     /// <b>Default value:</b> Unit matrix \n
     auto_ptr< SFMatrix4f > accumulatedInverse;
     
