@@ -390,26 +390,32 @@ void H3DWindowNode::renderChild( X3DChildNode *c,
 
   renderHapticTriangles();
   if( multi_pass_transparency ) {
+    H3DTIMER_BEGIN("Renderpass SOLID")
     X3DShapeNode::geometry_render_mode = X3DShapeNode::SOLID; 
     renderStyli();
     if( dlo )  dlo->displayList->callList();
     else c->render();
-    
+    H3DTIMER_END("Renderpass SOLID");
+    H3DTIMER_BEGIN("Renderpass BACK");
     X3DShapeNode::geometry_render_mode = X3DShapeNode::TRANSPARENT_BACK; 
     renderStyli();
     if( dlo )  dlo->displayList->callList();
     else c->render();
-    
+    H3DTIMER_END("Renderpass BACK");
+    H3DTIMER_BEGIN("Renderpass FRONT");
     X3DShapeNode::geometry_render_mode = X3DShapeNode::TRANSPARENT_FRONT; 
     renderStyli();
     if( dlo )  dlo->displayList->callList();
     else c->render();
     X3DShapeNode::geometry_render_mode = X3DShapeNode::ALL; 
+    H3DTIMER_END("Renderpass FRONT");
   } else {
+    H3DTIMER_BEGIN("Renderpass ALL")
     X3DShapeNode::geometry_render_mode = X3DShapeNode::ALL; 
     renderStyli();
     if( dlo )  dlo->displayList->callList();
     else c->render();
+    H3DTIMER_END("Renderpass ALL")
   }
 }
 
