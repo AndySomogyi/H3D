@@ -69,7 +69,7 @@ namespace H3D {
                                    true > SFImageObjectNodeBase;
     protected:
       /// Sets up a route between the added node's image field and the
-      /// owners image field.
+      /// owners SetImagePtr field.
       virtual void onAdd( Node *n );
 
       /// Remove the routes we want to maintain.
