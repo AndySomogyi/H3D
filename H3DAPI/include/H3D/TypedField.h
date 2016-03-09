@@ -39,7 +39,7 @@ namespace H3D {
   /// \param BaseField The Field type base class.  
   ///
   /// \param RequiredArgTypes The types of the routes that are required to be
-  /// there. If these routes are not present when the evaluate() function is
+  /// there. If these routes are not present when the update() function is
   /// called then an exception is thrown. The types can be specified with the
   /// \link TypedFieldTypeCheck::Types
   /// Types
@@ -54,7 +54,7 @@ namespace H3D {
   /// void can be used to specify that there are no required routes.
   ///
   /// \param OptionalArgTypes Types of optional routes. These do not have to 
-  /// be there in order for the field to be able to evaluate. In addition to 
+  /// be there in order for the field to be able to update. In addition to 
   /// the templates Any and Types used for RequiredArgTypes the template
   /// \link TypedFieldTypeCheck::AnyNumber
   /// AnyNumber 
@@ -65,7 +65,7 @@ namespace H3D {
   ///
   /// \par Examples:
   /// TypedField< SFInt32, SFInt32 > defines an SFInt32 field that requires 
-  /// one and only one DFInt32 field routed to it.
+  /// one and only one SFInt32 field routed to it.
   ///
   /// \par
   /// TypedField< MFFloat, void, AnyNumber<SFFloat> > defines an MFFloat 

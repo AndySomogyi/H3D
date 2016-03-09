@@ -408,6 +408,25 @@ namespace H3D {
     }
 
   };
+
+  /// DependentMFNodeObject is similar to DependentMFNode but uses
+  /// TypedMFNodeObject instead of TypedMFNode.
+  template< class NodeType, class FieldRefs = void, bool DynamicCast = false > 
+  class DependentMFNodeObject:
+    public FieldInternals::DependentNodeField<
+    TypedMFNodeObject< NodeType >,
+    FieldRefs, DynamicCast > {
+  public:
+        
+    /// Constructor. Default value of value is NULL.
+    DependentMFNodeObject(){}
+
+    /// Destructor.
+    ~DependentMFNodeObject(){
+      this->clear( this->ownerId() );
+    }
+
+  };
 }
 
 #endif

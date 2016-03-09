@@ -104,7 +104,7 @@ namespace H3D {
     // the type of vertex attribute
     VERTEXATTRIBUTE::VERTEXATTRIBUTETYPE attrib_type;
 
-    // address of the vertex buffer object, will be used for binless
+    // address of the vertex buffer object, will be used for bindless
     // vertex attribute
     GLuint64 vbo_GPUaddr;
 
