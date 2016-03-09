@@ -116,6 +116,30 @@ GLenum RenderTargetTexture::getTextureTarget() {
   return GL_TEXTURE_2D;
 }
 
+int RenderTargetTexture::getTextureWidth() {
+  FrameBufferTextureGenerator *gen = generator->getValue();
+  H3DInt32 target_index = index->getValue();
+  if ( gen && target_index<(H3DInt32)gen->colorTextures->size() ) {
+    return gen->colorTextures->getValueByIndex( target_index )->getTextureWidth();
+  }
+}
+
+int RenderTargetTexture::getTextureHeight() {
+  FrameBufferTextureGenerator *gen = generator->getValue();
+  H3DInt32 target_index = index->getValue();
+  if ( gen && target_index<(H3DInt32)gen->colorTextures->size() ) {
+    return gen->colorTextures->getValueByIndex( target_index )->getTextureHeight();
+  }
+}
+
+int RenderTargetTexture::getTextureDepth() {
+  FrameBufferTextureGenerator *gen = generator->getValue();
+  H3DInt32 target_index = index->getValue();
+  if ( gen && target_index<(H3DInt32)gen->colorTextures->size() ) {
+    return gen->colorTextures->getValueByIndex( target_index )->getTextureDepth();
+  }
+}
+
 void RenderTargetTexture::setTextureId( GLuint id ){
   FrameBufferTextureGenerator *gen = generator->getValue();
   H3DInt32 target_index = index->getValue();
@@ -199,6 +223,11 @@ std::pair<H3DInt32,H3DInt32> H3D::RenderTargetTexture::getDefaultSaveDimensions(
     GeneratedTexture * t = static_cast< GeneratedTexture* >( 
       gen->colorTextures->getValueByIndex( target_index ) );
     if( t->textureIdIsInitialized() ) {
+      int texture_width = t->getTextureWidth();
+      int texture_height = t->getTextureHeight();
+      if( texture_width>0&&texture_height>0 ) {
+        return std::pair<H3DInt32, H3DInt32>( texture_width, texture_height );
+      }
       GLuint tex_id = t->getTextureId();
       glPushAttrib( GL_TEXTURE_BIT );
       glBindTexture( getTextureTarget(), tex_id );

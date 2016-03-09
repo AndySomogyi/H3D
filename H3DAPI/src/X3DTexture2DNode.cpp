@@ -312,6 +312,8 @@ void X3DTexture2DNode::render()     {
       glDeleteTextures( 1, &texture_id );
       texture_id = 0;
       if( i ) {
+        texture_width = i->width();
+        texture_height = i->height();
         texture_id = renderImage( i, 
                                   texture_target, 
                                   scaleToPowerOfTwo->getValue() );

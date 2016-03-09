@@ -47,7 +47,10 @@ H3DSingleTextureNode::H3DSingleTextureNode(
   is_resident ( false ),
   texture_id(0),
   texture_unit(GL_TEXTURE0),
-  texture_target(0){
+  texture_target(0),
+  texture_width(-1),
+  texture_height(-1),
+  texture_depth(-1){
 }
 
 H3DSingleTextureNode::~H3DSingleTextureNode () {

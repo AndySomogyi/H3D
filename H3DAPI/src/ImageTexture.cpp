@@ -357,6 +357,30 @@ GLenum ImageTexture::getTextureTarget() {
   }
 }
 
+int ImageTexture::getTextureWidth() {
+  if( wrapped_image ) {
+    return wrapped_image->getTextureWidth();
+  } else {
+    return X3DTexture2DNode::getTextureWidth();
+  }
+}
+
+int ImageTexture::getTextureHeight() {
+  if( wrapped_image ) {
+    return wrapped_image->getTextureHeight();
+  } else {
+    return X3DTexture2DNode::getTextureHeight();
+  }
+}
+
+int ImageTexture::getTextureDepth() {
+  if ( wrapped_image ) {
+    return wrapped_image->getTextureDepth();
+  } else {
+    return X3DTexture2DNode::getTextureDepth();
+  }
+}
+
 void ImageTexture::setTextureId( GLuint id ){
   if (wrapped_image){
     wrapped_image->setTextureId(id);
@@ -378,6 +402,30 @@ void ImageTexture::setTextureTarget( GLenum target ){
     wrapped_image->setTextureTarget(target);
   }else{
     X3DTexture2DNode::setTextureTarget(target);
+  }
+}
+
+void ImageTexture::setTextureWidth( int _width ) {
+  if( wrapped_image ) {
+    wrapped_image->setTextureWidth( _width );
+  } else {
+    X3DTexture2DNode::setTextureWidth( _width );
+  }
+}
+
+void ImageTexture::setTextureHeight( int _height ) {
+  if( wrapped_image ) {
+    wrapped_image->setTextureHeight( _height );
+  } else {
+    X3DTexture2DNode::setTextureHeight( _height );
+  }
+}
+
+void ImageTexture::setTextureDepth( int _depth ) {
+  if ( wrapped_image ) {
+    wrapped_image->setTextureDepth( _depth );
+  } else {
+    X3DTexture2DNode::setTextureDepth( _depth );
   }
 }
 

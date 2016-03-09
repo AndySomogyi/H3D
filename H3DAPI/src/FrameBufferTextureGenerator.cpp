@@ -1536,26 +1536,45 @@ void FrameBufferTextureGenerator::_check_gl_error(const char *file, int line) {
 }
 
 bool FrameBufferTextureGenerator::resizeBuffers( H3DInt32 _width, H3DInt32 _height, H3DInt32 depth ) {
-  if ( X3DProgrammableShaderObject::use_bindless_textures ) {
-    // Bindless textures are immutable once they are resident, so we need to make
-    // new texture ids in order to change size
-    for ( NodeVector::const_iterator i= colorTextures->begin(); i != colorTextures->end(); ++i ) {
-      if ( GeneratedTexture* t= dynamic_cast < GeneratedTexture* > ( *i ) ) {
-        t->invalidateTextureHandle ();
+  // specify texture width, height, depth for colorTextures, depthTexture. 
+  // Also reinit if texture is bindless as bindless textures are immutable once they are resident
+  for ( NodeVector::const_iterator i = colorTextures->begin(); i!=colorTextures->end(); ++i ) {
+    if ( GeneratedTexture* t = dynamic_cast <GeneratedTexture*> (*i) ) {
+      t->setTextureWidth( _width );
+      t->setTextureHeight( _height );
+      t->setTextureDepth( depth );
+      if( X3DProgrammableShaderObject::use_bindless_textures ) {
+        t->invalidateTextureHandle();
         t->reinitialize();
-      } else if ( GeneratedTexture3D* t= dynamic_cast < GeneratedTexture3D* > ( *i ) ) {
-        t->invalidateTextureHandle ();
+      }
+    }else if( GeneratedTexture3D* t = dynamic_cast < GeneratedTexture3D* > (*i) ) {
+      t->setTextureWidth( _width );
+      t->setTextureHeight( _height );
+      t->setTextureDepth( depth );
+      if( X3DProgrammableShaderObject::use_bindless_textures ) {
+        t->invalidateTextureHandle();
         t->reinitialize();
       }
     }
-    if ( GeneratedTexture* t= dynamic_cast < GeneratedTexture* > ( depthTexture->getValue() ) ) {
-      t->invalidateTextureHandle ();
+  }
+  if ( GeneratedTexture* t = dynamic_cast <GeneratedTexture*> (depthTexture->getValue()) ) {
+    t->setTextureWidth( _width );
+    t->setTextureHeight( _height );
+    if( X3DProgrammableShaderObject::use_bindless_textures ) {
+      t->invalidateTextureHandle();
       t->reinitialize();
-    } else if ( GeneratedTexture3D* t= dynamic_cast < GeneratedTexture3D* > ( depthTexture->getValue() ) ) {
-      t->invalidateTextureHandle ();
+    }
+  } else if ( GeneratedTexture3D* t = dynamic_cast <GeneratedTexture3D*> (depthTexture->getValue()) ) {
+    t->setTextureWidth( _width );
+    t->setTextureHeight( _height );
+    t->setTextureDepth( depth );
+    if ( X3DProgrammableShaderObject::use_bindless_textures ) {
+      t->invalidateTextureHandle();
       t->reinitialize();
     }
   }
+
+
   string output_texture_type = outputTextureType->getValue();
   const vector< string > &color_texture_types = generateColorTextures->getValue();
   bool using_stencil_buffer = haveStencilBuffer();

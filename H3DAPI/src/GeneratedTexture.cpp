@@ -109,6 +109,11 @@ void GeneratedTexture::reinitialize () {
 std::pair<H3DInt32,H3DInt32> H3D::GeneratedTexture::getDefaultSaveDimensions()
 {
   if( textureIdIsInitialized() ) {
+    int texture_width = getTextureWidth();
+    int texture_height = getTextureHeight();
+    if( texture_width>0&&texture_height>0 ) {
+      return std::pair<H3DInt32, H3DInt32>( texture_width, texture_height );
+    }
     GLuint tex_id = getTextureId();
     glPushAttrib( GL_TEXTURE_BIT );
     glBindTexture(getTextureTarget(), tex_id);
