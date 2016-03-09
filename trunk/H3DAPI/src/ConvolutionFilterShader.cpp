@@ -96,72 +96,28 @@ ConvolutionFilterShader::ConvolutionFilterShader( Inst< DisplayList  > _displayL
 
 void ConvolutionFilterShader::traverseSG( TraverseInfo &ti ) {
   H3DGeneratedFragmentShaderNode::traverseSG( ti );
-  //TODO: better to have a general way to handle the texture width and height
-  X3DTexture2DNode *t = dynamic_cast<X3DTexture2DNode*> (texture->getValue());
-  RenderTargetTexture *rtt = dynamic_cast< RenderTargetTexture* >( texture->getValue() );
-  Image *image = NULL;
-  if( t ){
-  image = t->image->getValue();
-  }
-  if( image ) {
-    if( width->getValue()==-1 ) {
-      // use image width
-      widthInUse->setValue(image->width(),id);
-    }else{
-      // use specified width
-      widthInUse->setValue(width->getValue(),id);
-    }
-    if( height->getValue()==-1 ) {
-      // use image height
-      heightInUse->setValue(image->height(),id);
-    }else{
-      heightInUse->setValue(height->getValue(),id);
-    }
-  } else {
-    GeneratedTexture *gen_tex = dynamic_cast< GeneratedTexture * >( t );
-    if( gen_tex &&
-        gen_tex->textureIdIsInitialized()) {
-      GLuint tex_id = gen_tex->getTextureId();
-      glPushAttrib( GL_TEXTURE_BIT );
-      glBindTexture( gen_tex->getTextureTarget(), tex_id );
-      GLint h,w;
-      glGetTexLevelParameteriv(gen_tex->getTextureTarget(), 0, GL_TEXTURE_WIDTH, &w);
-      glGetTexLevelParameteriv(gen_tex->getTextureTarget(), 0, GL_TEXTURE_HEIGHT, &h);
-      glPopAttrib();
-      if( width->getValue()==-1 ) {
-        widthInUse->setValue(w,id);
-      }else{
-        widthInUse->setValue(width->getValue(),id);
-      }
-      if( height->getValue()==-1 ) {
-        heightInUse->setValue(h,id);
-      }else{
-        heightInUse->setValue(height->getValue(),id);
+  // if width or height are not positive, then retrieve dimension from texture
+  // otherwise use the one specified by the user
+  H3DSingleTextureNode* t = texture->getValue();
+  if ( t ) {
+    if ( width->getValue()<=0 ) {
+      int texture_width = t->getTextureWidth();
+      if ( texture_width>0&&texture_width!=widthInUse->getValue() ) {
+        widthInUse->setValue( texture_width, id );
       }
     } else {
-      widthInUse->setValue(0,id);
-      heightInUse->setValue(0,id);
+      widthInUse->setValue( width->getValue(), id );
+    }
+    if ( height->getValue()<=0 ) {
+      int texture_height = t->getTextureHeight();
+      if ( texture_height>0&&texture_height!=heightInUse->getValue() ) {
+        heightInUse->setValue( texture_height, id );
+      }
+    } else {
+      heightInUse->setValue( height->getValue(), id );
     }
   }
-  if( rtt ) {// if texture is a renderTargetTexture
-    GLuint tex_id = rtt->getTextureId();
-    glPushAttrib( GL_TEXTURE_BIT );
-    glBindTexture( rtt->getTextureTarget(), tex_id );
-    GLint h,w;
-    glGetTexLevelParameteriv(rtt->getTextureTarget(), 0, GL_TEXTURE_WIDTH, &w);
-    glGetTexLevelParameteriv(rtt->getTextureTarget(), 0, GL_TEXTURE_HEIGHT, &h);
-    glPopAttrib();
-    if( width->getValue()==-1 ) {
-      widthInUse->setValue(w,id);
-    }else{
-      widthInUse->setValue(widthInUse->getValue(),id);
-    }
-    if( height->getValue()==-1 ) {
-      heightInUse->setValue(h,id);
-    }else{
-      heightInUse->setValue(heightInUse->getValue(),id);
-    }
-  }
+
   // widthInUse and heightInUse is OUTPUT_ONLY and their value are not
   // obtained anywhere other than getFragmentShaderString() function.
   // so have to call upToDate here to make sure shader is rebuild when texture

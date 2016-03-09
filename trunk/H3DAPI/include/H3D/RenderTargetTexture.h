@@ -84,6 +84,18 @@ namespace H3D {
 
     /// Overridden virtual function to perform the same function on the correct 
     /// texture from the generator.
+    virtual int getTextureWidth();
+
+    /// Overridden virtual function to perform the same function on the correct 
+    /// texture from the generator.
+    virtual int getTextureHeight();
+
+    /// Overridden virtual function to perform the same function on the correct 
+    /// texture from the generator.
+    virtual int getTextureDepth();
+
+    /// Overridden virtual function to perform the same function on the correct 
+    /// texture from the generator.
     virtual void setTextureId( GLuint id );
     /// Overridden virtual function to perform the same function on the correct 
     /// texture from the generator.

@@ -297,6 +297,9 @@ void X3DTexture3DNode::render()     {
       glDeleteTextures( 1, &texture_id );
       texture_id = 0;
       if( i ) {
+        texture_width = i->width();
+        texture_height = i->height();
+        texture_depth = i->depth();
         texture_id = renderImage( i, 
                                   texture_target, 
                                   scaleToPowerOfTwo->getValue() );

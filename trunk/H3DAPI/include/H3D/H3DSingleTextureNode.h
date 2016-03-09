@@ -61,6 +61,24 @@ namespace H3D {
     /// Get the OpenGL texture target that is used for this texture.
     virtual GLenum getTextureTarget() {return texture_target;}
 
+    /// Get the texture width 
+    virtual int getTextureWidth() { return texture_width; }
+
+    /// Get the texture height
+    virtual int getTextureHeight() { return texture_height; }
+
+    /// Get the texture depth
+    virtual int getTextureDepth() { return texture_depth; }
+
+    /// Set the texture width
+    virtual void setTextureWidth( int _width ) { texture_width = _width; }
+
+    /// Set the texture height
+    virtual void setTextureHeight( int _height ) { texture_height = _height; }
+
+    /// Set the texture depth
+    virtual void setTextureDepth( int _depth ) { texture_depth = _depth; }
+
     /// Set the OpenGL texture id that is used for this texture.
     virtual void setTextureId( GLuint id ) { texture_id=id; }
 
@@ -141,6 +159,15 @@ namespace H3D {
     GLint texture_unit;
     /// The OpenGL texture target that is used to render this texture.
     GLenum texture_target; 
+
+    /// texture width
+    int texture_width;
+
+    /// texture height
+    int texture_height;
+
+    /// texture depth
+    int texture_depth;
 
     /// Shader fields which contain this texture
     Field::FieldVector shader_fields;
