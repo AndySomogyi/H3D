@@ -350,6 +350,7 @@ void MyApp::OnFatalException()
 
 bool MyApp::OnInit()
 {
+  H3DTIMER_BEGIN( "Init H3DViewer" );
   try {
     // call default behaviour (mandatory)
     if (!wxApp::OnInit())
@@ -456,6 +457,7 @@ bool MyApp::OnInit()
     logFile<<"init_time:"<<init_time<<endl;
     logFile.close();
   }
+  H3DTIMER_END( "Init H3DViewer" );
   return true;
 }
 

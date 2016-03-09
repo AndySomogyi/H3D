@@ -983,6 +983,7 @@ bool WxFrame::loadIniFile() {
 /*******************Member Functions*********************/
 
 bool WxFrame::loadFile( const string &filename) {
+  H3DTIMER_BEGIN("WxFrame::loadFile" );
 #ifdef WIN32
   UINT old_error_mode;
   old_error_mode = SetErrorMode( 0 );
@@ -1575,6 +1576,7 @@ bool WxFrame::loadFile( const string &filename) {
 #ifdef WIN32
   SetErrorMode( old_error_mode );
 #endif
+  H3DTIMER_END( "WxFrame::loadFile");
   return true;
 }
 

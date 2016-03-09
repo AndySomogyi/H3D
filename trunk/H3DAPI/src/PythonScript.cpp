@@ -552,6 +552,12 @@ catchOutErr = CatchOutErr ()\n\
 // Traverse the scenegraph. Used in PythonScript to call a function
 // in python once per scene graph loop.
 void PythonScript::traverseSG( TraverseInfo &ti ) {
+#ifdef HAVE_PROFILER
+  string timer_string = "PythonScript traverseSG (" + (url->size() > 0 ? url->getValue()[0]:"" ) + ")";
+  if( H3D::Profiling::profile_python_fields ) {  
+    H3DUtil::H3DTimer::stepBegin(timer_string);
+  }
+#endif 
   // ensure we have the GIL lock to work with multiple python threads.
   PyGILState_STATE state = PyGILState_Ensure();
 
@@ -570,10 +576,20 @@ void PythonScript::traverseSG( TraverseInfo &ti ) {
   } 
 
   PyGILState_Release(state);
+#ifdef HAVE_PROFILER
+  if( H3D::Profiling::profile_python_fields ) {
+    H3DUtil::H3DTimer::stepEnd(timer_string);
+  }
+#endif 
 }
 
 void PythonScript::initialize() {
-
+#ifdef HAVE_PROFILER
+  string timer_string = "PythonScript initialize (" + (url->size() > 0 ? url->getValue()[0]:"" ) + ")";
+  if( H3D::Profiling::profile_python_fields ) {
+    H3DUtil::H3DTimer::stepBegin(timer_string);
+  }
+#endif 
   H3DScriptNode::initialize();
 
   module_name = moduleName->getValue();
@@ -652,6 +668,11 @@ void PythonScript::initialize() {
   }
 
   PyGILState_Release(state);
+#ifdef HAVE_PROFILER
+  if( H3D::Profiling::profile_python_fields ) {
+    H3DUtil::H3DTimer::stepEnd(timer_string);
+  }
+#endif 
 }
 
 #endif // HAVE_PYTHON
