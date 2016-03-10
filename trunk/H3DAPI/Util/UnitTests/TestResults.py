@@ -43,19 +43,23 @@ class TestResults ( object ):
   def getPerformanceResult(self, profiling_data):
     def parseLine(profiling_line):
       # LEVEL      START       NUM         MIN        MAX       MEAN       DEV        TOTAL     PERCENT     ID
-      result = dict()
-      data = profiling_line.split()
-      result['LEVEL'] = data[0]
-      result['START'] = data[1]
-      result['NUM'] = data[2]
-      result['MIN'] = data[3]
-      result['MAX'] = data[4]
-      result['MEAN'] = data[5]
-      result['DEV'] = data[6]
-      result['TOTAL'] = data[7]
-      result['PERCENT'] = data[8]
-      result['ID'] = data[9]
-      return result
+      try:
+        result = dict()
+        data = profiling_line.split()
+        result['LEVEL'] = data[0]
+        result['START'] = data[1]
+        result['NUM'] = data[2]
+        result['MIN'] = data[3]
+        result['MAX'] = data[4]
+        result['MEAN'] = data[5]
+        result['DEV'] = data[6]
+        result['TOTAL'] = data[7]
+        result['PERCENT'] = data[8]
+        result['ID'] = data[9]
+        return result
+      except Exception as e:
+        print "Parsing profiling data line failed: " + str(e) + '\nLine was: ' + profiling_line
+        return None
 
     found_h3d_timer = False
     passed_total = False
@@ -69,7 +73,9 @@ class TestResults ( object ):
           break # There's an empty line after the last line of profiling data in the ===== MAIN THREAD ===== section of the output. We use that to determine when we're done parsing
         
         out_data = parseLine(line)
-        if out_data['ID'] == "TOTAL" and not passed_total:
+        if out_data is None:
+          pass
+        elif out_data['ID'] == "TOTAL" and not passed_total:
           passed_total = True
         elif passed_total:
           result.append(TestResults.PerformanceDataTuple(out_data['LEVEL'], out_data['ID'], out_data['MEAN'], out_data['PERCENT']))
