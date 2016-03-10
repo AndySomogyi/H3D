@@ -69,7 +69,7 @@ class UnitTestHelper :
         try:
           func()
         except Exception as e:
-          print str(e)
+          print "Exception in step " + func.__name__ + ": " + str(e)
         if(not (run_time is None)):
           timer_callback.addCallback(time.getValue()+run_time, UnitTestHelper.doTesting, (self,))
         else:
@@ -91,7 +91,7 @@ class UnitTestHelper :
       try:
         func()
       except Exception as e:
-        print str(e)
+        print "Exception in step " + func.__name__ + ": " + str(e)
 
       if(not (run_time is None)):
         timer_callback.addCallback(time.getValue()+run_time, UnitTestHelper.doTesting, (self,))
