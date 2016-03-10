@@ -48,37 +48,37 @@ namespace H3D {
 
     /// Reset specializes SFBool to go into reset mode when a true event
     /// is received.
-    class Reset: public OnNewValueSField< SFBool > {
+    class H3DAPI_API Reset: public OnNewValueSField< SFBool > {
       virtual void onNewValue( const bool &v );
     };
 
     /// WaitReset specializes SFBool to go into wait on reset mode when
     /// a true event is received.
-    class WaitReset: public OnNewValueSField< SFBool > {
+    class H3DAPI_API WaitReset: public OnNewValueSField< SFBool > {
       virtual void onNewValue( const bool &v );
     };
 
     /// GravityComp specializes SFBool to toggle gravity compensation 
     /// on and off.
-    class GravityComp: public OnValueChangeSField< SFBool > {
+    class H3DAPI_API GravityComp: public OnValueChangeSField< SFBool > {
       virtual void onValueChange( const bool &v );
     };
 
     /// EffectorMass specializes SFFloat to change the end effector 
     /// mass at change of value.
-    class EffectorMass: public OnValueChangeSField< SFFloat > {
+    class H3DAPI_API EffectorMass: public OnValueChangeSField< SFFloat > {
       virtual void onValueChange( const H3DFloat &v );
     };
 
     /// Brakes specializes SFBool to toggle brakes
     /// on and off.
-    class Brakes: public OnValueChangeSField< SFBool > {
+    class H3DAPI_API Brakes: public OnValueChangeSField< SFBool > {
       virtual void onValueChange( const bool &v );
     };
 
     /// EnableForce specializes SFBool to toggle forces
     /// on and off.
-    class EnableForce: public OnValueChangeSField< SFBool > {
+    class H3DAPI_API EnableForce: public OnValueChangeSField< SFBool > {
       virtual void onValueChange( const bool &v );
     };
 
