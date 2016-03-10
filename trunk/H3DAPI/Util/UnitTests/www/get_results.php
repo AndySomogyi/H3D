@@ -6,7 +6,7 @@ require('mysql_conf.php');
 
 $test_run_id = $_GET['test_run_id'];
   
-$query = sprintf("
+$perf_query = sprintf("
 (SELECT performance_results.id AS id,test_runs.timestamp,server_id,server_name,test_run_id,file_id,filename,case_id,
         'performance' AS result_type,case_name,performance_results.step_id,step_name,NULL AS success,NULL AS
         output_image,NULL AS diff_image,NULL AS baseline_image, NULL AS stdout, NULL AS stderr,NULL AS
@@ -23,8 +23,9 @@ $query = sprintf("
         join servers
           ON test_runs.server_id = servers.id
  WHERE  test_runs.id = %d
-)
-UNION ALL
+)", $test_run_id);
+
+$render_query = sprintf("
 (SELECT rendering_results.id AS id,test_runs.timestamp,server_id,server_name,rendering_results.test_run_id,
         rendering_results.file_id,filename,rendering_results.case_id,'rendering' AS result_type,case_name,
         rendering_results.step_id,step_name,success,rendering_results.output_image,rendering_results.diff_image,image AS
@@ -46,8 +47,9 @@ UNION ALL
                   AND rendering_results.step_id = baseline.step_id
  WHERE  test_runs.id = %d
  GROUP  BY case_id,file_id,step_name
-)
-UNION ALL
+)", $test_run_id);
+
+$console_query = sprintf("
 (SELECT console_results.id AS id,test_runs.timestamp,server_id,server_name,console_results.test_run_id,
         console_results.file_id,
         filename,console_results.case_id,'console' AS result_type,case_name,console_results.step_id,step_name,success,
@@ -64,8 +66,10 @@ UNION ALL
         join servers
           ON test_runs.server_id = servers.id
  WHERE  test_runs.id = %d
- GROUP  BY case_id,file_id,step_name)
-UNION ALL
+ GROUP  BY case_id,file_id,step_name
+ )", $test_run_id);
+ 
+$custom_query = sprintf("
 (SELECT custom_results.id AS id,test_runs.timestamp,server_id,server_name,custom_results.test_run_id,
         custom_results.file_id,
         filename,custom_results.case_id,'custom' AS result_type,case_name,custom_results.step_id,step_name,success,
@@ -82,8 +86,11 @@ UNION ALL
         join servers
           ON test_runs.server_id = servers.id
  WHERE  test_runs.id = %d
- GROUP  BY case_id,file_id,step_name)
-UNION ALL
+ GROUP  BY case_id,file_id,step_name
+ )", $test_run_id);
+ 
+ 
+$error_query = sprintf("
 (SELECT error_results.id AS id,test_runs.timestamp,server_id,server_name,error_results.test_run_id,
         error_results.file_id,
         filename,error_results.case_id,'error' AS result_type,case_name,error_results.step_id,step_name, NULL AS success,
@@ -99,22 +106,55 @@ UNION ALL
           ON error_results.file_id = test_files.id
         join servers
           ON test_runs.server_id = servers.id
- WHERE  test_runs.id = %d
- GROUP  BY case_id,file_id,step_name) 
-ORDER  BY case_id, step_id ASC ", $test_run_id, $test_run_id, $test_run_id, $test_run_id, $test_run_id);
+ WHERE test_runs.id = %d
+ GROUP BY case_id,file_id,step_name)", $test_run_id);
 
-$data = generate_results($db, $query);
+
+$error_rows = fetch_result($db, $error_query);
+$console_rows = fetch_result($db, $console_query);
+$custom_rows = fetch_result($db, $custom_query);
+$render_rows = fetch_result($db, $render_query);
+$perf_rows = fetch_result($db, $perf_query);
+
+//echo json_encode($error_rows, JSON_PRETTY_PRINT);
+
+$data = array();
+$data = generate_results($db, $data, $error_rows);
+$data = generate_results($db, $data, $console_rows);
+$data = generate_results($db, $data, $custom_rows);
+$data = generate_results($db, $data, $render_rows);
+$data = generate_results($db, $data, $perf_rows);
+
+if(count($data) == 0) {
+$testcase = array(
+  "name"   => "No results found",
+  "testcases" => array([
+    "step_name"  => "",
+    "filename"   => "Error",
+    "result_type" => "ignore"])
+  );  
+  $data = array($testcase);
+}
 
 // After this is done we've successfully built our object and just need to convert it to json.
   echo json_encode($data, JSON_PRETTY_PRINT);
 	
-function generate_results($db, $query) {
-if(!$fetch_result = mysqli_query($db, $query)) {
+	
+function fetch_result($db, $query) {
+  if(!$fetch_result = mysqli_query($db, $query)) {
 		die("ERROR: " . mysqli_error($db));
 	}	
+  $fetched_data = array();
 
+  while($row = mysqli_fetch_assoc($fetch_result)) {
+    array_push($fetched_data, $row);
+  }
+  return $fetched_data;
+}	
+	
+function generate_results($db, $data, $fetched_data) {
  
-  /*
+/*
     Tree-building algorithm:
 
     for every row:
@@ -147,22 +187,10 @@ if(!$fetch_result = mysqli_query($db, $query)) {
       
       add the data to $node['testcases']
         
-  */									
-
-  $data = array();
-  
-  if(mysqli_num_rows($fetch_result) == 0) {
-  $testcase = array(
-    "name"   => "No results found",
-    "testcases" => array([
-      "step_name"  => "",
-      "filename"   => "Error",
-      "result_type" => "ignore"])
-    );  
-    $data = array($testcase);
-  }
-  while($row = mysqli_fetch_assoc($fetch_result)) {
- //   echo "<br/>".json_encode($row, JSON_PARTIAL_OUTPUT_ON_ERROR)."</br>";
+*/
+  for($fetch_index = 0; $fetch_index < count($fetched_data); $fetch_index++) {
+     $row = $fetched_data[$fetch_index];
+//    echo "<br/>".json_encode($row, JSON_PARTIAL_OUTPUT_ON_ERROR)."</br>";
     $filename = $row['filename'];
     $category_structure = explode('/', $filename);
     // Store a reference to the root of the data tree. We'll move this reference down the tree until we reach the part where the leaf should go,
@@ -188,9 +216,9 @@ if(!$fetch_result = mysqli_query($db, $query)) {
     }
     if(count($category_structure) > 1)
       array_shift($category_structure);
-  //  echo '</br>it is now ' . json_encode($category_structure) ."</br>";
+//    echo '</br>it is now ' . json_encode($category_structure) ."</br>";
           
-    // Go through every folder specified in the casename path and build our array structure.
+//     Go through every folder specified in the casename path and build our array structure.
     while(count($category_structure) > 1) {
       $index = -1;
       for($i = 0; $i < count($node['children']); $i++) {
@@ -204,7 +232,7 @@ if(!$fetch_result = mysqli_query($db, $query)) {
       } else {     
         $new_node = array("name" => $category_structure[0], "children" => array(), 'success' => true);
         $node = &$node['children'][array_push($node['children'], $new_node)-1];
-  //  echo "node is: </br>" . json_encode($node) . "</br>";
+//    echo "node is: </br>" . json_encode($node) . "</br>";
       }
       // Remove the first element from $category_structure
       array_shift($category_structure); 
@@ -260,13 +288,13 @@ if(!$fetch_result = mysqli_query($db, $query)) {
       }
       
       $testcase['full'] = $row['full_profiling_data'];
-    //  echo "case name: ".$testcase['name']. "</br>";
-   //   echo json_encode($row, JSON_PARTIAL_OUTPUT_ON_ERROR)."<br/><br/>";
+//      echo "case name: ".$testcase['name']. "</br>";
+//      echo json_encode($row, JSON_PARTIAL_OUTPUT_ON_ERROR)."<br/><br/>";
 	  $recur = function(&$perf_fetch, &$parent, &$perf_row) use (&$recur, $db, $row, $testcase) {
-	//    echo "parent is ".$parent['id']."<br/>";
+//	    echo "parent is ".$parent['id']."<br/>";
       if($perf_row != null) {            
         $hist_query = "SELECT timestamp, mean, percent, server_name FROM performance_result_data JOIN performance_results JOIN test_runs ON performance_results.id=performance_result_data.performance_result_id AND performance_results.test_run_id = test_runs.id JOIN servers ON test_runs.server_id=servers.id WHERE case_id=".$row['case_id']." AND step_id=".$row['step_id']." AND identifier=\"".$perf_row['identifier']."\" AND timestamp <= '".$row['timestamp']."' ORDER BY timestamp, performance_result_data.id ASC";
-      //  print "query: ".$hist_query."<br/></br>";
+//        print "query: ".$hist_query."<br/></br>";
         if(!$hist_fetch = mysqli_query($db, $hist_query)) {
             die("ERROR: " . mysqli_error($db));
         }
@@ -282,9 +310,9 @@ if(!$fetch_result = mysqli_query($db, $query)) {
             ));
           }
         }
-      //  echo json_encode($perf_row['identifier'])."->";
+//        echo json_encode($perf_row['identifier'])."->";
         if($perf_row['level'] > $parent['level']) {
-   //       echo "down->";
+//          echo "down->";
           array_push($parent['children'], array(
             'level' => $perf_row['level'],
             'id' => $perf_row['identifier'],
@@ -294,7 +322,7 @@ if(!$fetch_result = mysqli_query($db, $query)) {
             'children' => array(),
             'data' => $history
             ));
- //           echo "<br/>added ".$perf_row['identifier']." to ".$parent['id']."<br/>";
+//            echo "<br/>added ".$perf_row['identifier']." to ".$parent['id']."<br/>";
             $dummy = null;
           $recur($perf_fetch, $parent['children'][count($parent['children'])-1], $dummy);
         } else if ($perf_row['level'] <= $parent['level']){
@@ -303,19 +331,19 @@ if(!$fetch_result = mysqli_query($db, $query)) {
         } 
       } else {
         while($perf_row = mysqli_fetch_assoc($perf_fetch)) {
- //        echo "<br/>".json_encode($perf_row, JSON_PARTIAL_OUTPUT_ON_ERROR)."<br/><br/>"; 
- //         echo "fetched<br/>";
+//          echo "<br/>".json_encode($perf_row, JSON_PARTIAL_OUTPUT_ON_ERROR)."<br/><br/>"; 
+//          echo "fetched<br/>";
           $recur($perf_fetch, $parent, $perf_row);
         }
       }
 	  };
 
       if($perf_row = mysqli_fetch_assoc($perf_fetch)) {        
-      //   echo json_encode($perf_row, JSON_PARTIAL_OUTPUT_ON_ERROR)."<br/><br/>";                                       // JSON_PARTIAL_OUTPUT_ON_ERROR
+//         echo json_encode($perf_row, JSON_PARTIAL_OUTPUT_ON_ERROR)."<br/><br/>";                                       // JSON_PARTIAL_OUTPUT_ON_ERROR
       
         $hist_query = "SELECT timestamp, mean, percent, server_name FROM performance_result_data JOIN performance_results JOIN test_runs ON performance_results.id=performance_result_data.performance_result_id AND performance_results.test_run_id = test_runs.id JOIN servers ON test_runs.server_id=servers.id WHERE case_id=".$row['case_id']." AND step_id=".$row['step_id']." AND identifier=\"".$perf_row['identifier']."\" AND timestamp <= '".$row['timestamp']."' ORDER BY timestamp, performance_result_data.id ASC";
-  //      print $hist_query."<br/></br>";
-     //   print "query: ".$hist_query."<br/></br>";
+//        echo $hist_query."<br/></br>";
+//        echo  "query: ".$hist_query."<br/></br>";
         if(!$hist_fetch = mysqli_query($db, $hist_query)) {
             die("ERROR: " . mysqli_error($db));
         }
@@ -359,48 +387,11 @@ if(!$fetch_result = mysqli_query($db, $query)) {
           }
         }
       };
-    //  echo json_encode($testcase['profiler_data'], JSON_PARTIAL_OUTPUT_ON_ERROR)."<br/><br/></br>";
+//      echo json_encode($testcase['profiler_data'], JSON_PARTIAL_OUTPUT_ON_ERROR)."<br/><br/></br>";
       $parent_nuller($testcase['profiler_data']);
 
       }
       
-/*
-      $testcase['history'] = array();
-      // Now build the history array
-      $query = "SELECT performance_results.id, timestamp, server_id, server_name, test_run_id 
-                                    FROM performance_results 
-                                      JOIN test_runs
-                                        ON performance_results.test_run_id=test_runs.id
-                                      JOIN servers
-                                        ON test_runs.server_id=servers.id
-                                      WHERE case_id=" .$row['case_id']. " AND timestamp<=\"" .$row['timestamp'] . "\" AND test_run_id!=".$row['test_run_id']." ORDER BY timestamp ASC";
-    //  echo "<br><br>Query: ".$query;
-      if(!$history_fetch = mysqli_query($db, $query)) {
-      		die("ERROR: " . mysqli_error($db));
-      }   	
-      while($hist_row = mysqli_fetch_assoc($history_fetch)) {
-         $history_entry = array(
-        "test_run_id" => $hist_row['test_run_id'],
-        "server_id"=> $hist_row['server_id'],
-        "server_name"=> $hist_row['server_name'],
-        "time"   => $hist_row['timestamp'],
-        "profiler_data"=> array());
-         
-        $query = "SELECT * FROM performance_result_data WHERE performance_result_id=".$hist_row['id']." ORDER BY id ASC";
-        if(!$perf_fetch = mysqli_query($db, $query)) {
-      		die("ERROR: " . mysqli_error($db));
-      }
-        while($perf_row = mysqli_fetch_assoc($perf_fetch)) {
-          array_push($history_entry['profiler_data'], array(
-          'id' => $perf_row['identifier'],
-          'mean' => $perf_row['mean'],
-          'percent' => $perf_row['percent']
-          ));
-        }
-  //      array_push($testcase['history'], $history_entry);
-      }
-      
-     */
      
     }
     else if ($row['result_type'] == 'console') {
@@ -426,8 +417,19 @@ if(!$fetch_result = mysqli_query($db, $query)) {
       $testcase["stderr"] = $row['stderr'];
     } 
     
-    // All that remains now is to push the testcase to the node's testcases array
-    array_push($node['testcases'], $testcase);
+//     All that remains now is to push the testcase to the node's testcases array
+    $target = 0;
+    while($target < count($node['testcases'])) {
+      $namediff = strcasecmp($node['testcases'][$target]['name'], $testcase['name']);
+      if($namediff >= 0) {
+        if(($namediff > 0) && ($node['testcases'][$target]['id'] < $testcase['id'])) {
+          break;
+        }
+      }
+      $target++;
+    }
+    array_splice($node['testcases'], $target, 0, array($testcase));
+
   }
   return $data;
 }

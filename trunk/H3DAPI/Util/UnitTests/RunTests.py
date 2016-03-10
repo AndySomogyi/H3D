@@ -8,7 +8,6 @@ Requirements:
 """
 
 import os, sys
-import shutil
 import time
 import platform
 from Queue import Queue, Empty
