@@ -76,12 +76,12 @@ x3d_template = '''<?xml version="1.0" encoding="utf-8"?>
 
 ''' 
 
-color_list = [['red', '255 0 0'],
-              ['green', '0 255 0'],
-              ['blue', '0 0 255'],
-              ['yellow', '255 255 0'],
-              ['cyan', '0 255 255'],
-              ['purple', '255 0 255']]
+color_list = [['red', '1 0 0'],
+              ['green', '0 1 0'],
+              ['blue', '0 0 1'],
+              ['yellow', '1 1 0'],
+              ['cyan', '0 1 1'],
+              ['purple', '1 0 1']]
 
 import argparse, os, traceback, sys
 from math import *
@@ -101,106 +101,169 @@ neginf = sys.float_info.min
 global func_count
 
 
-def writeDefaultValues(py, node):
+def writeDefaultValues(py, node, color_field=None):
   py.write("  # Writing default field values\n")
   for field in node['fields']:
-    if field['type'] == 'float':
-      py.write("  node.getField('" + field['name'] + "').setValue(" + str(eval(field['default'])) + ")\n")
-    elif field['type'] == 'Vec3f':
-      default = [eval(val) for val in field['default'].split(" ")]
-      py.write("  node.getField('" + field['name'] + "').setValueFromString('" + str(eval(default[0])) + " " + str(eval(default[1])) + " " + str(eval(default[2])) + "')\n")  
-      
+    if color_field is None or color_field != field['name']:
+      if field['type'] == 'float':
+        py.write("  node.getField('" + field['name'] + "').setValue(" + str(eval(field['default'])) + ")\n")
+      elif field['type'] == 'vec3f':
+        default = [eval(val) for val in field['default'].split(" ")]
+        py.write("  node.getField('" + field['name'] + "').setValueFromString('" + str(default[0]) + " " + str(default[1]) + " " + str(default[2]) + "')\n")  
+      elif field['type'] == 'bool':
+        py.write("  node.getField('" + field['name'] + "').setValue(" + str(field['default']) + ")\n")
+      elif field['type'] == 'string':
+        py.write("  node.getField('" + field['name'] + "').setValue('" + str(field['default']) + "')\n")
+        
   py.write("  # Writing test value\n")
+
+
+''' Parsing and writing bool '''
+def writeBoolField(py, node, field_name, field_value, color=None, color_field=None):
+  global func_count
+  func_count += 1
+  py.write("@screenshot(start_time=0.1)\n")
+  if color:
+    py.write("def test_" + field_name + '_' + str(field_value) + "_" + color[0] + "():\n")
+  else:
+    py.write("def test_" + field_name + '_' + str(field_value) + "():\n")
+  
+  
+  py.write("  #Code that sets " + field_name + " to value " + str(field_value) + "\n")
+  py.write("  node = getNamedNode('N')\n\n")
+  if color:
+    py.write("  #Setting the color for this test to " + color[0] + "\n")
+    py.write("  node.getField('" + color_field + "').setValueFromString('" + color[1] + "')\n")
+  
+  writeDefaultValues(py, node, color_field)
+  py.write("  node.getField('" + field_name + "').setValue(" + str(field_value) + ")\n\n\n")
+
+  
+def parseBoolField(py, node, field, color=None, color_field=None):
+  value = not field['default']
+  writeBoolField(py, node, field['name'], value, color, color_field)
       
 
-def writeFloatField(py, node, field_name, name_suffix, field_value, should_write_color=False, color=None, color_field=None):
+
+
+''' Parsing and writing string '''
+def writeStringField(py, node, field_name, name_suffix, field_value, color=None, color_field=None):
+  global func_count
+  func_count += 1
+  py.write("@screenshot(start_time=0.1)\n")
+  py.write("def test_" + field_name + name_suffix + "():\n")
+  
+  py.write("  #Code that sets " + field_name + " to value " + str(eval(field_value)) + "\n")
+  py.write("  node = getNamedNode('N')\n\n")
+  if color:
+    py.write("  #Setting the color for this test to " + color[0] + "\n")
+    py.write("  node.getField('" + color_field + "').setValueFromString('" + color[1] + "')\n")
+  
+  writeDefaultValues(py, node, color_field)
+  py.write("  node.getField('" + field_name + "').setValue('" + str(field_value) + "')\n\n\n")
+  
+
+def parseStringField(py, node, field, color, color_field):
+  for value in field['values']:
+    if value != field['default']:
+      if color:
+        writeStringfield(py, node, field['name'], "_" + value + "_" + color[0], value, color, color_field)
+      else:
+        writeStringfield(py, node, field['name'], "_" + value, value)
+      
+
+
+
+
+''' Parsing and writing float '''
+def writeFloatField(py, node, field_name, name_suffix, field_value, color=None, color_field=None):
   global func_count
   func_count += 1
 #  print "Writing function " + "def test" + field_name + name_suffix + "():\n"
   py.write("@screenshot(start_time=0.1)\n")
-  py.write("def test" + field_name + name_suffix + "():\n")
+  py.write("def test_" + field_name + name_suffix + "():\n")
   
   py.write("  #Code that sets " + field_name + " to value " + str(eval(field_value)) + "\n")
-  if color and should_write_color:
-    py.write("  #Also initiates the color " + color[0] + " for this series of tests \n")
-  py.write("  node = getNamedNode('N')\n")
-  if color and should_write_color:
-    py.write("  node.getField('" + color_field + "').setValueFromString('" + color[1] + "')\n\n")
+  py.write("  node = getNamedNode('N')\n\n")
+  if color:
+    py.write("  #Setting the color for this test to " + color[0] + "\n")
+    py.write("  node.getField('" + color_field + "').setValueFromString('" + color[1] + "')\n")
   
-  writeDefaultValues(py, node)
-  py.write("  node.getField('" + field_name + "').setValue(" + str(eval(field_value)) + ")\n\n")
+  writeDefaultValues(py, node, color_field)
+  py.write("  node.getField('" + field_name + "').setValue(" + str(eval(field_value)) + ")\n\n\n")
 
 
-def parseFloatField(py, node, field, should_write_color, color=None, color_field=None):
+
+def parseFloatField(py, node, field, color=None, color_field=None):
   value = field['values']
   if value[0] != field['default']:
     if color:
-      writeFloatField(py, node, field['name'], "_" + color[0] + "_lowest", value[0], should_write_color, color, color_field)
-      should_write_color = False
+      writeFloatField(py, node, field['name'], "_" + color[0] + "_lowest", value[0], color, color_field)
     else:
       writeFloatField(py, node, field['name'], "_lowest", value[0])
   
   if value[1] != field['default']:
     if color:
-      writeFloatField(py, node, field['name'], "_" + color[0] + "_highest", value[1], should_write_color, color, color_field)
-      should_write_color = False
+      writeFloatField(py, node, field['name'], "_" + color[0] + "_highest", value[1], color, color_field)
     else:
       writeFloatField(py, node, field['name'], "_highest", value[1])
 
  
   if color:
-    writeFloatField(py, node, field['name'], "_" + color[0] + "_default", field['default'], should_write_color, color, color_field)
-    should_write_color = False
+    writeFloatField(py, node, field['name'], "_" + color[0] + "_default", field['default'], color, color_field)
   else:
     writeFloatField(py, node, field['name'], "_default", field['default'])
           
   py.write("\n\n\n")
 
 
+''' Parsing and writing vec3f '''
 def writeVec3fField(py, node, name, name_suffix, x, y, z):
   global func_count
   func_count += 1
   py.write("@screenshot(start_time=0.1)\n")
-  py.write("def test" + name + name_suffix + "():\n")
+  py.write("def test_" + name + name_suffix + "():\n")
   
   py.write("  #Code that sets " + name + " to value " + str(x) + " " + str(y) + " " + str(z) + "\n")
   py.write("  node = getNamedNode('N')\n")
-  writeDefaultValues(py, node)
+  writeDefaultValues(py, node, color_field)
   py.write("  node.getField('" + name + "').setValueFromString('" + str(x) + " " + str(y) + " " + str(z) + "')\n\n")  
 
 
 def parseVec3fField(py, node, field):
   value = [eval(val) for val in field['values']]
   default = [eval(val) for val in field['default'].split(" ")]
-  if value[0] <= 1 and value[1] >= 1:
-    writeVec3fField(py, node, field['name'], "_normal_x",      1,  0,  0)
-    writeVec3fField(py, node, field['name'], "_normal_y",      0,  1,  0)
-    writeVec3fField(py, node, field['name'], "_normal_z",      0 , 0,  1)
-    writeVec3fField(py, node, field['name'], "_normal_xy",     1,  1,  0)
-    writeVec3fField(py, node, field['name'], "_normal_xz",     1,  0,  1)
-    writeVec3fField(py, node, field['name'], "_normal_yz",     0,  1,  1)
-    writeVec3fField(py, node, field['name'], "_normal_xyz",    1,  1,  1)  
   
-  if value[0] <= -1 and value[1] >= -1:
-    writeVec3fField(py, node, field['name'], "_normal_Invx",    -1,  0,  0)
-    writeVec3fField(py, node, field['name'], "_normal_Invxy",   -1,  1,  0)
-    writeVec3fField(py, node, field['name'], "_normal_xInvy",    1, -1,  0)
-    writeVec3fField(py, node, field['name'], "_normal_InvxInvy",  -1, -1,  0)
-    writeVec3fField(py, node, field['name'], "_normal_Invxz",   -1,  0,  1)
-    writeVec3fField(py, node, field['name'], "_normal_xInvz",    1,  0, -1)
-    writeVec3fField(py, node, field['name'], "_normal_InvxInvz",  -1,  0, -1)
-    writeVec3fField(py, node, field['name'], "_normal_Invxyz",  -1,  1,  1)
-    writeVec3fField(py, node, field['name'], "_normal_xInvyz",   1,  -1, 1)
-    writeVec3fField(py, node, field['name'], "_normal_xyInvz",   1,  1, -1)
-    writeVec3fField(py, node, field['name'], "_normal_InvxInvyz", -1, -1,  1)
-    writeVec3fField(py, node, field['name'], "_normal_InvxyInvz", -1,  1, -1)
-    writeVec3fField(py, node, field['name'], "_normal_xInvyInvz",  1, -1, -1)
-    writeVec3fField(py, node, field['name'], "_normal_InvxInvyInvz",-1, -1, -1)
-    writeVec3fField(py, node, field['name'], "_normal_Invy",     0, -1,  0)
-    writeVec3fField(py, node, field['name'], "_normal_Invyz",    0, -1,  1)
-    writeVec3fField(py, node, field['name'], "_normal_yInvz",    0,  1, -1)
-    writeVec3fField(py, node, field['name'], "_normal_InvyInvz",   0, -1, -1)
-    writeVec3fField(py, node, field['name'], "_normal_Invz",      0 , 0,  -1)
+  if field['normal']:
+    if value[0] <= 1 and value[1] >= 1:
+      writeVec3fField(py, node, field['name'], "_normal_x",      1,  0,  0)
+      writeVec3fField(py, node, field['name'], "_normal_y",      0,  1,  0)
+      writeVec3fField(py, node, field['name'], "_normal_z",      0 , 0,  1)
+      writeVec3fField(py, node, field['name'], "_normal_xy",     1,  1,  0)
+      writeVec3fField(py, node, field['name'], "_normal_xz",     1,  0,  1)
+      writeVec3fField(py, node, field['name'], "_normal_yz",     0,  1,  1)
+      writeVec3fField(py, node, field['name'], "_normal_xyz",    1,  1,  1)  
+    
+    if value[0] <= -1 and value[1] >= -1:
+      writeVec3fField(py, node, field['name'], "_normal_Invx",    -1,  0,  0)
+      writeVec3fField(py, node, field['name'], "_normal_Invxy",   -1,  1,  0)
+      writeVec3fField(py, node, field['name'], "_normal_xInvy",    1, -1,  0)
+      writeVec3fField(py, node, field['name'], "_normal_InvxInvy",  -1, -1,  0)
+      writeVec3fField(py, node, field['name'], "_normal_Invxz",   -1,  0,  1)
+      writeVec3fField(py, node, field['name'], "_normal_xInvz",    1,  0, -1)
+      writeVec3fField(py, node, field['name'], "_normal_InvxInvz",  -1,  0, -1)
+      writeVec3fField(py, node, field['name'], "_normal_Invxyz",  -1,  1,  1)
+      writeVec3fField(py, node, field['name'], "_normal_xInvyz",   1,  -1, 1)
+      writeVec3fField(py, node, field['name'], "_normal_xyInvz",   1,  1, -1)
+      writeVec3fField(py, node, field['name'], "_normal_InvxInvyz", -1, -1,  1)
+      writeVec3fField(py, node, field['name'], "_normal_InvxyInvz", -1,  1, -1)
+      writeVec3fField(py, node, field['name'], "_normal_xInvyInvz",  1, -1, -1)
+      writeVec3fField(py, node, field['name'], "_normal_InvxInvyInvz",-1, -1, -1)
+      writeVec3fField(py, node, field['name'], "_normal_Invy",     0, -1,  0)
+      writeVec3fField(py, node, field['name'], "_normal_Invyz",    0, -1,  1)
+      writeVec3fField(py, node, field['name'], "_normal_yInvz",    0,  1, -1)
+      writeVec3fField(py, node, field['name'], "_normal_InvyInvz",   0, -1, -1)
+      writeVec3fField(py, node, field['name'], "_normal_Invz",      0 , 0,  -1)
   
   
   writeVec3fField(py, node, field['name'], "_lowest_x", value[0], default[1],   default[2])
@@ -221,12 +284,6 @@ def parseVec3fField(py, node, field):
   writeVec3fField(py, node, field['name'], "_highest_y", default[0] , default[1],  value[1])
   
   writeVec3fField(py, node, field['name'], "_default", default[0], default[1], default[2])
-
-
-def parseStringField(py, node, field):
-  value = field['values']
-  
-  
 
     
 
@@ -262,6 +319,7 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
           break
         
         generate_colors = False
+        field_normal = False
         
         line = next_line(file)
         if line.split('=')[0] == 'color':
@@ -284,7 +342,15 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
             exit()
             break
             
-          line = next_line(file)
+          if field_type[1] == 'vec3f':
+            line = next_line(file)
+            if line.split('=')[0] == 'normal':
+              field_normal = True
+              line = next_line(file)
+          else:  
+            line = next_line(file)
+         
+            
           field_default = line.split('=')
           if field_default[0] != 'default':
             print "Error! Expected default, got " + '='.join(field_default)
@@ -304,6 +370,7 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
           field['type'] = field_type[1]
           field['default'] = field_default[1]
           field['values'] = field_values
+          field['normal'] = field_normal
           fields_to_generate.append( field )
           line = next_line(file)
           
@@ -313,6 +380,8 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
         node['generate_colors'] = generate_colors
         if generate_colors:
           node['color_field'] = color_field
+        else:
+          node['color_field'] = None
         nodes_to_generate.append( node )      
       
       file.close()
@@ -324,32 +393,33 @@ for file in os.listdir(os.path.join(os.path.abspath(args.workingDir), args.caseD
           
         py = open(os.path.join(os.path.abspath(args.workingDir), node['name'] + '.py'), 'w')
         py.write(test_script_header)
-     
+        
         func_count = 0
         if node['generate_colors']:
           for color in color_list:
-            first = True
             for field in node['fields']:
               #print "writing " + ", ".join(color)
               value = field['values']
               type = field['type'].lower()
               if type == 'float':
-                parseFloatField(py, node, field, first, color, color_field)
-                first = False
+                parseFloatField(py, node, field, color, node['color_field'])
               elif type == 'vec3f':
                 parseVec3fField(py, node, field)
               elif type == 'string':
-                parseStringField(py, node, field, first, color, color_field)
-                first = False
+                parseStringField(py, node, field, color, node['color_field'])
+              elif type == 'bool':
+                parseBoolField(py, node, field, color, node['color_field'])
         else:
           for field in node['fields']:
             type = field['type'].lower()
             if type == 'float':
-              parseFloatField(py, node, field, False)
+              parseFloatField(py, node, field)
             elif type == 'vec3f':
               parseVec3fField(py, node, field)
             elif type == 'string':
-              parseStringField(py, node, field, False)
+              parseStringField(py, node, field)
+            elif type == 'bool':
+              parseBoolField(py, node, field)
         print node['name'] + ' - ' + str(func_count) + ", runtime " + str(func_count*0.1) + 's'
         
           

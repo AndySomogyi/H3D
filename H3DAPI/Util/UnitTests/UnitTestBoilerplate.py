@@ -7,6 +7,7 @@ from Queue import Queue, Empty
 from inspect import getmembers, isfunction
 import operator
 from importlib import import_module
+import traceback
 
 
 
@@ -70,6 +71,7 @@ class UnitTestHelper :
           func()
         except Exception as e:
           print "Exception in step " + func.__name__ + ": " + str(e)
+          traceback.print_exc(3)
         if(not (run_time is None)):
           timer_callback.addCallback(time.getValue()+run_time, UnitTestHelper.doTesting, (self,))
         else:
@@ -91,7 +93,8 @@ class UnitTestHelper :
       try:
         func()
       except Exception as e:
-        print "Exception in step " + func.__name__ + ": " + str(e)
+          print "Exception in step " + func.__name__ + ": " + str(e)
+          traceback.print_exc(3)
 
       if(not (run_time is None)):
         timer_callback.addCallback(time.getValue()+run_time, UnitTestHelper.doTesting, (self,))
