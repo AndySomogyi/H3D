@@ -57,8 +57,9 @@ GeneratedTexture3D::GeneratedTexture3D(
 }
 
 void GeneratedTexture3D::render() {
+#ifndef USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT
   glGetIntegerv( GL_ACTIVE_TEXTURE_ARB, &texture_unit );
-
+#endif
   ensureInitialized();
   glBindTexture(  texture_target, texture_id );
   if( texture_target!=GL_TEXTURE_2D_MULTISAMPLE_ARRAY ) {

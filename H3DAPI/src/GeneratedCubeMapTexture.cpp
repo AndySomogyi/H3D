@@ -153,7 +153,9 @@ void GeneratedCubeMapTexture::render() {
   } else {
     if( !textures_initialized )
       initializeTextures();
+#ifndef USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT
     glGetIntegerv( GL_ACTIVE_TEXTURE_ARB, &texture_unit );
+#endif
     renderTextureProperties();
     enableTexturing();
   }
