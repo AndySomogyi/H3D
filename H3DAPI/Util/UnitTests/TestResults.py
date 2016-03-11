@@ -43,20 +43,25 @@ class TestResults ( object ):
   def getPerformanceResult(self, profiling_data):
     def parseLine(profiling_line):
       # LEVEL      START       NUM         MIN        MAX       MEAN       DEV        TOTAL     PERCENT     ID
+      # It's possible a line might not contain another entry of this, especially now that python script nodes might be printed in their entirety. So to be on the safe side we make the assumption that
+      # the first word has to be a digit. Python scripts don't generally start their lines with a lone constant integer.
       try:
         result = dict()
-        data = profiling_line.split()
-        result['LEVEL'] = data[0]
-        result['START'] = data[1]
-        result['NUM'] = data[2]
-        result['MIN'] = data[3]
-        result['MAX'] = data[4]
-        result['MEAN'] = data[5]
-        result['DEV'] = data[6]
-        result['TOTAL'] = data[7]
-        result['PERCENT'] = data[8]
-        result['ID'] = data[9]
-        return result
+        if line.strip().partition(' ')[0].isdigit(): 
+          data = profiling_line.split()
+          result['LEVEL'] = data[0]
+          result['START'] = data[1]
+          result['NUM'] = data[2]
+          result['MIN'] = data[3]
+          result['MAX'] = data[4]
+          result['MEAN'] = data[5]
+          result['DEV'] = data[6]
+          result['TOTAL'] = data[7]
+          result['PERCENT'] = data[8]
+          result['ID'] = data[9]
+          return result
+        else:
+          return None
       except Exception as e:
         print "Parsing profiling data line failed: " + str(e) + '\nLine was: ' + profiling_line
         return None
@@ -84,14 +89,7 @@ class TestResults ( object ):
     else:
       return TestResults.ErrorResultTuple("Performance test didn't output profiler data. The loading time might be longer than the test, make sure its starttime is long enough or that the test script waits for long enough.", "")
 
-    #fps_list = fps_data.split()
-    #fps_list_float = []
-    #for fps in fps_list:
-    #  fps_list_float.append( float( fps ) )
-    #if len( fps_list_float ) > 0:
-    #  fps_list_float.sort()
-    #  return TestResults.PerformanceResultTuple("%.2f" % fps_list_float[0], "%.2f" % fps_list_float[len( fps_list_float ) - 1], "%.2f" % (math.fsum( fps_list_float ) / float( len( fps_list_float ) ) ), "%.2f" % float( fps_list_float[len( fps_list_float ) / 2] ), fps_data)
-  
+
   def getRenderingResult(self, baseline_path, output_path, fuzz, threshold):
     valid, diff_path, error = self._validate_rendering(baseline_path.replace('\\', '/'), output_path.replace('\\', '/'), fuzz, threshold)
     for line in error:

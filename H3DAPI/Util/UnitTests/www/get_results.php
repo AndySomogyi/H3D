@@ -8,9 +8,7 @@ $test_run_id = $_GET['test_run_id'];
   
 $perf_query = sprintf("
 (SELECT performance_results.id AS id,test_runs.timestamp,server_id,server_name,test_run_id,file_id,filename,case_id,
-        'performance' AS result_type,case_name,performance_results.step_id,step_name,NULL AS success,NULL AS
-        output_image,NULL AS diff_image,NULL AS baseline_image, NULL AS stdout, NULL AS stderr,NULL AS
-        text_output,NULL AS text_baseline,NULL AS text_diff, full_profiling_data
+        'performance' AS result_type,case_name,performance_results.step_id,step_name, full_profiling_data
  FROM   test_runs
         left join performance_results
                ON performance_results.test_run_id = test_runs.id
@@ -29,8 +27,7 @@ $render_query = sprintf("
 (SELECT rendering_results.id AS id,test_runs.timestamp,server_id,server_name,rendering_results.test_run_id,
         rendering_results.file_id,filename,rendering_results.case_id,'rendering' AS result_type,case_name,
         rendering_results.step_id,step_name,success,rendering_results.output_image,rendering_results.diff_image,image AS
-        baseline_image,NULL AS stdout, NULL AS stderr,NULL AS
-        text_output,NULL AS text_baseline,NULL AS text_diff, NULL AS full_profiling_data
+        baseline_image
  FROM   test_runs
         left join rendering_results
                ON rendering_results.test_run_id = test_runs.id
@@ -53,7 +50,7 @@ $console_query = sprintf("
 (SELECT console_results.id AS id,test_runs.timestamp,server_id,server_name,console_results.test_run_id,
         console_results.file_id,
         filename,console_results.case_id,'console' AS result_type,case_name,console_results.step_id,step_name,success,
-        NULL AS output_image,NULL AS diff_image,NULL AS baseline_image,NULL AS stdout,NULL AS stderr,output AS text_output,baseline AS text_baseline, diff AS text_diff, NULL AS full_profiling_data
+        output AS text_output,baseline AS text_baseline, diff AS text_diff
  FROM   test_runs
         left join console_results
                ON console_results.test_run_id = test_runs.id
@@ -73,7 +70,7 @@ $custom_query = sprintf("
 (SELECT custom_results.id AS id,test_runs.timestamp,server_id,server_name,custom_results.test_run_id,
         custom_results.file_id,
         filename,custom_results.case_id,'custom' AS result_type,case_name,custom_results.step_id,step_name,success,
-        NULL AS output_image,NULL AS diff_image,NULL AS baseline_image,NULL AS stdout,NULL AS stderr,output AS text_output,baseline AS text_baseline, diff AS text_diff, NULL AS full_profiling_data
+        output AS text_output,baseline AS text_baseline, diff AS text_diff
  FROM   test_runs
         left join custom_results
                ON custom_results.test_run_id = test_runs.id
@@ -93,8 +90,7 @@ $custom_query = sprintf("
 $error_query = sprintf("
 (SELECT error_results.id AS id,test_runs.timestamp,server_id,server_name,error_results.test_run_id,
         error_results.file_id,
-        filename,error_results.case_id,'error' AS result_type,case_name,error_results.step_id,step_name, NULL AS success,
-        NULL AS output_image,NULL AS diff_image,NULL AS baseline_image, stdout, stderr,NULL AS text_output,NULL AS text_baseline, null AS text_diff, NULL AS full_profiling_data
+        filename,error_results.case_id,'error' AS result_type,case_name,error_results.step_id,step_name, stdout, stderr
  FROM   test_runs
         left join error_results
                ON error_results.test_run_id = test_runs.id
@@ -419,10 +415,14 @@ function generate_results($db, $data, $fetched_data) {
     
 //     All that remains now is to push the testcase to the node's testcases array
     $target = 0;
+    #print $testcase['name']."<br/>";
     while($target < count($node['testcases'])) {
       $namediff = strcasecmp($node['testcases'][$target]['name'], $testcase['name']);
       if($namediff >= 0) {
-        if(($namediff > 0) && ($node['testcases'][$target]['id'] < $testcase['id'])) {
+        if(($namediff > 0) && ($node['testcases'][$target]['id'] <= $testcase['id'])) {
+          break;
+        } else if ($namediff == 0){
+          $target++;
           break;
         }
       }
