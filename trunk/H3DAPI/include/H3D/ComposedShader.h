@@ -334,6 +334,8 @@ namespace H3D {
     auto_ptr<UpdateCache> updateCache;
 
     H3DInt32 max_texture_in_shader;
+
+    H3DInt32 max_image_in_shader;
     
     bool printShaderLog();
     DebugOptions *debug_options_previous;

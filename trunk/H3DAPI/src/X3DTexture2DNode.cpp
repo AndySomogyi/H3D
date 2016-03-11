@@ -300,7 +300,9 @@ void X3DTexture2DNode::glTexImage( Image *i, GLenum _texture_target,
 }
 
 void X3DTexture2DNode::render()     {
-  glGetIntegerv(GL_ACTIVE_TEXTURE_ARB, &texture_unit);
+#ifndef USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT
+  glGetIntegerv( GL_ACTIVE_TEXTURE_ARB, &texture_unit );
+#endif
   GLenum texture_target_prev = texture_target;
   updateTextureProperties->upToDate();
   bool texture_target_changed = (texture_target_prev != texture_target);

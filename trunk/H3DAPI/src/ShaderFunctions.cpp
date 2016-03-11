@@ -1352,7 +1352,7 @@ GLbitfield H3D::Shaders::getAffectedGLAttribs( H3DDynamicFieldsObject *dfo ) {
   return res;
 }
 
-void H3D::Shaders::preRenderTextures( H3DDynamicFieldsObject *dfo ) {
+void H3D::Shaders::preRenderTextures( H3DDynamicFieldsObject *dfo, H3DInt32* max_texture /* = NULL */ ) {
 
   if ( X3DProgrammableShaderObject::use_bindless_textures ) {
     // Bindless textures
@@ -1407,7 +1407,11 @@ void H3D::Shaders::preRenderTextures( H3DDynamicFieldsObject *dfo ) {
   } else {
     // Using texture binding
     GLint nr_textures_supported;
-    glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB, &nr_textures_supported );
+    if( max_texture ) {
+      nr_textures_supported = *max_texture;
+    } else {
+      glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB, &nr_textures_supported );
+    }
     X3DTextureNode *active_texture = X3DTextureNode::getActiveTexture();
     unsigned int nr_textures = 0; 
     Node* n;
@@ -1535,11 +1539,16 @@ void H3D::Shaders::postRenderShaderResources( H3DDynamicFieldsObject* dfo, GLhan
   }
 }
 
-void H3D::Shaders::postRenderTextures( H3DDynamicFieldsObject *dfo ) {
+void H3D::Shaders::postRenderTextures( H3DDynamicFieldsObject *dfo, H3DInt32* max_texture /* = NULL */ ) {
   if ( X3DProgrammableShaderObject::use_bindless_textures ) return;
 
   GLint nr_textures_supported;
-  glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB, &nr_textures_supported );
+  if( max_texture ) {
+    nr_textures_supported = *max_texture;
+  } else {
+    glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB, &nr_textures_supported );
+  }
+  
 
   unsigned int nr_textures = 0; 
   Node *n;
@@ -1599,21 +1608,27 @@ void H3D::Shaders::postRenderTextures( list<H3DSingleTextureNode*>* shader_textu
 }
 
 
-void H3D::Shaders::renderTextures( H3DDynamicFieldsObject *dfo ) {
+
+void H3D::Shaders::renderTextures( H3DDynamicFieldsObject *dfo, H3DInt32* max_texture /* = NULL */, H3DInt32* max_image ) {
   if ( X3DProgrammableShaderObject::use_bindless_textures ) return;
 
   GLint nr_textures_supported;
   GLint nr_images_supported;
-  if (GraphicsHardwareInfo::infoIsInitialized()) {
-    nr_textures_supported = GraphicsHardwareInfo::getInfo().max_combined_texture_image_units;
-    nr_images_supported = GraphicsHardwareInfo::getInfo().max_image_units;
-  }else {
-    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB, &nr_textures_supported);
-#ifdef GLEW_ARB_shader_image_load_store
-    if (GLEW_ARB_shader_image_load_store) {
-      glGetIntegerv(GL_MAX_IMAGE_UNITS, &nr_images_supported);
+  if( max_texture&&max_image ) {
+    nr_textures_supported = *max_texture;
+    nr_images_supported = *max_image;
+  } else {
+    if ( GraphicsHardwareInfo::infoIsInitialized() ) {
+      nr_textures_supported = GraphicsHardwareInfo::getInfo().max_combined_texture_image_units;
+      nr_images_supported = GraphicsHardwareInfo::getInfo().max_image_units;
+    } else {
+      glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB, &nr_textures_supported );
+      #ifdef GLEW_ARB_shader_image_load_store
+      if ( GLEW_ARB_shader_image_load_store ) {
+        glGetIntegerv( GL_MAX_IMAGE_UNITS, &nr_images_supported );
+      }
+      #endif // GLEW_ARB_shader_image_load_store
     }
-#endif // GLEW_ARB_shader_image_load_store
   }
   
   unsigned int nr_textures = 0; 

@@ -122,6 +122,7 @@ int RenderTargetTexture::getTextureWidth() {
   if ( gen && target_index<(H3DInt32)gen->colorTextures->size() ) {
     return gen->colorTextures->getValueByIndex( target_index )->getTextureWidth();
   }
+  return -1;
 }
 
 int RenderTargetTexture::getTextureHeight() {
@@ -130,6 +131,7 @@ int RenderTargetTexture::getTextureHeight() {
   if ( gen && target_index<(H3DInt32)gen->colorTextures->size() ) {
     return gen->colorTextures->getValueByIndex( target_index )->getTextureHeight();
   }
+  return -1;
 }
 
 int RenderTargetTexture::getTextureDepth() {
@@ -138,6 +140,7 @@ int RenderTargetTexture::getTextureDepth() {
   if ( gen && target_index<(H3DInt32)gen->colorTextures->size() ) {
     return gen->colorTextures->getValueByIndex( target_index )->getTextureDepth();
   }
+  return -1;
 }
 
 void RenderTargetTexture::setTextureId( GLuint id ){

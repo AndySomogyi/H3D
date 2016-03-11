@@ -266,7 +266,7 @@ GLbitfield ComposedShader::getAffectedGLAttribs() {
 void ComposedShader::preRender() {
   if( GLEW_ARB_shader_objects ) {
     glUseProgramObjectARB( program_handle );
-    Shaders::preRenderTextures( this );
+    Shaders::preRenderTextures( this, &max_texture_in_shader );
     //Shaders::preRenderTextures( &shader_textures, &max_texture_in_shader );
     Shaders::preRenderShaderResources( this, program_handle );
     X3DShaderNode::preRender();
@@ -279,7 +279,7 @@ void ComposedShader::preRender() {
 void ComposedShader::postRender() {
   if( GLEW_ARB_shader_objects ) {
     glUseProgramObjectARB( 0 );
-    Shaders::postRenderTextures( this );
+    Shaders::postRenderTextures( this, &max_texture_in_shader );
     //Shaders::postRenderTextures(&shader_textures, &max_texture_in_shader);
     X3DShaderNode::postRender();
   }
@@ -448,7 +448,7 @@ void ComposedShader::render() {
     }
 
     if( program_handle ) {
-      Shaders::renderTextures( this );
+      Shaders::renderTextures( this, &max_texture_in_shader, &max_image_in_shader );
       //Shaders::renderTextures( &shader_textures, &max_texture_in_shader );
 
       Shaders::renderShaderResources( this );
@@ -872,8 +872,14 @@ void ComposedShader::initialize() {
   X3DShaderNode::initialize();
   if( GraphicsHardwareInfo::infoIsInitialized() ) {
     max_texture_in_shader = GraphicsHardwareInfo::getInfo().max_combined_texture_image_units;
+    max_image_in_shader = GraphicsHardwareInfo::getInfo().max_image_units;
   }else{
     glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB, &max_texture_in_shader );
+#ifdef GLEW_ARB_shader_image_load_store
+    if ( GLEW_ARB_shader_image_load_store ) {
+      glGetIntegerv( GL_MAX_IMAGE_UNITS, &max_image_in_shader );
+    }
+#endif // GLEW_ARB_shader_image_load_store
   }
   GlobalSettings *default_settings = GlobalSettings::getActive();
   GraphicsOptions *graphic_options = NULL;

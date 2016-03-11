@@ -160,6 +160,9 @@
 /// to be used only for release
 #cmakedefine DISABLE_FIELD_ACCESS_TYPE_CHECK
 
+/// def if user are sure that they are always calling setTextureUnit after glActiveTexture
+#cmakedefine USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT
+
 /// def if user choose to not use x3d prototype node in SFNode,
 /// this is a temporary cpu optimization solution, do not turn it on 
 /// if you use x3d prototype node, it may not function as expected
