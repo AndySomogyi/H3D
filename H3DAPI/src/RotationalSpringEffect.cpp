@@ -91,9 +91,9 @@ void RotationalSpringEffect::traverseSG( TraverseInfo &ti ) {
           torque->resize( index + 1, Vec3f( 0, 0, 0 ), id );
         if( !haptic_rotational_spring[index] )
           haptic_rotational_spring.set( index, new HAPI::HapticRotationalSpring( true ) );
-        haptic_rotational_spring[index]->setDesiredAxis(
-          ti.getAccForwardMatrix().getScaleRotationPart() *
-          desiredAxis->getValue() );
+        Vec3f desired_axis = ti.getAccForwardMatrix().getScaleRotationPart() * desiredAxis->getValue();
+        desired_axis.normalizeSafe();
+        haptic_rotational_spring[index]->setDesiredAxis( desired_axis );
         haptic_rotational_spring[index]->setSpringConstant( springConstant->getValue() );
         haptic_rotational_spring[index]->setDamping( damping->getValue() );
         ti.addForceEffect( index, haptic_rotational_spring[index] );
