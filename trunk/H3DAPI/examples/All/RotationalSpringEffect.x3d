@@ -15,7 +15,7 @@
     <Viewpoint position='0 0 0.6' />    
     <RotationalSpringEffect
       desiredAxis='0 1 0'
-      springConstant='100'
+      springConstant='0'
       />
   </Scene>
 </X3D>
