@@ -31,12 +31,22 @@ FIND_PATH(SIXENSE_INCLUDE_DIR NAMES sixense.h
                            DOC "Path in which the file sixense.h is located." )
 MARK_AS_ADVANCED(SIXENSE_INCLUDE_DIR)
 
+IF( ${MSVC_VERSION} EQUAL 1600) 
+  SET( VS_DIR "VS2010")
+ENDIF( ${MSVC_VERSION} EQUAL 1600) 
+IF( ${MSVC_VERSION} EQUAL 1800) 
+  SET( VS_DIR "VS2013")
+ENDIF( ${MSVC_VERSION} EQUAL 1800) 
+IF( ${MSVC_VERSION} EQUAL 1900) 
+  SET( VS_DIR "VS2015")
+ENDIF( ${MSVC_VERSION} EQUAL 1900) 
+
 # Look for the library.
 FIND_LIBRARY(SIXENSE_LIBRARY NAMES sixense sixense_${SDK_LIB}
-                                PATHS ${SIXENSE_INSTALL_DIR}/lib/${SDK_LIB}/release_dll
+                                PATHS ${SIXENSE_INSTALL_DIR}/lib/${SDK_LIB}/${VS_DIR}/release_dll
                                       ${module_lib_search_paths}
-                                      ${steam_path}/lib/${SDK_LIB}/release_dll
-                                      $ENV{SIXENSE_SDK_PATH}/lib/${SDK_LIB}/release_dll
+                                      ${steam_path}/lib/${SDK_LIB}/${VS_DIR}/release_dll
+                                      $ENV{SIXENSE_SDK_PATH}/lib/${SDK_LIB}/${VS_DIR}/release_dll
                                 DOC "Path to sixense library." )
 MARK_AS_ADVANCED(SIXENSE_LIBRARY)
 
