@@ -1824,9 +1824,10 @@ self, deepCopy )" );
   
   int PyMatrix3f::init(PyMatrix3f *self, PyObject *args, PyObject *kwds)  {
     Py_ssize_t args_size =  PyTuple_Size( args );
+    Matrix3f *self_m = (Matrix3f *)self;
     if( args_size == 0 ) {
       // no arguments, identify matrix
-      self->setToIdentity( (PyObject *) self, args );
+      *self_m = Matrix3f();
     } else if( args_size == 1 ) {
       // from Quaternion, Rotation and Matrix3f
       PyObject *o = PyTuple_GetItem( args, 0 );
@@ -2083,7 +2084,7 @@ self, deepCopy )" );
     Py_ssize_t args_size =  PyTuple_Size( args );
     if( args_size == 0 ) {
       // no arguments, identify matrix
-      self->setToIdentity( (PyObject *) self, args );
+      *self_m = Matrix4f();
     } else if( args_size == 1 ) {
       // from Quaternion, Rotation and Matrix4f
       PyObject *o = PyTuple_GetItem( args, 0 );
@@ -2468,13 +2469,13 @@ self, deepCopy )" );
   
   int PyMatrix3d::init(PyMatrix3d *self, PyObject *args, PyObject *kwds)  {
     Py_ssize_t args_size =  PyTuple_Size( args );
+    Matrix3d *self_m = (Matrix3d *)self;
     if( args_size == 0 ) {
       // no arguments, identify matrix
-      self->setToIdentity( (PyObject *) self, args );
+      *self_m = Matrix3d();
     } else if( args_size == 1 ) {
       // from Quaternion, Rotation and Matrix3d
       PyObject *o = PyTuple_GetItem( args, 0 );
-      Matrix3d *self_m = (Matrix3d *)self;
       if( PyRotation_Check( o ) ) {
         Rotation r = PyRotation_AsRotation( o );
         *self_m = Matrix3d(r);
@@ -2783,7 +2784,7 @@ self, deepCopy )" );
     Py_ssize_t args_size =  PyTuple_Size( args );
     if( args_size == 0 ) {
       // no arguments, identify matrix
-      self->setToIdentity( (PyObject *) self, args );
+      *self_m = Matrix4d();
     } else if( args_size == 1 ) {
       // from Quaternion, Rotation and Matrix4d
       PyObject *o = PyTuple_GetItem( args, 0 );
