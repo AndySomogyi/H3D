@@ -108,6 +108,9 @@ namespace H3D {
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
 
+  protected:
+    /// Temporary storage of the divisor, to allow reset of state
+    H3DInt32 current_divisor;
   };
 }
 

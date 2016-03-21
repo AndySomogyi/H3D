@@ -228,7 +228,8 @@ namespace H3D {
                         Inst< AutoNormal       > _autoNormal      = 0,
                         Inst< MFInt32          > _set_index       = 0,
                         Inst< MFInt32          > _index           = 0,
-                        Inst< SFFogCoordinate  > _fogCoord        =0 );
+                        Inst< SFFogCoordinate  > _fogCoord        = 0,
+                        Inst< SFInt32          > _instanceCount   = 0 );
 
     /// Destructor
     virtual ~IndexedTriangleSet();
@@ -292,6 +293,15 @@ namespace H3D {
     ///
     /// \dotfile IndexedTriangleSet_index.dot 
     auto_ptr< MFInt32 > index;
+
+    /// If non-zero, then instanced rendering is used to render instanceCount instances
+    /// of the mesh.
+    ///
+    /// NOTE: Instanced rendering is not supported if normalPerVertex is false
+    /// 
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> 0 \n
+    auto_ptr< SFInt32 > instanceCount;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

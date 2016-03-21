@@ -51,6 +51,7 @@ H3DNodeDatabase IndexedTriangleSet::database(
 namespace IndexedTriangleSetInternals {
   FIELDDB_ELEMENT( IndexedTriangleSet, set_index, INPUT_ONLY );
   FIELDDB_ELEMENT( IndexedTriangleSet, index, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( IndexedTriangleSet, instanceCount, INPUT_OUTPUT );
 }
 
 
@@ -70,7 +71,8 @@ IndexedTriangleSet::IndexedTriangleSet(
                                        Inst< AutoNormal              > _autoNormal,
                                        Inst< MFInt32                 > _set_index,
                                        Inst< MFInt32                 > _index,
-                                       Inst< SFFogCoordinate         > _fogCoord ) :
+                                       Inst< SFFogCoordinate         > _fogCoord,
+                                       Inst< SFInt32                 > _instanceCount ) :
   X3DComposedGeometryNode( _metadata, _bound, _displayList, 
                            _color, _coord, _normal, _texCoord, 
                            _ccw, _colorPerVertex, _normalPerVertex,
@@ -78,6 +80,7 @@ IndexedTriangleSet::IndexedTriangleSet(
   autoNormal( _autoNormal ),   
   set_index( _set_index ),
   index( _index ),
+  instanceCount ( _instanceCount ),
   autoTangent( new AutoTangent ),
   render_tangents( false ),
   render_patches( false ),
@@ -92,6 +95,8 @@ IndexedTriangleSet::IndexedTriangleSet(
   autoTangent->setName( "autoTangent" );
   autoTangent->setOwner( this );
   
+  instanceCount->setValue( 0 );
+
   index->route( displayList );
   set_index->route( index, id );
   
@@ -279,23 +284,28 @@ void IndexedTriangleSet::render() {
           glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, *vbo_id );
         }
 
+        bool draw_patches = render_patches && GLEW_ARB_tessellation_shader;
+        GLuint primative_type = draw_patches ? GL_PATCHES : GL_TRIANGLES;
+
+        if( draw_patches ) {
+          glPatchParameteri( GL_PATCH_VERTICES, 3 );
+        }
+
         // Draw the triangles, the last parameter is NULL since vertex buffer
         // objects are used.
-        if ( !render_patches || !GLEW_ARB_tessellation_shader ) {
-          glDrawRangeElements( GL_TRIANGLES,
-                               0,
-                               coordinate_node->nrAvailableCoords() - 1,
-                               3*nr_triangles,
-                               GL_UNSIGNED_INT,
-                               NULL );
+        H3DInt32 instance_count = instanceCount->getValue();
+        if( instance_count > 0 ) {
+          glDrawElementsInstanced( primative_type,
+            3 * nr_triangles,
+            GL_UNSIGNED_INT,
+            NULL, instance_count );
         } else {
-          glPatchParameteri(GL_PATCH_VERTICES, 3);
-          glDrawRangeElements( GL_PATCHES,
-                               0,
-                               coordinate_node->nrAvailableCoords() - 1,
-                               3*nr_triangles,
-                               GL_UNSIGNED_INT,
-                               NULL );
+          glDrawRangeElements( primative_type,
+            0,
+            coordinate_node->nrAvailableCoords() - 1,
+            3 * nr_triangles,
+            GL_UNSIGNED_INT,
+            NULL );
         }
 
         // Disable all vertex buffer objects.
@@ -344,21 +354,28 @@ void IndexedTriangleSet::render() {
             if( attr ) attr->renderArray();
         }
 
-        if ( !render_patches || !GLEW_ARB_tessellation_shader ) {
-          glDrawRangeElements( GL_TRIANGLES,
-                               0,
-                               coordinate_node->nrAvailableCoords() - 1,
-                               3*nr_triangles, 
-                               GL_UNSIGNED_INT,
-                               &(*(indices.begin()) ) );
+        bool draw_patches = render_patches && GLEW_ARB_tessellation_shader;
+        GLuint primative_type = draw_patches ? GL_PATCHES : GL_TRIANGLES;
+
+        if( draw_patches ) {
+          glPatchParameteri( GL_PATCH_VERTICES, 3 );
+        }
+
+        // Draw the triangles, the last parameter is NULL since vertex buffer
+        // objects are used.
+        H3DInt32 instance_count = instanceCount->getValue();
+        if( instance_count > 0 ) {
+          glDrawElementsInstanced( primative_type,
+            3 * nr_triangles,
+            GL_UNSIGNED_INT,
+            &(*(indices.begin())), instance_count );
         } else {
-          glPatchParameteri(GL_PATCH_VERTICES, 3);
-          glDrawRangeElements( GL_PATCHES,
-                               0,
-                               coordinate_node->nrAvailableCoords() - 1,
-                               3*nr_triangles, 
-                               GL_UNSIGNED_INT,
-                               &(*(indices.begin()) ) );
+          glDrawRangeElements( primative_type,
+            0,
+            coordinate_node->nrAvailableCoords() - 1,
+            3 * nr_triangles,
+            GL_UNSIGNED_INT,
+            &(*(indices.begin())) );
         }
 
         coordinate_node->disableArray();
