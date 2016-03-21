@@ -555,7 +555,7 @@ void PythonScript::traverseSG( TraverseInfo &ti ) {
 #ifdef HAVE_PROFILER
   string timer_string = "PythonScript traverseSG (" + (url->size() > 0 ? url->getValue()[0]:"" ) + ")";
   if( H3D::Profiling::profile_python_fields ) {  
-    H3DUtil::H3DTimer::stepBegin(timer_string);
+    H3DUtil::H3DTimer::stepBegin(timer_string, "PYTHON");
   }
 #endif 
   // ensure we have the GIL lock to work with multiple python threads.
@@ -587,7 +587,7 @@ void PythonScript::initialize() {
 #ifdef HAVE_PROFILER
   string timer_string = "PythonScript initialize (" + (url->size() > 0 ? url->getValue()[0]:"" ) + ")";
   if( H3D::Profiling::profile_python_fields ) {
-    H3DUtil::H3DTimer::stepBegin(timer_string);
+    H3DUtil::H3DTimer::stepBegin(timer_string, "PYTHON");
   }
 #endif 
   H3DScriptNode::initialize();

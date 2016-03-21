@@ -68,6 +68,7 @@ Group* X3D::createX3DFromURL( const string &url,
                               DEFNodes *exported_nodes,
                               PrototypeVector *prototypes,
                               bool change_base_path_during_parsing ) {
+  H3DTIMER_BEGIN( "createX3DFromURL (" + url + ")", "PARSING" ) 
   // First try to resolve the url to file contents and load via string buffer
   // Otherwise fallback on using temp files
   string url_contents= ResourceResolver::resolveURLAsString ( url );
@@ -83,6 +84,7 @@ Group* X3D::createX3DFromURL( const string &url,
     Group* g= createX3DFromString ( url_contents, dn, exported_nodes, prototypes );
 
     ResourceResolver::setBaseURL( old_base );
+    H3DTIMER_END( "createX3DFromURL (" + url + ")" ) 
     return g;
   }
 
@@ -173,6 +175,7 @@ Group* X3D::createX3DFromURL( const string &url,
       if( is_tmp_file ) 
         ResourceResolver::releaseTmpFileName( resolved_url );
       ResourceResolver::setBaseURL( old_base );
+      H3DTIMER_END( "createX3DFromURL (" + url + ")" ) 
       return g;
     }
     istest.close();
@@ -190,6 +193,7 @@ Group* X3D::createX3DFromURL( const string &url,
       parser->parse( IStreamInputSource( is, url_ch ) );
     } catch(...) {
       delete[] url_ch;
+      H3DTIMER_END( "createX3DFromURL (" + url + ")" ) 
       throw;
     }
     delete[] url_ch;
@@ -205,6 +209,7 @@ Group* X3D::createX3DFromURL( const string &url,
   AutoRef< Node > n = handler.getResultingNode();
   if( n.get() )
     g->children->push_back( n.get() );
+  H3DTIMER_END( "createX3DFromURL (" + url + ")" ) 
   return g;
 #else
   Console(LogLevel::Warning) << "H3D API compiled without HAVE_XERCES flag. X3D-XML files "
@@ -235,6 +240,7 @@ AutoRef< Node > X3D::createX3DNodeFromString( const string &str,
     return createVRMLNodeFromString( str, dn, exported_nodes, prototypes );
   else {
 #ifdef HAVE_XERCES
+    H3DTIMER_BEGIN( "createX3DNodeFromString", "PARSING" ) 
     auto_ptr< SAX2XMLReader > parser( getNewXMLParser() );
     X3DSAX2Handlers handler( dn, exported_nodes, prototypes );
     stringstream s;
@@ -243,6 +249,7 @@ AutoRef< Node > X3D::createX3DNodeFromString( const string &str,
     parser->setErrorHandler(&handler); 
     parser->setLexicalHandler( &handler );
     parser->parse( IStreamInputSource( s, (const XMLCh*)L"<string input>" ) );
+    H3DTIMER_END( "createX3DNodeFromString") 
     return handler.getResultingNode();
 #else
   Console(LogLevel::Warning) << "H3D API compiled without HAVE_XERCES flag. X3D-XML files "
@@ -257,6 +264,7 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
                                            DEFNodes *exported_nodes,
                                            PrototypeVector *prototypes,
                                            bool change_base_path_during_parsing ) {
+  H3DTIMER_BEGIN( "createX3DNodeFromURL(" + url + ")", "PARSING" ) 
   // First try to resolve the url to file contents and load via string buffer
   // Otherwise fallback on using temp files
   string url_contents= ResourceResolver::resolveURLAsString ( url );
@@ -272,6 +280,7 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
      AutoRef< Node > n = createX3DNodeFromString ( url_contents, dn, exported_nodes, prototypes );
     
     ResourceResolver::setBaseURL( old_base );
+    H3DTIMER_END( "createX3DNodeFromURL(" + url + ")" )
     return n;
   }
 
@@ -365,6 +374,7 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
       if( is_tmp_file ) 
         ResourceResolver::releaseTmpFileName( resolved_url );
       ResourceResolver::setBaseURL( old_base );
+      H3DTIMER_END( "createX3DNodeFromURL(" + url + ")" )
       return n;
     }
     istest.close();
@@ -386,7 +396,9 @@ AutoRef< Node > X3D::createX3DNodeFromURL( const string &url,
   if( is_tmp_file ) 
     ResourceResolver::releaseTmpFileName( resolved_url );
   ResourceResolver::setBaseURL( old_base );
-
+  
+  H3DTIMER_END( "createX3DNodeFromURL(" + url + ")" )
+ 
 #ifdef HAVE_XERCES
   return handler.getResultingNode();
 #else
