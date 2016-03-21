@@ -438,6 +438,9 @@ ViewImage::ViewImage( wxWindow* parent, wxWindowID id, const wxString& title, co
 	
 	sbSizer2->Add( m_checkBoxChannelBlue, 0, wxALL, 5 );
 	
+	m_checkBoxChannelAlpha = new wxCheckBox( m_panel4, wxID_ANY, wxT("Alpha"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer2->Add( m_checkBoxChannelAlpha, 0, wxALL, 5 );
+	
 	
 	bSizer10->Add( sbSizer2, 1, wxALL|wxEXPAND, 5 );
 	
@@ -475,6 +478,7 @@ ViewImage::ViewImage( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_checkBoxChannelRed->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ViewImage::OnRefresh ), NULL, this );
 	m_checkBoxChannelGreen->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ViewImage::OnRefresh ), NULL, this );
 	m_checkBoxChannelBlue->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ViewImage::OnRefresh ), NULL, this );
+	m_checkBoxChannelAlpha->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ViewImage::OnRefresh ), NULL, this );
 	this->Connect( wxID_ANY, wxEVT_TIMER, wxTimerEventHandler( ViewImage::OnTimer ) );
 }
 
@@ -487,6 +491,7 @@ ViewImage::~ViewImage()
 	m_checkBoxChannelRed->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ViewImage::OnRefresh ), NULL, this );
 	m_checkBoxChannelGreen->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ViewImage::OnRefresh ), NULL, this );
 	m_checkBoxChannelBlue->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ViewImage::OnRefresh ), NULL, this );
+	m_checkBoxChannelAlpha->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ViewImage::OnRefresh ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_TIMER, wxTimerEventHandler( ViewImage::OnTimer ) );
 	
 }

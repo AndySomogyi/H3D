@@ -182,6 +182,7 @@ class ViewImage : public wxFrame
 		wxCheckBox* m_checkBoxChannelRed;
 		wxCheckBox* m_checkBoxChannelGreen;
 		wxCheckBox* m_checkBoxChannelBlue;
+		wxCheckBox* m_checkBoxChannelAlpha;
 		wxScrolledWindow* m_imagePanel;
 		wxTimer m_timerRefresh;
 		
