@@ -256,7 +256,7 @@ namespace H3D {
     virtual void update() {
 #ifdef HAVE_PROFILER
       if( Profiling::profile_python_fields ) {
-        H3DUtil::H3DTimer::stepBegin( getName() );
+        H3DUtil::H3DTimer::stepBegin( getName().c_str(), "PYTHON" );
       }
 #endif
 
