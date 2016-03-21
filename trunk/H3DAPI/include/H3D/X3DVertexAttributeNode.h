@@ -32,6 +32,7 @@
 #include <H3D/X3DGeometricPropertyNode.h>
 #include <H3D/GLVertexAttributeObject.h>
 #include <H3D/SFString.h>
+#include <H3D/SFInt32.h>
 
 namespace H3D {
   /// \ingroup AbstractNodes
@@ -47,7 +48,8 @@ namespace H3D {
   public:
     /// Constructor.
     X3DVertexAttributeNode( Inst< SFNode   > _metadata = 0,
-                            Inst< SFString > _name     = 0);
+                            Inst< SFString > _name     = 0,
+                            Inst< SFInt32  > _divisor  = 0 );
    
     /// Perform the OpenGL commands to set the vertex attribute
     /// with the given index. value_index is the index of the 
@@ -92,6 +94,13 @@ namespace H3D {
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> "" \n
     auto_ptr< SFString >  name;
+
+    /// If non-zero, for instanced rendering, the divisor specifies the number of instances 
+    /// that will pass between updates of the attribute
+    /// 
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> 0 \n
+    auto_ptr< SFInt32 > divisor;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

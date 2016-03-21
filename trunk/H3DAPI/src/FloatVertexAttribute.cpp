@@ -52,7 +52,8 @@ FloatVertexAttribute::FloatVertexAttribute( Inst< SFNode   > _metadata,
                                             Inst< SFInt32  > _numComponents):
   X3DVertexAttributeNode( _metadata, _name ),
   value( _value ),
-  numComponents( _numComponents ){
+  numComponents( _numComponents ),
+  current_divisor ( 0 ) {
 
   type_name = "FloatVertexAttribute";
   database.initFields( this );
@@ -93,6 +94,10 @@ void FloatVertexAttribute::renderArray() {
   if( !value->empty() ) {
     if( GLEW_ARB_vertex_program && attrib_index >= 0 ) {
       glEnableVertexAttribArrayARB( attrib_index );
+      current_divisor = divisor->getValue();
+      if( current_divisor != 0 ) {
+        glVertexAttribDivisor( attrib_index, current_divisor );
+      }
       glVertexAttribPointerARB( attrib_index,
         numComponents->getValue(),
         GL_FLOAT,
@@ -106,6 +111,9 @@ void FloatVertexAttribute::renderArray() {
 // Disable the array state enabled in renderArray().
 void FloatVertexAttribute::disableArray() {
   if( GLEW_ARB_vertex_program && attrib_index >= 0 ) {
+    if( current_divisor != 0 ) {
+      glVertexAttribDivisor( attrib_index, 0 );
+    }
     glDisableVertexAttribArrayARB( attrib_index );
   }
 }
@@ -122,6 +130,10 @@ void FloatVertexAttribute::setAttributeData ( ){
 
 void FloatVertexAttribute::renderVBO ( ){
   glEnableVertexAttribArrayARB ( attrib_index );
+  current_divisor = divisor->getValue();
+  if( current_divisor != 0 ) {
+    glVertexAttribDivisor( attrib_index, current_divisor );
+  }
   if ( use_bindless )
   {
     glVertexAttribFormatNV ( attrib_index, numComponents->getValue(), GL_FLOAT, GL_FALSE, 0 );
@@ -142,6 +154,9 @@ void FloatVertexAttribute::disableVBO ( ){
   if ( use_bindless )
   {
     glDisableClientState ( GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV );
+  }
+  if( current_divisor != 0 ) {
+    glVertexAttribDivisor( attrib_index, 0 );
   }
   glDisableVertexAttribArrayARB ( attrib_index );
 }

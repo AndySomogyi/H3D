@@ -42,16 +42,21 @@ H3DNodeDatabase X3DVertexAttributeNode::database(
 
 namespace X3DVertexAttributeNodeInternals {
   FIELDDB_ELEMENT( X3DVertexAttributeNode, name, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( X3DVertexAttributeNode, divisor, INPUT_OUTPUT );
 }
 
 X3DVertexAttributeNode::X3DVertexAttributeNode( Inst< SFNode   > _metadata,
-                                                Inst< SFString > _name):
+                                                Inst< SFString > _name,
+                                                Inst< SFInt32  > _divisor ):
   X3DGeometricPropertyNode( _metadata ),
   GLVertexAttributeObject ( VERTEXATTRIBUTE::GENERIC ),
   name( _name ),
+  divisor ( _divisor ),
   attrib_index( -1 ) {
 
   type_name = "X3DVertexAttributeNode";
   database.initFields( this );
+
+  divisor->setValue( 0 );
 }
 
