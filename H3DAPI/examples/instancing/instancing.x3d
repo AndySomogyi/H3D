@@ -12,8 +12,8 @@
     <Shape>
       <Appearance>
         <ComposedShader DEF='CSD_lines' language="GLSL">
-          <ShaderPartModifiable type="VERTEX" url="shaders/instancing.vert" />
-          <ShaderPartModifiable type="FRAGMENT" url="shaders/instancing.frag" />
+          <ShaderPart type="VERTEX" url="shaders/instancing.vert" />
+          <ShaderPart type="FRAGMENT" url="shaders/instancing.frag" />
         </ComposedShader>
       </Appearance>
 
