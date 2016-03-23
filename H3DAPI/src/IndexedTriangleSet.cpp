@@ -95,7 +95,7 @@ IndexedTriangleSet::IndexedTriangleSet(
   autoTangent->setName( "autoTangent" );
   autoTangent->setOwner( this );
   
-  instanceCount->setValue( 0 );
+  instanceCount->setValue( -1 );
 
   index->route( displayList );
   set_index->route( index, id );
@@ -294,7 +294,7 @@ void IndexedTriangleSet::render() {
         // Draw the triangles, the last parameter is NULL since vertex buffer
         // objects are used.
         H3DInt32 instance_count = instanceCount->getValue();
-        if( instance_count > 0 ) {
+        if( instance_count >= 0 ) {
           glDrawElementsInstanced( primative_type,
             3 * nr_triangles,
             GL_UNSIGNED_INT,
@@ -364,7 +364,7 @@ void IndexedTriangleSet::render() {
         // Draw the triangles, the last parameter is NULL since vertex buffer
         // objects are used.
         H3DInt32 instance_count = instanceCount->getValue();
-        if( instance_count > 0 ) {
+        if( instance_count >= 0 ) {
           glDrawElementsInstanced( primative_type,
             3 * nr_triangles,
             GL_UNSIGNED_INT,

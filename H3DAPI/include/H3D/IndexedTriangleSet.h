@@ -294,13 +294,13 @@ namespace H3D {
     /// \dotfile IndexedTriangleSet_index.dot 
     auto_ptr< MFInt32 > index;
 
-    /// If non-zero, then instanced rendering is used to render instanceCount instances
+    /// If 0 or greater, then instanced rendering is used to render instanceCount instances
     /// of the mesh.
     ///
     /// NOTE: Instanced rendering is not supported if normalPerVertex is false
     /// 
     /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0 \n
+    /// <b>Default value:</b> -1 \n
     auto_ptr< SFInt32 > instanceCount;
 
     /// The H3DNodeDatabase for this node.
