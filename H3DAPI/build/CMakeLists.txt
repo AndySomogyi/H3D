@@ -115,22 +115,41 @@ ${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}.${H3DAPI_BUILD_VERSION} )
 INCLUDE( ${H3DAPI_SOURCE_DIR}/H3DAPISourceFiles.txt )
 
 IF( GENERATE_UNITY_BUILD )
-# Generate a unity build, by creating the UnityBuild.cpp and only including the required 
-# source files.
-SET( H3DAPI_SRCS ${H3DAPI_SRCS_UNITYBUILD} )
-SET( UNITYBUILD_INCLUDES "" )
+  IF( NOT DEFINED UNITY_BUILD_${PROJECT_NAME} )
+    SET(  UNITY_BUILD_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
+  ENDIF()
 
-foreach(filename ${NON_UNITYBUILD_FILES})
-  SET( UNITYBUILD_INCLUDES "${UNITYBUILD_INCLUDES}\n #include \"${filename}\"" )
-endforeach(filename)
+  IF( UNITY_BUILD_${PROJECT_NAME} )  
+    # Generate a unity build, by creating the UnityBuild.cpp and only including the required 
+    # source files.
+    SET( UNITYBUILD_INCLUDES "" )
 
-CONFIGURE_FILE( ${H3DAPI_SOURCE_DIR}/UnityBuild.cmake ${H3DAPI_SOURCE_DIR}/../src/UnityBuild.cpp )
+    foreach(filename ${NON_UNITYBUILD_FILES})
+      SET( UNITYBUILD_INCLUDES "${UNITYBUILD_INCLUDES}\n #include \"${filename}\"" )
+    endforeach(filename)
 
-IF( MSVC )
-  SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /bigobj")
-ENDIF( MSVC )
+    file(WRITE UnityBuild.cpp ${UNITYBUILD_INCLUDES}  )
 
+    IF( MSVC )
+      SET( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /bigobj")
+    ENDIF( MSVC )
+
+    SET( H3DAPI_SRCS ${H3DAPI_SRCS_UNITYBUILD} )
+  ENDIF()
 ENDIF( GENERATE_UNITY_BUILD )
+
+SET( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should use precompiled headers. This greatly reduces build times after first build." )
+
+# set up precompiled headers  
+IF( MSVC AND PRECOMPILED_HEADERS_${PROJECT_NAME})
+  list( APPEND H3DAPI_HEADERS ${H3DAPI_SOURCE_DIR}/../include/H3D/StdAfx.h )
+  list( APPEND H3DAPI_SRCS ${H3DAPI_SOURCE_DIR}/../src/StdAfx.cpp )
+  SET_SOURCE_FILES_PROPERTIES( ${H3DAPI_SRCS}
+                               PROPERTIES COMPILE_FLAGS "/Zm900 /FIH3D/StdAfx.h /YuH3D/StdAfx.h" )
+  SET_SOURCE_FILES_PROPERTIES( ${H3DAPI_SOURCE_DIR}/../src/StdAfx.cpp 
+                               PROPERTIES COMPILE_FLAGS "/Zm900 /YcH3D/StdAfx.h" )
+ENDIF()
+
 
 # Add the H3DAPI.rc resource file if Visual Studio
 IF(MSVC)
