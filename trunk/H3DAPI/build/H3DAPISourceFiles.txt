@@ -856,7 +856,7 @@ endforeach(filename)
 
 # The sources for unity build is the UnityBuild.cpp file and all
 # unity build files.
-SET( H3DAPI_SRCS_UNITYBUILD "${H3DAPI_SOURCE_DIR}/../src/UnityBuild.cpp")
+SET( H3DAPI_SRCS_UNITYBUILD "UnityBuild.cpp")
 foreach(filename ${ALL_BUILD_FILES})
   SET( H3DAPI_SRCS_UNITYBUILD ${H3DAPI_SRCS_UNITYBUILD} "${H3DAPI_SOURCE_DIR}/../src/${filename}" )
 endforeach(filename)
