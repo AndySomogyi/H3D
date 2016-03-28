@@ -50,6 +50,38 @@ INCLUDE_DIRECTORIES( ../src )
 
 INCLUDE( "${H3DViewer_SOURCE_DIR}/H3DViewerSourceFiles.txt" )
 
+IF( GENERATE_UNITY_BUILD )
+  IF( NOT DEFINED UNITY_BUILD_${PROJECT_NAME} )
+    SET(  UNITY_BUILD_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
+  ENDIF()
+
+  IF( UNITY_BUILD_${PROJECT_NAME} )
+    # Generate a unity build, by creating the UnityBuild.cpp and only including the required 
+    # source files.
+    set( UNITYBUILD_INCLUDES "" )
+    foreach(filename ${H3DViewer_SRCS})
+      SET( UNITYBUILD_INCLUDES "${UNITYBUILD_INCLUDES}#include \"${filename}\"\n" )
+    endforeach(filename)
+
+    file(WRITE UnityBuild.cpp ${UNITYBUILD_INCLUDES}  )
+
+    # overwrite the source files to only include the generated unity build file.
+    set( H3DViewer_SRCS UnityBuild.cpp ) 
+  endif()
+endif()
+
+SET( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should use precompiled headers. This greatly reduces build times after first build." )
+
+# set up precompiled headers  
+IF( MSVC AND PRECOMPILED_HEADERS_${PROJECT_NAME})
+  list( APPEND H3DViewer_HEADERS ${H3DViewer_SOURCE_DIR}/../src/StdAfx.h )
+  list( APPEND H3DViewer_SRCS ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp )
+  SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SRCS}
+                               PROPERTIES COMPILE_FLAGS "/Zm900 /FIStdAfx.h /YuStdAfx.h" )
+  SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
+                               PROPERTIES COMPILE_FLAGS "/Zm900 /YcStdAfx.h" )
+ENDIF()
+
 # Add the H3DViewer.rc resource file if Visual Studio
 IF(MSVC)
   SET( H3DViewer_SRCS ${H3DViewer_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc

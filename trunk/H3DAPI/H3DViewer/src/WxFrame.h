@@ -28,6 +28,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef H3D_H3DVIEWER_WXFRAME_H__
+#define H3D_H3DVIEWER_WXFRAME_H__
+
 #include <wx/wx.h>
 #include <wx/propdlg.h> 
 #include <wx/bookctrl.h>
@@ -624,3 +627,4 @@ enum
   FRAME_RELOAD
 };
 
+#endif

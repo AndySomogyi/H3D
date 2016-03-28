@@ -225,4 +225,23 @@ class PythonConsole : public wxFrame
 	
 };
 
+
+inline string toStr( const wxString &s ) {
+# if(wxUSE_UNICODE)
+  char *b = new char[s.size()+1];
+  const wchar_t *wb = s.c_str();
+  for( unsigned int i = 0; i < s.size(); ++i ) {
+    b[i] = (char)(wb[i]);
+  }
+  
+  b[s.size()] = '\0';
+  string sb(b);
+  delete[] b;
+  return sb;
+#else
+  return string( s.c_str() );
+#endif
+}
+
+
 #endif //__H3DVIEWER_H__
