@@ -28,6 +28,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef __H3D_H3DVIEWER_ENVINI_H
+#define __H3D_H3DVIEWER_ENVINI_H
+
 #include <H3D/INIFile.h>
 #include <fstream>
 
@@ -83,3 +86,5 @@ inline string GET_ENV_INI_DEFAULT_FILE( INIFile &ini_file,
 ( ini_file.hasOption(GROUP,VAR) ?     \
   ini_file.getBoolean( GROUP, VAR ) : \
   DEFAULT )
+
+#endif
