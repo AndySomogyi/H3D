@@ -586,7 +586,6 @@ IF( GENERATE_CPACK_PROJECT )
                  ${H3DAPI_SOURCE_DIR}/H3DAPI.rc.cmake
                  ${H3DAPI_SOURCE_DIR}/H3DAPICPack.cmake
                  ${H3DAPI_SOURCE_DIR}/H3DAPISourceFiles.txt
-                 ${H3DAPI_SOURCE_DIR}/UnityBuild.cmake
                  ${H3DAPI_SOURCE_DIR}/UpdateResourceFile.exe
            DESTINATION H3DAPI/build
            COMPONENT H3DAPI_cpack_sources )
