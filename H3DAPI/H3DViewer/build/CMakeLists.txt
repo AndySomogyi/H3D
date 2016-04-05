@@ -76,10 +76,17 @@ SET( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the gene
 IF( MSVC AND PRECOMPILED_HEADERS_${PROJECT_NAME})
   list( APPEND H3DViewer_HEADERS ${H3DViewer_SOURCE_DIR}/../src/StdAfx.h )
   list( APPEND H3DViewer_SRCS ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp )
-  SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SRCS}
-                               PROPERTIES COMPILE_FLAGS "/Zm900 /FIStdAfx.h /YuStdAfx.h" )
-  SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
-                               PROPERTIES COMPILE_FLAGS "/Zm900 /YcStdAfx.h" )
+  IF( ${MSVC_VERSION} LESS 1900)
+    SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SRCS}
+                                 PROPERTIES COMPILE_FLAGS "/Zm900 /FIStdAfx.h /YuStdAfx.h" )
+    SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
+                                 PROPERTIES COMPILE_FLAGS "/Zm900 /YcStdAfx.h" )
+  ELSE( ${MSVC_VERSION} LESS 1900)
+    SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SRCS}
+                                 PROPERTIES COMPILE_FLAGS "/FIStdAfx.h /YuStdAfx.h" )
+    SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
+                                 PROPERTIES COMPILE_FLAGS "/YcStdAfx.h" )
+  ENDIF( ${MSVC_VERSION} LESS 1900)
 ENDIF()
 
 # Add the H3DViewer.rc resource file if Visual Studio
