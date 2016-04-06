@@ -45,15 +45,8 @@ namespace H3D {
   /// the torque is proportional to the the angle between the desired axis and
   /// the rotated default axis ( 0, 0, 1 ). The default axis is rotated by the
   /// haptics device orientation.
-  /// The effect will not start until the haptics device is within 
-  /// startDistance from the spring position.
-  /// The effect will stop when the haptics device is further away than
-  /// escapeDistance from the spring position.
   /// deviceIndex decides on which haptics device this effect should be on.
   /// The force generated will be 
-  /// force = (position - device_position) * springConstant - 
-  /// damping * device_velocity
-  ///
   ///
   /// <b>Examples:</b>
   ///   - <a href="../../../H3DAPI/examples/All/RotationalSpringEffect.x3d">RotationalSpringEffect.x3d</a>
@@ -90,10 +83,10 @@ namespace H3D {
     auto_ptr< MFVec3f > torque;
     
     /// The spring constant of the spring. 
-    /// torque = -rotation_diff_euler_angles * spring_constant -
-    /// damping * device_angular_velocity.
-    /// Where the rotation_diff_euler_angles are the euler angles for
-    /// the rotation from the rotated default axis to the desired axis.
+    /// torque = spring_constant * base_torque
+    /// Where base torque is the vector part of a quaternion created from
+    /// the rotation difference between the current defaul device axis
+    /// and the desired axis.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 100 \n
@@ -107,11 +100,7 @@ namespace H3D {
     auto_ptr< SFBool > enabled;
 
     /// The damping constant to use in the torque calculation.
-    ///
-    /// torque = -rotation_diff_euler_angles * spring_constant -
-    /// damping * device_angular_velocity.
-    /// Where the rotation_diff_euler_angles are the euler angles for
-    /// the rotation from the rotated default axis to the desired axis.
+    /// NOTE: Currently not used at all.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 0 \n
