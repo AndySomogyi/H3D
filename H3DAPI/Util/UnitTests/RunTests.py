@@ -261,6 +261,11 @@ class TestCaseRunner ( object ):
       if not os.path.exists(dir):
         os.mkdir(dir)
 
+
+    if os.path.exists(os.path.join(rendering_dir)):
+      for file in os.listdir(rendering_dir):
+        if file.startswith("diff_"):
+          os.remove(os.path.join(rendering_dir, file))
                 
     script = """
     <MetadataString DEF='TestCaseName' value='%s'/>
@@ -370,7 +375,9 @@ class TestCaseRunner ( object ):
   def ConnectDB(self):
     if self.db == None:
       try:
+        print "Attempting to connect to results database at " + args.dbhost
         self.db = MySQLdb.connect(host=args.dbhost, db=args.dbname, user=args.dbuser, passwd=args.dbpass)
+        print "Connected!"
         self.db.autocommit = True
         curs = self.db.cursor()
         curs.execute("SELECT * FROM servers WHERE server_name='%s'" % self.server_name)
@@ -380,6 +387,8 @@ class TestCaseRunner ( object ):
         self.db.commit()
       except Exception as e:
         print(str(e))        
+        
+        
   def UploadResultsToSQL(self, testCase, case_results, output_dir):
     self.ConnectDB()
     print "Uploading results."
