@@ -56,6 +56,8 @@ parser.add_argument('--servername', dest='servername', help='The name of this se
                     default='Unknown')
 parser.add_argument('--RunTestsDir', dest='RunTestsDir', help='The location of UnitTestsUtil.py and UnitTestsBoilerplate.py. This is for the cases where RunTests.py is being run from a different directory, for example for targeting a specific build of H3D.',
                     default=os.path.dirname(os.path.realpath(__file__)).replace('\\', '/'))
+parser.add_argument('--case', dest='case', help='The name of a specific case located somewhere in or below the workingdir. If this is specified then only this Case, out of all the cases in all the TestDefs, will be run', default='')
+parser.add_argument('--resolution', dest='resolution', help='The resolution h3dload should be run at (only used for h3dload), in the format widthxheight, for example 800x600', default='640x480')
 args = parser.parse_known_args()[0]
 
 all_tests_successful = True
@@ -83,17 +85,13 @@ def getExitCode ( results ):
    
 class TestCaseRunner ( object ):
 
-  def __init__ ( self, filepath, startup_time= 10, shutdown_time= 5, testable_callback= None, fake_fullscreen_due_to_PIL_bug = True, error_reporter = None ):
+  def __init__ ( self, filepath, startup_time= 10, shutdown_time= 5, resolution=None, testable_callback= None, fake_fullscreen_due_to_PIL_bug = True, error_reporter = None):
     self.filepath= filepath
     self.startup_time= startup_time
     self.shutdown_time= shutdown_time
     self.testable_callback= testable_callback
     self.early_shutdown_file = '%s/test_complete' % (args.RunTestsDir)
     self.startup_time_multiplier = 1
-    if h3d_process_name == "H3DLoad":
-      self.load_flags = [] #"--no-fullscreen","--screen=800x600"]
-    else:
-      self.load_flags = []
     self.db = None
     # Used to get intermediate failed results in order to be able to cancel test early and still get some results.
     self.error_reporter = error_reporter
@@ -115,14 +113,30 @@ class TestCaseRunner ( object ):
     haystack= haystack.lower()
     return ( haystack.count ( "warning" ), haystack.count ( "error" ) )
 
-  def launchTest ( self, url, cwd ):
+  def launchTest ( self, url, cwd, resolution=None ):
+    if h3d_process_name == "H3DLoad":
+      if resolution:
+        self.load_flags = ["--no-fullscreen","--screen=" + resolution]
+      else:
+        self.load_flags = ["--no-fullscreen","--screen=" + args.resolution]        
+    else:
+      self.load_flags = []
+
     process = self.getProcess()
-    process.launch ( [h3d_process_name + ".exe" if platform.system() == 'Windows' else h3d_process_name] + self.load_flags + [url], cwd )
+    process.launch ( [h3d_process_name + ".exe" if platform.system() == 'Windows' else h3d_process_name] + self.load_flags + [url], cwd)
     return process
 
-  def testStartUp ( self, url, cwd, variation ):
+  def testStartUp ( self, url, cwd, variation, resolution=None):
     """ Returns true if the example can be started. """
     
+    if h3d_process_name == "H3DLoad":
+      if resolution:
+        self.load_flags = ["--no-fullscreen","--screen=" + resolution]
+      else:
+        self.load_flags = ["--no-fullscreen","--screen=" + args.resolution]        
+    else:
+      self.load_flags = []    
+
     process = self.getProcess()
     return process.testLaunch ( [h3d_process_name + ".exe" if platform.system() == 'Windows' else h3d_process_name] + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
   
@@ -143,7 +157,7 @@ class TestCaseRunner ( object ):
     
     if os.path.isfile( self.early_shutdown_file ):
       os.remove( self.early_shutdown_file )
-    process= self.launchTest ( url, cwd )
+    process= self.launchTest ( url, cwd, test_case.resolution)
 
     time_slept = 0.0
     while time_slept < (self.startup_time ):
@@ -196,7 +210,7 @@ class TestCaseRunner ( object ):
       All of these values default to None
     The list will contain one namedtuple for each Section in the specified definition file
     """
-    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20}, allow_no_value=True)
+    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20, 'resolution': None}, allow_no_value=True)
     try:
       confParser.read(file_path)
     except:
@@ -205,7 +219,7 @@ class TestCaseRunner ( object ):
     result = []
     for sect in confParser.sections():
       if sect != 'Default':
-        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime'])
+        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution'])
         test_case.name = sect
         test_case.x3d = confParser.get(sect, 'x3d')
         test_case.baseline = confParser.get(sect, 'baseline folder')
@@ -226,8 +240,14 @@ class TestCaseRunner ( object ):
           test_case.threshold = confParser.getfloat(sect, 'threshold')
         except:
           test_case.threshold = 20
+        try:
+          test_case.resolution = confParser.get(sect, 'resolution')
+        except:
+          test_case.resolution = None
 
-        result.append(test_case)
+        if args.case == "" or args.case == test_case.name:
+          result.append(test_case)
+
     return result
 
   def processTestDef(self, file, testCase, results, directory):
