@@ -222,6 +222,6 @@ public:
   bool force_update_labels;
 
   // Help function to onSearchTextCtrl, recursive function to find the string in any wx label for any tree item.
-  bool onSearchTextCtrlHelp( const wxTreeItemId &item, const wxString &to_find, wxTreeItemId &found_item, bool (*compare_func)( const wxString &s1, const wxString &s2 ), const wxTreeItemId &check_parent = wxTreeItemId() );
+  bool onSearchTextCtrlHelp( const wxTreeItemId &item, const wxString &to_find, wxTreeItemId &found_item, bool (*compare_func)( const wxString &s1, const wxString &s2 ), const wxTreeItemId &check_parent = wxTreeItemId(), bool reverse_direction = false );
 };
 #endif // __H3DViewerTreeViewDialog__
