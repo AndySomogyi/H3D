@@ -43,160 +43,234 @@
 #include <H3D/X3D.h>
 
 #include <H3DUtil/LoadImageFunctions.h>
+#include <wx/confbase.h>
 
-H3DViewerTreeViewDialog::H3DViewerTreeViewDialog( wxWindow* parent )
-:
-  TreeViewDialog( parent ),
-  shown_last_loop( false ),
-  force_update_labels( false )
-{
-  TreeViewTree->AddRoot( wxT("World") );
+H3DViewerTreeViewDialog::H3DViewerTreeViewDialog(wxWindow* parent)
+  :
+  TreeViewDialog(parent),
+  shown_last_loop(false),
+  force_update_labels(false) {
+  TreeViewTree->AddRoot(wxT("World"));
   // add the bindable nodes in the tree view
-  bindable_tree_id = TreeViewTree->AppendItem( TreeViewTree->GetRootItem(), 
-                                               wxT("Active bindable nodes") );
-  TreeViewTree->Expand( TreeViewTree->GetRootItem() );
+  bindable_tree_id = TreeViewTree->AppendItem(TreeViewTree->GetRootItem(),
+                                              wxT("Active bindable nodes"));
+  TreeViewTree->Expand(TreeViewTree->GetRootItem());
 
-#ifdef USE_PROPGRID
-  field_values_panel = new H3DViewerFieldValuesPanelPropGrid( SplitterWindow, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL  );
-#else
-  field_values_panel = new H3DViewerFieldValuesPanel( SplitterWindow, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL  );
-#endif
-  
-  menu_container = new H3DViewerPopupMenus( this, this);
-  displayFieldsFromNode( NULL );
-  if( SplitterWindow->IsSplit() )
+  #ifdef USE_PROPGRID
+  field_values_panel = new H3DViewerFieldValuesPanelPropGrid(SplitterWindow, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
+  #else
+  field_values_panel = new H3DViewerFieldValuesPanel(SplitterWindow, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
+  #endif
+
+  // See if there's already a setting for "focus_search_result_checkbox"  
+  wxConfigBase* cfg = wxConfigBase::Get();
+  bool focus_search_result = false;
+  bool result = cfg->Read(wxT("focus_search_result_checkbox"), &focus_search_result);
+
+  // If there isn't, set value to false (default).
+  if(!result) {
+    cfg->Write(wxT("focus_search_result_checkbox"), focus_search_result);
+  }
+
+  focus_search_result_checkbox->SetValue(focus_search_result);
+
+  menu_container = new H3DViewerPopupMenus(this, this);
+  displayFieldsFromNode(NULL);
+  if(SplitterWindow->IsSplit())
     SplitterWindow->Unsplit();
-  SplitterWindow->SplitVertically( TreeViewPanel, field_values_panel, 283 );
+  SplitterWindow->SplitVertically(TreeViewPanel, field_values_panel, 283);
   this->Layout();
 
-  this->Connect( wxEVT_CHAR_HOOK, wxKeyEventHandler( H3DViewerTreeViewDialog::onCharHook ) );
-#ifdef HAVE_PROFILER
-  ProfileCheckbox->SetValue( H3D::Profiling::profile_group_nodes );
-#else  
+  this->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(H3DViewerTreeViewDialog::onCharHook));
+  #ifdef HAVE_PROFILER
+  ProfileCheckbox->SetValue(H3D::Profiling::profile_group_nodes);
+  #else  
   ProfileCheckbox->Hide();
-#endif
+  #endif
 }
 
 H3DViewerTreeViewDialog::~H3DViewerTreeViewDialog() {
-  this->Disconnect( wxEVT_CHAR_HOOK, wxKeyEventHandler( H3DViewerTreeViewDialog::onCharHook ) );
+  this->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(H3DViewerTreeViewDialog::onCharHook));
   // If the menu bar is set to NULL in the constructor it will not be
   // cleaned up. Done here explicitly.
   //if( GetMenuBar() == NULL )
   //  delete m_menubar1;
+
+  // Save focus_search_result_checkbox value.
+  wxConfigBase* cfg = wxConfigBase::Get();
+  cfg->Write(wxT("focus_search_result_checkbox"), focus_search_result_checkbox->IsChecked());
 }
 
-void H3DViewerTreeViewDialog::showImage ( X3DTextureNode& _image ) {
-  H3DViewImage* view_image= new H3DViewImage ( this, _image );
-  view_image->Show ();
+void H3DViewerTreeViewDialog::showImage(X3DTextureNode& _image) {
+  H3DViewImage* view_image = new H3DViewImage(this, _image);
+  view_image->Show();
 }
 
-void H3DViewerTreeViewDialog::OnNodeSelected( wxTreeEvent& event ) {
+void H3DViewerTreeViewDialog::OnNodeSelected(wxTreeEvent& event) {
 
- TreeIdMap::iterator ni = node_map.find( event.GetItem().m_pItem );
-  if( ni == node_map.end() ) {
-    selected_node.reset( NULL );
+  TreeIdMap::iterator ni = node_map.find(event.GetItem().m_pItem);
+  if(ni == node_map.end()) {
+    selected_node.reset(NULL);
   } else {
-    selected_node.reset( (*ni).second.get() );
+    selected_node.reset((*ni).second.get());
   }
 }
 
-bool findStringCase( const wxString &s1, const wxString &s2 ) {
-  return s1.find( s2 ) != string::npos;
+bool findStringCase(const wxString &s1, const wxString &s2) {
+  return s1.find(s2) != string::npos;
 }
 
-bool findStringNoCase( const wxString &s1, const wxString &s2 ) {
-  return findStringCase( s1.Lower(), s2 );
+bool findStringNoCase(const wxString &s1, const wxString &s2) {
+  return findStringCase(s1.Lower(), s2);
 }
 
-bool H3DViewerTreeViewDialog::onSearchTextCtrlHelp( const wxTreeItemId &item, const wxString &to_find, wxTreeItemId &found_item, bool (*compare_func)( const wxString &s1, const wxString &s2 ), const wxTreeItemId &check_parent ) {
-  if( !check_parent.IsOk() || item != check_parent ) {
-    if( compare_func( TreeViewTree->GetItemText( item ), to_find ) ) {
+bool H3DViewerTreeViewDialog::onSearchTextCtrlHelp(const wxTreeItemId &item, const wxString &to_find, wxTreeItemId &found_item, bool(*compare_func)(const wxString &s1, const wxString &s2), const wxTreeItemId &check_parent, bool reverse_direction /* = false*/) {
+  if(!check_parent.IsOk() || item != check_parent) {
+    if(compare_func(TreeViewTree->GetItemText(item), to_find)) {
       found_item = item;
       return true;
     }
 
-    wxTreeItemIdValue cookie;
-    wxTreeItemId first_child = TreeViewTree->GetFirstChild( item, cookie );
-    if( first_child.IsOk() ) {
-      if( onSearchTextCtrlHelp( first_child, to_find, found_item, compare_func ) )
-        return true;
+    if(reverse_direction) {
+      wxTreeItemId last_child = TreeViewTree->GetLastChild(item);
+      if(last_child.IsOk()) {
+        if(onSearchTextCtrlHelp(last_child, to_find, found_item, compare_func, wxTreeItemId(), reverse_direction))
+          return true;
+      }
+    } else {
+      wxTreeItemIdValue cookie;
+      wxTreeItemId first_child = TreeViewTree->GetFirstChild(item, cookie);
+      if(first_child.IsOk()) {
+        if(onSearchTextCtrlHelp(first_child, to_find, found_item, compare_func, wxTreeItemId(), reverse_direction))
+          return true;
+      }
     }
   }
 
-  wxTreeItemId id = TreeViewTree->GetNextSibling( item );
-  while( id.IsOk() ) {
-    if( compare_func( TreeViewTree->GetItemText( id ), to_find ) ) {
-      found_item = id;
-      return true;
-    }
-    wxTreeItemIdValue cookie;
-    wxTreeItemId first_child = TreeViewTree->GetFirstChild( id, cookie );
-    if( first_child.IsOk() ) {
-      if( onSearchTextCtrlHelp( first_child, to_find, found_item, compare_func ) )
+  wxTreeItemId id;
+  if(reverse_direction) {
+    id = TreeViewTree->GetPrevSibling(item);
+    while(id.IsOk()) {
+      if(compare_func(TreeViewTree->GetItemText(id), to_find)) {
+        found_item = id;
         return true;
+      }
+
+      wxTreeItemId last_child = TreeViewTree->GetLastChild(id);
+      if(last_child.IsOk()) {
+        if(onSearchTextCtrlHelp(last_child, to_find, found_item, compare_func, wxTreeItemId(), reverse_direction))
+          return true;
+      }
+      id = TreeViewTree->GetPrevSibling(id);
     }
-    id = TreeViewTree->GetNextSibling( id );
+  } else {
+    id = TreeViewTree->GetNextSibling(item);
+    while(id.IsOk()) {
+      if(compare_func(TreeViewTree->GetItemText(id), to_find)) {
+        found_item = id;
+        return true;
+      }
+      wxTreeItemIdValue cookie;
+      wxTreeItemId first_child = TreeViewTree->GetFirstChild(id, cookie);
+      if(first_child.IsOk()) {
+        if(onSearchTextCtrlHelp(first_child, to_find, found_item, compare_func))
+          return true;
+      }
+      id = TreeViewTree->GetNextSibling(id);
+    }
   }
 
-  if( check_parent ) {
-    id = TreeViewTree->GetItemParent( item );
-    if( id.IsOk() && onSearchTextCtrlHelp( id, to_find, found_item, compare_func, id ) )
+  if(check_parent) {
+    id = TreeViewTree->GetItemParent(item);
+    if(id.IsOk() && onSearchTextCtrlHelp(id, to_find, found_item, compare_func, id, reverse_direction))
       return true;
   }
+
 
   return false;
 }
 
-void H3DViewerTreeViewDialog::onSearchTextCtrl( wxCommandEvent& event ) {
+void H3DViewerTreeViewDialog::onSearchTextCtrl(wxCommandEvent& event) {
   wxString string_to_find = event.GetString();
-  if( string_to_find.IsEmpty() )
+  if(string_to_find.IsEmpty()) {
     return;
+  }
+
+  bool reverse_direction = false; 
+  if(event.GetClientData()) {
+    reverse_direction = *static_cast<bool*>(event.GetClientData());
+  }
+
   wxTreeItemId found_id;
   wxTreeItemId id_to_search_from;
   wxTreeItemId selected_id = TreeViewTree->GetSelection();
   wxTreeItemId check_parent;
-  bool (*compare_func)( const wxString &s1, const wxString &s2 ) = findStringCase;
-  if( !case_sensitive_checkbox->IsChecked() ) {
+
+  bool(*compare_func)(const wxString &s1, const wxString &s2) = findStringCase;
+
+  if(!case_sensitive_checkbox->IsChecked()) {
     compare_func = findStringNoCase;
     string_to_find = string_to_find.Lower();
   }
-  if( selected_id.IsOk() && compare_func( TreeViewTree->GetItemText( selected_id ), string_to_find ) ) {
-    wxTreeItemIdValue cookie;
-    id_to_search_from = TreeViewTree->GetFirstChild( selected_id, cookie );
-    if( !id_to_search_from.IsOk() ) id_to_search_from = selected_id;
+
+  if(selected_id.IsOk() && compare_func(TreeViewTree->GetItemText(selected_id), string_to_find)) {
+    if(reverse_direction) {
+      id_to_search_from = TreeViewTree->GetLastChild(selected_id);
+    } else {
+      wxTreeItemIdValue cookie;
+      id_to_search_from = TreeViewTree->GetFirstChild(selected_id, cookie);
+    }
+
+    if(!id_to_search_from.IsOk()) id_to_search_from = selected_id;
     check_parent = selected_id;
-  } else id_to_search_from = TreeViewTree->GetRootItem();
-    
-  if( id_to_search_from.IsOk() )
-    if( onSearchTextCtrlHelp( id_to_search_from, string_to_find, found_id, compare_func, check_parent ) ) {
-      if( !TreeViewTree->IsSelected( found_id ) ) {
-        TreeViewTree->SelectItem( found_id );
+  } else {
+    id_to_search_from = TreeViewTree->GetRootItem();
+  }
+
+  if(id_to_search_from.IsOk()) {
+    if(onSearchTextCtrlHelp(id_to_search_from, string_to_find, found_id, compare_func, check_parent, reverse_direction)) {
+      if(!TreeViewTree->IsSelected(found_id)) {
+        // SetFocus so that the selected item becomes marked and you can move 
+        // around tree with arrow keys without first having to click the element.
+        if(focus_search_result_checkbox->IsChecked()) {
+          TreeViewTree->SetFocus();
+        }
+
+        TreeViewTree->SelectItem(found_id);
       }
-    } else if( check_parent && onSearchTextCtrlHelp( TreeViewTree->GetRootItem(), string_to_find, found_id, compare_func ) ) {
-      if( !TreeViewTree->IsSelected( found_id ) ) {
-        TreeViewTree->SelectItem( found_id );
+    } else if(check_parent && onSearchTextCtrlHelp(TreeViewTree->GetRootItem(), string_to_find, found_id, compare_func, wxTreeItemId(), reverse_direction)) {
+      if(!TreeViewTree->IsSelected(found_id)) {
+        // SetFocus so that the selected item becomes marked and you can move 
+        // around tree with arrow keys without first having to click the element.
+        if(focus_search_result_checkbox->IsChecked()) {
+          TreeViewTree->SetFocus();
+        }
+
+        TreeViewTree->SelectItem(found_id);
       }
     }
+  }
+
   TimeStamp end_time;
 }
 
-int H3DViewerTreeViewDialog::getNrTriangles( X3DGeometryNode *geom ) {
-  IndexedFaceSet *ifs = dynamic_cast< IndexedFaceSet * >( geom );
-  if( ifs ) {
+int H3DViewerTreeViewDialog::getNrTriangles(X3DGeometryNode *geom) {
+  IndexedFaceSet *ifs = dynamic_cast<IndexedFaceSet *>(geom);
+  if(ifs) {
     // IndexedFaceSet nrTriangles function is an upper bound so
     // try to calculate a more exact number here.
     const vector< int > &index = ifs->coordIndex->getValue();
-    
+
     unsigned int i = 0;
     unsigned int nr_triangles = 0;
-    
-    while( i < index.size() ) {
+
+    while(i < index.size()) {
       unsigned int nr_face_vertices = 0;
-      while( i < index.size() && index[i++] != -1 ) {
+      while(i < index.size() && index[i++] != -1) {
         ++nr_face_vertices;
       }
-      
-      if( nr_face_vertices >= 3 ) {
+
+      if(nr_face_vertices >= 3) {
         nr_triangles += nr_face_vertices - 2;
       }
     }
@@ -205,214 +279,214 @@ int H3DViewerTreeViewDialog::getNrTriangles( X3DGeometryNode *geom ) {
   return geom->nrTriangles();
 }
 
-void H3DViewerTreeViewDialog::showEntireSceneAsTree( H3DViewerTreeViewDialog::ExpandMode expand_new ) {
+void H3DViewerTreeViewDialog::showEntireSceneAsTree(H3DViewerTreeViewDialog::ExpandMode expand_new) {
   // show the scene in the tree view.
   list< pair< H3D::Node *, string > > l;
-  Scene *s =  *Scene::scenes.begin();
-  l.push_back(make_pair(s, s->defaultXMLContainerField() ) );
+  Scene *s = *Scene::scenes.begin();
+  l.push_back(make_pair(s, s->defaultXMLContainerField()));
 
-  updateNodeTree( TreeViewTree->GetRootItem(), l, expand_new );
+  updateNodeTree(TreeViewTree->GetRootItem(), l, expand_new);
 
-  l.clear();  
+  l.clear();
   const X3DBindableNode::StackMapType &stacks = X3DBindableNode::getStackMap();
-  for( X3DBindableNode::StackMapType::const_iterator i = stacks.begin(); 
-       i != stacks.end();++i ) {
-    X3DBindableNode *b = X3DBindableNode::getActive( (*i).first );
-    if( b ) l.push_back( make_pair(b, b->defaultXMLContainerField() ) );
+  for(X3DBindableNode::StackMapType::const_iterator i = stacks.begin();
+  i != stacks.end(); ++i) {
+    X3DBindableNode *b = X3DBindableNode::getActive((*i).first);
+    if(b) l.push_back(make_pair(b, b->defaultXMLContainerField()));
   }
-  updateNodeTree( bindable_tree_id, l, H3DViewerTreeViewDialog::EXPAND_NONE );
+  updateNodeTree(bindable_tree_id, l, H3DViewerTreeViewDialog::EXPAND_NONE);
 }
 
-string H3DViewerTreeViewDialog::getNodeLabel( H3D::Node *n, const string &container_field ) {
+string H3DViewerTreeViewDialog::getNodeLabel(H3D::Node *n, const string &container_field) {
   // the name in the tree is NodeType(DEFed name)
   string tree_string = n->getTypeName();
-  if( n->hasName() ) {
+  if(n->hasName()) {
     tree_string = tree_string + " (" + n->getName() + ")";
   }
 
-  X3DGeometryNode *geom = dynamic_cast< X3DGeometryNode * >( n );
-  if( geom ) {
+  X3DGeometryNode *geom = dynamic_cast<X3DGeometryNode *>(n);
+  if(geom) {
 
-    int nr_triangles = getNrTriangles( geom );
-    if( nr_triangles == -1 ) {
+    int nr_triangles = getNrTriangles(geom);
+    if(nr_triangles == -1) {
       tree_string = tree_string + " (Approx nr triangles: Unknown )";
     } else {
       char nr_triangles_str[255];
-      sprintf(nr_triangles_str, " (Approx nr triangles: %d )", getNrTriangles(geom) );
+      sprintf(nr_triangles_str, " (Approx nr triangles: %d )", getNrTriangles(geom));
       tree_string = tree_string + nr_triangles_str;
     }
   }
 
-#ifdef HAVE_PROFILER
-  if( H3D::Profiling::profile_group_nodes ) {
-    X3DGroupingNode *group = dynamic_cast< X3DGroupingNode * >( n );
-    if( group ) {
+  #ifdef HAVE_PROFILER
+  if(H3D::Profiling::profile_group_nodes) {
+    X3DGroupingNode *group = dynamic_cast<X3DGroupingNode *>(n);
+    if(group) {
       char profile_string[255];
 
-      sprintf( profile_string, " (r: %.1f ms t: %.1f ms)", 1000 * group->time_in_last_render, 1000 * group->time_in_last_traverseSG );
+      sprintf(profile_string, " (r: %.1f ms t: %.1f ms)", 1000 * group->time_in_last_render, 1000 * group->time_in_last_traverseSG);
       tree_string = tree_string + profile_string;
     }
   }
-#endif
+  #endif
 
-  if( container_field != n->defaultXMLContainerField() ) {
+  if(container_field != n->defaultXMLContainerField()) {
     tree_string = tree_string + " (cf: " + container_field + ")";
   }
   return tree_string;
 }
 
 
-void H3DViewerTreeViewDialog::addNodeToTree( wxTreeItemId tree_id, 
-                                             H3D::Node *n,
-                                             string container_field,
-                                             H3DViewerTreeViewDialog::ExpandMode expand ) {
+void H3DViewerTreeViewDialog::addNodeToTree(wxTreeItemId tree_id,
+                                            H3D::Node *n,
+                                            string container_field,
+                                            H3DViewerTreeViewDialog::ExpandMode expand) {
 
-  if( !n ) return;
+  if(!n) return;
 
-  if( n->getProtoInstanceParent() ) {
+  if(n->getProtoInstanceParent()) {
     n = n->getProtoInstanceParent();
   }
 
   // Check if node has a metadata object named "TreeView_expandMode". If it does the value of it overrides
   // any other settings for expand mode for this node.
-  X3DNode *x3d_node = dynamic_cast< X3DNode * >( n );
-  if( x3d_node ) {
-    MetadataString *expand_mode_meta = dynamic_cast< MetadataString * >( x3d_node->getMetadataByName( "TreeView_expandMode" ) );
-    if( expand_mode_meta ) {
+  X3DNode *x3d_node = dynamic_cast<X3DNode *>(n);
+  if(x3d_node) {
+    MetadataString *expand_mode_meta = dynamic_cast<MetadataString *>(x3d_node->getMetadataByName("TreeView_expandMode"));
+    if(expand_mode_meta) {
       const vector<string> &values = expand_mode_meta->value->getValue();
-      if( !values.empty() ) {
+      if(!values.empty()) {
         const string &mode = values[0];
-        if( mode == "EXPAND_NONE" ) expand = H3DViewerTreeViewDialog::EXPAND_NONE;
-        else if( mode == "EXPAND_ALL" ) expand = H3DViewerTreeViewDialog::EXPAND_ALL;
-        else if( mode == "EXPAND_GROUP" ) expand = H3DViewerTreeViewDialog::EXPAND_GROUP;
+        if(mode == "EXPAND_NONE") expand = H3DViewerTreeViewDialog::EXPAND_NONE;
+        else if(mode == "EXPAND_ALL") expand = H3DViewerTreeViewDialog::EXPAND_ALL;
+        else if(mode == "EXPAND_GROUP") expand = H3DViewerTreeViewDialog::EXPAND_GROUP;
       }
     }
   }
-  
-  string tree_string = getNodeLabel( n, container_field );
+
+  string tree_string = getNodeLabel(n, container_field);
   // add an item for this node in the tree
-  wxTreeItemId new_id = TreeViewTree->AppendItem( tree_id, wxString( tree_string.c_str(), wxConvUTF8 ) );
+  wxTreeItemId new_id = TreeViewTree->AppendItem(tree_id, wxString(tree_string.c_str(), wxConvUTF8));
   unsigned int s1 = node_map.size();
 
   // add an entry for the tree_id-node pair 
-  node_map[ new_id.m_pItem ].reset( n );
+  node_map[new_id.m_pItem].reset(n);
 
-  bool expand_new_id = ( expand == H3DViewerTreeViewDialog::EXPAND_ALL || 
-                        (expand == H3DViewerTreeViewDialog::EXPAND_GROUP && (dynamic_cast< X3DGroupingNode * >( n ) || dynamic_cast< Scene * >( n ) ) ) );
+  bool expand_new_id = (expand == H3DViewerTreeViewDialog::EXPAND_ALL ||
+                        (expand == H3DViewerTreeViewDialog::EXPAND_GROUP && (dynamic_cast<X3DGroupingNode *>(n) || dynamic_cast<Scene *>(n))));
   // recursively add all the child nodes of the node to the tree
-  H3DNodeDatabase *db = H3DNodeDatabase::lookupNodeInstance( n );
-  for( H3DNodeDatabase::FieldDBConstIterator i = db->fieldDBBegin();
-       db->fieldDBEnd() != i; ++i ) {
-    Field *f = i.getField( n ); //n->getField( *i );
-    
-    if( SFNode *sfnode = dynamic_cast< SFNode * >( f ) ) {
-      if( sfnode->getAccessType() != Field::INPUT_ONLY ) {
-        addNodeToTree( new_id, sfnode->getValue(), sfnode->getName(), expand_new_id ? expand : H3DViewerTreeViewDialog::EXPAND_NONE );
+  H3DNodeDatabase *db = H3DNodeDatabase::lookupNodeInstance(n);
+  for(H3DNodeDatabase::FieldDBConstIterator i = db->fieldDBBegin();
+  db->fieldDBEnd() != i; ++i) {
+    Field *f = i.getField(n); //n->getField( *i );
+
+    if(SFNode *sfnode = dynamic_cast<SFNode *>(f)) {
+      if(sfnode->getAccessType() != Field::INPUT_ONLY) {
+        addNodeToTree(new_id, sfnode->getValue(), sfnode->getName(), expand_new_id?expand:H3DViewerTreeViewDialog::EXPAND_NONE);
       }
-    } else if( MFNode *mfnode = dynamic_cast< MFNode * >( f ) ) {
-      if( mfnode->getAccessType() != Field::INPUT_ONLY ) {
-        for( MFNode::const_iterator i = mfnode->begin(); i != mfnode->end(); ++i ) {
-          addNodeToTree( new_id, *i, mfnode->getName(), expand_new_id ? expand : H3DViewerTreeViewDialog::EXPAND_NONE );
+    } else if(MFNode *mfnode = dynamic_cast<MFNode *>(f)) {
+      if(mfnode->getAccessType() != Field::INPUT_ONLY) {
+        for(MFNode::const_iterator i = mfnode->begin(); i != mfnode->end(); ++i) {
+          addNodeToTree(new_id, *i, mfnode->getName(), expand_new_id?expand:H3DViewerTreeViewDialog::EXPAND_NONE);
         }
       }
     }
   }
 
   // make the tree be open down to leaves or not.
-  if( expand_new_id ) {
-    TreeViewTree->Expand( new_id );
-  } 
+  if(expand_new_id) {
+    TreeViewTree->Expand(new_id);
+  }
 }
 
 
-void H3DViewerTreeViewDialog::updateNodeTree( wxTreeItemId tree_id, 
-                                              list< pair< H3D::Node *, string > > nodes,
-                                              H3DViewerTreeViewDialog::ExpandMode expand_new,
-                                              bool check_if_expanded ) {
+void H3DViewerTreeViewDialog::updateNodeTree(wxTreeItemId tree_id,
+                                             list< pair< H3D::Node *, string > > nodes,
+                                             H3DViewerTreeViewDialog::ExpandMode expand_new,
+                                             bool check_if_expanded) {
 
   // find all children of tree_id
   list< wxTreeItemId > children_ids;
   wxTreeItemIdValue cookie;
 
-  wxTreeItemId id = TreeViewTree->GetFirstChild( tree_id, cookie );
-  if( check_if_expanded )
-    if( id.IsOk() && TreeViewTree->HasChildren(tree_id ) && !TreeViewTree->IsExpanded( tree_id ) ) { 
+  wxTreeItemId id = TreeViewTree->GetFirstChild(tree_id, cookie);
+  if(check_if_expanded)
+    if(id.IsOk() && TreeViewTree->HasChildren(tree_id) && !TreeViewTree->IsExpanded(tree_id)) {
       return;
     }
-  while( id.IsOk() ) {
-    children_ids.push_back( id );
-    id = TreeViewTree->GetNextSibling( id );
+  while(id.IsOk()) {
+    children_ids.push_back(id);
+    id = TreeViewTree->GetNextSibling(id);
   }
-  
+
   // update each of the tree ids that already exists. Either by updating
   // them if they still refer to a node or deleting them otherwise.
   bool have_node_in_tree = false;
-  for( list< wxTreeItemId >::iterator i = children_ids.begin();
-       i != children_ids.end(); ++i ) {
+  for(list< wxTreeItemId >::iterator i = children_ids.begin();
+  i != children_ids.end(); ++i) {
     // find the node corresponding to the id in the current tree view.
 
-    if( node_map.find( (*i).m_pItem ) == node_map.end() ) {
+    if(node_map.find((*i).m_pItem) == node_map.end()) {
       continue;
     }
 
-    Node *id_node = node_map[ (*i).m_pItem ].get(); 
+    Node *id_node = node_map[(*i).m_pItem].get();
 
     // check if this node still exists in the new node structure
     list< pair< H3D::Node *, string > >::iterator ni;
-    for( ni = nodes.begin(); ni != nodes.end(); ++ni ) {
+    for(ni = nodes.begin(); ni != nodes.end(); ++ni) {
       Node *node = (*ni).first;
-      if( node->getProtoInstanceParent() ) {
-        node = node->getProtoInstanceParent(); 
+      if(node->getProtoInstanceParent()) {
+        node = node->getProtoInstanceParent();
       }
-      if( node == id_node ) {
-#ifdef HAVE_PROFILER
-        if( H3D::Profiling::profile_group_nodes || force_update_labels) {
-          string node_label = getNodeLabel( node, (*ni).second ) ;
-          TreeViewTree->SetItemText(*i, wxString( node_label.c_str() ) );
+      if(node == id_node) {
+        #ifdef HAVE_PROFILER
+        if(H3D::Profiling::profile_group_nodes || force_update_labels) {
+          string node_label = getNodeLabel(node, (*ni).second);
+          TreeViewTree->SetItemText(*i, wxString(node_label.c_str()));
         }
-#endif
+        #endif
         break;
       }
     }
 
-    if( ni != nodes.end() ) {
+    if(ni != nodes.end()) {
       // the node the tree id refers to still exists on this level
       // so recurse down.
 
       // find all child nodes of the node
       list< pair< H3D::Node *, string > > child_nodes;
-      H3DNodeDatabase *db = H3DNodeDatabase::lookupNodeInstance( id_node );
-      for( H3DNodeDatabase::FieldDBConstIterator j = db->fieldDBBegin();
-           db->fieldDBEnd() != j; ++j ) {
-         Field *f = j.getField( id_node ); //Field *f = id_node->getField( *j );
+      H3DNodeDatabase *db = H3DNodeDatabase::lookupNodeInstance(id_node);
+      for(H3DNodeDatabase::FieldDBConstIterator j = db->fieldDBBegin();
+      db->fieldDBEnd() != j; ++j) {
+        Field *f = j.getField(id_node); //Field *f = id_node->getField( *j );
 
-        if( SFNode *sfnode = dynamic_cast< SFNode * >( f ) ) {
-          if( sfnode->getAccessType() != Field::INPUT_ONLY ) {
+        if(SFNode *sfnode = dynamic_cast<SFNode *>(f)) {
+          if(sfnode->getAccessType() != Field::INPUT_ONLY) {
             Node *n = sfnode->getValue();
-            if( n ) child_nodes.push_back( make_pair( sfnode->getValue(), sfnode->getName() ) );
+            if(n) child_nodes.push_back(make_pair(sfnode->getValue(), sfnode->getName()));
           }
-        } else if( MFNode *mfnode = dynamic_cast< MFNode * >( f ) ) {
-          if( mfnode->getAccessType() != Field::INPUT_ONLY ) {
-            for( MFNode::const_iterator mf = mfnode->begin(); 
-                 mf != mfnode->end(); ++mf ) {
-              if( *mf ) child_nodes.push_back( make_pair( *mf, mfnode->getName() ) );
+        } else if(MFNode *mfnode = dynamic_cast<MFNode *>(f)) {
+          if(mfnode->getAccessType() != Field::INPUT_ONLY) {
+            for(MFNode::const_iterator mf = mfnode->begin();
+            mf != mfnode->end(); ++mf) {
+              if(*mf) child_nodes.push_back(make_pair(*mf, mfnode->getName()));
             }
           }
-        }        
+        }
       }
       // update
-      updateNodeTree( *i, child_nodes, expand_new );
-      nodes.erase( ni );
+      updateNodeTree(*i, child_nodes, expand_new);
+      nodes.erase(ni);
     } else {
       // the node does not exist, so remove the tree id and all its children.
-      deleteTree( *i );
+      deleteTree(*i);
     }
   }
 
   // add all new nodes to the tree. 
-  for( list< pair< H3D::Node *, string > >::iterator i = nodes.begin();
-       i != nodes.end(); ++i ) {
-    addNodeToTree( tree_id, (*i).first, (*i).second, expand_new );
+  for(list< pair< H3D::Node *, string > >::iterator i = nodes.begin();
+  i != nodes.end(); ++i) {
+    addNodeToTree(tree_id, (*i).first, (*i).second, expand_new);
   }
 
   // make the tree be open down to leaves by default.
@@ -420,135 +494,152 @@ void H3DViewerTreeViewDialog::updateNodeTree( wxTreeItemId tree_id,
 }
 
 
-void H3DViewerTreeViewDialog::deleteTree( const wxTreeItemId &id ) { 
+void H3DViewerTreeViewDialog::deleteTree(const wxTreeItemId &id) {
   list< wxTreeItemId > children_ids;
   wxTreeItemIdValue cookie;
-  wxTreeItemId child_id = TreeViewTree->GetFirstChild( id, cookie );
-  while( child_id.IsOk() ) {
-    children_ids.push_back( child_id );
-    child_id = TreeViewTree->GetNextSibling( child_id );
+  wxTreeItemId child_id = TreeViewTree->GetFirstChild(id, cookie);
+  while(child_id.IsOk()) {
+    children_ids.push_back(child_id);
+    child_id = TreeViewTree->GetNextSibling(child_id);
   }
 
-  for( list< wxTreeItemId >::iterator i = children_ids.begin();
-       i != children_ids.end(); ++i ) {
-    deleteTree( *i );
+  for(list< wxTreeItemId >::iterator i = children_ids.begin();
+  i != children_ids.end(); ++i) {
+    deleteTree(*i);
   }
 
-  node_map.erase( id.m_pItem ); 
-  TreeViewTree->Delete( id );
+  node_map.erase(id.m_pItem);
+  TreeViewTree->Delete(id);
 }
 
-void H3DViewerTreeViewDialog::displayFieldsFromNode( Node *n ) {
-  field_values_panel->displayFieldsFromNode( n );
+void H3DViewerTreeViewDialog::displayFieldsFromNode(Node *n) {
+  field_values_panel->displayFieldsFromNode(n);
 }
- 
+
 void H3DViewerTreeViewDialog::clearTreeView() {
   list< pair< Node *, string> > l;
-  updateNodeTree( TreeViewTree->GetRootItem(), l );
-  updateNodeTree( bindable_tree_id, l, H3DViewerTreeViewDialog::EXPAND_NONE, false );
-  displayFieldsFromNode( NULL );
+  updateNodeTree(TreeViewTree->GetRootItem(), l);
+  updateNodeTree(bindable_tree_id, l, H3DViewerTreeViewDialog::EXPAND_NONE, false);
+  displayFieldsFromNode(NULL);
 }
 
-void H3DViewerTreeViewDialog::OnProfileCheckbox( wxCommandEvent& event ) {
+void H3DViewerTreeViewDialog::OnProfileCheckbox(wxCommandEvent& event) {
   bool checked = event.IsChecked();
   H3D::Profiling::profile_group_nodes = checked;
   force_update_labels = true;
 }
 
-void H3DViewerTreeViewDialog::OnIdle( wxIdleEvent& event ) {
+void H3DViewerTreeViewDialog::OnIdle(wxIdleEvent& event) {
   try {
-  if( IsShown() ) {
-    
-    if( selected_node.get() != field_values_panel->getDisplayedNode() ) {
-      displayFieldsFromNode( selected_node.get() );
-    }
+    if(IsShown()) {
 
-    field_values_panel->OnIdle( event );
-
-    TimeStamp now;
-    if( now - last_tree_update > 1 ) {
-      if( shown_last_loop ) {
-        showEntireSceneAsTree( H3DViewerTreeViewDialog::EXPAND_NONE );
-      } else {
-        showEntireSceneAsTree( H3DViewerTreeViewDialog::EXPAND_GROUP );
+      if(selected_node.get() != field_values_panel->getDisplayedNode()) {
+        displayFieldsFromNode(selected_node.get());
       }
-#ifdef HAVE_PROFILER
-      force_update_labels = false;
-#endif
-      last_tree_update = now;
-    }
-  } else if( shown_last_loop ) {
-    // make sure we do not hold any references to any nodes by clearing
-    // it.
-    clearTreeView();
-  }
 
-  shown_last_loop = IsShown();
-  } catch( ... ) {
+      field_values_panel->OnIdle(event);
+
+      TimeStamp now;
+      if(now - last_tree_update > 1) {
+        if(shown_last_loop) {
+          showEntireSceneAsTree(H3DViewerTreeViewDialog::EXPAND_NONE);
+        } else {
+          showEntireSceneAsTree(H3DViewerTreeViewDialog::EXPAND_GROUP);
+        }
+        #ifdef HAVE_PROFILER
+        force_update_labels = false;
+        #endif
+        last_tree_update = now;
+      }
+    } else if(shown_last_loop) {
+      // make sure we do not hold any references to any nodes by clearing
+      // it.
+      clearTreeView();
+    }
+
+    shown_last_loop = IsShown();
+  } catch(...) {
     // ignore any errors
   }
 }
 
-void H3DViewerTreeViewDialog::onCharHook ( wxKeyEvent& event ) {
-  if ( event.ControlDown() ) {
-    if ( event.GetKeyCode() == 70 /*F*/ ) {
+void H3DViewerTreeViewDialog::onCharHook(wxKeyEvent& event) {
+  if(event.ControlDown()) {
+    if(event.GetKeyCode() == 70 /*F*/) {
       // CTRL+F: Search/find
       search_text_ctrl->SetFocus();
       search_text_ctrl->SelectAll();
     }
   }
 
+  // F3 to cycle through search results.
+  if(event.GetKeyCode() == WXK_F3) {
+    wxCommandEvent e;
+    e.SetString(search_text_ctrl->GetValue());
+
+    // Hold down shift to reverse cycle direction.
+    if(event.ShiftDown()) {
+      bool reverse_direction = true;
+      e.SetClientData(&reverse_direction);
+      onSearchTextCtrl(e);
+    } else {
+      bool reverse_direction = false;
+      e.SetClientData(&reverse_direction);
+      onSearchTextCtrl(e);
+    }
+  }
+
   event.Skip();
 }
 
-void H3DViewerTreeViewDialog::highlightSearchBox () {
+void H3DViewerTreeViewDialog::highlightSearchBox() {
   search_text_ctrl->SetFocus();
   search_text_ctrl->Clear();
 }
 
-void H3DViewerTreeViewDialog::expandTree( const wxTreeItemId &id ) {
-  if( id.IsOk() ) {
+void H3DViewerTreeViewDialog::expandTree(const wxTreeItemId &id) {
+  if(id.IsOk()) {
     wxTreeItemIdValue cookie;
-    wxTreeItemId child_id = TreeViewTree->GetFirstChild( id, cookie );
-    while( child_id.IsOk() ) {
-      expandTree( child_id );
-      child_id = TreeViewTree->GetNextSibling( child_id );
+    wxTreeItemId child_id = TreeViewTree->GetFirstChild(id, cookie);
+    while(child_id.IsOk()) {
+      expandTree(child_id);
+      child_id = TreeViewTree->GetNextSibling(child_id);
     }
-    TreeViewTree->Expand( id );
+    TreeViewTree->Expand(id);
   }
 }
 
-void H3DViewerTreeViewDialog::collapseTree( const wxTreeItemId &id ) {
-  if( id.IsOk() ) {
+void H3DViewerTreeViewDialog::collapseTree(const wxTreeItemId &id) {
+  if(id.IsOk()) {
     wxTreeItemIdValue cookie;
-    wxTreeItemId child_id = TreeViewTree->GetFirstChild( id, cookie );
-    while( child_id.IsOk() ) {
-      collapseTree( child_id );
-      child_id = TreeViewTree->GetNextSibling( child_id );
+    wxTreeItemId child_id = TreeViewTree->GetFirstChild(id, cookie);
+    while(child_id.IsOk()) {
+      collapseTree(child_id);
+      child_id = TreeViewTree->GetNextSibling(child_id);
     }
-    TreeViewTree->Collapse( id );
+    TreeViewTree->Collapse(id);
   }
 }
 
 
-void H3DViewerTreeViewDialog::OnTreeRightClick( wxTreeEvent& event ) {
-  TreeViewTree->SelectItem( event.GetItem() );
-  TreeIdMap::iterator ni = node_map.find( event.GetItem().m_pItem );
+void H3DViewerTreeViewDialog::OnTreeRightClick(wxTreeEvent& event) {
+  TreeViewTree->SelectItem(event.GetItem());
+  TreeIdMap::iterator ni = node_map.find(event.GetItem().m_pItem);
   X3DGeometryNode *geom = NULL;
   X3DTextureNode * tex = NULL;
-  
-  if( ni != node_map.end() ) {
-   geom = dynamic_cast< X3DGeometryNode * >( (*ni).second.get() );
-   tex = dynamic_cast< X3DTextureNode * >( (*ni).second.get() );
+
+  if(ni != node_map.end()) {
+    geom = dynamic_cast<X3DGeometryNode *>((*ni).second.get());
+    tex = dynamic_cast<X3DTextureNode *>((*ni).second.get());
   }
 
-  if(geom) PopupMenu( menu_container->RightClickMenuGeometry );
-  else if(tex) PopupMenu( menu_container->RightClickMenuTexture );
-  else PopupMenu( menu_container->RightClickMenu );
+  if(geom) PopupMenu(menu_container->RightClickMenuGeometry);
+  else if(tex) PopupMenu(menu_container->RightClickMenuTexture);
+  else PopupMenu(menu_container->RightClickMenu);
 }
 
 
-void H3DViewerTreeViewDialog::OnClose( wxCloseEvent& event ) {
+void H3DViewerTreeViewDialog::OnClose(wxCloseEvent& event) {
   Hide();
 }
 
@@ -556,39 +647,39 @@ void H3DViewerTreeViewDialog::btnCloseClick(wxCommandEvent& event) {
   Hide();
 }
 
-void H3DViewerTreeViewDialog::collectAllTriangles( Node *n, 
-                                                   const Matrix4f &transform,
-                                                   vector< Vec3f > &triangles ) {
+void H3DViewerTreeViewDialog::collectAllTriangles(Node *n,
+                                                  const Matrix4f &transform,
+                                                  vector< Vec3f > &triangles) {
 
-  if( !n ) return;
+  if(!n) return;
 
-  
-  if( X3DShapeNode *shape = dynamic_cast< X3DShapeNode * >( n ) ) {
+
+  if(X3DShapeNode *shape = dynamic_cast<X3DShapeNode *>(n)) {
     X3DGeometryNode *geom = shape->geometry->getValue();
-    if( geom ) {
+    if(geom) {
       vector< HAPI::Collision::Triangle > tris;
-      geom->boundTree->getValue()->getAllTriangles( tris );
-      for( unsigned int i = 0; i < tris.size(); ++i ) {
-        triangles.push_back( transform * (Vec3f) tris[i].a );
-        triangles.push_back( transform * (Vec3f) tris[i].b );
-        triangles.push_back( transform * (Vec3f) tris[i].c );
+      geom->boundTree->getValue()->getAllTriangles(tris);
+      for(unsigned int i = 0; i < tris.size(); ++i) {
+        triangles.push_back(transform * (Vec3f)tris[i].a);
+        triangles.push_back(transform * (Vec3f)tris[i].b);
+        triangles.push_back(transform * (Vec3f)tris[i].c);
       }
     }
-  } 
+  }
 
-  MatrixTransform *t = dynamic_cast< MatrixTransform * >( n );
-  Matrix4f new_transform = t ? t->matrix->getValue() * transform :transform;
+  MatrixTransform *t = dynamic_cast<MatrixTransform *>(n);
+  Matrix4f new_transform = t?t->matrix->getValue() * transform:transform;
 
-  H3DNodeDatabase *db = H3DNodeDatabase::lookupNodeInstance( n );
-  for( H3DNodeDatabase::FieldDBConstIterator i = db->fieldDBBegin();
-       db->fieldDBEnd() != i; ++i ) {
-    Field *f = i.getField( n ); 
-    if( SFNode *sfnode = dynamic_cast< SFNode * >( f ) ) {
-      collectAllTriangles( sfnode->getValue(), new_transform, triangles );
-    } else if( MFNode *mfnode = dynamic_cast< MFNode * >( f ) ) {
-      for( unsigned int j = 0; j < mfnode->size(); ++j ) {
-        Node *n = mfnode->getValueByIndex( j ); 
-        collectAllTriangles( n, new_transform, triangles );
+  H3DNodeDatabase *db = H3DNodeDatabase::lookupNodeInstance(n);
+  for(H3DNodeDatabase::FieldDBConstIterator i = db->fieldDBBegin();
+  db->fieldDBEnd() != i; ++i) {
+    Field *f = i.getField(n);
+    if(SFNode *sfnode = dynamic_cast<SFNode *>(f)) {
+      collectAllTriangles(sfnode->getValue(), new_transform, triangles);
+    } else if(MFNode *mfnode = dynamic_cast<MFNode *>(f)) {
+      for(unsigned int j = 0; j < mfnode->size(); ++j) {
+        Node *n = mfnode->getValueByIndex(j);
+        collectAllTriangles(n, new_transform, triangles);
       }
     }
   }
@@ -597,120 +688,121 @@ void H3DViewerTreeViewDialog::collectAllTriangles( Node *n,
 BEGIN_EVENT_TABLE(wxImagePanel, wxPanel)
 EVT_PAINT(wxImagePanel::paintEvent)
 END_EVENT_TABLE()
- 
-wxImagePanel::wxImagePanel(wxWindow* parent) : wxPanel(parent) {}
+
+wxImagePanel::wxImagePanel(wxWindow* parent) : wxPanel(parent) {
+}
 
 void wxImagePanel::paintEvent(wxPaintEvent & evt) {
   wxPaintDC dc(this);
-  dc.DrawBitmap( image, 0, 0, false );
+  dc.DrawBitmap(image, 0, 0, false);
 }
 
-void wxImagePanel::setImage ( const wxImage& _image ) {
-  image= wxBitmap ( _image );
+void wxImagePanel::setImage(const wxImage& _image) {
+  image = wxBitmap(_image);
 
-  wxSize s ( image.GetWidth(), image.GetHeight() );
-  SetMinSize ( s );
-  SetMaxSize ( s );
+  wxSize s(image.GetWidth(), image.GetHeight());
+  SetMinSize(s);
+  SetMaxSize(s);
 }
 
-H3DViewImage::H3DViewImage ( wxWindow* parent, X3DTextureNode& _texture ) 
-: 
-  image_data ( NULL ),
-  ViewImage ( parent ) {
-  draw_pane = new wxImagePanel ( m_imagePanel );
+H3DViewImage::H3DViewImage(wxWindow* parent, X3DTextureNode& _texture)
+  :
+  image_data(NULL),
+  ViewImage(parent) {
+  draw_pane = new wxImagePanel(m_imagePanel);
   m_imagePanel->GetSizer()->Add(draw_pane, 1, wxEXPAND);
 
-  texture.reset ( &_texture );
+  texture.reset(&_texture);
   updateImage();
 
   stringstream s;
   s << "View: " << _texture.getName();
-  SetTitle ( wxString(s.str().c_str(),wxConvUTF8) );
+  SetTitle(wxString(s.str().c_str(), wxConvUTF8));
 }
 
-void H3DViewImage::OnSave( wxCommandEvent& event ) {
-#ifdef HAVE_FREEIMAGE
-  auto_ptr< wxFileDialog > file_dialog ( new wxFileDialog ( this,
-                                                            wxT("File to save as.."),
-                                                            wxT(""),
-                                                            wxT(""),
-                                                            wxT("*.png"),
-                                                            wxFD_SAVE,
-                                                            wxDefaultPosition) );
+void H3DViewImage::OnSave(wxCommandEvent& event) {
+  #ifdef HAVE_FREEIMAGE
+  auto_ptr< wxFileDialog > file_dialog(new wxFileDialog(this,
+                                                        wxT("File to save as.."),
+                                                        wxT(""),
+                                                        wxT(""),
+                                                        wxT("*.png"),
+                                                        wxFD_SAVE,
+                                                        wxDefaultPosition));
 
-  if (file_dialog->ShowModal() == wxID_OK) {
+  if(file_dialog->ShowModal() == wxID_OK) {
     try {
-      Image* image= texture->renderToImage ( -1, -1 );
-      if ( !image ) {
-        wxMessageBox( wxT("Failed to render texture to image!"), wxT("Error"),
-                    wxOK | wxICON_EXCLAMATION);
+      Image* image = texture->renderToImage(-1, -1);
+      if(!image) {
+        wxMessageBox(wxT("Failed to render texture to image!"), wxT("Error"),
+                     wxOK | wxICON_EXCLAMATION);
         return;
       }
- 
-      if( !H3DUtil::saveFreeImagePNG( string(file_dialog->GetPath().mb_str()),
-                                        *image ) ) {
+
+      if(!H3DUtil::saveFreeImagePNG(string(file_dialog->GetPath().mb_str()),
+                                    *image)) {
         stringstream s;
         s << "Error saving png file";
-        wxMessageBox( wxString(s.str().c_str(),wxConvUTF8), wxT("Error"),
-                      wxOK | wxICON_EXCLAMATION);
+        wxMessageBox(wxString(s.str().c_str(), wxConvUTF8), wxT("Error"),
+                     wxOK | wxICON_EXCLAMATION);
       }
-    } catch (const Exception::H3DException &e) {
+    } catch(const Exception::H3DException &e) {
       stringstream s;
       s << e;
-      wxMessageBox( wxString(s.str().c_str(),wxConvUTF8), wxT("Error"),
-                    wxOK | wxICON_EXCLAMATION);
+      wxMessageBox(wxString(s.str().c_str(), wxConvUTF8), wxT("Error"),
+                   wxOK | wxICON_EXCLAMATION);
     }
   }
-#endif
+  #endif
 }
 
-void H3DViewImage::OnRefresh ( wxCommandEvent& event ) {
-  updateImage ();
-  draw_pane->Refresh ();
+void H3DViewImage::OnRefresh(wxCommandEvent& event) {
+  updateImage();
+  draw_pane->Refresh();
 }
 
-void H3DViewImage::OnAutoRefresh ( wxCommandEvent& event ) {
-  if ( event.IsChecked() ) {
-    m_timerRefresh.Start( 2000 );
+void H3DViewImage::OnAutoRefresh(wxCommandEvent& event) {
+  if(event.IsChecked()) {
+    m_timerRefresh.Start(2000);
   } else {
     m_timerRefresh.Stop();
   }
 }
 
-void H3DViewImage::OnTimer ( wxTimerEvent& event ) {
-  updateImage ();
-  draw_pane->Refresh ();
+void H3DViewImage::OnTimer(wxTimerEvent& event) {
+  updateImage();
+  draw_pane->Refresh();
 }
 
-void H3DViewImage::updateImage () {
-  auto_ptr < Image > image ( texture->renderToImage ( -1, -1 ) );
-  if ( !image.get() ) {
+void H3DViewImage::updateImage() {
+  auto_ptr < Image > image(texture->renderToImage(-1, -1));
+  if(!image.get()) {
     Console(LogLevel::Error) << "ERROR: Failed to render texture to image!" << endl;
     return;
   }
 
-  unsigned char* rgb= new unsigned char [ image->width()*image->height()*3 ];
+  unsigned char* rgb = new unsigned char[image->width()*image->height() * 3];
 
-  size_t offset= 0;
-  for ( size_t y= 0; y < image->height(); ++y ) {
-    for ( size_t x= 0; x < image->width(); ++x ) {
-        RGBA rgba= image->getPixel ( x, image->height()-1-y );
+  size_t offset = 0;
+  for(size_t y = 0; y < image->height(); ++y) {
+    for(size_t x = 0; x < image->width(); ++x) {
+      RGBA rgba = image->getPixel(x, image->height() - 1 - y);
 
         if( m_checkBoxChannelAlpha->GetValue() ) {
           rgb[offset++] = (unsigned char)(rgba.a * 255);
           rgb[offset++] = (unsigned char)(rgba.a * 255);
           rgb[offset++] = (unsigned char)(rgba.a * 255);
         } else {
-          rgb[offset++] = m_checkBoxChannelRed->GetValue() ? (unsigned char)(rgba.r * 255) : 0;
-          rgb[offset++] = m_checkBoxChannelGreen->GetValue() ? (unsigned char)(rgba.g * 255) : 0;
-          rgb[offset++] = m_checkBoxChannelBlue->GetValue() ? (unsigned char)(rgba.b * 255) : 0;
+        rgb[offset++]= m_checkBoxChannelRed->GetValue()   ? (unsigned char)(rgba.r*255) : 0;
+        rgb[offset++]= m_checkBoxChannelGreen->GetValue() ? (unsigned char)(rgba.g*255) : 0;
+        rgb[offset++]= m_checkBoxChannelBlue->GetValue()  ? (unsigned char)(rgba.b*255) : 0;
         }
-      }
+    }
   }
 
-  draw_pane->setImage ( wxImage ( image->width(), image->height(), rgb, true ) );
-  Layout ();
+  draw_pane->setImage(wxImage(image->width(), image->height(), rgb, true));
+  Layout();
 
-  delete [] image_data;
+  delete[] image_data;
   image_data = rgb;
 }

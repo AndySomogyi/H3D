@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun  5 2014)
+// C++ code generated with wxFormBuilder (version Jun 17 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -52,6 +52,7 @@ class TreeViewDialog : public wxFrame
 		wxStaticText* m_staticText2;
 		wxTextCtrl* search_text_ctrl;
 		wxCheckBox* case_sensitive_checkbox;
+		wxCheckBox* focus_search_result_checkbox;
 		wxCheckBox* ProfileCheckbox;
 		wxButton* btnClose;
 		

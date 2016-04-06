@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun  5 2014)
+// C++ code generated with wxFormBuilder (version Jun 17 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -54,6 +54,11 @@ TreeViewDialog::TreeViewDialog( wxWindow* parent, wxWindowID id, const wxString&
 	
 	case_sensitive_checkbox = new wxCheckBox( this, wxID_ANY, wxT("Case sensitive"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer8->Add( case_sensitive_checkbox, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	focus_search_result_checkbox = new wxCheckBox( this, wxID_ANY, wxT("Focus on search result"), wxDefaultPosition, wxDefaultSize, 0 );
+	focus_search_result_checkbox->SetToolTip( wxT("If checked, moves focus to the first search result when you press enter.") );
+	
+	bSizer8->Add( focus_search_result_checkbox, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
 	ProfileCheckbox = new wxCheckBox( this, wxID_ANY, wxT("Show profiling"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer8->Add( ProfileCheckbox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -417,21 +422,21 @@ ViewImage::ViewImage( wxWindow* parent, wxWindowID id, const wxString& title, co
 	wxStaticBoxSizer* sbSizer2;
 	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( m_panel4, wxID_ANY, wxT("Channels") ), wxHORIZONTAL );
 	
-	m_checkBoxChannelRed = new wxCheckBox( m_panel4, wxID_ANY, wxT("Red"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxChannelRed = new wxCheckBox( sbSizer2->GetStaticBox(), wxID_ANY, wxT("Red"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_checkBoxChannelRed->SetValue(true); 
 	m_checkBoxChannelRed->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNTEXT ) );
 	m_checkBoxChannelRed->SetMinSize( wxSize( 50,-1 ) );
 	
 	sbSizer2->Add( m_checkBoxChannelRed, 0, wxALL, 5 );
 	
-	m_checkBoxChannelGreen = new wxCheckBox( m_panel4, wxID_ANY, wxT("Green"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxChannelGreen = new wxCheckBox( sbSizer2->GetStaticBox(), wxID_ANY, wxT("Green"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_checkBoxChannelGreen->SetValue(true); 
 	m_checkBoxChannelGreen->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNTEXT ) );
 	m_checkBoxChannelGreen->SetMinSize( wxSize( 50,-1 ) );
 	
 	sbSizer2->Add( m_checkBoxChannelGreen, 0, wxALL, 5 );
 	
-	m_checkBoxChannelBlue = new wxCheckBox( m_panel4, wxID_ANY, wxT("Blue"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxChannelBlue = new wxCheckBox( sbSizer2->GetStaticBox(), wxID_ANY, wxT("Blue"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_checkBoxChannelBlue->SetValue(true); 
 	m_checkBoxChannelBlue->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNTEXT ) );
 	m_checkBoxChannelBlue->SetMinSize( wxSize( 50,-1 ) );
