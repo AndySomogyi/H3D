@@ -43,7 +43,6 @@ namespace RotationalSpringEffectInternals {
   FIELDDB_ELEMENT( RotationalSpringEffect, torque, INPUT_OUTPUT );
   FIELDDB_ELEMENT( RotationalSpringEffect, springConstant, INPUT_OUTPUT );
   FIELDDB_ELEMENT( RotationalSpringEffect, enabled, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( RotationalSpringEffect, deviceIndex, INPUT_OUTPUT );
   FIELDDB_ELEMENT( RotationalSpringEffect, damping, INPUT_OUTPUT );
 }
 
