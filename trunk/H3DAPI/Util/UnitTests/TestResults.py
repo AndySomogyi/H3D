@@ -143,8 +143,11 @@ class TestResults ( object ):
         except:
           valid = False;
           error.append('WARNING: Image comparison failed!\n\nDetails:\n%s\n%s' % (rendering_path, err) )
+          return valid, "", error
 
-        if not metric is None and metric > error_threshold:
+        if metric is None:
+          valid = False
+        elif metric > error_threshold:
           valid = False
           error.append(
             'WARNING: The rendering ' +
