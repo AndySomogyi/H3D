@@ -192,6 +192,12 @@ namespace H3D {
     bool pauseDeviceTransform;
 
     HAPI::HAPIHapticsDevice::DeviceValues pauseDeviceTransformDV;
+  public:
+    virtual void initialize() {
+      // This makes it easier to subclass FakeHapticsDevice, or H3DFakeHapticsDevice and use a subclass
+      // H3DFakeHapticsDevice::FakeHapticsDevice internally.
+      dynamic_cast< H3DFakeHapticsDevice::FakeHapticsDevice * >(hapi_device.get())->owner = this;
+    }
   };
 }
 
