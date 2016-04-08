@@ -4,6 +4,9 @@ error_reporting(E_ALL);
 
 require('mysql_conf.php');
 
+
+ini_set('memory_limit', '512M');
+
 $test_run_id = $_GET['test_run_id'];
   
 $perf_query = sprintf("
@@ -115,11 +118,11 @@ $perf_rows = fetch_result($db, $perf_query);
 //echo json_encode($error_rows, JSON_PRETTY_PRINT);
 
 $data = array();
-$data = generate_results($db, $data, $error_rows);
-$data = generate_results($db, $data, $console_rows);
-$data = generate_results($db, $data, $custom_rows);
-$data = generate_results($db, $data, $render_rows);
-$data = generate_results($db, $data, $perf_rows);
+$data = generate_results($db, $data, 0, $error_rows);
+$data = generate_results($db, $data, 1, $console_rows);
+$data = generate_results($db, $data, 2, $custom_rows);
+$data = generate_results($db, $data, 3, $render_rows);
+$data = generate_results($db, $data, 4, $perf_rows);
 
 if(count($data) == 0) {
 $testcase = array(
@@ -148,7 +151,7 @@ function fetch_result($db, $query) {
   return $fetched_data;
 }	
 	
-function generate_results($db, $data, $fetched_data) {
+function generate_results($db, $data, $table_count, $fetched_data) {
  
 /*
     Tree-building algorithm:
@@ -426,7 +429,7 @@ function generate_results($db, $data, $fetched_data) {
           break;
         }
       }
-      $target++;
+      $target += 1 + $table_count;
     }
     array_splice($node['testcases'], $target, 0, array($testcase));
 

@@ -60,9 +60,9 @@ var display_options =  {
 };
 
         
-var hash_server = decodeURI(location.hash.substr(location.hash.indexOf('server=')).split('&')[0].split('=')[1]).replace(/_/g, ' ');
+var hash_server = decodeURI(location.hash.substr(location.hash.indexOf('server=')).split('&')[0].split('=')[1]).replace(/--/g, ' ');
 var hash_run = location.hash.substr(location.hash.indexOf('testrun=')).split('&')[0].split('=')[1];
-var hash_category = decodeURI(location.hash.substr(location.hash.indexOf('category=')).split('&')[0].split('=')[1]);
+var hash_category = decodeURI(location.hash.substr(location.hash.indexOf('category=')).split('&')[0].split('=')[1]).replace(/--/g, ' ');
 var hash_case = decodeURI(location.hash.substr(location.hash.indexOf('case=')).split('&')[0].split('=')[1]);
 
 
@@ -582,7 +582,7 @@ function ConstructTestCases(model, target, path) {
         
         var case_name_link = $("<a>");
         case_name_link.append("Case: " + model.testcases[i].name);
-        case_name_link.attr('href', encodeURI("#server=" + display_options.servers.current.replace(/ /g, '_') + "&testrun=" + display_options.testruns.selected + "&category=" + path + model.name + "&case=" + model.testcases[i].name));
+        case_name_link.attr('href', encodeURI("#server=" + display_options.servers.current.replace(/ /g, '--') + "&testrun=" + display_options.testruns.selected + "&category=" + path.replace(/ /g, '--') + "&case=" + model.testcases[i].name));
         case_name.append(case_name_link);
         if(model.testcases[i].success == 'Y') {
           case_name.addClass("test_successful");
@@ -658,7 +658,7 @@ function ConstructList(model, target, path) {
       var name = $('<a><h3>'+model[i].name+'</h3></a>');
       name.data('category_name', path + model[i].name + "/");
       name.click(function(){
-        window.location.hash = encodeURI("#server=" + display_options.servers.current.replace(/ /g, '_') + "&testrun=" + display_options.testruns.selected + "&category=" + $(this).data('category_name'));
+        window.location.hash = encodeURI("#server=" + display_options.servers.current.replace(/ /g, '--') + "&testrun=" + display_options.testruns.selected + "&category=" + $(this).data('category_name').replace(/ /g, '--'));
       });
       label.append(name);
 
@@ -734,7 +734,7 @@ function GetServerList() {
             SetServer($(this).data("server_id"), $(this).data("server_name"));
                 $(".Selected_Server").removeClass('Selected_Server');
                 $(this).addClass('Selected_Server');
-              window.location.hash = encodeURI("#server=" + display_options.servers.current.replace(/ /g, '_'));
+              window.location.hash = encodeURI("#server=" + display_options.servers.current.replace(/ /g, '--'));
           });
           if(hash_server == res[i].name) {
             SetServer($(div).data("server_id"), $(div).data("server_name"));
@@ -762,7 +762,7 @@ function SetServer(server_id, server_name) {
 function OnTestRunClick(){
   $(".TestRun").unbind("click");
   if(display_options.testruns.selected != $(this).data("test_run_id")) {
-    window.location.hash = encodeURI("#server=" + display_options.servers.current.replace(/ /g, '_') + "&testrun=" + $(this).data("test_run_id"));
+    window.location.hash = encodeURI("#server=" + display_options.servers.current.replace(/ /g, '--') + "&testrun=" + $(this).data("test_run_id"));
     hash_run = $(this).data("test_run_id");
   }
   SetTestRun($(this).data("test_run_id"));
@@ -852,7 +852,6 @@ function SetTestRun(test_run_id) {
     });
     
     
-    
     $('#Options_Toggle_Cases').data('collapsed', true);
     $('#Options_Toggle_Cases').prop('value', 'Expand Visible Cases');
     $('#Options_Toggle_Cases').unbind().click(function(){
@@ -892,8 +891,6 @@ var model = null;
 
 $(document).ready(function(){
   GetServerList();
- 
-  
-});    
+});
 
-          
+
