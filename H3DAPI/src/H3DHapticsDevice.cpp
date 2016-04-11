@@ -432,94 +432,99 @@ void H3DHapticsDevice::updateDeviceValues() {
           device_index = i;
       }
     }
-    assert( device_index != -1 );
 
-    HAPI::HAPIHapticsRenderer::Contacts all_contacts;
+    // Have to do this check since ClutchedHapticsDevice actually call H3DHapticsDevice::updateDeviceValues
+    // and since the ClutchedHapticsDevice is the one that is in DeviceInfo.
+    // Also what if we in the future create a similar device, having an assert will give issues in debug.
+    if( device_index > -1 ) {
 
-    for( unsigned int layer = 0; layer < hapi_device->nrLayers(); ++layer ) {
-      HAPI::HAPIHapticsRenderer *renderer = 
-        hapi_device->getHapticsRenderer( layer );
-      HAPI::HAPIHapticsRenderer::Contacts contacts;
-      if( renderer ) {
-        contacts = renderer->getContacts();
-        all_contacts.insert( all_contacts.end(),
-                             contacts.begin(),
-                             contacts.end() );
-      }
-      for( HAPI::HAPIHapticsRenderer::Contacts::iterator i = contacts.begin();
-           i != contacts.end(); ++i ) {
-        X3DGeometryNode *geom =
-          static_cast< X3DGeometryNode * >( (*i).first->getUserData() );
+      HAPI::HAPIHapticsRenderer::Contacts all_contacts;
+
+      for( unsigned int layer = 0; layer < hapi_device->nrLayers(); ++layer ) {
+        HAPI::HAPIHapticsRenderer *renderer = 
+          hapi_device->getHapticsRenderer( layer );
+        HAPI::HAPIHapticsRenderer::Contacts contacts;
+        if( renderer ) {
+          contacts = renderer->getContacts();
+          all_contacts.insert( all_contacts.end(),
+                               contacts.begin(),
+                               contacts.end() );
+        }
+        for( HAPI::HAPIHapticsRenderer::Contacts::iterator i = contacts.begin();
+             i != contacts.end(); ++i ) {
+          X3DGeometryNode *geom =
+            static_cast< X3DGeometryNode * >( (*i).first->getUserData() );
       
-        // make sure all fields have the right size
-        if( device_index > (int)geom->force->size() -1 )
-          geom->force->resize( device_index + 1, Vec3f( 0, 0, 0 ), geom->id );
-        if( device_index > (int)geom->contactPoint->size() -1 )
-          geom->contactPoint->resize( device_index + 1, Vec3f( 0, 0, 0 ),
-                                      geom->id );
-        if( device_index > (int)geom->contactNormal->size() -1 )
-          geom->contactNormal->resize( device_index + 1, Vec3f( 1, 0, 0 ),
-                                       geom->id );
-         if( device_index > (int)geom->contactTexCoord->size() -1 )
-          geom->contactTexCoord->resize( device_index + 1, Vec3f( 0, 0, 0 ),
+          // make sure all fields have the right size
+          if( device_index > (int)geom->force->size() -1 )
+            geom->force->resize( device_index + 1, Vec3f( 0, 0, 0 ), geom->id );
+          if( device_index > (int)geom->contactPoint->size() -1 )
+            geom->contactPoint->resize( device_index + 1, Vec3f( 0, 0, 0 ),
+                                        geom->id );
+          if( device_index > (int)geom->contactNormal->size() -1 )
+            geom->contactNormal->resize( device_index + 1, Vec3f( 1, 0, 0 ),
                                          geom->id );
-        if( device_index > (int)geom->isTouched->size() -1 )
-          geom->isTouched->resize( device_index + 1, false, geom->id );
+           if( device_index > (int)geom->contactTexCoord->size() -1 )
+            geom->contactTexCoord->resize( device_index + 1, Vec3f( 0, 0, 0 ),
+                                           geom->id );
+          if( device_index > (int)geom->isTouched->size() -1 )
+            geom->isTouched->resize( device_index + 1, false, geom->id );
         
-        HAPI::HAPISurfaceObject::ContactInfo ci = (*i).second;
+          HAPI::HAPISurfaceObject::ContactInfo ci = (*i).second;
 
-        // TODO: should be able to do it in a faster/better way.
-        Matrix4d global_to_local = (*i).first->getInverse();
-        Matrix3d global_vec_to_local = global_to_local.getRotationPart();
+          // TODO: should be able to do it in a faster/better way.
+          Matrix4d global_to_local = (*i).first->getInverse();
+          Matrix3d global_vec_to_local = global_to_local.getRotationPart();
 
-        Vec3f cp( global_to_local * ci.globalSurfaceContactPoint() );
+          Vec3f cp( global_to_local * ci.globalSurfaceContactPoint() );
 
-        if( geom->contactPoint->getValueByIndex( device_index ) != cp )
-          geom->contactPoint->setValue( device_index, cp, geom->id );
+          if( geom->contactPoint->getValueByIndex( device_index ) != cp )
+            geom->contactPoint->setValue( device_index, cp, geom->id );
 
-        Vec3f n( global_vec_to_local * ci.yAxis() );
+          Vec3f n( global_vec_to_local * ci.yAxis() );
 
-        if( geom->contactNormal->getValueByIndex( device_index ) != n ) 
-          geom->contactNormal->setValue( device_index, n, geom->id ); 
+          if( geom->contactNormal->getValueByIndex( device_index ) != n ) 
+            geom->contactNormal->setValue( device_index, n, geom->id ); 
 
-        if( geom->contactTexCoord->getValueByIndex( device_index ) !=
-            ci.contactPointTexCoord() ) 
-          geom->contactTexCoord->setValue( device_index,
-                                           (Vec3f) ci.contactPointTexCoord(),
-                                           geom->id ); 
+          if( geom->contactTexCoord->getValueByIndex( device_index ) !=
+              ci.contactPointTexCoord() ) 
+            geom->contactTexCoord->setValue( device_index,
+                                             (Vec3f) ci.contactPointTexCoord(),
+                                             geom->id ); 
         
-        Vec3f f( global_vec_to_local * ci.globalForce() );
+          Vec3f f( global_vec_to_local * ci.globalForce() );
 
-        if( geom->force->getValueByIndex( device_index ) != f ) 
-          geom->force->setValue(device_index, f, geom->id ); 
+          if( geom->force->getValueByIndex( device_index ) != f ) 
+            geom->force->setValue(device_index, f, geom->id ); 
 
-        bool contact_last_time = 
-          geom->isTouched->getValueByIndex( device_index );
-        if( !contact_last_time ) 
-          geom->isTouched->setValue( device_index, true, geom->id );
-      }
-    }
-
-    for( HAPI::HAPIHapticsRenderer::Contacts::iterator j =
-          last_contacts.begin();
-         j != last_contacts.end(); ++j ) {
-      bool still_in_contact = false;
-      for( HAPI::HAPIHapticsRenderer::Contacts::iterator i =
-            all_contacts.begin();
-           i != all_contacts.end(); ++i ) {
-        if( (*i).first->getUserData() == (*j).first->getUserData() ) {
-          still_in_contact = true;
-          break;
+          bool contact_last_time = 
+            geom->isTouched->getValueByIndex( device_index );
+          if( !contact_last_time ) 
+            geom->isTouched->setValue( device_index, true, geom->id );
         }
       }
-      if( !still_in_contact ) {
-        X3DGeometryNode *geom = 
-          static_cast< X3DGeometryNode * >((*j).first->getUserData() );
-        geom->isTouched->setValue( device_index, false, geom->id );
-        geom->force->setValue( device_index, Vec3f(), geom->id );
+
+      for( HAPI::HAPIHapticsRenderer::Contacts::iterator j =
+            last_contacts.begin();
+           j != last_contacts.end(); ++j ) {
+        bool still_in_contact = false;
+        for( HAPI::HAPIHapticsRenderer::Contacts::iterator i =
+              all_contacts.begin();
+             i != all_contacts.end(); ++i ) {
+          if( (*i).first->getUserData() == (*j).first->getUserData() ) {
+            still_in_contact = true;
+            break;
+          }
+        }
+        if( !still_in_contact ) {
+          X3DGeometryNode *geom = 
+            static_cast< X3DGeometryNode * >((*j).first->getUserData() );
+          geom->isTouched->setValue( device_index, false, geom->id );
+          geom->force->setValue( device_index, Vec3f(), geom->id );
+        }
       }
+      last_contacts.swap( all_contacts );
     }
-    last_contacts.swap( all_contacts );
 
   }
 
