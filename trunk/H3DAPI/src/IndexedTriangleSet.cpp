@@ -609,7 +609,7 @@ X3DNormalNode *IndexedTriangleSet::AutoNormal::generateNormalsPerVertex(
   const vector< int > &_index,
   bool _ccw ) {
     Normal *_normal = new Normal;
-    if( _coord ) {
+    if( _coord && _coord->nrAvailableCoords() > 0 ) {
       vector< Vec3f > normals( _coord->nrAvailableCoords(), 
         Vec3f( 0, 0, 0 ) );
       for( unsigned int j = 0; j < _index.size(); j+=3 ) {
@@ -651,7 +651,7 @@ X3DNormalNode *IndexedTriangleSet::AutoNormal::generateNormalsPerFace(
                                       const vector< int > &_index,
                                       bool _ccw ) {
   Normal *_normal = new Normal;
-  if( _coord ) {
+  if( _coord && _coord->nrAvailableCoords() > 0 ) {
     vector< Vec3f > normals;
     normals.reserve( _index.size() / 3 );
     for( size_t j = 0; j < _index.size(); j+=3 ) {
@@ -707,7 +707,7 @@ void IndexedTriangleSet::AutoTangent::generateTangentsPerVertex(
     binormal_node->value->clear();
   }
 
-  if( _coord ) {
+  if( _coord && _coord->nrAvailableCoords() > 0 ) {
     // the tangent and binormal for a vertex is the average of the tangent
     // of all triangles sharing that vertex.
     vector< float > tangents( _coord->nrAvailableCoords() * 3, 0 );
@@ -811,7 +811,7 @@ void IndexedTriangleSet::AutoTangent::generateTangentsPerFace(
     binormal_node->value->clear();
   }
 
-  if( _coord ) {
+  if( _coord && _coord->nrAvailableCoords() > 0 ) {
     vector< float > tangents;
     vector< float > binormals;
 
