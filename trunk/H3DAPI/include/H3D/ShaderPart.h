@@ -38,6 +38,8 @@
 #include <H3D/DebugOptions.h>
 
 namespace H3D {
+  // forward declarations
+  class ComposedShader;
 
   /// \ingroup X3DNodes
   /// \class ShaderPart
@@ -77,11 +79,26 @@ namespace H3D {
     public X3DUrlObject {
   public:
     /// Update the string to use as shader depending from the urls given.
-    class H3DAPI_API SFShaderString: 
-      public TypedField< SFString,
-                         Types<MFString,SFBool> > {
+    class H3DAPI_API SFShaderString : public TypedField< EventCollectingField< SFString >, 
+      Types<MFString,SFBool>, AnyNumber< Field > > {
+    public:
+      /// Check that the field is up-to-date, if not update() is called 
+      /// to make it up-to-date. Specialized here to apply the preProcess function
+      /// on the resulting shader string.
+      virtual void upToDate();
     protected:
       virtual void update();
+
+      /// Virtual function that will trigger a full rebuild of the shader string if
+      /// it returns true. If it returns false only parts that have changed will be
+      /// updated in place in the current shader string.
+      virtual bool doFullRebuild();
+
+    public:
+      /// Look for a constant with the name matching field->getName().
+      /// Then replace the value of that constant with the value of field->getValue().
+      /// Returns true on success.
+      bool modifyShaderConstants(Field* field);
     };
 
     typedef SFBool ForceReload;
@@ -96,6 +113,30 @@ namespace H3D {
     /// Returns a handle to the compiled shader or 0 if compiling 
     /// failed.
     virtual GLhandleARB compileShader();
+
+    /// Set the ComposedShader instance.that this ShaderPart is a child to.
+    void setParentComposedShader( ComposedShader *s );
+
+    /// Get the ComposedShader instance that this ShaderPart is a child to.
+    inline ComposedShader * getParentComposedShader() {
+      return parent_composed_shader;
+    }
+
+    /// Look for a constant with the name matching field->getName().
+    /// Then replace the value of that constant with the value of field->getValue().
+    /// Returns true on success.
+    bool modifyShaderConstants(Field* field);
+
+    /// Look for string_start and string_end. If to_insert can fit in properly, we replace.
+    /// Returns true on success.
+    /// 
+    /// If conditional_string isn't empty, we need to be able to find it, else
+    /// we return false;
+    bool replaceString( string &string_to_update,
+      const std::string& string_start,
+      const std::string& string_end,
+      const std::string& to_insert,
+      const std::string& conditional_string = "");
 
     /// Get the handle to the shader object that currently is used for
     /// this ShaderPart.
@@ -148,9 +189,16 @@ namespace H3D {
     static H3DNodeDatabase database;
     
   protected:
+    /// The ComposedShader instance that this ShaderPart is a child to.
+    ComposedShader * parent_composed_shader;
+
     /// The handle to the shader object used for this ShaderPart.
     GLhandleARB shader_handle;
     GLhandleARB compileShaderPart();
+
+    /// Extract all necessary data from a field.
+    bool getConstantVariableString(Field* const in_variable, 
+      std::string& out_name, std::string& out_type, std::string& out_field_value);
 
     /// Given the URL of a shader source, return the source code, or "" on failure
     std::string shaderStringFromURL ( const std::string& shader_url );
@@ -165,6 +213,16 @@ namespace H3D {
     /// \return The preprocessed shader source, with all preprocessor commands applied.
     ///
     std::string preProcess ( const std::string& input, const std::string& _url, int depth= 0 );
+
+    /// Update shader string with new values for constants.
+    /// \param input Shader string to update.
+    /// \param update_all_values If true, all constants will be updated, 
+    ///                          if false, only the constants that have 
+    ///                          changed will be updated.  
+    void updateShaderConstantValues( std::string &input, bool update_all_values );
+
+    /// Update shader string for us in single pass stereo render mode.
+    void updateSinglePassStereoValues( std::string &input );
 
     bool printShaderLog();
     DebugOptions *debug_options_previous;

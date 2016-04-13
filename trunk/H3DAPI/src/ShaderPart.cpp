@@ -65,7 +65,8 @@ ShaderPart::ShaderPart( Inst< SFNode         > _metadata,
   shaderString( _shader_string ),
   forceReload( _forceReload ),
   shader_handle( 0 ),
-  debug_options_previous( NULL ) {
+  debug_options_previous( NULL ),
+  parent_composed_shader( NULL ){
   type_name = "ShaderPart";
   database.initFields( this );
 
@@ -271,27 +272,95 @@ bool ShaderPart::isCompiled () {
   return shaderString->isUpToDate();
 }
 
-void ShaderPart::SFShaderString::update() {
-  //PROFILE_START("shaderpart: update");
-  ShaderPart *shader_part = static_cast< ShaderPart * >( getOwner() ); 
-  MFString *urls = static_cast< MFString * >( routes_in[0] );
-  for( MFString::const_iterator i = urls->begin(); i != urls->end(); ++i ) {
-    string include_source= shader_part->shaderStringFromURL ( *i );
-    if ( include_source != "" ) {
-      include_source= shader_part->preProcess ( include_source, *i );
-      value= include_source;
-      shader_part->setURLUsed ( *i );
-      return;
+bool ShaderPart::SFShaderString::doFullRebuild() {
+  ShaderPart *shader_part = static_cast<ShaderPart *>(getOwner());
+  return hasCausedEvent(shader_part->url) || hasCausedEvent(shader_part->forceReload);
+}
+
+void ShaderPart::SFShaderString::upToDate() {
+  bool have_event = (event.ptr != NULL);
+  TypedField< EventCollectingField< SFString >,
+    Types<MFString, SFBool>, AnyNumber< Field > >::upToDate();
+  if(have_event) {
+    ShaderPart *shader_part = static_cast<ShaderPart *>(getOwner());
+    if(value != "") {
+      value = shader_part->preProcess(value, shader_part->getURLUsed());
     }
   }
-  Console(LogLevel::Error) << "None of the urls in ShaderPart:"<<this->getFullName()<<" with url [";
-  for( MFString::const_iterator i = urls->begin(); i != urls->end(); ++i ) {  
-    Console(LogLevel::Error) << " \"" << *i << "\"";
+}
+
+void ShaderPart::SFShaderString::update() {
+  //PROFILE_START("shaderpart: update");
+
+  ShaderPart *shader_part = static_cast<ShaderPart *>(getOwner());
+  ComposedShader *parent = shader_part->getParentComposedShader();
+
+  bool full_rebuild = doFullRebuild();
+#ifdef DEBUG_COMPILE_LOG
+  Console(LogLevel::Error) << "Rebuilding(" << shader_part->type->getValue() << "). Reason: " << event.ptr->getName() << endl;
+#endif
+  if(full_rebuild) {
+    MFString *urls = static_cast<MFString *>(routes_in[0]);
+    bool found_url = false;
+    for(MFString::const_iterator i = urls->begin(); i != urls->end(); ++i) {
+      string include_source = shader_part->shaderStringFromURL(*i);
+      if(include_source != "") {
+        value = include_source;
+        shader_part->setURLUsed(*i);
+        found_url = true;
+        break;
+      }
+    }
+
+    if(!found_url) {
+      Console(LogLevel::Error) << "None of the urls in ShaderPart: " << this->getFullName() << " with url [";
+      for(MFString::const_iterator i = urls->begin(); i != urls->end(); ++i) {
+        Console(LogLevel::Error) << " \"" << *i << "\"";
+      }
+      Console(LogLevel::Error) << "] could be loaded." << endl;
+      shader_part->setURLUsed("");
+      value = "";
+    }
   }
-  Console(LogLevel::Error) << "] could be loaded." << endl;
-  shader_part->setURLUsed( "" );
-  value = "";
+
+  if(full_rebuild ||
+    (parent && hasCausedEvent(parent->shaderConstants))) {
+      shader_part->updateShaderConstantValues(value, full_rebuild);
+  }
+
+  if(shader_part->type->getValue() == "GEOMETRY"||shader_part->type->getValue() == "FRAGMENT") {
+    shader_part->updateSinglePassStereoValues(value);
+  }
+
   //PROFILE_END();
+}
+
+bool H3D::ShaderPart::SFShaderString::modifyShaderConstants(Field* field) {
+  ShaderPart* shader_part = static_cast<ShaderPart *>(getOwner());
+
+  if(shader_part) {
+    // See if the constant can be found in the shader part
+    size_t location = value.find(" " + field->getName() + " ");
+
+    // If a match is found, we set its value
+    if(location != std::string::npos) {
+
+      std::string field_name;
+      std::string field_type;
+      std::string field_value;
+
+      if(shader_part->getConstantVariableString(field, field_name, field_type, field_value)) {
+        // todo: we already know location so should use that knowledge
+        shader_part->replaceString(value, field_type + field_name + " =", ";", field_value);
+        return true;
+      } else {
+        // todo:
+        // warning
+      }
+    }
+  }
+
+  return false;
 }
 
 X3DUrlObject::LoadStatus ShaderPart::loadStatus() {
@@ -331,4 +400,227 @@ void ShaderPart::initialize() {
   X3DNode::initialize();
   GlobalSettings *default_settings = GlobalSettings::getActive();
   if( default_settings ) default_settings->getOptionNode( debug_options_previous );
+  // set up a route so that shader string is rebuilt if singlePassStereo 
+  // is changed
+  if(type->getValue() == "GEOMETRY"||type->getValue()=="FRAGMENT" ) {
+    Scene *scene = Scene::scenes.size() > 0?*Scene::scenes.begin():NULL;
+    if(scene) {
+      H3DWindowNode* window = static_cast<H3DWindowNode*>(scene->window->getValue()[0]);
+      window->singlePassStereo->route(shaderString);
+    }
+  }
+
 }
+
+bool ShaderPart::getConstantVariableString(Field* const variable,
+  std::string& out_name, std::string& out_type, std::string& out_field_value) {
+    std::string value_string;
+    X3DTypes::X3DType x3d_type = variable->getX3DType();
+
+    out_name = variable->getName();
+
+    switch(x3d_type) {
+    case X3DTypes::SFSTRING:
+      {
+        SFFloat *f = static_cast<SFFloat*>(variable);
+        out_type = "#define ";
+        out_field_value = f->getValueAsString();
+        break;
+      }
+    case X3DTypes::SFFLOAT:
+      {
+        SFFloat *f = static_cast<SFFloat*>(variable);
+        out_type = "const float ";
+        out_field_value = f->getValueAsString();
+        out_field_value = " float("+out_field_value+")";
+        break;
+      }
+    case X3DTypes::SFDOUBLE:
+      {
+        SFDouble *f = static_cast<SFDouble*>(variable);
+        out_type = "const double ";
+        out_field_value = f->getValueAsString();
+        break;
+      }
+    case X3DTypes::SFBOOL:
+      {
+        SFBool *f = static_cast<SFBool*>(variable);
+        out_type = "const bool ";
+        out_field_value = f->getValueAsString();
+        break;
+      }
+    case X3DTypes::SFINT32:
+      {
+        SFInt32 *f = static_cast<SFInt32*>(variable);
+        out_type = "const int ";
+        out_field_value = f->getValueAsString();
+        break;
+      }
+    case X3DTypes::SFVEC2F:{
+        SFVec2f *f = static_cast<SFVec2f*>(variable);
+        std::stringstream ss;
+        ss<<"vec2("<<f->getValue().x<<","<<
+          f->getValue().y<<")";
+        out_type = "const vec2 ";
+        out_field_value = ss.str();
+        break;
+      } 
+    case X3DTypes::SFVEC3F:
+      {
+        SFVec3f *f = static_cast<SFVec3f*>(variable);
+        std::stringstream ss;
+        ss << "vec3(" << f->getValue().x << "," <<
+          f->getValue().y << "," <<
+          f->getValue().z << ")";
+
+        out_type = "const vec3 ";
+        out_field_value = ss.str();
+        break;
+      }
+    case X3DTypes::SFVEC4F:
+      {
+        SFVec4f *f = static_cast<SFVec4f*>(variable);
+        std::stringstream ss;
+        ss << "vec4(" << f->getValue().x << "," << f->getValue().y << "," <<
+          f->getValue().z << "," << f->getValue().w << ")";
+
+        out_type = "const vec4 ";
+        out_field_value = ss.str();
+        break;
+      }
+    case X3DTypes::SFCOLOR:
+      {
+        SFColor *f = static_cast<SFColor*>(variable);
+        std::stringstream ss;
+        ss << "vec3(" << f->getValue().r << "," <<
+          f->getValue().g << "," <<
+          f->getValue().b << ")";
+
+        out_type = "const vec3 ";
+        out_field_value = ss.str();
+        break;
+      }
+    case X3DTypes::SFCOLORRGBA:
+      {
+        SFColorRGBA *f = static_cast<SFColorRGBA*>(variable);
+        std::stringstream ss;
+        ss << "vec4(" << f->getValue().r << "," << f->getValue().g << ","
+          << f->getValue().b << "," << f->getValue().a << ")";
+
+        out_field_value = ss.str();
+        out_type = "const vec4 ";
+        break;
+      }
+    default:
+    {
+      Console( LogLevel::Error )<<"shader constant type is not supported for "<<out_name<<endl;
+      return false;
+    }
+    }
+
+    return true;
+}
+
+
+bool H3D::ShaderPart::modifyShaderConstants(Field* field) {
+  return shaderString->modifyShaderConstants(field);
+}
+
+bool H3D::ShaderPart::replaceString(std::string &shader_string,
+  const std::string& string_start,
+  const std::string& string_end,
+  const std::string& to_insert,
+  const std::string& conditional_string /* = "" */) {
+
+    bool success = false;
+
+    // Find start in shader string
+    std::size_t found_start = shader_string.find(string_start);
+
+
+    // If conditional_string is defined, we only want to insert the to_insert
+    // string if we first find conditional_string.
+    if(!conditional_string.empty()) {
+      std::size_t conditional_found = shader_string.find(conditional_string);
+
+      // The conditional string was not found, and as such we set the start to
+      // npos to make the entire find&replace fail.
+      if(conditional_found == std::string::npos) {
+        found_start = std::string::npos;
+      }
+    }
+
+    if(found_start != std::string::npos) {
+      // Find end part and the nearest newline. Then compare the two to 
+      // make sure we don't overstep any newline boundaries.
+      std::size_t found_end = shader_string.find(string_end, found_start + string_start.length());
+      std::size_t found_newline = shader_string.find('\n', found_start + string_start.length());
+
+      // If everything went fine then we replace.
+      if(found_end != std::string::npos && found_end <= found_newline) {
+        shader_string.replace(found_start + string_start.length(),
+          found_end - found_start - string_start.length(),
+          to_insert);
+        success = true;
+      }
+    }
+
+    return success;
+}
+
+
+void ShaderPart::updateShaderConstantValues(std::string &shader_string, bool update_all_values) {
+  ComposedShader *parent = getParentComposedShader();
+  if(!parent) {
+    return;
+  }
+
+  ShaderConstants *constants_node = parent->shaderConstants->getValue();
+  if(constants_node) {
+    for(ShaderConstants::field_iterator it = constants_node->firstField(); it != constants_node->endField(); ++it) {
+      Field *field = *it;
+
+      if(constants_node->displayList->hasCausedEvent(field) || update_all_values) {
+        modifyShaderConstants(field);
+      }
+    }
+  }
+}
+
+
+void ShaderPart::updateSinglePassStereoValues(std::string &shader_string) {
+  Scene *scene = Scene::scenes.size() > 0 ? *Scene::scenes.begin() : NULL;
+  bool new_value = false;
+
+  if(scene) {
+    H3DWindowNode* window = static_cast<H3DWindowNode*>(scene->window->getValue()[0]);
+    new_value = window->singlePassStereo->getValue();
+  }
+
+  const std::string value_string = new_value?"1":"0";
+  const std::string sps_supported_str = "#define SPS_SUPPORTED";
+  const std::string sps_toggle_str = "#define SPS_ENABLED ";
+  bool success = replaceString(shader_string,
+    sps_toggle_str,
+    "\n",
+    value_string,
+    sps_supported_str);
+
+  if(!success) {
+    // todo: Print warning ?
+  }
+}
+
+
+void ShaderPart::setParentComposedShader(ComposedShader *s) {
+  if(parent_composed_shader) {
+    parent_composed_shader->shaderConstants->unroute(shaderString);
+  }
+
+  parent_composed_shader = s;
+
+  if(s) {
+    parent_composed_shader->shaderConstants->route(shaderString);
+  }
+}
+

@@ -63,6 +63,7 @@ namespace ComposedShaderInternals {
   FIELDDB_ELEMENT( ComposedShader, transparencyDetectMode, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ComposedShader, transformFeedbackVaryings, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ComposedShader, printShaderWarnings, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( ComposedShader, shaderConstants, INPUT_OUTPUT );
 #ifdef EXPORT_SHADER
   FIELDDB_ELEMENT( ComposedShader, saveShadersToUrl, INPUT_OUTPUT );
 #endif
@@ -81,7 +82,8 @@ ComposedShader::ComposedShader( Inst< DisplayList  > _displayList,
                                 Inst< SFInt32      > _geometryVerticesOut,
                                 Inst< SFString     > _transparencyDetectMode,
                                 Inst< MFString     > _transformFeedbackVaryings,
-                                Inst< SFBool       > _printShaderWarnings
+                                Inst< SFBool       > _printShaderWarnings,
+                                Inst< SFShaderConstants > _shaderConstants
 #ifdef EXPORT_SHADER
                                 ,
                                 Inst< UpdateSaveShadersToUrl > _saveShadersToUrl
@@ -97,6 +99,7 @@ ComposedShader::ComposedShader( Inst< DisplayList  > _displayList,
   geometryVerticesOut( _geometryVerticesOut ),
   transparencyDetectMode( _transparencyDetectMode ),
   transformFeedbackVaryings ( _transformFeedbackVaryings ),
+  shaderConstants(_shaderConstants),
   printShaderWarnings ( _printShaderWarnings ),
 #ifdef EXPORT_SHADER
   saveShadersToUrl( _saveShadersToUrl ),
@@ -145,6 +148,7 @@ ComposedShader::ComposedShader( Inst< DisplayList  > _displayList,
   parts->route( displayList, id );
   setupDynamicRoutes->route( displayList );
   transformFeedbackVaryings->route ( displayList, id );
+  shaderConstants->route( displayList, id );
 
   // need to update uniform values if shader is re-linked
   // displayList->route ( updateUniforms );
@@ -743,6 +747,43 @@ void ComposedShader::UpdateUniforms::update() {
   EventCollectingField < Field >::update();
 }
 
+
+void ComposedShader::MFShaderPart::onAdd(Node *n) {
+  ComposedShader::MFShaderPartBase::onAdd(n);
+  ComposedShader* owner = static_cast<ComposedShader*>(getOwner());
+  ShaderPart* part = dynamic_cast<ShaderPart*>(n);
+  if(part) {
+    part->setParentComposedShader(owner);
+  }
+}
+
+
+void ComposedShader::MFShaderPart::onRemove(Node *n) {
+  ShaderPart* part = dynamic_cast<ShaderPart*>(n);
+  if(part) {
+    part->setParentComposedShader(NULL);
+  }
+  ComposedShader::MFShaderPartBase::onRemove(n);
+}
+
+void ComposedShader::SFShaderConstants::onAdd( Node *n ) {
+  ComposedShader::SFShaderConstantsBase::onAdd( n );
+  ShaderConstants* scs = dynamic_cast<ShaderConstants*>(n);
+  StereoInfo* si = StereoInfo::getActive();
+  if( scs&&si ) {
+    // TODO: need to adapt potential active stereoInfo update
+    for ( H3DDynamicFieldsObject::field_iterator it = scs->firstField(); it!=scs->endField(); ++it ) {
+      Field* constant_field = (*it);
+      if ( "matrixProjShift"==constant_field->getName() ) {
+        si->matrixProjShift->route( constant_field );
+      }
+      if( "matrixViewShift"==constant_field->getName() ) {
+        si->matrixViewShift->route( constant_field );
+      }
+    }
+  }
+}
+
 #ifdef EXPORT_SHADER
 
 void ComposedShader::UpdateSaveShadersToUrl::onNewValue( const std::string &v ){
@@ -777,7 +818,6 @@ void ComposedShader::UpdateSaveShadersToUrl::onNewValue( const std::string &v ){
       ofstream   outFile( v+"_geometry_shader.txt", ofstream::out  );
       outFile<< shader_content <<endl;
       outFile.close();
-      break;
     }else if( shader_type==GL_TESS_EVALUATION_SHADER ) {
       ofstream   outFile( v+"_tessEva_shader.txt", ofstream::out  );
       outFile<< shader_content <<endl;
