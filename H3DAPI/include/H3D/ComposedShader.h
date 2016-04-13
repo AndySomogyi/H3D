@@ -38,6 +38,7 @@
 #include <string>
 #include <H3D/ShaderFunctions.h>
 #include <H3D/H3DSingleTextureNode.h>
+#include <H3D/ShaderConstants.h>
 
 namespace H3D {
 
@@ -75,19 +76,41 @@ namespace H3D {
     public X3DShaderNode, 
     public X3DProgrammableShaderObject {
   public:
+
+    /// The SFShaderConstants field is dependent on the displayList field of the
+    /// containing ShaderConstants node.
+    typedef DependentSFNode<ShaderConstants, 
+      FieldRef< H3DDisplayListObject,
+      H3DDisplayListObject::DisplayList, 
+      &H3DDisplayListObject::displayList >,
+      true > SFShaderConstantsBase;
+
+    class H3DAPI_API SFShaderConstants : public SFShaderConstantsBase {
+    protected:
+      virtual void onAdd( Node *n );
+    };
+
     typedef std::map< string , H3D::Shaders::UniformInfo > UniformFieldMap;    
 
     // a map to maintain the uniform values and their related properties 
     UniformFieldMap uniformFields;
 
-    /// The MFShaderPart is dependent on the url field of the
+    /// The MFShaderPartBase is dependent on the url field of the
     /// containing ShaderPart node.
     typedef DependentMFNode< ShaderPart,
-                             FieldRef< X3DUrlObject, 
-                                       MFString, 
-                                       &ShaderPart::url >,
-                             true >
-    MFShaderPart;
+      FieldRef< ShaderPart, 
+      ShaderPart::SFShaderString, 
+      &ShaderPart::shaderString >,
+      true > 
+      MFShaderPartBase;
+
+    /// MFShaderPart is specialized to transfer a pointer from itself to the ShaderPart instances
+    /// contained in the field.
+    class H3DAPI_API MFShaderPart: public MFShaderPartBase {
+    protected:
+      virtual void onAdd( Node *);
+      virtual void onRemove( Node *);
+    };
 
 #ifdef EXPORT_SHADER
     /// UpdateSaveShadersToUrl 
@@ -114,7 +137,8 @@ namespace H3D {
                     Inst< SFInt32      > _geometryVerticesOut = 0,
                     Inst< SFString     > _transparencyDetectMode = 0,
                     Inst< MFString     > _transformFeedbackVaryings = 0,
-                    Inst< SFBool       > _printShaderWarnings = 0
+                    Inst< SFBool       > _printShaderWarnings = 0,
+                    Inst< SFShaderConstants > _shaderConstants = 0
 #ifdef EXPORT_SHADER
                     ,
                     Inst< UpdateSaveShadersToUrl > _saveShadersToUrl = 0
@@ -168,6 +192,13 @@ namespace H3D {
     auto_ptr< UpdateSaveShadersToUrl > saveShadersToUrl;
 #endif
     
+    /// The shaderConstants field can contain a ShaderConstants node
+    /// defining constants that can be used by all ShaderPart instances
+    /// in the ComposedShader node. Constants can be used instead of 
+    /// uniform variables in a shader and will be more efficient but with
+    /// the drawback that whenever the value of any of them change, it triggers a recompile of 
+    /// the shader part that the constant value is located in.
+    std::auto_ptr< SFShaderConstants > shaderConstants;
 
     /// The shader parts to use in the ComposedShader 
     ///
