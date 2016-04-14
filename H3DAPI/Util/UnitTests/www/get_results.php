@@ -43,8 +43,9 @@ $render_query = sprintf("
         join servers
           ON test_runs.server_id = servers.id
         left join rendering_baselines AS baseline
-               ON rendering_results.case_id = baseline.case_id
-                  AND rendering_results.step_id = baseline.step_id
+               ON rendering_results.file_id = baseline.file_id
+                 AND rendering_results.case_id = baseline.case_id
+                    AND rendering_results.step_id = baseline.step_id
  WHERE  test_runs.id = %d
  GROUP  BY case_id,file_id,step_name
 )", $test_run_id);

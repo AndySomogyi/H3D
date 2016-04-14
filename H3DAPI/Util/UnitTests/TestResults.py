@@ -94,7 +94,7 @@ class TestResults ( object ):
     valid, diff_path, error = self._validate_rendering(baseline_path.replace('\\', '/'), output_path.replace('\\', '/'), fuzz, threshold)
     for line in error:
       print line
-    return TestResults.RenderingResultTuple(valid, baseline_path, output_path, diff_path)      
+    return TestResults.RenderingResultTuple(valid, baseline_path, output_path, diff_path), error
   
   def getCustomResult(self, baseline_path, output):
     valid, diff, error = self._validate_text(baseline_path, output)
@@ -163,7 +163,7 @@ class TestResults ( object ):
             pass#print "WARNING: Could not remove " + diff_path
 
     else:
-      pass#print "WARNING: No rendering baseline, skipping validation!"
+      pass#error.append("WARNING: No rendering baseline, skipping validation!")
     return valid, diff_path, error
 
   def _validate_text(self, baseline_path='.', output=''):
@@ -225,9 +225,11 @@ class TestResults ( object ):
         if line == 'screenshot':
           # Screenshot format: One line that says screenshot, one line with output screenshot path
           screenshot_path = self.getNextLine(f)
-          res = self.getRenderingResult(baseline_folder + '\\' + os.path.split(screenshot_path)[1], screenshot_path, fuzz, threshold)
+          res, render_error = self.getRenderingResult(baseline_folder + '\\' + os.path.split(screenshot_path)[1], screenshot_path, fuzz, threshold)
           success = success and res.success
           results.append(res)
+          if len(render_error) > 0:
+            results.append(self.ErrorResultTuple('Error when rendering validation for ' + screenshot_path + ':' + "\n".join(render_error), ''))
           
         elif line == 'performance_start':
           # Performance format: One line that says performance, one line with all framerate samples, separated by space

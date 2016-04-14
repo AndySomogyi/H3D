@@ -4,7 +4,8 @@
 # init(testHelper, validator, validation_output_file) a function that initiates any data the validator needs. This will be run before the test step function is called. validation_output_file is a file that can and should have any validation output appended to it.
 # post(testHelper, validator, validation_output_file) a function that stores validation data. This will be run the next scene graph iteration after run_time has passed. If run_time is undefined then or 0 then it will be run the next iteration after the test function is called.
 
-import os
+import os, sys
+from collections import deque
 from H3DInterface import *
 from H3DUtils import *
 
@@ -37,17 +38,62 @@ def screenshot(start_time = None, run_time = None):
 
 
 def performance(start_time = None, run_time = None):
+  class FramerateCounter( AutoUpdate( SFFloat ) ):
+    def __init__( self):
+      AutoUpdate( SFFloat ).__init__(self)
+      self.running = False
+      self.fps_data = deque(maxlen=10)
+
+    def update( self, event ):
+      if self.running:
+        self.fps_data.append(event.getValue())
+      return 0
+
+    def start( self ):
+      self.fps_data.clear()
+      self.running = True
+      scene = getCurrentScenes()[0]
+      scene.frameRate.routeNoEvent( self )
+      scene = None
+
+    def stop( self ):
+      self.running = False
+      return self.fps_data
+
   def _performance(func):
     def init(testHelper, validator, validation_output_file):
+      if getCurrentScenes()[0].getField("profiledResult") == None:
+        testHelper.performance_uses_profiling = False # This means there's no profiledResult so we have to fall back on getting the framerate field from the Scene node instead
+        testHelper.framerate_counter = FramerateCounter()
+        testHelper.framerate_counter.start()
+      else:
+        testHelper.performance_uses_profiling = True
       pass
 
     def post(testHelper, validator, validation_output_file):
-      try:
+      if testHelper.performance_uses_profiling:
         try:
           profiling_data = getCurrentScenes()[0].getField("profiledResult").getValue()[0]
         except:
           print "Error: getting profiledResult failed! This build of h3d might not have ENABLE_PROFILER set."
           return
+      else: # if it uses a FramerateCounter instead of the profiler
+        try:
+          counter = testHelper.framerate_counter
+          fps_data = counter.stop()
+          avg_fps = sum(fps_data)/len(fps_data)
+          min_fps = min(fps_data)
+          max_fps = max(fps_data)
+          mean_fps = fps_data[len(fps_data)/2]
+          total_fps = max_fps
+          profiling_data = ''' Timer: H3D_scene
+ LEVEL      START       NUM         MIN        MAX       MEAN       DEV        TOTAL     PERCENT     ID
+ 0          0           0           0          0         0          0          0         0           TOTAL
+ 1          0           1           %f         %f        %f         %f         %f        100       .H3D_scene_loop (framerate fallback)''' % (min_fps, max_fps, mean_fps, max_fps, total_fps)
+        except Exception as e:
+          print "Error: Problems obtaining framerate from framerate counter. This build of h3d also didn't have ENABLE_PROFILER set, which is recommended.\nError was: " + str(e)    
+          return
+      try:
         f = open(validation_output_file, 'a')
         f.write('performance_start\n')
         f.write(profiling_data + '\n')
@@ -55,7 +101,8 @@ def performance(start_time = None, run_time = None):
         f.flush()
         f.close()
       except Exception as e:
-        print(str(e))   
+        print str(e)
+
 
     if not hasattr(func, 'validation'):
       func.validation = []
