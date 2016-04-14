@@ -30,8 +30,10 @@
 
 #include <H3D/ShaderPart.h>
 #include <H3D/ResourceResolver.h>
-#include <fstream>
 #include <H3D/GlobalSettings.h>
+#include <H3D/ComposedShader.h>
+
+#include <fstream>
 
 
 using namespace H3D;
