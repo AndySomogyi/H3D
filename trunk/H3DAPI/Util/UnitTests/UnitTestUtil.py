@@ -62,13 +62,14 @@ def performance(start_time = None, run_time = None):
 
   def _performance(func):
     def init(testHelper, validator, validation_output_file):
-      if getCurrentScenes()[0].getField("profiledResult") == None:
+      try:
+        getCurrentScenes()[0].getField("profiledResult").getValue()[0]
+        testHelper.performance_uses_profiling = True
+      except:
         testHelper.performance_uses_profiling = False # This means there's no profiledResult so we have to fall back on getting the framerate field from the Scene node instead
+        print "not using profiler"
         testHelper.framerate_counter = FramerateCounter()
         testHelper.framerate_counter.start()
-      else:
-        testHelper.performance_uses_profiling = True
-      pass
 
     def post(testHelper, validator, validation_output_file):
       if testHelper.performance_uses_profiling:
@@ -89,7 +90,9 @@ def performance(start_time = None, run_time = None):
           profiling_data = ''' Timer: H3D_scene
  LEVEL      START       NUM         MIN        MAX       MEAN       DEV        TOTAL     PERCENT     ID
  0          0           0           0          0         0          0          0         0           TOTAL
- 1          0           1           %f         %f        %f         %f         %f        100       .H3D_scene_loop (framerate fallback)''' % (min_fps, max_fps, mean_fps, max_fps, total_fps)
+ 1          0           1           %f         %f        %f         %f         %f        100       .H3D_scene_loop(framerate fallback)
+====END====
+''' % (min_fps, max_fps, mean_fps, max_fps, total_fps)
         except Exception as e:
           print "Error: Problems obtaining framerate from framerate counter. This build of h3d also didn't have ENABLE_PROFILER set, which is recommended.\nError was: " + str(e)    
           return
