@@ -101,7 +101,6 @@ namespace H3D {
       bool modifyShaderConstants(Field* field);
     };
 
-    typedef SFBool ForceReload;
     /// Constructor.
     ShaderPart( Inst< SFNode         > _metadata      = 0,
                 Inst< MFString       > _url           = 0,
