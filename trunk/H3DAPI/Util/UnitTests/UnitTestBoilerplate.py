@@ -56,9 +56,13 @@ class UnitTestHelper :
       start_time = None
       run_time = None
       for validation in func.validation:
-        if (not (start_time is None) and (hasattr(validation, 'start_time') or (start_time < validation['start_time']))):
-          start_time = validation['start_time']
-    
+        if 'start_time' in validation:
+          if start_time is None or start_time < validation['start_time']:
+            start_time = validation['start_time']
+        if 'run_time' in validation:
+          if run_time is None or run_time < validation['run_time']:
+            run_time = validation['run_time']
+
       if not(start_time is None):
         timer_callback.addCallback(time.getValue()+start_time, UnitTestHelper.startFuncDelayed, (self,func, run_time))
       else:
