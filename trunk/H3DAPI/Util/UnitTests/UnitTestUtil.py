@@ -46,7 +46,8 @@ def performance(start_time = None, run_time = None):
 
     def update( self, event ):
       if self.running:
-        self.fps_data.append(event.getValue())
+        # Convert FPS to time in ms
+        self.fps_data.append( 1000.0/event.getValue() )
       return 0
 
     def start( self ):
