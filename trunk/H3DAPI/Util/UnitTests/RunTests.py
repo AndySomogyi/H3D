@@ -37,6 +37,12 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--workingdir', dest='workingdir', 
                     default=os.getcwd().replace('', ''),
                     help='The directory containing the unit tests.')
+parser.add_argument('--processworkingdir', dest='processworkingdir', 
+                    default=None,
+                    help='The working directory for the test process. If omitted, will be set to base of X3D file to test')
+parser.add_argument('--processname', dest='processname', 
+                    default='H3DLoad',
+                    help='The application used to run the tests.')
 parser.add_argument('--output', dest='output',
                    default='output',
                    help='The directory to output the results to.')
@@ -152,7 +158,10 @@ class TestCaseRunner ( object ):
 
     self.startup_time = test_case.starttime
     self.shutdown_time = test_case.runtime
-    cwd= os.path.abspath(os.path.split ( orig_url )[0])
+    if args.processworkingdir is None:
+      cwd= os.path.abspath(os.path.split ( orig_url )[0])
+    else:
+      cwd= args.processworkingdir
     filename= os.path.abspath ( url )
     
     if os.path.isfile( self.early_shutdown_file ):
@@ -800,7 +809,7 @@ print ""
 #time.sleep(3)
 
 
-h3d_process_name = "H3DLoad"
+h3d_process_name = args.processname
 
 exitCode= 0
 
