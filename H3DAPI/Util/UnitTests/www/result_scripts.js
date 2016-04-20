@@ -1,57 +1,4 @@
-(function() {
 
-    var d = window.Date,
-        regexIso8601 = /^(\d{4}|\+\d{6})(?:-(\d{2})(?:-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})\.(\d{1,})(Z|([\-+])(\d{2}):(\d{2}))?)?)?)?$/,
-        lOff, lHrs, lMin;
-
-    if (d.parse('2011-11-29T15:52:30.5') !== 1322599950500 ||
-        d.parse('2011-11-29T15:52:30.52') !== 1322599950520 ||
-        d.parse('2011-11-29T15:52:18.867') !== 1322599938867 ||
-        d.parse('2011-11-29T15:52:18.867Z') !== 1322581938867 ||
-        d.parse('2011-11-29T15:52:18.867-03:30') !== 1322594538867 ||
-        d.parse('2011-11-29') !== 1322524800000 ||
-        d.parse('2011-11') !== 1320105600000 ||
-        d.parse('2011') !== 1293840000000) {
-
-        d.__parse = d.parse;
-
-        lOff = -(new Date().getTimezoneOffset());
-        lHrs = Math.floor(lOff / 60);
-        lMin = lOff % 60;
-
-        d.parse = function(v) {
-
-            var m = regexIso8601.exec(v);
-
-            if (m) {
-                return Date.UTC(
-                    m[1],
-                    (m[2] || 1) - 1,
-                    m[3] || 1,
-                    m[4] - (m[8] ? m[9] ? m[9] + m[10] : 0 : lHrs) || 0,
-                    m[5] - (m[8] ? m[9] ? m[9] + m[11] : 0 : lMin) || 0,
-                    m[6] || 0,
-                    ((m[7] || 0) + '00').substr(0, 3)
-                );
-            }
-
-            return d.__parse.apply(this, arguments);
-
-        };
-    }
-
-    d.__fromString = d.fromString;
-
-    d.fromString = function(v) {
-
-        if (!d.__fromString || regexIso8601.test(v)) {
-            return new d(d.parse(v));
-        }
-
-        return d.__fromString.apply(this, arguments);
-    };
-
-})();
 
 function LoadSQLModel(test_run_id, result_callback) {
   // The model is a tree implemented with nested arrays
@@ -311,14 +258,14 @@ function generateDatasets(testcase) {
             for(var j = 0; j < arr.children[i].data.length; ++j) {
               if(arr.children[i].data[j].server_name == server) {           
                 if(parseFloat(getSelectedProperty(arr.children[i].data[j])) <= 0) {
-                  dataset.push([new Date(arr.children[i].data[j].timestamp).getTime(), null, arr.children[i].data[j]]);
+                  dataset.push([new Date(arr.children[i].data[j].timestamp.replace(' ', 'T')).getTime(), null, arr.children[i].data[j]]);
                 } else {
-                  dataset.push([new Date(arr.children[i].data[j].timestamp).getTime(), parseFloat(getSelectedProperty(arr.children[i].data[j])), arr.children[i].data[j]]);
-                  if(lowest_time == 0 || new Date(arr.children[i].data[j].timestamp) < new Date(lowest_time)) {
-                    lowest_time = arr.children[i].data[j].timestamp;
+                  dataset.push([new Date(arr.children[i].data[j].timestamp.replace(' ', 'T')).getTime(), parseFloat(getSelectedProperty(arr.children[i].data[j])), arr.children[i].data[j]]);
+                  if(lowest_time == 0 || new Date(arr.children[i].data[j].timestamp.replace(' ', 'T')) < new Date(lowest_time)) {
+                    lowest_time = arr.children[i].data[j].timestamp.replace(' ', 'T');
                   }
-                  if(highest_time == 0 || arr.children[i].data[j].timestamp > highest_time) {
-                    highest_time = arr.children[i].data[j].timestamp;
+                  if(highest_time == 0 || arr.children[i].data[j].timestamp.replace(' ', 'T') > highest_time) {
+                    highest_time = arr.children[i].data[j].timestamp.replace(' ', 'T');
                   }                   
                 }
               }
@@ -395,7 +342,7 @@ function generateGraph(div) {
         if(flotItem.series.prof_data.hasOwnProperty("children")) {
           for(var i = 0; i < flotItem.series.prof_data.children.length; ++i) {
             for(var d = 0; d < flotItem.series.prof_data.children[i].data.length; ++d) {
-              if(flotItem.series.prof_data.children[i].data[d].timestamp == flotItem.series.data[flotItem.dataIndex][2].timestamp) {              
+              if(flotItem.series.prof_data.children[i].data[d].timestamp.replace(' ', 'T') == flotItem.series.data[flotItem.dataIndex][2].timestamp.replace(' ', 'T')) {              
                 var val = parseFloat(getSelectedProperty(flotItem.series.prof_data.children[i].data[d]));
                 total += val;
                 res += flotItem.series.prof_data.children[i].id + ": " + val + getSelectedUnit() +"<br/>";
