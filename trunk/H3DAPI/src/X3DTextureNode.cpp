@@ -31,7 +31,7 @@
 #include <H3D/X3DTextureNode.h>
 #include <H3D/X3D.h>
 #include <H3D/FrameBufferTextureGenerator.h>
-#include <H3D/Appearance.h>
+#include <H3D/ComposedShader.h>
 #include <assert.h>
 
 #include <H3DUtil/LoadImageFunctions.h>
@@ -39,19 +39,53 @@
 namespace {
   /// X3D string containing frame buffer object used to save texture to file
   const std::string save_to_url_x3d= 
-    "<FrameBufferTextureGenerator DEF='GENERATOR' outputTextureType='2D' generateColorTextures='RGBA' update='NONE'>"
-    "  <Shape>"
-    "    <Appearance DEF='APP' />"
-    "    <FullscreenRectangle zValue='0.99' screenAligned='true' /> "
-    "  </Shape>"
-    "</FrameBufferTextureGenerator>";
+    " <FrameBufferTextureGenerator DEF='GENERATOR' outputTextureType='2D' generateColorTextures='RGBA' update='NONE'>                                "
+    " <Shape>                                                                                                                                        "
+    " <Appearance>                                                                                                                                   "
+    " <ComposedShader language='GLSL' DEF = 'CS'>                                                                                                    "
+    " <field name = 'texture' type = 'SFNode' accessType = 'inputOutput'/>                                                                           "
+    " <field name = 'transparency' type = 'SFFloat' value='0' accessType = 'inputOutput'/>                                                           "
+    " <ShaderPart type = 'VERTEX' url = ' glsl: void main() { gl_Position = gl_Vertex; gl_TexCoord[0].xy = gl_Vertex.xy*0.5+0.5;} '/>                "
+    " <ShaderPart type = 'FRAGMENT'                                                                                                                  "
+    " url = ' glsl: uniform float transparency = 0.0; uniform sampler2D texture; void main() {gl_FragColor = vec4( texture2D(texture, gl_TexCoord[0].xy).xyz,1.0-transparency);} '/> "
+    " </ComposedShader>                                                                                                                              "
+    " <Material DEF = 'MA'/>                                                                                                                         "
+    " <RenderProperties DEF = 'RP' depthTestEnabled = 'FALSE' blendEnabled = 'FALSE'/>                                                               "
+    " </Appearance>                                                                                                                                  "
+    " <IndexedTriangleSet solid = 'false'                                                                                          "
+    " normalPerVertex = 'true'                                                                                                                       "
+    " index = '0 1 2 0 2 3 '                                                                                                                         "
+    " >                                                                                                                                              "
+    " <Coordinate DEF = 'coords_ME_Plane'                                                                                                            "
+    " point = '-1.000000 -1.000000 0.000000 1.000000 -1.000000 0.000000 1.000000 1.000000 0.000000 -1.000000 1.000000 0.000000 '                     "
+    " />                                                                                                                                             "
+    " </IndexedTriangleSet>                                                                                                                          "
+    " </Shape>                                                                                                                                       "
+    " </FrameBufferTextureGenerator>                                                                                                                 ";
   const std::string save_to_url_floating_point_x3d=
-    "<FrameBufferTextureGenerator DEF='GENERATOR' outputTextureType='2D' generateColorTextures='RGBA32F' update='NONE'>"
-    "  <Shape>"
-    "    <Appearance DEF='APP' />"
-    "    <FullscreenRectangle zValue='0.99' screenAligned='true' /> "
-    "  </Shape>"
-    "</FrameBufferTextureGenerator>";
+    " <FrameBufferTextureGenerator DEF='GENERATOR' outputTextureType='2D' generateColorTextures='RGBA32F' update='NONE'>                             "
+    " <Shape>                                                                                                                                        "
+    " <Appearance>                                                                                                                                   "
+    " <ComposedShader language='GLSL' DEF = 'CS'>                                                                                                    "
+    " <field name = 'texture' type = 'SFNode' accessType = 'inputOutput'/>                                                                           "
+    " <field name = 'transparency' type = 'SFFloat' value='0' accessType = 'inputOutput'/>                                                           "
+    " <ShaderPart type = 'VERTEX' url = ' glsl: void main() { gl_Position = gl_Vertex; gl_TexCoord[0].xy = gl_Vertex.xy*0.5+0.5;} '/>                "
+    " <ShaderPart type = 'FRAGMENT'                                                                                                                  "
+    " url = ' glsl: uniform float transparency = 0.0; uniform sampler2D texture; void main() {gl_FragColor = vec4( texture2D(texture, gl_TexCoord[0].xy).xyz,1.0-transparency);} '/> "
+    " </ComposedShader>                                                                                                                              "
+    " <Material DEF = 'MA'/>                                                                                                                         "
+    " <RenderProperties DEF = 'RP' depthTestEnabled = 'FALSE' blendEnabled = 'FALSE'/>                                                               "
+    " </Appearance>                                                                                                                                  "
+    " <IndexedTriangleSet solid = 'false'                                                                                          "
+    " normalPerVertex = 'true'                                                                                                                       "
+    " index = '0 1 2 0 2 3 '                                                                                                                         "
+    " >                                                                                                                                              "
+    " <Coordinate DEF = 'coords_ME_Plane'                                                                                                            "
+    " point = '-1.000000 -1.000000 0.000000 1.000000 -1.000000 0.000000 1.000000 1.000000 0.000000 -1.000000 1.000000 0.000000 '                     "
+    " />                                                                                                                                             "
+    " </IndexedTriangleSet>                                                                                                                          "
+    " </Shape>                                                                                                                                       "
+    " </FrameBufferTextureGenerator>                                                                                                                 ";
 }
 
 using namespace H3D;
@@ -678,10 +712,10 @@ Image* X3DTextureNode::renderToImage ( H3DInt32 _width, H3DInt32 _height, bool o
   fbo->height->setValue ( _height );
   fbo->width->setValue  ( _width );
 
-  Appearance* app= NULL;
-  dn.getNode ( "APP", app );
+  ComposedShader* cs = NULL;
+  dn.getNode( "CS", cs );
 
-  app->texture->setValue ( this );
+  dynamic_cast<SFNode*>(cs->getField( "texture" ))->setValue ( this );
   fbo->update->setValue ( "SPECIFIED_FRAMES_ONLY" );
   fbo->framesBeforeStop->setValue ( 10 );
   fbo->displayList->callList();

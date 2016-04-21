@@ -30,9 +30,8 @@
 
 #include <H3D/FBODebugger.h>
 #include <H3D/FrameBufferTextureGenerator.h>
-#include <H3D/Appearance.h>
-#include <H3D/Material.h>
 #include <H3D/RenderProperties.h>
+#include <H3D/ComposedShader.h>
 
 using namespace H3D;
 
@@ -49,17 +48,30 @@ namespace FBODebuggerInternals {
   FIELDDB_ELEMENT( FBODebugger, saveToUrl, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FBODebugger, saveSuccess, INPUT_OUTPUT );
 
-  const string x3d_fbo = 
-"<Group>   \n" 
-"  <Shape> \n"
-"    <Appearance DEF=\"APP\" > \n"
-"      <Material DEF=\"MA\"/> \n"
-"      <RenderProperties DEF=\"RP\" depthTestEnabled=\"FALSE\" blendEnabled=\"FALSE\" /> \n"
-"    </Appearance> \n"
-"    <FullscreenRectangle zValue=\"0.99\"/> \n"
-"  </Shape> \n"
-"</Group>\n";
-
+  const string x3d_fbo =
+    " <Group>                                                                                                                                        "
+    " <Shape>                                                                                                                                        "
+    " <Appearance>                                                                                                                                   "
+    " <ComposedShader language='GLSL' DEF = 'CS'>                                                                                                   "
+    " <field name = 'texture' type = 'SFNode' accessType = 'inputOutput'/>                                                                           "
+    " <field name = 'transparency' type = 'SFFloat' value='0' accessType = 'inputOutput'/>                                                                           "
+    " <ShaderPart type = 'VERTEX' url = ' glsl: void main() { gl_Position = gl_Vertex; gl_TexCoord[0].xy = gl_Vertex.xy*0.5+0.5;} '/>                "
+    " <ShaderPart type = 'FRAGMENT'                                                                                                                  "
+    " url = ' glsl: uniform float transparency = 0.0; uniform sampler2D texture; void main() {gl_FragColor = vec4( texture2D(texture, gl_TexCoord[0].xy).xyz,1.0-transparency);} '/> "
+    " </ComposedShader>                                                                                                                              "
+    " <Material DEF = 'MA'/>                                                                                                                         "
+    " <RenderProperties DEF = 'RP' depthTestEnabled = 'FALSE' blendEnabled = 'FALSE'/>                                                               "
+    " </Appearance>                                                                                                                                  "
+    " <IndexedTriangleSet solid = 'false'                                                                                          "
+    " normalPerVertex = 'true'                                                                                                                       "
+    " index = '0 1 2 0 2 3 '                                                                                                                         "
+    " >                                                                                                                                              "
+    " <Coordinate DEF = 'coords_ME_Plane'                                                                                                            "
+    " point = '-1.000000 -1.000000 0.000000 1.000000 -1.000000 0.000000 1.000000 1.000000 0.000000 -1.000000 1.000000 0.000000 '                     "
+    " />                                                                                                                                             "
+    " </IndexedTriangleSet>                                                                                                                          "
+    " </Shape>                                                                                                                                       "
+    " </Group>                                                                                                                                       ";
 }
 
 FBODebugger::FBODebugger( Inst< SFNode            >  _metadata,
@@ -96,11 +108,6 @@ FBODebugger::FBODebugger( Inst< SFNode            >  _metadata,
   current_buffer = "COLOR0";
 
   texture_scene.reset( X3D::createX3DFromString( FBODebuggerInternals::x3d_fbo, &texture_scene_dn ) );
-  Material *ma;
-  texture_scene_dn.getNode( "MA", ma );
-  if( ma ){
-    transparency->route(ma->transparency);
-  }
   toggleBlend->setName("toggleBlend");
   toggleBlend->setOwner(this);
   transparency->route(toggleBlend);
@@ -142,36 +149,37 @@ void FBODebugger::traverseSG( TraverseInfo &ti ) {
     string selected_fbo_name = selected_fbo_node->getName();
     if( selected_fbo_name != current_fbo ||
       buffer->getValue() != current_buffer ) {
-        Appearance *app;
-        texture_scene_dn.getNode( "APP", app );
-        if( app ) {
+        ComposedShader * cs;
+        texture_scene_dn.getNode( "CS", cs );
+        if( cs ) {
+          transparency->route( cs->getField( "transparency" ) );
           const string &selected_buffer = buffer->getValue();
           if( selected_buffer == "DEPTH" ) {
-            app->texture->setValue( selected_fbo_node->depthTexture->getValue() );
+            dynamic_cast<SFNode*>(cs->getField("texture"))->setValue( selected_fbo_node->depthTexture->getValue() );
             selected_texture->setValue( selected_fbo_node->depthTexture->getValue() );
             if( !selected_fbo_node->generateDepthTexture->getValue() ) {
               Console(LogLevel::Error) << "Warning (FBODebugger): Cannot show DEPTH texture as no depth texture is generated by \"" << selected_fbo_name << "\" fbo" << endl;
             }
           } else if( selected_buffer == "COLOR0" ) {
             if( selected_fbo_node->colorTextures->size() > 0 ) {
-              app->texture->setValue( render_target_texture );
+              dynamic_cast<SFNode*>(cs->getField("texture"))->setValue( render_target_texture );
               render_target_texture->generator->setValue( selected_fbo_node );
               render_target_texture->index->setValue( 0 );
               selected_texture->setValue( render_target_texture );
             } else {
               Console(LogLevel::Error) << "Warning (FBODebugger): Cannot show COLOR0 texture as no color textures is generated by \"" << selected_fbo_name << "\" fbo" << endl;
-              app->texture->setValue( NULL );
+              dynamic_cast<SFNode*>(cs->getField("texture"))->setValue( NULL );
               selected_texture->setValue( NULL );
             }
           } else if( selected_buffer == "COLOR1" ) {
             if( selected_fbo_node->colorTextures->size() > 1 ) {
-              app->texture->setValue( render_target_texture.get() );
+              dynamic_cast<SFNode*>(cs->getField("texture"))->setValue( render_target_texture.get() );
               render_target_texture->generator->setValue( selected_fbo_node );
               render_target_texture->index->setValue( 1 );
               selected_texture->setValue( render_target_texture );
             } else {
               Console(LogLevel::Error) << "Warning (FBODebugger): Cannot show COLOR1 texture as no such color texture is generated by \"" << selected_fbo_name << "\" fbo" << endl;
-              app->texture->setValue( NULL );
+              dynamic_cast<SFNode*>(cs->getField("texture"))->setValue( NULL );
               selected_texture->setValue( NULL );
             }
           }
