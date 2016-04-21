@@ -62,6 +62,7 @@
 #include <H3D/Inline.h>
 #include <H3D/H3DSingleTextureNode.h>
 #include <H3D/X3DProgrammableShaderObject.h>
+#include <H3DUtil/ThreadPool.h>
 
 #ifndef H3D_WINDOWS
 #include <unistd.h>
@@ -710,7 +711,11 @@ Scene::Scene( Inst< SFChildNode >  _sceneRoot,
   H3DUtil::H3DTimer::setEnabled("H3D_scene",true);
   H3DUtil::H3DTimer::setInterval("H3D_scene",10);
 #endif //HAVE_PROFILER
+  if( scenes.empty() ) {
+    H3DUtil::ThreadPool::global_pool.resize( 8 ); 
+  }
   scenes.insert( this );
+  
   
   shadow_caster->algorithm->setValue( "ZFAIL" );
 
@@ -728,6 +733,9 @@ Scene::Scene( Inst< SFChildNode >  _sceneRoot,
 
 Scene::~Scene() {
   scenes.erase( this );
+  if( scenes.empty() ) {
+    ThreadPool::global_pool.resize(0);
+  }
   setSceneRoot( NULL );
 
   if( last_traverseinfo )
