@@ -40,9 +40,15 @@ parser.add_argument('--workingdir', dest='workingdir',
 parser.add_argument('--processworkingdir', dest='processworkingdir', 
                     default=None,
                     help='The working directory for the test process. If omitted, will be set to base of X3D file to test')
+parser.add_argument('--processpath', dest='processpath',
+                    help='The path to the application used to run the tests. This is so you don''t need H3DLoad in your path',
+                    default='')
 parser.add_argument('--processname', dest='processname', 
                     default='H3DLoad',
                     help='The application used to run the tests.')
+parser.add_argument('--processargs', dest='processargs',
+                    default='',
+                    help='Can be used to pass arguments to the process that you run. These will be put before the name of the .x3d file for the test that is being launched. This can be used to do things like running a python script instead of H3D by setting the processname to python.exe and the args to the path of the script you want to run.')
 parser.add_argument('--output', dest='output',
                    default='output',
                    help='The directory to output the results to.')
@@ -129,7 +135,10 @@ class TestCaseRunner ( object ):
       self.load_flags = []
 
     process = self.getProcess()
-    process.launch ( [h3d_process_name + ".exe" if platform.system() == 'Windows' else h3d_process_name] + self.load_flags + [url], cwd)
+    if args.processargs != "":
+      process.launch ( [os.path.join(args.processpath, h3d_process_name), args.processargs] + self.load_flags + [url], cwd)
+    else:
+      process.launch ( [os.path.join(args.processpath, h3d_process_name)] + self.load_flags + [url], cwd)
     return process
 
   def testStartUp ( self, url, cwd, variation, resolution=None):
@@ -144,7 +153,11 @@ class TestCaseRunner ( object ):
       self.load_flags = []    
 
     process = self.getProcess()
-    return process.testLaunch ( [h3d_process_name + ".exe" if platform.system() == 'Windows' else h3d_process_name] + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
+
+    if args.processargs != "":
+      return process.testLaunch ( [os.path.join(args.processpath, h3d_process_name), args.processargs] + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
+    else:
+      return process.testLaunch ( [os.path.join(args.processpath, h3d_process_name)] + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
   
   def runTestCase (self, filename, test_case, url, orig_url= None, var_name= "", variation = None):
 
@@ -291,25 +304,45 @@ class TestCaseRunner ( object ):
                                                                   testCase.starttime,
                                                                   os.path.join(args.RunTestsDir, 'UnitTestBoilerplate.py'))
     v = Variation (testCase.name, script)
-    if not args.only_validate:
-      # Create a temporary x3d file containing our injected script
-      success, variation_path= self._createVariationFile ( v, os.path.join(directory, testCase.x3d))
-      # Run that H3DViewer with that x3d file
-      result = self.runTestCase (file, testCase, variation_path, os.path.join(directory, testCase.x3d), v.name, v)
+    # Create a temporary x3d file containing our injected script
+    original_path = os.path.join(directory, testCase.x3d)
+    if os.path.exists(original_path+'_original.x3d'):
+      print original_path+'_original.x3d already exists! This probably means that RunTests was interrupted during a previous execution.'
+      print "Restoring " + original_path + " before continuing..."
+      try:
+        if os.path.exists(original_path):
+          os.remove(original_path)
+        os.rename(original_path+'_original.x3d', original_path)
+        print "Restored! Continuing the testing..."
+      except:
+        print "Failed to restore! Please check the files manually."
+        return
+
+    success, variation_path= self._createVariationFile ( v, os.path.join(directory, testCase.x3d))
+    os.rename(original_path, original_path+'_original.x3d') # rename the original .x3d file
+    os.rename(variation_path, original_path) # swap in our variation file for the original
+    try:
+     # Run the test
+      result = self.runTestCase (file, testCase, os.path.abspath(original_path), os.path.join(directory, testCase.x3d), v.name, v)
       print result.std_err
       print result.std_out
-#      print os.path.abspath(output_dir + '\\validation.txt')
+  #    print os.path.abspath(output_dir + '\\validation.txt')
       result.parseValidationFile(testCase, os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'), testCase.fuzz, testCase.threshold)
       exitcode = result.success and all_tests_successful
-    else:
-      result = TestResults('')
-      result.filename= file
-      result.name= testCase.name
-      result.url= os.path.join(directory, testCase.x3d)
+    except:
+      pass
+  
 
-    #if not args.only_validate:
     try:
-      os.remove ( variation_path )
+      os.remove(original_path)
+    except:
+      pass
+    try:
+      os.remove(variation_path)
+    except:
+      pass
+    try:
+      os.rename(original_path+'_original.x3d', original_path)
     except:
       pass
 
@@ -817,8 +850,7 @@ def isTestable ( file_name , files_in_dir):
   return True
 
 #html_reporter_errors= TestReportHTML( os.path.join(args.output, "reports"), only_failed= True )
-
-print "Running these tests using: " + subprocess.check_output('where.exe ' + h3d_process_name + '.exe') # Run our test script and wait for it to finish executing
+print "Running these tests using: " + subprocess.check_output('where.exe "' + (args.processpath + '":' if (args.processpath != "") else "") + h3d_process_name) # Run our test script and wait for it to finish executing
 
 
 tester= TestCaseRunner( os.path.join(args.workingdir, ""), startup_time= 5, shutdown_time= 5, testable_callback= isTestable, error_reporter=None)
