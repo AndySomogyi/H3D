@@ -100,18 +100,7 @@ class ProcessWin32(Process):
     
   def isRunning(self):
     # for Windows XP use this
-    query_process = "tasklist /NH /FI \"IMAGENAME EQ " + self.process_name + "\""
-    
-    # for Windows Vista use this
-    #query_process = 'query process'
-    
-    #for Linux use this
-    #query_process = 'ps -Af | grep ' + self.process_name +
-    
-    p = subprocess.Popen(query_process, stdout=subprocess.PIPE, shell=True)
-    output = p.communicate()
-    
-    return output[0].find(self.process_name) >= 0
+    return psutil.pid_exists(self.process.pid)
 
   def sendKey(self, key):
     if key == "{ESC}":
