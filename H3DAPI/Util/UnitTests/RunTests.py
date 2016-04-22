@@ -135,7 +135,7 @@ class TestCaseRunner ( object ):
       self.load_flags = []
 
     process = self.getProcess()
-    if self.processargs != "":
+    if self.processargs != []:
       process.launch ( [os.path.join(args.processpath, h3d_process_name)] + self.processargs + self.load_flags + [url], cwd)
     else:
       process.launch ( [os.path.join(args.processpath, h3d_process_name)] + self.load_flags + [url], cwd)
@@ -154,7 +154,7 @@ class TestCaseRunner ( object ):
 
     process = self.getProcess()
 
-    if self.processargs != "":
+    if self.processargs != []:
       return process.testLaunch ( [os.path.join(args.processpath, h3d_process_name)] + self.processargs + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
     else:
       return process.testLaunch ( [os.path.join(args.processpath, h3d_process_name)] + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
@@ -169,7 +169,7 @@ class TestCaseRunner ( object ):
     test_results.name= test_case.name
     test_results.url= orig_url
 
-    self.processargs = (args.processargs + " " + test_case.processargs).split(' ')
+    self.processargs = [arg for arg in (args.processargs.split(' ') + test_case.processargs.split(' ')) if arg != ""]
 
     self.startup_time = test_case.starttime
     self.shutdown_time = test_case.runtime
