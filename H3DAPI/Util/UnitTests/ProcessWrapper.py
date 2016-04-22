@@ -69,7 +69,7 @@ class ProcessWin32(Process):
 
     import ctypes
     ctypes.windll.kernel32.SetErrorMode(0)
-
+    print command
     self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd= cwd)
     
     self.std_out_q = Queue()
