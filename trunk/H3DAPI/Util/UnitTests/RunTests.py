@@ -135,8 +135,8 @@ class TestCaseRunner ( object ):
       self.load_flags = []
 
     process = self.getProcess()
-    if args.processargs != "":
-      process.launch ( [os.path.join(args.processpath, h3d_process_name), args.processargs] + self.load_flags + [url], cwd)
+    if self.processargs != "":
+      process.launch ( [os.path.join(args.processpath, h3d_process_name)] + self.processargs + self.load_flags + [url], cwd)
     else:
       process.launch ( [os.path.join(args.processpath, h3d_process_name)] + self.load_flags + [url], cwd)
     return process
@@ -154,8 +154,8 @@ class TestCaseRunner ( object ):
 
     process = self.getProcess()
 
-    if args.processargs != "":
-      return process.testLaunch ( [os.path.join(args.processpath, h3d_process_name), args.processargs] + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
+    if self.processargs != "":
+      return process.testLaunch ( [os.path.join(args.processpath, h3d_process_name)] + self.processargs + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
     else:
       return process.testLaunch ( [os.path.join(args.processpath, h3d_process_name)] + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
   
@@ -168,6 +168,8 @@ class TestCaseRunner ( object ):
     test_results.filename= filename
     test_results.name= test_case.name
     test_results.url= orig_url
+
+    self.processargs = (args.processargs + " " + test_case.processargs).split(' ')
 
     self.startup_time = test_case.starttime
     self.shutdown_time = test_case.runtime
@@ -232,7 +234,7 @@ class TestCaseRunner ( object ):
       All of these values default to None
     The list will contain one namedtuple for each Section in the specified definition file
     """
-    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20, 'resolution': None}, allow_no_value=True)
+    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20, 'resolution': None, 'processargs': ''}, allow_no_value=True)
     try:
       confParser.read(file_path)
     except:
@@ -241,7 +243,7 @@ class TestCaseRunner ( object ):
     result = []
     for sect in confParser.sections():
       if sect != 'Default':
-        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution'])
+        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs'])
         test_case.name = sect
         test_case.x3d = confParser.get(sect, 'x3d')
         test_case.baseline = confParser.get(sect, 'baseline folder')
@@ -266,6 +268,11 @@ class TestCaseRunner ( object ):
           test_case.resolution = confParser.get(sect, 'resolution')
         except:
           test_case.resolution = None
+
+        try:
+          test_case.processargs = confParser.get(sect, 'arguments')
+        except:
+          test_case.processargs = ''
 
         if args.case == "" or args.case == test_case.name:
           result.append(test_case)
