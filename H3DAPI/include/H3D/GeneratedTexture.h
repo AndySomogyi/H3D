@@ -46,6 +46,10 @@ namespace H3D {
   /// storing the data in a separate container such as the image field.
   /// 
   /// This node cannot be instantiated from X3D or Python.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/FrameBufferTextureGenerator.x3d">Surfaces.x3d</a>
+  ///     ( <a href="examples/FrameBufferTextureGenerator.x3d.html">Source</a> )
   class H3DAPI_API GeneratedTexture : public X3DTexture2DNode {
   public:
         
