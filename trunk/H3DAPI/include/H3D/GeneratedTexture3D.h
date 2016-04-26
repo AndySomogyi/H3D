@@ -35,17 +35,21 @@ namespace H3D {
 
   /// \ingroup H3DNodes
   /// \class GeneratedTexture3D
-  /// \brief The GeneratedTexture node is a 3d-texture node that are automatically
+  /// \brief The GeneratedTexture3D node is a 3d-texture node that are automatically
   /// generated from nodes like FrameBufferTextureGenerator.
   ///
   /// Basically it is just a wrapper around a OpenGL texture id and the generator
   /// will set up all parameters for it.
   ///
-  /// The GeneratedTexture node will never set the image field of it's base class
+  /// The GeneratedTexture3D node will never set the image field of it's base class
   /// since all the texture operations are performed directly in OpenGL without
   /// storing the data in a separate container such as the image field.
   /// 
   /// This node cannot be instantiated from X3D or Python.
+  ///
+  /// <b>Examples:</b>
+  ///   - <a href="../../../H3DAPI/examples/All/FrameBufferTextureGenerator_texturearray.x3d">Surfaces.x3d</a>
+  ///     ( <a href="examples/FrameBufferTextureGenerator_texturearray.x3d.html">Source</a> )
   class H3DAPI_API GeneratedTexture3D : public X3DTexture3DNode {
   public:
         
