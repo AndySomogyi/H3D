@@ -32,6 +32,8 @@
 #include <H3DUtil/Image.h>
 #include <H3D/GlobalSettings.h>
 
+#include <H3DUtil/LoadImageFunctions.h>
+
 using namespace H3D;
 
 H3DNodeDatabase X3DTexture3DNode::database( 
