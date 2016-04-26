@@ -69,6 +69,11 @@ namespace H3D {
                                        &TextureProperties::propertyChanged > > 
     SFTextureProperties;
 
+    class H3DAPI_API UpdateSaveToURL : public H3DSingleTextureNode::UpdateSaveToURL {
+    protected:
+      virtual void onNewValue( const std::string &v );
+    };
+
     /// Constructor.
     X3DTexture3DNode( Inst< DisplayList > _displayList = 0,
                       Inst< SFNode  > _metadata  = 0,
@@ -77,7 +82,11 @@ namespace H3D {
                       Inst< SFBool  > _repeatR   = 0,
                       Inst< SFBool  > _scaleToP2 = 0,
                       Inst< SFImage > _image     = 0,
-                      Inst< SFTextureProperties > _textureProperties = 0 );
+                      Inst< SFTextureProperties > _textureProperties = 0,
+                      Inst< UpdateSaveToURL > _saveToUrl = 0,
+                      Inst< SFBool > _saveSuccess = 0,
+                      Inst< SFInt32 > _saveHeight = 0,
+                      Inst< SFInt32 > _saveWidth = 0 );
 
     
     /// Destructor.

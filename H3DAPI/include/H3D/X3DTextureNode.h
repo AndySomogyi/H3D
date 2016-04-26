@@ -61,6 +61,7 @@ namespace H3D {
 
     /// A field used to execute the save to URL operation when the URL is set
     class H3DAPI_API UpdateSaveToURL : public OnNewValueSField < AutoUpdate < SFString > > {
+      protected:
       virtual void onNewValue( const std::string &v );
     };
 

@@ -57,8 +57,12 @@ X3DTexture3DNode::X3DTexture3DNode(
                                    Inst< SFBool  > _repeatR,
                                    Inst< SFBool  > _scaleToP2,
                                    Inst< SFImage > _image,
-                                   Inst< SFTextureProperties > _textureProp ) :
-  H3DSingleTextureNode( _displayList, _metadata ),
+                                   Inst< SFTextureProperties > _textureProp,
+                                   Inst< UpdateSaveToURL > _saveToUrl,
+                                   Inst< SFBool > _saveSuccess,
+                                   Inst< SFInt32 > _saveHeight,
+                                   Inst< SFInt32 > _saveWidth ) :
+  H3DSingleTextureNode( _displayList, _metadata, _saveToUrl, _saveSuccess, _saveHeight, _saveWidth ),
   H3DImageObject( _image ),
   repeatS ( _repeatS  ),
   repeatT ( _repeatT  ),
@@ -486,3 +490,19 @@ GLenum X3DTexture3DNode::glPixelFormat( Image *i ) {
     return H3DSingleTextureNode::glPixelFormat( i );
   }
 }
+
+void X3DTexture3DNode::UpdateSaveToURL::onNewValue( const string &v ) {
+#ifdef HAVE_TEEM
+  X3DTexture3DNode * node = static_cast< X3DTexture3DNode * >(getOwner());
+  Image * image = node->image->getValue();
+  string file_ending = v.size() > 3 ? v.substr( v.size() - 4, 4 ) : "";
+  if( file_ending == ".exr" || file_ending == ".png" || !image ) {
+#endif
+    H3DSingleTextureNode::UpdateSaveToURL::onNewValue( v );
+#ifdef HAVE_TEEM
+  } else {
+    node->saveSuccess->setValue( H3DUtil::saveImageAsNrrdFile( v, image ) == 0, node->id );
+  }
+#endif
+}
+
