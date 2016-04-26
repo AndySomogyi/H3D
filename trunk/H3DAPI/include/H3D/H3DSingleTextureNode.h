@@ -47,7 +47,11 @@ namespace H3D {
     
     /// Constructor.
     H3DSingleTextureNode( Inst< DisplayList > _displayList = 0,
-                          Inst< SFNode  > _metadata  = 0 );
+                          Inst< SFNode  > _metadata  = 0,
+                          Inst< UpdateSaveToURL > _saveToUrl = 0,
+                          Inst< SFBool > _saveSuccess = 0,
+                          Inst< SFInt32 > _saveHeight = 0,
+                          Inst< SFInt32 > _saveWidth = 0 );
 
     /// Destructor
     virtual ~H3DSingleTextureNode ();

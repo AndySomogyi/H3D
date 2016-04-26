@@ -40,8 +40,12 @@ H3DSingleTextureNode::TextureVector H3DSingleTextureNode::resident_textures;
 /// Constructor
 H3DSingleTextureNode::H3DSingleTextureNode( 
   Inst< DisplayList > _displayList,
-  Inst< SFNode  > _metadata ): 
-  X3DTextureNode( _displayList, _metadata ),
+  Inst< SFNode  > _metadata,
+  Inst< UpdateSaveToURL > _saveToUrl,
+  Inst< SFBool > _saveSuccess,
+  Inst< SFInt32 > _saveHeight,
+  Inst< SFInt32 > _saveWidth ): 
+  X3DTextureNode( _displayList, _metadata, _saveToUrl, _saveSuccess, _saveHeight, _saveWidth ),
   texture_handle ( 0 ),
   last_used ( 0 ),
   is_resident ( false ),
