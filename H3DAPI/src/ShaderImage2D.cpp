@@ -143,15 +143,17 @@ std::map<string, GLenum> ShaderImage2D::initStringImageFormat_map ( ){
   m["GL_R32UI"] = GL_R32UI; m["GL_R16UI"] = GL_R16UI; m["GL_R8UI"] = GL_R8UI;
   m["GL_RGBA32I"] = GL_RGBA32I; m["GL_RGBA16I"] = GL_RGBA16I; m["GL_RGBA8I"] = GL_RGBA8I;
   m["GL_R32I"] = GL_R32I; m["GL_R16I"] = GL_R16I; m["GL_R8I"] = GL_R8I;
+  m["GL_RG32I"] = GL_RG32I; m["GL_RG16I"] = GL_RG16I; m["GL_RG8I"] = GL_RG8I;
   return m;
 }
 
 
 std::vector<string> ShaderImage2D::initImage_formats ( ){
-  string vs[16] = { "GL_RGBA32F", "GL_RGBA16F", "GL_R32F", "GL_R16F", "GL_RG16F",
-    "GL_RGBA32UI", "GL_RGBA16UI", "GL_RGBA8UI", "GL_R32UI", "GL_R16UI", "GL_R8UI"
-    "GL_RGBA32I", "GL_RGBA16I", "GL_RGBA8I", "GL_R32I", "GL_R16I", "GL_R8I" };
-  vector<string> v ( &vs[0], &vs[0] + 16 );
+  string vs[20] = { "GL_RGBA32F", "GL_RGBA16F", "GL_R32F", "GL_R16F", "GL_RG16F",
+    "GL_RGBA32UI", "GL_RGBA16UI", "GL_RGBA8UI", "GL_R32UI", "GL_R16UI", "GL_R8UI",
+    "GL_RGBA32I", "GL_RGBA16I", "GL_RGBA8I", "GL_R32I", "GL_R16I", "GL_R8I", 
+    "GL_RG32I", "GL_RG16I", "GL_RG8I" };
+  vector<string> v ( &vs[0], &vs[0] + sizeof(vs)/sizeof(vs[0]) );
   return v;
 }
 
@@ -163,6 +165,7 @@ std::map<string, string> ShaderImage2D::initImageFormatQualifier_map(){
   m["GL_R32UI"] = "r32ui"; m["GL_R16UI"] = "r16ui"; m["GL_R8UI"] = "r8ui";
   m["GL_RGBA32I"] = "rgba32i"; m["GL_RGBA16I"] = "rgba16i"; m["GL_RGBA8I"] = "rgba8i";
   m["GL_R32I"] = "r32i"; m["GL_R16I"] = "r16i"; m["GL_R8I"] = "r8i";
+  m["GL_RG32I"] = "rg32i"; m["GL_RG16I"] = "rg16i"; m["GL_RG8I"] = "rg8i";
   return m;
 }
 
