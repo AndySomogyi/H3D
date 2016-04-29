@@ -425,7 +425,15 @@ void ComposedShader::render() {
             //std::cout<< this->getName() << " remove phandle "
             //         << program_handle << std::endl;
             glDeleteObjectARB( program_handle );
-            phandle_counts.erase( program_handle );
+
+            // Remove deleted handle from cache
+            phandle_counts.erase(program_handle);
+            for (std::map<string, GLhandleARB>::iterator it = phandles_map.begin(); it != phandles_map.end(); ++it) {
+              if (it->second == program_handle) {
+                phandles_map.erase(it);
+                break;
+              }
+            }
           }
         } else {
           // if not, this is a floating program handle. delete it anyway
