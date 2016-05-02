@@ -116,7 +116,7 @@ $custom_rows = fetch_result($db, $custom_query);
 $render_rows = fetch_result($db, $render_query);
 $perf_rows = fetch_result($db, $perf_query);
 
-//echo json_encode($error_rows, JSON_PRETTY_PRINT);
+//echo json_encode($error_rows, 128);
 
 $data = array();
 $data = generate_results($db, $data, $error_rows);
@@ -137,7 +137,7 @@ $testcase = array(
 }
 
 // After this is done we've successfully built our object and just need to convert it to json.
-  echo json_encode($data, JSON_PRETTY_PRINT);
+  echo json_encode($data, 128);
 	
 	
 function fetch_result($db, $query) {

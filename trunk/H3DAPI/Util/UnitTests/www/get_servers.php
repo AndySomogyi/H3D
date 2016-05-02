@@ -7,7 +7,7 @@ $query = "SELECT * FROM servers ORDER BY server_name ASC";
 
 $data = generate_results($db, $query);
 
-echo json_encode($data, JSON_PRETTY_PRINT);
+echo json_encode($data, 128);
 	
 function generate_results($db, $query){	
   if(!$fetch_result = mysqli_query($db, $query)) {

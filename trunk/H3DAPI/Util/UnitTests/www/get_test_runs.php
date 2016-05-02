@@ -15,7 +15,7 @@ FROM test_runs WHERE server_id=%d ORDER BY id DESC;
 $data = generate_results($db, $query);
 
 // After this is done we've successfully built our object and just need to convert it to json.
-echo json_encode($data, JSON_PRETTY_PRINT);
+echo json_encode($data, 128);
 	
 function generate_results($db, $query){	
   if(!$fetch_result = mysqli_query($db, $query)) {
