@@ -116,7 +116,7 @@ $custom_rows = fetch_result($db, $custom_query);
 $render_rows = fetch_result($db, $render_query);
 $perf_rows = fetch_result($db, $perf_query);
 
-//echo json_encode($error_rows, 128);
+//echo json_encode($error_rows);
 
 $data = array();
 $data = generate_results($db, $data, $error_rows);
@@ -128,16 +128,16 @@ $data = generate_results($db, $data, $perf_rows);
 if(count($data) == 0) {
 $testcase = array(
   "name"   => "No results found",
-  "testcases" => array([
+  "testcases" => array(
     "step_name"  => "",
     "filename"   => "Error",
-    "result_type" => "ignore"])
+    "result_type" => "ignore")
   );  
   $data = array($testcase);
 }
 
 // After this is done we've successfully built our object and just need to convert it to json.
-  echo json_encode($data, 128);
+  echo json_encode($data);
 	
 	
 function fetch_result($db, $query) {
