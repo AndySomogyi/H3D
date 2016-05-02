@@ -136,13 +136,17 @@ class TestCaseRunner ( object ):
 
     process = self.getProcess()
     proc_cmd = os.path.join(args.processpath, h3d_process_name)
+    proc_url = url
+
     if ' ' in proc_cmd:
       proc_cmd = '"' + proc_cmd + '"'
+    if ' ' in proc_url:
+      proc_url = '"' + proc_url + '"'
 
     if self.processargs != []:
-      process.launch ( [proc_cmd] + self.processargs + self.load_flags + [url], cwd)
+      process.launch ( [proc_cmd] + self.processargs + self.load_flags + [proc_url], cwd)
     else:
-      process.launch ( [proc_cmd] + self.load_flags + [url], cwd)
+      process.launch ( [proc_cmd] + self.load_flags + [proc_url], cwd)
     return process
 
   def testStartUp ( self, url, cwd, variation, resolution=None):
