@@ -135,10 +135,14 @@ class TestCaseRunner ( object ):
       self.load_flags = []
 
     process = self.getProcess()
+    proc_cmd = os.path.join(args.processpath, h3d_process_name)
+    if ' ' in proc_cmd:
+      proc_cmd = '"' + proc_cmd + '"'
+
     if self.processargs != []:
-      process.launch ( [os.path.join(args.processpath, h3d_process_name)] + self.processargs + self.load_flags + [url], cwd)
+      process.launch ( [proc_cmd] + self.processargs + self.load_flags + [url], cwd)
     else:
-      process.launch ( [os.path.join(args.processpath, h3d_process_name)] + self.load_flags + [url], cwd)
+      process.launch ( [proc_cmd] + self.load_flags + [url], cwd)
     return process
 
   def testStartUp ( self, url, cwd, variation, resolution=None):
@@ -174,9 +178,10 @@ class TestCaseRunner ( object ):
     self.startup_time = test_case.starttime
     self.shutdown_time = test_case.runtime
     if args.processworkingdir is None:
-      cwd= os.path.abspath(os.path.split ( orig_url )[0])
+      cwd= os.getcwd()
     else:
       cwd= args.processworkingdir
+      print "working dir for process is: " + cwd
     filename= os.path.abspath ( url )
     
     if os.path.isfile( self.early_shutdown_file ):
@@ -324,6 +329,8 @@ class TestCaseRunner ( object ):
       except:
         print "Failed to restore! Please check the files manually."
         return
+    if (os.path.exists(os.path.join(output_dir, "validation.txt"))):
+      os.remove(os.path.join(output_dir, "validation.txt"))
 
     success, variation_path= self._createVariationFile ( v, os.path.join(directory, testCase.x3d))
     os.rename(original_path, original_path+'_original.x3d') # rename the original .x3d file
@@ -379,6 +386,7 @@ class TestCaseRunner ( object ):
 
     all_tests_successful = True
     
+    found_tests = False
     for root, dirs, files in os.walk(directory):
       for file in files:
         base, ext= os.path.splitext(file)
@@ -388,6 +396,7 @@ class TestCaseRunner ( object ):
           testCases = self.parseTestDefinitionFile(file_path)
           for testCase in testCases:
             if testCase != None and testCase.x3d != None and testCase.script != None:
+              found_tests = True
               print "Testing: " + testCase.name
               case_results = self.processTestDef(file, testCase, results, root)
               results.append(case_results)
@@ -395,7 +404,8 @@ class TestCaseRunner ( object ):
               testCase.filename = (os.path.relpath(file_path, directory)).replace('\'', '/') # This is used to set up the tree structure for the results page. It will store this parameter in the database as a unique identifier of this specific file of tests.
               if case_results != None:  
                 self.UploadResultsToSQL(testCase, case_results, root)            
-                
+    if not found_tests:
+      print "No valid tests found in: " + os.path.abspath(directory)
               
     return results, all_tests_successful
   
@@ -861,7 +871,7 @@ print "Running these tests using: " + subprocess.check_output('where.exe "' + (a
 
 
 tester= TestCaseRunner( os.path.join(args.workingdir, ""), startup_time= 5, shutdown_time= 5, testable_callback= isTestable, error_reporter=None)
-results, all_tests_successful = tester.processAllTestDefinitions(directory=args.workingdir, output_dir=args.output)
+results, all_tests_successful = tester.processAllTestDefinitions(directory=os.path.abspath(args.workingdir), output_dir=args.output)
 
 if not all_tests_successful:
   print "Error: One or more tests failed!"
