@@ -73,12 +73,12 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
 }
 
 .TestResult_first_in_step {
-  clear: both;
+  clear: right;
 }
 
 .TestResult_graph {
   border: 1px solid black;
-  height:400px;
+  height:466px;
   width:700px;
   overflow:hidden;
   margin: 0;
@@ -88,7 +88,7 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
 }
 
 .TestResult_console {
-  height:auto;
+  height:466px;
   width:auto;
   overflow-y:hidden;
   margin: 0;
@@ -98,7 +98,7 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
 }
 
 .TestResult_error {
-  height:400px;
+  height:466px;
   width:400px;
   overflow-y:scroll;
   margin: 0;
@@ -137,7 +137,7 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
 }
 
 .TestResult_image {
-  height:400px;
+  height:420px;
   width: 533.33px;
   margin: 0;
   padding: 0;
