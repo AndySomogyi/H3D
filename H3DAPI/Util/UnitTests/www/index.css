@@ -73,7 +73,7 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
 }
 
 .TestResult_first_in_step {
-  clear: right;
+  clear: both;
 }
 
 .TestResult_graph {
