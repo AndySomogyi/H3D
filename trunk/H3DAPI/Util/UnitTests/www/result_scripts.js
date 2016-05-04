@@ -38,6 +38,9 @@ function LoadSQLModel(test_run_id, result_callback) {
       url: 'get_results.php?test_run_id=' + test_run_id,
       dataType: 'json',
       success:result_callback,
+      error: function() {
+        LoadSQLModel(test_run_id, result_callback);
+      },
       async: true
   });
 }
@@ -538,6 +541,8 @@ function generateConsole(div) {
       diff.append(testcase.text_diff.split('\n').join('</br>'));
       container.append(diff);
     }
+  } else {
+    $('.TestStep_name', div).addClass('minimized');
   }
   div.append(container);
 }

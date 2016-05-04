@@ -346,9 +346,12 @@ class TestCaseRunner ( object ):
       print result.std_out
   #    print os.path.abspath(output_dir + '\\validation.txt')
       result.parseValidationFile(testCase, os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'), testCase.fuzz, testCase.threshold)
-      exitcode = result.success and all_tests_successful
-    except:
-      pass
+      if result.success and all_tests_successful:
+        exitcode = 0
+      else:
+        exitcode = 1
+    except Exception as e:
+      print str(e)
   
 
     try:
