@@ -562,17 +562,28 @@ function ConstructTestCases(model, target, path) {
   var container = $('<div>');
   container.addClass('Test_Container');
   target.append(container);
+  
 
   if(model.testcases.length > 0) {
+    model.testcases.sort(function(a, b) {
+    /* First check that it is the same case */
+    var i = a.name.localeCompare(b.name);
+    if (i == 0) { /* Same case, so return comparison of step name instead */
+      return a.step_name.localeCompare(b.step_name);
+    }
+    else
+      return a.name.localeCompare(b.name);
+    }
+    );
     var current_case_name = 'placeholder that shouldn\'t ever match';
+    var current_step_name = 'another placeholder';
     for(var i = 0; i < model.testcases.length; i++) {
       if(model.testcases[i].name != current_case_name) {
         var case_div = $('<div>');
         case_div.addClass('TestCase');
-        case_div.addClass('Category_Item'); 
+        case_div.addClass('Category_Item');
         var case_name = $('<div>');
         case_name.addClass("TestResult_name");
-
         
         if(hash_server == display_options.servers.current && hash_category.startsWith(path) && hash_case == model.testcases[i].name) {
           $("input", $(target).parent()).prop("checked", true)
@@ -613,6 +624,10 @@ function ConstructTestCases(model, target, path) {
             
       var step_div = $('<div>');
       step_div.addClass('TestResult');
+      if(current_step_name != model.testcases[i].step_name) {
+        step_div.addClass('TestResult_first_in_step');
+        current_step_name = model.testcases[i].step_name;
+      }
       var name_div = $('<div>');
       name_div.addClass('TestStep_name');
       name_div.click(function(){ // onclick function for toggling the presence of a minimized-class

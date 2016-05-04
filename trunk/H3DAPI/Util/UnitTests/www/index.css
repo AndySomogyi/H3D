@@ -46,8 +46,8 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
 
 .stdout_div {
   position:relative; margin-left: 20px;
-  width: 450px;
-  height: 450px;
+  width: 400px;
+  height: 400px;
   overflow-y:scroll;
   word-wrap: break-word;
   padding: 0;
@@ -72,6 +72,9 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
   overflow:hidden;
 }
 
+.TestResult_first_in_step {
+  clear: both;
+}
 
 .TestResult_graph {
   border: 1px solid black;
