@@ -99,7 +99,10 @@ class ProcessWin32(Process):
     
   def isRunning(self):
     # for Windows XP use this
-    return psutil.pid_exists(self.process.pid)
+    try:
+      return psutil.pid_exists(self.process.pid)
+    except:
+      return False
 
   def sendKey(self, key):
     if key == "{ESC}":
@@ -144,15 +147,13 @@ class ProcessWin32(Process):
         for i in range(0, len(cmdparams)):
           if (cmdparams[i] == "-p") and (i < len(cmdparams)-1) and (cmdparams[i+1] == str(self.process.pid)):
             #This is the WerFault.exe that is forcefully keeping our process alive!
-            kill_process = "taskkill /F /PID " + str(proc.pid)
-            os.system(kill_process)
+            proc.kill()
         
     psutil_proc = psutil.Process(self.process.pid)
     for proc_child in psutil_proc.children(recursive=True):
       proc_child.kill()
-    if self.process.poll() == None:
-      kill_process = "taskkill /F /PID " + str(self.process.pid)
-      os.system(kill_process)
+    if self.isRunning():
+      psutil_proc.kill()
 
 
 
