@@ -50,6 +50,9 @@
 #endif
 
 #ifdef HAVE_DCMTK
+#ifndef H3D_WINDOWS
+#define HAVE_CONFIG_H // For unix platforms this have to be defined before including anything
+#endif
 #include <dcmtk/dcmdata/dctypes.h>
 #endif
 
