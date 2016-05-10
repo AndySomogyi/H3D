@@ -148,7 +148,7 @@ class ProcessWin32(Process):
             os.system(kill_process)
         
     psutil_proc = psutil.Process(self.process.pid)
-    for proc_child in psutil_proc.children(Recursive=True):
+    for proc_child in psutil_proc.children(recursive=True):
       proc_child.kill()
     if self.process.poll() == None:
       kill_process = "taskkill /F /PID " + str(self.process.pid)
