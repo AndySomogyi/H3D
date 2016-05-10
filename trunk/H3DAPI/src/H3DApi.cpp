@@ -49,6 +49,10 @@
 #include <FreeImage.h>
 #endif
 
+#ifdef HAVE_DCMTK
+#include <dcmtk/dcmdata/dctypes.h>
+#endif
+
 using namespace H3D;
 
 // Initialize H3D API(only needed if using H3D API as a static library). 
@@ -84,6 +88,13 @@ void H3D::initializeH3D() {
 #ifdef HAVE_LIBCURL
   curl_global_init( CURL_GLOBAL_ALL );
   ResourceResolver::addResolver( new LibCurlResolver );
+#endif
+
+#ifdef HAVE_DCMTK
+  // Initialize the internal dcm logger because it is a static variable and if
+  // this function is somehow implicitly called from separate threads at almost the same time
+  // at least one of the threads will fail sooner or later.
+  DCM_dcmdataGetLogger();
 #endif
 }
 
