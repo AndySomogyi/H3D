@@ -143,11 +143,15 @@ class ProcessWin32(Process):
  
     for proc in psutil.process_iter():
       if "WerFault.exe".lower() in proc.name().lower():
-        cmdparams = proc.cmdline()
-        for i in range(0, len(cmdparams)):
-          if (cmdparams[i] == "-p") and (i < len(cmdparams)-1) and (cmdparams[i+1] == str(self.process.pid)):
-            #This is the WerFault.exe that is forcefully keeping our process alive!
-            proc.kill()
+        # NOTE: Blanket kill all WerFault instances!
+        proc.kill()
+        
+        # # Check if WerFault is for our process
+        # cmdparams = proc.cmdline()
+        # for i in range(0, len(cmdparams)):
+          # if (cmdparams[i] == "-p") and (i < len(cmdparams)-1) and (cmdparams[i+1] == str(self.process.pid)):
+            # #This is the WerFault.exe that is forcefully keeping our process alive!
+            # proc.kill()
         
     psutil_proc = psutil.Process(self.process.pid)
     for proc_child in psutil_proc.children(recursive=True):
