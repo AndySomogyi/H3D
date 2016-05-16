@@ -277,3 +277,5 @@ class TestResults ( object ):
           break # goes out to the while step_name != True loop,
         line = self.getNextLine(f)
       step_name = line
+    
+    f.close()
