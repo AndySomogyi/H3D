@@ -93,7 +93,7 @@ void H3D::initializeH3D() {
   ResourceResolver::addResolver( new LibCurlResolver );
 #endif
 
-#ifdef HAVE_DCMTK
+#if defined( HAVE_DCMTK ) && defined( DCMTK_IS_VERSION360 )
   // Initialize the internal dcm logger because it is a static variable and if
   // this function is somehow implicitly called from separate threads at almost the same time
   // at least one of the threads will fail sooner or later.

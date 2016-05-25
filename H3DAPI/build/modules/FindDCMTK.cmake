@@ -57,6 +57,15 @@ FIND_PATH( DCMTK_config_INCLUDE_DIR NAMES dcmtk/config/osconfig.h
            DOC "Path in which the file dcmtk/config/osconfig.h is located." )
 MARK_AS_ADVANCED(DCMTK_config_INCLUDE_DIR)
 
+SET( DCMTK_IS_VERSION360 FALSE )
+IF( EXISTS ${DCMTK_config_INCLUDE_DIR}/dcmtk/config/osconfig.h )
+  FILE( STRINGS ${DCMTK_config_INCLUDE_DIR}/dcmtk/config/osconfig.h list_of_defines REGEX "3.6.0" )
+  LIST( LENGTH list_of_defines list_of_defines_length )
+  IF( list_of_defines_length )
+    SET( DCMTK_IS_VERSION360 TRUE )
+  ENDIF( list_of_defines_length )
+ENDIF()
+
 set( DCMTK_lib_names_internal dcmjpeg ofstd oflog dcmimage dcmdata dcmimgle  )
 if( DCMTK_lib_names )
   set( DCMTK_lib_names_internal ${DCMTK_lib_names} )
