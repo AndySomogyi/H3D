@@ -252,7 +252,7 @@ class TestCaseRunner ( object ):
     result = []
     for sect in confParser.sections():
       if sect != 'Default':
-        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs'])
+        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials'])
         test_case.name = sect
         test_case.x3d = confParser.get(sect, 'x3d')
         test_case.baseline = confParser.get(sect, 'baseline folder')
@@ -282,6 +282,11 @@ class TestCaseRunner ( object ):
           test_case.processargs = confParser.get(sect, 'arguments')
         except:
           test_case.processargs = ''
+          
+        try:
+          test_case.maxtrials = confParser.getint(sect, 'maxtrials')
+        except:
+          test_case.maxtrials = 1
 
         if args.case == "" or args.case == test_case.name:
           result.append(test_case)
@@ -340,10 +345,17 @@ class TestCaseRunner ( object ):
     os.rename(original_path, original_path+'_original.x3d') # rename the original .x3d file
     os.rename(variation_path, original_path) # swap in our variation file for the original
     try:
-     # Run the test
-      result = self.runTestCase (file, testCase, os.path.abspath(original_path), os.path.join(directory, testCase.x3d), v.name, v)
-      print result.std_err
-      print result.std_out
+      # Run the test
+      for trial in range(testCase.maxtrials):
+        print "NOTE: Running trial %d/%d..." % (trial+1, testCase.maxtrials)
+        result = self.runTestCase (file, testCase, os.path.abspath(original_path), os.path.join(directory, testCase.x3d), v.name, v)
+        if result.terminates_ok:
+          print result.std_err
+          print result.std_out
+          break
+        else:
+          print "WARNING: Trial %d/%d failed!" % (trial+1, testCase.maxtrials)
+        
   #    print os.path.abspath(output_dir + '\\validation.txt')
       result.parseValidationFile(testCase, os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'), testCase.fuzz, testCase.threshold)
       if result.success and all_tests_successful:
