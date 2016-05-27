@@ -639,6 +639,7 @@ void PythonScript::initialize() {
     if( _url != "" || url_contents != "" ) {
       loadScript( _url, url_contents );
       if( is_tmp_file ) ResourceResolver::releaseTmpFileName( _url );
+      setURLUsed( *i );
       script_loaded = true;
       break;
     }
