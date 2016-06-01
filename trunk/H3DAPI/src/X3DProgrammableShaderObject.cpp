@@ -161,7 +161,7 @@ void X3DProgrammableShaderObject::UpdateTextures::update () {
 }
 
 X3DProgrammableShaderObject::UpdateTextures::~UpdateTextures () {
-  for ( FieldToNodes::iterator i= fields_to_textures.begin(); i != fields_to_textures.end(); ++i ) {
-    clearField ( *(*i).first );
+  while( !fields_to_textures.empty() ) {
+    clearField( *(*fields_to_textures.begin()).first );
   }
 }
