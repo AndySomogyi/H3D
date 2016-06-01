@@ -202,8 +202,11 @@ namespace H3D {
     static PyObject* addField( PyObject *self, PyObject *args, 
                                PyObject *field_type, PyObject *access_type );
 
-    /// Create a clone the node
+    /// Create a clone of the node
     static PyObject* clone ( PyObject* self, PyObject *args );
+
+    /// Calculate the closest point to the node.
+    static PyObject* closestPoint ( PyObject* self, PyObject *args );
   };
 
   //////////////////////////////////////////////////////

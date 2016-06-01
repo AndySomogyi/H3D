@@ -1103,6 +1103,35 @@ class Node:
   def getTypeName():
     pass
 
+  ## Calculate the closest point between a point and the node.
+  ## Keyword argument is not supported.
+  ## \param p The point to which closest points should be calculated.
+  ## \param override_no_collision Decides if Collision nodes should be
+  ## traversed even if disabled. Optional argument, default is False
+  ## which means that they will not be traversed.
+  ## \param collide_invisible Decides if ToggleGroup nodes should be
+  ## traversed even if graphicsOn is set to False. Optional argument,
+  ## default is False which means that they will not be traversed.
+  ## \return A list of dictionaries. All dictionaries contain the
+  ## following keys:
+  ## <table>
+  ## <tr><td>"point"</td><td>Contains the closest point on this node. Given in local
+  ## coordinate of the node.</td></tr>
+  ## <tr><td>"normal"</td><td>Contains the normal at the closest point on this node.
+  ## Given in local coordinate of the node.</td></tr>
+  ## <tr><td>"tex_coord"</td><td>Contains the texture coordinate at the closest point
+  ## on this node.</td></tr>
+  ## <tr><td>"front_face"</td><td>If true then the front face of the node was hit.
+  ## This information can be used to filter out hits on the "inside",
+  ## of an object.</td></tr>
+  ## <tr><td>"node"</td><td>The node that this dictionary info refer to.</td></tr>
+  ## <tr><td>"matrix"</td><td>A transformation matrix from local space of the node
+  ## which this dictionary is valid for to the coordinate space of
+  ## the top node (i.e. the node on which this function was called).</td></tr>
+  ## </table>
+  def closestPoint( p, override_no_collision, collide_invisible ):
+    pass
+
 ## The Vec2f class represents a 2d vector type using single precition 
 ## floating point values for its components.
 ## 
