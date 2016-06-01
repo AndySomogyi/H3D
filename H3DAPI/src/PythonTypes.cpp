@@ -36,7 +36,8 @@
 #ifdef HAVE_PYTHON
 // DEV WARNING, never use PyBool_Check without also using PyInt_Check, the reason
 // is that pythonfieldGetValue returns an integer for the SFBool type. Until that is
-// changed this PyInt_Check also have to be used.
+// changed this PyInt_Check also have to be used. You can use the function PythonInternals::isPythonBool
+// to check this.
 
 #if defined(_MSC_VER)
 // undefine _DEBUG since we want to always link to the release version of
@@ -136,6 +137,10 @@ namespace H3D {
                                           H3D_FULL_LOCATION );
       }
     }
+
+    bool isPythonBool( PyObject *o ) {
+      return PyBool_Check( o ) || PyInt_Check( o );
+    }
     
   }
 
@@ -154,6 +159,7 @@ namespace H3D {
     { "setName", (PyCFunction) PyNode::setName, 0 },
     { "getTypeName", (PyCFunction) PyNode::getTypeName, 0 },
     { "clone", (PyCFunction) PyNode::clone, 0 },
+    { "closestPoint", (PyCFunction) PyNode::closestPoint, 0 },
     {NULL, NULL}
   };
   
@@ -296,7 +302,7 @@ self, name, field_type, access_type )" );
     Node *n = PyNode_AsNode( self );
 
     bool deepCopy= true;
-    if( arg && !( PyBool_Check( arg ) || PyInt_Check( arg ) ) ) {
+    if( arg && !PythonInternals::isPythonBool(arg) ) {
       PyErr_SetString( PyExc_ValueError, 
                        "Invalid argument(s) to function PyNode.clone( \
 self, deepCopy )" );
@@ -307,6 +313,83 @@ self, deepCopy )" );
     }
 
     return PyNode_FromNode ( n->clone ( deepCopy ) );
+  }
+
+  PyObject* PyNode::closestPoint ( PyObject *self, PyObject *args ) {
+    Node *n = PyNode_AsNode( self );
+
+    PyObject *python_p = args;
+    if( !args || !PyTuple_Check( args ) || PyTuple_Size( args ) < 1 ) {
+      if( !args || !( PyVec3f_Check( args ) || PyVec3d_Check( args ) ) ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Not enough arguments, or invalid arguments, to function PyNode.closestPoint( \
+  self, p, override_no_collision, collide_invisible )" );
+        return NULL;
+      }
+    } else {
+      python_p = PyTuple_GetItem( args, 0 );
+    }
+
+    Vec3f p;
+    if( PyVec3f_Check( python_p ) ) {
+      p = PyVec3f_AsVec3f( python_p );
+    } else
+      p = Vec3f( PyVec3d_AsVec3d( python_p ) );
+
+    bool override_no_collision = false;
+    bool collide_invisible = false;
+    if( PyTuple_Check( args ) && PyTuple_Size( args ) > 1 ) {
+      PyObject *python_override_no_collision = PyTuple_GetItem( args, 1 );
+      if( !python_override_no_collision || !PythonInternals::isPythonBool( python_override_no_collision ) ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Invalid second argument to PyNode.closestPoint( \
+  self, p, override_no_collision, collide_invisible )" );
+        return NULL;
+      }
+      override_no_collision = PyObject_IsTrue ( python_override_no_collision ) == 1;
+
+      if( PyTuple_Size( args ) > 2 ) {
+        PyObject *python_collide_invisible = PyTuple_GetItem( args, 2 );
+        if( !python_collide_invisible || !PythonInternals::isPythonBool( python_collide_invisible ) ) {
+          PyErr_SetString( PyExc_ValueError, 
+                           "Invalid third argument to PyNode.closestPoint( \
+    self, p, override_no_collision, collide_invisible )" );
+          return NULL;
+        }
+        collide_invisible = PyObject_IsTrue ( python_collide_invisible ) == 1;
+      }
+    }
+
+    Node::NodeIntersectResult result( NULL, override_no_collision, collide_invisible );
+    n->closestPoint( p, result );
+    if( result.result.empty() ) {
+      Py_INCREF( Py_None );
+      return Py_None;
+    }
+    result.transformResult();
+    PyObject *list = PyList_New( result.result.size() );
+    if( !list ) {
+      PyErr_SetString( PyExc_ValueError, 
+                           "Failed to create return value (a list). Please report this issue." );
+      return NULL;
+    }
+    for( Py_ssize_t i = 0; i < result.result.size(); ++i ) {
+      PyObject *dict = PyDict_New();
+      if( !dict ) {
+        PyErr_SetString( PyExc_ValueError, 
+                             "Failed to create return value (a dictionary). Please report this issue." );
+        Py_DECREF( list );
+        return NULL;
+      }
+      PyDict_SetItemString( dict, "point", PyVec3f_FromVec3f( Vec3f( result.result[i].point ) ) );
+      PyDict_SetItemString( dict, "normal", PyVec3f_FromVec3f( Vec3f( result.result[i].normal ) ) );
+      PyDict_SetItemString( dict, "tex_coord", PyVec3f_FromVec3f( Vec3f( result.result[i].tex_coord ) ) );
+      PyDict_SetItemString( dict, "front_face", PyInt_FromLong( long( result.result[i].face == HAPI::Collision::FRONT ) ) );
+      PyDict_SetItemString( dict, "node", PyNode_FromNode( result.theNodes[i] ) );
+      PyDict_SetItemString( dict, "matrix", PyMatrix4f_FromMatrix4f( result.getGeometryTransforms()[i] ) );
+      PyList_SetItem( list, i, dict );
+    }
+    return list;
   }
 
   void PyNode::installType( PyObject* H3D_module ) {
