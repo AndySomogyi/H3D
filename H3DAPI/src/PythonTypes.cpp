@@ -160,6 +160,7 @@ namespace H3D {
     { "getTypeName", (PyCFunction) PyNode::getTypeName, 0 },
     { "clone", (PyCFunction) PyNode::clone, 0 },
     { "closestPoint", (PyCFunction) PyNode::closestPoint, 0 },
+    { "lineIntersect", (PyCFunction) PyNode::lineIntersect, 0 },
     {NULL, NULL}
   };
   
@@ -366,7 +367,100 @@ self, deepCopy )" );
       Py_INCREF( Py_None );
       return Py_None;
     }
-    result.transformResult();
+
+    PyObject *list = PyList_New( result.result.size() );
+    if( !list ) {
+      PyErr_SetString( PyExc_ValueError, 
+                           "Failed to create return value (a list). Please report this issue." );
+      return NULL;
+    }
+    for( Py_ssize_t i = 0; i < result.result.size(); ++i ) {
+      PyObject *dict = PyDict_New();
+      if( !dict ) {
+        PyErr_SetString( PyExc_ValueError, 
+                             "Failed to create return value (a dictionary). Please report this issue." );
+        Py_DECREF( list );
+        return NULL;
+      }
+      PyDict_SetItemString( dict, "point", PyVec3f_FromVec3f( Vec3f( result.result[i].point ) ) );
+      PyDict_SetItemString( dict, "normal", PyVec3f_FromVec3f( Vec3f( result.result[i].normal ) ) );
+      PyDict_SetItemString( dict, "tex_coord", PyVec3f_FromVec3f( Vec3f( result.result[i].tex_coord ) ) );
+      PyDict_SetItemString( dict, "front_face", PyInt_FromLong( long( result.result[i].face == HAPI::Collision::FRONT ) ) );
+      PyDict_SetItemString( dict, "node", PyNode_FromNode( result.theNodes[i] ) );
+      PyDict_SetItemString( dict, "matrix", PyMatrix4f_FromMatrix4f( result.getGeometryTransforms()[i] ) );
+      PyList_SetItem( list, i, dict );
+    }
+    return list;
+  }
+
+  PyObject* PyNode::lineIntersect ( PyObject *self, PyObject *args ) {
+    Node *n = PyNode_AsNode( self );
+
+    if( !args || !PyTuple_Check( args ) || PyTuple_Size( args ) < 2 ) {
+      PyErr_SetString( PyExc_ValueError, 
+                         "Not enough arguments, to function PyNode.lineIntersect( \
+  self, start, end, override_no_collision, collide_invisible )" );
+      return NULL;
+    }
+    
+    PyObject * python_start = PyTuple_GetItem( args, 0 );
+    PyObject * python_end = PyTuple_GetItem( args, 1 );
+
+    Vec3f start;
+    if( PyVec3f_Check( python_start ) ) {
+      start = PyVec3f_AsVec3f( python_start );
+    } else if( PyVec3d_Check( python_start ) )
+      start = Vec3f( PyVec3d_AsVec3d( python_start ) );
+    else {
+      PyErr_SetString( PyExc_ValueError, 
+                         "Invalid first argument to PyNode.lineIntersect( \
+  self, start, end, override_no_collision, collide_invisible )" );
+      return NULL;
+    }
+
+    Vec3f end;
+    if( PyVec3f_Check( python_end ) ) {
+      end = PyVec3f_AsVec3f( python_end );
+    } else if( PyVec3d_Check( python_end ) )
+      end = Vec3f( PyVec3d_AsVec3d( python_end ) );
+    else {
+      PyErr_SetString( PyExc_ValueError, 
+                         "Invalid second argument to PyNode.lineIntersect( \
+  self, start, end, override_no_collision, collide_invisible )" );
+      return NULL;
+    }
+
+    bool override_no_collision = false;
+    bool collide_invisible = false;
+    if( PyTuple_Check( args ) && PyTuple_Size( args ) > 2 ) {
+      PyObject *python_override_no_collision = PyTuple_GetItem( args, 2 );
+      if( !python_override_no_collision || !PythonInternals::isPythonBool( python_override_no_collision ) ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Invalid third argument to PyNode.lineIntersect( \
+  self, start, end, override_no_collision, collide_invisible )" );
+        return NULL;
+      }
+      override_no_collision = PyObject_IsTrue ( python_override_no_collision ) == 1;
+
+      if( PyTuple_Size( args ) > 3 ) {
+        PyObject *python_collide_invisible = PyTuple_GetItem( args, 3 );
+        if( !python_collide_invisible || !PythonInternals::isPythonBool( python_collide_invisible ) ) {
+          PyErr_SetString( PyExc_ValueError, 
+                           "Invalid fourht argument to PyNode.lineIntersect( \
+    self, start, end, override_no_collision, collide_invisible )" );
+          return NULL;
+        }
+        collide_invisible = PyObject_IsTrue ( python_collide_invisible ) == 1;
+      }
+    }
+
+    Node::LineIntersectResult result( override_no_collision, false, NULL, collide_invisible );
+    n->lineIntersect( start, end, result );
+    if( result.result.empty() ) {
+      Py_INCREF( Py_None );
+      return Py_None;
+    }
+
     PyObject *list = PyList_New( result.result.size() );
     if( !list ) {
       PyErr_SetString( PyExc_ValueError, 

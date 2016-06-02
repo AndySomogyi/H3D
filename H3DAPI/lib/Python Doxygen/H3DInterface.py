@@ -1115,21 +1115,51 @@ class Node:
   ## \return A list of dictionaries. All dictionaries contain the
   ## following keys:
   ## <table>
-  ## <tr><td>"point"</td><td>Contains the closest point on this node. Given in local
-  ## coordinate of the node.</td></tr>
-  ## <tr><td>"normal"</td><td>Contains the normal at the closest point on this node.
-  ## Given in local coordinate of the node.</td></tr>
+  ## <tr><td>"node"</td><td>The node that this dictionary info refer to.</td></tr>
+  ## <tr><td>"point"</td><td>Contains the closest point on the node. Given in local
+  ## coordinates of the node.</td></tr>
+  ## <tr><td>"normal"</td><td>Contains the normal at the closest point on the node.
+  ## Given in local coordinates of the node.</td></tr>
   ## <tr><td>"tex_coord"</td><td>Contains the texture coordinate at the closest point
-  ## on this node.</td></tr>
+  ## on the node.</td></tr>
   ## <tr><td>"front_face"</td><td>If true then the front face of the node was hit.
   ## This information can be used to filter out hits on the "inside",
   ## of an object.</td></tr>
-  ## <tr><td>"node"</td><td>The node that this dictionary info refer to.</td></tr>
   ## <tr><td>"matrix"</td><td>A transformation matrix from local space of the node
-  ## which this dictionary is valid for to the coordinate space of
-  ## the top node (i.e. the node on which this function was called).</td></tr>
+  ## to the coordinate space of the top node (i.e. the node on which this function
+  ## was called).</td></tr>
   ## </table>
-  def closestPoint( p, override_no_collision, collide_invisible ):
+  def closestPoint( p, override_no_collision = False, collide_invisible = False ):
+    pass
+  
+  ## Calculate the closest intersection on a line segment and the node.
+  ## Keyword argument is not supported.
+  ## \param start The start point of the line
+  ## \param end The end point of the line
+  ## \param override_no_collision Decides if Collision nodes should be
+  ## traversed even if disabled. Optional argument, default is False
+  ## which means that they will not be traversed.
+  ## \param collide_invisible Decides if ToggleGroup nodes should be
+  ## traversed even if graphicsOn is set to False. Optional argument,
+  ## default is False which means that they will not be traversed.
+  ## \return A list of dictionaries. All dictionaries contain the
+  ## following keys:
+  ## <table>
+ ## <tr><td>"node"</td><td>The node that this dictionary info refer to.</td></tr>
+  ## <tr><td>"point"</td><td>Contains the closest intersection on the node. Given in local
+  ## coordinates of the node.</td></tr>
+  ## <tr><td>"normal"</td><td>Contains the normal at the closest interseciton on the node.
+  ## Given in local coordinates of the node.</td></tr>
+  ## <tr><td>"tex_coord"</td><td>Contains the texture coordinate at the closest intersection
+  ## on the node.</td></tr>
+  ## <tr><td>"front_face"</td><td>If true then the front face of the node was hit.
+  ## This information can be used to filter out hits on the "inside",
+  ## of an object.</td></tr>
+  ## <tr><td>"matrix"</td><td>A transformation matrix from local space of the node
+  ## to the coordinate space of the top node (i.e. the node on which this function
+  ## was called).</td></tr>
+  ## </table>
+  def lineIntersect( start, end, override_no_collision = False, collide_invisible = False ):
     pass
 
 ## The Vec2f class represents a 2d vector type using single precition 
