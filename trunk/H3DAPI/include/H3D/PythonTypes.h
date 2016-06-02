@@ -207,6 +207,9 @@ namespace H3D {
 
     /// Calculate the closest point to the node.
     static PyObject* closestPoint ( PyObject* self, PyObject *args );
+
+    /// Calculate a line intersection with the node.
+    static PyObject* lineIntersect ( PyObject* self, PyObject *args );
   };
 
   //////////////////////////////////////////////////////
