@@ -172,10 +172,14 @@ namespace H3D {
     auto_ptr< SFFloat > pixelStepOffset;
 
     /// The height of the window size this shader is going to apply to.
+    /// When the value goes to negative, the actual width in use will be the width of
+    /// input texture divided by the absolute value of this user specified width.
     /// by default the value is -1 which means it will be the same as the width of
     /// the input texture width. Once this value changed, rebuild shader
     auto_ptr< SFInt32 > width;
     /// The width of the window size this shader is going to apply to.
+    /// When the value goes to negative, the actual height in use will be the height of
+    /// input texture divided by the absolute value of this user specified height.
     /// by default the value is -1 which means it will be the same as the height of
     /// the input texture height. Once this value changed rebuild shader
     /// <b>Access type:</b> inputOutput

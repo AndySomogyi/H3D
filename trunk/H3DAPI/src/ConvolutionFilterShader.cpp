@@ -100,21 +100,31 @@ void ConvolutionFilterShader::traverseSG( TraverseInfo &ti ) {
   // otherwise use the one specified by the user
   H3DSingleTextureNode* t = texture->getValue();
   if ( t ) {
-    if ( width->getValue()<=0 ) {
-      int texture_width = t->getTextureWidth();
-      if ( texture_width>0&&texture_width!=widthInUse->getValue() ) {
+    int convolution_width = width->getValue();
+    int convolution_height = height->getValue();
+    int width_in_use = widthInUse->getValue();
+    int height_in_use = heightInUse->getValue();
+
+    if ( convolution_width<=0 ) {
+      int texture_width = H3DFloor( t->getTextureWidth()/(-convolution_width) ) ;
+      if ( texture_width>0&&texture_width!=width_in_use ) {
         widthInUse->setValue( texture_width, id );
       }
     } else {
-      widthInUse->setValue( width->getValue(), id );
+      if( width_in_use != convolution_width ) {
+        widthInUse->setValue( convolution_width, id );
+      }
     }
-    if ( height->getValue()<=0 ) {
-      int texture_height = t->getTextureHeight();
-      if ( texture_height>0&&texture_height!=heightInUse->getValue() ) {
+
+    if ( convolution_height<=0 ) {
+      int texture_height = H3DFloor( t->getTextureHeight()/(-convolution_height) );
+      if ( texture_height>0&&texture_height!=height_in_use ) {
         heightInUse->setValue( texture_height, id );
       }
     } else {
-      heightInUse->setValue( height->getValue(), id );
+      if( height_in_use!=convolution_height ) {
+        heightInUse->setValue( convolution_height, id );
+      }
     }
   }
 
