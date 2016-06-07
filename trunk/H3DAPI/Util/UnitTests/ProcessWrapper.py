@@ -153,11 +153,14 @@ class ProcessWin32(Process):
             # #This is the WerFault.exe that is forcefully keeping our process alive!
             # proc.kill()
         
-    psutil_proc = psutil.Process(self.process.pid)
-    for proc_child in psutil_proc.children(recursive=True):
-      proc_child.kill()
-    if self.isRunning():
-      psutil_proc.kill()
+    try:
+      psutil_proc = psutil.Process(self.process.pid)
+      for proc_child in psutil_proc.children(recursive=True):
+        proc_child.kill()
+      if self.isRunning():
+        psutil_proc.kill()
+    except:
+      pass
 
 
 
