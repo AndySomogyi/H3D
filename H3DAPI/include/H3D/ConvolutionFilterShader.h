@@ -163,7 +163,7 @@ namespace H3D {
     /// this value relatively small as too many pixel offset will make result strange.
     /// By using this value, you can enhance or weaken the convolving effect with
     /// slight artifact while no extra texture read. When this value is negative, it will
-    /// reduce the convolving effect. Keep in mind that if this value is -1, it will competely
+    /// reduce the convolving effect. Keep in mind that if this value is -1, it will completely
     /// cancel the convolving effect. This value can not be smaller than -1, as that will
     /// make the texture sampling impossible. So value smaller than -1 will be clipped to -1
     /// <b>Access type:</b> inputOutput
