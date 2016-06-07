@@ -106,7 +106,7 @@ void ConvolutionFilterShader::traverseSG( TraverseInfo &ti ) {
     int height_in_use = heightInUse->getValue();
 
     if ( convolution_width<=0 ) {
-      int texture_width = H3DFloor( t->getTextureWidth()/(-convolution_width) ) ;
+      int texture_width = t->getTextureWidth()/(-convolution_width)  ;
       if ( texture_width>0&&texture_width!=width_in_use ) {
         widthInUse->setValue( texture_width, id );
       }
@@ -117,7 +117,7 @@ void ConvolutionFilterShader::traverseSG( TraverseInfo &ti ) {
     }
 
     if ( convolution_height<=0 ) {
-      int texture_height = H3DFloor( t->getTextureHeight()/(-convolution_height) );
+      int texture_height = t->getTextureHeight()/(-convolution_height);
       if ( texture_height>0&&texture_height!=height_in_use ) {
         heightInUse->setValue( texture_height, id );
       }
