@@ -221,12 +221,15 @@ class TestCaseRunner ( object ):
       return test_results
     else:
       print "Shutdown timeout hit, test looks like it crashed or froze."
-      process.kill ()
-      time_slept = 0
-      self.shutdown_timeout = 60
-      while time_slept < self.shutdown_timeout and process.isRunning():
-        time.sleep(0.5)
-        time_slept += 0.5
+      try:
+        process.kill ()
+        time_slept = 0
+        self.shutdown_timeout = 60
+        while time_slept < self.shutdown_timeout and process.isRunning():
+          time.sleep(0.5)
+          time_slept += 0.5
+      except:
+        pass
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
       test_results.warnings, test_results.errors= self._countWarnings ( test_results )
@@ -572,6 +575,7 @@ class TestCaseRunner ( object ):
               if res == None:
                 curs.execute(("INSERT INTO rendering_baselines (file_id, case_id, step_id, image) VALUES (%d, %d, %d" % (testfile_id, testcase_id, teststep_id)) + ", %s)", [baseline_image,])
               elif res[1] != baseline_image:
+                print "running query: " + "UPDATE rendering_baselines SET image=%s WHERE id=%s", [baseline_image[0:10] + '...', res[0]]
                 curs.execute("UPDATE rendering_baselines SET image=%s WHERE id=%s", [baseline_image, res[0]])
             
             if not result.success: #validation failed, if possible we should upload both the rendering and the diff

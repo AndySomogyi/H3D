@@ -777,6 +777,7 @@ function SetServer(server_id, server_name) {
   $(".Selected_TestRun").removeClass('Selected_TestRun');
   $(this).addClass('Selected_Server');
   $('#Categories_List').empty();
+  $('#TestRuns_List').empty();
   display_options.servers.available = [server_name];
   display_options.servers.selected = [server_name];
   display_options.servers.current = server_name;
