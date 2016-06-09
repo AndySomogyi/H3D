@@ -896,8 +896,8 @@ tester= TestCaseRunner( os.path.join(args.workingdir, ""), startup_time= 5, shut
 results, all_tests_successful = tester.processAllTestDefinitions(directory=os.path.abspath(args.workingdir), output_dir=args.output)
 
 if not all_tests_successful:
-  print "Error: One or more tests failed!"
-  exitCode = -1
+  print "Warning: One or more tests failed!"
+  exitCode = 1
 
 
 exit(exitCode)
