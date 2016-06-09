@@ -519,68 +519,70 @@ void X3D::writeNodeAsX3DHelp( ostream& os,
     H3DDynamicFieldsObject * dyn_f_obj =
       dynamic_cast< H3DDynamicFieldsObject * >(node);
     AutoRef< Node > default_value_node( H3DNodeDatabase::createNode( node_name ) );
-    for( H3DNodeDatabase::FieldDBConstIterator k = db->fieldDBBegin();
-         k != db->fieldDBEnd(); ++k ) {
-      Field *f = node->getField( *k );
-      // In the case of dynamic fields a field in the field database might not
-      // exist for this node, in that case just check next.
-      if( !f )
-        continue;
-      Field::AccessType access_type = f->getAccessType();
-      // check if field is a dynamic field.
-      bool dynamic_field = false;
-      H3DDynamicFieldsObject::field_iterator j;
-      if( dyn_f_obj ) {
-        for( j = dyn_f_obj->firstField();
-             j != dyn_f_obj->endField(); ++j )
-          if( (*j) == f ) {
-            dynamic_field = true;
-            break;
-          }
-      }
-
-      if( dynamic_field ) {
-        // Dynamic fields are added to other vectors.
-        if( MFNode *mf_node = dynamic_cast< MFNode * >( f ) ) {
-          dyn_mf_nodes.push_back( make_pair( (*j)->getName(), mf_node ) );
-        } else if( SFNode *sf_node = dynamic_cast< SFNode * >( f ) ) {
-          dyn_sf_nodes.push_back( make_pair( (*j)->getName(), sf_node ) );
-        } else if( ParsableField *p_field = 
-                   dynamic_cast< ParsableField * >( f ) ) {
-          dyn_parse_fields.push_back( make_pair( (*j)->getName(), p_field ) );
+    if( default_value_node.get() ) {
+      for( H3DNodeDatabase::FieldDBConstIterator k = db->fieldDBBegin();
+           k != db->fieldDBEnd(); ++k ) {
+        Field *f = node->getField( *k );
+        // In the case of dynamic fields a field in the field database might not
+        // exist for this node, in that case just check next.
+        if( !f )
+          continue;
+        Field::AccessType access_type = f->getAccessType();
+        // check if field is a dynamic field.
+        bool dynamic_field = false;
+        H3DDynamicFieldsObject::field_iterator j;
+        if( dyn_f_obj ) {
+          for( j = dyn_f_obj->firstField();
+               j != dyn_f_obj->endField(); ++j )
+            if( (*j) == f ) {
+              dynamic_field = true;
+              break;
+            }
         }
-      } else if( access_type != Field::INPUT_ONLY &&
-                 access_type != Field::OUTPUT_ONLY ) {
-        if( MFNode *mf_node = dynamic_cast< MFNode * >( f ) ) {
-          if( mf_node->size() > 0 )
-            mf_nodes.push_back( make_pair( *k, mf_node ) );
-        } else if( SFNode *sf_node = dynamic_cast< SFNode * >( f ) ) {
-          if( sf_node->getValue() )
-            sf_nodes.push_back( make_pair( *k, sf_node ) );
-        } else if( ParsableField *p_field = 
-                   dynamic_cast< ParsableField * >( f ) ){
-          // only add value if it is different from the default value.
-          ParsableField *default_field = dynamic_cast< ParsableField * >(
-               default_value_node->getField( *k ) );
-          string v = p_field->getValueAsString();
-          if( default_field && default_field->getValueAsString() != v ) {
-            if( output_type == X3D_OUTPUT ) {
-              os << *k << "=\'" << v << "\' ";
-            } else if( output_type == VRML_OUTPUT ) {
-              // VRML versions of true and false are upper case.
-              if( dynamic_cast< MFBool * >( default_field ) || 
-                  dynamic_cast< SFBool * >( default_field ) ){
-                for (size_t l=0; l<v.length(); ++l) {
-                  v[l]=toupper(v[l]);
-                }
-              }
 
-              if( dynamic_cast< MFieldClass * >( default_field ) ) { 
-                os << new_prefix << *k << " [" << v << "]" << endl;
-              } else if( dynamic_cast< SFString *>( default_field ) ) {
-                os << new_prefix << *k << " \"" << v << "\"" << endl;
-              } else {
-                os << new_prefix << *k << " " << v << endl;
+        if( dynamic_field ) {
+          // Dynamic fields are added to other vectors.
+          if( MFNode *mf_node = dynamic_cast< MFNode * >( f ) ) {
+            dyn_mf_nodes.push_back( make_pair( (*j)->getName(), mf_node ) );
+          } else if( SFNode *sf_node = dynamic_cast< SFNode * >( f ) ) {
+            dyn_sf_nodes.push_back( make_pair( (*j)->getName(), sf_node ) );
+          } else if( ParsableField *p_field = 
+                     dynamic_cast< ParsableField * >( f ) ) {
+            dyn_parse_fields.push_back( make_pair( (*j)->getName(), p_field ) );
+          }
+        } else if( access_type != Field::INPUT_ONLY &&
+                   access_type != Field::OUTPUT_ONLY ) {
+          if( MFNode *mf_node = dynamic_cast< MFNode * >( f ) ) {
+            if( mf_node->size() > 0 )
+              mf_nodes.push_back( make_pair( *k, mf_node ) );
+          } else if( SFNode *sf_node = dynamic_cast< SFNode * >( f ) ) {
+            if( sf_node->getValue() )
+              sf_nodes.push_back( make_pair( *k, sf_node ) );
+          } else if( ParsableField *p_field = 
+                     dynamic_cast< ParsableField * >( f ) ){
+            // only add value if it is different from the default value.
+            ParsableField *default_field = dynamic_cast< ParsableField * >(
+                 default_value_node->getField( *k ) );
+            string v = p_field->getValueAsString();
+            if( default_field && default_field->getValueAsString() != v ) {
+              if( output_type == X3D_OUTPUT ) {
+                os << *k << "=\'" << v << "\' ";
+              } else if( output_type == VRML_OUTPUT ) {
+                // VRML versions of true and false are upper case.
+                if( dynamic_cast< MFBool * >( default_field ) || 
+                    dynamic_cast< SFBool * >( default_field ) ){
+                  for (size_t l=0; l<v.length(); ++l) {
+                    v[l]=toupper(v[l]);
+                  }
+                }
+
+                if( dynamic_cast< MFieldClass * >( default_field ) ) { 
+                  os << new_prefix << *k << " [" << v << "]" << endl;
+                } else if( dynamic_cast< SFString *>( default_field ) ) {
+                  os << new_prefix << *k << " \"" << v << "\"" << endl;
+                } else {
+                  os << new_prefix << *k << " " << v << endl;
+                }
               }
             }
           }
