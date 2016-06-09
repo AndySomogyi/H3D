@@ -575,7 +575,6 @@ class TestCaseRunner ( object ):
               if res == None:
                 curs.execute(("INSERT INTO rendering_baselines (file_id, case_id, step_id, image) VALUES (%d, %d, %d" % (testfile_id, testcase_id, teststep_id)) + ", %s)", [baseline_image,])
               elif res[1] != baseline_image:
-                print "running query: " + "UPDATE rendering_baselines SET image=%s WHERE id=%s", [baseline_image[0:10] + '...', res[0]]
                 curs.execute("UPDATE rendering_baselines SET image=%s WHERE id=%s", [baseline_image, res[0]])
             
             if not result.success: #validation failed, if possible we should upload both the rendering and the diff
