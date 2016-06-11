@@ -106,26 +106,16 @@ namespace H3D {
                      Inst< SFString    > _cursorType = 0 );
 
     ///// Destructor.
-    ~WxWidgetsWindow() {
-      if( theWxGLCanvas )
-        theWxGLCanvas->myOwner = NULL;
-
-      if( !have_parent ) {
-        theWindow->Destroy();
-      }
-      
-      // Seems like wxWidgets 2.9 does not destruct explicit wxGLCanvas.
-      if( theWxGLContext ) {
-        delete theWxGLContext;
-        theWxGLContext = NULL;
-      }
-    }
+    ~WxWidgetsWindow();
 
     /// Calls wxGLCanvas::SwapBuffers
     virtual void swapBuffers(); 
 
     /// Creates and initializes a wxWindow for OpenGL rendering
     virtual void initWindow();
+
+    /// Virtual function to clean up all that was created in initWindow.
+    virtual void deinitWindow();
 
     /// Initializes wxWindow
     virtual void initWindowHandler() { }

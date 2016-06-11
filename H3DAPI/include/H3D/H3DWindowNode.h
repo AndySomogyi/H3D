@@ -209,6 +209,9 @@ namespace H3D {
     /// to true if window is made active at initialization.
     virtual void initWindow() = 0;
 
+    /// Virtual function to clean up all that was created in initWindow.
+    virtual void deinitWindow();
+
     /// Virtual function to initialize the window handler if needed.
     /// E.g. glutInit().
     virtual void initWindowHandler() = 0;

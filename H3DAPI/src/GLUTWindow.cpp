@@ -132,7 +132,8 @@ GLUTWindow::GLUTWindow( Inst< SFInt32     > _width,
   last_fullscreen = fullscreen->getValue();
 }
 
-GLUTWindow::~GLUTWindow() {
+void GLUTWindow::deinitWindow() {
+  H3DWindowNode::deinitWindow();
   if ( window_id > 0 ) {
     // If the window is closed with the x-button glut can be deinitialized
     // before getting here, so make sure glut is initialized before calling
@@ -145,6 +146,10 @@ GLUTWindow::~GLUTWindow() {
       glutDestroyWindow( window_id );
     }
   }
+}
+
+
+GLUTWindow::~GLUTWindow() {
 }
 
 void GLUTWindow::initWindow() {
