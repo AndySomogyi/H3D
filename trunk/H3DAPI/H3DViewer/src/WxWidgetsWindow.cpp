@@ -96,6 +96,9 @@ WxWidgetsWindow::WxWidgetsWindow( wxWindow *_theParent,
   theWindow->SetSizer( sizer );
 }
 
+WxWidgetsWindow::~WxWidgetsWindow() {
+}
+
 void WxWidgetsWindow::initWindow() {
   if( isInitialized() && !allow_new_pixel_format_creation ) {
     Console(LogLevel::Error) << "WxWidgetsWindow does not support changing pixel format from/to "
@@ -227,6 +230,22 @@ void WxWidgetsWindow::initWindow() {
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
   glClear( GL_COLOR_BUFFER_BIT );
   is_initialized = true;
+}
+
+void WxWidgetsWindow::deinitWindow() {
+  H3DWindowNode::deinitWindow();
+  if( theWxGLCanvas )
+    theWxGLCanvas->myOwner = NULL;
+
+  if( !have_parent ) {
+    theWindow->Destroy();
+  }
+      
+  // Seems like wxWidgets 2.9 does not destruct explicit wxGLCanvas.
+  if( theWxGLContext ) {
+    delete theWxGLContext;
+    theWxGLContext = NULL;
+  }
 }
 
 void WxWidgetsWindow::setFullscreen( bool fullscreen ) {

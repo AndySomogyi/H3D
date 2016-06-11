@@ -72,6 +72,9 @@ namespace H3D {
     /// Creates and initializes a GLUT window/
     virtual void initWindow();
 
+    /// Virtual function to clean up all that was created in initWindow.
+    virtual void deinitWindow();
+
     /// Initializes GLUT.
     virtual void initWindowHandler() { initGLUT(); }
 

@@ -240,7 +240,12 @@ H3DWindowNode::H3DWindowNode(
   previous_mouse_position[1] = 0;
 }
 
+void H3DWindowNode::deinitWindow() {
+
+}
+
 H3DWindowNode::~H3DWindowNode() {
+  deinitWindow();
   delete h3d_navigation;
   h3d_navigation = NULL;
   if( stencil_mask )
