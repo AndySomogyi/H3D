@@ -51,8 +51,9 @@ namespace H3D {
       /// Specialized field that reCalculate the kernel when it updates
   public:
       
-    struct MFWeights : 
+    class H3DAPI_API MFWeights : 
         public TypedField< MFFloat, void,  AnyNumber< Field > > {
+        protected:
           virtual void update();
         };
 
@@ -74,7 +75,7 @@ namespace H3D {
                           Inst< SFFloat      > _sigma  = 0,
                           Inst< SFFloat      > _pixelStepOffset = 0,
                           Inst< SFInt32> _width = 0,
-                          Inst< SFInt32> _windowHeight = 0,
+                          Inst< SFInt32> _height = 0,
                           Inst< TextureMonitor> _widthInUse = 0,
                           Inst< TextureMonitor> _heightInUse = 0);
 
@@ -93,13 +94,12 @@ namespace H3D {
   protected:
 
     virtual bool canBuildShader();
+    std::vector<float> gauss2D( int x, int y, float _sigma );
+    std::vector<float> gauss1D( int x, float _sigma );
 
     /// regenerate the kernel. 
     //virtual void generateKernel();
 
-  private:
-    std::vector<float> gauss2D(int x,int y, float _sigma);
-    std::vector<float> gauss1D(int x,float _sigma);
 
 
   };

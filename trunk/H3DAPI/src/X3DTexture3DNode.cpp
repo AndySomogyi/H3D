@@ -72,7 +72,8 @@ X3DTexture3DNode::X3DTexture3DNode(
   scaleToPowerOfTwo( _scaleToP2 ),
   textureProperties( _textureProp ),
   imageUpdated( new Field ),
-  updateTextureProperties( new UpdateTextureProperties ){
+  updateTextureProperties( new UpdateTextureProperties ),
+  textureUpdated( new Field ){
 
   type_name = "X3DTexture3DNode";
   
@@ -94,6 +95,7 @@ X3DTexture3DNode::X3DTexture3DNode(
   repeatR->route( displayList );
   scaleToPowerOfTwo->route( displayList );
   textureProperties->route( displayList );
+  textureUpdated->route( displayList );
 
   imageUpdated->setName( "ImageUpdated" );
   imageUpdated->setOwner( this );
@@ -506,5 +508,29 @@ void X3DTexture3DNode::UpdateSaveToURL::onNewValue( const string &v ) {
     node->saveSuccess->setValue( H3DUtil::saveImageAsNrrdFile( v, image ) == 0, node->id );
   }
 #endif
+}
+
+void X3DTexture3DNode::setTextureWidth( int _width ) {
+  int current_width = this->getTextureWidth();
+  if ( current_width!=_width ) {
+    H3DSingleTextureNode::setTextureWidth( _width );
+    this->textureUpdated->touch();
+  }
+}
+
+void X3DTexture3DNode::setTextureHeight( int _height ) {
+  int current_hight = getTextureHeight();
+  if ( current_hight!=_height ) {
+    H3DSingleTextureNode::setTextureHeight( _height );
+    this->textureUpdated->touch();
+  }
+}
+
+void X3DTexture3DNode::setTextureDepth( int _depth ) {
+  int current_depth = getTextureDepth();
+  if( current_depth!=_depth ) {
+    H3DSingleTextureNode::setTextureDepth( _depth );
+    this->textureUpdated->touch();
+  }
 }
 

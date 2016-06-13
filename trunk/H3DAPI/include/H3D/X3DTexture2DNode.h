@@ -117,6 +117,10 @@ namespace H3D {
     /// directly from graphic card
     virtual Image* renderToImage ( H3DInt32 _width, H3DInt32 _height, bool output_float_texture = false  );
 
+    virtual void setTextureWidth( int _width );
+
+    virtual void setTextureHeight( int _height );
+
     /// If true the texture will repeat itself when the s texture coordinate
     /// is outside the range [0,1]. If false the texture will be clamped if
     /// outside the same range.
@@ -174,6 +178,8 @@ namespace H3D {
 
     /// Field to indicate image is modified
     auto_ptr< Field > imageUpdated;
+
+    auto_ptr< Field > textureUpdated;
 
     
 

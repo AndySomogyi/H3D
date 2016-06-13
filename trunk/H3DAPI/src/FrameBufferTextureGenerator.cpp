@@ -912,7 +912,22 @@ void FrameBufferTextureGenerator::render()     {
         glPopAttrib();        
         return;
       }
-      X3DGroupingNode::render();
+      if ( splitScene->getValue() ) {
+        const NodeVector &c = children->getValue();
+        for ( unsigned int i = 0; i<c.size(); ++i ) {
+          GLenum target = GL_COLOR_ATTACHMENT0_EXT+i;
+          glDrawBuffer( target );
+          if ( c[i] ) {
+            H3DDisplayListObject *tmp = dynamic_cast<H3DDisplayListObject*>(c[i]);
+            if ( tmp )
+              tmp->displayList->callList();
+            else
+              c[i]->render();
+          }
+        }
+      } else {
+        X3DGroupingNode::render();
+      }
       if( current_shadow_caster && !current_shadow_caster->object->empty() ) current_shadow_caster->render();
     }else{ // render every child to its own slice
       for( unsigned int i = 0; i < c.size(); ++i ) {
