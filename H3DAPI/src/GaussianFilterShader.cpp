@@ -28,7 +28,7 @@ H3DNodeDatabase GaussianFilterShader::database(
 namespace GaussianFilterShaderInternals {
   FIELDDB_ELEMENT( GaussianFilterShader, texture, INPUT_OUTPUT );
   FIELDDB_ELEMENT( GaussianFilterShader, type, INPUT_OUTPUT );
-  FIELDDB_ELEMENT( GaussianFilterShader, weights, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( GaussianFilterShader, weights, INPUT_OUTPUT );
   FIELDDB_ELEMENT( GaussianFilterShader, kernelSize, INPUT_OUTPUT );
   FIELDDB_ELEMENT( GaussianFilterShader, sigma, INPUT_OUTPUT);
   FIELDDB_ELEMENT( GaussianFilterShader, pixelStepOffset, INPUT_OUTPUT );

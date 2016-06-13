@@ -63,7 +63,8 @@ X3DTexture2DNode::X3DTexture2DNode(
   scaleToPowerOfTwo( _scaleToP2 ),
   textureProperties( _textureProperties ),
   imageUpdated ( new Field ),
-  updateTextureProperties( new UpdateTextureProperties ){
+  updateTextureProperties( new UpdateTextureProperties ),
+  textureUpdated( new Field ) {
 
   type_name = "X3DTexture2DNode";
   texture_unit = GL_TEXTURE0_ARB ;
@@ -82,6 +83,7 @@ X3DTexture2DNode::X3DTexture2DNode(
   repeatT->route( displayList );
   scaleToPowerOfTwo->route( displayList );
   textureProperties->route( displayList );
+  textureUpdated->route( displayList );
 
   imageUpdated->setName( "ImageUpdated" );
   imageUpdated->setOwner( this );
@@ -524,5 +526,21 @@ void X3DTexture2DNode::UpdateTextureProperties::update(){
       Console(LogLevel::Warning) << "Warning: Invalid textureType: \"" << target_type << "\" in TextureProperties for "
         << "X3DTexture2DNode. " << endl;
     }
+  }
+}
+
+void X3DTexture2DNode::setTextureWidth( int _width ) {
+  int current_width = this->getTextureWidth();
+  if( current_width!=_width ) {
+    H3DSingleTextureNode::setTextureWidth( _width );
+    this->textureUpdated->touch();
+  }
+}
+
+void X3DTexture2DNode::setTextureHeight( int _height ) {
+  int current_hight = getTextureHeight();
+  if( current_hight!=_height ) {
+    H3DSingleTextureNode::setTextureHeight( _height );
+    this->textureUpdated->touch();
   }
 }
