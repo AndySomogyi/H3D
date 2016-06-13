@@ -42,10 +42,13 @@ class Variation ( object ):
           return "<%s %s%s" % (r.group(1),r.group(2),replace_with)
       else:
         return r.group(0)
-      
+    
+    def replaceRoot ( m ):
+      return m.group(0)+"\n" + self.global_insertion_string
+    
     if self.global_insertion_string != "":
-      reg = re.compile( r'<Scene>' )
-      output_after = reg.sub('<Scene>\n' + self.global_insertion_string, output)
+      reg = re.compile( r'<Scene>|<Group>' )
+      output_after = reg.sub(replaceRoot, output)
       if output_after == output:
         self.global_insertion_string_failed = True
       else:
