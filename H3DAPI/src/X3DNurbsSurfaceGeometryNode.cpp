@@ -218,6 +218,8 @@ void X3DNurbsSurfaceGeometryNode::render( ) {
           << getName() << "). Node will not be rendered. " << endl;
         printWarning->upToDate();
       }
+      delete[] u_knots;
+      delete[] v_knots;
       return;
     }
 

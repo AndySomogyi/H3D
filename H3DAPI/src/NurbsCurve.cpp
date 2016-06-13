@@ -207,6 +207,8 @@ void NurbsCurve::render( ) {
       printWarning->upToDate();
     }
     if (valid_order) valid_order=false;
+    delete [] weight_float;
+    delete [] knots_float;
     return;
   }
 
@@ -220,6 +222,8 @@ void NurbsCurve::render( ) {
       printWarning->upToDate();
     }
     if (valid_controlPoints) valid_controlPoints = false;
+    delete [] weight_float;
+    delete [] knots_float;
     return;
   }
 

@@ -61,6 +61,7 @@ H3DSingleTextureNode::~H3DSingleTextureNode () {
   if ( X3DProgrammableShaderObject::use_bindless_textures ) {
     makeNonResident ();
   }
+  if (texture_id) glDeleteTextures(1, &texture_id);
 }
 
 bool H3DSingleTextureNode::makeResident () {
