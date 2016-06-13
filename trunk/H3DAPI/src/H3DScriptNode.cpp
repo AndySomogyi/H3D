@@ -74,8 +74,8 @@ int H3DScriptNode::removeNamedNode( const string &_name ) {
   if( i == named_nodes.end() ) {
     return -1;
   } else {
-    named_nodes.erase( i );
     (*i).second->removeDestructCallback( removeNamedNodeCB, this );
+    named_nodes.erase( i );
     return 0;
   }
 }

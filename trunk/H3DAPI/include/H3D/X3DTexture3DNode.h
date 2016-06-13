@@ -88,11 +88,6 @@ namespace H3D {
                       Inst< SFInt32 > _saveHeight = 0,
                       Inst< SFInt32 > _saveWidth = 0 );
 
-    
-    /// Destructor.
-    ~X3DTexture3DNode() {
-      if( texture_id ) glDeleteTextures( 1, &texture_id );
-    }
 
     /// Performs the OpenGL rendering required to install the image
     /// as a texture.
