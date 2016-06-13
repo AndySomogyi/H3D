@@ -407,6 +407,7 @@ class TestCaseRunner ( object ):
     self.server_id = res[0]
 
     all_tests_successful = True
+    all_tests_run = True
     
     found_tests = False
     for root, dirs, files in os.walk(directory):
@@ -423,13 +424,14 @@ class TestCaseRunner ( object ):
               case_results = self.processTestDef(file, testCase, results, root)
               results.append(case_results)
               all_tests_successful = case_results.success and all_tests_successful
+              all_tests_run = case_results.terminates_ok and all_tests_run
               testCase.filename = (os.path.relpath(file_path, directory)).replace('\'', '/') # This is used to set up the tree structure for the results page. It will store this parameter in the database as a unique identifier of this specific file of tests.
               if case_results != None:  
                 self.UploadResultsToSQL(testCase, case_results, root)            
     if not found_tests:
       print "No valid tests found in: " + os.path.abspath(directory)
               
-    return results, all_tests_successful
+    return results, all_tests_successful, all_tests_run
   
 
   def _isTestable ( self, file_path ):
@@ -893,9 +895,12 @@ print "Running these tests using: " + subprocess.check_output('where.exe "' + (a
 
 
 tester= TestCaseRunner( os.path.join(args.workingdir, ""), startup_time= 5, shutdown_time= 5, testable_callback= isTestable, error_reporter=None)
-results, all_tests_successful = tester.processAllTestDefinitions(directory=os.path.abspath(args.workingdir), output_dir=args.output)
+results, all_tests_successful, all_tests_run = tester.processAllTestDefinitions(directory=os.path.abspath(args.workingdir), output_dir=args.output)
 
-if not all_tests_successful:
+if not all_tests_run:
+  print "Error: Some tests were not run!"
+  exitCode = 2
+elif not all_tests_successful:
   print "Warning: One or more tests failed!"
   exitCode = 1
 
