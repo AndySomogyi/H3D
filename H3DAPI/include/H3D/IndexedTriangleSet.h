@@ -264,6 +264,23 @@ namespace H3D {
       return render_patches;
     }
 
+    virtual void glRender() {
+      bool previous_allow = allowingCulling();
+      bool prev_draw = draw_debug_options;
+      allowCulling( false );
+      draw_debug_options = false;
+      bool prev_patches = getRenderPatches();
+      if( prev_patches ) {
+        setRenderPatches( false );
+        render();
+        setRenderPatches( prev_patches );
+      } else
+        displayList->callList( false );
+      
+      draw_debug_options = prev_draw;
+      allowCulling( previous_allow );
+    }
+
     /// Auto-generated normals that are used if the normal field is NULL.
     /// Only accessable in C++.
     ///
