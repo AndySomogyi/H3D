@@ -285,7 +285,7 @@ void IndexedTriangleSet::render() {
         }
 
         bool draw_patches = render_patches && GLEW_ARB_tessellation_shader;
-        GLuint primative_type = draw_patches ? GL_PATCHES : GL_TRIANGLES;
+        GLuint primitive_type = draw_patches ? GL_PATCHES : GL_TRIANGLES;
 
         if( draw_patches ) {
           glPatchParameteri( GL_PATCH_VERTICES, 3 );
@@ -295,12 +295,12 @@ void IndexedTriangleSet::render() {
         // objects are used.
         H3DInt32 instance_count = instanceCount->getValue();
         if( instance_count >= 0 ) {
-          glDrawElementsInstanced( primative_type,
+          glDrawElementsInstanced( primitive_type,
             3 * nr_triangles,
             GL_UNSIGNED_INT,
             NULL, instance_count );
         } else {
-          glDrawRangeElements( primative_type,
+          glDrawRangeElements( primitive_type,
             0,
             coordinate_node->nrAvailableCoords() - 1,
             3 * nr_triangles,
@@ -355,7 +355,7 @@ void IndexedTriangleSet::render() {
         }
 
         bool draw_patches = render_patches && GLEW_ARB_tessellation_shader;
-        GLuint primative_type = draw_patches ? GL_PATCHES : GL_TRIANGLES;
+        GLuint primitive_type = draw_patches ? GL_PATCHES : GL_TRIANGLES;
 
         if( draw_patches ) {
           glPatchParameteri( GL_PATCH_VERTICES, 3 );
@@ -365,12 +365,12 @@ void IndexedTriangleSet::render() {
         // objects are used.
         H3DInt32 instance_count = instanceCount->getValue();
         if( instance_count >= 0 ) {
-          glDrawElementsInstanced( primative_type,
+          glDrawElementsInstanced( primitive_type,
             3 * nr_triangles,
             GL_UNSIGNED_INT,
             &(*(indices.begin())), instance_count );
         } else {
-          glDrawRangeElements( primative_type,
+          glDrawRangeElements( primitive_type,
             0,
             coordinate_node->nrAvailableCoords() - 1,
             3 * nr_triangles,
