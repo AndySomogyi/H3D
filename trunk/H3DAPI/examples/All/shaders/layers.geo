@@ -18,7 +18,7 @@ void main() {
   gl_Position= gl_in[2].gl_Position;
   gl_Layer= 0;
   EmitVertex();
-
+  EndPrimitive();
   // Layer 1
   gl_Position= gl_in[0].gl_Position;
   gl_Layer= 1;
@@ -31,4 +31,5 @@ void main() {
   gl_Position= gl_in[2].gl_Position;
   gl_Layer= 1;
   EmitVertex();
+  EndPrimitive();
 }
