@@ -1,12 +1,17 @@
 
 <Scene>
   <Viewpoint position="0 0 10" />
+  <StereoInfo  interocularDistance="0.05"/>
   <Shape>
     <Appearance>
       <ComposedShader DEF="MA_Material" language="GLSL" suppressUniformWarnings="true">
         <ShaderPart type="GEOMETRY" url="shaders/sps.geo" />
         <ShaderPart type="FRAGMENT" url="shaders/sps.frag" />
         <ShaderPart type="VERTEX" url="shaders/sps.vert" />
+        <ShaderConstants>
+          <field name="matrixProjShift" type="SFFloat" value="0.399439" accessType="inputOutput" />
+          <field name="matrixViewShift" type="SFFloat" value="5.0" accessType="inputOutput" />
+        </ShaderConstants>
       </ComposedShader>
     </Appearance>
     <IndexedTriangleSet DEF="ITS_Cube" solid="true"
