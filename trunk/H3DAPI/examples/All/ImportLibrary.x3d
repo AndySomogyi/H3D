@@ -16,7 +16,7 @@
   
   <Scene>
     <Viewpoint position='0 0 0.6' />
-    <ImportLibrary url='"../../../bin32/H3DPhysics_vc10" "../../../bin64/H3DPhysics_vc10" "libh3dphysics.so" "libh3dphysics.so.1.2.1"' />
+    <ImportLibrary url='"../../../bin32/H3DPhysics" "../../../bin64/H3DPhysics" "H3DPhysics" "libh3dphysics.so" "libh3dphysics.so.1.2.1"' />
     
     <Transform DEF='BOX-T'>
       <Shape DEF='BOX-S'>
