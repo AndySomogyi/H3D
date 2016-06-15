@@ -75,11 +75,33 @@ void ImportLibrary::initialize() {
       // try relative path first
       handle = DynamicLibrary::load( url_base + urn_name + "_d" );
       if( handle ) return;
-    }
 
-    // try absolute path.
-    handle = DynamicLibrary::load( urn_name + "_d" );
-    if( handle ) return;
+      // try absolute path.
+      handle = DynamicLibrary::load( urn_name + "_d" );
+      if( handle ) return;
+
+#if (_MSC_VER == 1600)
+      // look for vs2010-version of the library
+      // try relative path first
+      handle = DynamicLibrary::load(url_base + urn_name + "_vc10_d");
+      if (handle) return;
+
+      // try absolute path.
+      handle = DynamicLibrary::load(urn_name + "_vc10_d");
+      if (handle) return;
+
+#elif (_MSC_VER == 1900)
+      // look for vs2015-version of the library
+      // try relative path first
+      handle = DynamicLibrary::load(url_base + urn_name + "_vc14_d");
+      if (handle) return;
+
+      // try absolute path.
+      handle = DynamicLibrary::load(urn_name + "_vc14_d");
+      if (handle) return;
+#endif // _MSC_VER
+
+    }
     
 #endif // _DEBUG
 
@@ -97,6 +119,29 @@ void ImportLibrary::initialize() {
     handle =  DynamicLibrary::load( filename );
 
     if( handle ) return;
+
+    if(!ends_in_dll) {
+#if (_MSC_VER == 1600)
+    // look for vs2010-version of the library
+    // try relative path first
+    handle = DynamicLibrary::load(url_base + urn_name + "vc10");
+    if (handle) return;
+
+    // try absolute path.
+    handle = DynamicLibrary::load(urn_name + "vc10");
+    if (handle) return;
+
+#elif (_MSC_VER == 1900)
+    // look for vs2015-version of the library
+    // try relative path first
+    handle = DynamicLibrary::load(url_base + urn_name + "_vc14");
+    if (handle) return;
+
+    // try absolute path.
+    handle = DynamicLibrary::load(urn_name + "_vc14");
+    if (handle) return;
+#endif // _MSC_VER
+  }
   }
 
   // no library found
