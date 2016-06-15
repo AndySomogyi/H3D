@@ -58,9 +58,9 @@ namespace H3D {
                 Inst< SFFloat    > _interocularDistance = 0,
                 Inst< SFFloat    > _focalDistance       = 0,
                 Inst< SFRotation > _headTilt            = 0,
-                Inst< SFFloat > _matrixViewShift        = 0,
-                Inst< SFFloat > _matrixProjShift        = 0,
-                Inst< SFBool  > _swapEyes               = 0 );
+                Inst< SFFloat    > _matrixViewShift     = 0,
+                Inst< SFFloat    > _matrixProjShift     = 0,
+                Inst< SFBool     > _swapEyes            = 0 );
     
     /// Convenience function to get the top of the StereoInfo stack.
     static inline StereoInfo *getActive() {
@@ -74,7 +74,7 @@ namespace H3D {
     /// <b>Default value:</b> 0.06 \n
     auto_ptr< SFFloat > interocularDistance;
 
-    /// The focalDistance field specifies the distance in metres at which
+    /// The focalDistance field specifies the distance in meters at which
     /// objects in the scene will appear to be at zero parallax.
     ///
     /// <b>Access type:</b> inputOutput \n
@@ -90,10 +90,10 @@ namespace H3D {
     /// <b>Default value:</b> Rotation(1,0,0,0) \n
     auto_ptr< SFRotation > headTilt;
 
-    /// The matrixViewShift field specifies the view matrix stereo shirt.
+    /// The matrixViewShift field specifies the view matrix stereo shift.
     ///
     /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> 0.0 \n
+    /// <b>Default value:</b> 0.03 \n
     auto_ptr< SFFloat > matrixViewShift;
 
     /// The matrixViewShift field specifies the projection matrix stereo shift.
@@ -109,6 +109,11 @@ namespace H3D {
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> false \n
     auto_ptr< SFBool > swapEyes;
+
+    /// Function for updating the matrixViewShift
+    void updateViewShift( float _matrixViewShift );
+    /// Function for updating the matrixProjShift
+    void updateProjShift( float _matrixProjShift );
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
