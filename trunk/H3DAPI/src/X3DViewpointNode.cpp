@@ -371,11 +371,11 @@ void X3DViewpointNode::getProjectionDimensions( EyeMode eye_mode,
     if( eye_mode == RIGHT_EYE )
       frustum_shift = -frustum_shift;
   } 
-  if ( eye_mode == BOTH_EYE ) {
+  if ( (stereo_info) && ( eye_mode == BOTH_EYE ) ) {
     float new_matrix_proj_shift = 2*frustum_shift/(right-left);
     float diff_threshold = 0.00001f;
     if(H3DAbs(stereo_info->matrixProjShift->getValue()- new_matrix_proj_shift)>diff_threshold) {
-      stereo_info->matrixProjShift->setValue(new_matrix_proj_shift);
+      stereo_info->updateProjShift( new_matrix_proj_shift );
     }
   } else {
   left += frustum_shift;
@@ -418,9 +418,9 @@ void X3DViewpointNode::setupViewMatrix( EyeMode eye_mode,
       glTranslatef( -left_eye.x, -left_eye.y, -left_eye.z );
     } else if( eye_mode == RIGHT_EYE ) {
       glTranslatef( left_eye.x, left_eye.y, left_eye.z );
-    } else if( eye_mode == BOTH_EYE ) {
+    } else if( (stereo_info) && ( eye_mode == BOTH_EYE ) ) {
       if( stereo_info->matrixViewShift->getValue()!=half_interocular_distance ) {
-        stereo_info->matrixViewShift->setValue(half_interocular_distance);
+        stereo_info->updateViewShift( half_interocular_distance );
       }
     }
   }
