@@ -413,6 +413,7 @@ void H3DViewerPopupMenus::OnTreeViewAddChildNode( wxCommandEvent& event ) {
     wxMessageBox( wxT("Selected tree item is not a node"),
                   wxT("Error"),
                   wxOK | wxICON_EXCLAMATION);
+	return;
   }
 
   vector< wxString > node_fields;
