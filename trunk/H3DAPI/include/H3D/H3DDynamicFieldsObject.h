@@ -36,20 +36,17 @@
 namespace H3D {
   /// \ingroup AbstractInterface
   /// \class H3DDynamicFieldsObject
-  /// \brief This abstract interface class is the base class for all node
-  /// types that specify arbitrary fields i.e. fields that can be 
-  /// defined e.g. from X3D as in a prototype declaration.
+  /// \brief This abstract interface class is the base class for all classes
+  /// that specify arbitrary fields.
   /// 
-  class H3DAPI_API H3DDynamicFieldsObject {
+  class H3DAPI_API H3DDynamicFieldsObjectBase {
   public:
-    /// Constructor.
-    /// \deprecated Use the one without explicit database pointer input ( the default )
-    /// The argument to this constructor will be ignored.
-    H3DDynamicFieldsObject( H3DNodeDatabase *_database ):
-      database( NULL ), inherited_node( NULL ) {}
 
-    /// Destructor. Virtual to make H3DDynamicFieldsObject a polymorphic type.
-    virtual ~H3DDynamicFieldsObject() {
+    /// Constructor
+    H3DDynamicFieldsObjectBase() {}
+
+    /// Destructor. Virtual to make H3DDynamicFieldsObjectBase a polymorphic type.
+    virtual ~H3DDynamicFieldsObjectBase() {
     }
 
     /// Add a field to the Node. 
@@ -60,29 +57,113 @@ namespace H3D {
     /// when the Node is destructed.
     /// \returns true on success, false otherwise.
     inline virtual bool addField( const string &name,
-                                  const Field::AccessType &access,
-                                  Field *field ) {
-      Node *n = dynamic_cast< Node * >( this );
-      if( n ) {
-        if( !database.get() ) {
-          H3DNodeDatabase *parent_db = H3DNodeDatabase::lookupTypeId( typeid( *n ) );
-          database.reset( new H3DNodeDatabase( n, parent_db ) );
-        }
-        if( !database->getField( n, name ) ) {
-          // Set the placeholder to the node address.
-          inherited_node = n;
-          field->setOwner( n );
+      const Field::AccessType &access,
+      Field *field ) {
+
+        DynamicFieldsMap::const_iterator j = object_dynamic_fields.find( name );
+        if ( field && j == object_dynamic_fields.end() ) {
           field->setName( name );
           field->setAccessType( access );
-          database->addField( new DynamicFieldDBElement( database.get(),
-                                                         name,
-                                                         access,
-                                                         field ) );
-          dynamic_fields.push_back( field );
+          object_dynamic_fields.insert( std::pair< string, Field* >( name , field ) );
+          return true;
+        }
+
+        return false;
+
+    }
+
+    /// Remove a field from the Node.
+    /// \param name The name of the field to remove.
+    /// \returns true on success false otherwise.
+    inline virtual bool removeField ( const string& _name ) {
+
+      DynamicFieldsMap::iterator j = object_dynamic_fields.find( _name );
+      if ( j != object_dynamic_fields.end() ) {
+        Field* f= j->second;
+        if ( f ) {
+          object_dynamic_fields.erase ( j );
+          delete f;
           return true;
         }
       }
       return false;
+
+    }
+
+    /// Get a field from the dynamics object. Use this one if the instance is not a Node
+    /// otherwise use getField instead.
+    /// \param name The name of the field to get.
+    /// \returns Field on success NULL otherwise.
+    inline Field *getObjectField ( const string& _name ) const {
+      DynamicFieldsMap::const_iterator j = object_dynamic_fields.find( _name );
+      if ( j != object_dynamic_fields.end() ) {
+        Field* f= j->second;
+        return f;
+      }
+      return NULL;
+    }
+
+    /// Remove all dynamic fields that have been previously added.
+    virtual void clearFields() {
+      for( DynamicFieldsMap::iterator i = object_dynamic_fields.begin(); 
+        i != object_dynamic_fields.end(); ++i ) {
+          if( i->second )
+            delete i->second;
+      }
+      object_dynamic_fields.clear();
+    }
+
+  protected:
+    typedef map< string, Field* > DynamicFieldsMap;
+    DynamicFieldsMap object_dynamic_fields;
+  };
+
+
+  /// \ingroup AbstractInterface
+  /// \class H3DDynamicFieldsObject
+  /// \brief This abstract interface class is the base class for all node
+  /// types that specify arbitrary fields i.e. fields that can be 
+  /// defined e.g. from X3D as in a prototype declaration.
+  /// 
+  class H3DAPI_API H3DDynamicFieldsObject : public H3DDynamicFieldsObjectBase {
+  public:
+    /// Constructor.
+    /// \deprecated Use the one without explicit database pointer input ( the default )
+    /// The argument to this constructor will be ignored.
+    H3DDynamicFieldsObject( H3DNodeDatabase *_database ):
+      H3DDynamicFieldsObjectBase(), database( NULL ), inherited_node( NULL ) {}
+
+    /// Add a field to the Node. 
+    /// \param name The name of the field.
+    /// \param access The access type of the field.
+    /// \param field The field to add to the node. The ownership of the 
+    /// Field pointer is handed over to the Node and will be destructed
+    /// when the Node is destructed.
+    /// \returns true on success, false otherwise.
+    inline virtual bool addField( const string &name,
+      const Field::AccessType &access,
+      Field *field ) {
+        Node *n = dynamic_cast< Node * >( this );
+        if( n ) {
+          if( !database.get() ) {
+            H3DNodeDatabase *parent_db = H3DNodeDatabase::lookupTypeId( typeid( *n ) );
+            database.reset( new H3DNodeDatabase( n, parent_db ) );
+          }
+          if( !database->getField( n, name ) ) {
+            // Set the placeholder to the node address.
+            inherited_node = n;
+            field->setOwner( n );
+            field->setName( name );
+            field->setAccessType( access );
+            database->addField( new DynamicFieldDBElement( database.get(),
+              name,
+              access,
+              field ) );
+            dynamic_fields.push_back( field );
+            return true;
+          }
+        }
+        return false;
     }
     
     /// Remove a field from the Node.
@@ -92,7 +173,7 @@ namespace H3D {
       if ( database.get() ) {
         Field* f= inherited_node->getField ( _name );
         AutoPtrVector< Field >::iterator i= find ( dynamic_fields.begin(), dynamic_fields.end(), f );
-        
+    
         if ( f && i != dynamic_fields.end() ) {
           if ( database->removeField ( _name, inherited_node ) ) {
             dynamic_fields.erase ( i );
@@ -138,10 +219,10 @@ namespace H3D {
     // and the database is then not cleaned up properly.
     Node * inherited_node;
   public:
-    
+
     /// Constructor
     H3DDynamicFieldsObject():
-      database( NULL ), inherited_node( NULL ) {}
+        H3DDynamicFieldsObjectBase(), database( NULL ), inherited_node( NULL ) {}
   };
 }
 
