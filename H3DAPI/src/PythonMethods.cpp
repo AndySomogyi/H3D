@@ -683,6 +683,7 @@ if( check_func( value ) ) { \
       { "addURNResolveRule", pythonAddURNResolveRule, 0 },
       { "SFStringIsValidValue", pythonSFStringIsValidValue, 0 },
       { "SFStringGetValidValues", pythonSFStringGetValidValues, 0 },
+      { "exportGeometryAsSTL", pythonExportGeometryAsSTL, 0 },
       { NULL, NULL }      
     };
     
@@ -3450,6 +3451,75 @@ call the base class __init__ function." );
                          "Error: Field NULL pointer" );
         return 0;
       }
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////
+
+    PyObject* pythonExportGeometryAsSTL( PyObject *self, PyObject *args ) {
+      if( !args || !PyTuple_Check( args ) || PyTuple_Size( args ) < 2 ) {
+        PyErr_SetString( PyExc_ValueError, 
+                         "Not enough arguments, or invalid arguments, to function\
+ H3D.exportGeometryAsSTL( node, url, solid_name, use_binary_format )." );
+        return NULL;
+      }
+      PyObject *python_geom = PyTuple_GetItem( args, 0 );
+
+      if( !PyNode_Check( python_geom ) ) {
+        PyErr_SetString( PyExc_ValueError, "Invalid first argument to H3D.exportGeometryAsSTL( node, url, solid_name, use_binary_format ).\
+ Must be geometry node." );
+        return NULL;
+      }
+
+      Node *n = PyNode_AsNode( python_geom );
+      X3DGeometryNode *g = dynamic_cast< X3DGeometryNode * >(n);
+      if( !n || !g ) {
+        PyErr_SetString( PyExc_ValueError,  "Invalid first argument to H3D.exportGeometryAsSTL( node, url, solid_name, use_binary_format ).\
+ Must be geometry node." );
+        return NULL;
+      }
+
+      PyObject *python_url = PyTuple_GetItem( args, 1 );
+      if( !PyString_Check( python_url ) ) {
+        PyErr_SetString( PyExc_ValueError, "Invalid second argument to H3D.exportGeometryAsSTL( node, url, solid_name, use_binary_format )." );
+        return NULL;
+      }
+
+      string url = PyString_AsString( python_url );
+      string solid_name = "";
+      bool use_binary_format = false;
+      if( PyTuple_Check( args ) && PyTuple_Size( args ) > 2 ) {
+        PyObject *python_name = PyTuple_GetItem( args, 2 );
+        if( !python_name || !PyString_Check( python_name ) ) {
+          PyErr_SetString( PyExc_ValueError, 
+                           "Invalid third argument to H3D.exportGeometryAsSTL( node, url, solid_name, use_binary_format )." );
+          return NULL;
+        }
+        solid_name = PyString_AsString( python_name );
+
+        if( PyTuple_Size( args ) > 3 ) {
+          PyObject *python_use_binary_format = PyTuple_GetItem( args, 3 );
+          if( !python_use_binary_format || !( PyBool_Check( python_use_binary_format ) || PyInt_Check( python_use_binary_format ) ) ) {
+            PyErr_SetString( PyExc_ValueError, 
+                             "Invalid third argument to H3D.exportGeometryAsSTL( node, url, solid_name, use_binary_format )." );
+            return NULL;
+          }
+          use_binary_format = PyObject_IsTrue ( python_use_binary_format ) == 1;
+        }
+      }
+
+
+      ios_base::openmode open_mode = ios_base::out;
+      if( use_binary_format )
+        open_mode |= ios_base::binary;
+      ofstream s(url.c_str(), open_mode );
+      if( s.is_open() ) {
+        X3D::writeGeometryAsSTL( s, g, solid_name, use_binary_format );
+        s.close();
+        Py_RETURN_TRUE;
+      }
+
+      Py_RETURN_FALSE;
     }
   }
 }
