@@ -214,7 +214,9 @@ namespace H3D {
 
     PyObject* pythonTakeScreenshot( PyObject *self, PyObject *arg );
 
-    PyObject* pythonAddURNResolveRule( PyObject *self, PyObject *arg ); 
+    PyObject* pythonAddURNResolveRule( PyObject *self, PyObject *arg );
+
+    PyObject* pythonExportGeometryAsSTL( PyObject *self, PyObject *args );
   }
 
     

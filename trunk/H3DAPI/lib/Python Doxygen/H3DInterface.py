@@ -831,6 +831,17 @@ def writeNodeAsX3D( node ):
   pass
 
 ## \namespace H3DInterface 
+## \fn def exportGeometryAsSTL( node, url, solid_name, use_binary_format )
+## Export the geometry to a file written in the stl file format.
+## \param node The node to export. Must be a geometry.
+## \param solid_name The name of the solid in the generated stl string. Ignored if
+## use_binary_format is true. Is empty by default.
+## \param use_binary_format If true the binary version of the stl file format is used.
+## \return True if the file was written to succesfully. False otherwise.
+def exportGeometryAsSTL( node, url, solid_name, use_binary_format ):
+  pass
+
+## \namespace H3DInterface 
 ## \fn def getCurrentScenes()
 ## Returns a list of all Scene node instances that are created. 
 def getCurrentScenes():
