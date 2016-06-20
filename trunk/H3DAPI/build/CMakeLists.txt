@@ -368,6 +368,14 @@ IF(VORBIS_FOUND)
   SET(optionalLibs ${optionalLibs} ${VORBIS_LIBRARIES} )
 ENDIF(VORBIS_FOUND)
 
+# Optional extra library. Used for Oculus Rift support.
+FIND_PACKAGE(LibOVR)
+IF(LIBOVR_FOUND)
+  SET(HAVE_LIBOVR 1)
+  INCLUDE_DIRECTORIES( ${LIBOVR_INCLUDE_DIR} ) 
+  SET(optionalLibs ${optionalLibs} ${LIBOVR_LIBRARIES} )
+ENDIF(LIBOVR_FOUND)
+
 # Optional extra library. Used to read sound files.
 FIND_PACKAGE(Audiofile)
 IF(AUDIOFILE_FOUND)

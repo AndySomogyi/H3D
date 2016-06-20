@@ -93,6 +93,10 @@
 /// CG shader nodes will then not be supported.
 #cmakedefine HAVE_CG
 
+/// Undef if you do not have libovr (www.oculus.com) installed.
+/// OCULUS_RIFT stereo mode will then not be supported.
+#cmakedefine HAVE_LIBOVR
+
 /// Undef if you do not have FTGL(homepages.paradise.net.nz/henryj/code)
 /// installed. Text nodes will then not be supported.
 #cmakedefine HAVE_FTGL
