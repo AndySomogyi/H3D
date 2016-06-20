@@ -1161,7 +1161,15 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
       fbo_current_x = 0;
       fbo_current_y = 0;
-    }else{ // set viewport for left eye, when the viewport not covering the whole window
+    }else if( stereo_mode==RenderMode::HORIZONTAL_SPLIT ||
+              stereo_mode==RenderMode::VERTICAL_SPLIT   ||
+              stereo_mode==RenderMode::HORIZONTAL_SPLIT_KEEP_RATIO ||
+              stereo_mode==RenderMode::VERTICAL_SPLIT_KEEP_RATIO||
+              stereo_mode==RenderMode::HDMI_FRAME_PACKED_720P||
+              stereo_mode==RenderMode::HDMI_FRAME_PACKED_1080P||
+              stereo_mode==RenderMode::NVIDIA_3DVISION||
+              stereo_mode==RenderMode::VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS ) { 
+      // set viewport for left eye, when the viewport not covering the whole window
       if( viewports_size[4] != 0 || viewports_size[5] != 0 ||
         viewports_size[6] != width->getValue() || viewports_size[7] != height->getValue() ) {
           glViewport( (int)viewports_size[4], (int)viewports_size[5], 
@@ -1268,7 +1276,15 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glEnable(GL_STENCIL_TEST);
       glStencilFunc(GL_NOTEQUAL,1,1);
       glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-    }else{// set viewport for right eye when it is not covering the full window
+    } else if ( stereo_mode==RenderMode::HORIZONTAL_SPLIT||
+                stereo_mode==RenderMode::VERTICAL_SPLIT||
+                stereo_mode==RenderMode::HORIZONTAL_SPLIT_KEEP_RATIO||
+                stereo_mode==RenderMode::VERTICAL_SPLIT_KEEP_RATIO||
+                stereo_mode==RenderMode::HDMI_FRAME_PACKED_720P||
+                stereo_mode==RenderMode::HDMI_FRAME_PACKED_1080P||
+                stereo_mode==RenderMode::NVIDIA_3DVISION||
+                stereo_mode==RenderMode::VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS ) {
+      // set viewport for right eye when it is not covering the full window
       if( viewports_size[8] != 0 || viewports_size[9] != 0 ||
         viewports_size[10] != width->getValue() || viewports_size[11] != height->getValue() ) {
           glViewport( (int)viewports_size[8], (int)viewports_size[9], 
