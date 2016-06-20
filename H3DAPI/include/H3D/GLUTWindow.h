@@ -124,6 +124,9 @@ namespace H3D {
                                         int direction, int x, int y );
 
 
+    /// GLUT callback function for when window is closed.
+    static void glutWMCloseCallback();
+
     /// Initialize GLUT. 
     static void initGLUT();
 

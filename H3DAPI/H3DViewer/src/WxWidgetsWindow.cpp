@@ -97,6 +97,7 @@ WxWidgetsWindow::WxWidgetsWindow( wxWindow *_theParent,
 }
 
 WxWidgetsWindow::~WxWidgetsWindow() {
+  deinitWindow();
 }
 
 void WxWidgetsWindow::initWindow() {

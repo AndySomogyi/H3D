@@ -37,6 +37,8 @@
 #include <H3D/NavigationInfo.h>
 #include <H3D/FrameBufferTextureGenerator.h>
 
+class OculusRiftHandler;
+
 namespace H3D {
   class H3DNavigation;
 
@@ -134,7 +136,10 @@ namespace H3D {
         /// multiple viewport for both left and right eye. This render mode will requires
         /// that all object need to be rendered in the scene to shift its original geometry
         /// to both left and right to provide geometry for both eyes.
-        VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS
+        VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS,
+
+        /// Stereo mode for the Oculus Rift HMD.
+        OCULUS_RIFT
 
       } Mode;
 
@@ -433,6 +438,10 @@ namespace H3D {
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> false
     auto_ptr< SFBool > resetViewPoint;
+
+#ifdef HAVE_LIBOVR
+    OculusRiftHandler *oculus;
+#endif
 
     static set< H3DWindowNode* > windows;
 

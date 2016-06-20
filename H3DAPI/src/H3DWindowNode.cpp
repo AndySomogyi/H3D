@@ -27,7 +27,7 @@
 //
 //
 //////////////////////////////////////////////////////////////////////////////
-
+#include <H3D/OculusRiftHandler.h>
 #include <H3D/H3DWindowNode.h>
 #include <H3D/Viewpoint.h>
 #include <H3D/Bound.h>
@@ -160,7 +160,11 @@ H3DWindowNode::H3DWindowNode(
   current_cursor( "DEFAULT" ),
   h3d_navigation( new H3DNavigation ),
   window_is_made_active( false ),
-  check_if_stereo_obtained( false ){
+  check_if_stereo_obtained( false )
+#ifdef HAVE_LIBOVR
+  ,oculus( NULL ) 
+#endif
+{
 
   type_name = "H3DWindowNode";
   database.initFields( this );
@@ -205,6 +209,7 @@ H3DWindowNode::H3DWindowNode(
   renderMode->addValidValue( "HDMI_FRAME_PACKED_1080P" );
   renderMode->addValidValue( "NVIDIA_3DVISION" );
   renderMode->addValidValue( "VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS" );
+  renderMode->addValidValue("OCULUS_RIFT");
   renderMode->setValue( "MONO" );  
 
   cursorType->addValidValue( "DEFAULT" );
@@ -241,7 +246,12 @@ H3DWindowNode::H3DWindowNode(
 }
 
 void H3DWindowNode::deinitWindow() {
-
+#ifdef HAVE_LIBOVR
+  if (oculus) {
+    delete oculus;
+    oculus = NULL;
+  }
+#endif
 }
 
 H3DWindowNode::~H3DWindowNode() {
@@ -694,6 +704,7 @@ void H3DWindowNode::configureViewPortsSize( RenderMode::Mode stereo_mode,
     case RenderMode::RED_BLUE_STEREO:
     case RenderMode::RED_GREEN_STEREO:
     case RenderMode::RED_CYAN_STEREO:
+    case RenderMode::OCULUS_RIFT:
       {// only need one viewport
         n = 1;
         break;
@@ -850,6 +861,40 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     }
   }
   
+  if (stereo_mode == RenderMode::OCULUS_RIFT) {
+#ifdef HAVE_LIBOVR    
+    if (!oculus) {
+      oculus = new OculusRiftHandler;
+      oculus->setMSAA(true);
+    }
+
+    if (!oculus->isInitialized()) {
+      bool res = oculus->initVR();
+      if (!res) {
+        Console(LogLevel::Error)
+          << "Failed to initialize OculusRift, "
+          << "\"OCULUS_RIFT\" stereo mode cannot be used. Using \"MONO\" instead." << endl;
+        renderMode->setValue("MONO", id);
+      } else {
+        res = oculus->initVRBuffers(width->getValue(), height->getValue());
+        if (!res) {
+          oculus->destroyVR();
+          Console(LogLevel::Error)
+            << "Failed to initialize OculusRift, "
+            << "\"OCULUS_RIFT\" stereo mode cannot be used. Using \"MONO\" instead." << endl;
+          renderMode->setValue("MONO", id);
+        }
+      }
+    }
+#else
+    Console(LogLevel::Error) << "Cannot use OCULUR_RIFT rendermode. H3DAPI compiled without"
+      << " LibOVR support. Recompile H3DAPI with "
+      << "HAVE_LIBOVR defined in order to use it. Using \"MONO\" instead." << endl;
+ 
+    renderMode->setValue("MONO", id);
+#endif
+  }
+
   // make this the active window
   makeWindowActive();
   if( check_if_stereo_obtained )
@@ -857,6 +902,12 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
 
   // set fullscreen mode
   setFullscreen( fullscreen->getValue() );
+
+  if (stereo_mode == RenderMode::OCULUS_RIFT) {
+#ifdef HAVE_LIBOVR
+    oculus->onRenderStart();
+#endif
+  }
 
   if( !child_to_render ) {
     // clear the buffers
@@ -1120,15 +1171,22 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     // eye remain parallel and an the asymmetric view frustum is set up using 
     // glFrustum. This is done by calling the setupProjection function of
     // X3DViewpointNode.
-    eye_mode = stereo_swap_eyes ? X3DViewpointNode::RIGHT_EYE: X3DViewpointNode::LEFT_EYE;
-    vp->setupProjection( eye_mode,
-                         (H3DFloat)projectionWidth->getValue(),
-                         (H3DFloat)projectionHeight->getValue(),
-                         clip_near, clip_far,
-                         stereo_info );
-    
-    glDrawBuffer(GL_BACK_LEFT);
-    
+    if (stereo_mode == RenderMode::OCULUS_RIFT) {
+#ifdef HAVE_LIBOVR
+      Matrix4f ovr_mvp = oculus->onEyeRender(0);
+      glMultMatrixf(&ovr_mvp.transpose()[0][0]);
+#endif
+    } else {
+      eye_mode = stereo_swap_eyes ? X3DViewpointNode::RIGHT_EYE : X3DViewpointNode::LEFT_EYE;
+      vp->setupProjection(eye_mode,
+                          (H3DFloat)projectionWidth->getValue(),
+                          (H3DFloat)projectionHeight->getValue(),
+                          clip_near, clip_far,
+                          stereo_info); 
+
+      glDrawBuffer(GL_BACK_LEFT);
+    }
+   
     if( stereo_mode == RenderMode::RED_BLUE_STEREO ||
         stereo_mode == RenderMode::RED_GREEN_STEREO ||
         stereo_mode == RenderMode::RED_CYAN_STEREO )
@@ -1247,12 +1305,21 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     } else {
       glFrontFace( GL_CCW );
     }
-    eye_mode = stereo_swap_eyes ? X3DViewpointNode::LEFT_EYE: X3DViewpointNode::RIGHT_EYE;
-    vp->setupProjection( eye_mode,
-                         (H3DFloat)projectionWidth->getValue(),
-                         (H3DFloat)projectionHeight->getValue(),
-                         clip_near, clip_far,
-                         stereo_info );
+
+    if (stereo_mode == RenderMode::OCULUS_RIFT) {
+#ifdef HAVE_LIBOVR
+      oculus->onEyeRenderFinish(0);
+      Matrix4f ovr_mvp = oculus->onEyeRender(1);
+      glMultMatrixf(&ovr_mvp.transpose()[0][0]);
+#endif
+    } else {
+      eye_mode = stereo_swap_eyes ? X3DViewpointNode::LEFT_EYE : X3DViewpointNode::RIGHT_EYE;
+      vp->setupProjection(eye_mode,
+                          (H3DFloat)projectionWidth->getValue(),
+                          (H3DFloat)projectionHeight->getValue(),
+                          clip_near, clip_far,
+                          stereo_info);
+    }
 
     if( stereo_mode == RenderMode::QUAD_BUFFERED_STEREO ) {
       glDrawBuffer(GL_BACK_RIGHT);
@@ -1431,6 +1498,14 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
       glPopAttrib();
       glDisable( GL_SCISSOR_TEST );
+    }
+
+    if (stereo_mode == RenderMode::OCULUS_RIFT) {
+#ifdef HAVE_LIBOVR
+      oculus->onEyeRenderFinish(1);
+      oculus->submitFrame();
+      oculus->blitMirror();
+#endif
     }
 #ifdef  HAVE_PROFILER
     H3DUtil::H3DTimer::stepBegin("Stereo_swapBuffers");
@@ -1754,40 +1829,42 @@ void H3DWindowNode::display() {
 
 H3DWindowNode::RenderMode::Mode H3DWindowNode::RenderMode::getRenderMode() {
   upToDate();
-  if( value == "MONO" )
+  if (value == "MONO")
     return MONO;
-  else if( value == "QUAD_BUFFERED_STEREO" )
+  else if (value == "QUAD_BUFFERED_STEREO")
     return QUAD_BUFFERED_STEREO;
-  else if( value == "VERTICAL_SPLIT" )
+  else if (value == "VERTICAL_SPLIT")
     return VERTICAL_SPLIT;
-  else if( value == "VERTICAL_SPLIT_KEEP_RATIO" )
+  else if (value == "VERTICAL_SPLIT_KEEP_RATIO")
     return VERTICAL_SPLIT_KEEP_RATIO;
-  else if( value == "HORIZONTAL_SPLIT" )
+  else if (value == "HORIZONTAL_SPLIT")
     return HORIZONTAL_SPLIT;
-  else if( value == "HORIZONTAL_SPLIT_KEEP_RATIO" )
+  else if (value == "HORIZONTAL_SPLIT_KEEP_RATIO")
     return HORIZONTAL_SPLIT_KEEP_RATIO;
-  else if( value == "VERTICAL_INTERLACED" )
+  else if (value == "VERTICAL_INTERLACED")
     return VERTICAL_INTERLACED;
-  else if( value == "HORIZONTAL_INTERLACED" )
+  else if (value == "HORIZONTAL_INTERLACED")
     return HORIZONTAL_INTERLACED;
-  else if( value == "CHECKER_INTERLACED" )
+  else if (value == "CHECKER_INTERLACED")
     return CHECKER_INTERLACED;
-  else if( value == "RED_BLUE_STEREO" )
+  else if (value == "RED_BLUE_STEREO")
     return RED_BLUE_STEREO;
-  else if( value == "RED_GREEN_STEREO" )
+  else if (value == "RED_GREEN_STEREO")
     return RED_GREEN_STEREO;
-  else if( value == "RED_CYAN_STEREO" )
+  else if (value == "RED_CYAN_STEREO")
     return RED_CYAN_STEREO;
-  else if( value == "VERTICAL_INTERLACED_GREEN_SHIFT" )
-    return VERTICAL_INTERLACED_GREEN_SHIFT;  
-  else if( value == "HDMI_FRAME_PACKED_720P" )
+  else if (value == "VERTICAL_INTERLACED_GREEN_SHIFT")
+    return VERTICAL_INTERLACED_GREEN_SHIFT;
+  else if (value == "HDMI_FRAME_PACKED_720P")
     return HDMI_FRAME_PACKED_720P;
-  else if( value == "HDMI_FRAME_PACKED_1080P" )
+  else if (value == "HDMI_FRAME_PACKED_1080P")
     return HDMI_FRAME_PACKED_1080P;
-  else if( value == "NVIDIA_3DVISION" )
+  else if (value == "NVIDIA_3DVISION")
     return NVIDIA_3DVISION;
-  else if( value == "VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS" )
+  else if (value == "VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS")
     return VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS;
+  else if (value == "OCULUS_RIFT")
+    return OCULUS_RIFT;
   else {
     stringstream s;
     s << "Must be one of "
@@ -1805,6 +1882,7 @@ H3DWindowNode::RenderMode::Mode H3DWindowNode::RenderMode::getRenderMode() {
       << "HDMI_FRAME_PACKED_720P, "
       << "HDMI_FRAME_PACKED_1080P, "
       << "VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS"
+      << "OCULUS_RIFT"
       << "RED_CYAN_STEREO, RED_GREEN_STEREO or RED_BLUE_STEREO. ";
     throw InvalidRenderMode( value, 
                              s.str(),

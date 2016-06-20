@@ -311,6 +311,8 @@ public:
   void ShowPluginsDialog( wxCommandEvent & event );
   void ShowFrameRate( wxCommandEvent & event );
   void ShowProgramSettings( wxCommandEvent & event );
+
+  void OculusRiftRecenter(wxCommandEvent & event);
 #if defined(HAVE_PYTHON) && defined(USE_PYTHON_CONSOLE)
   void ShowPythonConsole( wxCommandEvent & event );
 #endif
@@ -354,6 +356,7 @@ public:
   void BuildViewpointsSubMenu( list< Node* > vp_list, wxMenu * menu, int &count, int &unnamed_vp, int &unnamed_vg );
   void DestroyViewpointsMenu();
   void DestroyViewpointsSubMenu( wxMenu * menu );
+  void SetOculusMenu(bool enabled);
   // returns a list of "top level" viewpoints and viewpoint groups
   list< Node * > GetTopLevelViews();
 
@@ -603,6 +606,7 @@ enum
   FRAME_HDMI720P,
   FRAME_HDMI1080P,
   FRAME_VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS,
+  FRAME_OCULUS_RIFT,
   //FRAME_DEVICECONTROL,
   FRAME_HAPTICSCONTROL,
   BASIC_PREFRENDERER,
@@ -624,7 +628,8 @@ enum
   FRAME_KEYBOARD_NAV,
   FRAME_SWS_NAV,
   FRAME_HAPTICSDEVICE_NAV,
-  FRAME_RELOAD
+  FRAME_RELOAD,
+  FRAME_OCULUS_RECENTER
 };
 
 #endif

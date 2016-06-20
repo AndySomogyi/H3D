@@ -143,13 +143,16 @@ void GLUTWindow::deinitWindow() {
 #else
     if( GLUT_init ) {
 #endif
+
       glutDestroyWindow( window_id );
+      window_id = 0;
     }
   }
 }
 
 
 GLUTWindow::~GLUTWindow() {
+  deinitWindow();
 }
 
 void GLUTWindow::initWindow() {
@@ -183,6 +186,8 @@ void GLUTWindow::initWindow() {
   if( gameMode->getValue() == "" ) {
     glutInitWindowSize( width->getValue(), height->getValue() );
     glutInitWindowPosition( posX->getValue(), posY->getValue() );
+    glutInitContextVersion(3, 1);
+    glutInitContextFlags(GLUT_CORE_PROFILE);
     window_id = glutCreateWindow( "H3D" );
     // This code is here to check if we got a stereo window using stereo mode.
     // It seems like on some systems GLUT_MULTISAMPLE can not be combined with
@@ -238,6 +243,9 @@ void GLUTWindow::initWindow() {
 #if defined(H3D_WINDOWS) && defined( FREEGLUT )
    }
 #endif // H3D_WINDOWS
+
+
+  glutWMCloseFunc(glutWMCloseCallback);
 
 #ifdef FREEGLUT
   glutSetOption( GLUT_ACTION_ON_WINDOW_CLOSE, 
@@ -535,6 +543,14 @@ void GLUTWindow::glutMouseWheelCallback( int wheel,
       window->onMouseWheelAction( MouseSensor::FROM );
     else
       window->onMouseWheelAction( MouseSensor::TOWARDS );
+  }
+}
+
+void GLUTWindow::glutWMCloseCallback() {
+  GLUTWindow *window = GLUTWindow::getGLUTWindow(glutGetWindow());
+  if (window) {
+    window->window_id = 0;
+    window->deinitWindow();
   }
 }
 

@@ -57,6 +57,7 @@
 #include <H3D/H3DNavigation.h>
 #include <H3D/HapticsRenderers.h>
 #include <H3D/GraphicsHardwareInfo.h>
+#include <H3D/OculusRiftHandler.h>
 
 #include <H3DUtil/DynamicLibrary.h>
 
@@ -347,6 +348,10 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
 #endif  
   stereoRenderMode->AppendRadioItem(FRAME_VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS, wxT("Vertical Split Keep Aspect render in one pass"),
                                     wxT("Vertical Split Keep Aspect render in one pass"));
+
+  stereoRenderMode->AppendRadioItem(FRAME_OCULUS_RIFT, wxT("Oculus Rift"),
+                                    wxT("Oculus Rift"));
+
   //Renderer Menu
   rendererMenu = new wxMenu;
   rendererMenu->AppendCheckItem(FRAME_FULLSCREEN, wxT("Fullscreen Mode\tF11"),
@@ -478,6 +483,22 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   Layout();
 }
 
+void WxFrame::SetOculusMenu(bool enabled) {
+  if (enabled) {
+    if (!advancedMenu->FindItem(FRAME_OCULUS_RECENTER)) {
+      advancedMenu->Append(FRAME_OCULUS_RECENTER,
+                           wxT("Recenter Oculus Rift\tF2"),
+                           wxT("Recenter Oculus Rift."));
+    }
+  } else {
+    if (advancedMenu->FindItem(FRAME_OCULUS_RECENTER)) {
+      advancedMenu->Delete(FRAME_OCULUS_RECENTER);
+    }
+  }
+
+}
+
+
 void WxFrame::ChangeNavType::update() {
   NavigationInfo *mynav =0;
   if(NavigationInfo::getActive()){
@@ -582,6 +603,7 @@ void WxFrame::UpdateStereoModeMenu::update() {
       frame->stereoRenderMode->Enable( FRAME_NVIDIA_3DVISION, false );
 #endif
       frame->stereoRenderMode->Enable( FRAME_VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS, false );
+      frame->stereoRenderMode->Enable( FRAME_OCULUS_RIFT, false);
     }
   } else if( stereo_mode == "HORIZONTAL_SPLIT" )
     frame->stereoRenderMode->Check( FRAME_HORZSPLIT, true );
@@ -615,6 +637,10 @@ void WxFrame::UpdateStereoModeMenu::update() {
 #endif
   else if( stereo_mode == "VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS" )
     frame->stereoRenderMode->Check( FRAME_VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS, true );
+  else if (stereo_mode == "OCULUS_RIFT")
+    frame->stereoRenderMode->Check(FRAME_OCULUS_RIFT, true);
+
+  frame->SetOculusMenu(stereo_mode == "OCULUS_RIFT");
 }
 
 /*******************Event Table*********************/
@@ -630,7 +656,7 @@ BEGIN_EVENT_TABLE(WxFrame, wxFrame)
   EVT_MENU (FRAME_SETTINGS, WxFrame::OnSettings)
   EVT_MENU (FRAME_TOGGLE_FULLSCREEN, WxFrame::ToggleFullscreen)
   EVT_MENU (FRAME_MIRROR, WxFrame::MirrorScene)
-  EVT_MENU_RANGE (FRAME_MONO, FRAME_VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS, WxFrame::StereoRenderMode)
+  EVT_MENU_RANGE (FRAME_MONO, FRAME_OCULUS_RIFT, WxFrame::StereoRenderMode)
   EVT_MENU_RANGE (FRAME_RENDERMODE_DEFAULT, 
                   FRAME_RENDERMODE_POINTS, WxFrame::RenderMode )
   EVT_MENU (FRAME_CONSOLE, WxFrame::ShowConsole)
@@ -638,6 +664,7 @@ BEGIN_EVENT_TABLE(WxFrame, wxFrame)
   EVT_MENU (FRAME_PROFILEDRESULT, WxFrame::ShowProfiledResult)
 #endif
   EVT_MENU (FRAME_TREEVIEW, WxFrame::ShowTreeView)
+  EVT_MENU(FRAME_OCULUS_RECENTER, WxFrame::OculusRiftRecenter)
   EVT_MENU (FRAME_PLUGINS, WxFrame::ShowPluginsDialog)
   EVT_MENU (FRAME_FRAMERATE, WxFrame::ShowFrameRate)
   EVT_MENU (FRAME_PROGRAMSETTINGS, WxFrame::ShowProgramSettings)
@@ -1838,6 +1865,9 @@ void WxFrame::StereoRenderMode(wxCommandEvent & event)
     case FRAME_VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS:
       renderMode = "VERTICAL_SPLIT_KEEP_ASPECT_ONE_PASS";
       break;
+    case FRAME_OCULUS_RIFT:
+      renderMode = "OCULUS_RIFT";
+      break;
   }
   glwindow->renderMode->setValue( renderMode.c_str() );
   // This is neeeded to avoid color changes when switching to stereo render
@@ -1981,6 +2011,14 @@ void WxFrame::ShowProfiledResult(wxCommandEvent & event)
   }
 }
 #endif
+
+void WxFrame::OculusRiftRecenter(wxCommandEvent & event) {
+#ifdef HAVE_LIBOVR
+  if( glwindow->oculus ) glwindow->oculus->recenterTracking();
+#endif
+}
+
+
 //Show console event
 void WxFrame::ShowTreeView(wxCommandEvent & event)
 {
