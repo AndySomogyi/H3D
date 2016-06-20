@@ -92,14 +92,14 @@ OculusRiftSensor::OculusRiftSensor(
 }
 
 void OculusRiftSensor::updateValues(){
-  using namespace OculusRiftSensorInternal;
-  // TODO: lock
+#ifdef HAVE_LIBOVR
+
   bool active = oculus && oculus->isInitialized();
 
   if( isActive->getValue() != active )
     isActive->setValue( active, id );
 
-#ifdef HAVE_LIBOVR
+
 
   if( active && enabled->getValue() ) {
     const ovrTrackingState &tracking_state = oculus->getTrackingState();
@@ -139,10 +139,12 @@ void OculusRiftSensor::PerformanceStatsField::onNewValue(const string &new_value
 }
 
 void OculusRiftSensor::RecenterTrackingField::onNewValue(const bool &new_value) {
-  
+#ifdef HAVE_LIBOVR  
   if (new_value && OculusRiftSensor::oculus) oculus->recenterTracking();
-
+#endif
 }
 void OculusRiftSensor::MSAAEnabledField::onNewValue(const bool &new_value) {
+#ifdef HAVE_LIBOVR
   if (OculusRiftSensor::oculus) oculus->setMSAA( new_value );
+#endif
 }
