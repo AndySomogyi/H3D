@@ -34,7 +34,9 @@
 #include <H3D/Scene.h>
 
 using namespace H3D;
+#ifdef HAVE_LIBOVR
 OculusRiftHandler * OculusRiftSensor::oculus = NULL;
+#endif
 
 // Add this node to the H3DNodeDatabase system.
 H3DNodeDatabase OculusRiftSensor::database( 
