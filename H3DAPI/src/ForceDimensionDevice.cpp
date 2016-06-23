@@ -179,9 +179,10 @@ H3DHapticsDevice::ErrorCode ForceDimensionDevice::initDevice() {
 #ifdef HAVE_DHDAPI
   HAPI::ForceDimensionHapticsDevice *dhd = 
     static_cast< HAPI::ForceDimensionHapticsDevice * >( hapi_device.get() );
-  if( dhd )
+  if( dhd ) {
     deviceType->setValue( dhd->getDeviceType(), id ); 
-
+    dhd->enableForce( enableForce->getValue());
+  }
 #endif
   return e;
 
