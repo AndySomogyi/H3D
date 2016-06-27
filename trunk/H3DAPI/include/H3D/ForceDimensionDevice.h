@@ -31,6 +31,7 @@
 
 #include <H3D/H3DHapticsDevice.h>
 #include <H3D/MFString.h>
+#include <H3D/PeriodicUpdate.h>
 
 namespace H3D {
 
@@ -112,7 +113,10 @@ namespace H3D {
             Inst< EffectorMass       > _endEffectorMass        = 0,
             Inst< Brakes             > _useBrakes              = 0,
             Inst< SFInt32            > _deviceType             = 0,
-            Inst< EnableForce        > _enableForce            = 0 );
+            Inst< EnableForce        > _enableForce            = 0,
+            Inst< SFFloat            > _vibrationFrequency     = 0,
+            Inst< SFFloat            > _vibrationAmplitude     = 0,
+            Inst< SFFloat            > _gripperAngle           = 0 );
     
     /// Does all the initialization needed for the device before starting to
     /// use it.
@@ -195,6 +199,44 @@ namespace H3D {
 
     /// Node database entry
     static H3DNodeDatabase database;
+
+    /// On some (custom) devices from force dimension there are vibration
+    /// support. This field is used to control the frequency of the vibration.
+    /// Only used if vibrationAmplitude is above 0.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> 100 \n
+    /// <b>Valid values:</b> [0, inf]
+    auto_ptr< SFFloat > vibrationFrequency;
+
+    /// On some (custom) devices from force dimension there are vibration
+    /// support. This field is used to control the amplitude of the vibration.
+    /// Negative values are clamped to 0 which means that vibrations is turned off.
+    /// A value of 1 means that vibration is at full amplitude of the device.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> 0 \n
+    /// <b>Valid values:</b> [0, 1]
+    auto_ptr< SFFloat > vibrationAmplitude;
+
+    /// Output field for the gripper angle. Angle is in radians.
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    auto_ptr< SFFloat > gripperAngle;
+
+    /// This function is used to transfer device values, such as position, 
+    /// button status etc from the realtime loop to the fields of H3DHapticsDevice,
+    /// and possible vice versa. Overridden to transfer gripper angle.
+    virtual void updateDeviceValues();
+
+    protected:
+      /// EnableForce specializes SFFloat to handle vibration.
+    class H3DAPI_API ChangeVibration: public PeriodicUpdate< TypedField< SFBool, Types< SFFloat, SFFloat > > > {
+    protected:
+      virtual void update();
+    };
+
+    auto_ptr< ChangeVibration > changeVibration;
   };
 }
 

@@ -47,6 +47,9 @@ namespace ForceDimensionDeviceInternals {
   FIELDDB_ELEMENT( ForceDimensionDevice, useBrakes, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ForceDimensionDevice, deviceType, OUTPUT_ONLY );
   FIELDDB_ELEMENT( ForceDimensionDevice, enableForce, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( ForceDimensionDevice, vibrationFrequency, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( ForceDimensionDevice, vibrationAmplitude, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( ForceDimensionDevice, gripperAngle, INPUT_OUTPUT );
 }
 
 /// Constructor.
@@ -79,7 +82,10 @@ ForceDimensionDevice::ForceDimensionDevice(
                Inst< EffectorMass    > _endEffectorMass,
                Inst< Brakes          > _useBrakes,
                Inst< SFInt32         > _deviceType,
-               Inst< EnableForce        > _enableForce ) :
+               Inst< EnableForce        > _enableForce,
+               Inst< SFFloat            > _vibrationFrequency,
+               Inst< SFFloat            > _vibrationAmplitude,
+               Inst< SFFloat            > _gripperAngle ) :
   H3DHapticsDevice( _devicePosition, _deviceOrientation, _trackerPosition,
               _trackerOrientation, _positionCalibration, 
               _orientationCalibration, _proxyPosition,
@@ -94,7 +100,11 @@ ForceDimensionDevice::ForceDimensionDevice(
   endEffectorMass( _endEffectorMass ),
   useBrakes( _useBrakes ),
   deviceType( _deviceType ),
-  enableForce( _enableForce ) {
+  enableForce( _enableForce ),
+  vibrationFrequency( _vibrationFrequency ),
+  vibrationAmplitude( _vibrationAmplitude ),
+  changeVibration( new ChangeVibration ),
+  gripperAngle( _gripperAngle ) {
 
   type_name = "ForceDimensionDevice";  
   database.initFields( this );
@@ -111,6 +121,11 @@ ForceDimensionDevice::ForceDimensionDevice(
   useBrakes->setValue( false );
   deviceType->setValue( -1, id );
   enableForce->setValue( false );
+  vibrationFrequency->setValue( 100 );
+  vibrationAmplitude->setValue( 0 );
+  changeVibration->setOwner( this );
+  vibrationFrequency->routeNoEvent( changeVibration );
+  vibrationAmplitude->routeNoEvent( changeVibration );
 }
 
 
@@ -192,4 +207,36 @@ H3DHapticsDevice::ErrorCode ForceDimensionDevice::releaseDevice() {
   HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::releaseDevice();
   deviceType->setValue( -1, id );
   return e;
+}
+
+void ForceDimensionDevice::ChangeVibration::update() {
+  H3DFloat frequency = static_cast< SFFloat * >(routes_in[0])->getValue();
+  H3DFloat amplitude = static_cast< SFFloat * >(routes_in[1])->getValue();
+  ForceDimensionDevice * fdd = static_cast< ForceDimensionDevice * >(getOwner());
+#ifdef HAVE_DHDAPI
+  HAPI::ForceDimensionHapticsDevice *dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( fdd->hapi_device.get() );
+  if( dhd ) {
+    if( frequency < 0 ) {
+      frequency = 0;
+    }
+    if( amplitude < 0 ) {
+      amplitude = 0;
+    } else if( amplitude > 1 ) {
+      amplitude = 1;
+    }
+    dhd->setVibration( frequency, amplitude );
+  }
+#endif
+}
+
+void ForceDimensionDevice::updateDeviceValues() {
+  H3DHapticsDevice::updateDeviceValues();
+#ifdef HAVE_DHDAPI
+  HAPI::ForceDimensionHapticsDevice *dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( hapi_device.get() );
+  if( dhd ) {
+    gripperAngle->setValue( (H3DFloat)(dhd->getGripperAngle()), id );
+  }
+#endif
 }
