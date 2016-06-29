@@ -125,11 +125,11 @@ void ImportLibrary::initialize() {
 #if (_MSC_VER == 1600)
       // look for vs2010-version of the library
       // try relative path first
-      handle = DynamicLibrary::load(url_base + urn_name + "vc10");
+      handle = DynamicLibrary::load(url_base + urn_name + "_vc10");
       if (handle) return;
 
       // try absolute path.
-      handle = DynamicLibrary::load(urn_name + "vc10");
+      handle = DynamicLibrary::load(urn_name + "_vc10");
       if (handle) return;
 
 #elif (_MSC_VER == 1900)
