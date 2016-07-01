@@ -232,13 +232,13 @@ void X3DSAX2Handlers::handleProtoInterfaceFieldElement( const Attributes &attrs 
         v = toString( field_value );
       }
       string error_message = proto_declaration->addFieldDeclaration(
-                                                                                                                        toString( field_name ),
-                              x3d_type,
-                              access_type,
-                              v );
-                        if( error_message != "" ) {
-                                Console(LogLevel::Warning) << error_message << " " << getLocationString() << endl;
-                        }
+                                                                     toString( field_name ),
+                                                                     x3d_type,
+                                                                     access_type,
+                                                                     v );
+      if( error_message != "" ) {
+        Console(LogLevel::Warning) << error_message << " " << getLocationString() << endl;
+      }
     }
     FieldValue *fv = new FieldValue( toString( field_name ), NULL );
     node_stack.push( NodeElement( fv ) ); 
@@ -754,9 +754,9 @@ void X3DSAX2Handlers::handleConnectElement( const Attributes &attrs,
       if( node_field->getAccessType() != Field::INPUT_OUTPUT &&
           node_field->getAccessType() != proto_field->getAccessType() ) {
         Console(LogLevel::Warning) << "Warning: accessType of \"nodeField\"("
-                                                                         << node_field->getName() << ") and \"protoField\"("
-                                                                         << proto_field->getName() << ") does not match"
-                                                                         << getLocationString() << endl;
+                                   << node_field->getName() << ") and \"protoField\"("
+                                   << proto_field->getName() << ") does not match"
+                                   << getLocationString() << endl;
         return;
       }
       
@@ -766,19 +766,19 @@ void X3DSAX2Handlers::handleConnectElement( const Attributes &attrs,
         return;
       }
 
-                        const Field::FieldSet &routes_out = node_field->getRoutesOut();
-                        for( Field::FieldSet::const_iterator i = routes_out.begin();
-                                         i != routes_out.end(); ++i ) {
-                                if( (*i)->getOwner() == proto_instance ) {
-                                        Console(LogLevel::Warning) << "Warning: \"nodeField\"("
-                                                                                 << node_field->getName()
-                                                                                 << ") is already associated with a field in the "
-                                                                                 << "ProtoInterface."
-                                                                                 << getLocationString() << endl;
-                                        return;
-                                }
-                        }
-  
+      const Field::FieldSet &routes_out = node_field->getRoutesOut();
+      for( Field::FieldSet::const_iterator i = routes_out.begin();
+           i != routes_out.end(); ++i ) {
+        if( (*i)->getOwner() == proto_instance ) {
+          Console(LogLevel::Warning) << "Warning: \"nodeField\"("
+                                     << node_field->getName()
+                                     << ") is already associated with a field in the "
+                                     << "ProtoInterface."
+                                     << getLocationString() << endl;
+          return;
+        }
+      }
+
       proto_instance->connectField( toString( proto_field_name ), node_field );
     }
   }
@@ -846,7 +846,7 @@ void X3DSAX2Handlers::protoStartElement( const XMLCh* const uri,
         node_stack.push( NodeElement( NULL ) );
       } else {
         proto_declaration.reset( new ProtoDeclaration( toString( name ), "",
-                                                                                                                                 vector< string >(), proto_declarations ) );
+                                                       vector< string >(), proto_declarations ) );
       }
     }
   } else  if( localname_string == "ExternProtoDeclare" ) {
@@ -1172,10 +1172,10 @@ void X3DSAX2Handlers::handleFieldValueElement( const Attributes &attrs,
 void X3DSAX2Handlers::startCDATA() {
   inside_cdata = true;
   cdata = "";
-        if( proto_declaration.get() && !defining_proto_body ) {
-                Console(LogLevel::Warning) << "Warning: CDATA elements not allowed inside ProtoInterface."
-                                                         << getLocationString() << endl;
-        }
+  if( proto_declaration.get() && !defining_proto_body ) {
+    Console(LogLevel::Warning) << "Warning: CDATA elements not allowed inside ProtoInterface."
+                               << getLocationString() << endl;
+  }
 }
  
 
@@ -1300,7 +1300,7 @@ void X3DSAX2Handlers::startElement(const XMLCh* const uri,
                                 // statements are also allowed in some cases.
                                 if( !proto_instance ) {
           Console(LogLevel::Warning) << "Warning: IS elements only allowed inside ProtoBody elements"
-                                                                                 << getLocationString() << endl;
+                                     << getLocationString() << endl;
           node_stack.push( NodeElement( NULL ) );
         } else {
           defining_proto_connections = true;
@@ -1309,8 +1309,8 @@ void X3DSAX2Handlers::startElement(const XMLCh* const uri,
         handleConnectElement( attrs, parent );
                         } else {
         Console(LogLevel::Warning) << "Warning: Only fieldValue ( and in some cases IS ) elements "
-                                                                         << "allowed in ProtoInstance element "
-                                                                         << getLocationString() << endl;
+                                   << "allowed in ProtoInstance element "
+                                   << getLocationString() << endl;
         node_stack.push( NodeElement( NULL ) );
       }
     } else {
