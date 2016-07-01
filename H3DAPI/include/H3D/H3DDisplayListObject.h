@@ -182,6 +182,12 @@ namespace H3D {
       inline bool hasCausedEvent( auto_ptr< FieldType > &f ) {
         return hasCausedEvent( f.get() );
       }
+            
+      /// Returns the number of input fields that has generated an event
+      /// to this field since the last call to the update() function.
+      inline unsigned int nrPendingEvents() {
+        return event_fields.size();
+      }
 
       /// initialize previous graphic option
       void initGraphicOption();
@@ -248,6 +254,7 @@ namespace H3D {
     
     /// The DisplayList instance handling the OpenGL caching of this object. 
     auto_ptr< DisplayList > displayList;
+
   };
 }
 
