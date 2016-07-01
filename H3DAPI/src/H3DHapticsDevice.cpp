@@ -79,6 +79,8 @@ namespace H3DHapticsDeviceInternals {
   FIELDDB_ELEMENT( H3DHapticsDevice, deadmansSwitch, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, forceLimit, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, torqueLimit, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( H3DHapticsDevice, deviceAngularVelocity, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( H3DHapticsDevice, trackerAngularVelocity, OUTPUT_ONLY );
 }
 
 
@@ -107,11 +109,13 @@ H3DHapticsDevice::H3DHapticsDevice(
                Inst< MFVec3f         > _proxyPositions,
                Inst< SFBool          > _followViewpoint,
                Inst< SFVec3f         > _deviceVelocity,
-               Inst< TrackerVelocity > _trackerVelocity
+               Inst< TrackerVelocity > _trackerVelocity,
                #ifdef HAVE_PROFILER
                ,
-               Inst< SFString        > _profiledResult
+               Inst< SFString        > _profiledResult,
                #endif
+               Inst< SFVec3f         > _deviceAngularVelocity,
+               Inst< TrackerAngularVelocity > _trackerAngularVelocity
                ):
   devicePosition( _devicePosition ),
 #ifdef HAVE_PROFILER
@@ -149,7 +153,9 @@ H3DHapticsDevice::H3DHapticsDevice(
   deadmansSwitch( new SFBool ),
   forceLimit( new SFFloat ),
   torqueLimit( new SFFloat ),
-  error_msg_printed( false ) {
+  error_msg_printed( false ),
+  deviceAngularVelocity( _deviceAngularVelocity ),
+  trackerAngularVelocity( _trackerAngularVelocity ) {
 
   type_name = "H3DHapticsDevice";  
   database.initFields( this );
@@ -191,6 +197,8 @@ H3DHapticsDevice::H3DHapticsDevice(
   proxyWeighting->route( weightedProxyPosition, id );
 
   vp_initialized = 0;
+  orientationCalibration->route( trackerAngularVelocity, id );
+  deviceAngularVelocity->route( trackerAngularVelocity, id );
 }
 
 H3DHapticsDevice::ErrorCode H3DHapticsDevice::enableDevice() {
@@ -382,6 +390,7 @@ void H3DHapticsDevice::updateDeviceValues() {
     devicePosition->setValue( Vec3f( dv.position ), id);
     deviceVelocity->setValue( Vec3f( dv.velocity ), id);
     deviceOrientation->setValue( Rotation(dv.orientation), id);
+    deviceAngularVelocity->setValue( Vec3f( dv.angular_velocity ), id);
     force->setValue( (Vec3f)dv.force, id);
     torque->setValue( (Vec3f)dv.torque, id);
     buttons->setValue( dv.button_status, id );

@@ -230,6 +230,8 @@ namespace H3D {
       }
     };
 
+    class TrackerAngularVelocity;
+
     /// Constructor.
     H3DHapticsDevice( Inst< SFVec3f         > _devicePosition         = 0,
                       Inst< SFRotation      > _deviceOrientation      = 0,
@@ -254,11 +256,13 @@ namespace H3D {
                       Inst< MFVec3f         > _proxyPositions         = 0,
                       Inst< SFBool          > _followViewpoint        = 0,
                       Inst< SFVec3f         > _deviceVelocity         = 0,
-                      Inst< TrackerVelocity > _trackerVelocity        = 0
+                      Inst< TrackerVelocity > _trackerVelocity        = 0,
                       #ifdef HAVE_PROFILER
                       ,
-                      Inst< SFString        > _profiledResult         = 0
+                      Inst< SFString        > _profiledResult         = 0,
                       #endif
+                      Inst< SFVec3f         > _deviceAngularVelocity         = 0,
+                      Inst< TrackerAngularVelocity > _trackerAngularVelocity = 0
                       );
 
     /// Destuctor.
@@ -599,7 +603,6 @@ namespace H3D {
     /// \dotfile H3DHapticsDevice_deviceVelocity.dot
     auto_ptr< SFVec3f >    deviceVelocity;
 
-
     ///  The velocity of the device in the world coordinates of the API.
     /// device.
     ///
@@ -674,6 +677,49 @@ namespace H3D {
     // Used to set the haptics renderer for a layer.
     void setHapticsRenderer( unsigned int layer );
 
+  public:
+    /// The TrackerAngularVelocity field updates itself from the deviceAngularVelocity
+    /// and orientationCalibration fields. 
+    /// trackerAngularVelocity = orientationCalibration * deviceAngularVelocity 
+    ///
+    /// - routes_in[0] is the orientationCalibration
+    /// - routes_in[1] is the deviceAngularVelocity
+    ///
+    class H3DAPI_API TrackerAngularVelocity: 
+      public TypedField< SFVec3f, Types< SFRotation, SFVec3f > > {
+    protected:
+
+      virtual void update() {
+        H3DHapticsDevice *hd = static_cast< H3DHapticsDevice *>(owner);
+        Rotation cal;
+        if( hd->followViewpoint->getValue() ) {
+          cal = hd->adjustedOrnCalibration->getValue();
+        } else {
+          cal  = static_cast< SFRotation * >( routes_in[0] )->getValue();
+        }
+
+        value = cal * static_cast< SFVec3f * >( routes_in[1] )->getValue();
+      }
+  
+    };
+
+    /// The angular velocity of the device in the coordinate system of the 
+    /// device.
+    /// \todo Only actually calculated for ForceDimension device atm.
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// 
+    /// \dotfile H3DHapticsDevice_deviceAngularVelocity.dot
+    auto_ptr< SFVec3f > deviceAngularVelocity;
+
+    ///  The angular velocity of the device in the world coordinates of the API.
+    /// device.
+    /// \todo Only actually calculated for ForceDimension device atm.
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// 
+    /// \dotfile H3DHapticsDevice_trackerAngularVelocity.dot
+    auto_ptr< TrackerAngularVelocity > trackerAngularVelocity;
   };
 }
 
