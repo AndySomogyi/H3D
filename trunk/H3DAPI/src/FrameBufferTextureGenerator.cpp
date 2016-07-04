@@ -291,7 +291,7 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
     getNrSamples->setName("getNrSamples");
     getNrSamples->setOwner(this);
     samples->route(getNrSamples);
-    
+
 }
 
 void FrameBufferTextureGenerator::initialize()
@@ -383,7 +383,7 @@ void FrameBufferTextureGenerator::initialize()
 #undef max
 #endif
 void FrameBufferTextureGenerator::traverseSG( TraverseInfo &ti ) {
-  
+
   if( update->getValue()=="NONE" ) {// if update field is none , skip traverseSG
     return;
   }
@@ -403,7 +403,7 @@ void FrameBufferTextureGenerator::traverseSG( TraverseInfo &ti ) {
   // specify fbo_require_stereo data , so its children can use this info to decide
   // whether related shader need to be modified when single pass stereo is also needed
   ti.setUserData("fbo_require_stereo", (void*)(useStereo.get()));
-  
+
   X3DGroupingNode::traverseSG( ti );
 
   ti.setUserData("fbo_require_stereo", NULL);
@@ -484,10 +484,10 @@ void FrameBufferTextureGenerator::render()     {
     return;
   } else if( (output_texture_type == "2D_MULTISAMPLE_ARRAY" 
     || output_texture_type == "2D_MULTISAMPLE") && !GLEW_ARB_texture_multisample ) {
-    Console(LogLevel::Error) << "Warning: Multi-sampled texture is not supported by your graphics card "
-      << "(ARB_texture_multisample). FrameBufferTextureGenerator nodes with \"2D_MULTISAMPLE\" or \"2D_MULTISAMPLE_ARRAY\" will "
-      << "not work." << endl;
-    return;
+      Console(LogLevel::Error) << "Warning: Multi-sampled texture is not supported by your graphics card "
+        << "(ARB_texture_multisample). FrameBufferTextureGenerator nodes with \"2D_MULTISAMPLE\" or \"2D_MULTISAMPLE_ARRAY\" will "
+        << "not work." << endl;
+      return;
   }
 
   if( output_texture_type != "3D" && 
@@ -530,7 +530,7 @@ void FrameBufferTextureGenerator::render()     {
   }
   GLint previous_fbo_id;
   glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &previous_fbo_id );
-  
+
   // if a viewpoint has been specified use that instead of what has already 
   // been set up (current active viewpoint)
   bool have_local_vp = false;
@@ -583,7 +583,7 @@ void FrameBufferTextureGenerator::render()     {
   int buffer_src_x = window->fbo_current_x;
   int buffer_src_y = window->fbo_current_y;
 
-  
+
   // specially handle the width and height being used to provide
   // easy fbo width scaling down 
   if( desired_fbo_width <=-1 &&
@@ -650,7 +650,7 @@ void FrameBufferTextureGenerator::render()     {
       }else{
         glDisable(GL_SCISSOR_TEST);
       }
-      
+
     }else{
 #endif
       Console(LogLevel::Error) << "Warning: GL_ARB_viewport_array is not supported by the graphic card. "
@@ -658,8 +658,7 @@ void FrameBufferTextureGenerator::render()     {
 #ifdef GLEW_ARB_viewport_array
     }
 #endif
-  }
-  else if( !always_use_existing_viewport) {
+  } else if( !always_use_existing_viewport) {
     // Set viewport to span entire frame buffer  to be used as target
     glViewport( 0 , 0, desired_fbo_width, desired_fbo_heigth );
     if( useScissor->getValue() ) {
@@ -695,7 +694,7 @@ void FrameBufferTextureGenerator::render()     {
   }else{
     glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, fbo_id );
   }
-  
+
 
 
   // set up to render to all color buffers
@@ -711,8 +710,8 @@ void FrameBufferTextureGenerator::render()     {
   if( generateColorTextures->size() == 0&&generateDepthTexture->getValue() ) {
     glColorMask(false,false,false,false);
   }
-  
-  
+
+
   if( have_local_vp||have_local_navi )
   { 
     //switch projection, if not necessary, try to avoid this, as it is expensive
@@ -736,7 +735,7 @@ void FrameBufferTextureGenerator::render()     {
         clip_far = -1;
     }
     X3DViewpointNode::EyeMode eye_mode = X3DViewpointNode::MONO;
-    
+
     if( useStereo->getValue()&&window->getEyeMode()!=eye_mode ) {
       // when current active eye mode is not MONO and FBO need to use stereo, need to specify 
       // stereo_info
@@ -766,7 +765,7 @@ void FrameBufferTextureGenerator::render()     {
 
     // render scene.
     if( render_func ) {
-       preProcessFBO(buffer_src_x, buffer_src_y, desired_fbo_width,desired_fbo_heigth,current_depth);
+      preProcessFBO(buffer_src_x, buffer_src_y, desired_fbo_width,desired_fbo_heigth,current_depth);
       render_func( this, -1, render_func_data );
     } else {
       if( !useSpecifiedClearColor->getValue() ) {
@@ -791,7 +790,7 @@ void FrameBufferTextureGenerator::render()     {
           const Rotation &vp_orientation = bgVP->totalOrientation->getValue();
           const Matrix4f &vp_inv_m = bgVP->accInverseMatrix->getValue();
           Rotation vp_inv_rot = Rotation(vp_inv_m.getRotationPart());
-        
+
           glMatrixMode(GL_MODELVIEW);
           glPushMatrix();
           glLoadIdentity();
@@ -864,8 +863,8 @@ void FrameBufferTextureGenerator::render()     {
         }
         X3DShapeNode::geometry_render_mode= m;
       }
-      
-      
+
+
       if( current_shadow_caster && !current_shadow_caster->object->empty() ) current_shadow_caster->render();
     }
 #ifdef GLEW_ARB_invalidate_subdata
@@ -994,7 +993,7 @@ void FrameBufferTextureGenerator::initializeFBO() {
   if( !fbo_initialized ) {
     glGenFramebuffersEXT(1, &fbo_id); 
     glGenFramebuffersEXT(1, &multi_samples_fbo_id); 
-    
+
     createOutputTextures ();
 
     // create multi sample color and depth texture/renderbuffer as intermedia result
@@ -1054,11 +1053,11 @@ void FrameBufferTextureGenerator::createOutputTextures () {
     generate_2d = false;
   } else {
     if( output_texture_type != "2D" && output_texture_type != "2D_RECTANGLE" &&
-        output_texture_type != "2D_MULTISAMPLE" ) {
-      Console(LogLevel::Error) << "Warning: Invalid outputTextureType value: \"" << output_texture_type 
-        << "\". Valid values are \"2D\", \"2D_RECTANGLE\", \"2D_MULTISAMPLE\"," 
-        << "\"2D_MULTISAMPLE_ARRAY\", \"2D_ARRAY\" and \"3D\". "
-        <<"Using 2D instead(in FrameBufferTextureGenerator node). " << endl;
+      output_texture_type != "2D_MULTISAMPLE" ) {
+        Console(LogLevel::Error) << "Warning: Invalid outputTextureType value: \"" << output_texture_type 
+          << "\". Valid values are \"2D\", \"2D_RECTANGLE\", \"2D_MULTISAMPLE\"," 
+          << "\"2D_MULTISAMPLE_ARRAY\", \"2D_ARRAY\" and \"3D\". "
+          <<"Using 2D instead(in FrameBufferTextureGenerator node). " << endl;
     }
   }
 
@@ -1210,8 +1209,23 @@ void FrameBufferTextureGenerator::preProcessFBO(int x, int y,int w, int h, int d
       // use locally created depth buffer, just clear the buffer for present
       clearBuffers(target_fbo, 0, 0, w, h, GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     } else if( depth_buffer_storage == "DEFAULT_COPY" ) { 
-      // copy depth buffer from default frame buffer
-      blitDepthBuffer(0,target_fbo,x,y,w,h);
+      // OpenGL doesn't allow blitting when num samples are mismatched, 
+      // except for some very specific cases like 4x -> 0x or 0x -> 4x.
+      // But we have no guarantee that future default FBO will also use 4x 
+      // samples, so we leave it at only allowing default copy if samples = 0.
+      if(samples->getValue() > 0) {
+        if(!depthWarningPrinted->getValue()) {
+          Console(LogLevel::Error) << "Warning: Can't copy depth from " <<
+            "default FBO if number of samples is larger than 0." << std::endl;
+          depthWarningPrinted->setValue(true);
+        }
+
+        // use locally created depth buffer, just clear the buffer for present
+        clearBuffers(target_fbo, 0, 0, w, h, GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+      } else {
+        // copy depth buffer from default frame buffer
+        blitDepthBuffer(0,target_fbo,x,y,w,h);
+      }
     } else if( depth_buffer_storage == "FBO_SHARE" ) { 
       // use depth buffer from external frame buffer
       if( !external_FBO_depth ) { // however no external fbo is set
@@ -1335,22 +1349,39 @@ void FrameBufferTextureGenerator::preProcessFBO(int x, int y,int w, int h, int d
     // need_external_fbo_num -1 will be the index of currently specified 
     // external fbo in external_fbo_colors_vector
     size_t need_external_fbo_num = 0;
-    
+
 
 
     for( int i = 0;i < end_index; ++i ) {
       // i is the index for current internal color buffer 
       std::string color_buffer_storage = color_buffer_storages[i];
       if( color_buffer_storage.empty() || color_buffer_storage == "LOCAL" ) { 
-        // clear the color buffer being processing which is i.
+        // clear the color buffer being processed which is i.
         clearColorBuffer( target_fbo, 0, 0, w, h, &clear_color_value[0]+4*i, i );
         continue;
       } else { 
         // colorBufferStorage is DEFAULT, FBO_COPY_x or FBO_SHARE_x
         if( color_buffer_storage =="DEFAULT_COPY" ) { 
-          // blit color buffer from default frame buffer to the 
-          // i-th attachment point of internal FBO 
-          blitColorBuffer(0, target_fbo, x, y, w, h, -1, i);
+          // OpenGL doesn't allow blitting when num samples are mismatched, 
+          // except for some very specific cases like 4x -> 0x or 0x -> 4x.
+          // But we have no guarantee that future default FBO will also use 4x 
+          // samples, so we leave it at only allowing default copy if samples = 0.
+          if(samples->getValue() > 0) {
+            if(!colorInitWarningPrinted->getValue()[i]) {
+              Console(LogLevel::Error) << "Warning: Can't copy color from " <<
+                "default FBO if number of samples is larger than 0." << std::endl;
+              colorInitWarningPrinted->setValue(i, true);
+            }
+
+            // clear the color buffer being processed which is i.
+            clearColorBuffer( target_fbo, 0, 0, w, h, &clear_color_value[0]+4*i, i );
+
+            continue;
+          } else {
+            // blit color buffer from default frame buffer to the 
+            // i-th attachment point of internal FBO 
+            blitColorBuffer(0, target_fbo, x, y, w, h, -1, i);
+          }
         } else { // color_buffer_storage can only be FBO_COPY_x or FBO_SHARE_x
           ++need_external_fbo_num;
           std::string style = "";
@@ -1611,7 +1642,7 @@ bool FrameBufferTextureGenerator::resizeBuffers( H3DInt32 _width, H3DInt32 _heig
     samples->setValue(1);
     Console(LogLevel::Error)<<"Warning: when using 2D_MULTISAMPLE or 2D_MULTISAMPLE_ARRAY  as output, the number of samples"
       <<"specified should not be zero, will set the number of sample to be one"<<endl;
-      
+
   }
 
   GLenum depth_internal_format = stringToInternalDepthFormat( depthBufferType->getValue() );
@@ -2161,68 +2192,68 @@ void FrameBufferTextureGenerator::blitFBOBuffers(GLenum src, GLenum dst,
 }
 
 void FrameBufferTextureGenerator::UpdateMode::onNewValue( const std::string& new_value ) {
-    if ( new_value == "NOW" ) {
-        static_cast < FrameBufferTextureGenerator* > ( getOwner() )->render();
-    }
+  if ( new_value == "NOW" ) {
+    static_cast < FrameBufferTextureGenerator* > ( getOwner() )->render();
+  }
 }
 
 void FrameBufferTextureGenerator::setupScissor( bool needSinglePassStereo, 
   float* viewports_size, int desired_fbo_width, int desired_fbo_height ){
 #ifdef GL_ARB_viewport_array
-  if( needSinglePassStereo ) {
-    glEnable(GL_SCISSOR_TEST);
-    
-    GLint scissorBox_size[12];
-    int box_x  = scissorBoxX->getValue();
-    int box_y = scissorBoxY->getValue();
-    int box_w = scissorBoxWidth->getValue();
-    int box_h = scissorBoxHeight->getValue();
-    scissorBox_size[0] = (GLint)viewports_size[0];
-    scissorBox_size[1] = (GLint)viewports_size[1];
-    scissorBox_size[2] = (GLint)viewports_size[2];
-    scissorBox_size[3] = (GLint)viewports_size[3];
-    for( int i = 1; i<3; ++i ) { 
-      // only modify the scissor box for the second and third viewport
-      scissorBox_size[4*i] = (GLint)viewports_size[4*i]+box_x;
-      scissorBox_size[4*i+1] = (GLint)viewports_size[4*i+1]+box_y;
-      scissorBox_size[4*i+2] = box_w;
-      scissorBox_size[4*i+3] = box_h;
+    if( needSinglePassStereo ) {
+      glEnable(GL_SCISSOR_TEST);
+
+      GLint scissorBox_size[12];
+      int box_x  = scissorBoxX->getValue();
+      int box_y = scissorBoxY->getValue();
+      int box_w = scissorBoxWidth->getValue();
+      int box_h = scissorBoxHeight->getValue();
+      scissorBox_size[0] = (GLint)viewports_size[0];
+      scissorBox_size[1] = (GLint)viewports_size[1];
+      scissorBox_size[2] = (GLint)viewports_size[2];
+      scissorBox_size[3] = (GLint)viewports_size[3];
+      for( int i = 1; i<3; ++i ) { 
+        // only modify the scissor box for the second and third viewport
+        scissorBox_size[4*i] = (GLint)viewports_size[4*i]+box_x;
+        scissorBox_size[4*i+1] = (GLint)viewports_size[4*i+1]+box_y;
+        scissorBox_size[4*i+2] = box_w;
+        scissorBox_size[4*i+3] = box_h;
+        if( box_x<0 ) {
+          scissorBox_size[4*i] = (GLint)viewports_size[4*i]+ (GLint)( viewports_size[4*i+2]*(-(float)box_x/(float)10000.0) );
+        }
+        if( box_y<0 ) {
+          scissorBox_size[4*i+1] = (GLint)viewports_size[4*i+1]+ (GLint)( viewports_size[4*i+3]*(-(float)box_y/(float)10000.0) );
+        }
+        if( box_w<0 ) {
+          scissorBox_size[4*i+2] = (GLint)( viewports_size[4*i+2]*(-(float)box_w/(float)10000.0) );
+        }
+        if( box_h<0 ) {
+          scissorBox_size[4*i+3] = (GLint)( viewports_size[4*i+3]*(-(float)box_h/(float)10000.0) );
+        }
+      }
+      glScissorArrayv( 0, 3, scissorBox_size );
+    }else{
+#endif
+      glEnable(GL_SCISSOR_TEST);
+      int box_x  = scissorBoxX->getValue();
+      int box_y = scissorBoxY->getValue();
+      int box_w = scissorBoxWidth->getValue();
+      int box_h = scissorBoxHeight->getValue();
       if( box_x<0 ) {
-        scissorBox_size[4*i] = (GLint)viewports_size[4*i]+ (GLint)( viewports_size[4*i+2]*(-(float)box_x/(float)10000.0) );
+        box_x = int ( (-(float)box_x/10000.0)*desired_fbo_width );
       }
       if( box_y<0 ) {
-        scissorBox_size[4*i+1] = (GLint)viewports_size[4*i+1]+ (GLint)( viewports_size[4*i+3]*(-(float)box_y/(float)10000.0) );
+        box_y = int ( (-(float)box_y/10000.0)*desired_fbo_height );
       }
       if( box_w<0 ) {
-        scissorBox_size[4*i+2] = (GLint)( viewports_size[4*i+2]*(-(float)box_w/(float)10000.0) );
+        box_w = int( (-(float)box_w/10000.0)*desired_fbo_width );
       }
       if( box_h<0 ) {
-        scissorBox_size[4*i+3] = (GLint)( viewports_size[4*i+3]*(-(float)box_h/(float)10000.0) );
+        box_h = int( (-(float)box_h/10000.0)*desired_fbo_height );
       }
-    }
-    glScissorArrayv( 0, 3, scissorBox_size );
-  }else{
-#endif
-    glEnable(GL_SCISSOR_TEST);
-    int box_x  = scissorBoxX->getValue();
-    int box_y = scissorBoxY->getValue();
-    int box_w = scissorBoxWidth->getValue();
-    int box_h = scissorBoxHeight->getValue();
-    if( box_x<0 ) {
-      box_x = int ( (-(float)box_x/10000.0)*desired_fbo_width );
-    }
-    if( box_y<0 ) {
-      box_y = int ( (-(float)box_y/10000.0)*desired_fbo_height );
-    }
-    if( box_w<0 ) {
-      box_w = int( (-(float)box_w/10000.0)*desired_fbo_width );
-    }
-    if( box_h<0 ) {
-      box_h = int( (-(float)box_h/10000.0)*desired_fbo_height );
-    }
-    glScissor( box_x, box_y, box_w, box_h  );
+      glScissor( box_x, box_y, box_w, box_h  );
 #ifdef GL_ARB_viewport_array
-  }
+    }
 #endif
 }
 
