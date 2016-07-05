@@ -111,7 +111,6 @@ H3DHapticsDevice::H3DHapticsDevice(
                Inst< SFVec3f         > _deviceVelocity,
                Inst< TrackerVelocity > _trackerVelocity,
                #ifdef HAVE_PROFILER
-               ,
                Inst< SFString        > _profiledResult,
                #endif
                Inst< SFVec3f         > _deviceAngularVelocity,

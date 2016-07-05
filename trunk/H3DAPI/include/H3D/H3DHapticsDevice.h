@@ -258,7 +258,6 @@ namespace H3D {
                       Inst< SFVec3f         > _deviceVelocity         = 0,
                       Inst< TrackerVelocity > _trackerVelocity        = 0,
                       #ifdef HAVE_PROFILER
-                      ,
                       Inst< SFString        > _profiledResult         = 0,
                       #endif
                       Inst< SFVec3f         > _deviceAngularVelocity         = 0,
