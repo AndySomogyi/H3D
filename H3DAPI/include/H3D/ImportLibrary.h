@@ -49,6 +49,10 @@ namespace H3D {
   ///     ( <a href="examples/ImportLibrary.x3d.html">Source</a> )
   class H3DAPI_API ImportLibrary : public X3DChildNode,
                                    public X3DUrlObject {
+  private:
+    DynamicLibrary::LIBHANDLE TryLoadLibrary(string& library_name, bool ends_in_dll);
+    string GetVCVer();
+
   public:
     /// Constructor.
     ImportLibrary( Inst< SFNode >  _metadata = 0,

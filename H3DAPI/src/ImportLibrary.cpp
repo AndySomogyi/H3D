@@ -56,6 +56,36 @@ ImportLibrary::ImportLibrary( Inst< SFNode >  _metadata,
   database.initFields( this );
 }
 
+
+string ImportLibrary::GetVCVer() {
+#if _MSC_VER < 1500
+  return "vc8";
+#elif _MSC_VER < 1600
+  return "vc9";
+#elif _MSC_VER < 1700
+  return "vc10";
+#elif _MSC_VER < 1800
+  return "vc12";
+#elif _MSC_VER < 2000
+  return "vc14";
+#endif
+}
+
+
+DynamicLibrary::LIBHANDLE ImportLibrary::TryLoadLibrary(string& library_name, bool ends_in_dll) {
+  DynamicLibrary::LIBHANDLE handle;
+  if (!ends_in_dll) {
+    // try relative path first
+    handle = DynamicLibrary::load(url_base + library_name);
+    if (handle) return handle;
+  }
+  // try absolute path.
+  handle = DynamicLibrary::load(library_name);
+  if (handle) return handle;
+  return 0;
+}
+
+
 void ImportLibrary::initialize() {
   for( MFString::const_iterator i = url->begin();
        i != url->end();
@@ -65,85 +95,34 @@ void ImportLibrary::initialize() {
     if( urn_resolver ) {
       urn_name = urn_resolver->resolveURN( *i );
     }
-    DynamicLibrary::LIBHANDLE handle;
+
+    bool ends_in_dll = false;
 #ifdef WIN32
-    bool ends_in_dll = urn_name.find( ".dll" ) != string::npos;
+    ends_in_dll = urn_name.find(".dll") != string::npos;
+#endif // WIN32
 
 #ifdef _DEBUG
-
-    if( !ends_in_dll ) {
-      // try relative path first
-      handle = DynamicLibrary::load( url_base + urn_name + "_d" );
-      if( handle ) return;
-
-      // try absolute path.
-      handle = DynamicLibrary::load( urn_name + "_d" );
-      if( handle ) return;
-
-#if (_MSC_VER == 1600)
-      // look for vs2010-version of the library
-      // try relative path first
-      handle = DynamicLibrary::load(url_base + urn_name + "_vc10_d");
-      if (handle) return;
-
-      // try absolute path.
-      handle = DynamicLibrary::load(urn_name + "_vc10_d");
-      if (handle) return;
-
-#elif (_MSC_VER == 1900)
-      // look for vs2015-version of the library
-      // try relative path first
-      handle = DynamicLibrary::load(url_base + urn_name + "_vc14_d");
-      if (handle) return;
-
-      // try absolute path.
-      handle = DynamicLibrary::load(urn_name + "_vc14_d");
-      if (handle) return;
-#endif // _MSC_VER
-
-    }
-    
+    if(TryLoadLibrary(urn_name + "_d", ends_in_dll))
+      return;
 #endif // _DEBUG
+    if (TryLoadLibrary(urn_name, ends_in_dll))
+      return;
 
-    if( !ends_in_dll ) {
-      // try as relative path first
-      handle = DynamicLibrary::load( url_base + urn_name );
-      if( handle ) return;
-    }
-
+#ifdef WIN32
+#ifdef _DEBUG
+    if (TryLoadLibrary(urn_name + "_" + GetVCVer() + "_d", ends_in_dll))
+      return;
+#endif // _DEBUG
+    if (TryLoadLibrary(urn_name + "_" + GetVCVer(), ends_in_dll))
+      return;
 #endif // WIN32
+
 
     // test the given name directly.
     string filename = resolveURLAsFile( urn_name );
     if( filename == "" ) filename = urn_name;
-    handle =  DynamicLibrary::load( filename );
-
-    if( handle ) return;
-
-#ifdef H3D_WINDOWS
-    if(!ends_in_dll) {
-#if (_MSC_VER == 1600)
-      // look for vs2010-version of the library
-      // try relative path first
-      handle = DynamicLibrary::load(url_base + urn_name + "_vc10");
-      if (handle) return;
-
-      // try absolute path.
-      handle = DynamicLibrary::load(urn_name + "_vc10");
-      if (handle) return;
-
-#elif (_MSC_VER == 1900)
-      // look for vs2015-version of the library
-      // try relative path first
-      handle = DynamicLibrary::load(url_base + urn_name + "_vc14");
-      if (handle) return;
-
-      // try absolute path.
-      handle = DynamicLibrary::load(urn_name + "_vc14");
-      if (handle) return;
-#endif // _MSC_VER
-    }
-#endif
+    if(DynamicLibrary::load( filename ))
+      return;
   }
 
   // no library found
