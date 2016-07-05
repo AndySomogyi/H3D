@@ -33,6 +33,8 @@
 #include <H3D/X3DChildNode.h>
 #include <H3D/X3DUrlObject.h>
 #include <H3D/MFString.h>
+#include <H3DUtil/DynamicLibrary.h>
+
 
 namespace H3D {
   /// \ingroup H3DNodes 
