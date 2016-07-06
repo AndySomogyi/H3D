@@ -349,7 +349,8 @@ void X3DViewpointNode::getProjectionDimensions( EyeMode eye_mode,
                                                 H3DFloat &bottom,
                                                 H3DFloat &right,
                                                 H3DFloat &left,
-                                                StereoInfo * stereo_info ) {
+                                                StereoInfo * stereo_info,
+                                                bool update_stereo_proj_shift ) {
   windowFromfieldOfView( width,
                          height,
                          clip_near,
@@ -371,20 +372,23 @@ void X3DViewpointNode::getProjectionDimensions( EyeMode eye_mode,
     if( eye_mode == RIGHT_EYE )
       frustum_shift = -frustum_shift;
   } 
-  if ( (stereo_info) && ( eye_mode == BOTH_EYE ) ) {
-    float new_matrix_proj_shift = 2*frustum_shift/(right-left);
-    float diff_threshold = 0.00001f;
-    if(H3DAbs(stereo_info->matrixProjShift->getValue()- new_matrix_proj_shift)>diff_threshold) {
-      stereo_info->updateProjShift( new_matrix_proj_shift );
+  if ( eye_mode == BOTH_EYE ) {
+    if( stereo_info&&update_stereo_proj_shift ) {
+      float new_matrix_proj_shift = 2*frustum_shift/(right-left);
+      float diff_threshold = 0.00001f;
+      if ( H3DAbs( stereo_info->matrixProjShift->getValue()-new_matrix_proj_shift )>diff_threshold ) {
+        stereo_info->updateProjShift( new_matrix_proj_shift );
+      }
     }
   } else {
-  left += frustum_shift;
-  right += frustum_shift;
-}
+    left += frustum_shift;
+    right += frustum_shift;
+  }
 }
 
 void X3DViewpointNode::setupViewMatrix( EyeMode eye_mode,
-                                        StereoInfo * stereo_info  ) {
+                                        StereoInfo * stereo_info,
+                                        bool update_stereo_view_shift ) {
   const Vec3f &vp_position = totalPosition->getValue();
   const Rotation &vp_orientation = totalOrientation->getValue();
   const Matrix4f &vp_inv_m = accInverseMatrix->getValue();  
@@ -418,7 +422,7 @@ void X3DViewpointNode::setupViewMatrix( EyeMode eye_mode,
       glTranslatef( -left_eye.x, -left_eye.y, -left_eye.z );
     } else if( eye_mode == RIGHT_EYE ) {
       glTranslatef( left_eye.x, left_eye.y, left_eye.z );
-    } else if( (stereo_info) && ( eye_mode == BOTH_EYE ) ) {
+    } else if( update_stereo_view_shift && (stereo_info) && ( eye_mode == BOTH_EYE ) ) {
       if( stereo_info->matrixViewShift->getValue()!=half_interocular_distance ) {
         stereo_info->updateViewShift( half_interocular_distance );
       }

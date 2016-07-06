@@ -120,10 +120,11 @@ bool Viewpoint::windowFromfieldOfView( H3DFloat width, H3DFloat height,
 void Viewpoint::setupProjection( EyeMode eye_mode,
                                  H3DFloat width, H3DFloat height,
                                  H3DFloat clip_near, H3DFloat clip_far,
-                                 StereoInfo * stereo_info ) {
+                                 StereoInfo * stereo_info,
+                                 bool update_stereo_proj_shift ) {
   H3DFloat top, bottom, right, left;
   getProjectionDimensions( eye_mode, width, height, clip_near, top,
-                           bottom, right, left, stereo_info );
+                           bottom, right, left, stereo_info, update_stereo_proj_shift );
 
   GLdouble A = (right+left)/(right - left );
   GLdouble B = (top+bottom)/(top-bottom);

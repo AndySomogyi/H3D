@@ -457,10 +457,12 @@ namespace H3D {
     /// means infinity.
     /// \param[in] stereo_info Stereo rendering parameters, used to specify 
     /// e.g. interocular distance.
+    /// \param[in] update_stereo_proj_shift Decides if stereo project shift variable will be calculated
     virtual void setupProjection( EyeMode eye_mode,
                                   H3DFloat width, H3DFloat height,
                                   H3DFloat clip_near, H3DFloat clip_far,
-                                  StereoInfo * stereo_info = 0 )
+                                  StereoInfo * stereo_info = 0,
+                                  bool update_stereo_proj_shift = false )
 #ifndef H3D_GENERATE_DOTROUTE_FILES
                                         = 0;
 #else
@@ -481,8 +483,10 @@ namespace H3D {
     /// \param[in] eye_mode The eye to render for (LEFT_EYE, RIGHT_EYE or MONO).
     /// \param[in] stereo_info Stereo rendering parameters, used to specify 
     /// interocular distance
+    /// \param[in] update_stereo_view_shift Decides if stereo view shift variable will be calculated
     virtual void setupViewMatrix( EyeMode eye_mode,
-                                  StereoInfo * stereo_info = 0 ); 
+                                  StereoInfo * stereo_info = 0,
+                                  bool update_stereo_view_shift = false  ); 
 
 
     /// Gets the viewMatrix for this viewpoint, i.e. the transformation
@@ -622,7 +626,8 @@ namespace H3D {
                                   H3DFloat &bottom,
                                   H3DFloat &right,
                                   H3DFloat &left,
-                                  StereoInfo * stereo_info = 0 );
+                                  StereoInfo * stereo_info = 0,
+                                  bool update_stereo_proj_shift = false );
 
   };
 }

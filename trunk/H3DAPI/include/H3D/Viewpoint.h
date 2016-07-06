@@ -92,7 +92,8 @@ namespace H3D {
     virtual void setupProjection( EyeMode eye_mode,
                                   H3DFloat width, H3DFloat height,
                                   H3DFloat clip_near, H3DFloat clip_far,
-                                  StereoInfo * stereo_info = 0 );
+                                  StereoInfo * stereo_info = 0,
+                                  bool update_stereo_proj_shift = false );
 
     /// The fieldOfView field specifies a preferred minimum viewing angle
     /// from this viewpoint in radians. 
