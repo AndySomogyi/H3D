@@ -47,14 +47,16 @@ ShaderAtomicCounter::ShaderAtomicCounter(
   Inst< SFNode        > _metadata,
   Inst< SFInt32       > _initialValue ) :
 ShaderChildNode(_displayList,_metadata),
-  initialValue(_initialValue){
-    type_name = "ShaderAtomicCounter";
-    database.initFields(this);
-    displayList->setName( "displayList" );
-    displayList->setOwner( this );
-    buffer_id = -1;
-    initialValue->setValue(0);
-    prev_travinfoadr = NULL;
+  initialValue(_initialValue),
+  program_handle ( 0 ),
+  buffer_id ( -1 ),
+  atomic_counter_binding ( 0 ),
+  do_init_value ( false ) {
+  type_name = "ShaderAtomicCounter";
+  database.initFields(this);
+  displayList->setName( "displayList" );
+  displayList->setOwner( this );
+  initialValue->setValue(0);
 }
 
 void ShaderAtomicCounter::initialize ( ){
@@ -105,6 +107,12 @@ void ShaderAtomicCounter::render ( ){
 #ifdef DEBUG_GL_ERROR
   GLenum err = glGetError();
 #endif
+
+  if( do_init_value ) {
+    applyInitialValue();
+    do_init_value = false;
+  }
+
   // the second parameter here refers to the index of an active atomic counter buffer
   // it has to being in range from zero to GL_ACTIVE_ATOMIC_COUNTER_BUFFERS minus one
   // as i am not actually not very sure how to make the multiple atomic counter buffers
@@ -145,41 +153,37 @@ void ShaderAtomicCounter::render ( ){
 }
 
 void ShaderAtomicCounter::traverseSG( TraverseInfo &ti ){
+  do_init_value = true;
+}
+
+void ShaderAtomicCounter::applyInitialValue() {
 #ifdef GLEW_ARB_shader_atomic_counters
 
-  if( prev_travinfoadr != &ti){
 #ifdef DEBUG_GL_ERROR
     GLenum err = glGetError();
 #endif
-    if ( buffer_id == -1 )
-    {// either it is the first that the buffer is used, or the size need to be changed
-      prepareAtomicCounterBuffer();
-    }
     // initialized once only per one traverse
     glBindBufferBase( GL_ATOMIC_COUNTER_BUFFER, atomic_counter_binding, buffer_id );
 #ifdef DEBUG_GL_ERROR
     err = glGetError();
-    if( err!=GL_NO_ERROR ) {
-      Console(LogLevel::Error)<<"error happens when binding the atomic counter : "<<gluErrorString(err)<<endl;
-    }
+    if( err != GL_NO_ERROR ) {
+      Console( LogLevel::Error ) << "error happens when binding the atomic counter : " << gluErrorString( err ) << endl;
+}
 #endif
-    static const unsigned int initial_value = (unsigned int)initialValue->getValue();
-    //static const unsigned int zero = 0;
-    glBufferSubData( GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(initial_value),&initial_value); 
+    unsigned int initial_value = (unsigned int)initialValue->getValue();
+    glBufferSubData( GL_ATOMIC_COUNTER_BUFFER, 0, sizeof( initial_value ), &initial_value );
 #ifdef DEBUG_GL_ERROR
     err = glGetError();
-    if( err!=GL_NO_ERROR ) {
-      Console(LogLevel::Error)<<"error happens when initializing the atomic counter value: "<<gluErrorString(err)<<endl;
+    if( err != GL_NO_ERROR ) {
+      Console( LogLevel::Error ) << "error happens when initializing the atomic counter value: " << gluErrorString( err ) << endl;
     }
 #endif
-    prev_travinfoadr = &ti;
-  }
+
 #endif
 }
 
 ShaderAtomicCounter::~ShaderAtomicCounter ( ){
-  if ( buffer_id!=-1 )
-  {
+  if ( buffer_id!=-1 ) {
     glDeleteBuffers ( 1, (GLuint*)&buffer_id );
   }
 }
