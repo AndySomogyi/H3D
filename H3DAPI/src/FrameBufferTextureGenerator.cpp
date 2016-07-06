@@ -577,8 +577,7 @@ void FrameBufferTextureGenerator::render()     {
   // get the desired width and height of the buffer in pixels.
   int desired_fbo_width  = width->getValue();
   int desired_fbo_heigth = height->getValue();
-  int projection_width = desired_fbo_width;
-  int projection_height = desired_fbo_heigth;
+
   // the fbo copying source staring point  when FBTG is not creating a new fbo
   int buffer_src_x = window->fbo_current_x;
   int buffer_src_y = window->fbo_current_y;
@@ -590,8 +589,6 @@ void FrameBufferTextureGenerator::render()     {
     desired_fbo_heigth<=-1 ) {
       desired_fbo_width = window->fbo_current_width / -(desired_fbo_width);
       desired_fbo_heigth = window->fbo_current_height / -(desired_fbo_heigth);
-      projection_width = window->projectionWidth->getValue();
-      projection_height = window->projectionHeight->getValue();
   }
 
   // current_width and current_height should be set to default viewport width, height
@@ -603,8 +600,6 @@ void FrameBufferTextureGenerator::render()     {
   if( colorbuffer_default_copy||depthBufferStorage->getValue()=="DEFAULT_COPY" ) {
     desired_fbo_width = window->fbo_current_width;
     desired_fbo_heigth = window->fbo_current_height;
-    projection_width = window->projectionWidth->getValue();
-    projection_height = window->projectionHeight->getValue();
   }
 
 
@@ -739,20 +734,23 @@ void FrameBufferTextureGenerator::render()     {
     if( useStereo->getValue()&&window->getEyeMode()!=eye_mode ) {
       // when current active eye mode is not MONO and FBO need to use stereo, need to specify 
       // stereo_info
+      // TODO: support local stereo_info
       eye_mode = window->getEyeMode ( );
       stereo_info = StereoInfo::getActive();
     }
+    int projection_width = window->projectionWidth->getValue();
+    int projection_height = window->projectionHeight->getValue();
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
     glLoadIdentity();
-    vp->setupViewMatrix( eye_mode, stereo_info );
+    vp->setupViewMatrix( eye_mode, stereo_info, false );
     glMatrixMode( GL_PROJECTION );
     glPushMatrix();
     glLoadIdentity();
     vp->setupProjection( eye_mode,
       (H3DFloat) projection_width,
       (H3DFloat) projection_height,
-      clip_near, clip_far, stereo_info );
+      clip_near, clip_far, stereo_info, false );
   } 
   if ( desired_fbo_width != widthInUse->getValue() ) {
     widthInUse->setValue(desired_fbo_width, id);

@@ -1598,7 +1598,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     vp->setupProjection( eye_mode,
                          (H3DFloat)projectionWidth->getValue(),
                          (H3DFloat)projectionHeight->getValue(),
-                         clip_near, clip_far );
+                         clip_near, clip_far, stereo_info, true );
 
     glMatrixMode(GL_MODELVIEW);
     glDrawBuffer(GL_BACK);
@@ -1627,7 +1627,7 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
       glEnable( GL_NORMALIZE );
 
     // add viewmatrix to model view matrix.
-    vp->setupViewMatrix( eye_mode );
+    vp->setupViewMatrix( eye_mode, stereo_info, true );
 
     if( any_pointing_device_sensors ) {
       // Get matrices used to calculate arguments for
