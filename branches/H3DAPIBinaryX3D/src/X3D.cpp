@@ -57,9 +57,10 @@ struct X3DToBinaryWrap {
     fileToLoad = file;
   }
 };
-Scene::CallbackCode handleBinaryWriting(void * a){
+auto_ptr< PeriodicThread > binary_thread;
+PeriodicThread::CallbackCode handleBinaryWriting(void * a){
   TimeStamp startTimeW, endTimeW;
-
+  cout << "Writing Started in thread " << std::endl;
   startTimeW = TimeStamp::now();
   X3DToBinaryWrap * toBinary = static_cast< X3DToBinaryWrap * >(a);
   toBinary->object->writeToBinary(toBinary->fileToLoad);
@@ -67,7 +68,7 @@ Scene::CallbackCode handleBinaryWriting(void * a){
   TimeStamp timeLapsed = endTimeW - startTimeW;
   std::cout << "File " << toBinary->fileToLoad <<" has been SUCCESSFULLY written in binary format in: " << timeLapsed << std::endl;
   delete toBinary; 
-  return Scene::CALLBACK_DONE;
+  return PeriodicThread::CALLBACK_DONE ;
 
 }
 Group* X3D::createX3DFromString( const string &str,
@@ -144,8 +145,10 @@ Group* X3D::createX3DFromURL( const string &url,
 
   if( change_base_path_during_parsing )
     ResourceResolver::setBaseURL( path ); 
-
-   X3DToBinary* binaryHandler = new X3DToBinary(dn, exported_nodes);
+  
+  // ========== Handling binary files ======== 
+  
+  X3DToBinary* binaryHandler = new X3DToBinary(dn, exported_nodes);
   std::string binaryFilePath = resolved_url + ".r";
   
   ifstream ifile(binaryFilePath);
@@ -158,8 +161,11 @@ Group* X3D::createX3DFromURL( const string &url,
     //return static_cast<Group *>(root);
   } 
   
+  binary_thread.reset(new PeriodicThread(100));
+  binary_thread->setThreadName("BinaryWriteThread");
   X3DToBinaryWrap * a = new X3DToBinaryWrap(binaryHandler, url);
-  Scene::addCallback (handleBinaryWriting,  a);
+  binary_thread->asynchronousCallback(&handleBinaryWriting,  a);
+  //Scene::addCallback (handleBinaryWriting,  a);
 
 
 #ifdef HAVE_XERCES

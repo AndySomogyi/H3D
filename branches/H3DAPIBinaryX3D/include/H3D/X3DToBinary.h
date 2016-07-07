@@ -16,9 +16,9 @@
 #include <iterator>
 #include <map>
 
-  #include <tinyxml.h>
+#include <tinyxml.h>
 
-  #include <iostream>
+#include <iostream>
 
 #include <algorithm>
 
@@ -183,6 +183,21 @@ private:
     std::string defName;
   } useNode;
  
+  struct Attribute {
+    unsigned int attributeNameLength;
+    std::string attribName;
+    unsigned int numberOfValues;
+    char valueType;
+    std::string sValue;
+    int* iValues;
+    double* dValues;
+    Attribute(unsigned int attributeNameLength, std::string attributeName, unsigned int numVals, char valType, std::string stringVal, double * doubleVals, int * intVals) : numberOfValues(numVals), valueType(valType), sValue(stringVal), dValues(doubleVals), iValues(intVals) {
+    }
+    ~Attribute() {
+      delete[] iValues;
+      delete[] dValues;
+    }
+  };
   void encode_to_binary_file_ID( TiXmlNode* pParent);
   int encode_attribs_to_binary_file_ID(TiXmlElement* pElement);
   void encode_to_binary_cdata(TiXmlNode* pParent);
@@ -206,6 +221,7 @@ private:
 
   Node* parseNodesH3D(NodeFieldWrap * pParent, bool isRoot);
   void parseAttributesH3D(H3D::Node * pNewNode, std::string * pContainerField);
+  Attribute* getNextAttribute();
 
   
   H3D::Node* parseNodesH3DRoot();
