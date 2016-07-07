@@ -46,8 +46,30 @@
 
 #endif
 
-using namespace H3D;
+#include <H3D/X3DToBinary.h>
 
+using namespace H3D;
+struct X3DToBinaryWrap {
+  X3DToBinary* object;
+  std::string fileToLoad;
+  X3DToBinaryWrap(X3DToBinary* obj, const std::string &file) {
+    object = obj;
+    fileToLoad = file;
+  }
+};
+Scene::CallbackCode handleBinaryWriting(void * a){
+  TimeStamp startTimeW, endTimeW;
+
+  startTimeW = TimeStamp::now();
+  X3DToBinaryWrap * toBinary = static_cast< X3DToBinaryWrap * >(a);
+  toBinary->object->writeToBinary(toBinary->fileToLoad);
+  endTimeW = TimeStamp::now();
+  TimeStamp timeLapsed = endTimeW - startTimeW;
+  std::cout << "File " << toBinary->fileToLoad <<" has been SUCCESSFULLY written in binary format in: " << timeLapsed << std::endl;
+  delete toBinary; 
+  return Scene::CALLBACK_DONE;
+
+}
 Group* X3D::createX3DFromString( const string &str,
                                  DEFNodes *dn,
                                  DEFNodes *exported_nodes,
@@ -68,7 +90,8 @@ Group* X3D::createX3DFromURL( const string &url,
                               DEFNodes *exported_nodes,
                               PrototypeVector *prototypes,
                               bool change_base_path_during_parsing ) {
-  H3DTIMER_BEGIN( "createX3DFromURL (" + url + ")", "PARSING" ) 
+  H3DTIMER_BEGIN( "createX3DFromURL (" + url + ")", "PARSING" );
+  
   // First try to resolve the url to file contents and load via string buffer
   // Otherwise fallback on using temp files
   string url_contents= ResourceResolver::resolveURLAsString ( url );
@@ -87,6 +110,9 @@ Group* X3D::createX3DFromURL( const string &url,
     H3DTIMER_END( "createX3DFromURL (" + url + ")" ) 
     return g;
   }
+
+  
+ 
 
   bool is_tmp_file;
   string resolved_url = ResourceResolver::resolveURLAsFile( url, 
@@ -118,6 +144,23 @@ Group* X3D::createX3DFromURL( const string &url,
 
   if( change_base_path_during_parsing )
     ResourceResolver::setBaseURL( path ); 
+
+   X3DToBinary* binaryHandler = new X3DToBinary(dn, exported_nodes);
+  std::string binaryFilePath = resolved_url + ".r";
+  
+  ifstream ifile(binaryFilePath);
+  if (ifile){
+    Node * root = binaryHandler->readBinaryRoot(binaryFilePath);
+    ResourceResolver::setBaseURL( old_base );
+    Group *g = new Group;
+    g->children->push_back( root );
+    return g;
+    //return static_cast<Group *>(root);
+  } 
+  
+  X3DToBinaryWrap * a = new X3DToBinaryWrap(binaryHandler, url);
+  Scene::addCallback (handleBinaryWriting,  a);
+
 
 #ifdef HAVE_XERCES
   auto_ptr< SAX2XMLReader > parser( getNewXMLParser() );
@@ -217,7 +260,6 @@ Group* X3D::createX3DFromURL( const string &url,
   return 0;
 #endif
 }
-
 Group* X3D::createX3DFromStream( istream &is, 
                                  DEFNodes *dn,
                                  DEFNodes *exported_nodes,

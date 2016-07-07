@@ -266,6 +266,20 @@ IF(OPENGL_FOUND)
   SET(requiredLibs ${requiredLibs} ${OPENGL_LIBRARIES} )
 ENDIF(OPENGL_FOUND)
 
+
+
+# TinyXML
+FIND_PACKAGE(TinyXML REQUIRED)
+IF(WIN32)
+ # add winsock libs
+ SET(requiredLibs ${requiredLibs} netapi32.lib wsock32.lib )
+ENDIF(WIN32)
+IF(TINYXML_FOUND)
+ INCLUDE_DIRECTORIES( ${TINYXML_INCLUDE_DIR} ) 
+ SET(requiredLibs ${requiredLibs} ${TINYXML_LIBRARIES} )
+ENDIF(TINYXML_FOUND)
+
+
 # Find Glew library. Required to compile.
 FIND_PACKAGE(GLEW REQUIRED)
 IF(GLEW_FOUND)
