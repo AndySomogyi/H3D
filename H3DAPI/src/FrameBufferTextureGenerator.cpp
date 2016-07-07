@@ -1013,7 +1013,7 @@ void FrameBufferTextureGenerator::initializeFBO() {
     size_t nr_color_textures = color_texture_types.size();
     if( (GLint)nr_color_textures > max_draw_buffers ||
       (GLint)nr_color_textures > max_color_attachments ) {
-        nr_color_textures = H3DMin( max_draw_buffers, max_draw_buffers );
+        nr_color_textures = H3DMin( max_draw_buffers, max_color_attachments );
         Console(LogLevel::Error) << "Warning: Too many color textures. Supported by your graphics card: "
           << nr_color_textures << ". Tried to use: " << color_texture_types.size() 
           << ". Additional textures will be ignored(in FrameBufferTextureGenerator). "
