@@ -122,7 +122,7 @@ class TestResults ( object ):
       baselinerendering= max(g, key= os.path.getmtime)
       try:
         process= subprocess.Popen(
-          ["compare",
+          [ "magick", "compare",
             "-fuzz","%d%%"%fuzz,
             "-metric","AE",
             baseline_path,rendering_path, os.path.split(rendering_path)[0] + '\\diff_' + os.path.split(rendering_path)[1]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
