@@ -33,7 +33,7 @@
 
 namespace H3D {
   namespace H3DExports {
-    Node *getH3DExportNode( const string &name );
+    H3DAPI_API Node *getH3DExportNode( const string &name );
   }
 }
 
