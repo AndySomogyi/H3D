@@ -47,10 +47,15 @@ class Variation ( object ):
       return m.group(0)+"\n" + self.global_insertion_string
     
     if self.global_insertion_string != "":
-      reg = re.compile( r'<Scene>|<Group>' )
-      output_after = reg.sub(replaceRoot, output)
-      if output_after == output:
-        self.global_insertion_string_failed = True
+      reg = re.compile( r'<Scene>' )
+      output_after = reg.sub(replaceRoot, output, count=1)
+      if output_after == output: # If Injecting into Scene fails then we don't have a scene so try to inject it into the first Group node we find instead
+        reg = re.compile( r'<Group>' )
+        output_after = reg.sub(replaceRoot, output, count=1)
+        if output_after == output:
+          self.global_insertion_string_failed = True
+        else:
+          output = output_after
       else:
         output = output_after
           
