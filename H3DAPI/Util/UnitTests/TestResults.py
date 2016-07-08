@@ -186,6 +186,7 @@ class TestResults ( object ):
       except StopIteration:
         return valid, diff, error #This is where we end up if it worked
     except Exception as e:
+        print str(e)
         error.append(str(e))
     return False, diff, error
 

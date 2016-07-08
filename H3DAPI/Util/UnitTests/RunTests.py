@@ -3,8 +3,6 @@ This script is supposed to run unit tests on every H3DAPI node.
 
 Requirements:
   You must install Imagemagick (and add to PATH) in order for image comparison to function, otherwise rendering tests will always fail.
-  You must install the google app-engine python library as well as gspread.
-
 """
 
 import os, sys
@@ -330,23 +328,26 @@ class TestCaseRunner ( object ):
     v = Variation (testCase.name, script)
     # Create a temporary x3d file containing our injected script
     original_path = os.path.join(directory, testCase.x3d)
-    if os.path.exists(original_path+'_original.x3d'):
-      print original_path+'_original.x3d already exists! This probably means that RunTests was interrupted during a previous execution.'
-      print "Restoring " + original_path + " before continuing..."
-      try:
-        if os.path.exists(original_path):
-          os.remove(original_path)
-        os.rename(original_path+'_original.x3d', original_path)
-        print "Restored! Continuing the testing..."
-      except:
-        print "Failed to restore! Please check the files manually."
-        return
-    if (os.path.exists(os.path.join(output_dir, "validation.txt"))):
-      os.remove(os.path.join(output_dir, "validation.txt"))
+    try:
+      if os.path.exists(original_path+'_original.x3d'):
+        print original_path+'_original.x3d already exists! This probably means that RunTests was interrupted during a previous execution.'
+        print "Restoring " + original_path + " before continuing..."
+        try:
+          if os.path.exists(original_path):
+            os.remove(original_path)
+          os.rename(original_path+'_original.x3d', original_path)
+          print "Restored! Continuing the testing..."
+        except:
+          print "Failed to restore! Please check the files manually."
+          return
+      if (os.path.exists(os.path.join(output_dir, "validation.txt"))):
+        os.remove(os.path.join(output_dir, "validation.txt"))
 
-    success, variation_path= self._createVariationFile ( v, os.path.join(directory, testCase.x3d))
-    os.rename(original_path, original_path+'_original.x3d') # rename the original .x3d file
-    os.rename(variation_path, original_path) # swap in our variation file for the original
+      success, variation_path= self._createVariationFile ( v, os.path.join(directory, testCase.x3d))
+      os.rename(original_path, original_path+'_original.x3d') # rename the original .x3d file
+      os.rename(variation_path, original_path) # swap in our variation file for the original
+    except:
+      pass
     try:
       # Run the test
       for trial in range(testCase.maxtrials):
