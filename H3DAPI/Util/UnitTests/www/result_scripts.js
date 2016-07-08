@@ -509,11 +509,11 @@ function generateConsole(div) {
   
   if(testcase.success == "N"){
     succeeded.addClass('test_failed');
-    if(!testcase.text_baseline)
+    if(!testcase.hasOwnProperty("text_baseline"))
       succeeded.append("Step failed - No baseline!");
-    else if(!testcase.text_output)
+    else if(!testcase.hasOwnProperty("text_output"))
       succeeded.append("Step failed - No output!");
-    else 
+    else
       succeeded.append("Step failed - Invalid output!");
   } else {
     succeeded.addClass('test_successful');
@@ -527,14 +527,14 @@ function generateConsole(div) {
   output.append(testcase.text_output.split('\n').join('</br>'));
   container.append(output);
   if(testcase.success == "N") {  
-    if(baseline) {
+    if(testcase.hasOwnProperty("text_baseline")) {
       var baseline = $('<div>');
       baseline.addClass('stdout_div');
       baseline.append("<b>Baseline:</b></br></br>");
       baseline.append(testcase.text_baseline.split('\n').join('</br>'));
       container.append(baseline);
     }
-    if(diff) {
+    if(testcase.hasOwnProperty("text_diff")) {
     var diff = $('<div>');
       diff.addClass('stdout_div');
       diff.append("<b>Diff:</b></br></br>");
