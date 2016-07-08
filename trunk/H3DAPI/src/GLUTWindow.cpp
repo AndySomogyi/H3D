@@ -549,6 +549,10 @@ void GLUTWindow::glutMouseWheelCallback( int wheel,
 void GLUTWindow::glutWMCloseCallback() {
   GLUTWindow *window = GLUTWindow::getGLUTWindow(glutGetWindow());
   if (window) {
+    // Make sure we clean up our scene before deinitWindow, because after that the opengl context won't exist anymore
+    for (set< Scene * >::iterator i = Scene::scenes.begin(); i != Scene::scenes.end(); ++i) {
+      (*i)->setSceneRoot(NULL);
+    }
     window->window_id = 0;
     window->deinitWindow();
   }
