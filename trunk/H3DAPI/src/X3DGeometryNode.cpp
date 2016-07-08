@@ -66,6 +66,7 @@ namespace X3DGeometryNodeInternals {
   FIELDDB_ELEMENT( X3DGeometryNode, contactNormal, OUTPUT_ONLY );
   FIELDDB_ELEMENT( X3DGeometryNode, options, INPUT_OUTPUT );
   FIELDDB_ELEMENT( X3DGeometryNode, contactTexCoord, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( X3DGeometryNode, centerOfMass, INPUT_OUTPUT );
 }
 
 X3DGeometryNode::X3DGeometryNode( 
@@ -77,7 +78,8 @@ X3DGeometryNode::X3DGeometryNode(
                                  Inst< MFVec3f > _contactPoint,
                                  Inst< MFVec3f > _contactNormal,
                                  Inst< MFVec3f > _contactTexCoord,
-                                 Inst< SFBoundTree > _boundTree ) :
+                                 Inst< SFBoundTree > _boundTree,
+                                 Inst< SFVec3f > _centerOfMass ) :
   X3DChildNode( _metadata ),
   H3DBoundedObject( _bound ),
   H3DDisplayListObject( _displayList ),
@@ -87,6 +89,7 @@ X3DGeometryNode::X3DGeometryNode(
   contactTexCoord( _contactTexCoord ),
   contactNormal( _contactNormal ),
   boundTree( _boundTree ),
+  centerOfMass ( _centerOfMass ),
   options( new MFOptionsNode ),
   shadow_volume( NULL ),
   use_culling( false ),
@@ -104,6 +107,7 @@ X3DGeometryNode::X3DGeometryNode(
   database.initFields( this );
 
   displayList->route( boundTree );
+  centerOfMass->setValue(Vec3f(0.0,0.0,0.0));
 }
 
 void X3DGeometryNode::initialize() {
@@ -327,7 +331,15 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
       }
     }
   }
-  
+
+  Bound *b = geom->bound->getValue();
+  if( b ) {
+    BoxBound *bb = dynamic_cast<BoxBound*>(b);
+    if( bb ) {
+      geom->centerOfMass->setValue( bb->center->getValue() );
+    }
+  }
+
   // restore previous values for culling
   if( culling_enabled ) glEnable( GL_CULL_FACE );
   else glDisable( GL_CULL_FACE );
