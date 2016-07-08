@@ -101,7 +101,8 @@ namespace H3D {
                      Inst< MFVec3f     > _contactPoint = 0,
                      Inst< MFVec3f     > _contactNormal = 0,
                      Inst< MFVec3f     > _contactTexCoord = 0,
-                     Inst< SFBoundTree > _boundTree = 0 );
+                     Inst< SFBoundTree > _boundTree = 0,
+                     Inst< SFVec3f     > _centerOfMass = 0);
 
     /// Traverse the scenegraph. A HAPIHapticShape is added for haptic
     /// rendering if haptics is enabled.
@@ -310,6 +311,12 @@ namespace H3D {
     ///
     /// <b>Access type:</b> outputOnly
     auto_ptr< MFVec3f >  contactNormal;
+
+    /// The field contains center of mass for the object, based on its bounding box.
+    /// The point is given in local coordinates of the X3DGeometryNode.
+    ///
+    /// <b>Access type:</b> inputOutput
+    auto_ptr< SFVec3f >  centerOfMass;
 
     /// Contains a tree of the HAPI::GeometryPrimitives that build up
     /// the X3DGeometryNode. C++-only field.
