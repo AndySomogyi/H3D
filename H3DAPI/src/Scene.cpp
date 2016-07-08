@@ -117,7 +117,10 @@ namespace SceneInternal {
     }
     catch (const Exception::QuitAPI &) {
 #ifdef FREEGLUT
-      glutLeaveMainLoop();
+      for (set< Scene * >::iterator i = Scene::scenes.begin(); i != Scene::scenes.end(); ++i) {
+        (*i)->setSceneRoot(NULL);
+      }
+        glutLeaveMainLoop();
 #else
       // normal glut does not support exiting main loop. Have to quit 
       // using exit. This will not call any destructors.
@@ -128,6 +131,9 @@ namespace SceneInternal {
     catch (const Exception::H3DException &e) {
       Console(LogLevel::Error) << e << endl;
 #ifdef FREEGLUT
+      for (set< Scene * >::iterator i = Scene::scenes.begin(); i != Scene::scenes.end(); ++i) {
+        (*i)->setSceneRoot(NULL);
+      }
       glutLeaveMainLoop();
 #else
       // normal glut does not support exiting main loop. Have to quit 
