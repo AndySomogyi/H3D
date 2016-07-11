@@ -97,6 +97,11 @@ void ClutchedDevice::updateDeviceValues() {
   unclutchedOrientation->setValue ( Rotation(dv.orientation), id );
 }
 
+ClutchedDevice::~ClutchedDevice() {
+  HAPI::ClutchedHapticsDevice* clutch_hapi = static_cast<HAPI::ClutchedHapticsDevice*>(hapi_device.get());
+  clutch_hapi->setActualHapticsDevice(NULL);
+}
+
 void ClutchedDevice::initialize () {
   H3DHapticsDevice::initialize ();
 
@@ -109,7 +114,7 @@ void ClutchedDevice::initialize () {
 
     HAPI::ClutchedHapticsDevice* clutched_device = static_cast< HAPI::ClutchedHapticsDevice * >( hapi_device.get() );
     if ( HAPI::HAPIHapticsDevice* hapi_hd= hd->getHAPIDevice() ) {
-      clutched_device->setActualHapticsDevice ( *hapi_hd );
+       clutched_device->setActualHapticsDevice ( hapi_hd );
     }
   }
 }
