@@ -336,7 +336,8 @@ void ComposedShader::traverseSG ( TraverseInfo& ti ) {
     if( default_settings&&default_settings->optionNodesUpdated() ) {
       default_settings->getOptionNode( options );
       size_t size = updateCache->getRoutesIn().size();
-      options->useCaching->route(updateCache);
+      if(options)
+        options->useCaching->route(updateCache);
     }
   }
   updateCache->upToDate();
