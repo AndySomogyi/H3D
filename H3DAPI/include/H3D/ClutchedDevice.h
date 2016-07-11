@@ -76,6 +76,8 @@ namespace H3D {
             Inst< SFVec3f            > _unclutchedPosition     = 0,
             Inst< SFRotation         > _unclutchedOrientation  = 0 );
 
+
+    virtual ~ClutchedDevice();
     /// Initialize the node
     virtual void initialize ();
 
