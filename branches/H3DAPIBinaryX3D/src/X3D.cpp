@@ -34,6 +34,7 @@
 #include <H3D/IStreamInputSource.h>
 #endif
 
+#define X3DTOBINARY
 #include <H3D/ResourceResolver.h>
 #include <H3D/VrmlParser.h>
 #include <H3D/X3DGeometryNode.h>
@@ -49,6 +50,9 @@
 #include <H3D/X3DToBinary.h>
 
 using namespace H3D;
+
+
+#ifdef X3DTOBINARY
 struct X3DToBinaryWrap {
   X3DToBinary* object;
   std::string fileToLoad;
@@ -69,8 +73,10 @@ PeriodicThread::CallbackCode handleBinaryWriting(void * a){
   std::cout << "File " << toBinary->fileToLoad <<" has been SUCCESSFULLY written in binary format in: " << timeLapsed << std::endl;
   delete toBinary; 
   return PeriodicThread::CALLBACK_DONE ;
-
 }
+
+#endif
+
 Group* X3D::createX3DFromString( const string &str,
                                  DEFNodes *dn,
                                  DEFNodes *exported_nodes,
@@ -147,26 +153,27 @@ Group* X3D::createX3DFromURL( const string &url,
     ResourceResolver::setBaseURL( path ); 
   
   // ========== Handling binary files ======== 
-  
+#ifdef X3DTOBINARY
   X3DToBinary* binaryHandler = new X3DToBinary(dn, exported_nodes);
-  std::string binaryFilePath = resolved_url + ".r";
-  
-  ifstream ifile(binaryFilePath);
-  if (ifile){
-    Node * root = binaryHandler->readBinaryRoot(binaryFilePath);
-    ResourceResolver::setBaseURL( old_base );
-    Group *g = new Group;
-    g->children->push_back( root );
-    return g;
-    //return static_cast<Group *>(root);
+  //std::string binaryFilePath = resolved_url + binaryHandler->EX;
+ 
+  if (binaryHandler->openToRead(resolved_url)){
+    Node * root = binaryHandler->readBinaryRoot(resolved_url);
+    if (root != NULL) {
+      Group *g = new Group;
+      g->children->push_back(root);
+      ResourceResolver::setBaseURL(old_base);
+      H3DTIMER_END("createX3DNodeFromURL(" + url + ")");
+      return g;
+    }
   } 
   
   binary_thread.reset(new PeriodicThread(100));
   binary_thread->setThreadName("BinaryWriteThread");
   X3DToBinaryWrap * a = new X3DToBinaryWrap(binaryHandler, url);
   binary_thread->asynchronousCallback(&handleBinaryWriting,  a);
-  //Scene::addCallback (handleBinaryWriting,  a);
-
+ // Scene::addCallback (handleBinaryWriting,  a);
+#endif
 
 #ifdef HAVE_XERCES
   auto_ptr< SAX2XMLReader > parser( getNewXMLParser() );
