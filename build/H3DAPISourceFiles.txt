@@ -19,7 +19,9 @@ SET( ALL_BUILD_FILES "GLUTWindow.cpp"
 # These are the files that are not part of a unity build solution. They
 # will all be included in the UnityBuild.cpp file instead.
 SET( NON_UNITYBUILD_FILES 
-                 "Anchor.cpp"
+                 "X3DToBinary.cpp"
+				 
+				 "Anchor.cpp"
                  "AnyDevice.cpp"
                  "Appearance.cpp"
                  "Arc2D.cpp"
@@ -396,7 +398,9 @@ SET( NON_UNITYBUILD_FILES
 
 
 
-SET( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
+SET( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/X3DToBinary.h"
+
+					"${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/AnyDevice.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Appearance.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Arc2D.h"

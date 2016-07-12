@@ -6,8 +6,13 @@
 #define TIXML_USE_STL
 #endif
 
-#include <fstream>
 
+#ifdef H3D_WINDOWS
+#include <Windows.h>
+#endif // H3D_WINDOWS
+#include <sys/stat.h>
+
+#include <fstream>
 #include <sstream>
 
 #include <string>
@@ -165,6 +170,7 @@ private:
   H3D::X3D::DEFNodes* exported_nodes;
 
   const std::string VERSION;
+  const std::string EXT;
 
   std::map<std::string, unsigned int> Occurrences;
 
@@ -239,6 +245,8 @@ public:
   X3DToBinary(X3D::DEFNodes * _def_map, X3D::DEFNodes * _exported_nodes);
   ~X3DToBinary();
   
+  bool openToRead(std::string &filePath);
+  bool isX3DModified(std::string &filePath);
   void setFilePath(const std::string& fileToLoad);
   int writeToBinary (std::string fileToLoad);
   void readBinary (std::string fileToLoad);

@@ -379,18 +379,15 @@ int X3DToBinary::writeToBinary (std::string fileToLoad = "") {
   if(fileToLoad.empty()) fileToLoad = filePath;
   TiXmlDocument doc;
   doc.LoadFile(fileToLoad);
-  string::size_type to = fileToLoad.find_last_of( "/\\" );
-
-  std::string basePath;
-  if( to != string::npos ) {
-    basePath = fileToLoad.substr( 0, to + 1 );
-  }
-  std::string fileName = fileToLoad.substr(to+1, -1);
-  std::string pathToWrite = basePath + fileName + ".r";
-  remove(pathToWrite.c_str());
+  std::string pathToWrite = fileToLoad + ".inprogress";
+  std::remove(pathToWrite.c_str());
+  std::remove((fileToLoad + EXT).c_str());
+  if (myfile.is_open())
+    myfile.close();
   myfile.open (pathToWrite, std::fstream::out | std::fstream::app | std::ios::binary);
    if ( doc.ErrorId() == 0 ) {
      //put a flag at a very beginning to indicate if the file has been written successfuly
+
      std::string header = "" + VERSION;
      int headerLength = header.size();
      myfile.write(reinterpret_cast<const char*> (&headerLength), sizeof(int));
@@ -413,6 +410,7 @@ int X3DToBinary::writeToBinary (std::string fileToLoad = "") {
        }
        if(!root_found) {
          encode_to_binary_file_ID( pParent );
+
        }
      } else {
        encode_to_binary_file_ID( pParent );
@@ -421,7 +419,14 @@ int X3DToBinary::writeToBinary (std::string fileToLoad = "") {
    else {
      myfile << "Doc is not read correctly \n";
    }
+
+  /* myfile.seekp(myfile.beg);
+   myfile.write("<\"\"", 3 * sizeof(char));*/
    myfile.close();
+   if (rename(pathToWrite.c_str(), (fileToLoad + EXT).c_str()) == 0)
+     Console(LogLevel::Info) << "File successfully written and renamed. " << fileToLoad + EXT << std::endl;
+   else 
+     Console(LogLevel::Error) << "File could not be renamed: " << pathToWrite << std::endl;
    return 0;
 }
 
@@ -1756,10 +1761,11 @@ Node* X3DToBinary::parseNodesH3D(NodeFieldWrap* pParent, bool isRoot) {
     // map[nodeName] = end - start;
 }
 H3D::Node* X3DToBinary::readBinaryRoot(std::string fileToLoad){
-  myfile.open(fileToLoad, std::ios::binary | std::fstream::in);
-  int headerLength;
+  if (!myfile.is_open())
+        myfile.open(fileToLoad + EXT, std::ios::binary | std::ifstream::in);
 
-  if(myfile.is_open()){
+  int headerLength;
+	if(myfile.is_open()){
     std::string fileVersion;
     myfile.read((char *) &headerLength, sizeof(int));
     fileVersion = BUTILS::readString(myfile, headerLength);
@@ -1768,16 +1774,16 @@ H3D::Node* X3DToBinary::readBinaryRoot(std::string fileToLoad){
       nfw->pParent = new Node();
       nfw->field = false;
       Node* rootNode = parseNodesH3D(nfw, true);
+      
       myfile.close();
       return rootNode;
     } else {
-      std::cout << "Could not load. File Version: * " << fileVersion << " * is old. Current Version: " << VERSION << std::endl; 
+      Console(LogLevel::Warning)  << "Could not load. File Version: * " << fileVersion << " * is old. Current Version: " << VERSION << std::endl;
       return NULL;
     }
   }
-  myfile.close();
   return NULL;
-
+  
 }
 void X3DToBinary::setFilePath(const std::string& fileToLoad){
   filePath = fileToLoad;
@@ -1790,7 +1796,25 @@ void X3DToBinary::readBinary(std::string fileToLoad){
   }
   myfile.close();
 }
-X3DToBinary::X3DToBinary(X3D::DEFNodes * _def_map, X3D::DEFNodes * _exported_nodes) : VERSION("RA02"), DEF_map(_def_map), exported_nodes(_exported_nodes) {
+bool X3DToBinary::openToRead(std::string &filePath) {
+  std::string binaryFilePath = filePath + EXT;
+  if (!isX3DModified(filePath)) {
+    myfile.open(binaryFilePath, std::ios::binary | std::ifstream::in);
+    return myfile.is_open();
+  }
+  return false;
+}
+bool X3DToBinary::isX3DModified(std::string &filePath) {
+  struct _stat orig_file_stat, cache_file_stat;
+  if (_stat(filePath.c_str(), &orig_file_stat) != 0) 
+    return true;
+  if (_stat((filePath + EXT).c_str(), &cache_file_stat) != 0) 
+    return true;
+  if (cache_file_stat.st_mtime > orig_file_stat.st_mtime)
+    return false;
+  return true;
+}
+X3DToBinary::X3DToBinary(X3D::DEFNodes * _def_map, X3D::DEFNodes * _exported_nodes) : VERSION("H3DB01"), EXT(".h3db"), DEF_map(_def_map), exported_nodes(_exported_nodes) {
   if(!DEF_map) {
     DEF_map = new X3D::DEFNodes();
   }

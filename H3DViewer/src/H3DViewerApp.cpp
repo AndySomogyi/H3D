@@ -430,6 +430,7 @@ bool MyApp::OnInit()
 
   } catch (const Exception::H3DException &e) {
     cerr << e << endl;
+    H3DTIMER_END("Init H3DViewer");
     return false;
   }
 

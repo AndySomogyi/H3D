@@ -72,6 +72,10 @@
 #define H3D_WINDOWS
 #endif
 
+#ifndef HAVE_TINYXML
+#cmakedefine HAVE_TINYXML
+#endif
+
 /// Undef if you do not have xerces-c(http://xerces.apache.org/xerces-c/) 
 /// installed. Required for parsing xml based x3d files.
 #cmakedefine HAVE_XERCES
