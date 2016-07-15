@@ -30,6 +30,7 @@
 #define __GLUTWINDOW_H__
 
 #include <H3D/H3DWindowNode.h>
+#include <H3D/Scene.h>
 #ifdef HAVE_GLUT
 
 namespace H3D {
