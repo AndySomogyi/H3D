@@ -154,6 +154,8 @@ Group* X3D::createX3DFromURL(const string &url,
     ResourceResolver::setBaseURL(path);
   // ========== Handling binary files ======== 
 #ifdef X3DTOBINARY
+
+/*Sequence to read binaary forword is as the following */
   X3DToBinary* binaryHandler = new X3DToBinary(dn, exported_nodes);
   //std::string binaryFilePath = resolved_url + binaryHandler->EX;
 

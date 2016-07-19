@@ -180,7 +180,7 @@ private:
 
   //TimeStamp startTime, endTime, timeACCattrib, timeACCNodeNameCheck, timeACCDatabase;
   
-  std::vector<H3DNodeDatabase *> NodePointers;
+  std::vector<H3DNodeDatabase *> node_db_pointers;
 
 
   struct USE_NODE {
@@ -214,10 +214,10 @@ private:
     }
   };
 
-  void encode_to_binary_file_ID( TiXmlNode* p_parent);
-  int encode_attribs_to_binary_file_ID(TiXmlElement* p_element);
-  void encode_to_binary_cdata(TiXmlNode* p_parent);
-  int encode_attribs_to_binary_file_ID_Node(TiXmlElement* p_element, H3D::Node * pParent);
+  void writeNodeToFile( TiXmlNode* p_parent);
+  int writeAttributesToFile(TiXmlElement* p_element);
+  int writeAttributesToFile(TiXmlElement* p_element, H3D::Node * pParent);
+  void writeCDATAtoFile(TiXmlNode* p_parent);
   void initialiseNodeDB();
 
   Node* parseNodesH3D(NodeFieldWrap * pParent, bool isRoot);

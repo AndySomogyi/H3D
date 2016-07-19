@@ -154,7 +154,7 @@ void X3DToBinary::printOccurrences (std::string file_to_load) {
     std::cout << it->first << " => " << it->second << '\n';
 }
 
-int X3DToBinary::encode_attribs_to_binary_file_ID(TiXmlElement* p_element)
+int X3DToBinary::writeAttributesToFile(TiXmlElement* p_element)
 {
   if (!p_element) return 0;
 
@@ -233,7 +233,7 @@ int X3DToBinary::encode_attribs_to_binary_file_ID(TiXmlElement* p_element)
   }
   return i;
 }
-void X3DToBinary::encode_to_binary_cdata(TiXmlNode* p_parent) {
+void X3DToBinary::writeCDATAtoFile(TiXmlNode* p_parent) {
     int length = 5; // sizeof("cdata")
     int ID = 250;
     int num_atr = 1;
@@ -250,7 +250,7 @@ void X3DToBinary::encode_to_binary_cdata(TiXmlNode* p_parent) {
     myfile.write("s", sizeof(char));
     myfile.write(p_parent->Value(), num_of_bytes * sizeof(char)); 
 }
-void X3DToBinary::encode_to_binary_file_ID( TiXmlNode* p_parent)
+void X3DToBinary::writeNodeToFile( TiXmlNode* p_parent)
 {
 	if ( !p_parent ) return;
 
@@ -349,17 +349,17 @@ void X3DToBinary::encode_to_binary_file_ID( TiXmlNode* p_parent)
         pNewNode = H3D::H3DNodeDatabase::createNode(p_parent->ValueStr());
       }
       else {
-        pNewNode = NodePointers[ID]->createNode();
+        pNewNode = node_db_pointers[ID]->createNode();
       }
       if (pNewNode) {
         pNewNode->setManualInitialize(true);
-        num = encode_attribs_to_binary_file_ID_Node(p_parent->ToElement(), pNewNode);
+        num = writeAttributesToFile(p_parent->ToElement(), pNewNode);
       } 
       else
-        num = encode_attribs_to_binary_file_ID(p_parent->ToElement());
+        num = writeAttributesToFile(p_parent->ToElement());
     }
     else {
-      num = encode_attribs_to_binary_file_ID(p_parent->ToElement());
+      num = writeAttributesToFile(p_parent->ToElement());
     }
 
 	case TiXmlNode::TINYXML_COMMENT:
@@ -371,7 +371,7 @@ void X3DToBinary::encode_to_binary_file_ID( TiXmlNode* p_parent)
 		break;
 
 	case TiXmlNode::TINYXML_TEXT:
-    encode_to_binary_cdata(p_parent);
+    writeCDATAtoFile(p_parent);
 		//myfile << "Text: [" << pText->Value() << "]";
 		break;
 
@@ -387,14 +387,14 @@ void X3DToBinary::encode_to_binary_file_ID( TiXmlNode* p_parent)
 
 	for ( p_child = p_parent->FirstChild(); p_child != 0; p_child = p_child->NextSibling()) 
 	{
-		encode_to_binary_file_ID(p_child);
+		writeNodeToFile(p_child);
 	}
   
   
   //myfile << "\n" <<  ">" << pParent->ValueStr().length() << pParent->Value();
   //myfile << "\n" <<  ">";
 }
-int X3DToBinary::encode_attribs_to_binary_file_ID_Node(TiXmlElement* p_element, H3D::Node * p_parent)
+int X3DToBinary::writeAttributesToFile(TiXmlElement* p_element, H3D::Node * p_parent)
 {
   if (!p_element) return 0;
   TiXmlAttribute* p_attrib = p_element->FirstAttribute();
@@ -547,17 +547,17 @@ int X3DToBinary::writeToBinary (std::string file_to_load = "") {
        {	
          std::string name = pChild->Value();
          if (name == "Group" || name == "Scene" ) {
-           encode_to_binary_file_ID( pChild );
+           writeNodeToFile( pChild );
            root_found = true;
            break;
          }
        }
        if(!root_found) {
-         encode_to_binary_file_ID( p_parent );
+         writeNodeToFile( p_parent );
 
        }
      } else {
-       encode_to_binary_file_ID( p_parent );
+       writeNodeToFile( p_parent );
      }
    }
    else {
@@ -1475,40 +1475,42 @@ void X3DToBinary::readNextAttribute(Attribute &a)
 		break;
 	}
 }
+
+/*Initializes a vector which represents pointers to most commonly used nodes' database
+Order is important! Do not change the order of entries. Only push_back is allowed without breaking the code.
+If the order has to be changed following functions have to be updated as well: 
+parseNodeH3D() and writeNodeToFile()
+*/
 void X3DToBinary::initialiseNodeDB() {
   //Order is important corresponds to our encoding.
-  NodePointers.push_back(&Group::database);
-  NodePointers.push_back(&Transform::database);
-  NodePointers.push_back(&Shape::database);
-  NodePointers.push_back(&Coordinate::database);
-  NodePointers.push_back(&Appearance::database);
-  NodePointers.push_back(&Material::database);
-  NodePointers.push_back(&IndexedFaceSet::database);
-  NodePointers.push_back(&FrictionalSurface::database);
-  NodePointers.push_back(&ImageTexture::database);
-  NodePointers.push_back(&TextureTransform::database);
-  NodePointers.push_back(&TextureCoordinate::database);
-  NodePointers.push_back(&FitToBoxTransform::database);
-  //NodePointers.push_back(Shape::database);
-  //NodePointers.push_back(Material::database);
+  node_db_pointers.push_back(&Group::database);
+  node_db_pointers.push_back(&Transform::database);
+  node_db_pointers.push_back(&Shape::database);
+  node_db_pointers.push_back(&Coordinate::database);
+  node_db_pointers.push_back(&Appearance::database);
+  node_db_pointers.push_back(&Material::database);
+  node_db_pointers.push_back(&IndexedFaceSet::database);
+  node_db_pointers.push_back(&FrictionalSurface::database);
+  node_db_pointers.push_back(&ImageTexture::database);
+  node_db_pointers.push_back(&TextureTransform::database);
+  node_db_pointers.push_back(&TextureCoordinate::database);
+  node_db_pointers.push_back(&FitToBoxTransform::database);
 
-  NodePointers.push_back(&PointLight::database);
-  NodePointers.push_back(&DirectionalLight::database);
-  NodePointers.push_back(&ComposedShader::database);
-  NodePointers.push_back(&ShaderPart::database);
-  NodePointers.push_back(&PixelTexture::database);
-  NodePointers.push_back(&IndexedTriangleSet::database);
+  node_db_pointers.push_back(&PointLight::database);
+  node_db_pointers.push_back(&DirectionalLight::database);
+  node_db_pointers.push_back(&ComposedShader::database);
+  node_db_pointers.push_back(&ShaderPart::database);
+  node_db_pointers.push_back(&PixelTexture::database);
+  node_db_pointers.push_back(&IndexedTriangleSet::database);
 
-  NodePointers.push_back(&Normal::database);
+  node_db_pointers.push_back(&Normal::database);
+  node_db_pointers.push_back(&FloatVertexAttribute::database);
+  node_db_pointers.push_back(&CoordinateInterpolator::database);
+  node_db_pointers.push_back(&NormalInterpolator::database);
 
-  NodePointers.push_back(&FloatVertexAttribute::database);
-  NodePointers.push_back(&CoordinateInterpolator::database);
-  NodePointers.push_back(&NormalInterpolator::database);
-
-  
-  NodePointers.push_back(&TimeSensor::database);
-  NodePointers.push_back(&SmoothSurface::database);
-  NodePointers.push_back(&ToggleGroup::database);
+  node_db_pointers.push_back(&TimeSensor::database);
+  node_db_pointers.push_back(&SmoothSurface::database);
+  node_db_pointers.push_back(&ToggleGroup::database);
 }
 
 Node* X3DToBinary::parseNodesH3D(NodeFieldWrap* pParent, bool isRoot) {
@@ -1567,7 +1569,7 @@ Node* X3DToBinary::parseNodesH3D(NodeFieldWrap* pParent, bool isRoot) {
 				pNewNode = H3D::H3DNodeDatabase::createNode(node_name);
 			}
 			else {
-				pNewNode = NodePointers[node_id]->createNode();
+				pNewNode = node_db_pointers[node_id]->createNode();
 			}
 			//TimeStamp endTDatabase = TimeStamp::now();
 			//timeACCDatabase = timeACCDatabase + endTDatabase - startTDatabase;
@@ -1755,6 +1757,7 @@ void X3DToBinary::setFilePath(const std::string& file_to_load){
   filePath = file_to_load;
 }
 
+/*Tries to open binary file associated with the provided X3D file. Performs all the necessry checks*/
 bool X3DToBinary::openToRead(std::string &file_path) {
 	std::string base = ResourceResolver::getBaseURL();
 	//if (base != "objects\tools" && base != "x3d\eyes\components" && base != "x3d/scenes/../eyes/components/")
@@ -1770,6 +1773,8 @@ bool X3DToBinary::openToRead(std::string &file_path) {
 	}
 	return false;
 }
+
+/*Returns true if the timestamp of X3D file is newer than the one of H3DB file associated with it */
 bool X3DToBinary::isX3DModified(std::string &file_path) {
   struct _stat orig_file_stat, cache_file_stat;
   if (_stat(file_path.c_str(), &orig_file_stat) != 0) 
@@ -1780,6 +1785,10 @@ bool X3DToBinary::isX3DModified(std::string &file_path) {
     return false;
   return true;
 }
+
+/*Constructor required to specify file version to avoid confusion between reading and writing. VERSION will be cheked in readBinaryRoot() funciton 
+  DEF_map can be transfered between different X3D files using exported_nodes
+*/
 X3DToBinary::X3DToBinary(X3D::DEFNodes * _def_map, X3D::DEFNodes * _exported_nodes) : VERSION("H3DB01"), EXT(".h3db"), DEF_map(_def_map), exported_nodes(_exported_nodes) {
   if(!DEF_map) {
     DEF_map = new X3D::DEFNodes();
