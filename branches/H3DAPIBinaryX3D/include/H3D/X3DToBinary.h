@@ -207,14 +207,7 @@ private:
   void encode_to_binary_file_ID( TiXmlNode* pParent);
   int encode_attribs_to_binary_file_ID(TiXmlElement* pElement);
   void encode_to_binary_cdata(TiXmlNode* pParent);
-
-
-
-  int dump_attribs_to_stdout(TiXmlElement* pElement, unsigned int indent);
-  const char * getIndentAlt( unsigned int numIndents );
-  const char * getIndent( unsigned int numIndents );
-
-  //bool BothAreSpaces(char lhs, char rhs);
+  int encode_attribs_to_binary_file_ID_Node(TiXmlElement* pElement, H3D::Node * pParent);
 
   void initialiseNodeDB();
 
@@ -225,20 +218,13 @@ private:
   void handleCdataElement(NodeFieldWrap* parent);
   void handleProgramSettingElement( unsigned int numAttrib );
 
+  void readNextAttribute(Attribute & a);
+
   Node* parseNodesH3D(NodeFieldWrap * pParent, bool isRoot);
   void parseAttributesH3D(H3D::Node * pNewNode, std::string * pContainerField);
   Attribute* getNextAttribute();
-
-  
-  H3D::Node* parseNodesH3DRoot();
   
   void calculateOccurrences (TiXmlNode* pParent);
-
-
-
-void parseNodes();
-void parseAttributes();
-
 
   
 public:
@@ -249,7 +235,6 @@ public:
   bool isX3DModified(std::string &filePath);
   void setFilePath(const std::string& fileToLoad);
   int writeToBinary (std::string fileToLoad);
-  void readBinary (std::string fileToLoad);
   H3D::Node* readBinaryRoot(std::string fileToLoad);
   void printOccurrences (std::string fileToLoad);
  };

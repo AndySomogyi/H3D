@@ -156,43 +156,48 @@ void X3DToBinary::printOccurrences (std::string fileToLoad) {
 
 int X3DToBinary::encode_attribs_to_binary_file_ID(TiXmlElement* pElement)
 {
-	if ( !pElement ) return 0;
+  if (!pElement) return 0;
 
-	TiXmlAttribute* pAttrib=pElement->FirstAttribute();
-	int i=0;
-	int ival;
-	double dval;
+  TiXmlAttribute* pAttrib = pElement->FirstAttribute();
+  int i = 0;
+  int ival;
+  double dval;
 
-	while (pAttrib)
-	{
+  while (pAttrib)
+  {
+	  if (pAttrib->ValueStr().size() == 0) {
+		  pAttrib = pAttrib->Next();
+		  continue;
+	  }
+
     int length = strlen(pAttrib->Name());
 
-    if(pAttrib->QueryDoubleValue(&dval) == TIXML_SUCCESS || pAttrib->QueryIntValue(&ival) == TIXML_SUCCESS) {
+    if (pAttrib->QueryDoubleValue(&dval) == TIXML_SUCCESS || pAttrib->QueryIntValue(&ival) == TIXML_SUCCESS) {
       std::string str(pAttrib->Value());
-      
+
       std::string charToFill(" ");
       std::string charsToClear(" \t\n\v\f\r,");
-      
+
       std::vector<double> valuesD = BUTILS::getDoublesFromString(str, charsToClear);
-      
+
       int numVal = valuesD.size();
-      
+
       //skip elements with no attributes
       if (numVal == 0) {
-        pAttrib=pAttrib->Next();
-         continue;
+        pAttrib = pAttrib->Next();
+        continue;
       }
-       
+
       myfile.write(reinterpret_cast<const char *>(&length), sizeof(int));
       myfile.write(pAttrib->Name(), length);
 
-      if(pAttrib->QueryDoubleValue(&dval) == TIXML_SUCCESS) {
+      if (pAttrib->QueryDoubleValue(&dval) == TIXML_SUCCESS) {
 
         int numVal = valuesD.size();
         myfile.write(reinterpret_cast<const char *>(&numVal), sizeof(int));
         myfile.write("d", sizeof(char));
-        for(unsigned long long int i = 0; i < valuesD.size(); i++) {
-           double num = valuesD[i];
+        for (unsigned long long int i = 0; i < valuesD.size(); i++) {
+          double num = valuesD[i];
           myfile.write(reinterpret_cast<const char *>(&num), sizeof(double));
         }
       }
@@ -200,18 +205,19 @@ int X3DToBinary::encode_attribs_to_binary_file_ID(TiXmlElement* pElement)
 
         myfile.write(reinterpret_cast<const char *>(&numVal), sizeof(int));
         myfile.write("i", sizeof(char));
-        for(unsigned long long int i = 0; i < valuesD.size(); i++) {
-           double num = valuesD[i];
+        for (unsigned long long int i = 0; i < valuesD.size(); i++) {
+          double num = valuesD[i];
           myfile.write(reinterpret_cast<const char *>(&num), sizeof(double));
         }
       }
-      
-    
-    } else { // end if iteger 
+
+
+    }
+    else { // end if iteger 
 
       unsigned int numberOfBytes = pAttrib->ValueStr().length();
       if (numberOfBytes == 0) {
-        pAttrib=pAttrib->Next();
+        pAttrib = pAttrib->Next();
         continue;
       }
       myfile.write(reinterpret_cast<const char *>(&length), sizeof(int));
@@ -222,11 +228,11 @@ int X3DToBinary::encode_attribs_to_binary_file_ID(TiXmlElement* pElement)
 
 
     }// end IF is double or int 
-    
-		i++;
-		pAttrib=pAttrib->Next();
-	}
-	return i;	
+
+    i++;
+    pAttrib = pAttrib->Next();
+  }
+  return i;
 }
 void X3DToBinary::encode_to_binary_cdata(TiXmlNode* pParent) {
     int length = 5; // sizeof("cdata")
@@ -335,11 +341,28 @@ void X3DToBinary::encode_to_binary_file_ID( TiXmlNode* pParent)
     } else if (pParent->ValueStr() == "PROGRAM_SETTING") {
       ID = 243;
     } 
-
     myfile.write(reinterpret_cast<const char *>(&ID), sizeof(int));
     myfile.write(reinterpret_cast<const char *>(&numAtr), sizeof(int));
     myfile.write(reinterpret_cast<const char *>(&numChildren), sizeof(int));
-		num=encode_attribs_to_binary_file_ID(pParent->ToElement());
+    H3D::Node* pNewNode;
+
+    if (ID < 243 && ID > -2) {
+      if (ID == -1) {
+        pNewNode = H3D::H3DNodeDatabase::createNode(pParent->ValueStr());
+      }
+      else {
+        pNewNode = NodePointers[ID]->createNode();
+      }
+      if (pNewNode) {
+        pNewNode->setManualInitialize(true);
+        num = encode_attribs_to_binary_file_ID_Node(pParent->ToElement(), pNewNode);
+      } 
+      else
+        num = encode_attribs_to_binary_file_ID(pParent->ToElement());
+    }
+    else {
+      num = encode_attribs_to_binary_file_ID(pParent->ToElement());
+    }
 
 	case TiXmlNode::TINYXML_COMMENT:
 		//myfile << "Comment: [" << pParent->Value() << "]";
@@ -366,14 +389,138 @@ void X3DToBinary::encode_to_binary_file_ID( TiXmlNode* pParent)
 
 	for ( pChild = pParent->FirstChild(); pChild != 0; pChild = pChild->NextSibling()) 
 	{
-		encode_to_binary_file_ID( pChild);
+		encode_to_binary_file_ID(pChild);
 	}
   
   
   //myfile << "\n" <<  ">" << pParent->ValueStr().length() << pParent->Value();
   //myfile << "\n" <<  ">";
 }
+int X3DToBinary::encode_attribs_to_binary_file_ID_Node(TiXmlElement* pElement, H3D::Node * pParent)
+{
+  if (!pElement) return 0;
+  TiXmlAttribute* pAttrib = pElement->FirstAttribute();
+  int i = 0;
+  int ival;
+  double dval;
+  int fieldType;
+  H3D::Field * pField;
 
+  while (pAttrib)
+  {
+	  if (pAttrib->ValueStr().size() == 0) {
+		  pAttrib = pAttrib->Next();
+		  continue;
+	  }
+		  
+
+
+    int length = strlen(pAttrib->Name());
+    pField = pParent->getField(pAttrib->Name());
+    if (pField) {
+      fieldType = pField->getX3DType();
+      if (fieldType != H3D::X3DTypes::UNKNOWN_X3D_TYPE)
+      {
+        if (fieldType == H3D::X3DTypes::SFBOOL
+          || fieldType == H3D::X3DTypes::SFSTRING
+          || fieldType == H3D::X3DTypes::MFBOOL
+          || fieldType == H3D::X3DTypes::MFBOOL
+          || fieldType == H3D::X3DTypes::MFSTRING)
+        {
+          unsigned int numberOfBytes = pAttrib->ValueStr().length();
+          if (numberOfBytes == 0) {
+            pAttrib = pAttrib->Next();
+            continue;
+          }
+          myfile.write(reinterpret_cast<const char *>(&length), sizeof(int));
+          myfile.write(pAttrib->Name(), length);
+          myfile.write(reinterpret_cast<const char *>(&numberOfBytes), sizeof(int));
+          myfile.write("s", sizeof(char));
+          myfile.write(pAttrib->Value(), numberOfBytes * sizeof(char));
+
+        }
+        // DOUBLES
+        else
+        {
+          std::string str(pAttrib->Value());
+          std::string charToFill(" ");
+          std::string charsToClear(" \t\n\v\f\r,");
+          std::vector<double> valuesD = BUTILS::getDoublesFromString(str, charsToClear);
+          int numVal = valuesD.size();
+          myfile.write(reinterpret_cast<const char *>(&length), sizeof(int));
+          myfile.write(pAttrib->Name(), length);
+          myfile.write(reinterpret_cast<const char *>(&numVal), sizeof(int));
+          myfile.write("d", sizeof(char));
+          for (unsigned long long int i = 0; i < valuesD.size(); i++) {
+            double num = valuesD[i];
+            myfile.write(reinterpret_cast<const char *>(&num), sizeof(double));
+          }
+        }
+      }
+    }
+    else {
+      if (pAttrib->QueryDoubleValue(&dval) == TIXML_SUCCESS || pAttrib->QueryIntValue(&ival) == TIXML_SUCCESS) {
+        std::string str(pAttrib->Value());
+
+        std::string charToFill(" ");
+        std::string charsToClear(" \t\n\v\f\r,");
+
+        std::vector<double> valuesD = BUTILS::getDoublesFromString(str, charsToClear);
+
+        int numVal = valuesD.size();
+
+        //skip elements with no attributes
+        if (numVal == 0) {
+          pAttrib = pAttrib->Next();
+          continue;
+        }
+
+        myfile.write(reinterpret_cast<const char *>(&length), sizeof(int));
+        myfile.write(pAttrib->Name(), length);
+
+        if (pAttrib->QueryDoubleValue(&dval) == TIXML_SUCCESS) {
+
+          int numVal = valuesD.size();
+          myfile.write(reinterpret_cast<const char *>(&numVal), sizeof(int));
+          myfile.write("d", sizeof(char));
+          for (unsigned long long int i = 0; i < valuesD.size(); i++) {
+            double num = valuesD[i];
+            myfile.write(reinterpret_cast<const char *>(&num), sizeof(double));
+          }
+        }
+        else {
+
+          myfile.write(reinterpret_cast<const char *>(&numVal), sizeof(int));
+          myfile.write("i", sizeof(char));
+          for (unsigned long long int i = 0; i < valuesD.size(); i++) {
+            double num = valuesD[i];
+            myfile.write(reinterpret_cast<const char *>(&num), sizeof(double));
+          }
+        }
+
+
+      }
+      else { // end if iteger 
+
+        unsigned int numberOfBytes = pAttrib->ValueStr().length();
+        if (numberOfBytes == 0) {
+          pAttrib = pAttrib->Next();
+          continue;
+        }
+        myfile.write(reinterpret_cast<const char *>(&length), sizeof(int));
+        myfile.write(pAttrib->Name(), length);
+        myfile.write(reinterpret_cast<const char *>(&numberOfBytes), sizeof(int));
+        myfile.write("s", sizeof(char));
+        myfile.write(pAttrib->Value(), numberOfBytes * sizeof(char));
+
+
+      }// end IF is double or int 
+    }
+    i++;
+    pAttrib = pAttrib->Next();
+  }
+  return i;
+}
 
 int X3DToBinary::writeToBinary (std::string fileToLoad = "") {
   if(fileToLoad.empty()) fileToLoad = filePath;
@@ -417,7 +564,9 @@ int X3DToBinary::writeToBinary (std::string fileToLoad = "") {
      }
    }
    else {
-     myfile << "Doc is not read correctly \n";
+	   myfile.close();
+	   Console(LogLevel::Warning) << "H3DB: TinyXML could not load: " << fileToLoad << std::endl;
+	   return 1;
    }
 
   /* myfile.seekp(myfile.beg);
@@ -1004,7 +1153,7 @@ void X3DToBinary::handleRouteElement(unsigned int numAttribs, bool route_no_even
     } else if( to_field_name.empty() && attribName == "toField" ) {
       to_field_name = BUTILS::readString(myfile, numberOfValues);
     } else {
-      Console(LogLevel::Warning) << "Warning: Unknown attribute \"" << attribName  
+		Console(LogLevel::Warning) << "H3DB: Warning: Unknown attribute \"" << attribName  
            << "\" in ROUTE element " << endl;
     }
   }
@@ -1012,15 +1161,15 @@ void X3DToBinary::handleRouteElement(unsigned int numAttribs, bool route_no_even
    // All route attributes were not found, so whrow exception
   if( from_node_name.empty() ) {
     string message = "Invalid ROUTE specification. Missing \"fromNode\" attribute ";
-    Console(LogLevel::Error) << message << attribName  
+	Console(LogLevel::Error) << "H3DB: "<< message << attribName  
            << "\" in ROUTE element " << endl;
   } else if ( from_field_name.empty() ) {
     string message = "Invalid ROUTE specification. Missing \"fromField\" attribute ";
-    Console(LogLevel::Error) << message << attribName  
+    Console(LogLevel::Error) << "H3DB: " << message << attribName
            << "\" in ROUTE element " << endl;
   } else if ( to_node_name.empty() ) {
     string message = "Invalid ROUTE specification. Missing \"toNode\" attribute ";
-    Console(LogLevel::Error) << message << attribName  
+    Console(LogLevel::Error) << "H3DB: " << message << attribName
            << "\" in ROUTE element " << endl;
   }
   else if ( to_field_name.empty() ) {
@@ -1044,28 +1193,34 @@ void X3DToBinary::handleRouteElement(unsigned int numAttribs, bool route_no_even
             else
               from_field->routeNoEvent( to_field );
           } else {
-            Console(LogLevel::Warning) << "Warning: Route error. Could not find field named \"" 
-                 << to_field_name
-                 << "\" in \"" << to_node_name << "\" Node " 
-                        << endl;
+            Console(LogLevel::Warning) << "H3DB: " << "Warning: Route error. Could not find field named \""
+				<< to_field_name 
+				<< "\" in \"" 
+				<< to_node_name
+				<< "\" Node " 
+				<< filePath 
+				<< endl;
           }
         } else {
-          Console(LogLevel::Warning) << "Warning: Route error. Could not find Node named \"" 
+          Console(LogLevel::Warning) << "H3DB: " << "Warning: Route error. Could not find Node named \""
                << to_node_name
                << "\" specified in \"toNode\" attribute " 
+			   << filePath
                << endl;
         }
       } else {
-        Console(LogLevel::Warning) << "Warning: Route error. Could not find field named \"" 
+        Console(LogLevel::Warning) << "H3DB: " << "Warning: Route error. Could not find field named \""
              << from_field_name
              << "\" in \"" << from_node_name << "\" Node " 
-              << endl;
+			<< filePath
+			<< endl;
       }
     } else {
-      Console(LogLevel::Warning) << "Warning: Route error. Could not find Node named \"" 
-           << from_node_name
-           << "\" specified in \"fromNode\" attribute " 
-           << endl;
+      Console(LogLevel::Warning) << "H3DB: " << "Warning: Route error. Could not find Node named \""
+		  << from_node_name
+		  << "\" specified in \"fromNode\" attribute " 
+		  << filePath
+		  << endl;
     }
   }
 }
@@ -1120,7 +1275,7 @@ void X3DToBinary::handleFieldElement(unsigned int numAttribs, unsigned int numCh
      fieldValue = true;
      fieldValueType = valueType;
       } else {
-        Console(LogLevel::Warning) << "Warning: Unknown attribute \"" << attribName  
+        Console(LogLevel::Warning) << "H3DB: " << "Warning: Unknown attribute \"" << attribName
              << "\" in 'field' element " << endl;
       }
     }
@@ -1146,7 +1301,7 @@ void X3DToBinary::handleFieldElement(unsigned int numAttribs, unsigned int numCh
     if( !f ) {
       string message = 
         "Invalid value for 'type' attribute of 'field' specification.";
-      Console(LogLevel::Warning)<< message << std::endl;
+      Console(LogLevel::Warning) << "H3DB: " << message << std::endl;
     }
     
     f->setOwner( parent->pParent );
@@ -1165,7 +1320,7 @@ void X3DToBinary::handleFieldElement(unsigned int numAttribs, unsigned int numCh
     else {
       string message = 
         "Invalid value for 'accessType' attribute of 'field' specification.";
-      Console(LogLevel::Warning)<< message << std::endl;
+      Console(LogLevel::Warning) << "H3DB: " << message << std::endl;
     }
     
     if( fieldValue ) {
@@ -1176,7 +1331,7 @@ void X3DToBinary::handleFieldElement(unsigned int numAttribs, unsigned int numCh
         s << "Cannot parse field \"" << f->getFullName() 
           << "\". Field type must be a subclass of ParsableField "
           << "in order to be parsable. ";
-        Console(LogLevel::Warning)<< s.str() << std::endl;
+        Console(LogLevel::Warning) << "H3DB: " << s.str() << std::endl;
       }
       if( access_type == Field::INITIALIZE_ONLY ||
           access_type == Field::INPUT_OUTPUT ||
@@ -1198,7 +1353,7 @@ void X3DToBinary::handleFieldElement(unsigned int numAttribs, unsigned int numCh
             }
 
       } else {
-        Console(LogLevel::Warning) << "Warning: 'value' attribute ignored. Only used if "
+        Console(LogLevel::Warning) << "H3DB: " << "Warning: 'value' attribute ignored. Only used if "
              << "accesstype is initializeOnly, inputOnly or inputOutput " 
              << endl;
       }
@@ -1217,7 +1372,7 @@ void X3DToBinary::handleFieldElement(unsigned int numAttribs, unsigned int numCh
       Node * pDump = parseNodesH3D(nfw, false);
     }
   }  else {
-    Console(LogLevel::Warning) << "Warning: 'field' declaration in Node that is does not support"
+    Console(LogLevel::Warning) << "H3DB: " << "Warning: 'field' declaration in Node that is does not support"
          << " it " << endl;
     //node_stack.push( NodeElement( NULL ) ); 
   }
@@ -1269,7 +1424,7 @@ void X3DToBinary::handleImportElement(unsigned int numAttribs){
     } else if( as_name.empty() &&  attribName == "AS" ) {
       as_name = sValue;
     } else {
-      Console(LogLevel::Warning) << "Warning: Unknown attribute \"" << attribName  
+      Console(LogLevel::Warning) << "H3DB: " << "Warning: Unknown attribute \"" << attribName
              << "\" in 'field' element " << endl;
     }
   }
@@ -1277,15 +1432,15 @@ void X3DToBinary::handleImportElement(unsigned int numAttribs){
   if( inline_def_name.empty() ) {
     string message = 
         "Invalid 'field' specification. Missing \"name\" attribute";
-    Console(LogLevel::Warning) << message << std::endl;
+    Console(LogLevel::Warning) << "H3DB: " << message << std::endl;
   } else if ( exported_def_name.empty() ) {
     string message = 
         "Invalid 'field' specification. Missing \"type\" attribute";
-    Console(LogLevel::Warning)<< message << std::endl;
+    Console(LogLevel::Warning) << "H3DB: " << message << std::endl;
   } else if ( as_name.empty() ) {
     string message = 
         "Invalid 'field' specification. Missing \"accessType\" attribute";
-    Console(LogLevel::Warning)<< message << std::endl;
+    Console(LogLevel::Warning) << "H3DB: " << message << std::endl;
   } else {
     
     const std::string &s = exported_def_name;
@@ -1296,7 +1451,7 @@ void X3DToBinary::handleImportElement(unsigned int numAttribs){
         DEF_map->addNode(as_name, 
           import_node ); 
       } else {
-        Console(LogLevel::Warning) << "Warning: IMPORT error. H3D_EXPORTS " 
+        Console(LogLevel::Warning) << "H3DB: " << "Warning: IMPORT error. H3D_EXPORTS "
           << "does not include \""
           << exported_def_name << "\"" 
           << endl;
@@ -1311,18 +1466,18 @@ void X3DToBinary::handleImportElement(unsigned int numAttribs){
           DEF_map->addNode(as_name, 
                             import_node); 
         } else {
-          Console(LogLevel::Warning) << "Warning: IMPORT error. Inline node \"" 
+          Console(LogLevel::Warning) << "H3DB: " << "Warning: IMPORT error. Inline node \""
                << inline_def_name << "\" does not EXPORT \""
                << exported_def_name << "\"" 
                << endl;
         }
       } else {
         if( n ) {
-          Console(LogLevel::Warning) << "Warning: IMPORT error. Node \"" 
+          Console(LogLevel::Warning) << "H3DB: " << "Warning: IMPORT error. Node \""
                << inline_def_name << "\" is not an Inline node "
                << endl;
         } else {
-          Console(LogLevel::Warning) << "Warning: IMPORT error. Node named \"" 
+          Console(LogLevel::Warning) << "H3DB: " << "Warning: IMPORT error. Node named \""
                << inline_def_name << "\" does not exist."
                << endl;
         }
@@ -1374,7 +1529,7 @@ void X3DToBinary::handleExportElement( unsigned int numAttribs ) {
     } else if( as_name.empty() &&  attribName == "AS" ) {
       as_name = sValue;
     } else {
-      Console(LogLevel::Warning) << "Warning: Unknown attribute \"" << attribName  
+      Console(LogLevel::Warning) << "H3DB: " << "Warning: Unknown attribute \"" << attribName
              << " in EXPORT element" << endl;
     }
   }
@@ -1383,18 +1538,18 @@ void X3DToBinary::handleExportElement( unsigned int numAttribs ) {
   if( local_def_name.empty() ) {
     string message = 
         "Invalid 'EXPORT' specification. Missing \"localDEF\" attribute";
-    Console(LogLevel::Warning) << message << std::endl;
+    Console(LogLevel::Warning) << "H3DB: " << message << std::endl;
   }  else if ( as_name.empty() ) {
     string message = 
         "Invalid 'IMPORT' specification. Missing \"AS\" attribute";
-    Console(LogLevel::Warning)<< message << std::endl;
+    Console(LogLevel::Warning) << "H3DB: " << message << std::endl;
   } else {
     // Lookup the nodes and fields and set up the route.
     Node *n = DEF_map->getNode( local_def_name);
     if( n ) {
       exported_nodes->addNode(as_name, n ); 
     } else {
-      Console(LogLevel::Warning) << "Warning: EXPORT error. Node named \"" 
+      Console(LogLevel::Warning) << "H3DB: " << "Warning: EXPORT error. Node named \""
            << local_def_name << "\" does not exist."
            << endl;
     }
@@ -1465,7 +1620,7 @@ void X3DToBinary::handleProgramSettingElement( unsigned int numAttribs ) {
     } else if( attribName == "section" ) {
       setting_section = sValue;
     } else {
-      Console(LogLevel::Warning) << "Warning: Unknown attribute \"" << attribName  
+      Console(LogLevel::Warning) << "H3DB: " << "Warning: Unknown attribute \"" << attribName
              << " in PROGRAM_SETTING element" << endl;
     }
   }
@@ -1473,10 +1628,10 @@ void X3DToBinary::handleProgramSettingElement( unsigned int numAttribs ) {
             
   // All route attributes were not found, so whrow exception
   if( node_name.empty() ) {
-    std::cout << "Invalid PROGRAM_SETTING specification. Missing \"node\" attribute" << std::endl;
+    Console(LogLevel::Warning) << "H3DB: " << "Invalid PROGRAM_SETTING specification. Missing \"node\" attribute" << std::endl;
     
   } else if ( field_name.empty() ) {
-    std::cout << "Invalid PROGRAM_SETTING specification. Missing \"field\" attribute" << std::endl;
+   Console(LogLevel::Warning) << "H3DB: " << "Invalid PROGRAM_SETTING specification. Missing \"field\" attribute" << std::endl;
   } else {
     // Lookup the nodes and fields and set up the route.
     Node *node = DEF_map->getNode(node_name);
@@ -1489,13 +1644,13 @@ void X3DToBinary::handleProgramSettingElement( unsigned int numAttribs ) {
                                   setting_section  ); 
                                   
       } else {
-        Console(LogLevel::Warning) << "Warning: Program setting error. Could not find field named \"" 
+        Console(LogLevel::Warning) << "H3DB: " << "Warning: Program setting error. Could not find field named \""
              << field_name
              << "\" in \"" << node_name << "\" Node " 
              << endl;
       }
     } else {
-      Console(LogLevel::Warning) << "Warning: program setting error. Could not find Node named \"" 
+      Console(LogLevel::Warning) << "H3DB: " << "Warning: program setting error. Could not find Node named \""
            << node_name
            << "\" specified in \"node\" attribute " 
             << endl;
@@ -1503,6 +1658,33 @@ void X3DToBinary::handleProgramSettingElement( unsigned int numAttribs ) {
   }
 
   // push NULL on the node stack to skip elements within PROGRAM_SETTING element.
+}
+
+void X3DToBinary::readNextAttribute(Attribute &a)
+{
+	myfile.read((char *)&a.attributeNameLength, sizeof(int));
+	a.attribName = BUTILS::readString(myfile, a.attributeNameLength);
+	myfile.read((char *)&a.numberOfValues, sizeof(int));
+	myfile.read(&a.valueType, sizeof(char));
+
+	switch (a.valueType) {
+	case 'i':
+		a.iValues = new int[a.numberOfValues];
+		myfile.read((char*)a.iValues, a.numberOfValues * sizeof(int));
+
+		break;
+
+	case 'd':
+		a.dValues = new double[a.numberOfValues];
+		myfile.read((char*)a.dValues, a.numberOfValues * sizeof(double));
+
+		break;
+	case 's':
+		a.sValue = BUTILS::readString(myfile, a.numberOfValues);
+		break;
+	default:
+		break;
+	}
 }
 
 
@@ -1548,224 +1730,226 @@ void X3DToBinary::initialiseNodeDB() {
 }
 
 Node* X3DToBinary::parseNodesH3D(NodeFieldWrap* pParent, bool isRoot) {
-    // start = now()
-    int nodeNameSize = -1;
-    int numAttribs = -1;
-    int numChildren = -1;
-    int nodeID = -1;
-    std::string nodeName;
-    H3D::Node* pNewNode;
-    myfile.read((char*)&nodeNameSize, sizeof(int));
-    nodeName = BUTILS::readString(myfile, nodeNameSize);
-     //myfile.read(nodeName, nodeNameSize);
-    //nodeName[nodeNameSize] = '\0';
-    myfile.read((char*) &nodeID, sizeof(int));
-    myfile.read((char*) &numAttribs, sizeof(int));
-    myfile.read((char*) &numChildren, sizeof(int));
-    
-    //TimeStamp startTNameCheck = TimeStamp::now();
-    GlobalSettings *gs;
-    bool event;
-    switch (nodeID) {
-    case 243: //Program_Setting
-      handleProgramSettingElement( numAttribs );
-      break;
-    case 244: //ROUTE
-      event = GlobalSettings::default_x3d_route_sends_event;
-      gs = GlobalSettings::getActive();
-      if( gs ) event = gs->x3dROUTESendsEvent->getValue();
-      handleRouteElement(numAttribs, !event );
-      break;
-    case 245: //Route_No_Event
-      handleRouteElement(numAttribs, true );
-      break;
-    case 246: //ROUTE_WITH_EVENT
-      handleRouteElement(numAttribs, false );
-      break;
-    case 247: //IMPORT
-      handleImportElement( numAttribs );
-      break;
-    case 248: //EXPORT
-      handleExportElement( numAttribs );
-      break;
-    case 249: //field
-      handleFieldElement(numAttribs,numChildren, pParent);
-      break;
-    case 250: //CDATA
-      handleCdataElement(pParent);
-      break;
-    default:
-      //TimeStamp endTNameCheck = TimeStamp::now();
-     // timeACCNodeNameCheck = timeACCNodeNameCheck + endTNameCheck - startTNameCheck;
-      try { 
-        //TimeStamp startTDatabase = TimeStamp::now();
-        if(nodeID == -1) {
-          pNewNode = H3D::H3DNodeDatabase::createNode( nodeName );
-        }
-        else {
-          pNewNode = NodePointers[nodeID]->createNode();
-        }
-        //TimeStamp endTDatabase = TimeStamp::now();
-        //timeACCDatabase = timeACCDatabase + endTDatabase - startTDatabase;
+	// start = now()
+	int nodeNameSize = -1;
+	int numAttribs = -1;
+	int numChildren = -1;
+	int nodeID = -1;
+	std::string nodeName;
+	H3D::Node* pNewNode;
+	myfile.read((char*)&nodeNameSize, sizeof(int));
+	nodeName = BUTILS::readString(myfile, nodeNameSize);
+	//myfile.read(nodeName, nodeNameSize);
+	//nodeName[nodeNameSize] = '\0';
+	myfile.read((char*)&nodeID, sizeof(int));
+	myfile.read((char*)&numAttribs, sizeof(int));
+	myfile.read((char*)&numChildren, sizeof(int));
 
-      if( pNewNode ) {
-              // remove the initialization that occurs on first reference
-                // since we don't want it to occur until all child nodes
-                // have been created and set.
-                pNewNode->setManualInitialize( true );
+	//TimeStamp startTNameCheck = TimeStamp::now();
+	GlobalSettings *gs;
+	bool event;
+	switch (nodeID) {
+	case 243: //Program_Setting
+		handleProgramSettingElement(numAttribs);
+		break;
+	case 244: //ROUTE
+		event = GlobalSettings::default_x3d_route_sends_event;
+		gs = GlobalSettings::getActive();
+		if (gs) event = gs->x3dROUTESendsEvent->getValue();
+		handleRouteElement(numAttribs, !event);
+		break;
+	case 245: //Route_No_Event
+		handleRouteElement(numAttribs, true);
+		break;
+	case 246: //ROUTE_WITH_EVENT
+		handleRouteElement(numAttribs, false);
+		break;
+	case 247: //IMPORT
+		handleImportElement(numAttribs);
+		break;
+	case 248: //EXPORT
+		handleExportElement(numAttribs);
+		break;
+	case 249: //field
+		handleFieldElement(numAttribs, numChildren, pParent);
+		break;
+	case 250: //CDATA
+		handleCdataElement(pParent);
+		break;
+	default:
+		//TimeStamp endTNameCheck = TimeStamp::now();
+		// timeACCNodeNameCheck = timeACCNodeNameCheck + endTNameCheck - startTNameCheck;
+		try {
+			//TimeStamp startTDatabase = TimeStamp::now();
+			if (nodeID == -1) {
+				pNewNode = H3D::H3DNodeDatabase::createNode(nodeName);
+			}
+			else {
+				pNewNode = NodePointers[nodeID]->createNode();
+			}
+			//TimeStamp endTDatabase = TimeStamp::now();
+			//timeACCDatabase = timeACCDatabase + endTDatabase - startTDatabase;
 
-                // if node is a script node add the current named nodes
-                // from the current DEF_map and store the node in the 
-                // script_nodes vector. When parsing is done the named
-                // nodes will be updated in all scripts to contain
-                // all named nodes from the parsed file.
-                                
-                if( H3DScriptNode *script_node = 
-                    dynamic_cast< H3DScriptNode * >( pNewNode ) ) {
-                  script_node->addNamedNodes( DEF_map );
-                  script_nodes.push_back( script_node );
-                } 
-      } else {
-        std::cout << "Warning: Could not create \"" << nodeName
-          << "\" node. It does not exist in the H3DNod   eDatabase " << std::endl;
-      }
-      } catch (const H3D::Exception::H3DException &e) {
-        std::cout << "Warning: Could not create \"" << nodeName 
-          << "\" node. Exception in constructor: "
-          << e  << std::endl;
-    }
+			if (pNewNode) {
+				// remove the initialization that occurs on first reference
+				// since we don't want it to occur until all child nodes
+				// have been created and set.
+				pNewNode->setManualInitialize(true);
 
-    std::string containerFieldName = pNewNode ? pNewNode->defaultXMLContainerField() : std::string("") ;
-    useNode.USE = false;
-    useNode.COPY= false;
+				// if node is a script node add the current named nodes
+				// from the current DEF_map and store the node in the 
+				// script_nodes vector. When parsing is done the named
+				// nodes will be updated in all scripts to contain
+				// all named nodes from the parsed file.
 
-    for(int i = 0; i < numAttribs; ++i) {
-     // TimeStamp startTattr = TimeStamp::now();
-      parseAttributesH3D(pNewNode, &containerFieldName);
-      //TimeStamp endTAttr = TimeStamp::now();
-      //timeACCattrib = timeACCattrib + (endTAttr-startTattr);
-    }
-   
-    if( useNode.USE ) {
-      // if we have a USE attribute, lookup the matching node and use that.
-      pNewNode = DEF_map->getNode( useNode.nodeToUse);
-      if(containerFieldName.empty()) 
-        containerFieldName = pNewNode->defaultXMLContainerField();
-      if ( useNode.COPY && pNewNode )
-      {
-        if ( !useNode.defName.empty() )
-        {
-          Node *copied_node = pNewNode->clone();
-          DEF_map->addNode( useNode.defName, copied_node );
-          copied_node->setName( useNode.defName );
-          pNewNode = copied_node;
-        }
-        else
-        {
-          stringstream s;
-          s << "Invalid COPY attribute. " 
-            << "No DEF node name defined.";
-        }
-      }
-      
-      if( !pNewNode ) {
-        stringstream s;
-        s << "Invalid USE attribute. " 
-          << "No node with DEF name \"" << useNode.defName 
-          << "\" defined.";
-      }
-    }
-   
-    NodeFieldWrap* nfw = new NodeFieldWrap();
-    nfw->pParent = pNewNode;
-    nfw->isField = false;
-    
+				if (H3DScriptNode *script_node =
+					dynamic_cast< H3DScriptNode * >(pNewNode)) {
+					script_node->addNamedNodes(DEF_map);
+					script_nodes.push_back(script_node);
+				}
+			}
+			else {
+				Console(LogLevel::Warning) << "H3DB: " << "Warning: Could not create \"" << nodeName
+					<< "\" node. It does not exist in the H3DNode Database " << std::endl;
+			}
+		}
+		catch (const H3D::Exception::H3DException &e) {
+			Console(LogLevel::Warning) << "H3DB: " << "Warning: Could not create \"" << nodeName
+				<< "\" node. Exception in constructor: "
+				<< e << std::endl;
+		}
 
-   for (int i = 0; i < numChildren; ++i) 
-      Node * pDump = parseNodesH3D(nfw, false);
-    
-    
-   if( !pNewNode->isInitialized() && pNewNode->getManualInitialize() ) 
-      pNewNode->initialize();
+		std::string containerFieldName = pNewNode ? pNewNode->defaultXMLContainerField() : std::string("");
+		useNode.USE = false;
+		useNode.COPY = false;
 
-    //startTime = TimeStamp::now();
-    if(pParent->isField) {
-      Field::AccessType access_type = pParent->field->getAccessType();
-        if( access_type == Field::INITIALIZE_ONLY ||
-            access_type == Field::INPUT_OUTPUT ) {
-          SFNode *sf = dynamic_cast< SFNode *>( pParent->field );
-          if( sf ) { 
-            sf->setValue( pNewNode );
-          } else {
-            MFNode *mf = dynamic_cast< MFNode *>( pParent->field );
-            if( mf ) {
-              mf->push_back( pNewNode );
-            }
-            else Console(LogLevel::Warning) << "Warning: 'value' element ignored. Only used if "
-                      << "field type is SFNode or MFNode" 
-                      << endl;
-          }
-        } else {
-          Console(LogLevel::Warning) << "Warning: 'value' element ignored. Only used if "
-               << "accesstype is initializeOnly or inputOutput " 
-               << endl;
-        }
-    }
-    else {
-      H3D::Field *f = pParent->pParent->getField(containerFieldName);
-      if( f ) {
-        H3D::SFNode *sf = dynamic_cast< H3D::SFNode *>(f);
-        if(sf) {
-          sf->setValue(pNewNode);
-        }
-        else {
-          H3D::MFNode *mf = dynamic_cast< H3D::MFNode *>(f);
-          if( mf ) {
-            mf->push_back( pNewNode );
-          }
-        }
-      }
-      else { // (!f) Could not get field
-        std::cout << "Invalid containerField attribute \"" 
-          <<  containerFieldName
-          << "\". Field is not of type SFNode or MFNode.";
-      }
+		for (int i = 0; i < numAttribs; ++i) {
+			// TimeStamp startTattr = TimeStamp::now();
+			parseAttributesH3D(pNewNode, &containerFieldName);
+			//TimeStamp endTAttr = TimeStamp::now();
+			//timeACCattrib = timeACCattrib + (endTAttr-startTattr);
+		}
 
-    }
-    //endTime = TimeStamp::now();
-    //TimeStamp tSetField = endTime - startTime;
-    }
+		if (useNode.USE) {
+			// if we have a USE attribute, lookup the matching node and use that.
+			pNewNode = DEF_map->getNode(useNode.nodeToUse);
+			if (containerFieldName.empty())
+				containerFieldName = pNewNode->defaultXMLContainerField();
+			if (useNode.COPY && pNewNode)
+			{
+				if (!useNode.defName.empty())
+				{
+					Node *copied_node = pNewNode->clone();
+					DEF_map->addNode(useNode.defName, copied_node);
+					copied_node->setName(useNode.defName);
+					pNewNode = copied_node;
+				}
+				else
+				{
+					Console(LogLevel::Warning) << "H3DB: " << "Invalid COPY attribute. "
+						<< "No DEF node name defined.";
+				}
+			}
 
-    //TODO:Rustam: this has to be tested!
-    if( nodeName == "Inline" ) {
-      Inline *inline_node = dynamic_cast< Inline * >( pNewNode );
+			if (!pNewNode) {
+				Console(LogLevel::Warning) << "H3DB: " << "Invalid USE attribute. "
+					<< "No node with DEF name \"" << useNode.defName
+					<< "\" defined.";
+			}
+		}
 
-      if( inline_node ) {
-        const string &import_mode = inline_node->importMode->getValue();      
-        if( import_mode == "AUTO" || import_mode == "AUTO_IMPORT" ) {
-          DEF_map->merge( &inline_node->exported_nodes );
-        }
-      }
-    }
-    
-    if(!isRoot) 
-    {
-      return new Node();
-    }
-    else 
-    {
-      return pNewNode;
-    }
-    //std::cout << nodeNameSize << nodeName;
-    //end = now()
-    // map[nodeName] = end - start;
+		NodeFieldWrap* nfw = new NodeFieldWrap();
+		nfw->pParent = pNewNode;
+		nfw->isField = false;
+
+
+		for (int i = 0; i < numChildren; ++i)
+			Node * pDump = parseNodesH3D(nfw, false);
+
+
+		if (!pNewNode->isInitialized() && pNewNode->getManualInitialize())
+			pNewNode->initialize();
+
+		//startTime = TimeStamp::now();
+		if (pParent->isField) {
+			Field::AccessType access_type = pParent->field->getAccessType();
+			if (access_type == Field::INITIALIZE_ONLY ||
+				access_type == Field::INPUT_OUTPUT) {
+				SFNode *sf = dynamic_cast< SFNode *>(pParent->field);
+				if (sf) {
+					sf->setValue(pNewNode);
+				}
+				else {
+					MFNode *mf = dynamic_cast< MFNode *>(pParent->field);
+					if (mf) {
+						mf->push_back(pNewNode);
+					}
+					else Console(LogLevel::Warning) << "H3DB: " << "Warning: 'value' element ignored. Only used if "
+						<< "field type is SFNode or MFNode"
+						<< endl;
+				}
+			}
+			else {
+				Console(LogLevel::Warning) << "H3DB: " << "Warning: 'value' element ignored. Only used if "
+					<< "accesstype is initializeOnly or inputOutput "
+					<< endl;
+			}
+		}
+		else {
+			H3D::Field *f = pParent->pParent->getField(containerFieldName);
+			if (f) {
+				H3D::SFNode *sf = dynamic_cast< H3D::SFNode *>(f);
+				if (sf) {
+					sf->setValue(pNewNode);
+				}
+				else {
+					H3D::MFNode *mf = dynamic_cast< H3D::MFNode *>(f);
+					if (mf) {
+						mf->push_back(pNewNode);
+					}
+				}
+			}
+			else { // (!f) Could not get field
+				if (!isRoot) {
+					Console(LogLevel::Error) << "H3DB: " << "Invalid containerField attribute \""
+						<< containerFieldName << ". Parent: " << pParent->pParent->getName() << std::endl << " New Node: " << pNewNode->getFullName();
+				}
+			}
+
+		}
+		//endTime = TimeStamp::now();
+		//TimeStamp tSetField = endTime - startTime;
+	}
+
+	//TODO:Rustam: this has to be tested!
+	if (nodeName == "Inline") {
+		Inline *inline_node = dynamic_cast< Inline * >(pNewNode);
+
+		if (inline_node) {
+			const string &import_mode = inline_node->importMode->getValue();
+			if (import_mode == "AUTO" || import_mode == "AUTO_IMPORT") {
+				DEF_map->merge(&inline_node->exported_nodes);
+			}
+		}
+	}
+
+	if (!isRoot)
+	{
+		return nullptr;
+	}
+	else
+	{
+		return pNewNode;
+	}
+	//std::cout << nodeNameSize << nodeName;
+	//end = now()
+	// map[nodeName] = end - start;
 }
 H3D::Node* X3DToBinary::readBinaryRoot(std::string fileToLoad){
   if (!myfile.is_open())
         myfile.open(fileToLoad + EXT, std::ios::binary | std::ifstream::in);
-
   int headerLength;
-	if(myfile.is_open()){
+  if(myfile.is_open()){
     std::string fileVersion;
     myfile.read((char *) &headerLength, sizeof(int));
     fileVersion = BUTILS::readString(myfile, headerLength);
@@ -1778,31 +1962,32 @@ H3D::Node* X3DToBinary::readBinaryRoot(std::string fileToLoad){
       myfile.close();
       return rootNode;
     } else {
-      Console(LogLevel::Warning)  << "Could not load. File Version: * " << fileVersion << " * is old. Current Version: " << VERSION << std::endl;
+      Console(LogLevel::Warning) << "H3DB: " << "Could not load. File Version: * " << fileVersion << " * is old. Current Version: " << VERSION << std::endl;
       return NULL;
     }
   }
+  Console(LogLevel::Error) << "H3DB: " << "Could not load BINARY file: " << fileToLoad << EXT << std::endl;
   return NULL;
   
 }
 void X3DToBinary::setFilePath(const std::string& fileToLoad){
   filePath = fileToLoad;
 }
-void X3DToBinary::readBinary(std::string fileToLoad){
 
-  myfile.open("D:\\Rustam\\testscenes\\example.txt", std::ios::binary | std::fstream::in);
-  if(myfile.is_open()){
-    //parseNodesH3D();
-  }
-  myfile.close();
-}
 bool X3DToBinary::openToRead(std::string &filePath) {
-  std::string binaryFilePath = filePath + EXT;
-  if (!isX3DModified(filePath)) {
-    myfile.open(binaryFilePath, std::ios::binary | std::ifstream::in);
-    return myfile.is_open();
-  }
-  return false;
+	std::string base = ResourceResolver::getBaseURL();
+	//if (base != "objects\tools" && base != "x3d\eyes\components" && base != "x3d/scenes/../eyes/components/")
+	//{
+	//	Console(LogLevel::Warning) << "H3DB: " << "Omitting files in: " << base << std::endl;
+	//	return false;
+	//}
+	//Console(LogLevel::Warning) << "H3DB: " << "Opened files in: " << base << std::endl;
+	std::string binaryFilePath = filePath + EXT;
+	if (!isX3DModified(filePath)) {
+		myfile.open(binaryFilePath, std::ios::binary | std::ifstream::in);
+		return myfile.is_open();
+	}
+	return false;
 }
 bool X3DToBinary::isX3DModified(std::string &filePath) {
   struct _stat orig_file_stat, cache_file_stat;
