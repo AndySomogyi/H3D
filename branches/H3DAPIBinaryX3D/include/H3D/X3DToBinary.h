@@ -153,99 +153,124 @@
 
 namespace H3D {
 
-struct NodeFieldWrap {
-  bool is_field;
-  Field *field;
-  Node *pParent;
-};
+	struct NodeFieldWrap {
+		bool is_field;
+		Field *field;
+		Node *pParent;
+	};
+
+
+	/*A class that handles writing and reading from binary x3d file format
+	The file format is as following:
+	The header is omitted. All binary files start with <Scene>
+	For example:
+	<?xml version="1.0" encoding="utf-8"?>
+	<X3D profile='Full' version='3.2'>
+	  <head>
+	    <meta name='title' content='Box.x3d'/>
+	    <meta name='description' content='X3D Box node example.'/>
+	    <meta name='author' content='SenseGraphics AB, 2006-2014'/>
+	  </head>
+	  <Scene>
+	    <Viewpoint position='0   0    0.6666666666666666    ' />
+	    <Shape DEF="myshape">
+	      <Box size='0.2 0.1 0.05' solid='true' />
+	    </Shape>
+	  </Scene>
+	</X3D>
+
+	Will be stored as ===== >
+	5Scene0 0 1 --------------------------------------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren]
+	  9Viewpoint-110 8position3d 0 0 0.666666 --------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][double][double][double]
+	  5Shape2 1 2 3DEF7s myshape ---------------------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][char]...[char]
+	    3Box-1 2 0 4size3d 0.2 0.1 0.05 5solid4s true ------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][double][double][double][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][char]...[char]
+
+	Ignore all the spaces and identation. they are here only for readability
+
+	*/
+	class X3DToBinary {
+	private:
+
+		//TiXmlDocument doc;
+		std::string current_file;
+		H3D::X3D::DEFNodes* DEF_map;
+		H3D::X3D::DEFNodes* exported_nodes;
+
+		const std::string VERSION;
+		const std::string EXT;
+
+		std::map<std::string, unsigned int> Occurrences;
+
+		std::fstream file_stream;
+
+		AutoRefVector< H3DScriptNode > script_nodes;
+
+		std::vector<H3DNodeDatabase *> node_db_pointers;
+
+
+		struct USE_NODE {
+			bool use_attrib, copy_attrib;
+			std::string node_to_use;
+			std::string def_name;
+		} useNode;
+
+		struct Attribute {
+			unsigned int attribute_name_length;
+			std::string attrib_name;
+			unsigned int number_of_values;
+			char value_type;
+			std::string s_value;
+			int* i_values;
+			double* d_values;
+			~Attribute() {
+				switch (value_type)
+				{
+				case 'i':
+					delete[] i_values;
+					break;
+				case 'd':
+					delete[] d_values;
+					break;
+				default:
+					break;
+				}
+
+
+			}
+		};
+
+		void writeNodeToFile(TiXmlNode* p_parent);
+		int writeAttributesToFile(TiXmlElement* p_element);
+		int writeAttributesToFile(TiXmlElement* p_element, H3D::Node * pParent, bool is_field);
+		void writeCDATAtoFile(TiXmlNode* p_parent);
+		void initialiseNodeDB();
+
+		H3D::Node* parseNodesH3D(NodeFieldWrap * pParent, bool isRoot);
+		void parseAttributesH3D(H3D::Node * pNewNode, std::string * p_container_field_name);
+		void readNextAttribute(Attribute & a);
+		void handleRouteElement(unsigned int num_of_attribs, bool route_no_event);
+		void handleFieldElement(unsigned int num_of_attribs, unsigned int num_of_children, NodeFieldWrap* pParent);
+		void handleImportElement(unsigned int num_of_attribs);
+		void handleExportElement(unsigned int num_of_attribs);
+		void handleCdataElement(NodeFieldWrap* parent);
+		void handleProgramSettingElement(unsigned int num_of_attribs);
 
 
 
-class X3DToBinary{
-private:
-  
-  //TiXmlDocument doc;
-  std::string filePath;
-  H3D::X3D::DEFNodes* DEF_map;
-  H3D::X3D::DEFNodes* exported_nodes;
-
-  const std::string VERSION;
-  const std::string EXT;
-
-  std::map<std::string, unsigned int> Occurrences;
-
-  std::fstream myfile;
-
-  AutoRefVector< H3DScriptNode > script_nodes;
-
-  //TimeStamp startTime, endTime, timeACCattrib, timeACCNodeNameCheck, timeACCDatabase;
-  
-  std::vector<H3DNodeDatabase *> node_db_pointers;
+		void calculateOccurrences(TiXmlNode* pParent);
 
 
-  struct USE_NODE {
-    bool use_attrib, copy_attrib;
-    std::string node_to_use;
-    std::string def_name;
-  } useNode;
- 
-  struct Attribute {
-    unsigned int attribute_name_length;
-    std::string attrib_name;
-    unsigned int number_of_values;
-    char value_type;
-    std::string s_value;
-    int* i_values;
-    double* s_values;
-    ~Attribute() {
-		switch (value_type)
-		{
-		case 'i':
-			delete[] i_values;
-			break;
-		case 'd':
-			delete[] s_values;
-			break;
-		default:
-			break;
-		}
-    
-  
-    }
-  };
+	public:
+		X3DToBinary(X3D::DEFNodes * _def_map, X3D::DEFNodes * _exported_nodes);
+		~X3DToBinary();
 
-  void writeNodeToFile( TiXmlNode* p_parent);
-  int writeAttributesToFile(TiXmlElement* p_element);
-  int writeAttributesToFile(TiXmlElement* p_element, H3D::Node * pParent);
-  void writeCDATAtoFile(TiXmlNode* p_parent);
-  void initialiseNodeDB();
-
-  Node* parseNodesH3D(NodeFieldWrap * pParent, bool isRoot);
-  void parseAttributesH3D(H3D::Node * pNewNode, std::string * p_container_field_name);
-  void readNextAttribute(Attribute & a);
-  void handleRouteElement(unsigned int num_of_attribs, bool route_no_event  );
-  void handleFieldElement( unsigned int num_of_attribs, unsigned int num_of_children, NodeFieldWrap* pParent);
-  void handleImportElement(unsigned int num_of_attribs);
-  void handleExportElement(unsigned int num_of_attribs);
-  void handleCdataElement(NodeFieldWrap* parent);
-  void handleProgramSettingElement( unsigned int num_of_attribs );
-
-
-
-  void calculateOccurrences (TiXmlNode* pParent);
-
-  
-public:
-  X3DToBinary(X3D::DEFNodes * _def_map, X3D::DEFNodes * _exported_nodes);
-  ~X3DToBinary();
-  
-  bool openToRead(std::string &file_path);
-  bool isX3DModified(std::string &file_path);
-  void setFilePath(const std::string& file_to_load);
-  int writeToBinary (std::string file_to_load);
-  H3D::Node* readBinaryRoot(std::string file_to_load);
-  void printOccurrences (std::string file_to_load);
- };
+		bool openToRead(std::string &file_path);
+		bool isX3DModified(std::string &file_path);
+		void setFilePath(const std::string& file_to_load);
+		int writeToBinary(std::string file_to_load);
+		H3D::Node* readBinaryRoot(std::string file_to_load);
+		void printOccurrences(std::string file_to_load);
+	};
 
 }
 
