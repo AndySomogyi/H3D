@@ -49,6 +49,7 @@ namespace ShaderPartInternals {
   FIELDDB_ELEMENT( ShaderPart, url, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ShaderPart, type, INITIALIZE_ONLY );
   FIELDDB_ELEMENT( ShaderPart, forceReload, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( ShaderPart, shaderString, INPUT_OUTPUT );
 }
 
 namespace {
@@ -71,9 +72,6 @@ ShaderPart::ShaderPart( Inst< SFNode         > _metadata,
   parent_composed_shader( NULL ){
   type_name = "ShaderPart";
   database.initFields( this );
-
-  shaderString->setOwner( this );
-  shaderString->setName( "shaderString" );
 
   addInlinePrefix( "glsl" );
 

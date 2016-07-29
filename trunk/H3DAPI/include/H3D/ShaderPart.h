@@ -156,9 +156,14 @@ namespace H3D {
     /// \dotfile ShaderPart_type.dot
     auto_ptr< SFString > type;
 
-    /// Internal field that contains the string loaded from file and
+    /// A field that contains the string loaded from file and
     /// to be used as input to the shader.
+    ///
+    /// Access should logically be outputOnly, but is inputOutput for 
+    /// backward compatibility (to avoid access exceptions in external code).
+    /// It may be changed in future (major) releases.
     /// 
+    /// <b>Access type:</b> inputOutput \n
     /// \dotfile ShaderPart_shaderString.dot
     auto_ptr< SFShaderString > shaderString;
 
