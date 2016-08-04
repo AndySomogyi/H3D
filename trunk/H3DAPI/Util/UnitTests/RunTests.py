@@ -244,7 +244,7 @@ class TestCaseRunner ( object ):
       All of these values default to None
     The list will contain one namedtuple for each Section in the specified definition file
     """
-    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20, 'resolution': None, 'processargs': ''}, allow_no_value=True)
+    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20, 'resolution': None, 'processargs': '', 'physics_engine': None}, allow_no_value=True)
     try:
       confParser.read(file_path)
     except:
@@ -253,7 +253,7 @@ class TestCaseRunner ( object ):
     result = []
     for sect in confParser.sections():
       if sect != 'Default':
-        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials'])
+        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials', 'physics_engine'])
         test_case.name = sect
         test_case.x3d = confParser.get(sect, 'x3d')
         test_case.baseline = confParser.get(sect, 'baseline folder')
@@ -288,6 +288,11 @@ class TestCaseRunner ( object ):
           test_case.maxtrials = confParser.getint(sect, 'maxtrials')
         except:
           test_case.maxtrials = 1
+
+        try:
+          test_case.physics_engine = confParser.get(sect, 'physics_engine')
+        except:
+          test_case.physics_engine = None
 
         if args.case == "" or args.case == test_case.name:
           result.append(test_case)
@@ -326,7 +331,12 @@ class TestCaseRunner ( object ):
                                                                   testCase.starttime,
                                                                   os.path.join(args.RunTestsDir, 'UnitTestBoilerplate.py'))
     v = Variation (testCase.name, script)
+    # Check if we should change the physics engine being used for this test and if so then use Variation's Option feature to ensure the test is run with that engine
+    if not testCase.physics_engine is None:
+      v.options.append ( Option ( ["RigidBodyCollection"], "physicsEngine", testCase.physics_engine ) )
+
     # Create a temporary x3d file containing our injected script
+
     original_path = os.path.join(directory, testCase.x3d)
     try:
       if os.path.exists(original_path+'_original.x3d'):
