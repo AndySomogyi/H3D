@@ -73,13 +73,37 @@ namespace H3D {
     /// consists of the Field causing the event and a TimeStamp for when
     /// the event was generated.
     struct H3DAPI_API Event {
-      Event( Field *_ptr, const TimeStamp &_time_stamp ):
+
+      /// Constructor
+      Event( Field *_ptr, const TimeStamp &_time_stamp, H3DTime _event_time = -1 ):
         ptr( _ptr ),
-        time_stamp( _time_stamp ) {}
+        time_stamp( _time_stamp ) {
+        // If given event time is < 0, generate it, otherwise use it
+        event_time = _event_time < 0 ? generateEventTime() : _event_time;
+      }
+
       /// The Field that caused the event.
       Field *ptr;
+
       /// The time of the event.
-      TimeStamp time_stamp;       
+      TimeStamp time_stamp;
+      
+      /// A value which is unique for each triggered event and always increasing
+      /// with each subsequent event. This is required since events created in 
+      /// quick succession may have identical time_stamp values due to the limits of 
+      /// the timer's precision
+      H3DTime event_time;
+
+    protected:
+      /// Provides a value which is guaranteed to be unique (unlike TimeStamp())
+      /// and always increasing
+      static H3DTime generateEventTime() {
+        last_event_time += H3DUtil::Constants::d_epsilon;
+        return last_event_time;
+      }
+
+      /// Last used globally unique time
+      static H3DTime last_event_time;
     };    
 
     /// Constructor.
