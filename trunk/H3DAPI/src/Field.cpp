@@ -38,6 +38,8 @@ using namespace std;
 
 using namespace H3D;
 
+H3DTime Field::Event::last_event_time = 0;
+
 Field::Field( ) : 
   name( "" ),
   event( 0, 0 ),
@@ -338,11 +340,14 @@ void Field::propagateEvent( Event e ) {
 #ifdef DEBUG
   Console(LogLevel::Debug) << "Field(" << getFullName() << ")::propagateEvent()" << endl;
 #endif
-  if ( !event_lock && /*!event.ptr && */ e.time_stamp > event.time_stamp ) {
-    event.time_stamp = e.time_stamp;
-    event.ptr = e.ptr;
+  // Note: Check that the incoming event is newer than the existing event.
+  // If a new event is triggered during an existing event's propagation, then
+  // it is possible that the incoming event is older than the existing one, and
+  // in this case we do not need to continue the propagation
+  if ( !event_lock && /*!event.ptr && */ e.event_time > event.event_time ) {
+    event = e;
     event_lock = true;
-    Event newe( this, event.time_stamp );
+    Event newe( this, event.time_stamp, event.event_time );
     for( unsigned int i = 0; i < routes_out.size(); ++i ) {
       Field *f = routes_out[i];
       f->propagateEvent( newe );
