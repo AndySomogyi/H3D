@@ -104,7 +104,6 @@ namespace H3D {
 
       /// Last used globally unique time
       static H3DTime last_event_time;
-      static bool event_is_drifting;
     };    
 
     /// Constructor.
