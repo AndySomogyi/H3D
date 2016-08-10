@@ -83,15 +83,23 @@ bool DicomImageLoader::supportsFileType( const string &url ) {
   // temporarily shut down console to avoid warning messages from
   // dcmtk while checking if supported.
   H3DUtil::Console.disable();
+    
+    log4cplus::Logger log = log4cplus::Logger::getRoot();
+    log4cplus::LogLevel old_level = log.getLogLevel();
+    // make DCMTK less likely to send out messages to console which is disabled
+    // Note: better to competely disable it if it is possible
+    log.setLogLevel( OFLogger::FATAL_LOG_LEVEL );
 
-  DcmFileFormat fileformat;
-  OFCondition status = fileformat.loadFile( url.c_str(), EXS_Unknown, 
-                                            EGL_noChange, 0 );
 
-  // restore console output level.
-  H3DUtil::Console.enable();
-  
-  return status.good();
+    DcmFileFormat fileformat;
+    OFCondition status = fileformat.loadFile( url.c_str(), EXS_Unknown,
+      EGL_noChange, 0 );
+    // restore console output level.
+    H3DUtil::Console.enable();
+    log.setLogLevel( old_level );
+    return status.good();
+
+
 }
 
 H3D::Image *DicomImageLoader::loadImage( const string &url ) {
