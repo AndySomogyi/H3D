@@ -98,7 +98,7 @@ void Field::route( Field *f, int id ) {
     }
     
     // create new event, with a new timestamp
-    event.time_stamp = TimeStamp::now();
+    event.time_stamp = Event::generateEventTime();
     Event e( this, event.time_stamp );
     event_lock = true;
     f->propagateEvent( e );
@@ -230,7 +230,7 @@ Field * Field::replaceRoute( Field *f, unsigned int i, int id ) {
     Field *replaced_field = f->replaceRouteFrom( this, i, id );
 
     // create new event, with a new timestamp
-    event.time_stamp = TimeStamp::now();
+    event.time_stamp = Event::generateEventTime();
     Event e( this, event.time_stamp );
     event_lock = true;
     f->propagateEvent( e );
@@ -307,7 +307,7 @@ void Field::touch() {
   Console(LogLevel::Debug) << "Field(" << getFullName() << ")::touch()" << endl;
 #endif
   // create new event, with a new timestamp
-  event.time_stamp = TimeStamp::now();
+  event.time_stamp = Event::generateEventTime();
   Event e( this, event.time_stamp );
 
   event_lock = true;
@@ -324,7 +324,7 @@ void Field::startEvent() {
   Console(LogLevel::Debug) << "Field(" << getFullName() << ")::startEvent()" << endl;
 #endif
   // create new event, with a new timestamp
-  event.time_stamp = TimeStamp::now();
+  event.time_stamp = Event::generateEventTime();
   event.ptr = 0;
   Event e( this, event.time_stamp );
 
@@ -344,10 +344,10 @@ void Field::propagateEvent( Event e ) {
   // If a new event is triggered during an existing event's propagation, then
   // it is possible that the incoming event is older than the existing one, and
   // in this case we do not need to continue the propagation
-  if ( !event_lock && /*!event.ptr && */ e.event_time > event.event_time ) {
+  if ( !event_lock && /*!event.ptr && */ e.time_stamp > event.time_stamp ) {
     event = e;
     event_lock = true;
-    Event newe( this, event.time_stamp, event.event_time );
+    Event newe( this, event.time_stamp );
     for( unsigned int i = 0; i < routes_out.size(); ++i ) {
       Field *f = routes_out[i];
       f->propagateEvent( newe );
