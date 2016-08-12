@@ -11,7 +11,24 @@ import traceback
 
 
 
-timer_callback = TimerCallback()
+timer_callbacks = {}
+
+def scheduleCallback ( timeSource, time, func, data ):
+  """ Schedule a delayed callback, using a custom field as the timer.
+  """
+  
+  if not id(timeSource) in timer_callbacks:
+    timer = TimerCallback ()
+    # Replace time source
+    for f in timer.getRoutesIn():
+      f.unroute ( timer )
+    timeSource.routeNoEvent ( timer )
+    timer_callbacks[id(timeSource)] = timer
+  else:
+    timer = timer_callbacks[id(timeSource)]
+  
+  # Add out callback
+  timer.addCallback ( time, func, data )
 
 class UnitTestHelper :
   def __init__( self, early_shutdown_file, output_file_prefix, screenshot_filename_prefix):
@@ -55,6 +72,8 @@ class UnitTestHelper :
       self.last_func = func_data[1]
       start_time = None
       run_time = None
+      time_source = time
+      absolute_time = False
       for validation in func.validation:
         if 'start_time' in validation:
           if start_time is None or start_time < validation['start_time']:
@@ -62,9 +81,13 @@ class UnitTestHelper :
         if 'run_time' in validation:
           if run_time is None or run_time < validation['run_time']:
             run_time = validation['run_time']
+        if 'time_source' in validation and not validation['time_source'] is None:
+          time_source = validation['time_source']
+        if 'absolute_time' in validation and not validation['absolute_time'] is None:
+          absolute_time = validation['absolute_time']
 
       if not(start_time is None):
-        timer_callback.addCallback(time.getValue()+start_time, UnitTestHelper.startFuncDelayed, (self,func, run_time))
+        scheduleCallback ( time_source, (0 if absolute_time else time_source.getValue())+start_time, UnitTestHelper.startFuncDelayed, (self,func, run_time, time_source) )
       else:
         try:
           for validation in func.validation:
@@ -77,9 +100,9 @@ class UnitTestHelper :
           print "Exception in step " + func.__name__ + ": " + str(e)
           traceback.print_exc(3)
         if(not (run_time is None)):
-          timer_callback.addCallback(time.getValue()+run_time, UnitTestHelper.doTesting, (self,))
+          scheduleCallback ( time_source, time_source.getValue()+run_time, UnitTestHelper.doTesting, (self,))
         else:
-          timer_callback.addCallback(time.getValue()+1, UnitTestHelper.doTesting, (self,))          
+          scheduleCallback ( time_source, time_source.getValue()+1, UnitTestHelper.doTesting, (self,))          
       return
     except Exception as e:
       shutdown_file = open( self.early_shutdown_file, 'w' )
@@ -88,7 +111,7 @@ class UnitTestHelper :
       shutdown_file.close()
       throwQuitAPIException()
 
-  def startFuncDelayed(self, func, run_time):
+  def startFuncDelayed(self, func, run_time, time_source):
       try:
         for validation in func.validation:
           validation['init'](self, validation, self.validation_file)
@@ -101,9 +124,9 @@ class UnitTestHelper :
           traceback.print_exc(3)
 
       if(not (run_time is None)):
-        timer_callback.addCallback(time.getValue()+run_time, UnitTestHelper.doTesting, (self,))
+        scheduleCallback ( time_source, time_source.getValue()+run_time, UnitTestHelper.doTesting, (self,))
       else:
-        timer_callback.addCallback(time.getValue()+0.5, UnitTestHelper.doTesting, (self,))          
+        scheduleCallback ( time_source, time_source.getValue()+0.5, UnitTestHelper.doTesting, (self,))
 
   def printCustom(self, value):
     if self.customPrintHelper is None:
@@ -138,4 +161,4 @@ testHelper = UnitTestHelper(TestBaseFolder+"/test_complete", os.path.abspath(os.
 testHelper.addTests(testfunctions_list)
 res.printCustom = testHelper.printCustom
 
-timer_callback.addCallback(time.getValue()+StartTime, UnitTestHelper.doTesting, (testHelper,))
+scheduleCallback ( time, time.getValue()+StartTime, UnitTestHelper.doTesting, (testHelper,))
