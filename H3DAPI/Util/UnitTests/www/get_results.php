@@ -4,7 +4,6 @@ error_reporting(E_ALL);
 
 require('mysql_conf.php');
 
-
 ini_set('memory_limit', '512M');
 
 $test_run_id = $_GET['test_run_id'];
@@ -114,17 +113,23 @@ $error_rows = fetch_result($db, $error_query);
 $console_rows = fetch_result($db, $console_query);
 $custom_rows = fetch_result($db, $custom_query);
 $render_rows = fetch_result($db, $render_query);
-$perf_rows = fetch_result($db, $perf_query);
-
+if($_GET['get_perf']) {
+  $perf_rows = fetch_result($db, $perf_query);
+}
 //echo json_encode($error_rows);
+
+
+
+
 
 $data = array();
 $data = generate_results($db, $data, $error_rows);
 $data = generate_results($db, $data, $console_rows);
 $data = generate_results($db, $data, $custom_rows);
 $data = generate_results($db, $data, $render_rows);
-$data = generate_results($db, $data, $perf_rows);
-
+if($_GET['get_perf']) {
+  $data = generate_results($db, $data, $perf_rows);
+}
 if(count($data) == 0) {
 $testcase = array(
   "name"   => "No results found",
@@ -137,7 +142,7 @@ $testcase = array(
 }
 
 // After this is done we've successfully built our object and just need to convert it to json.
-  echo json_encode($data);
+echo json_encode($data);
 	
 	
 function fetch_result($db, $query) {
@@ -372,7 +377,7 @@ function generate_results($db, $data, $fetched_data) {
           
           
         $dummy = null;
-        $recur($perf_fetch, $testcase['profiler_data'], $dummy);
+      //  $recur($perf_fetch, $testcase['profiler_data'], $dummy);
 
       $parent_nuller = function(&$node) use (&$parent_nuller) {
         if($node == null) {
@@ -416,7 +421,6 @@ function generate_results($db, $data, $fetched_data) {
       $testcase["stdout"] = $row['stdout'];
       $testcase["stderr"] = $row['stderr'];
     } 
-    
 //     All that remains now is to push the testcase to the node's testcases array
     $target = 0;
     #print $testcase['name']."<br/>";

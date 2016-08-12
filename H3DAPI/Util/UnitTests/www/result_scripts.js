@@ -33,13 +33,16 @@ function LoadSQLModel(test_run_id, result_callback) {
   // max_fps : float
   
   // Connect database
+  var url = 'get_results.php?test_run_id=' + test_run_id;
+  if(display_options.fetchPerformanceData) {
+    url += '&get_perf=true';
+  }
   $.ajax({
       type: 'GET',
-      url: 'get_results.php?test_run_id=' + test_run_id,
+      url: url,
       dataType: 'json',
       success:result_callback,
       error: function() {
-        LoadSQLModel(test_run_id, result_callback);
       },
       async: true
   });
@@ -47,6 +50,7 @@ function LoadSQLModel(test_run_id, result_callback) {
    
 var all_graphs = [];
 var display_options =  {
+  fetchPerformanceData: false,
   displayFramerate: false,
   properties: {
     available: ["mean", "percent"],
@@ -214,6 +218,19 @@ function refreshDisplayOptions(model) {
     });
   }
   
+  var cbGetPerf = $("<input>");
+  cbGetPerf.attr('type', 'checkbox');
+  cbGetPerf.prop('checked', display_options.fetchPerformanceData);
+  cbGetPerf.click(function(){
+    if($(this).prop('checked'))
+      display_options.fetchPerformanceData = true;
+    else
+      display_options.fetchPerformanceData = false;
+  });
+  $('#Option_Properties').append(cbGetPerf);
+  $('#Option_Properties').append("Include performance data</br>");
+  
+  
   var cbFPS = $("<input>");
   cbFPS.attr('type', 'checkbox');
   cbFPS.click(function(){
@@ -232,7 +249,7 @@ function refreshDisplayOptions(model) {
   });
   $('#Option_Properties').append(cbFPS);
   $('#Option_Properties').append("Display perf data as framerate");
-  
+
 }
 
 
