@@ -9,7 +9,7 @@ from collections import deque
 from H3DInterface import *
 from H3DUtils import *
 
-def screenshot(start_time = None, run_time = None):
+def screenshot(start_time = None, run_time = None, time_source = None, absolute_time = None):
   def _screenshot(func):
     def init(testHelper, validator, validation_output_file):
       pass
@@ -32,12 +32,12 @@ def screenshot(start_time = None, run_time = None):
     if not hasattr(func, 'validation'):
       func.validation = []
 
-    func.validation.append({'type': 'screenshot', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : run_time})
+    func.validation.append({'type': 'screenshot', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : run_time, "time_source" : time_source, "absolute_time" : absolute_time})
     return func
   return _screenshot
 
 
-def performance(start_time = None, run_time = None):
+def performance(start_time = None, run_time = None, time_source = None, absolute_time = None):
   class FramerateCounter( AutoUpdate( SFFloat ) ):
     def __init__( self):
       AutoUpdate( SFFloat ).__init__(self)
@@ -117,12 +117,12 @@ def performance(start_time = None, run_time = None):
     if (not (run_time is None) and (not hasattr(func, 'run_time') or (func.run_time < run_time))):
       func.run_time = run_time
       
-    func.validation.append({'type': 'performance', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : run_time})
+    func.validation.append({'type': 'performance', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : run_time, "time_source" : time_source, "absolute_time" : absolute_time})
     return func
   return _performance
 
 
-def console(start_time = None):
+def console(start_time = None, time_source = None, absolute_time = None):
   def _console(func):
     def init(testHelper, validator, validation_output_file):
       print 'console_start_' + validator['step_name']
@@ -142,12 +142,12 @@ def console(start_time = None):
 
 
       
-    func.validation.append({'type': 'console', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : None})
+    func.validation.append({'type': 'console', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : None, "time_source" : time_source, "absolute_time" : absolute_time})
     return func
   return _console
 
 
-def custom(start_time = None):
+def custom(start_time = None, time_source = None, absolute_time = None):
   def _custom(func):
     def customPrintHelper(testHelper, value):
       testHelper.customValidator['custom_output'] += value + "\n"
@@ -181,7 +181,7 @@ def custom(start_time = None):
       func.start_time = start_time
 
       
-    func.validation.append({'type': 'custom', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : None, 'custom_output' : ""})
+    func.validation.append({'type': 'custom', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : None, "time_source" : time_source, "absolute_time" : absolute_time, 'custom_output' : ""})
     return func
   return _custom
 
