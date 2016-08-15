@@ -36,6 +36,8 @@
 
 #define X3DTOBINARY
 #define WRITE_TO_BINARY
+
+
 #include <H3D/ResourceResolver.h>
 #include <H3D/VrmlParser.h>
 #include <H3D/X3DGeometryNode.h>
@@ -54,14 +56,15 @@ using namespace H3D;
 
 
 #ifdef X3DTOBINARY
-struct X3DToBinaryWrap {
-  X3DToBinary* object;
-  std::string fileToLoad;
-  X3DToBinaryWrap(X3DToBinary* obj, const std::string &file) {
-    object = obj;
-    fileToLoad = file;
-  }
-};
+//In case when we want to test it with threads
+//struct X3DToBinaryWrap {
+//  X3DToBinary* object;
+//  std::string fileToLoad;
+//  X3DToBinaryWrap(X3DToBinary* obj, const std::string &file) {
+//    object = obj;
+//    fileToLoad = file;
+//  }
+//};
 //auto_ptr< PeriodicThread > binary_thread;
 //PeriodicThread::CallbackCode handleBinaryWriting(void * a) {
 //  TimeStamp startTimeW, endTimeW;
@@ -100,6 +103,7 @@ Group* X3D::createX3DFromURL(const string &url,
   bool change_base_path_during_parsing) {
   H3DTIMER_BEGIN("createX3DFromURL (" + url + ")", "PARSING");
 
+  //Console(LogLevel::Warning) << "<> " << url << std::endl;
   // First try to resolve the url to file contents and load via string buffer
   // Otherwise fallback on using temp files
   string url_contents = ResourceResolver::resolveURLAsString(url);
@@ -118,9 +122,6 @@ Group* X3D::createX3DFromURL(const string &url,
     H3DTIMER_END("createX3DFromURL (" + url + ")")
       return g;
   }
-
-
-
 
   bool is_tmp_file;
   string resolved_url = ResourceResolver::resolveURLAsFile(url,
@@ -153,14 +154,18 @@ Group* X3D::createX3DFromURL(const string &url,
   if (change_base_path_during_parsing)
     ResourceResolver::setBaseURL(path);
   // ========== Handling binary files ======== 
+
 #ifdef X3DTOBINARY
-
-/*Sequence to read binaary forword is as the following */
+  //create a handler and pass global nodes.
   X3DToBinary* binaryHandler = new X3DToBinary(dn, exported_nodes);
-  //std::string binaryFilePath = resolved_url + binaryHandler->EX;
 
+  //try to open binary file that corresponds to the current url.
   if (binaryHandler->openToRead(resolved_url)) {
-    Node * root = binaryHandler->readBinaryRoot(resolved_url);
+	  TimeStamp startTimeW = TimeStamp::now();
+	  Node * root = binaryHandler->readBinaryRoot(resolved_url);
+	  TimeStamp endTimeW = TimeStamp::now();
+	  Console(LogLevel::Info) << "Time Spent parsing using Binary: " << endTimeW - startTimeW << std::endl;
+  
     if (root != NULL) {
       Group *g = new Group;
       g->children->push_back(root);
@@ -241,6 +246,7 @@ Group* X3D::createX3DFromURL(const string &url,
 		  TimeStamp startTimeW = TimeStamp::now();
 	  binaryHandler->writeToBinary(resolved_url);
 	  TimeStamp endTimeW = TimeStamp::now();
+	  Console(LogLevel::Info) << "Time Spent Writing Binary file: " << endTimeW - startTimeW << std::endl;
 #endif // WRITE_TO_BINARY
         return g;
     }
@@ -256,8 +262,11 @@ Group* X3D::createX3DFromURL(const string &url,
     }
     url_ch[url.size()] = '\0';
     try {
-      parser->parse(IStreamInputSource(is, url_ch));
-    }
+		TimeStamp startTimeW = TimeStamp::now();
+		parser->parse(IStreamInputSource(is, url_ch));
+		TimeStamp endTimeW = TimeStamp::now();
+		Console(LogLevel::Info) << "Time Spent parsing: " << endTimeW - startTimeW << std::endl;
+	}
     catch (...) {
       delete[] url_ch;
       H3DTIMER_END("createX3DFromURL (" + url + ")")
@@ -282,6 +291,7 @@ Group* X3D::createX3DFromURL(const string &url,
 	  TimeStamp startTimeW = TimeStamp::now();
   binaryHandler->writeToBinary(resolved_url);
   TimeStamp endTimeW = TimeStamp::now();
+  Console(LogLevel::Info) << "Time Spent Writing Binary file: " << endTimeW - startTimeW << std::endl;
 #endif // WRITE_TO_BINARY
 
 

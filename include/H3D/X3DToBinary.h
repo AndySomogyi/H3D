@@ -162,7 +162,7 @@ namespace H3D {
 
 	/*A class that handles writing and reading from binary x3d file format
 	The file format is as following:
-	The header is omitted. All binary files start with <Scene>
+	The header is omitted. All binary files start with <Scene> 
 	For example:
 	<?xml version="1.0" encoding="utf-8"?>
 	<X3D profile='Full' version='3.2'>
@@ -170,7 +170,7 @@ namespace H3D {
 	    <meta name='title' content='Box.x3d'/>
 	    <meta name='description' content='X3D Box node example.'/>
 	    <meta name='author' content='SenseGraphics AB, 2006-2014'/>
-	  </head>
+	   </head>
 	  <Scene>
 	    <Viewpoint position='0   0    0.6666666666666666    ' />
 	    <Shape DEF="myshape">
@@ -179,11 +179,13 @@ namespace H3D {
 	  </Scene>
 	</X3D>
 
+	//TODO:Rustam How many bytes each one. Mention that Node name is not required. only for debugging. Check if id is unknown then read nodename.Write extensive documentation to what files are used and how overall works
+	//write comments in .h file.
 	Will be stored as ===== >
-	5Scene0 0 1 --------------------------------------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren]
-	  9Viewpoint-110 8position3d 0 0 0.666666 --------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][double][double][double]
-	  5Shape2 1 2 3DEF7s myshape ---------------------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][char]...[char]
-	    3Box-1 2 0 4size3d 0.2 0.1 0.05 5solid4s true ------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][double][double][double][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][char]...[char]
+	  5Scene0 0 1 --------------------------------------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren]
+	    9Viewpoint-1 1 0 8position3d 0 0 0.666666 -------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][double][double][double]
+		5Shape2 1 2 3DEF7s myshape ---------------------------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][char]...[char]
+		  3Box-1 2 0 4size3d 0.2 0.1 0.05 5solid4s true ------- [NnumberOfBytesInName][NodeName][ID][NumberOfAttributess][NumberOfChildren][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][double][double][double][NumberOfBytesInAttribName][AttribName][NumberOfValues][ValuesType][char]...[char]
 
 	Ignore all the spaces and identation. they are here only for readability
 
@@ -239,20 +241,37 @@ namespace H3D {
 			}
 		};
 
+		///Encodes TinyXMLs node to a binary file and writes it to file
 		void writeNodeToFile(TiXmlNode* p_parent);
+		/// Writes attributes to binary files then the parent node could not be identified. (slow to read, requires to parse string during reading)
 		int writeAttributesToFile(TiXmlElement* p_element);
+		/// Writes attributes to binary file. Has to be notified is it is writing '<field'
 		int writeAttributesToFile(TiXmlElement* p_element, H3D::Node * pParent, bool is_field);
+		/// Writes element directly as a string without cheking its contents
 		void writeCDATAtoFile(TiXmlNode* p_parent);
+		///Initializes a vector which represents pointers to most commonly used nodes' database
+		///Order is important! Do not change the order of entries. Only push_back is allowed without breaking the code.
+		///If the order has to be changed following functions have to be updated as well:
+		///parseNodeH3D() and writeNodeToFile()
 		void initialiseNodeDB();
 
+		/// Reads and handles Node from a binary file
 		H3D::Node* parseNodesH3D(NodeFieldWrap * pParent, bool isRoot);
+		///Reads and handles attributes one at a time of a current node
 		void parseAttributesH3D(H3D::Node * pNewNode, std::string * p_container_field_name);
+		///Reads next attribute and stores it in Attribute struct
 		void readNextAttribute(Attribute & a);
+		///Reads and handles special element ROUTE from binary file
 		void handleRouteElement(unsigned int num_of_attribs, bool route_no_event);
+		///Reads and handles special element FIELD from binary file
 		void handleFieldElement(unsigned int num_of_attribs, unsigned int num_of_children, NodeFieldWrap* pParent);
+		///Reads and handles special element IMPORT from binary file
 		void handleImportElement(unsigned int num_of_attribs);
+		///Reads and handles special element EXPORT from binary file
 		void handleExportElement(unsigned int num_of_attribs);
+		///Reads  and handles special element CDATA from binary file 
 		void handleCdataElement(NodeFieldWrap* parent);
+		///Reads  and handles special element ProgramSetting from binary file
 		void handleProgramSettingElement(unsigned int num_of_attribs);
 
 
@@ -261,14 +280,20 @@ namespace H3D {
 
 
 	public:
+		///Constructor required to specify file version to avoid confusion between reading and writing. VERSION will be cheked in readBinaryRoot() funciton
 		X3DToBinary(X3D::DEFNodes * _def_map, X3D::DEFNodes * _exported_nodes);
 		~X3DToBinary();
-
+		///Returns true if the binary file associated with the provided X3D file could be opened.
 		bool openToRead(std::string &file_path);
+		///Returns true if the timestamp of X3D file is newer than the one of H3DB file associated with it 
 		bool isX3DModified(std::string &file_path);
+		/// Sets the internal file path. Mostly used for debugging
 		void setFilePath(const std::string& file_to_load);
 		int writeToBinary(std::string file_to_load);
+		///Initializes parsing of the binary file. Returns the root Node of the scene
 		H3D::Node* readBinaryRoot(std::string file_to_load);
+		///Prints to the terminal frequencies of each nodes appearing in the given 3XD file. Useful to tweak initialiseNodeDB() to
+		/// include the most relevant entries for the givein project.
 		void printOccurrences(std::string file_to_load);
 	};
 
