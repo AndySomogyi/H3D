@@ -113,7 +113,7 @@ $error_rows = fetch_result($db, $error_query);
 $console_rows = fetch_result($db, $console_query);
 $custom_rows = fetch_result($db, $custom_query);
 $render_rows = fetch_result($db, $render_query);
-if($_GET['get_perf']) {
+if(isset($_GET['get_perf']) && $_GET['get_perf']) {
   $perf_rows = fetch_result($db, $perf_query);
 }
 //echo json_encode($error_rows);
@@ -127,7 +127,7 @@ $data = generate_results($db, $data, $error_rows);
 $data = generate_results($db, $data, $console_rows);
 $data = generate_results($db, $data, $custom_rows);
 $data = generate_results($db, $data, $render_rows);
-if($_GET['get_perf']) {
+if(isset($_GET['get_perf']) && $_GET['get_perf']) {
   $data = generate_results($db, $data, $perf_rows);
 }
 if(count($data) == 0) {
