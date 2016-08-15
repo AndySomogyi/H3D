@@ -70,7 +70,9 @@ DicomImageLoader::DicomImageLoader():
   loadSingleFile->setValue( false );
 }
 
-namespace dcmtk {
+// DCMTK version 3.6.1 adds namespace and puts log4cplus in the namespace.
+// So the simplest fix is simply to add the empty namespace here and then use it.
+namespace dcmtk { 
 }
 using namespace dcmtk;
 
