@@ -196,7 +196,7 @@ namespace H3D {
 		int i_val;
 		double d_val;
 		int field_type;
-		H3D::Field * pField;
+		H3D::Field * pField = nullptr;
 
 		while (p_attrib)
 		{
@@ -205,11 +205,12 @@ namespace H3D {
 				p_attrib = p_attrib->Next();
 				continue;
 			}
-
+			
 			int length = strlen(p_attrib->Name());
 			// make sure that the current node is not a <field>. 
-			if (!is_field)
+			if(!is_field){
 				pField = p_parent->getField(p_attrib->Name());
+			}
 			if (pField && !is_field) {
 				// if Node's field is obtained correctly check what type it is supposed to be
 				field_type = pField->getX3DType();
@@ -353,7 +354,7 @@ namespace H3D {
 		switch (t)
 		{
 		case TiXmlNode::TINYXML_DOCUMENT:
-			Console(LogLevel::Error) << "TiXmlNode of type TINYXML_DOCUMENT is not supported in current version" << std::endl
+			Console(LogLevel::Error) << "TiXmlNode of type TINYXML_DOCUMENT is not supported in current version" <<  std::endl
 				<< "Node name: " << p_parent->ValueStr() << " in file: " << current_file;
 			break;
 
@@ -362,11 +363,11 @@ namespace H3D {
 			num_of_attribs = BUTILS::getNumberOfAttributes(p_parent->ToElement());
 			num_of_children = BUTILS::getNumberOfChildren(p_parent);
 
-			file_stream.write(reinterpret_cast<const char *>(&length), sizeof(int));
-			file_stream.write(p_parent->Value(), length * sizeof(char));
+			
 
-			//Here we are encoding most common nodes by assignin them IDs. These IDs' order is predefined in initialiseDB() function
+			//Here we are encoding most common nodes by assignin them IDs. These IDs' order is predefined in initialiseNodeDB() function
 			//ID is an integer at the moment. In future could be translated to CHAR due to low probability of having more than 256 IDs for nodes.
+			//TODO:Rustam make ID enum.
 			ID = -1; //no such node in lookup table
 			if (p_parent->ValueStr() == "Scene" || p_parent->ValueStr() == "Group") {
 				ID = 0;
@@ -465,12 +466,16 @@ namespace H3D {
 				ID = 243;
 			}
 			file_stream.write(reinterpret_cast<const char *>(&ID), sizeof(int));
+			if (ID == -1) {
+				file_stream.write(reinterpret_cast<const char *>(&length), sizeof(int));
+				file_stream.write(p_parent->Value(), length * sizeof(char)); //write name of the node
+			}
 			file_stream.write(reinterpret_cast<const char *>(&num_of_attribs), sizeof(int));
 			file_stream.write(reinterpret_cast<const char *>(&num_of_children), sizeof(int));
 			H3D::Node* pNewNode;
 
 			//Make sure that our nod is not a scpecial node (field, route, ... ) Also additionally check that ID is within expected boundaries.
-			if (ID < 243 && ID > -2) {
+			if (ID < 243 && ID > -2){
 				//Try to create a Node. This is required to correctly identify the the attribute types that have to be written to the binary file.
 				if (ID == -1) {
 					pNewNode = H3D::H3DNodeDatabase::createNode(p_parent->ValueStr());
@@ -518,7 +523,7 @@ namespace H3D {
 		default:
 			break;
 		}
-
+		
 		for (p_child = p_parent->FirstChild(); p_child != 0; p_child = p_child->NextSibling())
 		{
 			writeNodeToFile(p_child);
@@ -1570,7 +1575,7 @@ namespace H3D {
 
 		// push NULL on the node stack to skip elements within PROGRAM_SETTING element.
 	}
-
+	
 	///Reads next attribute and stores it in Attribute struct
 	void X3DToBinary::readNextAttribute(Attribute &a)
 	{
@@ -1645,11 +1650,11 @@ namespace H3D {
 		int node_id = -1;
 		std::string node_name;
 		H3D::Node* pNewNode;
-		file_stream.read((char*)&node_name_length, sizeof(int));
-		node_name = BUTILS::readString(file_stream, node_name_length);
-		//file_stream.read(nodeName, nodeNameSize);
-		//nodeName[nodeNameSize] = '\0';
 		file_stream.read((char*)&node_id, sizeof(int));
+		if(node_id == -1) {
+			file_stream.read((char*)&node_name_length, sizeof(int));
+			node_name = BUTILS::readString(file_stream, node_name_length);
+		}
 		file_stream.read((char*)&num_of_attribs, sizeof(int));
 		file_stream.read((char*)&num_of_children, sizeof(int));
 
@@ -1887,8 +1892,8 @@ namespace H3D {
 		/*std::string base = ResourceResolver::getBaseURL();
 		if (base != "objects\tools" && base != "x3d\eyes\components" && base != "x3d/scenes/../eyes/components/")
 		{
-		Console(LogLevel::Warning) << "H3DB: " << "Omitting files in: " << base << std::endl;
-		return false;
+			Console(LogLevel::Warning) << "H3DB: " << "Omitting files in: " << base << std::endl;
+			return false;
 		}*/
 		//Console(LogLevel::Warning) << "H3DB: " << "Opened files in: " << base << std::endl;
 		std::string binary_file_path = file_path + EXT;
