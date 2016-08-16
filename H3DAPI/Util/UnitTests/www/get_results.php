@@ -28,8 +28,7 @@ $perf_query = sprintf("
 $render_query = sprintf("
 (SELECT rendering_results.id AS id,test_runs.timestamp,server_id,server_name,rendering_results.test_run_id,
         rendering_results.file_id,filename,rendering_results.case_id,'rendering' AS result_type,case_name,
-        rendering_results.step_id,step_name,success,rendering_results.output_image,rendering_results.diff_image,image AS
-        baseline_image
+        rendering_results.step_id,step_name,success, baseline.id as baseline_id
  FROM   test_runs
         left join rendering_results
                ON rendering_results.test_run_id = test_runs.id
@@ -282,9 +281,7 @@ function generate_results($db, $data, $fetched_data) {
         $node['success'] = false;
       }
       $testcase["success"] = $row['success'];
-      $testcase["output_image"] = base64_encode($row['output_image']);
-      $testcase["diff_image"] = base64_encode($row['diff_image']);
-      $testcase["baseline_image"] = base64_encode($row['baseline_image']);
+      $testcase["baseline_id"] = $row['baseline_id'];
     }
     else if($row['result_type'] == "performance") {
       $query = "SELECT * FROM performance_result_data WHERE performance_result_id=".$row['id']." ORDER BY id ASC";
