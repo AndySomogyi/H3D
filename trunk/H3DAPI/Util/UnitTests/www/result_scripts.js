@@ -428,25 +428,16 @@ function generateGraph(div) {
 }
 
 
-function getImageBlobURL(blob, download_name) {
-  var byteCharacters = atob(blob);
-  var byteNumbers = new Array(byteCharacters.length);
-  for (var i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  var arrayBufferView = new Uint8Array(byteNumbers);
-  var blob = new Blob( [ arrayBufferView ], { type: "image/png" } );
-  var urlCreator = window.URL || window.webkitURL;
-  var imageUrl = urlCreator.createObjectURL( blob );
+function getImageBlobURL(id, image_type, download_name) {
   var container = $('<div>');
   var link = $("<a>");
   link.addClass("image_download_link");
-  link.attr("href", imageUrl);
-  link.attr("target", imageUrl);
+  link.attr("href",  "get_image.php?type="+image_type+"&id="+id+"&name="+download_name);
+  link.attr("target",  "get_image.php?type="+image_type+"&id="+id+"&name="+download_name);
   link.attr("download", download_name);
   link.append("(Download)");
   var img = $("<img>");
-  img.attr("src", imageUrl);
+  img.attr("src", "get_image.php?type="+image_type+"&id="+id+"&name="+download_name);
   img.addClass("TestResult_image");
   container.append(img);
   container.append(link);
@@ -470,11 +461,11 @@ function generateImages(div) {
     succeeded.append("Step successful!");
     div.append(succeeded);
     var image_container = $('<div>');
-    if(testcase.baseline_image != "") {
+    if(testcase.baseline_id != "") {
       var image_container = $('<div>');
       image_container.addClass('TestResult_image_div'); 
       image_container.append("Baseline:</br>");
-      image_container.append(getImageBlobURL(testcase.baseline_image, download_name));
+      image_container.append(getImageBlobURL(testcase.baseline_id, "baseline", download_name));
       container.append(image_container);
     }
   } else { // Didn't succeed
@@ -482,36 +473,36 @@ function generateImages(div) {
     succeeded.addClass('test_failed');
     div.append(succeeded);
     
-    if (testcase.diff_image == "") {
+/*    if (testcase.diff_image == "") {
       if(testcase.output_image == "")
          succeeded.append("Step failed - No image output!");
       else
          succeeded.append("Step failed - No diff available!");
     }    
-    else if (testcase.baseline_image == "")
+    else */if (testcase.baseline_id == "")
       succeeded.append("Step failed - No baseline found!");        
     else
       succeeded.append("Step failed - Invalid output!");
         
-    if(testcase.baseline_image != "") {
+    if(testcase.baseline_id != "") {
       var image_container = $('<div>');
       image_container.addClass('TestResult_image_div'); 
       image_container.append("Baseline:</br>");
-      image_container.append(getImageBlobURL(testcase.baseline_image, download_name));
+      image_container.append(getImageBlobURL(testcase.baseline_id, "baseline",download_name));
       container.append(image_container);
     }
-    if(testcase.output_image != "") {
+    
       var image_container = $('<div>');
       image_container.addClass('TestResult_image_div'); 
       image_container.append("Output:</br>");
-      image_container.append(getImageBlobURL(testcase.output_image, download_name));
+      image_container.append(getImageBlobURL(testcase.id, "result", download_name));
       container.append(image_container);
-    }
+    
     if((testcase.output_image != "") && (testcase.baseline_image != "")) {
       var image_container = $('<div>');
       image_container.addClass('TestResult_image_div'); 
       image_container.append("Diff:</br>");
-      image_container.append(getImageBlobURL(testcase.diff_image, diff_download_name));
+      image_container.append(getImageBlobURL(testcase.id, "diff", diff_download_name));
       container.append(image_container);
     } 
   }
