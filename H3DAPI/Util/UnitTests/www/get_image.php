@@ -31,6 +31,7 @@ function fetch_image($db, $query, $table_name, $column_name) {
     $image_statement->bind_result($image);
     if($image_statement->fetch()) {
     header('Content-Type: image/png');
+    header('Content-Disposition: inline; filename="'.$_GET['name'].'"');
       echo $image;
     } else {
       die("ERROR, unable to fetch: " . mysqli_error($db));
