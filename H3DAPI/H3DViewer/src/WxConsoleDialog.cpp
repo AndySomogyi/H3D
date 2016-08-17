@@ -255,8 +255,7 @@ WxConsoleDialog::WxConsoleDialog ( wxWindow *parent,
       //wxDirExists(plugin_dir)
       subdirectory = "log\\";
     #else
-      //subdirectory = "log/";
-      subdirectory = "";
+      subdirectory = "log/";
     #endif
 
     string session_uuid;
