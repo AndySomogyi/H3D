@@ -74,9 +74,9 @@ DicomImageLoader::DicomImageLoader():
 // So the simplest fix is simply to add the empty namespace here and then use it.
 namespace dcmtk { 
 }
-using namespace dcmtk;
 
 bool DicomImageLoader::supportsFileType( const string &url ) {
+  using namespace dcmtk;
   // DicomImageLoader try to load some DDS image, then it hangs, so stop
   // using DicomImageLoader to load it when DDSImageLoader can do it
   if( DDSImageLoader::supportsFileType(url) ) {
