@@ -86,6 +86,10 @@ SimpleAudioClip::SimpleAudioClip(
   audioState->addValidValue("PAUSED");
   audioState->setValue( "STOPPED", id );
 
+  play->setValue( false, id );
+  stop->setValue( false, id );
+  pause->setValue( false, id );
+
   play->routeNoEvent( updateAudioPlay, id );
   stop->routeNoEvent( updateAudioPlay, id );
   pause->routeNoEvent( updateAudioPlay, id );
@@ -99,35 +103,36 @@ void SimpleAudioClip::UpdateAudioPlay::update(){
   SimpleAudioClip* sac = static_cast< SimpleAudioClip* >( getOwner() );
   // play
   if( event.ptr == routes_in[0] ) {
-    // if currently is paused, resume , if not, directly start
-    if( sac->isPaused->getValue() ) {
-      sac->resumeTime->setValue( TimeStamp() );
-    }else{
-      sac->startTime->setValue( TimeStamp() );
+    if( static_cast< SFBool * >(routes_in[0])->getValue() ) {
+      // if currently is paused, resume , if not, directly start
+      if( sac->isPaused->getValue() ) {
+        sac->resumeTime->setValue( TimeStamp() );
+      }else{
+        sac->startTime->setValue( TimeStamp() );
+      }
+      sac->audioState->setValue( "PLAYING", sac->id );
+      sac->play->setValue( false, sac->id );
     }
-    sac->audioState->setValue( "PLAYING", sac->id );
-    sac->play->setValue( false, sac->id );
-  }
-  // stop
-  else if( event.ptr == routes_in[1] ) {
-    sac->stopTime->setValue( TimeStamp() );
+  } else if( event.ptr == routes_in[1] ) {
+    // stop
+    if( static_cast< SFBool * >(routes_in[1])->getValue() ) {
+      sac->stopTime->setValue( TimeStamp() );
+      sac->audioState->setValue( "STOPPED", sac->id );
+      sac->stop->setValue( false, sac->id );
+    }
+  } else if( event.ptr == routes_in[2] ) {
+    // pause
+    if( static_cast< SFBool * >(routes_in[2])->getValue() ) {
+      sac->pauseTime->setValue( TimeStamp() );
+      sac->audioState->setValue( "PAUSED", sac->id );
+      sac->pause->setValue( false, sac->id );
+    }
+  } else if( event.ptr == routes_in[3] ) {
+    // url change
     sac->audioState->setValue( "STOPPED", sac->id );
-    sac->stop->setValue( false, sac->id );
-  }
-  // pause
-  else if( event.ptr == routes_in[2] ) {
-    sac->pauseTime->setValue( TimeStamp() );
-    sac->audioState->setValue( "PAUSED", sac->id );
-    sac->pause->setValue( false, sac->id );
-  }
-  
-  // url change
-  else if( event.ptr == routes_in[3] ) {
-    sac->audioState->setValue( "STOPPED", sac->id );
-  }
-  // isActive change
-  else if( event.ptr == routes_in[4] ) {
-    if (sac->audioState->getValue() == "PLAYING"&&!sac->isActive->getValue()){
+  } else if( event.ptr == routes_in[4] ) {
+    // isActive change
+    if( sac->audioState->getValue() == "PLAYING" && !sac->isActive->getValue() ){
       sac->audioState->setValue( "STOPPED", sac->id );
     }
   }
