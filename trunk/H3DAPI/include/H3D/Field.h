@@ -92,7 +92,7 @@ namespace H3D {
         H3DTime event_time = TimeStamp::now ();
         if( event_time <= last_event_time ) {
 #ifdef DEBUG
-          Console(LogLevel::Debug) << "Field(" << getFullName() << ") - new event has same timestamp as last generated event, incrementing timestamp" << std::endl;
+          Console(LogLevel::Debug) << "Field: New event has same timestamp as last generated event, incrementing timestamp" << std::endl;
 #endif          
           // Casting a pointer to last_event_time to a long long (which is at least 64bit) so we can increment it, thus incrementing the mantissa of last_event_time and getting us the smallest possible higher value
           unsigned long long* temp = reinterpret_cast<unsigned long long*>(&last_event_time);
