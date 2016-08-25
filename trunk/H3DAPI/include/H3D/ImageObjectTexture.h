@@ -54,7 +54,8 @@ namespace H3D {
     class H3DAPI_API SFImageObject: 
       public AutoUpdate< TypedSFNodeObject< H3DImageObject > > {
     protected:
-      /// Update fields from the image contained in the node.
+      /// Sets up a route between the added node's image field and the
+      /// owners image field.
       virtual void onAdd( Node *n );
 
       /// Removes the route that was added by onAdd ().
