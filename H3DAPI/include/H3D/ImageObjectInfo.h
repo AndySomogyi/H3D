@@ -61,8 +61,7 @@ namespace H3D {
                                        &H3DImageObject::image >,
                                    true > SFImageObjectNodeBase;
     protected:
-      /// Sets up a route between the added node's image field and the
-      /// owners image field.
+      /// Update fields from the image contained in the node.
       virtual void onAdd( Node *n );
     };
 
