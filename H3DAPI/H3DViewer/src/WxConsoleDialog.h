@@ -156,6 +156,9 @@ protected:
   ConsoleStreamBuf *console_stream_buf_w; // Warnings
   ConsoleStreamBuf *console_stream_buf_e; // Errors
 
+  std::auto_ptr< ConsoleStreamBuf > console_stream_buf_stdcout; // console stream buffer for std cerr
+  std::auto_ptr< ConsoleStreamBuf > console_stream_buf_stdcerr; // console stream buffer for std cout
+
   // the streambuf of cerr and cout that was used when this WxConsoleDialog was created.
   std::streambuf *orig_cerr_buf, *orig_cout_buf;
 

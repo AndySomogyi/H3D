@@ -218,17 +218,22 @@ WxConsoleDialog::WxConsoleDialog ( wxWindow *parent,
 
   H3DUtil::Console.setShowLevel( true );
 
-  // redirect the cout, cerr to logText wxTextCtrl so sofa output can be redirected to wxDialog
-  orig_cout_buf = cout.rdbuf(); 
-  orig_cerr_buf = cerr.rdbuf();
-  cout.rdbuf(console_stream_buf);
-  cerr.rdbuf(console_stream_buf_e);
+  //console stream for  std cout
+  console_stream_buf_stdcout.reset( new ConsoleStreamBuf( *this, logText, NULL, wxTextAttr( *wxGREEN ) ) );
+  orig_cout_buf = cout.rdbuf();
+  cout.rdbuf( console_stream_buf_stdcout.get() );
 
-  if( char *buffer = getenv("H3D_CONSOLE_LOGFILE") ) {
-    if (strcmp( buffer, "TRUE" ) == 0 ){
-      filelog_enabled = true; }
-    else if (strcmp( buffer, "FALSE" ) == 0 ){
-      filelog_enabled = false; }
+  //console stream for std cerr
+  console_stream_buf_stdcerr.reset( new ConsoleStreamBuf( *this, logText, logTextErrors, wxTextAttr( redorange ) ) );
+  orig_cerr_buf = cerr.rdbuf();
+  cerr.rdbuf( console_stream_buf_stdcerr.get() );
+
+  if( char *buffer = getenv( "H3D_CONSOLE_LOGFILE" ) ) {
+    if( strcmp( buffer, "TRUE" ) == 0 ) {
+      filelog_enabled = true;
+    } else if( strcmp( buffer, "FALSE" ) == 0 ) {
+      filelog_enabled = false;
+    }
   }
 
   if (filelog_enabled) {
@@ -300,6 +305,9 @@ WxConsoleDialog::~WxConsoleDialog() {
   streambuf * tmp_buf_e = console_stream_e->rdbuf(NULL);
   console_stream_e.reset( NULL );
   delete tmp_buf_e; tmp_buf_e = 0;
+
+  console_stream_buf_stdcout.reset( NULL );
+  console_stream_buf_stdcerr.reset( NULL );
 }
 
 /*******************Event Table*********************/
@@ -323,6 +331,7 @@ void WxConsoleDialog::OnConsoleClear(wxCommandEvent &event) {
   case 1:
     logTextErrors->Clear();
     console_stream_buf_e->line_count = 0;
+    console_stream_buf_stdcerr->line_count = 0;
     break;
   case 2:
     logTextWarnings->Clear();
@@ -364,10 +373,12 @@ void WxConsoleDialog::OnIdle(wxIdleEvent &event) {
   console_stream_buf->onIdle();
   console_stream_buf_w->onIdle();
   console_stream_buf_e->onIdle();
+  console_stream_buf_stdcerr->onIdle();
+  console_stream_buf_stdcout->onIdle();
 }
 
 void WxConsoleDialog::updateNotebook() {
-  tabs->SetPageText( 1, getTabTitle ( wxT("Errors"), console_stream_buf_e->line_count ) );
+  tabs->SetPageText( 1, getTabTitle ( wxT("Errors"), console_stream_buf_e->line_count+console_stream_buf_stdcerr->line_count ) );
   tabs->SetPageText( 2, getTabTitle( wxT("Warnings"), console_stream_buf_w->line_count ) );
 }
 
