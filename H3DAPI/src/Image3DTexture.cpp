@@ -208,10 +208,14 @@ void Image3DTexture::SFImage::update() {
     thread_data.texture = texture;
     thread_data.urls = urls->getValue();
     thread_data.image_loaders = image_loaders->getValue();
-
-    texture->load_thread.reset( new H3DUtil::SimpleThread( &loadImageThreadFunc, 
-                                                   (void *)&thread_data ) );
-    texture->load_thread->setThreadName( "ImageTexture3D load thread" );
+    H3DUtil::SimpleThread* new_thread = new H3DUtil::SimpleThread( &loadImageThreadFunc,
+      (void *)&thread_data );
+    if( !new_thread->isValid() ) {
+      value = loadImage( texture, urls->getValue(), image_loaders->getValue() );
+    } else {
+      texture->load_thread.reset( new_thread );
+      texture->load_thread->setThreadName( "ImageTexture3D load thread" );
+    }
   } else {
     value = loadImage( texture, urls->getValue(), image_loaders->getValue() );
   }
