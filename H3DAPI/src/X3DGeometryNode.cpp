@@ -332,13 +332,6 @@ void X3DGeometryNode::DisplayList::callList( bool build_list ) {
     }
   }
 
-  Bound *b = geom->bound->getValue();
-  if( b ) {
-    BoxBound *bb = dynamic_cast<BoxBound*>(b);
-    if( bb ) {
-      geom->centerOfMass->setValue( bb->center->getValue() );
-    }
-  }
 
   // restore previous values for culling
   if( culling_enabled ) glEnable( GL_CULL_FACE );
@@ -487,6 +480,16 @@ void X3DGeometryNode::SFBoundTree::update() {
 void X3DGeometryNode::traverseSG( TraverseInfo &ti ) {
   X3DChildNode::traverseSG( ti );
   
+  if( !displayList->isUpToDate() ) {
+    Bound *b = bound->getValue();
+    if( b ) {
+      BoxBound *bb = dynamic_cast<BoxBound*>(b);
+      if( bb ) {
+        centerOfMass->setValue( bb->center->getValue() );
+      }
+    }
+  }
+
   if( H3DRenderModeGroupNode::current_render_mode_group ) {
     // We do not know what OpenGL states are changed  by the 
     // H3DRenderModeGroupNode, so we cannot have it cached in a display
