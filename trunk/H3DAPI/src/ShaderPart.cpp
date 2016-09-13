@@ -163,7 +163,8 @@ GLhandleARB ShaderPart::compileShaderPart(){
         else Console(LogLevel::Warning) << "Warning: W";
         Console(LogLevel::Warning) << "hen compiling shader source of \"" 
           << getName() << "\" node (" << url_used 
-          << ")." << endl << log << endl;
+          << ") in "<<(getParentComposedShader()==NULL?"Undefined shader":getParentComposedShader()->getFullName())
+          <<"." << endl << log << endl;
 
         if( print_error == 1 ) {
           glDeleteObjectARB( shader_handle );
