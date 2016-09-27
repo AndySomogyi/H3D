@@ -17,6 +17,17 @@ IF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INST
   SET( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
 ENDIF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
 
+# Add a cache variable ENABLE_SVN_REVISION to have the choice of using
+# SubWCRev.exe to embed svn revision number in generated DLLs.
+# Default is YES for Visual Studio and NMake generators, NO otherwise.
+IF( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
+  SET( ENABLE_SVN_REVISION_DEFAULT "NO" )
+  IF( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
+    SET( ENABLE_SVN_REVISION_DEFAULT "YES" )
+  ENDIF( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
+  SET( ENABLE_SVN_REVISION ${ENABLE_SVN_REVISION_DEFAULT} CACHE BOOL "Use SubWCRev.exe to embed svn revision number in generated DLLs." )
+ENDIF( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
+
 # use, i.e. don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 
@@ -258,36 +269,40 @@ ENDIF ( GENERATE_H3DVIEWER_CPACK_PROJECT )
 IF( MSVC )
 
   SET( H3DViewer_SVN_VERSION "0" )
-  # Find SubWCRev.exe
-  FIND_FILE( SubWCRev
-             NAMES "SubWCRev.exe"
-             DOC   "Set to SubWCRev.exe that comes with TortoiseSVN. Used to find svn revision number." )
-  MARK_AS_ADVANCED( SubWCRev )
+  IF( ENABLE_SVN_REVISION )
+    # Find SubWCRev.exe
+    FIND_FILE( SubWCRev
+               NAMES "SubWCRev.exe"
+               DOC   "Set to SubWCRev.exe that comes with TortoiseSVN. Used to find svn revision number." )
+    MARK_AS_ADVANCED( SubWCRev )
+  ENDIF( ENABLE_SVN_REVISION )
 
   SET( H3DViewer_is_working_copy 10 )
-  IF( SubWCRev )
+  IF( ENABLE_SVN_REVISION AND SubWCRev )
     EXECUTE_PROCESS( COMMAND ${SubWCRev} ${H3DViewer_SOURCE_DIR}/../
                      RESULT_VARIABLE H3DViewer_is_working_copy )
     IF( ${H3DViewer_is_working_copy} EQUAL 0 )
       SET( H3DViewer_SVN_VERSION "$WCREV$" )
     ENDIF( ${H3DViewer_is_working_copy} EQUAL 0 )
-  ENDIF( SubWCRev )
+  ENDIF( ENABLE_SVN_REVISION AND SubWCRev )
 
   # autogenerate H3DViewer.rc depending on the version
   CONFIGURE_FILE( H3DViewer.rc.cmake ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
 
-  ADD_CUSTOM_COMMAND( TARGET H3DViewer
-                      PRE_BUILD
-                      COMMAND ${H3DViewer_SOURCE_DIR}/../../build/UpdateResourceFile 
-                      ARGS H3DViewer ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${H3DViewer_SOURCE_DIR}/H3DViewer.rc.cmake
-                      ${H3DViewer_MAJOR_VERSION} ${H3DViewer_MINOR_VERSION}
-                      ${H3DViewer_BUILD_VERSION} "${H3DViewer_SVN_VERSION}"
-                      "H3DViewer_SOURCE_DIR"
-                      ${H3DViewer_SOURCE_DIR}
-                      "H3DViewer_Output_Name"
-                      "$(TargetFileName)" )
+  IF( ENABLE_SVN_REVISION )
+    ADD_CUSTOM_COMMAND( TARGET H3DViewer
+                        PRE_BUILD
+                        COMMAND ${H3DViewer_SOURCE_DIR}/../../build/UpdateResourceFile 
+                        ARGS H3DViewer ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${H3DViewer_SOURCE_DIR}/H3DViewer.rc.cmake
+                        ${H3DViewer_MAJOR_VERSION} ${H3DViewer_MINOR_VERSION}
+                        ${H3DViewer_BUILD_VERSION} "${H3DViewer_SVN_VERSION}"
+                        "H3DViewer_SOURCE_DIR"
+                        ${H3DViewer_SOURCE_DIR}
+                        "H3DViewer_Output_Name"
+                        "$(TargetFileName)" )
+  ENDIF( ENABLE_SVN_REVISION )
 
-  IF( SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
+  IF( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
     # Update SVN revision in file.
     EXECUTE_PROCESS( COMMAND ${SubWCRev} ${H3DViewer_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
     
@@ -295,7 +310,7 @@ IF( MSVC )
                         PRE_BUILD 
                         COMMAND ${SubWCRev} 
                         ARGS ${H3DViewer_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
-  ENDIF( SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
+  ENDIF( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
 ENDIF(MSVC)
 
 

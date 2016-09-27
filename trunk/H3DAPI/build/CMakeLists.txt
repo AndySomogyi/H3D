@@ -45,6 +45,17 @@ IF( NOT DEFINED GENERATE_UNITY_BUILD )
   SET( GENERATE_UNITY_BUILD "NO" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
 ENDIF( NOT DEFINED GENERATE_UNITY_BUILD )
 
+# Add a cache variable ENABLE_SVN_REVISION to have the choice of using
+# SubWCRev.exe to embed svn revision number in generated DLLs.
+# Default is YES for Visual Studio and NMake generators, NO otherwise.
+IF( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
+  SET( ENABLE_SVN_REVISION_DEFAULT "NO" )
+  IF( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
+    SET( ENABLE_SVN_REVISION_DEFAULT "YES" )
+  ENDIF( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
+  SET( ENABLE_SVN_REVISION ${ENABLE_SVN_REVISION_DEFAULT} CACHE BOOL "Use SubWCRev.exe to embed svn revision number in generated DLLs." )
+ENDIF( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
+
 # Add a cache variable PREFER_STATIC_LIBRARIES to have the choice of generating a project
 # linking against static libraries if they exist. Default is NO since most people will not use this.
 IF( NOT DEFINED PREFER_STATIC_LIBRARIES )
@@ -519,34 +530,38 @@ ADD_LIBRARY(H3DAPI SHARED ${H3DAPI_SRCS} ${H3DAPI_HEADERS})
 # make sure that the H3DAPI.rc contains the correct svn-version
 IF( MSVC )
   SET( H3DAPI_SVN_VERSION "0" )
-  # Find SubWCRev.exe
-  FIND_FILE( SubWCRev
-             NAMES "SubWCRev.exe"
-             DOC   "Set to SubWCRev.exe that comes with TortoiseSVN. Used to find svn revision number." )
-  MARK_AS_ADVANCED( SubWCRev )
+  IF( ENABLE_SVN_REVISION )
+    # Find SubWCRev.exe
+    FIND_FILE( SubWCRev
+               NAMES "SubWCRev.exe"
+               DOC   "Set to SubWCRev.exe that comes with TortoiseSVN. Used to find svn revision number." )
+    MARK_AS_ADVANCED( SubWCRev )
+  ENDIF( ENABLE_SVN_REVISION )
 
   SET( H3DAPI_is_working_copy 10 )
-  IF( SubWCRev )
+  IF( ENABLE_SVN_REVISION AND SubWCRev )
     EXECUTE_PROCESS( COMMAND ${SubWCRev} ${H3DAPI_SOURCE_DIR}/../
                      RESULT_VARIABLE H3DAPI_is_working_copy )
     IF( ${H3DAPI_is_working_copy} EQUAL 0 )
       SET( H3DAPI_SVN_VERSION "$WCREV$" )
     ENDIF( ${H3DAPI_is_working_copy} EQUAL 0 )
-  ENDIF( SubWCRev )
+  ENDIF( ENABLE_SVN_REVISION AND SubWCRev )
 
   # autogenerate H3DAPI.rc depending on the version
   CONFIGURE_FILE( H3DAPI.rc.cmake ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc )
-  
-  ADD_CUSTOM_COMMAND( TARGET H3DAPI
-                      PRE_BUILD
-                      COMMAND ${H3DAPI_SOURCE_DIR}/UpdateResourceFile 
-                      ARGS H3DAPI ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc ${H3DAPI_SOURCE_DIR}/H3DAPI.rc.cmake
-                      ${H3DAPI_MAJOR_VERSION} ${H3DAPI_MINOR_VERSION}
-                      ${H3DAPI_BUILD_VERSION} "${H3DAPI_SVN_VERSION}"
-                      "H3DAPI_Output_Name"
-                      "$(TargetFileName)" )
 
-  IF( SubWCRev AND ${H3DAPI_is_working_copy} EQUAL 0 )
+  IF( ENABLE_SVN_REVISION )
+    ADD_CUSTOM_COMMAND( TARGET H3DAPI
+                        PRE_BUILD
+                        COMMAND ${H3DAPI_SOURCE_DIR}/UpdateResourceFile 
+                        ARGS H3DAPI ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc ${H3DAPI_SOURCE_DIR}/H3DAPI.rc.cmake
+                        ${H3DAPI_MAJOR_VERSION} ${H3DAPI_MINOR_VERSION}
+                        ${H3DAPI_BUILD_VERSION} "${H3DAPI_SVN_VERSION}"
+                        "H3DAPI_Output_Name"
+                        "$(TargetFileName)" )
+  ENDIF( ENABLE_SVN_REVISION )
+
+  IF( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DAPI_is_working_copy} EQUAL 0 )
     # Update SVN revision in file.
     EXECUTE_PROCESS( COMMAND ${SubWCRev} ${H3DAPI_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc )
 
@@ -554,7 +569,7 @@ IF( MSVC )
                         PRE_BUILD 
                         COMMAND ${SubWCRev} 
                         ARGS ${H3DAPI_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc )
-  ENDIF( SubWCRev AND ${H3DAPI_is_working_copy} EQUAL 0 )
+  ENDIF( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DAPI_is_working_copy} EQUAL 0 )
 ENDIF(MSVC)
 
 # add the libraries needed for linking
