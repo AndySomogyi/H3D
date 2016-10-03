@@ -55,6 +55,8 @@ namespace PhantomDeviceInternals {
   FIELDDB_ELEMENT( PhantomDevice, needsCalibration, OUTPUT_ONLY );
   FIELDDB_ELEMENT( PhantomDevice, calibrate, INPUT_ONLY );
   FIELDDB_ELEMENT( PhantomDevice, motorTemperatures, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( PhantomDevice, encoderValues, OUTPUT_ONLY );
+  
 }
 
 unsigned int PhantomDevice::nr_initialized_devices = 0;
@@ -106,6 +108,7 @@ PhantomDevice::PhantomDevice(
   jointAngles( new SFVec3f ),
   needsCalibration( new SFBool ),
   motorTemperatures( new MFDouble ),
+  encoderValues( new MFDouble ),
   calibrate( new Calibrate ) { 
 
   type_name = "PhantomDevice";  
@@ -121,6 +124,7 @@ PhantomDevice::PhantomDevice(
   usableWorkspaceDimensions->resize( 2, Vec3f(0,0,0), id );
   needsCalibration->setValue( false, id );
   motorTemperatures->setValue( vector< H3DDouble >( 6, 0 ), id );
+  encoderValues->setValue( vector< H3DDouble >( 6, 0 ), id );
 
   desiredHapticsRate->setValue( 1000, id );
 }
@@ -198,6 +202,8 @@ void PhantomDevice::updateDeviceValues() {
     gimbalAngles->setValue( (Vec3f)pd->getGimbalAngles(), id );
     jointAngles->setValue( (Vec3f) pd->getJointAngles(), id );
     motorTemperatures->setValue( pd->getMotorTemperatures(), id );
+    encoderValues->setValue( pd->getEncoderValues(), id );
+
   }
 #endif
 }
