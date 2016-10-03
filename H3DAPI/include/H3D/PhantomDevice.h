@@ -235,6 +235,11 @@ namespace H3D {
     /// <b>Access type: outputOnly</b> 
     auto_ptr< MFDouble > motorTemperatures;
 
+    /// Encoder values
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< MFDouble > encoderValues;
+
     /// Node database entry
     static H3DNodeDatabase database;
 
