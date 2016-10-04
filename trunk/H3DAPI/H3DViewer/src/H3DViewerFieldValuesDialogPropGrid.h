@@ -148,7 +148,7 @@ public:
                                       wxWindowID id = wxID_ANY, 
                                       const wxString& title = wxEmptyString, 
                                       const wxPoint& pos = wxDefaultPosition, 
-                                      const wxSize& size = wxSize( 236,335 ), 
+                                      const wxSize& size = wxSize( 400,335 ), 
                                       long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL,
                                       bool destroy_on_close = true);
   ~H3DViewerFieldValuesDialogPropGrid();
