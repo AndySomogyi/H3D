@@ -175,32 +175,32 @@ namespace H3D {
     /// 
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 1 \n
-    auto_ptr< CycleInterval  >  cycleInterval;
+    auto_ptr< CycleInterval > cycleInterval;
 
-    /// The cycleTime  field sends a time event at startTime and at 
+    /// The cycleTime field sends a time event at startTime and at 
     /// the beginning of each new cycle with the current time.
     ///
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< SFTime  >  cycleTime;
+    auto_ptr< SFTime > cycleTime;
 
     /// If the enabled field is TRUE, the TimeSensor node is enabled and may
     /// be running, otherwise no field updates are made.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> TRUE \n
-    auto_ptr< SFBool  >  enabled;
+    auto_ptr< SFBool > enabled;
 
     /// The fraction_changed field is the completed fraction of the
     /// current cycle, i.e. a value in the interval [0-1].
     ///
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< SFFloat >  fraction_changed;
+    auto_ptr< SFFloat > fraction_changed;
 
-    /// The time field sends the absolute time for a given 
-    /// simulation tick( i.e. for this scene-graph loop). 
+    /// The time field sends the absolute time for a given
+    /// simulation tick( i.e. for this scene-graph loop).
     ///
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< SFTime  >  time;
+    auto_ptr< SFTime > time;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
