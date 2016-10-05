@@ -48,7 +48,7 @@ MFNodeSplitter::MFNodeSplitter( Inst< SFNode   > _metadata,
                 Inst< MFNode > _mfnode,
                 Inst< MFInt32 > _indexes) : 
 X3DChildNode( _metadata ),
-H3DDynamicFieldsObject( &database ),
+H3DDynamicFieldsObject(),
 mfnode(_mfnode),
 indexes(_indexes),
 updateSelection(new UpdateSelection){

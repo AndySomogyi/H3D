@@ -30,9 +30,9 @@ H3DNodeDatabase ShaderConstants::database("ShaderConstants",
 namespace ShaderConstantsInternals {
 }
 
-ShaderConstants::ShaderConstants( Inst< DisplayList > _displaylist ) : 
+ShaderConstants::ShaderConstants( Inst< DisplayList > _displaylist ) :
   Node(), 
-  H3DDynamicFieldsObject(&database),
+  H3DDynamicFieldsObject(),
   H3DDisplayListObject( _displaylist ) {
     type_name = "ShaderConstants";
     database.initFields(this);
