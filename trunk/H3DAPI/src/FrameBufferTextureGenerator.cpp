@@ -69,6 +69,8 @@ namespace FrameBufferTextureGeneratorInternals {
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, height, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, widthInUse, OUTPUT_ONLY );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, heightInUse, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( FrameBufferTextureGenerator, projectionWidth, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( FrameBufferTextureGenerator, projectionHeight, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, useStereo, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, depthTextureProperties, INPUT_OUTPUT );
   FIELDDB_ELEMENT( FrameBufferTextureGenerator, colorTextureProperties, INITIALIZE_ONLY );
@@ -136,6 +138,8 @@ FrameBufferTextureGenerator::FrameBufferTextureGenerator( Inst< AddChildren    >
   Inst< SFInt32         > _height,
   Inst< SFInt32         > _widthInUse,
   Inst< SFInt32         > _heightInUse,
+  Inst< SFInt32         > _projectionWidth,
+  Inst< SFInt32         > _projectionHeight,
   Inst< SFBool          > _useStereo,
   Inst< SFString        > _depthBufferStorage,
   Inst< SFFrameBufferTextureGeneratorNode > _externalFBODepthBuffer,
@@ -178,6 +182,8 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
   height( _height ),
   widthInUse( _widthInUse ),
   heightInUse( _heightInUse ),
+  projectionWidth( _projectionWidth ),
+  projectionHeight( _projectionHeight ),
   useStereo( _useStereo ),
   useNavigation( _useNavigation ),
   useSpecifiedClearColor( _useSpecifiedClearColor ),
@@ -223,6 +229,8 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
     height->setValue( -1 );
     widthInUse->setValue( -1, id );
     heightInUse->setValue( -1, id );
+    projectionWidth->setValue( -1 );
+    projectionHeight->setValue( -1 );
     useStereo->setValue( false );
     useNavigation->setValue( false );
     useSpecifiedClearColor->setValue( false );
@@ -738,8 +746,16 @@ void FrameBufferTextureGenerator::render()     {
       eye_mode = window->getEyeMode ( );
       stereo_info = StereoInfo::getActive();
     }
-    int projection_width = window->projectionWidth->getValue();
-    int projection_height = window->projectionHeight->getValue();
+
+    // If projection width and height is set locally then use those values
+    // else use width and height of window
+    int projection_width = projectionWidth->getValue();
+    int projection_height = projectionHeight->getValue();
+    if (projection_width < 0 || projection_height < 0) {
+      projection_width = window->projectionWidth->getValue();
+      projection_height = window->projectionHeight->getValue();
+    }
+
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
     glLoadIdentity();
