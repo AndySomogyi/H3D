@@ -112,6 +112,7 @@ void WxWidgetsWindow::initWindow() {
     return;
   }
   RenderMode::Mode stereo_mode = renderMode->getRenderMode();
+  int num_samples = 0;
 
   int attribList[20];
   unsigned int i = 0;
@@ -125,12 +126,16 @@ void WxWidgetsWindow::initWindow() {
   // fullscreen anti-aliasing only supported on wxWidgets 2.9 or later
 #if( wxMAJOR_VERSION > 2 || wxMINOR_VERSION >= 9 ) 
   if( useFullscreenAntiAliasing->getValue() ) {
+    num_samples = 4;
+
     attribList[i++] = WX_GL_SAMPLE_BUFFERS;
     attribList[i++] = 1;
     attribList[i++] = WX_GL_SAMPLES;
-    attribList[i++] = 4;
+    attribList[i++] = num_samples;
   }
 #endif
+
+  numSamples->setValue(num_samples, id);
 
   // TODO: FIX stereo mode
 #ifdef MACOSX
