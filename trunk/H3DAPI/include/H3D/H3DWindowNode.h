@@ -201,7 +201,8 @@ namespace H3D {
                    Inst< SFVec2f     > _clipDistances = 0,
                    Inst< SFBool      > _singlePassStereo = 0,
                    Inst< SFString    > _pointingDeviceRefreshMode = 0,
-                   Inst< SFBool      > _resetViewPoint = 0);
+                   Inst< SFBool      > _resetViewPoint = 0,
+                   Inst< SFInt32     > _numSamples = 0);
 
     /// Destructor.
     ~H3DWindowNode();
@@ -421,6 +422,11 @@ namespace H3D {
     /// <b>Access type:</b> outputOnly \n
     auto_ptr< SFInt32 > projectionHeight;
     
+    /// Flag for whether singlePassStereo is enabled or not.
+    /// A change in this flag should trigger shader rebuilds.
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// <b>Default value:</b> false \n
     auto_ptr< SFBool > singlePassStereo;
     
     /// Determines how often the X3DPointingDeviceSensorNode's in the scene
@@ -436,8 +442,14 @@ namespace H3D {
 
     /// Reset viewpoint 
     /// <b>Access type:</b> inputOutput \n
-    /// <b>Default value:</b> false
+    /// <b>Default value:</b> false \n
     auto_ptr< SFBool > resetViewPoint;
+
+    /// Number of samples used by this window
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    /// <b>Default value:</b> 0 \n
+    auto_ptr< SFInt32 > numSamples;
 
 #ifdef HAVE_LIBOVR
     OculusRiftHandler *oculus;

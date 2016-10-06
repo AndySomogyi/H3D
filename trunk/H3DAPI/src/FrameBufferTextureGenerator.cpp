@@ -1188,6 +1188,15 @@ void FrameBufferTextureGenerator::preProcessFBO(int x, int y,int w, int h, int d
   colorMismatchWarningPrinted->upToDate();
   colorInitWarningPrinted->upToDate();
   const string &output_texture_type = outputTextureType->getValue();
+
+  Scene *scene = Scene::scenes.size() > 0?*Scene::scenes.begin():NULL;
+  H3DWindowNode* window = static_cast<H3DWindowNode*>(scene->window->getValue()[0]);
+
+  // OpenGL doesn't allow blitting when num samples are mismatched, 
+  // except for 0 -> X, or implementation specific cases.
+  bool can_blit = (getNrSamples->getValue() == 0 || 
+    getNrSamples->getValue() == window->numSamples->getValue());
+
   // prepare the fbo_id, multi_sample_fbo_id as user specified
   GLuint target_fbo;
   // the multi_sample_fbo_id will be used as the starting point for rendering.
@@ -1227,10 +1236,10 @@ void FrameBufferTextureGenerator::preProcessFBO(int x, int y,int w, int h, int d
       // except for some very specific cases like 4x -> 0x or 0x -> 4x.
       // But we have no guarantee that future default FBO will also use 4x 
       // samples, so we leave it at only allowing default copy if samples = 0.
-      if(samples->getValue() > 0) {
+      if(!can_blit) {
         if(!depthWarningPrinted->getValue()) {
-          Console(LogLevel::Error) << "Warning: Can't copy depth from " <<
-            "default FBO if number of samples is larger than 0." << std::endl;
+          Console(LogLevel::Error) << "Warning: Can only copy depth from default"
+          " FBO if numSamples == 0 or it matches H3DWindowNode::numSamples." << std::endl;
           depthWarningPrinted->setValue(true);
         }
 
@@ -1251,7 +1260,7 @@ void FrameBufferTextureGenerator::preProcessFBO(int x, int y,int w, int h, int d
         clearBuffers(target_fbo,0,0,w,h, GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
       } else { // bind depth buffer from external fbo to internal fbo
         // update the depth_id and depth tex of internal fbo bounded depth buffer.
-        if( getNrSamples->getValue()>0 ) {
+        if( can_blit ) {
           if( !depthWarningPrinted->getValue() ) {
             Console(LogLevel::Error)<< "Warning: Multi-sampled FBO can not share depth buffer "
               << "will use FBO_COPY instead" <<std::endl;
@@ -1301,7 +1310,7 @@ void FrameBufferTextureGenerator::preProcessFBO(int x, int y,int w, int h, int d
         GLuint external_FBO_id_depth = external_FBO_depth->getFBOId();
         blitDepthBuffer(external_FBO_id_depth, target_fbo, 0, 0, w, h);
       }
-    } else { 
+    } else {
       if( !depthWarningPrinted->getValue() ) {
         Console(LogLevel::Error)  << "The specified depth_buffer_storage value: ["
           <<depth_buffer_storage<<"] is not currently supported" 
@@ -1375,15 +1384,11 @@ void FrameBufferTextureGenerator::preProcessFBO(int x, int y,int w, int h, int d
         continue;
       } else { 
         // colorBufferStorage is DEFAULT, FBO_COPY_x or FBO_SHARE_x
-        if( color_buffer_storage =="DEFAULT_COPY" ) { 
-          // OpenGL doesn't allow blitting when num samples are mismatched, 
-          // except for some very specific cases like 4x -> 0x or 0x -> 4x.
-          // But we have no guarantee that future default FBO will also use 4x 
-          // samples, so we leave it at only allowing default copy if samples = 0.
-          if(samples->getValue() > 0) {
+        if( color_buffer_storage == "DEFAULT_COPY" ) { 
+          if(!can_blit) {
             if(!colorInitWarningPrinted->getValue()[i]) {
-              Console(LogLevel::Error) << "Warning: Can't copy color from " <<
-                "default FBO if number of samples is larger than 0." << std::endl;
+              Console(LogLevel::Error) << "Warning: Can only copy color from default"
+                " FBO if numSamples == 0 or it matches H3DWindowNode::numSamples." << std::endl;
               colorInitWarningPrinted->setValue(i, true);
             }
 

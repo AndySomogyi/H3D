@@ -265,6 +265,11 @@ void GLUTWindow::initWindow() {
 #endif // H3D_WINDOWS
 #endif // FREEGLUT
   window_is_made_active = true;
+
+  GLint num_samples;
+  glGetIntegerv(GL_SAMPLES, &num_samples);
+
+  numSamples->setValue(num_samples, id);
 }
 
 

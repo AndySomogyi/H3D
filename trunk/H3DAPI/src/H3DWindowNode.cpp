@@ -99,8 +99,7 @@ namespace H3DWindowNodeInternals {
   FIELDDB_ELEMENT( H3DWindowNode, singlePassStereo, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DWindowNode, pointingDeviceRefreshMode, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DWindowNode, resetViewPoint, INPUT_OUTPUT );
-
-  
+  FIELDDB_ELEMENT( H3DWindowNode, numSamples, OUTPUT_ONLY );
 }
 
 bool H3DWindowNode::GLEW_init = false;
@@ -123,7 +122,8 @@ H3DWindowNode::H3DWindowNode(
                    Inst< SFVec2f > _clipDistances,
                    Inst< SFBool      > _singlePassStereo,
                    Inst< SFString > _pointingDeviceRefreshMode,
-                   Inst< SFBool   > _resetViewPoint ) :
+                   Inst< SFBool   > _resetViewPoint,
+                   Inst< SFInt32 > _numSamples ) :
 #ifdef WIN32
   rendering_context( NULL ),
 #endif
@@ -149,6 +149,7 @@ H3DWindowNode::H3DWindowNode(
   fbo_current_y(0),
   pointingDeviceRefreshMode( _pointingDeviceRefreshMode ),
   resetViewPoint(_resetViewPoint),
+  numSamples(_numSamples),
   last_render_child( NULL ),
   window_id( 0 ),
   rebuild_stencil_mask( false ),
@@ -220,6 +221,7 @@ H3DWindowNode::H3DWindowNode(
   pointingDeviceRefreshMode->setValue( "MOUSE_MOVE" );  
 
   resetViewPoint->setValue(false);
+  numSamples->setValue(0, id);
 
   useFullscreenAntiAliasing->setValue( true );
   manualCursorControl->setValue( false );
