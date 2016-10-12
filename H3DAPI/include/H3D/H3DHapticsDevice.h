@@ -620,6 +620,15 @@ namespace H3D {
     /// \dotfile H3DHapticsDevice_forceLimit.dot    
     auto_ptr< SFFloat > forceLimit;
 
+    /// Set the scaling of the output force. The forces generated will
+    /// be multiplied by the value.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> 1 \n
+    ///
+    /// \dotfile H3DHapticsDevice_forceScale.dot 
+    auto_ptr < SFFloat > forceScale;
+
     /// This is an alternative operational safety mode. When enabled the mainButton
     /// assumes the function of a dead man's switch. Force are only rendered, if the
     /// button is pressed/hold down, otherwise the forceLimit and torqueLimit are

@@ -79,6 +79,7 @@ namespace H3DHapticsDeviceInternals {
   FIELDDB_ELEMENT( H3DHapticsDevice, deadmansSwitch, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, forceLimit, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, torqueLimit, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( H3DHapticsDevice, forceScale, INPUT_OUTPUT );
   FIELDDB_ELEMENT( H3DHapticsDevice, deviceAngularVelocity, OUTPUT_ONLY );
   FIELDDB_ELEMENT( H3DHapticsDevice, trackerAngularVelocity, OUTPUT_ONLY );
 }
@@ -152,6 +153,7 @@ H3DHapticsDevice::H3DHapticsDevice(
   deadmansSwitch( new SFBool ),
   forceLimit( new SFFloat ),
   torqueLimit( new SFFloat ),
+  forceScale( new SFFloat ),
   error_msg_printed( false ),
   deviceAngularVelocity( _deviceAngularVelocity ),
   trackerAngularVelocity( _trackerAngularVelocity ) {
@@ -175,6 +177,7 @@ H3DHapticsDevice::H3DHapticsDevice(
   deadmansSwitch->setValue( false, id );
   forceLimit->setValue( -1, id );
   torqueLimit->setValue( -1, id );
+  forceScale->setValue( 1, id );
 
   // Even though this is an input only field a default value
   // should be set to false since onValueChanged is used which is
@@ -316,6 +319,8 @@ void H3DHapticsDevice::updateDeviceValues() {
         hapi_device->setForceLimit( forceLimit->getValue() );
         hapi_device->setTorqueLimit( torqueLimit->getValue() );
     }
+
+    hapi_device->setForceScale( forceScale->getValue() );
 
     X3DViewpointNode *vp = X3DViewpointNode::getActive();
     vp = H3DNavigation::viewpointToUse( vp, 0 );
