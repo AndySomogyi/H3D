@@ -1985,15 +1985,43 @@ void WxFrame::ChangeRenderer(wxCommandEvent & event)
 //}
 
 //Show console event
-void WxFrame::ShowConsole(wxCommandEvent & event)
-{
-  if (!(check_dialogs_position_because_of_fullscreen_and_not_quadro &&
-      GetScreenRect().Intersects( the_console->GetScreenRect() ) ) ) {
-    if( the_console->IsIconized() )
+void WxFrame::ShowConsole(wxCommandEvent & event) {
+  if(!(check_dialogs_position_because_of_fullscreen_and_not_quadro &&
+       GetScreenRect().Intersects(the_console->GetScreenRect()))) {
+    // Move the console window to be located below the main window.
+    if(!glwindow->fullscreen->getValue()) {
+      wxPoint curr_pos = GetScreenPosition();
+      wxSize curr_size = GetSize();
+      wxRect desktop_dims = wxGetClientDisplayRect();
+      wxSize console_size = the_console->GetSize();
+
+      // Make sure console isn't moved outside screen X.
+      if(curr_pos.x + console_size.GetWidth() >=
+        (desktop_dims.GetRight() - console_size.GetWidth())) {
+        curr_pos.x = (desktop_dims.GetRight() - console_size.GetWidth());
+      } else {
+        //curr_pos.x stays unchanged.
+      }
+
+      // Make sure console isn't moved outside screen Y.
+      if(curr_pos.y + console_size.GetHeight() >=
+        (desktop_dims.GetBottom() - console_size.GetHeight())) {
+        curr_pos.y = (desktop_dims.GetBottom() - console_size.GetHeight());
+      } else {
+        curr_pos.y = curr_pos.y + curr_size.GetHeight();
+      }
+
+      the_console->Move(curr_pos.x, curr_pos.y);
+    }
+
+    if(the_console->IsIconized()) {
       the_console->Iconize(false);
-    if( !the_console->Show())
-    // already shown, bring it up
+    }
+
+    if(!the_console->Show()) {
+      // already shown, bring it up
       the_console->SetFocus();
+    }
   }
 }
 
@@ -2020,17 +2048,44 @@ void WxFrame::OculusRiftRecenter(wxCommandEvent & event) {
 
 
 //Show console event
-void WxFrame::ShowTreeView(wxCommandEvent & event)
-{
-  if( tree_view_dialog->IsIconized() )
+void WxFrame::ShowTreeView(wxCommandEvent & event) {
+  // Move the tree view window to be located to the right of the main window.
+  if(!glwindow->fullscreen->getValue()) {
+    wxPoint curr_pos = GetScreenPosition();
+    wxSize curr_size = GetSize();
+    wxRect desktop_dims = wxGetClientDisplayRect();
+    wxSize tree_view_size = tree_view_dialog->GetSize();
+
+    // Make sure tree view isn't moved outside screen X.
+    if(curr_pos.x + tree_view_size.GetWidth() >=
+      (desktop_dims.GetRight() - tree_view_size.GetWidth())) {
+      curr_pos.x = (desktop_dims.GetRight() - tree_view_size.GetWidth());
+    } else {
+      curr_pos.x = curr_pos.x + curr_size.GetWidth();
+    }
+
+    // Make sure tree view isn't moved outside screen Y.
+    if(curr_pos.y + tree_view_size.GetHeight() >=
+      (desktop_dims.GetBottom() - tree_view_size.GetHeight())) {
+      curr_pos.y = (desktop_dims.GetBottom() - tree_view_size.GetHeight());
+    } else {
+      //curr_pos.y stays unchanged.
+    }
+
+    tree_view_dialog->Move(curr_pos.x, curr_pos.y);
+  }
+
+  if(tree_view_dialog->IsIconized()) {
     tree_view_dialog->Iconize(false);
-  if (!tree_view_dialog->Show()) {
+  }
+
+  if(!tree_view_dialog->Show()) {
     // already shown, bring it up
     tree_view_dialog->SetFocus();
   }
 
   // Give focus to the search box by default
-  tree_view_dialog->highlightSearchBox ();
+  tree_view_dialog->highlightSearchBox();
 }
 
 //Show program settings window

@@ -76,9 +76,16 @@ H3DViewerTreeViewDialog::H3DViewerTreeViewDialog(wxWindow* parent)
 
   menu_container = new H3DViewerPopupMenus(this, this);
   displayFieldsFromNode(NULL);
-  if(SplitterWindow->IsSplit())
+  
+  if(SplitterWindow->IsSplit()) {
     SplitterWindow->Unsplit();
-  SplitterWindow->SplitVertically(TreeViewPanel, field_values_panel, 283);
+  }
+
+  TreeViewPanel->SetMinSize(wxSize(450, -1));
+  field_values_panel->SetSize(wxSize(150, -1));
+  SplitterWindow->SplitVertically(TreeViewPanel, field_values_panel, 0);
+  SplitterWindow->Fit();
+
   this->Layout();
 
   this->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(H3DViewerTreeViewDialog::onCharHook));
