@@ -66,7 +66,6 @@
 using namespace std;
 using namespace H3D;
 
-
 void insertLineBreak(stringstream &inputstream, stringstream &outputstream, int charCount){
   char *line = new char[charCount];
   int length;
@@ -409,6 +408,9 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
                                  wxT("If checked routes sends events when set up, i.e. not as in X3D spec.") );
   advancedMenu->AppendCheckItem( FRAME_LOADTEXTURESINTHREAD, wxT("Load textures in thread"),
                                  wxT("If checked textures are loaded in a separate thread.") );
+  advancedMenu->AppendCheckItem(FRAME_ALIGNCONSOLETREEVIEW, wxT("Align console and tree view"),
+                                 wxT("If checked, console and tree view window are aligned next to main window") );
+
   h3dConfig->SetPath(wxT("/Settings"));
   bool new_viewpoint_on_load = true;
   h3dConfig->Read(wxT("new_viewpoint_on_load"), &new_viewpoint_on_load);
@@ -421,6 +423,9 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   h3dConfig->Read(wxT("load_textures_in_thread"), &load_textures_in_thread);
   advancedMenu->Check( FRAME_LOADTEXTURESINTHREAD, load_textures_in_thread );
   global_settings->loadTexturesInThread->setValue( load_textures_in_thread );
+  bool align_console_treeview = false;
+  h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
+  advancedMenu->Check(FRAME_ALIGNCONSOLETREEVIEW, align_console_treeview);
   //Help Menu
   helpMenu = new wxMenu;
   //helpMenu->Append(FRAME_HELP, wxT("Help"));
@@ -674,6 +679,7 @@ BEGIN_EVENT_TABLE(WxFrame, wxFrame)
   EVT_MENU (FRAME_KEEPVIEWPOINTONLOAD, WxFrame::OnKeepViewpointOnLoadCheck )
   EVT_MENU (FRAME_ROUTESENDSEVENTS, WxFrame::OnRouteSendsEventsCheck )
   EVT_MENU (FRAME_LOADTEXTURESINTHREAD, WxFrame::OnLoadTexturesInThreadCheck )
+  EVT_MENU (FRAME_ALIGNCONSOLETREEVIEW, WxFrame::OnAlignConsoleAndTreeview )
   EVT_MENU (FRAME_VIEWPOINT, WxFrame::ChangeViewpoint)
   EVT_MENU (FRAME_RESET_VIEWPOINT, WxFrame::ResetViewpoint)
   EVT_MENU (FRAME_NAVIGATION, WxFrame::ChangeNavigation)
@@ -1988,8 +1994,12 @@ void WxFrame::ChangeRenderer(wxCommandEvent & event)
 void WxFrame::ShowConsole(wxCommandEvent & event) {
   if(!(check_dialogs_position_because_of_fullscreen_and_not_quadro &&
        GetScreenRect().Intersects(the_console->GetScreenRect()))) {
+    bool align_console_treeview = false;
+    h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
+
     // Move the console window to be located below the main window.
-    if(!glwindow->fullscreen->getValue()) {
+    if((!glwindow->fullscreen->getValue() && !IsMaximized()) && 
+        align_console_treeview) {
       wxPoint curr_pos = GetScreenPosition();
       wxSize curr_size = GetSize();
       wxRect desktop_dims = wxGetClientDisplayRect();
@@ -2049,8 +2059,12 @@ void WxFrame::OculusRiftRecenter(wxCommandEvent & event) {
 
 //Show console event
 void WxFrame::ShowTreeView(wxCommandEvent & event) {
+  bool align_console_treeview = false;
+  h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
+
   // Move the tree view window to be located to the right of the main window.
-  if(!glwindow->fullscreen->getValue()) {
+  if((!glwindow->fullscreen->getValue() && !IsMaximized()) &&
+    align_console_treeview) {
     wxPoint curr_pos = GetScreenPosition();
     wxSize curr_size = GetSize();
     wxRect desktop_dims = wxGetClientDisplayRect();
@@ -2152,6 +2166,13 @@ void WxFrame::OnLoadTexturesInThreadCheck(wxCommandEvent & event)
   h3dConfig->SetPath(wxT("/Settings"));
   h3dConfig->Write(wxT("load_textures_in_thread"), event.IsChecked());
   global_settings->loadTexturesInThread->setValue( event.IsChecked() );
+}
+
+void WxFrame::OnAlignConsoleAndTreeview(wxCommandEvent & event)
+{
+  h3dConfig = wxConfigBase::Get();
+  h3dConfig->SetPath(wxT("/Settings"));
+  h3dConfig->Write(wxT("align_console_treeview"), event.IsChecked());
 }
 
 void WxFrame::ShowPluginsDialog(wxCommandEvent & event)

@@ -22,6 +22,7 @@ TreeViewDialog::TreeViewDialog( wxWindow* parent, wxWindowID id, const wxString&
 	SplitterWindow = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxSize( -1,500 ), wxSP_3D );
 	SplitterWindow->SetSashGravity( 1 );
 	SplitterWindow->Connect( wxEVT_IDLE, wxIdleEventHandler( TreeViewDialog::SplitterWindowOnIdle ), NULL, this );
+	SplitterWindow->SetMinimumPaneSize( 1 );
 	
 	SplitterWindow->SetMinSize( wxSize( -1,500 ) );
 	
@@ -37,7 +38,7 @@ TreeViewDialog::TreeViewDialog( wxWindow* parent, wxWindowID id, const wxString&
 	TreeViewPanel->Layout();
 	bSizer3->Fit( TreeViewPanel );
 	FieldValueViewPanel = new wxPanel( SplitterWindow, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	SplitterWindow->SplitVertically( TreeViewPanel, FieldValueViewPanel, 283 );
+	SplitterWindow->SplitVertically( TreeViewPanel, FieldValueViewPanel, 340 );
 	bSizer14->Add( SplitterWindow, 1, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer8;
@@ -443,7 +444,7 @@ ViewImage::ViewImage( wxWindow* parent, wxWindowID id, const wxString& title, co
 	
 	sbSizer2->Add( m_checkBoxChannelBlue, 0, wxALL, 5 );
 	
-	m_checkBoxChannelAlpha = new wxCheckBox( m_panel4, wxID_ANY, wxT("Alpha"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxChannelAlpha = new wxCheckBox( sbSizer2->GetStaticBox(), wxID_ANY, wxT("Alpha"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer2->Add( m_checkBoxChannelAlpha, 0, wxALL, 5 );
 	
 	
