@@ -75,7 +75,7 @@ class TreeViewDialog : public wxFrame
 		
 		void SplitterWindowOnIdle( wxIdleEvent& )
 		{
-			SplitterWindow->SetSashPosition( 283 );
+			SplitterWindow->SetSashPosition( 340 );
 			SplitterWindow->Disconnect( wxEVT_IDLE, wxIdleEventHandler( TreeViewDialog::SplitterWindowOnIdle ), NULL, this );
 		}
 	
@@ -234,7 +234,7 @@ inline std::string toStr( const wxString &s ) {
   for( unsigned int i = 0; i < s.size(); ++i ) {
     b[i] = (char)(wb[i]);
   }
-  
+
   b[s.size()] = '\0';
   std::string sb(b);
   delete[] b;
@@ -243,6 +243,5 @@ inline std::string toStr( const wxString &s ) {
   return std::string( s.c_str() );
 #endif
 }
-
 
 #endif //__H3DVIEWER_H__
