@@ -142,8 +142,15 @@ namespace H3D {
       virtual void onValueChange(const H3DDouble &v);
     };
 
+    /// EnableSecondaryCollisions specializes SFBool to set the value determining
+    /// whether to enable secondary collisions when calculating proxy position
+    class H3DAPI_API EnableSecondaryCollisions : public OnValueChangeSField< SFBool > {
+      virtual void onValueChange(const bool &v);
+    };
+
     /// Constructor.
-    GodObjectRenderer( Inst< MinDistance > _minDistance = 0);
+    GodObjectRenderer( Inst< MinDistance > _minDistance = 0, 
+                       Inst< EnableSecondaryCollisions > _enableSecondaryCollisions = 0);
 
     /// The minimum distance the proxy will be from the surface. The proxy
     /// will be moved above the surface with the given factor in order to
@@ -153,12 +160,22 @@ namespace H3D {
     /// <b>Default value:</b> 1e-7 \n
     auto_ptr< SFDouble > minDistance;
 
+    /// Performs additional collision detection when calculating a new proxy position
+    /// Attempts to avoid placing the from point behind
+    /// another surface when calculating proxy movement.
+    /// Enabling prevents fall through issues from occuring 
+    /// but may have an adverse effect on performance
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> false \n
+    auto_ptr< SFBool > enableSecondaryCollisions;
+
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   protected:
     /// Returns a new instance of HAPI::GodObjectRenderer
     virtual HAPI::HAPIHapticsRenderer *getNewHapticsRenderer() {
-      return new HAPI::GodObjectRenderer( minDistance->getValue());
+      return new HAPI::GodObjectRenderer( minDistance->getValue(), enableSecondaryCollisions->getValue());
     }
   };
 
