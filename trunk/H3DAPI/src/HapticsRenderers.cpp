@@ -80,6 +80,9 @@ HAPI::HAPIHapticsRenderer *Chai3DRenderer::getNewHapticsRenderer() {
 #endif
 
 namespace HapticsRendererInternals {
+
+  FIELDDB_ELEMENT( GodObjectRenderer, minDistance, INPUT_OUTPUT );
+
   FIELDDB_ELEMENT( RuspiniRenderer, proxyRadius, INPUT_OUTPUT );
   FIELDDB_ELEMENT( RuspiniRenderer, alwaysFollowSurface, INPUT_OUTPUT );
 
@@ -88,6 +91,25 @@ namespace HapticsRendererInternals {
   FIELDDB_ELEMENT( OpenHapticsRenderer, defaultHapticCameraView, INPUT_OUTPUT );
 
   FIELDDB_ELEMENT( LayeredRenderer, hapticsRenderer, INPUT_OUTPUT );
+}
+
+GodObjectRenderer::GodObjectRenderer(Inst< MinDistance > _minDistance) :
+  minDistance ( _minDistance ) {
+
+  type_name = "GodObjectRenderer";
+  database.initFields(this);
+
+  minDistance->setValue( (H3DDouble) 1e-7 );
+}
+
+void GodObjectRenderer::MinDistance::onValueChange(const H3DDouble &v) {
+  GodObjectRenderer *godObject_node =
+    static_cast< GodObjectRenderer * >(getOwner());
+  for (unsigned int i = 0; i < godObject_node->renderers.size(); ++i) {
+    HAPI::GodObjectRenderer *r =
+      static_cast< HAPI::GodObjectRenderer * >(godObject_node->getHapticsRenderer(i));
+    r->setMinDistance( v );
+  }
 }
 
 RuspiniRenderer::RuspiniRenderer( Inst< ProxyRadius > _proxyRadius,

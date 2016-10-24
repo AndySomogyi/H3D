@@ -31,6 +31,7 @@
 
 // H3DApi includes
 #include <H3D/H3DHapticsRendererNode.h>
+#include <H3D/SFDouble.h>
 #include <H3D/SFFloat.h>
 #include <H3D/SFString.h>
 #include <H3D/SFBool.h>
@@ -135,19 +136,29 @@ namespace H3D {
   class H3DAPI_API GodObjectRenderer: public H3DHapticsRendererNode {
   public:
 
+    /// minDistance specializes SFDouble to set the minimum distance
+    /// between the surface and the proxy in GodObjectRenderer
+    class H3DAPI_API MinDistance : public OnValueChangeSField< SFDouble > {
+      virtual void onValueChange(const H3DDouble &v);
+    };
+
     /// Constructor.
-    GodObjectRenderer() {
- 
-      type_name = "GodObjectRenderer";
-      database.initFields( this );
-    }
+    GodObjectRenderer( Inst< MinDistance > _minDistance = 0);
+
+    /// The minimum distance the proxy will be from the surface. The proxy
+    /// will be moved above the surface with the given factor in order to
+    /// avoid roundoff errors and fallthrough problems.
+    ///
+    /// <b>Access type:</b> inputOutput \n
+    /// <b>Default value:</b> 1e-7 \n
+    auto_ptr< SFDouble > minDistance;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
   protected:
     /// Returns a new instance of HAPI::GodObjectRenderer
     virtual HAPI::HAPIHapticsRenderer *getNewHapticsRenderer() {
-      return new HAPI::GodObjectRenderer;
+      return new HAPI::GodObjectRenderer( minDistance->getValue());
     }
   };
 
