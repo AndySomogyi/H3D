@@ -82,6 +82,7 @@ HAPI::HAPIHapticsRenderer *Chai3DRenderer::getNewHapticsRenderer() {
 namespace HapticsRendererInternals {
 
   FIELDDB_ELEMENT( GodObjectRenderer, minDistance, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( GodObjectRenderer, enableSecondaryCollisions, INPUT_OUTPUT );
 
   FIELDDB_ELEMENT( RuspiniRenderer, proxyRadius, INPUT_OUTPUT );
   FIELDDB_ELEMENT( RuspiniRenderer, alwaysFollowSurface, INPUT_OUTPUT );
@@ -93,13 +94,16 @@ namespace HapticsRendererInternals {
   FIELDDB_ELEMENT( LayeredRenderer, hapticsRenderer, INPUT_OUTPUT );
 }
 
-GodObjectRenderer::GodObjectRenderer(Inst< MinDistance > _minDistance) :
-  minDistance ( _minDistance ) {
+GodObjectRenderer::GodObjectRenderer(Inst< MinDistance > _minDistance,
+                                     Inst< EnableSecondaryCollisions > _enableSecondaryCollisions) :
+  minDistance ( _minDistance ),
+  enableSecondaryCollisions( _enableSecondaryCollisions ) {
 
   type_name = "GodObjectRenderer";
   database.initFields(this);
 
   minDistance->setValue( (H3DDouble) 1e-7 );
+  enableSecondaryCollisions->setValue(false);
 }
 
 void GodObjectRenderer::MinDistance::onValueChange(const H3DDouble &v) {
@@ -109,6 +113,16 @@ void GodObjectRenderer::MinDistance::onValueChange(const H3DDouble &v) {
     HAPI::GodObjectRenderer *r =
       static_cast< HAPI::GodObjectRenderer * >(godObject_node->getHapticsRenderer(i));
     r->setMinDistance( v );
+  }
+}
+
+void GodObjectRenderer::EnableSecondaryCollisions::onValueChange(const bool &v) {
+  GodObjectRenderer *godObject_node =
+    static_cast< GodObjectRenderer * >(getOwner());
+  for (unsigned int i = 0; i < godObject_node->renderers.size(); ++i) {
+    HAPI::GodObjectRenderer *r =
+      static_cast< HAPI::GodObjectRenderer * >(godObject_node->getHapticsRenderer(i));
+    r->setSecondaryCollisions(v);
   }
 }
 
