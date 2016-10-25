@@ -200,7 +200,10 @@ class TestCaseRunner ( object ):
       print "Test finished successfully after " + str(time_slept) + "s"
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
-      test_results.warnings, test_results.errors= self._countWarnings ( test_results )
+      if test_case.ignore_warnings:
+        test_results.warnings, test_results.errors = [0,0]
+      else:
+        test_results.warnings, test_results.errors= self._countWarnings ( test_results )
       test_results.terminates_ok = os.path.isfile(self.early_shutdown_file)
       return test_results
    
@@ -215,7 +218,10 @@ class TestCaseRunner ( object ):
       test_results.terminates_ok= True
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
-      test_results.warnings, test_results.errors= self._countWarnings ( test_results )
+      if test_case.ignore_warnings:
+        test_results.warnings, test_results.errors = [0,0]
+      else:
+        test_results.warnings, test_results.errors= self._countWarnings ( test_results )
       return test_results
     else:
       print "Shutdown timeout hit, test looks like it crashed or froze."
@@ -230,7 +236,10 @@ class TestCaseRunner ( object ):
         pass
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
-      test_results.warnings, test_results.errors= self._countWarnings ( test_results )
+      if test_case.ignore_warnings:
+        test_results.warnings, test_results.errors = [0,0]
+      else:
+        test_results.warnings, test_results.errors= self._countWarnings ( test_results )
       return test_results
   
 
@@ -253,7 +262,7 @@ class TestCaseRunner ( object ):
     result = []
     for sect in confParser.sections():
       if sect != 'Default':
-        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials', 'physics_engine'])
+        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials', 'physics_engine','ignore_warnings'])
         test_case.name = sect
         test_case.x3d = confParser.get(sect, 'x3d')
         test_case.baseline = confParser.get(sect, 'baseline folder')
@@ -293,6 +302,11 @@ class TestCaseRunner ( object ):
           test_case.physics_engine = confParser.get(sect, 'physics_engine')
         except:
           test_case.physics_engine = None
+        
+        try:
+          test_case.ignore_warnings = confParser.getboolean(sect, 'ignore_warnings')
+        except:
+          test_case.ignore_warnings = False
 
         if args.case == "" or args.case == test_case.name:
           result.append(test_case)
