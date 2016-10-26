@@ -165,6 +165,23 @@ class TestCaseRunner ( object ):
     else:
       return process.testLaunch ( [os.path.join(args.processpath, h3d_process_name)] + self.load_flags + [url], cwd, self.startup_time, self.shutdown_time, 1 if variation and variation.global_insertion_string_failed else self.startup_time_multiplier, self.early_shutdown_file )
   
+  def getExePath(self,program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+  
   def runTestCase (self, filename, test_case, url, orig_url= None, var_name= "", variation = None):
 
     if orig_url is None:
@@ -225,21 +242,29 @@ class TestCaseRunner ( object ):
       return test_results
     else:
       print "Shutdown timeout hit, test looks like it crashed or froze."
-      try:
-        process.kill ()
-        time_slept = 0
-        self.shutdown_timeout = 60
-        while time_slept < self.shutdown_timeout and process.isRunning():
-          time.sleep(0.5)
-          time_slept += 0.5
-      except:
-        pass
+      pskill_path = self.getExePath("pskill.exe")
+      if pskill_path is not None:
+        print "force shutting down h3dviewer with pskill"
+        kill_process = str(pskill_path)+" /accepteula -t -nobanner H3DViewer.exe"
+        import subprocess
+        p = subprocess.Popen( kill_process, shell=False )
+      else:
+        try:
+          process.kill ()
+          time_slept = 0
+          self.shutdown_timeout = 60
+          while time_slept < self.shutdown_timeout and process.isRunning():
+            time.sleep(0.5)
+            time_slept += 0.5
+        except:
+          pass
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
       if test_case.ignore_warnings:
         test_results.warnings, test_results.errors = [0,0]
       else:
         test_results.warnings, test_results.errors= self._countWarnings ( test_results )
+      
       return test_results
   
 
