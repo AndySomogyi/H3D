@@ -105,21 +105,21 @@ namespace H3D {
     /// Set the matrix fields from the values provided in ti.
     virtual void traverseSG( TraverseInfo &ti );
 
-  virtual void render();
+    virtual void render();
 
     /// The accForwardMatrix field is the matrix that transforms from the local
     /// coordinate space where this Node resides in the scenegraph to 
     /// global space.
     /// 
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< SFMatrix4f >  accForwardMatrix;
+    auto_ptr< SFMatrix4f > accForwardMatrix;
 
     /// The accInverseMatrix field is the matrix that transforms from the 
     /// global coordinate space to the coordinate space this Node resides
     /// in in the scenegraph.
     /// 
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< SFMatrix4f >  accInverseMatrix;
+    auto_ptr< SFMatrix4f > accInverseMatrix;
 
     /// Determines if the OpenGL matrix fields should be updated or not
     /// (the fields starting with gl). Note that when this is true 
@@ -134,23 +134,23 @@ namespace H3D {
     /// transform hierarchy.
     /// 
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< SFMatrix4f >  glModelViewMatrix;
+    auto_ptr< SFMatrix4f > glModelViewMatrix;
 
     /// The inverse matrix of glModelViewMatrix
     /// 
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< Matrix4fInverse >  glModelViewMatrixInverse;
+    auto_ptr< Matrix4fInverse > glModelViewMatrixInverse;
 
     /// The OpenGL GL_PROJECTION_MATRIX at the current point of the 
     /// transform hierarchy.
     /// 
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< SFMatrix4f >  glProjectionMatrix;
+    auto_ptr< SFMatrix4f > glProjectionMatrix;
 
     /// The inverse matrix of glProjectionMatrix
     /// 
     /// <b>Access type:</b> outputOnly \n
-    auto_ptr< Matrix4fInverse >  glProjectionMatrixInverse;
+    auto_ptr< Matrix4fInverse > glProjectionMatrixInverse;
 
     /// The inverse transposed matrix of glModelViewMatrix, used to transform
     /// normal from object space to view/eye/camera space.
