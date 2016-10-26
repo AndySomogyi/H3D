@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//    Copyright 2004-2014, SenseGraphics AB
+//    Copyright 2004-2016, SenseGraphics AB
 //
 //    This file is part of H3D API.
 //
@@ -82,6 +82,7 @@ PlanarReflector::PlanarReflector(
   geometry->route( displayList );
   reflectivity->route( displayList );
   color->route( displayList );
+  displayList->setFrustumCullingMode( H3DDisplayListObject::DisplayList::ON );
 }
 
 
@@ -107,7 +108,11 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
                     local_to_global[0][3], local_to_global[1][3],
                     local_to_global[2][3], local_to_global[3][3] };
   glMultMatrixf( t );
-  
+  if( displayList->usingFrustumCulling() && displayList->isOutsideViewFrustum() ) {
+    glPopMatrix();
+    return;
+  }
+
   glClear( GL_STENCIL_BUFFER_BIT );
 
   // write 1 into all values in the stencil buffer used when rendering the
@@ -123,7 +128,7 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   X3DGeometryNode *g = geometry->getValue();
   if( g ) g->displayList->callList();
   
-  // reset to frite to frame and depth buffer again
+  // reset to write to frame and depth buffer again
   glColorMask( 1, 1, 1, 1 );
   glEnable( GL_DEPTH_TEST );
 
@@ -253,11 +258,14 @@ void PlanarReflector::renderPostViewpoint ( X3DChildNode *n,
   
   const RGB &c = color->getValue();
 
+  GLfloat current_color[4];
+  glGetFloatv( GL_CURRENT_COLOR, current_color );
   glColor4f( c.r, c.g, c.b, 1 - reflectivity->getValue() );
   if( g ) g->render();
   glEnable( GL_LIGHTING );
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
+  glColor4f( current_color[0], current_color[1], current_color[2], current_color[3] );
 
   glFrontFace( front_face );
     /*
@@ -310,7 +318,9 @@ void PlanarReflector::traverseSG( TraverseInfo &ti ) {
   Node *g = geometry->getValue();
   if ( g ) g->traverseSG( ti );
   X3DChildNode::traverseSG( ti );
-  H3DMultiPassRenderObject::traverseSG( ti );
+  if( ti.graphicsEnabled() ) {
+    ++nr_times_in_scene;
+  }
 }
 
 bool PlanarReflector::lineIntersect(
