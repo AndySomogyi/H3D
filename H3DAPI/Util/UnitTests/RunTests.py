@@ -27,6 +27,7 @@ import MySQLdb
 from TestResults import TestResults
 from Variations import Option, Variation
 from ProcessWrapper import *
+import subprocess
 
 
 
@@ -205,6 +206,9 @@ class TestCaseRunner ( object ):
     
     if os.path.isfile( self.early_shutdown_file ):
       os.remove( self.early_shutdown_file )
+    if os.path.isfile("childProcessIdList.txt"):
+      os.remove( "childProcessIdList.txt" )
+
     process= self.launchTest ( url, cwd, test_case.resolution)
 
     time_slept = 0.0
@@ -242,29 +246,35 @@ class TestCaseRunner ( object ):
       return test_results
     else:
       print "Shutdown timeout hit, test looks like it crashed or froze."
+      # To ensure the launched process is killed, use pskill and 
+      # id information stored in childProcessedIDList.txt to force kill those ids. 
+      # try to locate childProcessIdList.txt file which is supposed to be generated
+      # by test case to indicate the the id of the process
       pskill_path = self.getExePath("pskill.exe")
       if pskill_path is not None:
-        print "force shutting down h3dviewer with pskill"
-        kill_process = str(pskill_path)+" /accepteula -t -nobanner H3DViewer.exe"
-        import subprocess
-        p = subprocess.Popen( kill_process, shell=False )
-      else:
-        try:
-          process.kill ()
-          time_slept = 0
-          self.shutdown_timeout = 60
-          while time_slept < self.shutdown_timeout and process.isRunning():
-            time.sleep(0.5)
-            time_slept += 0.5
-        except:
-          pass
+        if os.path.isfile("childProcessIdList.txt"):
+          f = open("childProcessIdList.txt",'r')
+          process_ids = f.read().split()
+          for process_id in process_ids:
+            print "force kiling id", process_id
+            kill_process = str(pskill_path)+" /accepteula -t -nobanner "+str(process_id)
+            p = subprocess.Popen( kill_process, shell=False )
+
+      try:
+        process.kill ()
+        time_slept = 0
+        self.shutdown_timeout = 60
+        while time_slept < self.shutdown_timeout and process.isRunning():
+          time.sleep(0.5)
+          time_slept += 0.5
+      except:
+        pass
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
       if test_case.ignore_warnings:
         test_results.warnings, test_results.errors = [0,0]
       else:
         test_results.warnings, test_results.errors= self._countWarnings ( test_results )
-      
       return test_results
   
 
