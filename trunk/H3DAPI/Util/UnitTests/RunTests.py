@@ -68,6 +68,7 @@ parser.add_argument('--servername', dest='servername', help='The name of this se
 parser.add_argument('--RunTestsDir', dest='RunTestsDir', help='The location of UnitTestsUtil.py and UnitTestsBoilerplate.py. This is for the cases where RunTests.py is being run from a different directory, for example for targeting a specific build of H3D.',
                     default=os.path.dirname(os.path.realpath(__file__)).replace('\\', '/'))
 parser.add_argument('--case', dest='case', help='The name of a specific case located somewhere in or below the workingdir. If this is specified then only this Case, out of all the cases in all the TestDefs, will be run', default='')
+parser.add_argument('--testdefs', dest='testdefs', help='The name of testdef files. If this is specified, only these specified testDef files will be considered', default='')
 parser.add_argument('--resolution', dest='resolution', help='The resolution h3dload should be run at (only used for h3dload), in the format widthxheight, for example 800x600', default='640x480')
 args = parser.parse_known_args()[0]
 
@@ -473,21 +474,23 @@ class TestCaseRunner ( object ):
     for root, dirs, files in os.walk(directory):
       for file in files:
         base, ext= os.path.splitext(file)
-        if ext.lower() in fileExtensions:
-          file_path= os.path.join(root,file)
-          print "Checking " + file_path + " for tests"
-          testCases = self.parseTestDefinitionFile(file_path)
-          for testCase in testCases:
-            if testCase != None and testCase.x3d != None and testCase.script != None:
-              found_tests = True
-              print "Testing: " + testCase.name
-              case_results = self.processTestDef(file, testCase, results, root)
-              results.append(case_results)
-              all_tests_successful = case_results.success and all_tests_successful
-              all_tests_run = case_results.terminates_ok and all_tests_run
-              testCase.filename = (os.path.relpath(file_path, directory)).replace('\'', '/') # This is used to set up the tree structure for the results page. It will store this parameter in the database as a unique identifier of this specific file of tests.
-              if case_results != None:  
-                self.UploadResultsToSQL(testCase, case_results, root)            
+        if ext.lower() not in fileExtensions:
+          continue
+        if args.testdefs !="" and not(any( testdef == base for testdef in args.testdefs.split() )):
+          continue
+        file_path= os.path.join(root,file)
+        testCases = self.parseTestDefinitionFile(file_path)
+        for testCase in testCases:
+          if testCase != None and testCase.x3d != None and testCase.script != None:
+            found_tests = True
+            print "Testing: " + testCase.name
+            case_results = self.processTestDef(file, testCase, results, root)
+            results.append(case_results)
+            all_tests_successful = case_results.success and all_tests_successful
+            all_tests_run = case_results.terminates_ok and all_tests_run
+            testCase.filename = (os.path.relpath(file_path, directory)).replace('\'', '/') # This is used to set up the tree structure for the results page. It will store this parameter in the database as a unique identifier of this specific file of tests.
+            if case_results != None:  
+              self.UploadResultsToSQL(testCase, case_results, root)            
     if not found_tests:
       print "No valid tests found in: " + os.path.abspath(directory)
               
