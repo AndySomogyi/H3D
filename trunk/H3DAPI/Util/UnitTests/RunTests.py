@@ -260,6 +260,10 @@ class TestCaseRunner ( object ):
             print "force kiling id", process_id
             kill_process = str(pskill_path)+" /accepteula -t -nobanner "+str(process_id)
             p = subprocess.Popen( kill_process, shell=False )
+        else:
+          print "pskill located, but cannot locate the id for the process that started for current test case"
+      else: 
+        print "pskill does not exist, use internal process kill to try to locate and kill all related processes"
 
       try:
         process.kill ()
