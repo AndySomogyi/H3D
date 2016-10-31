@@ -20,7 +20,7 @@ class Variation ( object ):
     self.global_insertion_string = insertion_string
     self.global_insertion_string_failed = False
     
-  def parse ( self, input ):
+  def parse ( self, input, inject_at_end_of_scene=True):
     """ Parses the input x3d string and returns a new x3d string where this Variation's Options have been inserted into the appropriate nodes. """
     replace_with= ""
     output= input
@@ -44,10 +44,16 @@ class Variation ( object ):
         return r.group(0)
     
     def replaceRoot ( m ):
-      return m.group(0)+"\n" + self.global_insertion_string
+      if inject_at_end_of_scene:
+        return self.global_insertion_string + "\n" + m.group(0)
+      else:
+        return m.group(0)+"\n" + self.global_insertion_string
     
     if self.global_insertion_string != "":
-      reg = re.compile( r'<Scene>' )
+      if inject_at_end_of_scene:
+        reg = re.compile( '</Scene>' )
+      else:
+        reg = re.compile( '<Scene>' )
       output_after = reg.sub(replaceRoot, output, count=1)
       if output_after == output: # If Injecting into Scene fails then we don't have a scene so try to inject it into the first Group node we find instead
         reg = re.compile( r'<Group>' )
