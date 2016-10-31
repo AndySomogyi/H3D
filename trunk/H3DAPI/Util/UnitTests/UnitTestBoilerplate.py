@@ -31,13 +31,13 @@ def scheduleCallback ( timeSource, time, func, data ):
   timer.addCallback ( time, func, data )
 
 class UnitTestHelper :
-  def __init__( self, early_shutdown_file, output_file_prefix, screenshot_filename_prefix):
+  def __init__( self, early_shutdown_file, output_file_prefix, output_filename_prefix):
     self.test_funcs = Queue()
     self.screenshot_queue = Queue()
     self.early_shutdown_file = early_shutdown_file
     self.output_file_prefix = output_file_prefix
     self.screenshot_counter = 0    
-    self.screenshot_filename_prefix = screenshot_filename_prefix
+    self.output_filename_prefix = output_filename_prefix
     self.validation_file = output_file_prefix + "/validation.txt"
     self.last_func = None
     self.customPrintHelper = None

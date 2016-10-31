@@ -17,7 +17,7 @@ def screenshot(start_time = None, run_time = None, time_source = None, absolute_
     def post(testHelper, validator, validation_output_file):
       try:
         screenshot_name = validator['step_name']
-        filename = os.path.abspath(os.path.join(testHelper.output_file_prefix, "renderings/", testHelper.screenshot_filename_prefix + validator['step_name'] + '.png').replace('\\', '/'))
+        filename = os.path.abspath(os.path.join(testHelper.output_file_prefix, "renderings/", testHelper.output_filename_prefix + validator['step_name'] + '.png').replace('\\', '/'))
         takeScreenshot(filename)
     #    pp.pprint("saving to " + self.validation_file)
         f = open(validation_output_file, 'a')
@@ -166,7 +166,7 @@ def custom(start_time = None, time_source = None, absolute_time = None):
         f.write('custom_end\n')
         f.flush()
         f.close()
-        f = open(os.path.abspath(os.path.join(testHelper.output_file_prefix, "text/" + validator['step_name'] + "_custom.txt")), 'w')
+        f = open(os.path.abspath(os.path.join(testHelper.output_file_prefix, "text/" + testHelper.output_filename_prefix + validator['step_name'] + "_custom.txt")), 'w')
         f.write(validator['custom_output'])
         f.flush()
         f.close()
