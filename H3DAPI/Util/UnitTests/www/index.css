@@ -215,6 +215,12 @@ div#TestRuns_list {
   background-color: lightblue;
 }
 
+div#Toggle_button {
+  position: fixed;
+  right: 12px;
+  top:20px;
+  z-index: 200;
+}
 
 div#Options {
   min-width:300px;
