@@ -21,6 +21,7 @@ import ConfigParser
 import json
 import datetime
 from collections import namedtuple
+import shlex
 
 import MySQLdb
 
@@ -71,6 +72,7 @@ parser.add_argument('--case', dest='case', help='The name of a specific case loc
 parser.add_argument('--testdefs', dest='testdefs', help='The name of one or more testdefs located somewhere in or below the workingdir. If this is specified then only cases in these TestDefs will be run. This can be combined with --case if you have multiple testdefs containing cases with the same name and only want to run one of them.', default='')
 parser.add_argument('--resolution', dest='resolution', help='The resolution h3dload should be run at (only used for h3dload), in the format widthxheight, for example 800x600', default='640x480')
 parser.add_argument('--inject_at_end_of_scene', dest='inject_at_end_of_scene', help='Specifies if the testing boilerplate nodes should be injected before </Scene> instead of the standard behaviour of injecting after <Scene>. For compatibility with projects that do search-and-replace inside the x3d file and might match information in one of the unittesting nodes if they come before nodes that are expected to be in Scene.', default=False)
+parser.add_argument('--simulationbasedir', dest='simulationbasedir', help='Path to the directory where the project that is being tested has its SimulationBase  python directory, this is required for using the settings testdef property.', default=None)
 args = parser.parse_known_args()[0]
 
 all_tests_successful = True
@@ -294,7 +296,7 @@ class TestCaseRunner ( object ):
       All of these values default to None
     The list will contain one namedtuple for each Section in the specified definition file
     """
-    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20, 'resolution': None, 'processargs': '', 'physics_engine': None}, allow_no_value=True)
+    confParser = ConfigParser.RawConfigParser(defaults={'x3d':None, 'baseline':None, 'script':None, 'runtime':1, 'starttime':1, 'fuzz': 2, 'threshold': 20, 'resolution': None, 'processargs': '', 'physics_engine': None, 'settings': None, 'ignore_warnings': None}, allow_no_value=True)
     try:
       confParser.read(file_path)
     except:
@@ -303,7 +305,7 @@ class TestCaseRunner ( object ):
     result = []
     for sect in confParser.sections():
       if sect != 'Default':
-        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials', 'physics_engine','ignore_warnings'])
+        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials', 'physics_engine','settings', 'ignore_warnings'])
         test_case.name = sect
         test_case.x3d = confParser.get(sect, 'x3d')
         test_case.baseline = confParser.get(sect, 'baseline folder')
@@ -344,6 +346,11 @@ class TestCaseRunner ( object ):
         except:
           test_case.physics_engine = None
         
+        try:
+          test_case.settings = confParser.get(sect, 'settings')
+        except:
+          test_case.settings = None
+                  
         try:
           test_case.ignore_warnings = confParser.getboolean(sect, 'ignore_warnings')
         except:
@@ -386,6 +393,52 @@ class TestCaseRunner ( object ):
                                                                   testCase.starttime,
                                                                   os.path.join(args.RunTestsDir, 'UnitTestBoilerplate.py'))
     v = Variation (testCase.name, script)
+    # Check if we should change settings
+    if not testCase.settings is None:
+      if args.simulationbasedir is None:
+        print("Error! No --simulationbasedir flag! The Settings testdef property requires access to SimulationBase! Skipping TestCase!")
+        all_tests_successful = False
+        exitcode = 1
+        return None
+      else:
+        try:
+          print("Doing settings injection!")
+          settings_new, settings_old = shlex.split(testCase.settings)
+          if settings_new is None or settings_old is None:
+            print("Error! Settings property needs two values, the settings file to use and the settings file that needs to be modified!")
+            all_tests_successful = False
+            exitcode = 1
+            return None
+          settings_new = directory + "\\" + settings_new
+          settings_old = directory + "\\" + settings_old
+          sys.path.append(args.simulationbasedir)
+          import SimulationBase.Settings
+          settings_file = SimulationBase.Settings.ConfigINI()
+          if os.path.exists(settings_old + ".original.ini"):
+            try:
+              print settings_old+'_original.ini already exists! This probably means that RunTests was interrupted during a previous execution.'
+              print "Restoring " + settings_old + " before continuing..."
+              os.remove(settings_old)
+              os.rename(settings_old + ".original.ini", settings_old)  
+            except:
+              print "Failed to restore! Please check the files manually."
+              return
+            
+          settings_file.load(settings_old)
+          if not settings_file.save(settings_old + ".original.ini"):
+            print("Failed to backup original file.")
+          settings_file_new = SimulationBase.Settings.ConfigINI()
+          settings_file_new.load(settings_new)
+          for section in settings_file_new.getSections():
+            for option in settings_file_new.getOptions(section):
+              settings_file.set(section, option, settings_file_new.get(section, option))
+          if not settings_file.save(settings_old):
+            print("Failed to save new file")
+        except Exception as e:
+          print(str(e))
+        
+        
+        
     # Check if we should change the physics engine being used for this test and if so then use Variation's Option feature to ensure the test is run with that engine
     if not testCase.physics_engine is None:
       v.options.append ( Option ( ["RigidBodyCollection"], "physicsEngine", testCase.physics_engine ) )
@@ -445,6 +498,14 @@ class TestCaseRunner ( object ):
       pass
     try:
       os.rename(original_path+'_original.x3d', original_path)
+    except:
+      pass
+      
+    try:
+      if testCase.settings != None:
+        settings_new, settings_old = shlex.split(testCase.settings)
+        os.remove(directory + "\\" + settings_old)
+        os.rename(directory + "\\" + settings_old+".original.ini", directory + "\\" + settings_old)
     except:
       pass
 
