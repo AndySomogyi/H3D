@@ -160,5 +160,6 @@ testfunctions_list.sort(key=linenumber_of_member)
 testHelper = UnitTestHelper(TestBaseFolder+"/test_complete", os.path.abspath(os.path.join(TestCaseDefFolder, "output").replace("\\", '/')), TestCaseName + '_')
 testHelper.addTests(testfunctions_list)
 res.printCustom = testHelper.printCustom
+res.TestCaseDefFolder = TestCaseDefFolder
 
 scheduleCallback ( time, time.getValue()+StartTime, UnitTestHelper.doTesting, (testHelper,))
