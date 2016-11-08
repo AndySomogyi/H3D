@@ -75,7 +75,6 @@ parser.add_argument('--inject_at_end_of_scene', dest='inject_at_end_of_scene', h
 parser.add_argument('--simulationbasedir', dest='simulationbasedir', help='Path to the directory where the project that is being tested has its SimulationBase  python directory, this is required for using the settings testdef property.', default=None)
 args = parser.parse_known_args()[0]
 
-all_tests_successful = True
 
 def createFilename(orig_url, var_name):
   """ Returns a valid file name based on the provided path and variable name. """
@@ -188,7 +187,6 @@ class TestCaseRunner ( object ):
     return None
   
   def runTestCase (self, filename, test_case, url, orig_url= None, var_name= "", variation = None):
-
     if orig_url is None:
       orig_url= url
     
@@ -365,6 +363,8 @@ class TestCaseRunner ( object ):
     """
         
     """
+    all_tests_successful = True
+    
     output_dir = os.path.abspath(os.path.join(directory, "output"))
     rendering_dir = os.path.join(directory, output_dir, 'renderings')
     text_dir = os.path.join(directory, output_dir, 'text')
