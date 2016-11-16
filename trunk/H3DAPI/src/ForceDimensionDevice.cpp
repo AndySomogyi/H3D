@@ -50,6 +50,8 @@ namespace ForceDimensionDeviceInternals {
   FIELDDB_ELEMENT( ForceDimensionDevice, vibrationFrequency, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ForceDimensionDevice, vibrationAmplitude, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ForceDimensionDevice, gripperAngle, INPUT_OUTPUT );
+  FIELDDB_ELEMENT( ForceDimensionDevice, autoCalibrate, INPUT_ONLY );
+  FIELDDB_ELEMENT( ForceDimensionDevice, isAutoCalibrated, OUTPUT_ONLY );
 }
 
 /// Constructor.
@@ -85,7 +87,9 @@ ForceDimensionDevice::ForceDimensionDevice(
                Inst< EnableForce        > _enableForce,
                Inst< SFFloat            > _vibrationFrequency,
                Inst< SFFloat            > _vibrationAmplitude,
-               Inst< SFFloat            > _gripperAngle ) :
+               Inst< SFFloat            > _gripperAngle,
+               Inst< SFAutoCalibrate    > _autoCalibrate,
+               Inst< SFBool > _isAutoCalibrated ) :
   H3DHapticsDevice( _devicePosition, _deviceOrientation, _trackerPosition,
               _trackerOrientation, _positionCalibration, 
               _orientationCalibration, _proxyPosition,
@@ -104,7 +108,9 @@ ForceDimensionDevice::ForceDimensionDevice(
   vibrationFrequency( _vibrationFrequency ),
   vibrationAmplitude( _vibrationAmplitude ),
   changeVibration( new ChangeVibration ),
-  gripperAngle( _gripperAngle ) {
+  gripperAngle( _gripperAngle ),
+  autoCalibrate( _autoCalibrate ),
+  isAutoCalibrated( _isAutoCalibrated ) {
 
   type_name = "ForceDimensionDevice";  
   database.initFields( this );
@@ -126,6 +132,8 @@ ForceDimensionDevice::ForceDimensionDevice(
   changeVibration->setOwner( this );
   vibrationFrequency->routeNoEvent( changeVibration );
   vibrationAmplitude->routeNoEvent( changeVibration );
+  autoCalibrate->setValue( false );
+  isAutoCalibrated->setValue( false, id );
 }
 
 
@@ -196,11 +204,13 @@ H3DHapticsDevice::ErrorCode ForceDimensionDevice::initDevice() {
     static_cast< HAPI::ForceDimensionHapticsDevice * >( hapi_device.get() );
   if( dhd ) {
     deviceType->setValue( dhd->getDeviceType(), id ); 
-    dhd->enableForce( enableForce->getValue());
+    dhd->enableForce( enableForce->getValue() );
+    if( e == HAPI::HAPIHapticsDevice::SUCCESS && autoCalibrate->getValue(id) && !dhd->isAutoCalibrated() ) {
+      dhd->autoCalibrate();
+    }
   }
 #endif
   return e;
-
 }
 
 H3DHapticsDevice::ErrorCode ForceDimensionDevice::releaseDevice() {
@@ -237,6 +247,25 @@ void ForceDimensionDevice::updateDeviceValues() {
     static_cast< HAPI::ForceDimensionHapticsDevice * >( hapi_device.get() );
   if( dhd ) {
     gripperAngle->setValue( (H3DFloat)(dhd->getGripperAngle()), id );
+    bool is_auto_calibrated = dhd->isAutoCalibrated();
+    if( isAutoCalibrated->getValue() != is_auto_calibrated ) {
+      isAutoCalibrated->setValue( is_auto_calibrated, id );
+    }
+  }
+#endif
+}
+
+void ForceDimensionDevice::SFAutoCalibrate::onNewValue( const bool &v ) {
+#ifdef HAVE_DHDAPI
+  ForceDimensionDevice *fd = 
+    static_cast< ForceDimensionDevice * >( getOwner() );
+  HAPI::ForceDimensionHapticsDevice * dhd = 
+    static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
+  if( v ) {
+    dhd->enableForce( false );
+    if( dhd->autoCalibrate() ) {
+      dhd->enableForce( fd->enableForce->getValue() );
+    }
   }
 #endif
 }

@@ -83,6 +83,12 @@ namespace H3D {
       virtual void onValueChange( const bool &v );
     };
 
+    /// SFAutoCalibrate specializes SFBool to go into auto calibrate mode
+    /// when a true event is received.
+    class H3DAPI_API SFAutoCalibrate: public OnNewValueSField< SFBool > {
+      virtual void onNewValue( const bool &v );
+    };
+
     /// Constructor.
     ForceDimensionDevice( 
             Inst< SFVec3f            > _devicePosition         = 0,
@@ -116,7 +122,9 @@ namespace H3D {
             Inst< EnableForce        > _enableForce            = 0,
             Inst< SFFloat            > _vibrationFrequency     = 0,
             Inst< SFFloat            > _vibrationAmplitude     = 0,
-            Inst< SFFloat            > _gripperAngle           = 0 );
+            Inst< SFFloat            > _gripperAngle           = 0,
+            Inst< SFAutoCalibrate    > _autoCalibrate          = 0,
+            Inst< SFBool             > _isAutoCalibrated       = 0 );
     
     /// Does all the initialization needed for the device before starting to
     /// use it.
@@ -140,22 +148,20 @@ namespace H3D {
     /// In this mode, the user is expected to put the device end-effector
     /// at its rest position. This is how the device performs its calibration. 
     /// 
-    /// <b>Access type:</b> inputOnly \n   
-    auto_ptr< SFBool > reset;
+    /// <b>Access type:</b> inputOnly \n
+    auto_ptr< Reset > reset;
 
     /// When a true event is received, the device is put into RESET mode 
-    /// and wait for the user to calibrate the device.  Optionally, a 
-    /// timeout can be defined after which the call returns even if
-    /// calibration has not occured.
+    /// and wait for the user to calibrate the device.
     /// 
-    /// <b>Access type:</b> inputOnly \n   
-    auto_ptr< SFBool > waitForReset;
+    /// <b>Access type:</b> inputOnly \n
+    auto_ptr< WaitReset > waitForReset;
 
     /// Set the end effector mass used in gravity compensation in order
     /// to provide accurate gravity compensation when custom-made or 
     /// modified end-effectors are used.
     /// 
-    /// <b>Access type:</b> inputOnly \n   
+    /// <b>Access type:</b> inputOnly \n
     auto_ptr< SFFloat > endEffectorMass;
 
     /// Enable/disable the device electromagnetic brakes. If enabled
@@ -237,6 +243,21 @@ namespace H3D {
     };
 
     auto_ptr< ChangeVibration > changeVibration;
+    
+    public:
+      /// When a true event is received, the device is auto calibrated.
+      /// This will not do anything unless H3DAPI is compiled with DRD api support
+      /// (HAVE_DRDAPI defined).
+      ///
+      /// <b>Access type:</b> inputOnly \n
+      /// <b>Default value:</b> false \n
+      auto_ptr< SFAutoCalibrate > autoCalibrate;
+
+      /// Set to true if device is auto calibrated if the
+      /// checkIfAutoCalibrated has received a true event.
+      ///
+      /// <b>Access type:</b> outputOnly \n
+      auto_ptr< SFBool > isAutoCalibrated;
   };
 }
 
