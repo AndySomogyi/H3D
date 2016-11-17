@@ -80,6 +80,11 @@ namespace H3D {
     /// EnableForce specializes SFBool to toggle forces
     /// on and off.
     class H3DAPI_API EnableForce: public OnValueChangeSField< SFBool > {
+    public:
+      EnableForce(): OnValueChangeSField< SFBool >(), call_hapi_function( true ) {}
+    
+      bool call_hapi_function;
+    protected:
       virtual void onValueChange( const bool &v );
     };
 
@@ -245,19 +250,19 @@ namespace H3D {
     auto_ptr< ChangeVibration > changeVibration;
     
     public:
-      /// When a true event is received, the device is auto calibrated.
-      /// This will not do anything unless H3DAPI is compiled with DRD api support
-      /// (HAVE_DRDAPI defined).
-      ///
-      /// <b>Access type:</b> inputOnly \n
-      /// <b>Default value:</b> false \n
-      auto_ptr< SFAutoCalibrate > autoCalibrate;
+    /// When a true event is received, the device is auto calibrated.
+    /// This will not do anything unless H3DAPI is compiled with DRD api support
+    /// (HAVE_DRDAPI defined).
+    /// After the device is calibrated forces will be enabled.
+    ///
+    /// <b>Access type:</b> inputOnly \n
+    /// <b>Default value:</b> false \n
+    auto_ptr< SFAutoCalibrate > autoCalibrate;
 
-      /// Set to true if device is auto calibrated if the
-      /// checkIfAutoCalibrated has received a true event.
-      ///
-      /// <b>Access type:</b> outputOnly \n
-      auto_ptr< SFBool > isAutoCalibrated;
+    /// Indicates whether the device is calibrated.
+    ///
+    /// <b>Access type:</b> outputOnly \n
+    auto_ptr< SFBool > isAutoCalibrated;
   };
 }
 

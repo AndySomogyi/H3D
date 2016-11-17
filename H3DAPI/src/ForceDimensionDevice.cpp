@@ -193,7 +193,9 @@ void ForceDimensionDevice::EnableForce::onValueChange( const bool &v ) {
     static_cast< ForceDimensionDevice * >( getOwner() );
   HAPI::ForceDimensionHapticsDevice * dhd = 
     static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
-  dhd->enableForce( v );
+  if( call_hapi_function ) {
+    dhd->enableForce( v );
+  }
 #endif
 }
 
@@ -262,10 +264,10 @@ void ForceDimensionDevice::SFAutoCalibrate::onNewValue( const bool &v ) {
   HAPI::ForceDimensionHapticsDevice * dhd = 
     static_cast< HAPI::ForceDimensionHapticsDevice * >( fd->hapi_device.get() );
   if( v ) {
-    dhd->enableForce( false );
-    if( dhd->autoCalibrate() ) {
-      dhd->enableForce( fd->enableForce->getValue() );
-    }
+    dhd->autoCalibrate();
+    fd->enableForce->call_hapi_function = false;
+    fd->enableForce->setValue(true);
+    fd->enableForce->call_hapi_function = true;
   }
 #endif
 }
