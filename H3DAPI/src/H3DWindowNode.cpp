@@ -1020,7 +1020,12 @@ void H3DWindowNode::render( X3DChildNode *child_to_render ) {
     vp->relPos->setValue( Vec3f() );
     resetViewPoint->setValue(false);
   }
-  vp = h3d_navigation->viewpointToUse( vp );
+  
+  // only use old viewpoint on first frame when switching viewpoints if not using TELEPORT transition type
+  // otherwise the old viewpoint will be rendered for a single frame
+  if (!nav_info || h3d_navigation->getTransitionType(nav_info->transitionType->getValue()) != "TELEPORT") {
+    vp = h3d_navigation->viewpointToUse(vp);
+  }
 
   const Rotation &vp_orientation = vp->totalOrientation->getValue();
   const Matrix4f &vp_inv_m = vp->accInverseMatrix->getValue();
