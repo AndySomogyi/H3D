@@ -120,42 +120,42 @@ WxConsoleDialog::WxConsoleDialog ( wxWindow *parent,
   long style
   ): wxDialog (parent, id, title, pos, size, style)
 {
-  wxBoxSizer *topsizer = new wxBoxSizer( wxVERTICAL );
+  wxBoxSizer *topsizer = new wxBoxSizer(wxVERTICAL);
 
-  tabs = new wxNotebook( this, wxID_ANY );
+  tabs = new wxNotebook(this, wxID_ANY);
 
-  // create text ctrl with minimal size 400x200
-  logText = new wxTextCtrl ( tabs, -1, wxT(""),
-    wxDefaultPosition, wxSize( 750, 450 ),
-    wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH );
+  // create text ctrl with minimal size 750x450
+  logText = new wxTextCtrl(tabs, -1, wxT(""),
+                           wxDefaultPosition, wxSize(1, 1),
+                           wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
 
-  logText->SetFont( wxFont( 10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL ) );
-  logText->SetBackgroundColour( wxColour( 50,50,50 ) );
-  tabs->AddPage( logText, wxT( "All" ) );
+  logText->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+  logText->SetBackgroundColour(wxColour(50, 50, 50));
+  tabs->AddPage(logText, wxT("All"));
 
-  logTextErrors = new wxTextCtrl( tabs, -1, wxT( "" ),
-    wxDefaultPosition, wxSize( 750, 450 ),
-    wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH );
+  logTextErrors = new wxTextCtrl(tabs, -1, wxT(""),
+                                 wxDefaultPosition, wxSize(1, 1),
+                                 wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
 
-  logTextErrors->SetFont( wxFont( 10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL ) );
-  logTextErrors->SetBackgroundColour( wxColour( 50, 50, 50 ) );
+  logTextErrors->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+  logTextErrors->SetBackgroundColour(wxColour(50, 50, 50));
 
-  tabs->AddPage( logTextErrors, wxT( "Errors" ) );
+  tabs->AddPage(logTextErrors, wxT("Errors"));
 
-  logTextWarnings = new wxTextCtrl( tabs, -1, wxT( "" ),
-    wxDefaultPosition, wxSize( 750, 450 ),
-    wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH );
+  logTextWarnings = new wxTextCtrl(tabs, -1, wxT(""),
+                                   wxDefaultPosition, wxSize(1, 1),
+                                   wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
 
-  logTextWarnings->SetFont( wxFont( 10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL ) );
-  logTextWarnings->SetBackgroundColour( wxColour( 50, 50, 50 ) );
+  logTextWarnings->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+  logTextWarnings->SetBackgroundColour(wxColour(50, 50, 50));
 
-  tabs->AddPage( logTextWarnings, wxT( "Warnings" ) );
+  tabs->AddPage(logTextWarnings, wxT("Warnings"));
 
-  topsizer->Add( tabs,
-      1,            // make vertically stretchable
-      wxEXPAND |    // make horizontally stretchable
-      wxALL,        //   and make border all around
-      10 );         // set border width to 10 */
+  topsizer->Add(tabs,
+                1,            // make vertically stretchable
+                wxEXPAND |    // make horizontally stretchable
+                wxALL,        //   and make border all around
+                10);         // set border width to 10 */
 
   clip_board = new wxClipboard();
 
@@ -163,35 +163,42 @@ WxConsoleDialog::WxConsoleDialog ( wxWindow *parent,
   wxButton *clearBtn = new wxButton(this, wxID_CLEAR, wxT("Cle&ar"));
 
   // Close button
-  wxButton *closeButton = new wxButton( this, wxID_CLOSE, wxT("&Close") );
+  wxButton *closeButton = new wxButton(this, wxID_CLOSE, wxT("&Close"));
 
   // Copy button
   wxButton *copyButton = new wxButton(this, wxID_ANY, wxT("Co&py"));
 
   // boxsizer for the buttons
-  wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
+  wxBoxSizer *button_sizer = new wxBoxSizer(wxHORIZONTAL);
   button_sizer->Add(clearBtn,
-    0,          // make horizontally unstretchable
-    wxALL,      // make border all around (implicit top alignment)
-    10 );       // set border width to 10
+                    0,          // make horizontally unstretchable
+                    wxALL,      // make border all around (implicit top alignment)
+                    10);       // set border width to 10
 
-  button_sizer->Add(closeButton, 
-    0,           // make horizontally unstretchable
-    wxALL,       // make border all around (implicit top alignment)
-    10 );        // set border width to 10
+  button_sizer->Add(closeButton,
+                    0,           // make horizontally unstretchable
+                    wxALL,       // make border all around (implicit top alignment)
+                    10);        // set border width to 10
 
   button_sizer->Add(copyButton,
-    0,
-    wxALL,
-    10);
+                    0,
+                    wxALL,
+                    10);
 
   topsizer->Add(button_sizer,
-    0,                // make vertically unstretchable
-    wxALIGN_CENTER ); // no border and center horizontally
+                0,                // make vertically unstretchable
+                wxALIGN_CENTER); // no border and center horizontally
 
-  SetSizer( topsizer );      // use the sizer for layout
+  SetSizer(topsizer);      // use the sizer for layout
+  topsizer->SetSizeHints(this);   // set size hints to honor minimum size
 
-  topsizer->SetSizeHints( this );   // set size hints to honor minimum size
+  // Set the size and minsize of this window and children.
+  // 
+  // You can't set the size in the constructors, because wxWidgets will 
+  // use that value as minSize as well, and then you have a 
+  // (750, 550)px large window that you can't make smaller.
+  SetMinSize(wxSize(1, 1));
+  SetSize(wxSize(750, 550));
 
   // redirect the console to logText wxTextCtrl.
 
