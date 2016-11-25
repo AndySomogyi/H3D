@@ -320,6 +320,7 @@ public:
   void OnRouteSendsEventsCheck( wxCommandEvent & event );
   void OnLoadTexturesInThreadCheck( wxCommandEvent & event );
   void OnAlignConsoleAndTreeview( wxCommandEvent & event );
+  void OnShowWindowsInFullscreen(wxCommandEvent & event);
   void ChangeViewpoint( wxCommandEvent & event );
   void ResetViewpoint( wxCommandEvent & event );
   void ChangeNavigation( wxCommandEvent & event );
@@ -353,6 +354,7 @@ public:
   void LoadPlugins();
   void buildNavMenu();
   void SetFullscreen( bool fullscreen );
+  void SetShowWindowsInFullscreen( bool show );
   void BuildViewpointsMenu( list< Node * > vp_list );
   void BuildViewpointsSubMenu( list< Node* > vp_list, wxMenu * menu, int &count, int &unnamed_vp, int &unnamed_vg );
   void DestroyViewpointsMenu();
@@ -576,6 +578,7 @@ enum
   FRAME_ROUTESENDSEVENTS,
   FRAME_LOADTEXTURESINTHREAD,
   FRAME_ALIGNCONSOLETREEVIEW,
+  FRAME_SHOWWINDOWSINFULLSCREEN,
   FRAME_SELECTION,
   FRAME_VIEWPOINT,
   FRAME_NAVIGATION = 6500,

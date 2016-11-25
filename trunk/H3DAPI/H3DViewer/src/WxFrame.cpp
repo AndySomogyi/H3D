@@ -410,6 +410,8 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
                                  wxT("If checked textures are loaded in a separate thread.") );
   advancedMenu->AppendCheckItem(FRAME_ALIGNCONSOLETREEVIEW, wxT("Align console and tree view"),
                                  wxT("If checked, console and tree view window are aligned next to main window") );
+  advancedMenu->AppendCheckItem(FRAME_SHOWWINDOWSINFULLSCREEN, wxT("Display child windows when fullscreen"),
+                                wxT("If checked, windows like Console and Tree View dialog are drawn on top of main window, when fullscreen"));
 
   h3dConfig->SetPath(wxT("/Settings"));
   bool new_viewpoint_on_load = true;
@@ -423,9 +425,11 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   h3dConfig->Read(wxT("load_textures_in_thread"), &load_textures_in_thread);
   advancedMenu->Check( FRAME_LOADTEXTURESINTHREAD, load_textures_in_thread );
   global_settings->loadTexturesInThread->setValue( load_textures_in_thread );
-  bool align_console_treeview = false;
-  h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
+  bool align_console_treeview = h3dConfig->ReadBool(wxT("align_console_treeview"), false);
   advancedMenu->Check(FRAME_ALIGNCONSOLETREEVIEW, align_console_treeview);
+  bool show_windows_in_fullscreen = h3dConfig->ReadBool(wxT("show_windows_in_fullscreen"), false);
+  advancedMenu->Check(FRAME_SHOWWINDOWSINFULLSCREEN, show_windows_in_fullscreen);
+
   //Help Menu
   helpMenu = new wxMenu;
   //helpMenu->Append(FRAME_HELP, wxT("Help"));
@@ -486,6 +490,7 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   LoadPlugins();
   Raise();
   Layout();
+  SetShowWindowsInFullscreen(show_windows_in_fullscreen);
 }
 
 void WxFrame::SetOculusMenu(bool enabled) {
@@ -1775,27 +1780,186 @@ void WxFrame::OnIdle(wxIdleEvent &event) {
 }
 
 void WxFrame::SetFullscreen( bool fullscreen ) {
-  if( glwindow->fullscreen->getValue() != fullscreen ) {
-    if( fullscreen ) {
+  if(glwindow->fullscreen->getValue() != fullscreen) {
+    if(fullscreen) {
       long style = getFullScreenStyle();
       ShowFullScreen(true, style);
-      if( style != wxFULLSCREEN_ALL ) {
+      if(style != wxFULLSCREEN_ALL) {
         hideAllDialogs();
       }
-      glwindow->fullscreen->setValue( true );
+      glwindow->fullscreen->setValue(true);
       rendererMenu->Check(FRAME_FULLSCREEN, true);
       SetStatusText(wxT("Press F11 to exit fullscreen mode"), 0);
       SetStatusText(wxT("Viewing in Fullscreen"), 1);
+
+      h3dConfig = wxConfigBase::Get();
+      h3dConfig->SetPath(wxT("/Settings"));
+      bool show_windows_in_fullscreen = h3dConfig->ReadBool(wxT("show_windows_in_fullscreen"), false);
+      SetShowWindowsInFullscreen(show_windows_in_fullscreen);
+
+      // Make sure all child windows are drawn 
+      // on top when switching to fullscreen.
+      if(style == wxFULLSCREEN_ALL && show_windows_in_fullscreen) {
+        if(the_console->IsShownOnScreen()) {
+          the_console->Raise();
+
+          // This sad else{} clause is here so that child windows can be 
+          // opened on top of the fullscreen main window.
+          //
+          // It brings up the_console window out of minimization/hiding,
+          // sets it as focus, then returns focus to main window and 
+          // hides the console window again.
+          // 
+          // It seems like there needs to have been at least one activated child 
+          // window since fullscreen was enabled, in order to be able to draw
+          // other windows on top of main canvas.
+          // 
+          // Might be possible to solve it with a well-placed update() somewhere.
+        } else {
+          if(the_console->IsIconized()) {
+            the_console->Iconize(false);
+          }
+
+          the_console->SetFocus();
+
+          // Return focus to the main frame.
+          SetFocus();
+
+          the_console->Raise();
+          the_console->Hide();
+          the_console->Iconize(true);
+        }
+
+        #ifdef HAVE_PROFILER
+        if(the_profiled_result->IsShownOnScreen()) {
+          the_profiled_result->Raise();
+        }
+        #endif
+
+        if(tree_view_dialog->IsShownOnScreen()) {
+          tree_view_dialog->Raise();
+        }
+
+        #ifdef HAVE_WXPROPGRID
+        if(program_settings_dialog->IsShownOnScreen()) {
+          program_settings_dialog->Raise();
+        }
+        #endif
+
+        if(plugins_dialog->IsShownOnScreen()) {
+          plugins_dialog->Raise();
+        }
+
+        if(frameRates->IsShownOnScreen()) {
+          frameRates->Raise();
+        }
+
+        if(settings->IsShownOnScreen()) {
+          settings->Raise();
+        }
+
+        if(speed_slider->IsShownOnScreen()) {
+          speed_slider->Raise();
+        }
+      }
     } else {
       ShowFullScreen(false, wxFULLSCREEN_ALL);
-      glwindow->fullscreen->setValue( false );
+      glwindow->fullscreen->setValue(false);
       rendererMenu->Check(FRAME_FULLSCREEN, false);
       SetStatusText(currentFilename, 0);
       SetStatusText(currentPath, 1);
       showPreviouslyHiddenDialogs();
+
+      // Disable wxSTAY_ON_TOP for children when not fullscreen.
+      SetShowWindowsInFullscreen(false);
     }
   }
 }
+
+
+
+void WxFrame::SetShowWindowsInFullscreen(bool show) {
+  if(show) {
+    long style = the_console->GetWindowStyleFlag();
+    style |= wxSTAY_ON_TOP;
+    the_console->SetWindowStyleFlag(style);
+
+    #ifdef HAVE_PROFILER
+    style = the_profiled_result->GetWindowStyleFlag();
+    style |= wxSTAY_ON_TOP;
+    the_profiled_result->SetWindowStyleFlag(style);
+    #endif
+
+    style = tree_view_dialog->GetWindowStyleFlag();
+    style |= wxSTAY_ON_TOP;
+    tree_view_dialog->SetWindowStyleFlag(style);
+    #ifdef HAVE_WXPROPGRID
+    style = program_settings_dialog->GetWindowStyleFlag();
+    style |= wxSTAY_ON_TOP;
+    program_settings_dialog->SetWindowStyleFlag(style);
+    #endif
+
+    style = plugins_dialog->GetWindowStyleFlag();
+    style |= wxSTAY_ON_TOP;
+    plugins_dialog->SetWindowStyleFlag(style);
+
+    //style = menu_container->GetWindowStyleFlag();
+    //style |= wxSTAY_ON_TOP;
+    //menu_container->SetWindowStyleFlag(style);
+
+    style = frameRates->GetWindowStyleFlag();
+    style |= wxSTAY_ON_TOP;
+    frameRates->SetWindowStyleFlag(style);
+
+    style = settings->GetWindowStyleFlag();
+    style |= wxSTAY_ON_TOP;
+    settings->SetWindowStyleFlag(style);
+
+    style = speed_slider->GetWindowStyleFlag();
+    style |= wxSTAY_ON_TOP;
+    speed_slider->SetWindowStyleFlag(style);
+  } else {
+    long style = the_console->GetWindowStyleFlag();
+    style &= ~(wxSTAY_ON_TOP);
+    the_console->SetWindowStyleFlag(style);
+
+    #ifdef HAVE_PROFILER
+    style = the_profiled_result->GetWindowStyleFlag();
+    style &= ~(wxSTAY_ON_TOP);
+    the_profiled_result->SetWindowStyleFlag(style);
+    #endif
+
+    style = tree_view_dialog->GetWindowStyleFlag();
+    style &= ~(wxSTAY_ON_TOP);
+    tree_view_dialog->SetWindowStyleFlag(style);
+    #ifdef HAVE_WXPROPGRID
+    style = program_settings_dialog->GetWindowStyleFlag();
+    style &= ~(wxSTAY_ON_TOP);
+    program_settings_dialog->SetWindowStyleFlag(style);
+    #endif
+
+    style = plugins_dialog->GetWindowStyleFlag();
+    style &= ~(wxSTAY_ON_TOP);
+    plugins_dialog->SetWindowStyleFlag(style);
+
+    //style = menu_container->GetWindowStyleFlag();
+    //style &= ~(wxSTAY_ON_TOP);
+    //menu_container->SetWindowStyleFlag(style);
+
+    style = frameRates->GetWindowStyleFlag();
+    style &= ~(wxSTAY_ON_TOP);
+    frameRates->SetWindowStyleFlag(style);
+
+    style = settings->GetWindowStyleFlag();
+    style &= ~(wxSTAY_ON_TOP);
+    settings->SetWindowStyleFlag(style);
+
+    style = speed_slider->GetWindowStyleFlag();
+    style &= ~(wxSTAY_ON_TOP);
+    speed_slider->SetWindowStyleFlag(style);
+  }
+}
+
 
 //Restore from fullscreen
 void WxFrame::ToggleFullscreen(wxCommandEvent & event)
@@ -1992,46 +2156,48 @@ void WxFrame::ChangeRenderer(wxCommandEvent & event)
 
 //Show console event
 void WxFrame::ShowConsole(wxCommandEvent & event) {
-  if(!(check_dialogs_position_because_of_fullscreen_and_not_quadro &&
-       GetScreenRect().Intersects(the_console->GetScreenRect()))) {
-    bool align_console_treeview = false;
-    h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
+  if(check_dialogs_position_because_of_fullscreen_and_not_quadro &&
+     !GetScreenRect().Intersects(the_console->GetScreenRect())) {
+    return;
+  }
 
-    // Move the console window to be located below the main window.
-    if((!glwindow->fullscreen->getValue() && !IsMaximized()) && 
-        align_console_treeview) {
-      wxPoint curr_pos = GetScreenPosition();
-      wxSize curr_size = GetSize();
-      wxRect desktop_dims = wxGetClientDisplayRect();
-      wxSize console_size = the_console->GetSize();
+  bool align_console_treeview = false;
+  h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
 
-      // Make sure console isn't moved outside screen X.
-      if(curr_pos.x + console_size.GetWidth() >=
-        (desktop_dims.GetRight() - console_size.GetWidth())) {
-        curr_pos.x = (desktop_dims.GetRight() - console_size.GetWidth());
-      } else {
-        //curr_pos.x stays unchanged.
-      }
+  // Move the console window to be located below the main window.
+  if((!glwindow->fullscreen->getValue() && !IsMaximized()) &&
+     align_console_treeview) {
+    wxPoint curr_pos = GetScreenPosition();
+    wxSize curr_size = GetSize();
+    wxRect desktop_dims = wxGetClientDisplayRect();
+    wxSize console_size = the_console->GetSize();
 
-      // Make sure console isn't moved outside screen Y.
-      if(curr_pos.y + console_size.GetHeight() >=
-        (desktop_dims.GetBottom() - console_size.GetHeight())) {
-        curr_pos.y = (desktop_dims.GetBottom() - console_size.GetHeight());
-      } else {
-        curr_pos.y = curr_pos.y + curr_size.GetHeight();
-      }
-
-      the_console->Move(curr_pos.x, curr_pos.y);
+    // Make sure console isn't moved outside screen X.
+    if(curr_pos.x + console_size.GetWidth() >=
+      (desktop_dims.GetRight() - console_size.GetWidth())) {
+      curr_pos.x = (desktop_dims.GetRight() - console_size.GetWidth());
+    } else {
+      //curr_pos.x stays unchanged.
     }
 
-    if(the_console->IsIconized()) {
-      the_console->Iconize(false);
+    // Make sure console isn't moved outside screen Y.
+    if(curr_pos.y + console_size.GetHeight() >=
+      (desktop_dims.GetBottom() - console_size.GetHeight())) {
+      curr_pos.y = (desktop_dims.GetBottom() - console_size.GetHeight());
+    } else {
+      curr_pos.y = curr_pos.y + curr_size.GetHeight();
     }
 
-    if(!the_console->Show()) {
-      // already shown, bring it up
-      the_console->SetFocus();
-    }
+    the_console->Move(curr_pos.x, curr_pos.y);
+  }
+
+  if(the_console->IsIconized()) {
+    the_console->Iconize(false);
+  }
+
+  if(!the_console->Show()) {
+    // already shown, bring it up
+    the_console->SetFocus();
   }
 }
 
@@ -2173,6 +2339,13 @@ void WxFrame::OnAlignConsoleAndTreeview(wxCommandEvent & event)
   h3dConfig = wxConfigBase::Get();
   h3dConfig->SetPath(wxT("/Settings"));
   h3dConfig->Write(wxT("align_console_treeview"), event.IsChecked());
+}
+
+void WxFrame::OnShowWindowsInFullscreen(wxCommandEvent & event) {
+  h3dConfig = wxConfigBase::Get();
+  h3dConfig->SetPath(wxT("/Settings"));
+  h3dConfig->Write(wxT("show_windows_in_fullscreen"), event.IsChecked());
+  SetShowWindowsInFullscreen(event.IsChecked());
 }
 
 void WxFrame::ShowPluginsDialog(wxCommandEvent & event)
