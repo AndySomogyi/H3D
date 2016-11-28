@@ -425,9 +425,11 @@ WxFrame::WxFrame( wxWindow *_parent, wxWindowID _id,
   h3dConfig->Read(wxT("load_textures_in_thread"), &load_textures_in_thread);
   advancedMenu->Check( FRAME_LOADTEXTURESINTHREAD, load_textures_in_thread );
   global_settings->loadTexturesInThread->setValue( load_textures_in_thread );
-  bool align_console_treeview = h3dConfig->ReadBool(wxT("align_console_treeview"), false);
+  bool align_console_treeview = false;
+  h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
   advancedMenu->Check(FRAME_ALIGNCONSOLETREEVIEW, align_console_treeview);
-  bool show_windows_in_fullscreen = h3dConfig->ReadBool(wxT("show_windows_in_fullscreen"), false);
+  bool show_windows_in_fullscreen = false;
+  h3dConfig->Read(wxT("show_windows_in_fullscreen"), &show_windows_in_fullscreen);
   advancedMenu->Check(FRAME_SHOWWINDOWSINFULLSCREEN, show_windows_in_fullscreen);
 
   //Help Menu
