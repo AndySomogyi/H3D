@@ -584,16 +584,17 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
    
    glNormal3f( 0, 0, 1 );
 #ifdef H3D_WINDOWS
-   wchar_t * wtext = new wchar_t[text.size()];
    const char *src = text.c_str();
-   size_t ret = mbsrtowcs( wtext, &src, size_t( text.size() ), NULL );
+   mbstate_t state = mbstate_t();
+   size_t ret = mbsrtowcs( NULL, &src, 0, &state );
+   wstring wtext( ret, L'\0' );
+   mbsrtowcs( &wtext[0], &src, size_t(wtext.size()), &state );
    if( errno == EILSEQ ) {
     // Could not convert try to use original text string.
     font->Render( text.c_str() );
    } else {
-    font->Render( wtext, ret );
+    font->Render( &wtext[0], ret);
    }
-   delete [] wtext;
 #else
    font->Render( text.c_str() );
 #endif
