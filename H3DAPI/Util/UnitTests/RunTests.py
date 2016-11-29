@@ -257,6 +257,7 @@ class TestCaseRunner ( object ):
         if os.path.isfile("childProcessIdList.txt"):
           f = open("childProcessIdList.txt",'r')
           process_ids = f.read().split()
+          f.close()
           for process_id in process_ids:
             print "force kiling id", process_id
             kill_process = str(pskill_path)+" /accepteula -t -nobanner "+str(process_id)
