@@ -1796,7 +1796,8 @@ void WxFrame::SetFullscreen( bool fullscreen ) {
 
       h3dConfig = wxConfigBase::Get();
       h3dConfig->SetPath(wxT("/Settings"));
-      bool show_windows_in_fullscreen = h3dConfig->ReadBool(wxT("show_windows_in_fullscreen"), false);
+      bool show_windows_in_fullscreen = false;
+      h3dConfig->Read(wxT("show_windows_in_fullscreen"), &show_windows_in_fullscreen);
       SetShowWindowsInFullscreen(show_windows_in_fullscreen);
 
       // Make sure all child windows are drawn 
