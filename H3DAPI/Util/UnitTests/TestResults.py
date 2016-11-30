@@ -26,6 +26,8 @@ class TestResults ( object ):
     self.url= ""
     self.std_out= ""
     self.std_err= ""
+    self.svn_url_x3d = ""
+    self.svn_url_script = ""
     self.starts_ok= False
     self.terminates_ok= False
   

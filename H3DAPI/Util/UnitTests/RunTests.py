@@ -439,7 +439,28 @@ class TestCaseRunner ( object ):
           print(str(e))
         
         
-        
+    # use svn info to attempt to find the repo url of this test and its test script
+    p = subprocess.Popen( 'svn info "' + os.path.join(directory, testCase.x3d) + '"', stdout=subprocess.PIPE, shell=False )
+    svn_info_out, _ = p.communicate()
+    if p.returncode != 0:
+      print("Unable to obtain svn info for test x3d file, won't include it in results")
+    else:
+      #include it here
+      for line in svn_info_out.split('\r\n'):
+        if line.startswith("URL: "):
+          svn_url_x3d = line[5:]
+          break
+    p = subprocess.Popen('svn info "' + os.path.join(directory, testCase.script) + '"', stdout=subprocess.PIPE, shell=False )
+    svn_info_out, _ = p.communicate()
+    if p.returncode != 0:
+      print("Unable to obtain svn info for test x3d file, won't include it in results")
+    else:
+      #include it here
+      for line in svn_info_out.split('\r\n'):
+        if line.startswith("URL: "):
+          svn_url_script = line[5:]
+          break
+
     # Check if we should change the physics engine being used for this test and if so then use Variation's Option feature to ensure the test is run with that engine
     if not testCase.physics_engine is None:
       v.options.append ( Option ( ["RigidBodyCollection"], "physicsEngine", testCase.physics_engine ) )
@@ -509,6 +530,10 @@ class TestCaseRunner ( object ):
         os.rename(directory + "\\" + settings_old+".original.ini", directory + "\\" + settings_old)
     except:
       pass
+
+    if result:
+      result.svn_url_x3d = svn_url_x3d
+      result.svn_url_script = svn_url_script
 
     return result
 
@@ -604,13 +629,32 @@ class TestCaseRunner ( object ):
     self.ConnectDB()
     print "Uploading results."
     curs = self.db.cursor()
+    
+    # fetch the optional test_description.txt file from the directory
+    testcat_description = ""
+    if os.path.exists(os.path.join(args.workingdir, os.path.split(testCase.filename)[0], "description.txt")):
+      description_file = open(os.path.join(args.workingdir, os.path.split(testCase.filename)[0], "description.txt"), "r")
+      testcat_description = description_file.read()
+    # check if there is a description for this directory already, if so replace it if it differs from this one
+    curs.execute("SELECT id, description FROM test_categories WHERE path='%s'" % self.db.escape_string(os.path.split(testCase.filename)[0]))
+    res = curs.fetchone()
+    if res == None:
+      #Doesn't exist, so upload it
+      curs.execute("INSERT INTO test_categories (path, description) VALUES ('%s', '%s')" % (self.db.escape_string(os.path.split(testCase.filename)[0]), self.db.escape_string(testcat_description)))
+    else:
+      if curs[1] != testcat_description:
+        curs.execute("UPDATE test_categories SET description='%s' WHERE id=%d" % (self.db.escape_string(testcat_description), curs[0]))
+
     # Then ensure the test file and test_case exists in the database
-    curs.execute("SELECT id FROM test_files WHERE filename='%s'" % os.path.splitext(testCase.filename.replace("\\", "/"))[0])
+    curs.execute("SELECT id, description FROM test_files WHERE filename='%s'" % os.path.splitext(testCase.filename.replace("\\", "/"))[0])
     res = curs.fetchone()
     if res == None: # test_file doesn't exist, so add it
       curs.execute("INSERT INTO test_files (filename) VALUES ('%s')" % os.path.splitext(testCase.filename.replace("\\", "/"))[0]) 
       curs.execute("SELECT id FROM test_files WHERE filename='%s'" % os.path.splitext(testCase.filename.replace("\\", "/"))[0])
       res = curs.fetchone()
+    else:
+      if res[1] != testcat_description:
+        curs.execute("UPDATE test_files SET description='%s' WHERE id=%d" % (self.db.escape_string(testcat_description), res[0]))
     testfile_id = res[0]
     
     
@@ -624,12 +668,15 @@ class TestCaseRunner ( object ):
 
 
     # Now ensure the test_case exists in the database
-    curs.execute("SELECT test_cases.id FROM test_cases JOIN test_files WHERE case_name='%s'" % testCase.name)
+    curs.execute("SELECT test_cases.id, test_cases.svn_url_x3d, test_cases.svn_url_script FROM test_cases JOIN test_files WHERE case_name='%s'" % testCase.name)
     res = curs.fetchone()
     if res == None:
-      curs.execute("INSERT INTO test_cases (case_name) VALUES ('%s')" % testCase.name)
+      curs.execute("INSERT INTO test_cases (case_name, svn_url_x3d, svn_url_script) VALUES ('%s', '%s', '%s')" % (testCase.name, case_results.svn_url_x3d, case_results.svn_url_script))
       curs.execute("SELECT id FROM test_cases WHERE case_name='%s'" % testCase.name)
       res = curs.fetchone()
+    else:
+      if (res[1] != case_results.svn_url_x3d) or (res[2] != case_results.svn_url_script):
+        curs.execute("UPDATE test_cases SET svn_url_x3d='%s', svn_url_script='%s' WHERE test_cases.id=%d" % (case_results.svn_url_x3d, case_results.svn_url_script, res[0]))
     testcase_id = res[0]
 
 
@@ -700,12 +747,12 @@ class TestCaseRunner ( object ):
               baseline_file = open(result.baseline_path, 'rb')
               baseline_image = baseline_file.read()
               baseline_file.close()
-              curs.execute("SELECT id, image FROM rendering_baselines WHERE file_id=%s AND case_id=%s AND step_id='%s'" % (testfile_id, testcase_id, teststep_id))
+              curs.execute("SELECT id, image FROM rendering_baselines WHERE file_id=%s AND case_id=%s AND step_id='%s' ORDER BY timestamp DESC LIMIT 1" % (testfile_id, testcase_id, teststep_id))
               res = curs.fetchone()
-              if res == None:
-                curs.execute(("INSERT INTO rendering_baselines (file_id, case_id, step_id, image) VALUES (%d, %d, %d" % (testfile_id, testcase_id, teststep_id)) + ", %s)", [baseline_image,])
-              elif res[1] != baseline_image:
-                curs.execute("UPDATE rendering_baselines SET image=%s WHERE id=%s", [baseline_image, res[0]])
+              if res == None or res[1] != baseline_image:
+                curs.execute(("INSERT INTO rendering_baselines (file_id, case_id, step_id, timestamp, image) VALUES (%d, %d, %d, '%s'" % (testfile_id, testcase_id, teststep_id, args.timestamp)) + ", %s)", [baseline_image,])
+#              elif res[1] != baseline_image:
+#                curs.execute("INSERT into rendering_baselines  image=%s WHERE id=%s", [baseline_image, res[0]])
             
             if not result.success: #validation failed, if possible we should upload both the rendering and the diff
               if result.diff_path != '':
