@@ -302,8 +302,14 @@ class TestCaseRunner ( object ):
       print sys.exc_info()[0]
       return None
     result = []
+    description = ""
     for sect in confParser.sections():
-      if sect != 'Default':
+      if sect == 'FileDescription':
+        try:
+          description = confParser.get(sect, "description")
+        except:
+          description = ''
+      else:
         test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials', 'physics_engine','settings', 'ignore_warnings'])
         test_case.name = sect
         test_case.x3d = confParser.get(sect, 'x3d')
@@ -358,7 +364,7 @@ class TestCaseRunner ( object ):
         if args.case == "" or args.case == test_case.name:
           result.append(test_case)
 
-    return result
+    return result, description
 
   def processTestDef(self, file, testCase, results, directory):
     """
@@ -571,7 +577,7 @@ class TestCaseRunner ( object ):
         if ext.lower() in fileExtensions:
           if args.testdefs == "" or base in args.testdefs.split():
             file_path= os.path.join(root,file)
-            testCases = self.parseTestDefinitionFile(file_path)
+            testCases, filedescription = self.parseTestDefinitionFile(file_path)
             for testCase in testCases:
               if testCase != None and testCase.x3d != None and testCase.script != None:
                 found_tests = True
@@ -582,7 +588,7 @@ class TestCaseRunner ( object ):
                 all_tests_run = case_results.terminates_ok and all_tests_run
                 testCase.filename = (os.path.relpath(file_path, directory)).replace('\'', '/') # This is used to set up the tree structure for the results page. It will store this parameter in the database as a unique identifier of this specific file of tests.
                 if case_results != None:  
-                  self.UploadResultsToSQL(testCase, case_results, root)            
+                  self.UploadResultsToSQL(testCase, case_results, root, filedescription)            
     if not found_tests:
       print "No valid tests found in: " + os.path.abspath(directory)
               
@@ -627,7 +633,7 @@ class TestCaseRunner ( object ):
         print(str(e))        
         
         
-  def UploadResultsToSQL(self, testCase, case_results, output_dir):
+  def UploadResultsToSQL(self, testCase, case_results, output_dir, testfile_description):
     self.ConnectDB()
     print "Uploading results."
     curs = self.db.cursor()
@@ -651,12 +657,12 @@ class TestCaseRunner ( object ):
     curs.execute("SELECT id, description FROM test_files WHERE filename='%s'" % os.path.splitext(testCase.filename.replace("\\", "/"))[0])
     res = curs.fetchone()
     if res == None: # test_file doesn't exist, so add it
-      curs.execute("INSERT INTO test_files (filename) VALUES ('%s')" % os.path.splitext(testCase.filename.replace("\\", "/"))[0]) 
+      curs.execute("INSERT INTO test_files (filename, description) VALUES ('%s', '%s')" % (os.path.splitext(testCase.filename.replace("\\", "/"))[0], self.db.escape_string(testfile_description)))
       curs.execute("SELECT id FROM test_files WHERE filename='%s'" % os.path.splitext(testCase.filename.replace("\\", "/"))[0])
       res = curs.fetchone()
     else:
-      if res[1] != testcat_description:
-        curs.execute("UPDATE test_files SET description='%s' WHERE id=%d" % (self.db.escape_string(testcat_description), res[0]))
+      if res[1] != testfile_description:
+        curs.execute("UPDATE test_files SET description='%s' WHERE id=%d" % (self.db.escape_string(testfile_description), res[0]))
     testfile_id = res[0]
     
     

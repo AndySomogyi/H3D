@@ -10,7 +10,7 @@ $test_run_id = $_GET['test_run_id'];
   
 $perf_query = sprintf("
 (SELECT performance_results.id AS id,test_runs.timestamp,server_id,server_name,test_run_id,file_id,filename,case_id,
-        'performance' AS result_type,case_name,performance_results.step_id,step_name, full_profiling_data, test_cases.svn_url_x3d, test_cases.svn_url_script
+        'performance' AS result_type,case_name,performance_results.step_id,step_name, full_profiling_data, test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description
  FROM   test_runs
         left join performance_results
                ON performance_results.test_run_id = test_runs.id
@@ -28,7 +28,7 @@ $perf_query = sprintf("
 $render_query = sprintf("
 (SELECT rendering_results.id AS id,test_runs.timestamp,server_id,server_name,rendering_results.test_run_id,
         rendering_results.file_id,filename,rendering_results.case_id,'rendering' AS result_type,case_name,
-        rendering_results.step_id,step_name,success,test_cases.svn_url_x3d, test_cases.svn_url_script,
+        rendering_results.step_id,step_name,success,test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description,
         (SELECT id FROM rendering_baselines
           WHERE rendering_results.file_id = rendering_baselines.file_id
             AND rendering_results.case_id = rendering_baselines.case_id
@@ -54,7 +54,7 @@ $console_query = sprintf("
 (SELECT console_results.id AS id,test_runs.timestamp,server_id,server_name,console_results.test_run_id,
         console_results.file_id,
         filename,console_results.case_id,'console' AS result_type,case_name,console_results.step_id,step_name,success,
-        output AS text_output,baseline AS text_baseline, diff AS text_diff, test_cases.svn_url_x3d, test_cases.svn_url_script
+        output AS text_output,baseline AS text_baseline, diff AS text_diff, test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description
  FROM   test_runs
         left join console_results
                ON console_results.test_run_id = test_runs.id
@@ -74,7 +74,7 @@ $custom_query = sprintf("
 (SELECT custom_results.id AS id,test_runs.timestamp,server_id,server_name,custom_results.test_run_id,
         custom_results.file_id,
         filename,custom_results.case_id,'custom' AS result_type,case_name,custom_results.step_id,step_name,success,
-        output AS text_output,baseline AS text_baseline, diff AS text_diff, test_cases.svn_url_x3d, test_cases.svn_url_script
+        output AS text_output,baseline AS text_baseline, diff AS text_diff, test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description
  FROM   test_runs
         left join custom_results
                ON custom_results.test_run_id = test_runs.id
@@ -94,7 +94,7 @@ $custom_query = sprintf("
 $error_query = sprintf("
 (SELECT error_results.id AS id,test_runs.timestamp,server_id,server_name,error_results.test_run_id,
         error_results.file_id,
-        filename,error_results.case_id,'error' AS result_type,case_name,error_results.step_id,step_name, stdout, stderr, test_cases.svn_url_x3d, test_cases.svn_url_script
+        filename,error_results.case_id,'error' AS result_type,case_name,error_results.step_id,step_name, stdout, stderr, test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description
  FROM   test_runs
         left join error_results
                ON error_results.test_run_id = test_runs.id
@@ -282,7 +282,7 @@ function generate_results($db, $data, $fetched_data) {
         $node = &$node['children'][array_push($node['children'], $new_node)-1];
         }
     }
-
+    $node['description'] = $row['description'];
     $testcase = array(
       "id" => $row['id'],
       "name"   => $row['case_name'],
