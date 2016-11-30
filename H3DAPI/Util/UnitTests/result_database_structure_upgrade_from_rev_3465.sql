@@ -1,6 +1,6 @@
 -- Run this file if your database is based on result_database_structure.sql from SVN revision 3465 (June 21st 2016)
 ALTER TABLE `rendering_baselines`
-	ADD COLUMN `timestamp` DATETIME NULL DEFAULT NULL AFTER `step_id`;
+	ADD COLUMN `timestamp` DATETIME NULL DEFAULT "2015-01-01" AFTER `step_id`;
 
 ALTER TABLE `test_cases`
 	ADD COLUMN `description` MEDIUMTEXT NULL AFTER `case_name`,
