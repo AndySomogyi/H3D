@@ -642,8 +642,8 @@ class TestCaseRunner ( object ):
       #Doesn't exist, so upload it
       curs.execute("INSERT INTO test_categories (path, description) VALUES ('%s', '%s')" % (self.db.escape_string(os.path.split(testCase.filename)[0]), self.db.escape_string(testcat_description)))
     else:
-      if curs[1] != testcat_description:
-        curs.execute("UPDATE test_categories SET description='%s' WHERE id=%d" % (self.db.escape_string(testcat_description), curs[0]))
+      if res[1] != testcat_description:
+        curs.execute("UPDATE test_categories SET description='%s' WHERE id=%d" % (self.db.escape_string(testcat_description), res[0]))
 
     # Then ensure the test file and test_case exists in the database
     curs.execute("SELECT id, description FROM test_files WHERE filename='%s'" % os.path.splitext(testCase.filename.replace("\\", "/"))[0])
