@@ -442,6 +442,8 @@ class TestCaseRunner ( object ):
     # use svn info to attempt to find the repo url of this test and its test script
     p = subprocess.Popen( 'svn info "' + os.path.join(directory, testCase.x3d) + '"', stdout=subprocess.PIPE, shell=False )
     svn_info_out, _ = p.communicate()
+    svn_url_x3d = ""
+    svn_url_script = ""
     if p.returncode != 0:
       print("Unable to obtain svn info for test x3d file, won't include it in results")
     else:
