@@ -574,6 +574,14 @@ function generateError(div) {
 function ConstructTestCases(model, target, path) {
   var container = $('<div>');
   container.addClass('Test_Container');
+  
+  if (model.description) {
+    var description = $("<div>");
+    description.addClass('TestCase');
+    description.append(model.description);
+    container.append(description);
+  }
+
   target.append(container);
   
 
@@ -725,7 +733,16 @@ function ConstructList(model, target, path) {
       
       CategoryCount++;
       
-      if(model[i].hasOwnProperty('children')) {
+      if (model[i].hasOwnProperty('children')) {
+        if (model[i].description) {
+            var description_container = $('<ul>');
+			description_container.addClass("Category_Item");
+		    var description = $("<div>");
+		    description.addClass('TestCase');
+		    description.append(model[i].description);
+            description_container.append(description);
+		    ul.append(description_container);
+        }
         ConstructList(model[i].children, ul, path + model[i].name + "/");
         if($('.test_failed', ul).length > 0)
           name.addClass('test_failed');                
