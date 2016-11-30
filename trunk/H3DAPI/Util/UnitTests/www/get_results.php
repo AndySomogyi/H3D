@@ -10,7 +10,7 @@ $test_run_id = $_GET['test_run_id'];
   
 $perf_query = sprintf("
 (SELECT performance_results.id AS id,test_runs.timestamp,server_id,server_name,test_run_id,file_id,filename,case_id,
-        'performance' AS result_type,case_name,performance_results.step_id,step_name, full_profiling_data
+        'performance' AS result_type,case_name,performance_results.step_id,step_name, full_profiling_data, test_cases.svn_url_x3d, test_cases.svn_url_script
  FROM   test_runs
         left join performance_results
                ON performance_results.test_run_id = test_runs.id
@@ -28,7 +28,13 @@ $perf_query = sprintf("
 $render_query = sprintf("
 (SELECT rendering_results.id AS id,test_runs.timestamp,server_id,server_name,rendering_results.test_run_id,
         rendering_results.file_id,filename,rendering_results.case_id,'rendering' AS result_type,case_name,
-        rendering_results.step_id,step_name,success, baseline.id as baseline_id
+        rendering_results.step_id,step_name,success,test_cases.svn_url_x3d, test_cases.svn_url_script,
+        (SELECT id FROM rendering_baselines
+          WHERE rendering_results.file_id = rendering_baselines.file_id
+            AND rendering_results.case_id = rendering_baselines.case_id
+            AND rendering_results.step_id = rendering_baselines.step_id
+            AND test_runs.timestamp >= rendering_baselines.timestamp
+          ORDER BY rendering_baselines.timestamp DESC LIMIT 1) as baseline_id
  FROM   test_runs
         left join rendering_results
                ON rendering_results.test_run_id = test_runs.id
@@ -40,10 +46,6 @@ $render_query = sprintf("
           ON rendering_results.file_id = test_files.id
         join servers
           ON test_runs.server_id = servers.id
-        left join rendering_baselines AS baseline
-               ON rendering_results.file_id = baseline.file_id
-                 AND rendering_results.case_id = baseline.case_id
-                    AND rendering_results.step_id = baseline.step_id
  WHERE  test_runs.id = %d
  GROUP  BY case_id,file_id,step_name
 )", $test_run_id);
@@ -52,7 +54,7 @@ $console_query = sprintf("
 (SELECT console_results.id AS id,test_runs.timestamp,server_id,server_name,console_results.test_run_id,
         console_results.file_id,
         filename,console_results.case_id,'console' AS result_type,case_name,console_results.step_id,step_name,success,
-        output AS text_output,baseline AS text_baseline, diff AS text_diff
+        output AS text_output,baseline AS text_baseline, diff AS text_diff, test_cases.svn_url_x3d, test_cases.svn_url_script
  FROM   test_runs
         left join console_results
                ON console_results.test_run_id = test_runs.id
@@ -72,7 +74,7 @@ $custom_query = sprintf("
 (SELECT custom_results.id AS id,test_runs.timestamp,server_id,server_name,custom_results.test_run_id,
         custom_results.file_id,
         filename,custom_results.case_id,'custom' AS result_type,case_name,custom_results.step_id,step_name,success,
-        output AS text_output,baseline AS text_baseline, diff AS text_diff
+        output AS text_output,baseline AS text_baseline, diff AS text_diff, test_cases.svn_url_x3d, test_cases.svn_url_script
  FROM   test_runs
         left join custom_results
                ON custom_results.test_run_id = test_runs.id
@@ -92,7 +94,7 @@ $custom_query = sprintf("
 $error_query = sprintf("
 (SELECT error_results.id AS id,test_runs.timestamp,server_id,server_name,error_results.test_run_id,
         error_results.file_id,
-        filename,error_results.case_id,'error' AS result_type,case_name,error_results.step_id,step_name, stdout, stderr
+        filename,error_results.case_id,'error' AS result_type,case_name,error_results.step_id,step_name, stdout, stderr, test_cases.svn_url_x3d, test_cases.svn_url_script
  FROM   test_runs
         left join error_results
                ON error_results.test_run_id = test_runs.id
@@ -107,6 +109,19 @@ $error_query = sprintf("
  WHERE test_runs.id = %d
  GROUP BY case_id,file_id,step_name)", $test_run_id);
 
+
+function getCategoryDescription($db, $path) {
+  $category_query = "SELECT description FROM test_categories WHERE path = '" . $path . "';";
+  if(!$category_fetch = mysqli_query($db, $category_query)) {
+      die("ERROR: " . mysqli_error($db));
+  }
+  if(mysqli_num_rows($category_fetch) > 0) {
+    $cat_row = mysqli_fetch_assoc($category_fetch);
+    return $cat_row['description'];
+  } else {
+    return "";
+  }
+}
 
 $error_rows = fetch_result($db, $error_query);
 $console_rows = fetch_result($db, $console_query);
@@ -201,7 +216,7 @@ function generate_results($db, $data, $fetched_data) {
     // creating any missing nodes on the way there.
     // NOTE: json_encode won't output an array if there are any named elements in it. It'll turn those into objects.
     $node = &$data;
-
+    $path = $category_structure[0];
     $index = -1;
     for($i = 0; $i < count($data); $i++) {
       if(strcmp($data[$i]['name'], $category_structure[0]) == 0) {
@@ -211,15 +226,18 @@ function generate_results($db, $data, $fetched_data) {
     }
     if($index == -1) { // We don't have a top-level entry for this category or testcase, so let's add it.
       if(count($category_structure) > 1) {
-        $node = &$data[array_push($data, array("name" => $category_structure[0], "children" => array()))-1];
+        $category_description = getCategoryDescription($db, $path);
+        $node = &$data[array_push($data, array("name" => $category_structure[0], "description" => $category_description, "children" => array()))-1];
       } else {
-        $node = &$data[array_push($data, array("name" => $category_structure[0], "testcases" => array()))-1];
+        $category_description = getCategoryDescription($db, $path);
+        $node = &$data[array_push($data, array("name" => $category_structure[0], "description" => $category_description, "testcases" => array()))-1];
       }
     } else {
       $node = &$data[$index];
     }
     if(count($category_structure) > 1)
       array_shift($category_structure);
+      $path = $path ."/".$category_structure[0];
 //    echo '</br>it is now ' . json_encode($category_structure) ."</br>";
           
 //     Go through every folder specified in the casename path and build our array structure.
@@ -234,7 +252,8 @@ function generate_results($db, $data, $fetched_data) {
       if($index > -1) {
         $node = &$node['children'][$i];
       } else {     
-        $new_node = array("name" => $category_structure[0], "children" => array(), 'success' => true);
+        $category_description = getCategoryDescription($db, $path);
+        $new_node = array("name" => $category_structure[0], "description" => $category_description, "children" => array(), 'success' => true);
         $node = &$node['children'][array_push($node['children'], $new_node)-1];
 //    echo "node is: </br>" . json_encode($node) . "</br>";
       }
@@ -258,7 +277,8 @@ function generate_results($db, $data, $fetched_data) {
       } else {
         //create and push an element for this testfile into the array
         //point $node at that element
-        $new_node = array( 'name' => $category_structure[0], 'testcases' => array(), 'success' => true);
+        $category_description = getCategoryDescription($db, $path);
+        $new_node = array( 'name' => $category_structure[0], "description" => $category_description, 'testcases' => array(), 'success' => true);
         $node = &$node['children'][array_push($node['children'], $new_node)-1];
         }
     }
@@ -272,6 +292,8 @@ function generate_results($db, $data, $fetched_data) {
       "server_id"=> $row['server_id'],
       "server_name"=> $row['server_name'],
       "time"   => $row['timestamp'],
+      "svn_url_x3d" => $row['svn_url_x3d'],
+      "svn_url_script" => $row['svn_url_script'],
       "success" => 'Y',
       );
     $testcase["step_name"] = $row['step_name'];

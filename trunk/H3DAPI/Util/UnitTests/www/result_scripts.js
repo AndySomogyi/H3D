@@ -618,7 +618,21 @@ function ConstructTestCases(model, target, path) {
           case_name.addClass("test_failed");
         }
         
-        case_div.append(case_name);        
+        case_div.append(case_name);
+
+        if (model.testcases[i].svn_url_x3d && model.testcases[i].svn_url_x3d != "") {
+          var case_svn_x3d_link = $("<a>");
+          case_svn_x3d_link.append("x3d");
+          case_svn_x3d_link.attr('href', encodeURI(model.testcases[i].svn_url_x3d));
+          case_div.append(case_svn_x3d_link);
+          case_div.append(" ");
+        }
+        if (model.testcases[i].svn_url_script && model.testcases[i].svn_url_script != "") {
+          var case_svn_script_link = $("<a>");
+          case_svn_script_link.append("script");
+          case_svn_script_link.attr('href', encodeURI(model.testcases[i].svn_url_script));
+          case_div.append(case_svn_script_link);
+        }
         
         container.append(case_div);
         current_case_name = model.testcases[i].name;
@@ -899,19 +913,15 @@ function SetTestRun(test_run_id) {
       }
     });
 
-    $('#Options_Toggle_Steps').data('collapsed', true);
-    $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
-    $('#Options_Toggle_Steps').unbind().click(function(){
-      if($(this).data('collapsed')) {
-        $('.TestStep_name:visible').removeClass('minimized');
-        $(this).data('collapsed', false);
-        $('#Options_Toggle_Steps').prop('value', 'Collapse Visible Steps');
-      } else {
-        $('.TestStep_name:visible').addClass('minimized');
-        $(this).data('collapsed', true);
-        $('#Options_Toggle_Steps').prop('value', 'Expand Visible Steps');
-      }
-    });  
+    $('#Options_Collapse_Steps').prop('value', 'Collapse Visible Steps');
+    $('#Options_Collapse_Steps').click(function(){
+      $('.TestStep_name:visible').addClass('minimized');
+    });
+    $('#Options_Expand_Steps').prop('value', 'Expand Visible Steps');
+    $('#Options_Expand_Steps').click(function(){
+      $('.TestStep_name:visible').removeClass('minimized');
+    });
+
     $(".TestRun").unbind("click");
     $(".TestRun").click(OnTestRunClick);      
   });
