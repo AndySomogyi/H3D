@@ -32,6 +32,7 @@
 #define __H3DViewerPopupMenus__
 
 #include "H3DViewerTreeViewDialog.h"
+#include "H3DViewerAddChildDialog.h"
 
 class H3DViewerPopupMenus : public MenuContainer {
 public:
