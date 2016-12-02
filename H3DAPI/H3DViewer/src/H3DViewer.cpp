@@ -541,3 +541,50 @@ PythonConsole::~PythonConsole()
 	m_textCtrlInput->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( PythonConsole::onExecuteCommand ), NULL, this );
 	
 }
+
+AddChildDialog::AddChildDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizerAddChildDialog;
+	bSizerAddChildDialog = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizerAddChildDialog->Add( 0, 10, 0, wxEXPAND, 5 );
+	
+	cbNewNodeName = new wxComboBox( this, wxID_ANY, wxEmptyString, wxPoint( 100,25 ), wxSize( 200,-1 ), 0, NULL, 0 ); 
+	bSizerAddChildDialog->Add( cbNewNodeName, 0, wxALL, 5 );
+	
+	btSizerAddNode = new wxStdDialogButtonSizer();
+	btSizerAddNodeOK = new wxButton( this, wxID_OK );
+	btSizerAddNode->AddButton( btSizerAddNodeOK );
+	btSizerAddNodeCancel = new wxButton( this, wxID_CANCEL );
+	btSizerAddNode->AddButton( btSizerAddNodeCancel );
+	btSizerAddNode->Realize();
+	
+	bSizerAddChildDialog->Add( btSizerAddNode, 1, wxALIGN_CENTER, 5 );
+	
+	
+	this->SetSizer( bSizerAddChildDialog );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	cbNewNodeName->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( AddChildDialog::cbNewNodeNameOnKeyDown ), NULL, this );
+	cbNewNodeName->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( AddChildDialog::cbNewNodeNameOnText ), NULL, this );
+	cbNewNodeName->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( AddChildDialog::cbNewNodeNameOnTextEnter ), NULL, this );
+	btSizerAddNodeCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AddChildDialog::btSizerAddNodeOnCancelButtonClick ), NULL, this );
+	btSizerAddNodeOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AddChildDialog::btSizerAddNodeOnOKButtonClick ), NULL, this );
+}
+
+AddChildDialog::~AddChildDialog()
+{
+	// Disconnect Events
+	cbNewNodeName->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( AddChildDialog::cbNewNodeNameOnKeyDown ), NULL, this );
+	cbNewNodeName->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( AddChildDialog::cbNewNodeNameOnText ), NULL, this );
+	cbNewNodeName->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( AddChildDialog::cbNewNodeNameOnTextEnter ), NULL, this );
+	btSizerAddNodeCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AddChildDialog::btSizerAddNodeOnCancelButtonClick ), NULL, this );
+	btSizerAddNodeOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AddChildDialog::btSizerAddNodeOnOKButtonClick ), NULL, this );
+	
+}

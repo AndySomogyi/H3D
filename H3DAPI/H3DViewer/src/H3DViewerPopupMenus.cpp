@@ -464,14 +464,11 @@ void H3DViewerPopupMenus::OnTreeViewAddChildNode( wxCommandEvent& event ) {
     }
   }
 
-  wxTextEntryDialog *node_name_dialog = 
-    new wxTextEntryDialog(this, 
-                          wxT("Enter the name of the node type you want to use" ),
-                          wxT("Add/replace node" ) );
+  H3DViewerAddChildDialog *node_name_dialog = new H3DViewerAddChildDialog(this);
   if (node_name_dialog->ShowModal() == wxID_OK) {
-    Node *new_node = H3DNodeDatabase::createNode( std::string(node_name_dialog->GetValue().mb_str()) );
+    Node *new_node = H3DNodeDatabase::createNode( std::string(node_name_dialog->GetNodeName().mb_str()) );
     if( !new_node ) {
-      wxMessageBox( wxT("No such node type exists: " + node_name_dialog->GetValue()),
+      wxMessageBox( wxT("No such node type exists: " + node_name_dialog->GetNodeName()),
                     wxT("Error"),
                     wxOK | wxICON_EXCLAMATION);
     } else {

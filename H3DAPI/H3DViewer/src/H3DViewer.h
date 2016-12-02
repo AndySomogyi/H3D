@@ -34,6 +34,7 @@
 #include <wx/statbox.h>
 #include <wx/scrolwin.h>
 #include <wx/timer.h>
+#include <wx/combobox.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -226,6 +227,33 @@ class PythonConsole : public wxFrame
 	
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class AddChildDialog
+///////////////////////////////////////////////////////////////////////////////
+class AddChildDialog : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxComboBox* cbNewNodeName;
+		wxStdDialogButtonSizer* btSizerAddNode;
+		wxButton* btSizerAddNodeOK;
+		wxButton* btSizerAddNodeCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void cbNewNodeNameOnKeyDown( wxKeyEvent& event ) { event.Skip(); }
+		virtual void cbNewNodeNameOnText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void cbNewNodeNameOnTextEnter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void btSizerAddNodeOnCancelButtonClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void btSizerAddNodeOnOKButtonClick( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		AddChildDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Enter name of node to add"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 216,133 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~AddChildDialog();
+	
+};
 
 inline std::string toStr( const wxString &s ) {
 # if(wxUSE_UNICODE)
