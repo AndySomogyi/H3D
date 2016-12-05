@@ -9,8 +9,9 @@ H3DViewerAddChildDialog::H3DViewerAddChildDialog(wxWindow* parent)
   cbNewNodeName->Freeze(); // We freeze the list so it doesn't do a redraw for every Append.
   for (H3DNodeDatabase::NodeDatabaseConstIterator nodedb_it = H3DNodeDatabase::begin();
     H3DNodeDatabase::end() != nodedb_it; ++nodedb_it) {
-    available_nodes.Add(wxString(nodedb_it->second->getName()));
-    cbNewNodeName->Append(nodedb_it->second->getName());
+    wxString new_value( nodedb_it->second->getName().c_str(), wxConvUTF8 );
+    available_nodes.Add(new_value);
+    cbNewNodeName->Append(new_value);
   }
   cbNewNodeName->Thaw();
 }
@@ -21,7 +22,7 @@ void H3DViewerAddChildDialog::cbNewNodeNameOnKeyDown(wxKeyEvent& event)
     // We need to make sure backspace actually deletes the selection because otherwise the last character
     // in the autocompleted part is erased and autocomplete just refills it all, so you can't erase anything.
     block_OnText = true;
-    cbNewNodeName->RemoveSelection();
+    cbNewNodeName->SetSelection(wxNOT_FOUND);
     block_OnText = false;
   }
   event.Skip();
