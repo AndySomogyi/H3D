@@ -129,7 +129,8 @@ namespace H3D {
             Inst< SFFloat            > _vibrationAmplitude     = 0,
             Inst< SFFloat            > _gripperAngle           = 0,
             Inst< SFAutoCalibrate    > _autoCalibrate          = 0,
-            Inst< SFBool             > _isAutoCalibrated       = 0 );
+            Inst< SFBool             > _isAutoCalibrated       = 0,
+            Inst< SFInt32            > _desiredComThreadRate   = 0 );
     
     /// Does all the initialization needed for the device before starting to
     /// use it.
@@ -263,6 +264,15 @@ namespace H3D {
     ///
     /// <b>Access type:</b> outputOnly \n
     auto_ptr< SFBool > isAutoCalibrated;
+
+    /// The desired frequency for the thread that communicates with the haptics device.
+    /// If value is -1 then the communication is done directly in the haptics thread
+    /// otherwise the communication is done in a separate thread at the given rate
+    /// and locks are used to transfer values to the haptics thread.
+    ///
+    /// <b>Access type:</b> initializeOnly \n
+    /// <b>Default value type:</b> 1000 \n
+    auto_ptr< SFInt32 > desiredComThreadRate;
   };
 }
 

@@ -52,6 +52,7 @@ namespace ForceDimensionDeviceInternals {
   FIELDDB_ELEMENT( ForceDimensionDevice, gripperAngle, INPUT_OUTPUT );
   FIELDDB_ELEMENT( ForceDimensionDevice, autoCalibrate, INPUT_ONLY );
   FIELDDB_ELEMENT( ForceDimensionDevice, isAutoCalibrated, OUTPUT_ONLY );
+  FIELDDB_ELEMENT( ForceDimensionDevice, desiredComThreadRate, INITIALIZE_ONLY );
 }
 
 /// Constructor.
@@ -89,7 +90,8 @@ ForceDimensionDevice::ForceDimensionDevice(
                Inst< SFFloat            > _vibrationAmplitude,
                Inst< SFFloat            > _gripperAngle,
                Inst< SFAutoCalibrate    > _autoCalibrate,
-               Inst< SFBool > _isAutoCalibrated ) :
+               Inst< SFBool             > _isAutoCalibrated,
+               Inst< SFInt32            > _desiredComThreadRate ) :
   H3DHapticsDevice( _devicePosition, _deviceOrientation, _trackerPosition,
               _trackerOrientation, _positionCalibration, 
               _orientationCalibration, _proxyPosition,
@@ -110,7 +112,8 @@ ForceDimensionDevice::ForceDimensionDevice(
   changeVibration( new ChangeVibration ),
   gripperAngle( _gripperAngle ),
   autoCalibrate( _autoCalibrate ),
-  isAutoCalibrated( _isAutoCalibrated ) {
+  isAutoCalibrated( _isAutoCalibrated ),
+  desiredComThreadRate( _desiredComThreadRate ) {
 
   type_name = "ForceDimensionDevice";  
   database.initFields( this );
@@ -200,10 +203,15 @@ void ForceDimensionDevice::EnableForce::onValueChange( const bool &v ) {
 }
 
 H3DHapticsDevice::ErrorCode ForceDimensionDevice::initDevice() {
-  HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::initDevice();
 #ifdef HAVE_DHDAPI
   HAPI::ForceDimensionHapticsDevice *dhd = 
     static_cast< HAPI::ForceDimensionHapticsDevice * >( hapi_device.get() );
+  if( dhd ) {
+    dhd->setComThreadFrequency( desiredComThreadRate->getValue() );
+  }
+#endif
+  HAPI::HAPIHapticsDevice::ErrorCode e = H3DHapticsDevice::initDevice();
+#ifdef HAVE_DHDAPI
   if( dhd ) {
     deviceType->setValue( dhd->getDeviceType(), id ); 
     dhd->enableForce( enableForce->getValue() );
