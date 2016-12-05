@@ -124,7 +124,8 @@ WxConsoleDialog::WxConsoleDialog ( wxWindow *parent,
 
   tabs = new wxNotebook(this, wxID_ANY);
 
-  // create text ctrl with minimal size 750x450
+  // create text ctrl with minimum size (1, 1).
+  // It will get sized properly further down with a call to SetSize().
   logText = new wxTextCtrl(tabs, -1, wxT(""),
                            wxDefaultPosition, wxSize(1, 1),
                            wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
