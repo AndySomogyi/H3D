@@ -397,7 +397,9 @@ void H3DHapticsDevice::updateDeviceValues() {
     deviceAngularVelocity->setValue( Vec3f( dv.angular_velocity ), id);
     force->setValue( (Vec3f)dv.force, id);
     torque->setValue( (Vec3f)dv.torque, id);
-    buttons->setValue( dv.button_status, id );
+    if( dv.button_status != buttons->getValue() ) {
+      buttons->setValue( dv.button_status, id );
+    }
     // set mainButton and secondaryButton
     bool temp_value = (dv.button_status & 0x01) != 0;
     if( temp_value != mainButton->getValue() )
