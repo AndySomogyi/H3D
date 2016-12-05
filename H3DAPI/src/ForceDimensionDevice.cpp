@@ -137,6 +137,7 @@ ForceDimensionDevice::ForceDimensionDevice(
   vibrationAmplitude->routeNoEvent( changeVibration );
   autoCalibrate->setValue( false );
   isAutoCalibrated->setValue( false, id );
+  desiredComThreadRate->setValue( 1000 );
 }
 
 
