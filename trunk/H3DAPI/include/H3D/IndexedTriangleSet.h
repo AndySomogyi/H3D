@@ -284,13 +284,13 @@ namespace H3D {
     /// Auto-generated normals that are used if the normal field is NULL.
     /// Only accessable in C++.
     ///
-    /// \dotfile IndexedFaceSet_autoNormal.dot 
+    /// \dotfile IndexedTriangleSet_autoNormal.dot 
     auto_ptr< AutoNormal > autoNormal;
 
     /// Auto-generated vertex attributes for tangents and binormals.
     /// Only accessable in C++.
     ///
-    /// \dotfile IndexedFaceSet_autoNormal.dot 
+    /// \dotfile IndexedTriangleSet_autoTangent.dot 
     auto_ptr< AutoTangent > autoTangent;
 
     /// Field for setting the value of the index field.
