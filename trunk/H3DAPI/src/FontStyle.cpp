@@ -328,7 +328,7 @@ string FC_GetFontByName( const char *font_name, bool bold, bool italic ) {
 #endif //
     FTFont *font = NULL;
   // search font cache first:
-    string font_to_search = render_type + to_string(face_size) + full_font_path;
+    string font_to_search = render_type + to_string((_ULonglong)face_size) + full_font_path;
     FontStyleInternals::FontStyleMap::iterator f =
       font_db.find( font_to_search );
   if ( f != font_db.end() )
