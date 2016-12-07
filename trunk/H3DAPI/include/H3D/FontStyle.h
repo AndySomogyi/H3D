@@ -34,6 +34,7 @@
 #include <H3D/MFString.h>
 #include <H3D/SFBool.h>
 #include <H3D/SFFloat.h>
+#include <H3D/SFInt32.h>
 
 // forward declaration
 class FTFont;
@@ -173,7 +174,8 @@ namespace H3D {
                Inst< SFFloat  > _spacing     = 0,
                Inst< SFString > _style       = 0,
                Inst< SFBool   > _topToBottom = 0,
-               Inst< SFString > _renderType  = 0 );
+               Inst< SFString > _renderType  = 0,
+               Inst< SFInt32  > _faceSize    = 0);
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
     /// Build Character instances for all characters that will be allowed
     /// for use by this font node. For Windows wglUseFontOutlines will 
@@ -327,6 +329,14 @@ namespace H3D {
     /// <b>Default value:</b> "TEXTURE" \n
     /// <b>Value range:</b> "TEXTURE", "POLYGON" or "OUTLINE" \n
     auto_ptr< SFString > renderType;
+
+	/// The faceSize field specifies the size of character faces in
+	/// points, where each point is 1/72 of an inch.
+	/// The input will be clamped to be within the valid range
+	/// <b>Access type:</b> initializeOnly \n
+	/// <b>Default value:</b> 72 \n
+	/// <b>Value range: </b> [4-72] \n
+	auto_ptr< SFInt32 > faceSize;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;

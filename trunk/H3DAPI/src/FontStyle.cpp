@@ -279,7 +279,8 @@ string FC_GetFontByName( const char *font_name, bool bold, bool italic ) {
   FTFont* getFontByName( const string &font_name,
                          bool bold, 
                          bool italic,
-                         const string &render_type ) {
+                         const string &render_type,
+                         int face_size) {
 
   string full_font_path;
 
@@ -327,7 +328,7 @@ string FC_GetFontByName( const char *font_name, bool bold, bool italic ) {
 #endif //
     FTFont *font = NULL;
   // search font cache first:
-    string font_to_search = render_type + full_font_path;
+    string font_to_search = render_type + to_string(face_size) + full_font_path;
     FontStyleInternals::FontStyleMap::iterator f =
       font_db.find( font_to_search );
   if ( f != font_db.end() )
@@ -343,7 +344,7 @@ string FC_GetFontByName( const char *font_name, bool bold, bool italic ) {
   }
   if( !font || font->Error() ) return NULL;
   else {
-    font->FaceSize( 72 );
+    font->FaceSize( face_size );
     font->CharMap(ft_encoding_unicode);
     font->UseDisplayList( true );
     font_db[font_to_search]=font;
@@ -380,6 +381,7 @@ namespace FontStyleInternals {
   FIELDDB_ELEMENT( FontStyle, style, INITIALIZE_ONLY );
   FIELDDB_ELEMENT( FontStyle, topToBottom, INITIALIZE_ONLY );
   FIELDDB_ELEMENT( FontStyle, renderType, INITIALIZE_ONLY );
+  FIELDDB_ELEMENT( FontStyle, faceSize, INITIALIZE_ONLY);
 }
 
 FontStyle::FontStyle( 
@@ -393,7 +395,8 @@ FontStyle::FontStyle(
                      Inst< SFFloat  >  _spacing,
                      Inst< SFString >  _style,
                      Inst< SFBool   >  _topToBottom,
-                     Inst< SFString > _renderType ) :
+                     Inst< SFString > _renderType,
+                     Inst< SFInt32  > _faceSize) :
   X3DFontStyleNode( _metadata ),
   family     ( _family      ),
   horizontal ( _horizontal  ),
@@ -404,7 +407,8 @@ FontStyle::FontStyle(
   spacing    ( _spacing     ),
   style      ( _style       ),
   topToBottom( _topToBottom ),
-  renderType ( _renderType  )
+  renderType ( _renderType  ),
+  faceSize   ( _faceSize    )
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
   ,font( NULL )
 #endif
@@ -434,6 +438,8 @@ FontStyle::FontStyle(
   renderType->addValidValue( "EXTRUDED" );
   renderType->setValue( "TEXTURE" );
 
+  faceSize->setValue(72);
+
 #if !( defined( HAVE_FREETYPE ) && defined( HAVE_FTGL ) )
   Console(LogLevel::Error) << "Warning: H3D API compiled withour FTGL or FreeType. FontStyle"
              << " nodes will be unusable." << endl;
@@ -446,6 +452,15 @@ void FontStyle::buildFonts() {
   if( fonts_built )
     return;
   
+  int face_size = faceSize->getValue();
+
+  // Clamp face size to valid range
+  if (face_size < 4) {
+	  face_size = 4;
+  } else if (face_size > 72) {
+	  face_size = 72;
+  }
+
   const string &render_type = renderType->getValue();
   if( render_type != "POLYGON" && render_type != "TEXTURE" &&
       render_type != "OUTLINE" && render_type != "EXTRUDED" ) {
@@ -488,11 +503,11 @@ void FontStyle::buildFonts() {
       font_name = DEFAULT_TYPEWRITER_FONT;
     } 
     
-  font =FontStyleInternals::getFontByName( font_name, bold, italic, render_type );
+  font =FontStyleInternals::getFontByName( font_name, bold, italic, render_type, face_size );
     // if bold or italic font was not found try to get the plain font
     // instead.
     if( !font && ( bold||italic) ) 
-      font = FontStyleInternals::getFontByName( font_name, false, false, render_type );
+      font = FontStyleInternals::getFontByName( font_name, false, false, render_type, face_size );
 
     // the font was found, so use that font
     if( font )
@@ -516,12 +531,14 @@ void FontStyle::buildFonts() {
     font = FontStyleInternals::getFontByName( DEFAULT_SERIF_FONT, 
                                               bold, 
                                               italic,
-                        render_type);
+                                              render_type,
+                                              face_size);
     if( !font && ( bold||italic) )
       font = FontStyleInternals::getFontByName( DEFAULT_SERIF_FONT, 
                                          false, 
                                          false,
-                     render_type);
+                                         render_type,
+                                         face_size);
 
 
     if( !font ) {
