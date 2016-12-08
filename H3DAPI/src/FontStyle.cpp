@@ -326,11 +326,12 @@ string FC_GetFontByName( const char *font_name, bool bold, bool italic ) {
     #endif
    #endif // else HAVE_FONTCONFIG
 #endif //
-    FTFont *font = NULL;
+  FTFont *font = NULL;
   // search font cache first:
-    string font_to_search = render_type + to_string((_ULonglong)face_size) + full_font_path;
-    FontStyleInternals::FontStyleMap::iterator f =
-      font_db.find( font_to_search );
+  stringstream ss;
+  ss << face_size;
+  string font_to_search = render_type + ss.str() + full_font_path;
+  FontStyleInternals::FontStyleMap::iterator f = font_db.find( font_to_search );
   if ( f != font_db.end() )
     return (*f).second;
   if( render_type == "POLYGON" ) {
