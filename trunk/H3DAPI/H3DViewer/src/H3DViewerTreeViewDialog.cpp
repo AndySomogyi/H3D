@@ -636,9 +636,31 @@ void H3DViewerTreeViewDialog::OnTreeRightClick(wxTreeEvent& event) {
     tex = dynamic_cast<X3DTextureNode *>((*ni).second.get());
   }
 
-  if(geom) PopupMenu(menu_container->RightClickMenuGeometry);
-  else if(tex) PopupMenu(menu_container->RightClickMenuTexture);
-  else PopupMenu(menu_container->RightClickMenu);
+  // You are not allowed to use a menu that is attached to a menubar as a popup menu in newer versions of wxwidgets.
+  // So we detach the menu we are about to use from our menu_container. But we need the event handler in the menu_container
+  // since otherwise we would have to regenerate our H3DViewerTreeViewdialog class and put all the event handling there.
+  // So as a compromise we make sure to set the same event handler the menu previously had after we've detached it.
+  if(geom) {
+    if (menu_container->RightClickMenuGeometry->IsAttached()) {
+      menu_container->RightClickMenuGeometry->Detach();
+      menu_container->RightClickMenuGeometry->SetEventHandler(menu_container->GetEventHandler());
+    }
+    PopupMenu(menu_container->RightClickMenuGeometry);
+  }
+  else if(tex) {
+    if (menu_container->RightClickMenuTexture->IsAttached()) {
+      menu_container->RightClickMenuTexture->Detach();
+      menu_container->RightClickMenuTexture->SetEventHandler(menu_container->GetEventHandler());
+    }
+    PopupMenu(menu_container->RightClickMenuTexture);
+  }
+  else {
+    if (menu_container->RightClickMenu->IsAttached()) {
+      menu_container->RightClickMenu->Detach();
+      menu_container->RightClickMenu->SetEventHandler(menu_container->GetEventHandler());
+    }
+    PopupMenu(menu_container->RightClickMenu);
+  }
 }
 
 
