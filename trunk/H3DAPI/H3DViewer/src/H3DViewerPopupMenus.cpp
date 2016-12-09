@@ -603,8 +603,8 @@ void H3DViewerPopupMenus::OnTreeViewSavePng( wxCommandEvent& event ) {
           }
         }
  
-        if(!image || (H3DUtil::saveFreeImagePNG( 
-              std::string(file_dialog->GetPath().mb_str()), *image ) != 0 )) {
+        if(!image || !H3DUtil::saveFreeImagePNG( 
+              std::string(file_dialog->GetPath().mb_str()), *image ) ) {
           stringstream s;
           s << "Error saving png file";
           wxMessageBox( wxString(s.str().c_str(),wxConvUTF8), wxT("Error"),
