@@ -525,13 +525,25 @@ void H3DViewerPopupMenus::OnTreeViewSaveNrrd( wxCommandEvent& event ) {
         if( X3DTexture2DNode * tex = 
             dynamic_cast< X3DTexture2DNode * >( n ) ) {
           image = tex->image->getValue();
+
+          // Some texture nodes don't write to their image field; 
+          // e.g. GeneratedTexture and RenderTargetTexture. 
+          // 
+          // For these cases, we extract the image from OpenGL.
+          if(!image) {
+            image = tex->renderToImage(-1, -1);
+          }
         } else if( X3DTexture3DNode * tex = 
                    dynamic_cast< X3DTexture3DNode * >( n ) ) {
           image = tex->image->getValue();
+
+          if(!image) {
+            image = tex->renderToImage(-1, -1);
+          }
         }
  
-        if( H3DUtil::saveImageAsNrrdFile( string(file_dialog->GetPath().mb_str()),
-                                          image ) != 0 ) {
+        if(!image || (H3DUtil::saveImageAsNrrdFile( 
+          std::string(file_dialog->GetPath().mb_str()), image ) != 0) ) {
           stringstream s;
           s << "Error saving nrrd file";
           wxMessageBox( wxString(s.str().c_str(),wxConvUTF8), wxT("Error"),
@@ -574,13 +586,25 @@ void H3DViewerPopupMenus::OnTreeViewSavePng( wxCommandEvent& event ) {
         if( X3DTexture2DNode * tex = 
             dynamic_cast< X3DTexture2DNode * >( n ) ) {
           image = tex->image->getValue();
+
+          // Some texture nodes don't write to their image field; 
+          // e.g. GeneratedTexture and RenderTargetTexture. 
+          // 
+          // For these cases, we extract the image from OpenGL.
+          if(!image) {
+            image = tex->renderToImage(-1, -1);
+          }
         } else if( X3DTexture3DNode * tex = 
                    dynamic_cast< X3DTexture3DNode * >( n ) ) {
           image = tex->image->getValue();
+
+          if(!image) {
+            image = tex->renderToImage(-1, -1);
+          }
         }
  
-        if( !H3DUtil::saveFreeImagePNG( string(file_dialog->GetPath().mb_str()),
-                                          *image ) ) {
+        if(!image || (H3DUtil::saveFreeImagePNG( 
+              std::string(file_dialog->GetPath().mb_str()), *image ) != 0 )) {
           stringstream s;
           s << "Error saving png file";
           wxMessageBox( wxString(s.str().c_str(),wxConvUTF8), wxT("Error"),
