@@ -2165,6 +2165,7 @@ void WxFrame::ShowConsole(wxCommandEvent & event) {
   }
 
   bool align_console_treeview = false;
+  h3dConfig->SetPath(wxT("/Settings"));
   h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
 
   // Move the console window to be located below the main window.
@@ -2176,16 +2177,15 @@ void WxFrame::ShowConsole(wxCommandEvent & event) {
     wxSize console_size = the_console->GetSize();
 
     // Make sure console isn't moved outside screen X.
-    if(curr_pos.x + console_size.GetWidth() >=
-      (desktop_dims.GetRight() - console_size.GetWidth())) {
+    if((curr_pos.x + console_size.GetWidth()) >= desktop_dims.GetRight()) {
       curr_pos.x = (desktop_dims.GetRight() - console_size.GetWidth());
     } else {
       //curr_pos.x stays unchanged.
     }
 
     // Make sure console isn't moved outside screen Y.
-    if(curr_pos.y + console_size.GetHeight() >=
-      (desktop_dims.GetBottom() - console_size.GetHeight())) {
+    if((curr_pos.y + curr_size.GetHeight() + console_size.GetHeight()) >=
+       desktop_dims.GetBottom()) {
       curr_pos.y = (desktop_dims.GetBottom() - console_size.GetHeight());
     } else {
       curr_pos.y = curr_pos.y + curr_size.GetHeight();
@@ -2202,6 +2202,8 @@ void WxFrame::ShowConsole(wxCommandEvent & event) {
     // already shown, bring it up
     the_console->SetFocus();
   }
+
+  the_console->Update();
 }
 
 #ifdef HAVE_PROFILER
@@ -2229,27 +2231,28 @@ void WxFrame::OculusRiftRecenter(wxCommandEvent & event) {
 //Show console event
 void WxFrame::ShowTreeView(wxCommandEvent & event) {
   bool align_console_treeview = false;
+  h3dConfig->SetPath(wxT("/Settings"));
   h3dConfig->Read(wxT("align_console_treeview"), &align_console_treeview);
 
   // Move the tree view window to be located to the right of the main window.
   if((!glwindow->fullscreen->getValue() && !IsMaximized()) &&
-    align_console_treeview) {
+     align_console_treeview) {
+
     wxPoint curr_pos = GetScreenPosition();
     wxSize curr_size = GetSize();
     wxRect desktop_dims = wxGetClientDisplayRect();
     wxSize tree_view_size = tree_view_dialog->GetSize();
 
     // Make sure tree view isn't moved outside screen X.
-    if(curr_pos.x + tree_view_size.GetWidth() >=
-      (desktop_dims.GetRight() - tree_view_size.GetWidth())) {
+    if((curr_pos.x + curr_size.GetWidth() + tree_view_size.GetWidth()) >=
+       desktop_dims.GetRight()) {
       curr_pos.x = (desktop_dims.GetRight() - tree_view_size.GetWidth());
     } else {
       curr_pos.x = curr_pos.x + curr_size.GetWidth();
     }
 
     // Make sure tree view isn't moved outside screen Y.
-    if(curr_pos.y + tree_view_size.GetHeight() >=
-      (desktop_dims.GetBottom() - tree_view_size.GetHeight())) {
+    if((curr_pos.y + tree_view_size.GetHeight()) >= desktop_dims.GetBottom()) {
       curr_pos.y = (desktop_dims.GetBottom() - tree_view_size.GetHeight());
     } else {
       //curr_pos.y stays unchanged.
