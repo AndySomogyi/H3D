@@ -552,7 +552,7 @@ AddChildDialog::AddChildDialog( wxWindow* parent, wxWindowID id, const wxString&
 	
 	bSizerAddChildDialog->Add( 0, 10, 0, wxEXPAND, 5 );
 	
-	cbNewNodeName = new wxComboBox( this, wxID_ANY, wxEmptyString, wxPoint( 100,25 ), wxSize( 200,-1 ), 0, NULL, 0 ); 
+	cbNewNodeName = new wxComboBox( this, wxID_ANY, wxEmptyString, wxPoint( 100,25 ), wxSize( 200,-1 ), 0, NULL, wxTE_PROCESS_ENTER ); 
 	bSizerAddChildDialog->Add( cbNewNodeName, 0, wxALL, 5 );
 	
 	btSizerAddNode = new wxStdDialogButtonSizer();
