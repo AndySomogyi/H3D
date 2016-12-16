@@ -4,16 +4,8 @@ H3DViewerAddChildDialog::H3DViewerAddChildDialog(wxWindow* parent)
   :
   AddChildDialog(parent)
 {
+  target_field = NULL;
   block_OnText = false; // Putting this in the initializer list makes wxFormBuilder generate a conflicting constructor
-  cbNewNodeName->Clear(); // build the initial combobox list
-  cbNewNodeName->Freeze(); // We freeze the list so it doesn't do a redraw for every Append.
-  for (H3DNodeDatabase::NodeDatabaseConstIterator nodedb_it = H3DNodeDatabase::begin();
-    H3DNodeDatabase::end() != nodedb_it; ++nodedb_it) {
-    wxString new_value( nodedb_it->second->getName().c_str(), wxConvUTF8 );
-    available_nodes.Add(new_value);
-    cbNewNodeName->Append(new_value);
-  }
-  cbNewNodeName->Thaw();
 }
 
 void H3DViewerAddChildDialog::cbNewNodeNameOnKeyDown(wxKeyEvent& event)
@@ -34,22 +26,33 @@ void H3DViewerAddChildDialog::cbNewNodeNameOnText(wxCommandEvent& event)
   // of the combobox from inside this event-handler so we suppress it ourselves with block_OnText.
   if (!block_OnText) {
     block_OnText = true;
+    
     wxString new_value = event.GetString();
+
+    for (auto new_it = new_value.begin(); new_it != new_value.end(); ++new_it) {
+      *new_it = tolower(*new_it);
+    }
+
+
     bool exact_match = false;
     if (new_value.length() > 0) {
       wxArrayString matching_nodes;
       for (wxArrayString::const_iterator it = available_nodes.begin();
         it != available_nodes.end(); ++it) {
-        if ((it->Find(new_value) == 0)) { // Has to start with what we've written to match
+        wxString it_lowercase = wxString(*it);
+        for (auto c_it = it_lowercase.begin(); c_it != it_lowercase.end(); ++c_it) {
+          *c_it = tolower(*c_it);
+        }
+        if ((it_lowercase.Find(new_value) == 0)) { // Has to start with what we've written to match
           matching_nodes.Add(*it);
-          if (*it == new_value) {
+          if (it_lowercase == new_value) {
             exact_match = true;
           }
         }
       }
       // If we stop finding matches then we don't clear the list, that way the
       // user gets to see previously matched valid ones with similar names.
-      if (matching_nodes.Count() > 0) {                                         
+      if (matching_nodes.Count() > 0) {
         if (!exact_match) { // And we also only clear the list if there's no exact match for the same reason as above
           cbNewNodeName->Clear();
           for (wxArrayString::const_iterator match_it = matching_nodes.begin(); match_it != matching_nodes.end(); ++match_it) {
@@ -63,7 +66,7 @@ void H3DViewerAddChildDialog::cbNewNodeNameOnText(wxCommandEvent& event)
       }
 
     } else { // If the user didn't enter anything then we can just show the full list
-      cbNewNodeName->Clear(); 
+      cbNewNodeName->Clear();
       cbNewNodeName->Freeze(); // We freeze the list so it doesn't do a redraw for every Append.
       for (wxArrayString::const_iterator it = available_nodes.begin(); it != available_nodes.end(); ++it) {
         cbNewNodeName->Append(*it);
@@ -93,4 +96,26 @@ void H3DViewerAddChildDialog::btSizerAddNodeOnOKButtonClick(wxCommandEvent& even
 wxString H3DViewerAddChildDialog::GetNodeName()
 {
   return cbNewNodeName->GetValue();
+}
+
+void H3DViewerAddChildDialog::SetTargetField(Field* target)
+{
+  cbNewNodeName->Clear(); // build the initial combobox list
+  cbNewNodeName->Freeze(); // We freeze the list so it doesn't do a redraw for every Append.
+  Node* copy = NULL;
+  Field* target_copy = NULL;
+  if (target) {
+    string target_name = target->getName();
+    if (target_name == "sceneRoot") {
+      target = NULL;
+    }
+  }
+
+  for (H3DNodeDatabase::NodeDatabaseConstIterator nodedb_it = H3DNodeDatabase::begin();
+    H3DNodeDatabase::end() != nodedb_it; ++nodedb_it) {
+      wxString new_value(nodedb_it->second->getName().c_str(), wxConvUTF8);
+      available_nodes.Add(new_value);
+      cbNewNodeName->Append(new_value);
+  }
+  cbNewNodeName->Thaw();
 }

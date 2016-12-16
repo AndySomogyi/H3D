@@ -419,6 +419,10 @@ void H3DViewerPopupMenus::OnTreeViewAddChildNode( wxCommandEvent& event ) {
   vector< wxString > node_fields;
 
   Node *selected_node = (*ni).second.get();
+  if (!selected_node) {
+    return;
+  }
+
   H3DNodeDatabase *db = H3DNodeDatabase::lookupNodeInstance( selected_node );
   for( H3DNodeDatabase::FieldDBConstIterator i = db->fieldDBBegin();
        db->fieldDBEnd() != i; ++i ) {
@@ -465,6 +469,7 @@ void H3DViewerPopupMenus::OnTreeViewAddChildNode( wxCommandEvent& event ) {
   }
 
   H3DViewerAddChildDialog *node_name_dialog = new H3DViewerAddChildDialog(this);
+  node_name_dialog->SetTargetField(selected_node->getField( field_to_change ));
   if (node_name_dialog->ShowModal() == wxID_OK) {
     Node *new_node = H3DNodeDatabase::createNode( std::string(node_name_dialog->GetNodeName().mb_str()) );
     if( !new_node ) {
@@ -496,7 +501,8 @@ void H3DViewerPopupMenus::OnTreeViewAddChildNode( wxCommandEvent& event ) {
         }
       }
     }
-  } 
+  }
+  delete node_name_dialog;
 }
 
 // Callback for node save Nrrd menu choice.
