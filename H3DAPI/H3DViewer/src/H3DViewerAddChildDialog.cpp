@@ -27,22 +27,14 @@ void H3DViewerAddChildDialog::cbNewNodeNameOnText(wxCommandEvent& event)
   if (!block_OnText) {
     block_OnText = true;
     
-    wxString new_value = event.GetString();
-
-    for (auto new_it = new_value.begin(); new_it != new_value.end(); ++new_it) {
-      *new_it = tolower(*new_it);
-    }
-
+    wxString new_value = event.GetString().Lower();
 
     bool exact_match = false;
     if (new_value.length() > 0) {
       wxArrayString matching_nodes;
       for (wxArrayString::const_iterator it = available_nodes.begin();
         it != available_nodes.end(); ++it) {
-        wxString it_lowercase = wxString(*it);
-        for (auto c_it = it_lowercase.begin(); c_it != it_lowercase.end(); ++c_it) {
-          *c_it = tolower(*c_it);
-        }
+        wxString it_lowercase = wxString(*it).Lower();
         if ((it_lowercase.Find(new_value) == 0)) { // Has to start with what we've written to match
           matching_nodes.Add(*it);
           if (it_lowercase == new_value) {
