@@ -443,8 +443,17 @@ def PeriodicUpdate( base_class ):
     periodic_update_classes[base_class] = PeriodicUpdateBase
     return PeriodicUpdateBase
 
+## \namespace H3DInterface
+## \class H3DInterface.AutoUpdate
+## \copydoc AutoUpdate()
+## See also \ref TemplateFunctions
 
-# Documentation of classes generated in for loop above. 
+## \namespace H3DInterface
+## \class H3DInterface.PeriodicUpdate
+## \copydoc PeriodicUpdate()
+## See also \ref TemplateFunctions
+
+# Documentation of classes generated in for loop above.
 
 ## \namespace H3DInterface
 ## \class H3DInterface.SFFloat
@@ -680,7 +689,7 @@ class SFString( SField ):
 ## \param node_name Type name of the node to create, e.g. "Sphere" or "Group".
 ## \return A new instance of the node type specified. None if no such node type
 ## exists.
-## 
+##
 ## <b>Example usage: </b>
 ## \code
 ## sphere = createNode( "Sphere" )
@@ -696,10 +705,10 @@ def createNode( node_name ):
 ## specified. The file can be in X3D/XML or X3D/VRML format.
 ## \param url The path to the file with the scene description. Can be a local
 ## path such as /home/ben/test.x3d or remote http://www.h3d.org/test.x3d.
-## \return A tuple with a Group containing the top nodes of the file and 
-## a dictionary with all the DEF nodes in the file for later access. 
+## \return A tuple with a Group containing the top nodes of the file and
+## a dictionary with all the DEF nodes in the file for later access.
 ## On error an exception will be thrown.
-## 
+##
 ## <b>Example usage: </b>
 ## \code
 ## test.x3d:
@@ -721,11 +730,11 @@ def createX3DFromURL( url ):
 ## \fn def createX3DFromString( s )
 ## \brief Create a local H3D scene graph from the scene description specified
 ## in a string. The string can be in X3D/XML or X3D/VRML format.
-## \param s string with the scene description. 
-## \return A tuple with a Group containing the top nodes of the file and 
-## a dictionary with all the DEF nodes in the file for later access. On 
+## \param s string with the scene description.
+## \return A tuple with a Group containing the top nodes of the file and
+## a dictionary with all the DEF nodes in the file for later access. On
 ## error an exception will be thrown.
-## 
+##
 ## <b>Example usage: </b>
 ## \code
 ## s = """<Shape>
@@ -750,7 +759,7 @@ def createX3DFromString( url ):
 ## \return A tuple with the top node of the scene and a dictionary with
 ## all the DEF nodes in the file for later access. On error an exception
 ## will be thrown.
-## 
+##
 ## <b>Example usage: </b>
 ## \code
 ## test.x3d:
@@ -772,11 +781,11 @@ def createX3DNodeFromURL( url ):
 ## \fn def createX3DNodeFromString( s )
 ## \brief Create a local H3D scene graph from the scene description specified
 ## in a string. The string can be in X3D/XML or X3D/VRML format.
-## \param s string with the scene description. 
+## \param s string with the scene description.
 ## \return A tuple with the top node of the scene and a dictionary with
 ## all the DEF nodes in the file for later access. On error an exception
 ## will be thrown.
-## 
+##
 ## <b>Example usage: </b>
 ## \code
 ## s = """<Shape>
@@ -819,7 +828,7 @@ def createVRMLNodeFromURL( url ):
 def createVRMLNodeFromString( s ):
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def writeNodeAsX3D( node )
 ## Returns an X3D/XML string representing a node.
 ## This is a snapshot of all nodes and field values at the time
@@ -830,7 +839,7 @@ def createVRMLNodeFromString( s ):
 def writeNodeAsX3D( node ):
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def exportGeometryAsSTL( node, url, solid_name, use_binary_format )
 ## Export the geometry to a file written in the stl file format.
 ## \param node The node to export. Must be a geometry.
@@ -841,22 +850,22 @@ def writeNodeAsX3D( node ):
 def exportGeometryAsSTL( node, url, solid_name, use_binary_format ):
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getCurrentScenes()
-## Returns a list of all Scene node instances that are created. 
+## Returns a list of all Scene node instances that are created.
 def getCurrentScenes():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getActiveBindableNode( s )
 ## Returns the currently active bindable node from a bindable node stack.
 ## \param s The bindable stack to get the active node for.
-## \return The currently active bindable node for the specified stack. None 
+## \return The currently active bindable node for the specified stack. None
 ## if no such node exists or the specified bindable stack does not exist.
 def getActiveBindableNode( s ):
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getActiveDeviceInfo()
 ## Returns the currently active DeviceInfo node.
 ## \return The currently active DeviceInfo node. None if no DeviceInfo
@@ -864,7 +873,7 @@ def getActiveBindableNode( s ):
 def getActiveDeviceInfo():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getActiveViewpoint()
 ## Returns the currently active Viewpoint node.
 ## \return The currently active Viewpoint node. None if no Viewpoint
@@ -872,15 +881,15 @@ def getActiveDeviceInfo():
 def getActiveViewpoint():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getActiveNavigationInfo()
 ## Returns the currently active NavigationInfo node.
-## \return The currently active NavigationInfo node. None if no 
+## \return The currently active NavigationInfo node. None if no
 ## NavigationInfo node exist.
 def getActiveNavigationInfo():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getActiveStereoInfo()
 ## Returns the currently active StereoInfo node.
 ## \return The currently active StereoInfo node. None if no StereoInfo
@@ -888,7 +897,7 @@ def getActiveNavigationInfo():
 def getActiveStereoInfo():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getActiveBackground()
 ## Returns the currently active Background node.
 ## \return The currently active Background node. None if no Background
@@ -896,7 +905,7 @@ def getActiveStereoInfo():
 def getActiveBackground():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getActiveFog()
 ## Returns the currently active Fog node.
 ## \return The currently active Fog node. None if no Fog
@@ -904,15 +913,15 @@ def getActiveBackground():
 def getActiveFog():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getActiveGlobalSettings()
 ## Returns the currently active GlobalSettings node.
-## \return The currently active GlobalSettings node. None if no 
+## \return The currently active GlobalSettings node. None if no
 ## GlobalSettings node exist.
 def getActiveGlobalSettings():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getNrHapticsDevices()
 ## Returns the number of currently specified haptics devices.
 ## Same as the number of devices specified in the currently bound
@@ -921,7 +930,7 @@ def getActiveGlobalSettings():
 def getNrHapticsDevices():
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getHapticsDevice( index )
 ## Returns the haptics device node with the specified index.
 ## \param index The index of the haptics device. 0 for the first device,
@@ -931,7 +940,7 @@ def getNrHapticsDevices():
 def getHapticsDevice( index ):
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def getNamedNode( DEF_name )
 ## Returns the node with the given DEF name from the parsed x3d file
 ## the PythonScript node that runs the current script was defined in.
@@ -940,7 +949,7 @@ def getHapticsDevice( index ):
 def getNamedNode( DEF_name ):
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def resolveURLAsFile( url )
 ## Resolves a url and returns the path a local file with the file content.
 ## This will include URNResolver lookups if active.
@@ -950,7 +959,7 @@ def getNamedNode( DEF_name ):
 def resolveURLAsFile( url ):
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def resolveURLAsFolder( url )
 ## Resolves a url and returns the path a local folder it represents.
 ## This will include URNResolver lookups if active.
@@ -960,7 +969,7 @@ def resolveURLAsFile( url ):
 def resolveURLAsFolder( url ):
   pass
 
-## \namespace H3DInterface 
+## \namespace H3DInterface
 ## \fn def throwQuitAPIException()
 ## Shut down the program.
 ## Throws a QuitAPI C++-exception. This can be used in H3DLoad and H3DViewer
@@ -974,12 +983,12 @@ def throwQuitAPIException():
 ## \param field        The field to add.
 ## \param setting_name Optional argument used to name the setting. If empty the
 ##                     name of the field will be used.
-## \param section_name Optional argument which can be used to group settings. 
+## \param section_name Optional argument which can be used to group settings.
 ##                     If empty field is added to "Main settings" section.
 def addProgramSetting ( field, setting_name = "", section_name = "" ):
 
 ## Find nodes matching the specified criteria.
-## Recursively searches for child nodes that match the given criteria, starting from the 
+## Recursively searches for child nodes that match the given criteria, starting from the
 ## specified root node.
 ##
 ## \param node          The root node to start the search from
@@ -993,11 +1002,11 @@ def addProgramSetting ( field, setting_name = "", section_name = "" ):
 ##                      must contain node_name as a sub-string.
 ## \param verbose       If true then the function prints debugging information about the search to the console.
 ##
-## \return A list containing 1 tuple for each node found. Each tuple contains the found node, followed by a tuple 
+## \return A list containing 1 tuple for each node found. Each tuple contains the found node, followed by a tuple
 ##         containing all the nodes parents. I.e., [(found_node,(parent0,parent1,...)),...]
 def findNodes ( node, type_names, node_name= "", field_names= [], exactNodeName= True, verbose= False ):
   pass
-  
+
 ## Take a screenshot of the current scene. H3D must be built
 ## with FreeImage support for this function to succeed.
 ##
@@ -1012,15 +1021,15 @@ def takeScreenshot( url ):
   pass
 
 ## \namespace H3DInterface
-## \var time 
-## \brief Python access to the Scene::time field. 
-## The time field value is updated once each scene-graph loop with the 
+## \var time
+## \brief Python access to the Scene::time field.
+## The time field value is updated once each scene-graph loop with the
 ## current time.
 time = SFTime
 
 ## \namespace H3DInterface
-## \var eventSink 
-## \brief Python access to the Scene::eventSink field. 
+## \var eventSink
+## \brief Python access to the Scene::eventSink field.
 ## The eventSink field will make sure that all fields routed to it is
 ## up-to-date once per scene-graph loop.
 eventSink = Field
@@ -1038,7 +1047,7 @@ eventSink = Field
 ## \code
 ## n = createX3DNodeFromString( "<Sphere />" )[0]
 ## # access the radius field of the sphere node by node attribute.
-## n.radius.setValue( 0.2 ) 
+## n.radius.setValue( 0.2 )
 ## \endcode
 class Node:
 
@@ -1047,7 +1056,7 @@ class Node:
   ## The default implementation copies the node's registered field values
   ## of access type INPUT_OUTPUT and INITIALIZE_ONLY.
   ##
-  ## \param deepCopy Bool: If true then references to other nodes will also be 
+  ## \param deepCopy Bool: If true then references to other nodes will also be
   ##                 cloned. Otherwise just the pointer is copied.
   ##
   def clone ( deepCopy ):
@@ -1059,7 +1068,7 @@ class Node:
     pass
 
   ## Add a field to a node.
-  ## This only works if the node is a H3DDynamicFieldsObject. If it is 
+  ## This only works if the node is a H3DDynamicFieldsObject. If it is
   ## not an exception will be thrown.
   ## \param name The name of the new field.
   ## \param field_type The type of the new field.
@@ -1085,7 +1094,7 @@ class Node:
   ##  SFMATRIX3D,   MFMATRIX3D,
   ##  SFMATRIX4D,   MFMATRIX4D,
   ##  SFIMAGE,      MFIMAGE,
-  ##  UNKNOWN_X3D_TYPE 
+  ##  UNKNOWN_X3D_TYPE
   ## \param access_type The access type of the new field. Must be one of
   ## "inputOnly", "outputOnly", "initializeOnly" or "inputOutput".
   def addField( name, field_type, access_type ):
@@ -1098,7 +1107,7 @@ class Node:
 
   ## Returns the name of the node.
   ## \return The name of the node. If this node has been specified
-  ## with a DEF keyword that will be the name. 
+  ## with a DEF keyword that will be the name.
   def getName():
     pass
 
@@ -1142,7 +1151,7 @@ class Node:
   ## </table>
   def closestPoint( p, override_no_collision = False, collide_invisible = False ):
     pass
-  
+
   ## Calculate the closest intersection on a line segment and the node.
   ## Keyword argument is not supported.
   ## \param start The start point of the line
@@ -1173,9 +1182,9 @@ class Node:
   def lineIntersect( start, end, override_no_collision = False, collide_invisible = False ):
     pass
 
-## The Vec2f class represents a 2d vector type using single precition 
+## The Vec2f class represents a 2d vector type using single precition
 ## floating point values for its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>v1 + v2</td><td>Component-wise addition. </td></tr>
@@ -1189,9 +1198,9 @@ class Vec2f:
   ## Constructs a new Vec2f with its values set to (0,0)
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Vec2f with values copied from another instance 
+  ## Constructs a new Vec2f with values copied from another instance
   ## of Vec2f or Vec2d.
   ## \param v The Vec2f or Vec2d to copy.
   def __init__( self, v ):
@@ -1206,7 +1215,7 @@ class Vec2f:
     ## The y-component of the vector.
     self.y = y
     pass
-  
+
   ## Returns the length of the vector.
   ## \return The length of the vector.
   def length( self ):
@@ -1214,18 +1223,18 @@ class Vec2f:
 
   ## Returns the length squared of the vector.
   ## This is a faster operation than length since it does not
-  ## involve a square root. 
-  ## \return The length squared of the vector.  
+  ## involve a square root.
+  ## \return The length squared of the vector.
   def lengthSqr( self ):
     pass
 
-  ## Normalize the vector values so the length is 1. 
+  ## Normalize the vector values so the length is 1.
   ## If the vector is a zero vector an exception will
   ## be thrown.
   def normalize( self ):
     pass
 
-  ## Normalize the vector values so the length is 1. 
+  ## Normalize the vector values so the length is 1.
   ## If the vector is a zero vector this is a no-op.
   def normalizeSafe( self ):
     pass
@@ -1239,7 +1248,7 @@ class Vec2f:
 
 ## The Vec2d class represents a 2d vector type using double precision
 ## floating point values for its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>v1 + v2</td><td>Component-wise addition. </td></tr>
@@ -1253,9 +1262,9 @@ class Vec2d:
   ## Constructs a new Vec2d with its values set to (0,0)
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Vec2d with values copied from another instance 
+  ## Constructs a new Vec2d with values copied from another instance
   ## of Vec2f or Vec2d.
   ## \param v The Vec2f or Vec2d to copy.
   def __init__( self, v ):
@@ -1270,7 +1279,7 @@ class Vec2d:
     ## The y-component of the vector.
     self.y = y
     pass
-  
+
   ## Returns the length of the vector.
   ## \return The length of the vector.
   def length( self ):
@@ -1278,18 +1287,18 @@ class Vec2d:
 
   ## Returns the length squared of the vector.
   ## This is a faster operation than length since it does not
-  ## involve a square root. 
-  ## \return The length squared of the vector.  
+  ## involve a square root.
+  ## \return The length squared of the vector.
   def lengthSqr( self ):
     pass
 
-  ## Normalize the vector values so the length is 1. 
+  ## Normalize the vector values so the length is 1.
   ## If the vector is a zero vector an exception will
   ## be thrown.
   def normalize( self ):
     pass
 
-  ## Normalize the vector values so the length is 1. 
+  ## Normalize the vector values so the length is 1.
   ## If the vector is a zero vector this is a no-op.
   def normalizeSafe( self ):
     pass
@@ -1304,7 +1313,7 @@ class Vec2d:
 
 ## The Vec3f class represents a 3d vector type using single precision
 ## floating point values for its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>v1 + v2</td><td>Component-wise addition. </td></tr>
@@ -1319,9 +1328,9 @@ class Vec3f:
   ## Constructs a new Vec3f with its values set to (0,0,0)
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Vec3f with values copied from another instance 
+  ## Constructs a new Vec3f with values copied from another instance
   ## of Vec3f or Vec3d.
   ## \param v The Vec3f or Vec3d to copy.
   def __init__( self, v ):
@@ -1339,7 +1348,7 @@ class Vec3f:
     ## The z-component of the vector.
     self.z = z
     pass
-  
+
   ## Returns the length of the vector.
   ## \return The length of the vector.
   def length( self ):
@@ -1347,18 +1356,18 @@ class Vec3f:
 
   ## Returns the length squared of the vector.
   ## This is a faster operation than length since it does not
-  ## involve a square root. 
-  ## \return The length squared of the vector.  
+  ## involve a square root.
+  ## \return The length squared of the vector.
   def lengthSqr( self ):
     pass
 
-  ## Normalize the vector values so the length is 1. 
+  ## Normalize the vector values so the length is 1.
   ## If the vector is a zero vector an exception will
   ## be thrown.
   def normalize( self ):
     pass
 
-  ## Normalize the vector values so the length is 1. 
+  ## Normalize the vector values so the length is 1.
   ## If the vector is a zero vector this is a no-op.
   def normalizeSafe( self ):
     pass
@@ -1379,7 +1388,7 @@ class Vec3f:
 
 ## The Vec3d class represents a 3d vector type using double precision
 ## floating point values for its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>v1 + v2</td><td>Component-wise addition. </td></tr>
@@ -1394,9 +1403,9 @@ class Vec3d:
   ## Constructs a new Vec3d with its values set to (0,0,0)
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Vec3d with values copied from another instance 
+  ## Constructs a new Vec3d with values copied from another instance
   ## of Vec3f or Vec3d.
   ## \param v The Vec3f or Vec3d to copy.
   def __init__( self, v ):
@@ -1414,7 +1423,7 @@ class Vec3d:
     ## The z-component of the vector.
     self.z = z
     pass
-  
+
   ## Returns the length of the vector.
   ## \return The length of the vector.
   def length( self ):
@@ -1422,18 +1431,18 @@ class Vec3d:
 
   ## Returns the length squared of the vector.
   ## This is a faster operation than length since it does not
-  ## involve a square root. 
-  ## \return The length squared of the vector.  
+  ## involve a square root.
+  ## \return The length squared of the vector.
   def lengthSqr( self ):
     pass
 
-  ## Normalize the vector values so the length is 1. 
+  ## Normalize the vector values so the length is 1.
   ## If the vector is a zero vector an exception will
   ## be thrown.
   def normalize( self ):
     pass
 
-  ## Normalize the vector values so the length is 1. 
+  ## Normalize the vector values so the length is 1.
   ## If the vector is a zero vector this is a no-op.
   def normalizeSafe( self ):
     pass
@@ -1451,10 +1460,10 @@ class Vec3d:
     pass
 
 
-## The Vec4f class represents a 4d vector type or a homogeneous 
+## The Vec4f class represents a 4d vector type or a homogeneous
 ## coordinate using single precision floating point values for
 ## its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>v1 + v2</td><td>Component-wise addition. </td></tr>
@@ -1468,9 +1477,9 @@ class Vec4f:
   ## Constructs a new Vec4f with its values set to (0,0,0,1)
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Vec4f with values copied from another instance 
+  ## Constructs a new Vec4f with values copied from another instance
   ## of Vec4f or Vec4d.
   ## \param v The Vec4f or Vec4d to copy.
   def __init__( self, v ):
@@ -1493,10 +1502,10 @@ class Vec4f:
     pass
 
 
-## The Vec4d class represents a 4d vector type or a homogeneous 
+## The Vec4d class represents a 4d vector type or a homogeneous
 ## coordinate using double precision floating point values for
 ## its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>v1 + v2</td><td>Component-wise addition. </td></tr>
@@ -1509,9 +1518,9 @@ class Vec4d:
   ## Constructs a new Vec4d with its values set to (0,0,0,1)
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Vec4d with values copied from another instance 
+  ## Constructs a new Vec4d with values copied from another instance
   ## of Vec4f or Vec4d.
   ## \param v The Vec4f or Vec4d to copy.
   def __init__( self, v ):
@@ -1536,7 +1545,7 @@ class Vec4d:
 
 ## The Matrix3f class represents a 3x3 matrix type using single
 ## precision floating point values for its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>m1 + m2</td><td>Component-wise addition. </td></tr>
@@ -1551,9 +1560,9 @@ class Matrix3f:
   ## Constructs a new idenity Matrix3f.
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Matrix3f with values copied from another instance 
+  ## Constructs a new Matrix3f with values copied from another instance
   ## of Matrix3f or Matrix3d.
   ## \param m The Matrix3f or Matrix3d to copy.
   def __init__( self, m ):
@@ -1561,12 +1570,12 @@ class Matrix3f:
 
   ## Casting constructor.
   ## Constructs a new Matrix3f rotation matrix from another rotation
-  ## representation. 
+  ## representation.
   ## \param r A Rotation or Quaternion instance to create a rotation matrix for.
   def __init__( self, r ):
     pass
 
-  ## Constructs a new Matrix3f with its values set to 
+  ## Constructs a new Matrix3f with its values set to
   ## ( m00, m01, m02,
   ##   m10, m11, m12,
   ##   m20, m21, m22 )
@@ -1614,7 +1623,7 @@ class Matrix3f:
   ## Set an element of the matrix.
   ## \param row The row of the element to set(0-2)
   ## \param column The column of the element to set(0-2)
-  ## \param value The value to set. 
+  ## \param value The value to set.
   def setElement( row, column, value ):
     pass
 
@@ -1629,7 +1638,7 @@ class Matrix3f:
   def transpose():
     pass
 
-  ## Get the euler angles( yaw, pitch, roll ) representation of 
+  ## Get the euler angles( yaw, pitch, roll ) representation of
   ## the rotation matrix. Assumes that the Matrix3f is a rotation matrix.
   ## \return A Vec3f with each components (yaw, pitch, roll) in radians.
   def toEulerAngles():
@@ -1639,7 +1648,7 @@ class Matrix3f:
 
 ## The Matrix3d class represents a 3x3 matrix type using double
 ## precision floating point values for its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>m1 + m2</td><td>Component-wise addition. </td></tr>
@@ -1654,9 +1663,9 @@ class Matrix3d:
   ## Constructs a new idenity Matrix3d.
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Matrix3d with values copied from another instance 
+  ## Constructs a new Matrix3d with values copied from another instance
   ## of Matrix3f or Matrix3d.
   ## \param m The Matrix3f or Matrix3d to copy.
   def __init__( self, m ):
@@ -1664,12 +1673,12 @@ class Matrix3d:
 
   ## Casting constructor.
   ## Constructs a new Matrix3d rotation matrix from another rotation
-  ## representation. 
+  ## representation.
   ## \param r A Rotation or Quaternion instance to create a rotation matrix for.
   def __init__( self, r ):
     pass
 
-  ## Constructs a new Matrix3d with its values set to 
+  ## Constructs a new Matrix3d with its values set to
   ## ( m00, m01, m02,
   ##   m10, m11, m12,
   ##   m20, m21, m22 )
@@ -1717,7 +1726,7 @@ class Matrix3d:
   ## Set an element of the matrix.
   ## \param row The row of the element to set(0-2)
   ## \param column The column of the element to set(0-2)
-  ## \param value The value to set. 
+  ## \param value The value to set.
   def setElement( row, column, value ):
     pass
 
@@ -1732,7 +1741,7 @@ class Matrix3d:
   def transpose():
     pass
 
-  ## Get the euler angles( yaw, pitch, roll ) representation of 
+  ## Get the euler angles( yaw, pitch, roll ) representation of
   ## the rotation matrix. Assumes that the Matrix3d is a rotation matrix.
   ## \return A Vec3d with each components (yaw, pitch, roll) in radians.
   def toEulerAngles():
@@ -1742,7 +1751,7 @@ class Matrix3d:
 
 ## The Matrix4f class represents a 3x3 matrix type using single
 ## precision floating point values for its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>m1 + m2</td><td>Component-wise addition. </td></tr>
@@ -1757,9 +1766,9 @@ class Matrix4f:
   ## Constructs a new idenity Matrix4f.
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Matrix4f with values copied from another instance 
+  ## Constructs a new Matrix4f with values copied from another instance
   ## of Matrix4f or Matrix4d.
   ## \param m The Matrix4f or Matrix4d to copy.
   def __init__( self, m ):
@@ -1767,12 +1776,12 @@ class Matrix4f:
 
   ## Casting constructor.
   ## Constructs a new Matrix4f rotation matrix from another rotation
-  ## representation. 
+  ## representation.
   ## \param r A Rotation or Quaternion instance to create a rotation matrix for.
   def __init__( self, r ):
     pass
 
-  ## Constructs a new Matrix4f with its values set to 
+  ## Constructs a new Matrix4f with its values set to
   ## ( m00, m01, m02, m03
   ##   m10, m11, m12, m13
   ##   m20, m21, m22, m23,
@@ -1796,7 +1805,7 @@ class Matrix4f:
   ## \param m33 The value at position (3,3)
   def __init__( self, m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 ):
     pass
-    
+
   ## Transformation constructor.
   ## Creates a transformation matrix from translation and optional rotation and scale parameters.
   ## \param translation A Vec3f describing the translation.
@@ -1843,7 +1852,7 @@ class Matrix4f:
   ## Set an element of the matrix.
   ## \param row The row of the element to set(0-3)
   ## \param column The column of the element to set(0-3)
-  ## \param value The value to set. 
+  ## \param value The value to set.
   def setElement( row, column, value ):
     pass
 
@@ -1855,7 +1864,7 @@ class Matrix4f:
 
   ## Get the rotation part of the matrix is a
   ## transformation matrix.
-  ## \return A Matrix3d rotation matrix. 
+  ## \return A Matrix3d rotation matrix.
   def getRotationPart():
     pass
 
@@ -1877,7 +1886,7 @@ class Matrix4f:
 
 ## The Matrix4d class represents a 3x3 matrix type using double
 ## precision floating point values for its components.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>m1 + m2</td><td>Component-wise addition. </td></tr>
@@ -1892,9 +1901,9 @@ class Matrix4d:
   ## Constructs a new idenity Matrix4d.
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Matrix4d with values copied from another instance 
+  ## Constructs a new Matrix4d with values copied from another instance
   ## of Matrix4f or Matrix4d.
   ## \param m The Matrix4f or Matrix4d to copy.
   def __init__( self, m ):
@@ -1902,12 +1911,12 @@ class Matrix4d:
 
   ## Casting constructor.
   ## Constructs a new Matrix4d rotation matrix from another rotation
-  ## representation. 
+  ## representation.
   ## \param r A Rotation or Quaternion instance to create a rotation matrix for.
   def __init__( self, r ):
     pass
 
-  ## Constructs a new Matrix4d with its values set to 
+  ## Constructs a new Matrix4d with its values set to
   ## ( m00, m01, m02, m03
   ##   m10, m11, m12, m13
   ##   m20, m21, m22, m23,
@@ -1931,7 +1940,7 @@ class Matrix4d:
   ## \param m33 The value at position (3,3)
   def __init__( self, m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 ):
     pass
-    
+
   ## Transformation constructor.
   ## Creates a transformation matrix from translation and optional rotation and scale parameters.
   ## \param translation A Vec3d describing the translation.
@@ -1978,7 +1987,7 @@ class Matrix4d:
   ## Set an element of the matrix.
   ## \param row The row of the element to set(0-3)
   ## \param column The column of the element to set(0-3)
-  ## \param value The value to set. 
+  ## \param value The value to set.
   def setElement( row, column, value ):
     pass
 
@@ -1990,7 +1999,7 @@ class Matrix4d:
 
   ## Get the rotation part of the matrix assuming the matrix is a
   ## transformation matrix.
-  ## \return A Matrix3d rotation matrix. 
+  ## \return A Matrix3d rotation matrix.
   def getRotationPart():
     pass
 
@@ -2012,7 +2021,7 @@ class Matrix4d:
 
 ## The Rotation class describes an arbitrary rotation. It specifies
 ## an axis to rotate around and the angle to rotate.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>r1 * r2 </td><td>Concatenation of rotations. </td></tr>
@@ -2026,9 +2035,9 @@ class Rotation:
   ## Constructs a new zero Rotation (1,0,0,0)
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Rotation with values copied from another instance 
+  ## Constructs a new Rotation with values copied from another instance
   ## of Rotation or Matrix3d.
   ## \param m The Rotation or Matrix3d to copy.
   def __init__( self, m ):
@@ -2036,8 +2045,8 @@ class Rotation:
 
   ## Casting constructor.
   ## Constructs a new Rotation instance from another rotation
-  ## representation. 
-  ## \param r A Rotation or Matrix3f rotation matrix instance. Also 
+  ## representation.
+  ## \param r A Rotation or Matrix3f rotation matrix instance. Also
   ## Vec3f and Vec3d instances representing euler angles are allowed.
   def __init__( self, r ):
     pass
@@ -2075,15 +2084,15 @@ class Rotation:
     pass
 
   ## Spherical linear interpolation between two Rotation instances.
-  ## 
+  ##
   ## \param r Ending Rotation
   ## \param t Interpolation value between 0 and 1.
   ## \return The interpolated Rotation value.
   def slerp( r, t ):
     pass
 
-  ## Get the euler angles( yaw, pitch, roll ) representation of 
-  ## the Rotation. 
+  ## Get the euler angles( yaw, pitch, roll ) representation of
+  ## the Rotation.
   ## \return A Vec3f with each components (yaw, pitch, roll) in radians.
   def toEulerAngles():
     pass
@@ -2093,7 +2102,7 @@ class Rotation:
 
 ## The Quaternion class represents quaternion objects that are used
 ## for rotation operations.
-## 
+##
 ## Operators supported:
 ## <table>
 ## <tr><td>q1 + q2 </td><td>Quaternion addition. </td></tr>
@@ -2108,9 +2117,9 @@ class Quaternion:
   ## Constructs a new zero Quaternion (0,0,0,0)
   def __init__( self ):
     pass
-  
+
   ## Copy constructor.
-  ## Constructs a new Quaternion with values copied from another instance 
+  ## Constructs a new Quaternion with values copied from another instance
   ## of Quaternion.
   ## \param q The Quaternion to copy.
   def __init__( self, q ):
@@ -2118,8 +2127,8 @@ class Quaternion:
 
   ## Casting constructor.
   ## Constructs a new Quaternion instance from another rotation
-  ## representation. 
-  ## \param r A Rotation or Matrix3f rotation matrix instance. 
+  ## representation.
+  ## \param r A Rotation or Matrix3f rotation matrix instance.
   def __init__( self, r ):
     pass
 
@@ -2152,15 +2161,15 @@ class Quaternion:
     self.w = w
 
   ## Spherical linear interpolation between two Quaternion instances.
-  ## 
+  ##
   ## \param r Ending Quaternion
   ## \param t Interpolation value between 0 and 1.
   ## \return The interpolated Quaternion value.
   def slerp( r, t ):
     pass
 
-  ## Get the euler angles( yaw, pitch, roll ) representation of 
-  ## the Quaternion. 
+  ## Get the euler angles( yaw, pitch, roll ) representation of
+  ## the Quaternion.
   ## \return A Vec3f with each components (yaw, pitch, roll) in radians.
   def toEulerAngles():
     pass
@@ -2198,7 +2207,7 @@ class RGB:
   ## Constructs a new RGB with its values set to (0,0,0)
   def __init__( self ):
     pass
-  
+
   ## Constructs a new RGB with its values set to (r,g,b)
   ## \param r The amount of red in the color(0-1)
   ## \param g The amount of green in the color(0-1)
@@ -2218,7 +2227,7 @@ class RGBA:
   ## Constructs a new RGBA with its values set to (0,0,0,1)
   def __init__( self ):
     pass
-  
+
   ## Constructs a new RGBA with its values set to (r,g,b,a)
   ## \param r The amount of red in the color(0-1)
   ## \param g The amount of green in the color(0-1)
