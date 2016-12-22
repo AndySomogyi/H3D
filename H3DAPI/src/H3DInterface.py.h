@@ -319,38 +319,6 @@ def PeriodicUpdate( base_class ):\n\
   else:\n\
     periodic_update_classes[base_class] = PeriodicUpdateBase\n\
     return PeriodicUpdateBase\n\
-    \n\
-def deprecated(alternativeClass_or_func):\n\
-  def deprecate(cls_or_func):\n\
-  \n\
-      if inspect.isclass(cls_or_func):\n\
-      \n\
-        def __new_init__(*args, **kwargs):\n\
-          cls_or_func.__old_init__(*args, **kwargs)\n\
-          filename = sys.modules[cls_or_func.__module__].__file__\n\
-          print \"File \"{}\" : Call to deprecated class ({}), use {} class instead.\".format(filename, \n\
-                                                                                            cls_or_func.__name__, \n\
-                                                                                            alternativeClass_or_func) \n\
-        if not hasattr(cls_or_func, \"__old_init__\"): \n\
-          cls_or_func.__old_init__ = cls_or_func.__init__ \n\
-          cls_or_func.__init__ = __new_init__ \n\
-          \n\
-        return cls_or_func \n\
-        \n\
-        \n\
-      if inspect.isfunction(cls_or_func) or inspect.ismethod(cls_or_func):\n\
-      \n\
-        @functools.wraps(cls_or_func) \n\
-        def new_function(*args, **kwargs): \n\
-          x = cls_or_func(*args, **kwargs) \n\
-          _code = cls_or_func.__code__ \n\
-          filename = _code.co_filename \n\
-          lineno = _code.co_firstlineno + 1 \n\
-          print \"File \"{}\" : Call to deprecated function ({}) in line {}, use {} function instead.\".format(filename, cls_or_func.__name__,lineno, alternativeClass_or_func) \n\
-          return x \n\
-        return new_function \n\
-        \n\
-  return deprecate \n\
 \n";
 
     const string H3DUtils_string ="from H3DInterface import *\n\
