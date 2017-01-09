@@ -22,7 +22,7 @@
 //
 //
 /// \file ShadowCasterShaders.cpp
-/// \brief CPP file for ShadowCasterShaders
+/// \brief CPP file for ShadowCasterShaders namespace.
 ///
 //
 //
