@@ -21,8 +21,8 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// \file ShadowCasterShader.h
-/// \brief Header file for ShadowCasterShader.
+/// \file ShadowCasterShaders.h
+/// \brief Header file for ShadowCasterShaders namespace.
 ///
 //
 //////////////////////////////////////////////////////////////////////////////

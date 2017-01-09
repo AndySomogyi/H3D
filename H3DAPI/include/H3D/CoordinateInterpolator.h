@@ -22,7 +22,7 @@
 //
 //
 /// \file CoordinateInterpolator.h
-/// \brief UNIMPLEMENTED: Header file for CoordinateInterpolator, 
+/// \brief Header file for CoordinateInterpolator, 
 ///  X3D scene-graph node
 ///
 //
