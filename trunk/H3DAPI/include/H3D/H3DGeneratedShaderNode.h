@@ -310,6 +310,11 @@ namespace H3D {
     /// extensions.
     virtual string getFragmentShaderHeader() { return ""; }
 
+    /// Return a string that is placed at the beginning of a vertex shader
+    /// to specify minimum required version of the shader as well as enabled
+    /// extensions.
+    virtual string getVertexShaderHeader() { return ""; }
+
  };
 }
 
