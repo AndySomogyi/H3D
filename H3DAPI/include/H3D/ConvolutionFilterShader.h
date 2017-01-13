@@ -219,6 +219,9 @@ namespace H3D {
     /// to specify minimum required version of the shader as well as enabled
     /// extensions.
     virtual string getFragmentShaderHeader() { return "#version 150 compatibility"; } // using 150 to be able to use the compatability keyword. 130 should be enough otherwise.
+    
+	/// Use version 150 compatibility for cCnvolutionFilterShader
+    virtual string getVertexShaderHeader() { return "#version 150 compatibility"; }
 
   };
 }
