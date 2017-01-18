@@ -6,8 +6,8 @@
 //    www.sensegraphics.com, for more information.
 //
 //
-/// \file ShaderPartModifier.h
-/// \brief Header file for ShaderPartModifier.
+/// \file ShaderConstants.h
+/// \brief Header file for ShaderConstants.
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -39,14 +39,14 @@ namespace H3D {
       return "shaderConstants";
     }
 
-	/// override the addField function, to collect all field added and filter out
-	/// duplications. 
-	virtual bool addField( const std::string &name,
-		const Field::AccessType &access, Field *field );
+    /// override the addField function, to collect all field added and filter out
+    /// duplications. 
+    virtual bool addField( const std::string &name,
+      const Field::AccessType &access, Field *field );
 
-	// add field , but do not trigger event
-	virtual bool addFieldNoEvent( const std::string &name,
-		const Field::AccessType &access, Field *field );
+    // add field , but do not trigger event
+    virtual bool addFieldNoEvent( const std::string &name,
+      const Field::AccessType &access, Field *field );
 
     /// Remove a field from the Node.
     /// \param name The name of the field to remove.
