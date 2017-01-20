@@ -62,7 +62,7 @@ def log ( level, message ):\n\
 # Field base class and SF* MF* class definitions\n\
 #\n\
 ###################################################################\n\
-class Field:\n\
+class Field(object):\n\
   type = UNKNOWN_X3D_TYPE\n\
   def __init__( self, auto_update = 0 ):\n\
     module = self.__class__.__dict__[\"__module__\"]\n\
