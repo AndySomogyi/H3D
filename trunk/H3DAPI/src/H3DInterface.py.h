@@ -21,8 +21,8 @@
 //    www.sensegraphics.com for more information.
 //
 //
-/// @file H3DInterface.py.h
-/// @brief header file containing H3DInterface python module strings.
+/// \file H3DInterface.py.h
+/// \brief header file containing H3DInterface python module strings.
 ///
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -36,8 +36,6 @@ namespace H3D {
 from H3D import * \n\
 \n\
 import sys\n\
-import functools\n\
-import inspect\n\
 \n\
 Console = H3DConsole()\n\
 \n\
@@ -320,32 +318,7 @@ def PeriodicUpdate( base_class ):\n\
     return periodic_update_classes[base_class]\n\
   else:\n\
     periodic_update_classes[base_class] = PeriodicUpdateBase\n\
-    return PeriodicUpdateBase \n\
-\n\
-def deprecated(alternativeClass_or_func):\n\
-  def deprecate(cls_or_func):\n\
-    if inspect.isclass(cls_or_func):\n\
-      def __new_init__(*args, **kwargs):\n\
-        cls_or_func.__old_init__(*args, **kwargs)\n\
-        filename = sys.modules[cls_or_func.__module__].__file__\n\
-        print \"File %s : Call to deprecated class ( %s ), use %s class instead.\" % (filename, cls_or_func.__name__, alternativeClass_or_func)\n\
-      if not hasattr(cls_or_func, \"__old_init__\"):\n\
-        cls_or_func.__old_init__ = cls_or_func.__init__\n\
-        cls_or_func.__init__ = __new_init__\n\
-      return cls_or_func \n\
-\n\
-    if inspect.isfunction(cls_or_func) or inspect.ismethod(cls_or_func):\n\
-      @functools.wraps(cls_or_func)\n\
-      def new_function(*args, **kwargs):\n\
-        x = cls_or_func(*args, **kwargs)\n\
-        _code = cls_or_func.__code__\n\
-        filename = _code.co_filename\n\
-        lineno = _code.co_firstlineno + 1\n\
-        print \"File {} : Call to deprecated function ( {} ) in line {}, use {} function instead.\".format(filename, cls_or_func.__name__,lineno, alternativeClass_or_func)\n\
-        return x\n\
-      return new_function\n\
-      \n\
-  return deprecate\n\
+    return PeriodicUpdateBase\n\
 \n";
 
     const string H3DUtils_string ="from H3DInterface import *\n\
