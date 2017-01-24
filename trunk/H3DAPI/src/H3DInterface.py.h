@@ -65,6 +65,7 @@ def log ( level, message ):\n\
 class Field(object):\n\
   type = UNKNOWN_X3D_TYPE\n\
   def __init__( self, auto_update = 0 ):\n\
+    super(Field, self).__init__()\n\
     module = self.__class__.__dict__[\"__module__\"]\n\
     createField( self, auto_update, module + \".\" + self.__class__.__name__ )\n\
 \n\
