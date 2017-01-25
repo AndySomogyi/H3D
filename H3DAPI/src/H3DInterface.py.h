@@ -297,7 +297,7 @@ auto_update_classes = {}\n\
 def AutoUpdate( base_class ):\n\
   class AutoUpdateBase( base_class ):\n\
     def __init__( self ):\n\
-      base_class.__init__( self, 1 )\n\
+      super(AutoUpdateBase, self).__init__(1)\n\
 \n\
   global auto_update_classes\n\
   if( auto_update_classes.has_key( base_class ) ):\n\
@@ -311,7 +311,7 @@ periodic_update_classes = {}\n\
 def PeriodicUpdate( base_class ):\n\
   class PeriodicUpdateBase( base_class ):\n\
     def __init__( self ):\n\
-      base_class.__init__( self, 0 )\n\
+      super(PeriodicUpdateBase, self).__init__(0)\n\
       self.route( eventSink )\n\
   \n\
   global periodic_update_classes\n\
