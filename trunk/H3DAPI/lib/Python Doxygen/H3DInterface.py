@@ -986,6 +986,7 @@ def throwQuitAPIException():
 ## \param section_name Optional argument which can be used to group settings.
 ##                     If empty field is added to "Main settings" section.
 def addProgramSetting ( field, setting_name = "", section_name = "" ):
+  pass
 
 ## Find nodes matching the specified criteria.
 ## Recursively searches for child nodes that match the given criteria, starting from the
