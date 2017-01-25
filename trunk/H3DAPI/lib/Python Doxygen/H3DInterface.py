@@ -25,7 +25,7 @@ def log ( level, message ):
 
 ## The base class for all Field types in Python.
 ## It provides common basic event handling methods for all fields.
-class Field:
+class Field(object):
   ## The X3D Type of the value this field contains. This will be set
   ## by base classes to the type it handles.
   type = UNKNOWN_X3D_TYPE
@@ -36,6 +36,7 @@ class Field:
   ## its update function as soon as it receives an event instead of
   ## only when the value is asked for.
   def __init__( self, auto_update = 0 ):
+    super(Field, self).__init__()
     module = self.__class__.__dict__["__module__"]
     createField( self, auto_update, module + "." + self.__class__.__name__ )
 
@@ -401,7 +402,7 @@ def TypedField( base_class, type_info = None, opt_type_info = None ):
 def AutoUpdate( base_class ):
   class AutoUpdateBase( base_class ):
     def __init__( self ):
-      base_class.__init__( self, 1 )
+      super(AutoUpdateBase, self).__init__(1)
 
   global auto_update_classes
   if( auto_update_classes.has_key( base_class ) ):
@@ -433,7 +434,7 @@ def AutoUpdate( base_class ):
 def PeriodicUpdate( base_class ):
   class PeriodicUpdateBase( base_class ):
     def __init__( self ):
-      base_class.__init__( self, 0 )
+      super(PeriodicUpdateBase, self).__init__(0)
       self.route( eventSink )
   
   global periodic_update_classes
