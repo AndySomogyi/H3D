@@ -416,7 +416,7 @@ def AutoUpdate( base_class ):
 ## \ingroup TemplateFunctions
 ## Returns a class definition where the field value is checked
 ## that it is up-to-date each scene graph loop. If it is not it is 
-## updated. This is a preferrable to AutoUpdate in many cases where it
+## updated. This is preferrable to AutoUpdate in many cases where it
 ## is not crucial that the update function has to be called on every 
 ## event but it is enough to check and update at a regular interval.
 ## 
