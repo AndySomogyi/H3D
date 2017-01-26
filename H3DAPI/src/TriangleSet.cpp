@@ -254,10 +254,10 @@ void TriangleSet::AutoNormal::update() {
                                         ( routes_in[1] )->getValue() );
   bool _ccw = static_cast< SFBool * >( routes_in[2] )->getValue();
 
-  value = generateNormalsPerVertex( _coord, _ccw );
+  value = generateNormalsPerFace( _coord, _ccw );
  }
 
-X3DNormalNode *TriangleSet::AutoNormal::generateNormalsPerVertex( 
+X3DNormalNode *TriangleSet::AutoNormal::generateNormalsPerFace( 
                                    X3DCoordinateNode *_coord,
                                    bool _ccw ) {
   Normal *_normal = new Normal;

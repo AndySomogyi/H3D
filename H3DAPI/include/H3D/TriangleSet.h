@@ -84,8 +84,7 @@ namespace H3D {
     class H3DAPI_API AutoNormal: 
       public TypedField< SFNormalNode,
                          Types< SFBool, SFCoordinateNode, SFBool > > {
-      /// Calls generateNormalsPerVertex() if routes_in[0] is true, 
-      /// otherwise generateNormalsPerFace() is called.
+      /// Calls generateNormalsPerFace().
       virtual void update();
 
       /// Create a new X3DNormalNode from the arguments given
@@ -103,7 +102,7 @@ namespace H3D {
       /// \returns A new Normal node with a normal for each
       /// vertex.
       ///
-      virtual X3DNormalNode *generateNormalsPerVertex( 
+      virtual X3DNormalNode *generateNormalsPerFace( 
                                                       X3DCoordinateNode *_coord,
                                                       bool _ccw );
     };
