@@ -147,6 +147,7 @@ void H3DGeneratedShaderNode::buildShader() {
 
   // vertex shader
   stringstream sv;
+  sv << getVertexShaderHeader() << endl;
 
   for( unsigned int i = 0; i < varying.size(); ++i ) {
     sv << "varying " << varying[i].type << " " << varying[i].name << ";" << endl; 
