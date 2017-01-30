@@ -168,7 +168,7 @@ void H3DNavigation::doNavigation(
             // If the translation_sum is greater than epsilon use that,
             // otherwise just choose a direction to zoom out from.
             if( move_info.translation_sum.length() < Constants::f_epsilon ){
-              direction = Vec3f( 1, 0, 0 );
+              direction = Vec3f( 0, 0, -1 );
               max_movement = 1;
             } else {
               direction = -move_info.translation_sum;
