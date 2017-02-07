@@ -593,28 +593,28 @@ IF( GENERATE_CPACK_PROJECT )
   INSTALL( FILES ${H3DAPI_SOURCE_DIR}/modules/Find3DXWARE.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindAudiofile.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindChai3D.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/FindDCMTK.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindDCMTK.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindDirectShow.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindDirectX.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindFFmpeg.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindFontConfig.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/FindFreeImage.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindFreeImage.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindFTGL.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindGLEW.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindGLUTWin.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DAPI.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/FindH3DBZip2.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindH3DBZip2.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DCURL.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DFreetype.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DOpenAL.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/FindH3DTeem.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindH3DTeem.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindH3DUtil.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/FindH3DZLIB.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindH3DZLIB.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindHAPI.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/FindMd5sum.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindMd5sum.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindNvidiaCG.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindOpenHaptics.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/FindPTHREAD.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindPTHREAD.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindSixenseSDK.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindSpiderMonkey.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/FindV8.cmake
@@ -626,9 +626,9 @@ IF( GENERATE_CPACK_PROJECT )
                  ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions.ini.in
                  ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions_64.ini.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/NSIS.template.in
-                 ${H3DAPI_SOURCE_DIR}/modules/StripAndAddLibraryDirectories.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/StripAndAddLibraryDirectories.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/TestIfVCExpress.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/UseDebian.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/UseDebian.cmake
            DESTINATION H3DAPI/build/modules
            COMPONENT H3DAPI_cpack_sources )
 
