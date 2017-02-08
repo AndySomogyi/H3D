@@ -39,7 +39,7 @@ IF( GENERATE_CPACK_PROJECT )
 
   # Set information properties about the project to install.
   set( CPACK_ALL_INSTALL_TYPES Full Developer )
-  SET(CMAKE_MODULE_PATH ${H3DAPI_SOURCE_DIR}/modules )
+  SET(CMAKE_MODULE_PATH ${H3DAPI_SOURCE_DIR}/modules ${H3DAPI_SOURCE_DIR}/modules/sharedModules )
   SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "H3DAPI. A cross platform, haptics device independent, X3D based API for 3D graphics and haptics.")
   SET(CPACK_PACKAGE_VENDOR "SenseGraphics AB")
   SET(CPACK_PACKAGE_CONTACT "support@sensegraphics.com" )
