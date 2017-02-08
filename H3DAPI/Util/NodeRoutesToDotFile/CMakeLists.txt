@@ -49,7 +49,7 @@ INCLUDE_DIRECTORIES( . )
 SET(requiredLibs)
 
 # Where to find modules, used when finding packages.
-SET(CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}/../../build/modules/")
+SET(CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}/../../build/modules/sharedModules")
 
 IF( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
@@ -87,7 +87,6 @@ ELSE( H3D_USE_DEPENDENCIES_ONLY )
   ENDIF(HAPI_FOUND)
 
   #UI
-  SET(CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}")
   FIND_PACKAGE(UI)
 
   IF(UI_FOUND)
@@ -103,8 +102,6 @@ ELSE( H3D_USE_DEPENDENCIES_ONLY )
     SET(optionalLibs ${optionalLibs} ${H3DPhysics_LIBRARIES} )
   ENDIF(H3DPhysics_FOUND)
 ENDIF( H3D_USE_DEPENDENCIES_ONLY )
-
-SET(CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}/../../build/modules/")
 
 # Optional extra library. Used for sound in H3D API.
 FIND_PACKAGE(H3DOpenAL)

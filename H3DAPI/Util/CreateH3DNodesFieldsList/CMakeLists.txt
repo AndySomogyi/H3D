@@ -20,7 +20,7 @@ INCLUDE_DIRECTORIES( . )
 SET(requiredLibs)
 
 # Where to find modules, used when finding packages.
-SET(CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../build/modules/")
+SET(CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../build/modules/sharedModules" )
 
 IF( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
@@ -85,7 +85,6 @@ IF( INCLUDE_UI )
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../UI/doc/nodesFieldsList" )
     ENDIF()
   ELSE( TARGET UI )
-    SET( CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}/../NodeRoutesToDotFile/" )
     FIND_PACKAGE(UI)
 
     IF(UI_FOUND)
@@ -111,7 +110,6 @@ IF( INCLUDE_H3DPhysics )
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../H3DPhysics/doc/nodesFieldsList" )
     ENDIF()
   ELSE( TARGET H3DPhysics )
-    SET( CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}/../NodeRoutesToDotFile/" )
     FIND_PACKAGE(H3DPhysics)
 
     IF(H3DPhysics_FOUND)
@@ -137,7 +135,6 @@ IF( INCLUDE_MedX3D )
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../MedX3D/doc/nodesFieldsList" )
     ENDIF()
   ELSE( TARGET MedX3D )
-    SET( CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}" )
     FIND_PACKAGE(MedX3D)
 
     IF(MEDX3D_FOUND)
@@ -201,8 +198,6 @@ IF( NOT OUTPUT_ABREVIATION_OR_NAME_CLASH )
 ENDIF()
 
 CONFIGURE_FILE( ${CreateH3DNodesFieldsList_SOURCE_DIR}/CreateH3DNodesFieldsList.cmake ${CreateH3DNodesFieldsList_SOURCE_DIR}/CreateH3DNodesFieldsList.cpp )
-
-SET(CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../build/modules/")
 
 # Create build filess.
 ADD_EXECUTABLE(CreateH3DNodesFieldsList  ${CreateH3DNodesFieldsList_SRCS})
