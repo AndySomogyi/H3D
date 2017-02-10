@@ -90,7 +90,8 @@ namespace H3D {
             Inst< SFInt32            > _hapticsRate            = 0,
             Inst< SFInt32            > _desiredHapticsRate     = 0,
             Inst< SFNode             > _stylus                 = 0,
-            Inst< SFString           > _deviceName             = 0 );
+            Inst< SFString           > _deviceName             = 0,
+            Inst< SFBool             > _inInkwell              = 0 );
     
     /// Does all the initialization needed for the device before starting to
     /// use it.
@@ -239,6 +240,11 @@ namespace H3D {
     /// 
     /// <b>Access type: outputOnly</b> 
     auto_ptr< MFDouble > encoderValues;
+
+    /// True when the device is in the inkwell
+    /// 
+    /// <b>Access type: outputOnly</b> 
+    auto_ptr< SFBool > inInkwell;
 
     /// Node database entry
     static H3DNodeDatabase database;
