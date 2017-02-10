@@ -56,7 +56,7 @@ namespace PhantomDeviceInternals {
   FIELDDB_ELEMENT( PhantomDevice, calibrate, INPUT_ONLY );
   FIELDDB_ELEMENT( PhantomDevice, motorTemperatures, OUTPUT_ONLY );
   FIELDDB_ELEMENT( PhantomDevice, encoderValues, OUTPUT_ONLY );
-  
+  FIELDDB_ELEMENT( PhantomDevice, inInkwell, OUTPUT_ONLY );
 }
 
 unsigned int PhantomDevice::nr_initialized_devices = 0;
@@ -84,7 +84,8 @@ PhantomDevice::PhantomDevice(
                Inst< SFInt32         > _hapticsRate,
                Inst< SFInt32         > _desiredHapticsRate,
                Inst< SFNode          > _stylus,
-               Inst< SFString        > _deviceName ) :
+               Inst< SFString        > _deviceName,
+               Inst< SFBool          > _inInkwell ) :
   H3DHapticsDevice( _devicePosition, _deviceOrientation, _trackerPosition,
               _trackerOrientation, _positionCalibration, 
               _orientationCalibration, _proxyPosition,
@@ -92,7 +93,8 @@ PhantomDevice::PhantomDevice(
                     _secondaryButton, _buttons,
               _force, _torque, _inputDOF, _outputDOF, _hapticsRate,
               _desiredHapticsRate, _stylus ),
-    deviceName( _deviceName ),
+  deviceName( _deviceName ),
+  inInkwell( _inInkwell ),
   HDAPIVersion( new SFString ),
   deviceModelType( new SFString ),
   deviceDriverVersion( new SFString ),
@@ -127,6 +129,7 @@ PhantomDevice::PhantomDevice(
   encoderValues->setValue( vector< H3DDouble >( 6, 0 ), id );
 
   desiredHapticsRate->setValue( 1000, id );
+  inInkwell->setValue( false, id );
 }
 
 void PhantomDevice::initialize() {
@@ -169,6 +172,7 @@ H3DHapticsDevice::ErrorCode PhantomDevice::initDevice() {
     needsCalibration->setValue( pd->needsCalibration(), id );
     inputDOF->setValue( pd->getInputDOF(), id );
     outputDOF->setValue( pd->getOutputDOF(), id );
+    inInkwell->setValue( pd->isInInkwell(), id );
 
     ++nr_initialized_devices;
     render_shapes_called = 0;
@@ -204,6 +208,10 @@ void PhantomDevice::updateDeviceValues() {
     motorTemperatures->setValue( pd->getMotorTemperatures(), id );
     encoderValues->setValue( pd->getEncoderValues(), id );
 
+    bool in_inkwell = pd->isInInkwell();
+    if( inInkwell->getValue() != in_inkwell ) {
+      inInkwell->setValue( in_inkwell, id );
+    }
   }
 #endif
 }
