@@ -440,10 +440,10 @@ ENDIF(FTGL_FOUND)
 
 # Optional extra library. Used to read images.
 FIND_PACKAGE(FreeImage)
-IF(FREEIMAGE_FOUND)
-  INCLUDE_DIRECTORIES( ${FREEIMAGE_INCLUDE_DIR} ) 
-  SET(optionalLibs ${optionalLibs} ${FREEIMAGE_LIBRARIES} )
-ENDIF(FREEIMAGE_FOUND)
+IF(FreeImage_FOUND)
+  INCLUDE_DIRECTORIES( ${FreeImage_INCLUDE_DIRS} ) 
+  SET(optionalLibs ${optionalLibs} ${FreeImage_LIBRARIES} )
+ENDIF()
 
 IF(HAPTIK_FOUND)
   SET(optionalLibs ${optionalLibs} ${HAPTIK_LIBRARY} )
