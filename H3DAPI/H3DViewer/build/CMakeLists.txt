@@ -252,7 +252,7 @@ ENDIF(wxWidgets_FOUND)
 FIND_PACKAGE( DirectX )
 IF( DirectX_FOUND )
   SET( HAVE_DX9 1 )
-  INCLUDE_DIRECTORIES( ${DirectX_INCLUDE_DIR} )
+  INCLUDE_DIRECTORIES( ${DirectX_INCLUDE_DIRS} )
   SET( requiredLibs ${requiredLibs} ${DirectX_LIBRARIES} )
 ENDIF( DirectX_FOUND )
 
