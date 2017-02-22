@@ -41,6 +41,13 @@
 #define CODEC_TYPE_AUDIO AVMEDIA_TYPE_AUDIO
 #endif
 
+#if ( LIBAVCODEC_VERSION_MAJOR < 57 )
+#define H3D_PIX_FMT_RGB24 PIX_FMT_RGB24
+#else
+#define H3D_PIX_FMT_RGB24 AV_PIX_FMT_RGB24
+#endif
+
+
 using namespace H3D;
 
 // Define this if you want to render only the video component with no audio
@@ -260,24 +267,31 @@ bool FFmpegDecoder::loadClip( const string &url ) {
 #endif
 #endif // WITH_AUDIO
 
+#if ( LIBAVCODEC_VERSION_MAJOR < 57 )
   // Allocate video frame
   pFrame=avcodec_alloc_frame();
-
   // Allocate an AVFrame structure
   pFrameRGB=avcodec_alloc_frame();
+#else
+  // Allocate video frame
+  pFrame=av_frame_alloc();
+  // Allocate an AVFrame structure
+  pFrameRGB=av_frame_alloc();
+#endif
+
   if(pFrameRGB==NULL)
     return -1;
 
   
   // Determine required buffer size and allocate buffer
-  numBytes=avpicture_get_size(PIX_FMT_RGB24, pCodecCtx->width,
+  numBytes=avpicture_get_size(H3D_PIX_FMT_RGB24, pCodecCtx->width,
                             pCodecCtx->height);
   temp_buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
 
   // Assign appropriate parts of buffer to image planes in pFrameRGB
   // Note that pFrameRGB is an AVFrame, but AVFrame is a superset
   // of AVPicture
-  avpicture_fill((AVPicture *)pFrameRGB, temp_buffer, PIX_FMT_RGB24,
+  avpicture_fill((AVPicture *)pFrameRGB, temp_buffer, H3D_PIX_FMT_RGB24,
                 pCodecCtx->width, pCodecCtx->height);
 
   duration = pFormatCtx->duration * 10e-7;
@@ -302,7 +316,7 @@ bool FFmpegDecoder::loadClip( const string &url ) {
                                   pCodecCtx->pix_fmt, 
                                   pCodecCtx->width, 
                                   pCodecCtx->height, 
-                                  PIX_FMT_RGB24, 
+                                  H3D_PIX_FMT_RGB24, 
                                   SWS_FAST_BILINEAR,
                                   NULL, NULL, NULL);
 
