@@ -1074,7 +1074,7 @@ def isTestable ( file_name , files_in_dir):
   return True
 
 #html_reporter_errors= TestReportHTML( os.path.join(args.output, "reports"), only_failed= True )
-print "Running these tests using: " + subprocess.check_output('where.exe "' + (args.processpath + '":' if (args.processpath != "") else "") + h3d_process_name) # Run our test script and wait for it to finish executing
+print "Running these tests using: " + subprocess.check_output('where.exe ' + ('"'+ args.processpath + '":' if (args.processpath != "") else "") + h3d_process_name) # Run our test script and wait for it to finish executing
 
 
 tester= TestCaseRunner( os.path.join(args.workingdir, ""), startup_time= 5, shutdown_time= 5, testable_callback= isTestable, error_reporter=None)
