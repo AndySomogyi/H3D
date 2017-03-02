@@ -20,7 +20,7 @@ include_directories( . )
 set(requiredLibs)
 
 # Where to find modules, used when finding packages.
-set(CMAKE_MODULE_PATH "${UpdateResourceFile_SOURCE_DIR}/../../build/modules/")
+set(CMAKE_MODULE_PATH "${UpdateResourceFile_SOURCE_DIR}/../../build/modules/sharedModules")
 
 # Set properties so that the project is built statically with MFC to avoid
 # linking against, and hence loading msvcp/r71.dll.

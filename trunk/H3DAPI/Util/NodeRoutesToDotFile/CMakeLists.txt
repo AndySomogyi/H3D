@@ -104,7 +104,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
 endif( H3D_USE_DEPENDENCIES_ONLY )
 
 # Optional extra library. Used for sound in H3D API.
-find_package(H3DOpenAL)
+find_package(OpenAL)
 if(OPENAL_FOUND)
   include_directories( ${OPENAL_INCLUDE_DIR} )
   set(optionalLibs ${optionalLibs} ${OPENAL_LIBRARIES} )
