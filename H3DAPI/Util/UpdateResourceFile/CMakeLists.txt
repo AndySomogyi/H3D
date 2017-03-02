@@ -1,6 +1,6 @@
-IF(WIN32)
+if(WIN32)
   cmake_minimum_required(VERSION 2.6.0)
-ENDIF(WIN32)
+endif(WIN32)
 
 # The name of our project is "UpdateResourceFile".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${UpdateResourceFile_SOURCE_DIR} and
@@ -8,47 +8,47 @@ ENDIF(WIN32)
 project( UpdateResourceFile )
 
 # Where to find Source files.
-SET( UpdateResourceFile_SRCS "${UpdateResourceFile_SOURCE_DIR}/UpdateResourceFile.cpp" )
+set( UpdateResourceFile_SRCS "${UpdateResourceFile_SOURCE_DIR}/UpdateResourceFile.cpp" )
 
 # Add optional libs to this variable.
-SET(optionalLibs)
+set(optionalLibs)
 
 # Include directories.
-INCLUDE_DIRECTORIES( . )
+include_directories( . )
 
 # Add required libs to this variable.
-SET(requiredLibs)
+set(requiredLibs)
 
 # Where to find modules, used when finding packages.
-SET(CMAKE_MODULE_PATH "${UpdateResourceFile_SOURCE_DIR}/../../build/modules/")
+set(CMAKE_MODULE_PATH "${UpdateResourceFile_SOURCE_DIR}/../../build/modules/")
 
 # Set properties so that the project is built statically with MFC to avoid
 # linking against, and hence loading msvcp/r71.dll.
-IF( WIN32 )
-  ADD_DEFINITIONS(-D_AFXDLL)
-  SET(CMAKE_MFC_FLAG 1)
-ENDIF( WIN32 )
+if( WIN32 )
+  add_definitions(-D_AFXDLL)
+  set(CMAKE_MFC_FLAG 1)
+endif( WIN32 )
 
 # Create build filess.
-ADD_EXECUTABLE(UpdateResourceFile ${UpdateResourceFile_SRCS})
-TARGET_LINK_LIBRARIES( UpdateResourceFile ${requiredLibs} ${optionalLibs} )
+add_executable(UpdateResourceFile ${UpdateResourceFile_SRCS})
+target_link_libraries( UpdateResourceFile ${requiredLibs} ${optionalLibs} )
 
 # Debug version should have _d postfix.
-SET_TARGET_PROPERTIES( UpdateResourceFile PROPERTIES DEBUG_POSTFIX "_d" )
+set_target_properties( UpdateResourceFile PROPERTIES DEBUG_POSTFIX "_d" )
 
 # set the install directory to the H3D directory on Windows
-IF(WIN32) 
+if(WIN32) 
   # Variable used to set compile properties.
-  SET( UPDATERESOURCEFILE_COMPILE_FLAGS "" )
+  set( UPDATERESOURCEFILE_COMPILE_FLAGS "" )
   # Set compile and link properties for projects.
-  IF(MSVC80)
+  if(MSVC80)
     # Remove some warnings about deprecated functions. Do not treat wchar_t as built in type
-    SET( UPDATERESOURCEFILE_COMPILE_FLAGS "${UPDATERESOURCEFILE_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t-" )
-  ELSEIF(MSVC90)
+    set( UPDATERESOURCEFILE_COMPILE_FLAGS "${UPDATERESOURCEFILE_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t-" )
+  elseif(MSVC90)
     # Remove some warnings about deprecated functions. Do not treat wchar_t as built in type. Compile on multiple processors/threads if possible.
-    SET( UPDATERESOURCEFILE_COMPILE_FLAGS "${UPDATERESOURCEFILE_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t- /MP" )
-  ENDIF(MSVC80)
+    set( UPDATERESOURCEFILE_COMPILE_FLAGS "${UPDATERESOURCEFILE_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t- /MP" )
+  endif(MSVC80)
 
-  SET_TARGET_PROPERTIES( UpdateResourceFile PROPERTIES COMPILE_FLAGS "${UPDATERESOURCEFILE_COMPILE_FLAGS}" )
+  set_target_properties( UpdateResourceFile PROPERTIES COMPILE_FLAGS "${UPDATERESOURCEFILE_COMPILE_FLAGS}" )
 
-ENDIF(WIN32)
+endif(WIN32)

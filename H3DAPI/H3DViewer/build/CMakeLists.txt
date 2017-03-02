@@ -1,296 +1,296 @@
-IF( COMMAND cmake_policy )
-  IF( POLICY CMP0003 )
+if( COMMAND cmake_policy )
+  if( POLICY CMP0003 )
     cmake_policy(SET CMP0003 OLD)
-  ENDIF( POLICY CMP0003 )
-ENDIF( COMMAND cmake_policy )
-IF(WIN32)
+  endif( POLICY CMP0003 )
+endif( COMMAND cmake_policy )
+if(WIN32)
   cmake_minimum_required(VERSION 2.6.0)
-ENDIF(WIN32)
+endif(WIN32)
 # The name of our project is "H3DViewer".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${H3DViewer_SOURCE_DIR} and
 # to the root binary directory of the project as ${H3DViewer_BINARY_DIR}.
 project (H3DViewer)
 
 # set the install directory to the H3D directory on Windows
-IF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
-  SET( CMAKE_INSTALL_PREFIX ${H3DViewer_SOURCE_DIR}/../../.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
-  SET( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
-ENDIF( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
+if( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
+  set( CMAKE_INSTALL_PREFIX ${H3DViewer_SOURCE_DIR}/../../.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
+  set( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
+endif( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
 
 # Add a cache variable ENABLE_SVN_REVISION to have the choice of using
 # SubWCRev.exe to embed svn revision number in generated DLLs.
 # Default is YES for Visual Studio and NMake generators, NO otherwise.
-IF( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
-  SET( ENABLE_SVN_REVISION_DEFAULT "NO" )
-  IF( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
-    SET( ENABLE_SVN_REVISION_DEFAULT "YES" )
-  ENDIF( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
-  SET( ENABLE_SVN_REVISION ${ENABLE_SVN_REVISION_DEFAULT} CACHE BOOL "Use SubWCRev.exe to embed svn revision number in generated DLLs." )
-ENDIF( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
+if( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
+  set( ENABLE_SVN_REVISION_DEFAULT "NO" )
+  if( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
+    set( ENABLE_SVN_REVISION_DEFAULT "YES" )
+  endif( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
+  set( ENABLE_SVN_REVISION ${ENABLE_SVN_REVISION_DEFAULT} CACHE BOOL "Use SubWCRev.exe to embed svn revision number in generated DLLs." )
+endif( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
 
 # use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-ENDIF("${isSystemDir}" STREQUAL "-1")
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+endif("${isSystemDir}" STREQUAL "-1")
 
-SET(H3DViewer_MAJOR_VERSION "2")
-SET(H3DViewer_MINOR_VERSION "3")
-SET(H3DViewer_BUILD_VERSION "1")
-SET( H3DVIEWER_APP_NAME "H3DViewer ${H3DViewer_MAJOR_VERSION}.${H3DViewer_MINOR_VERSION}.${H3DViewer_BUILD_VERSION}" )
+set(H3DViewer_MAJOR_VERSION "2")
+set(H3DViewer_MINOR_VERSION "3")
+set(H3DViewer_BUILD_VERSION "1")
+set( H3DVIEWER_APP_NAME "H3DViewer ${H3DViewer_MAJOR_VERSION}.${H3DViewer_MINOR_VERSION}.${H3DViewer_BUILD_VERSION}" )
 
 # Add a cache variable USE_PYTHON_CONSOLE to have the choice of enabling the
 # interactive Python console in H3DViewer. Default is NO.
-IF( NOT DEFINED USE_PYTHON_CONSOLE )
-  SET( USE_PYTHON_CONSOLE "NO" CACHE BOOL "Decides if the interactive Python console is enabled in H3DViewer." )
-ENDIF( NOT DEFINED USE_PYTHON_CONSOLE )
+if( NOT DEFINED USE_PYTHON_CONSOLE )
+  set( USE_PYTHON_CONSOLE "NO" CACHE BOOL "Decides if the interactive Python console is enabled in H3DViewer." )
+endif( NOT DEFINED USE_PYTHON_CONSOLE )
 
 # Include directories.
-INCLUDE_DIRECTORIES( ../src )
+include_directories( ../src )
 
-INCLUDE( "${H3DViewer_SOURCE_DIR}/H3DViewerSourceFiles.txt" )
+include( "${H3DViewer_SOURCE_DIR}/H3DViewerSourceFiles.txt" )
 
-IF( GENERATE_UNITY_BUILD )
-  IF( NOT DEFINED UNITY_BUILD_${PROJECT_NAME} )
-    SET(  UNITY_BUILD_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
-  ENDIF()
+if( GENERATE_UNITY_BUILD )
+  if( NOT DEFINED UNITY_BUILD_${PROJECT_NAME} )
+    set(  UNITY_BUILD_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
+  endif()
 
-  IF( UNITY_BUILD_${PROJECT_NAME} )
+  if( UNITY_BUILD_${PROJECT_NAME} )
     # Generate a unity build, by creating the UnityBuild.cpp and only including the required 
     # source files.
     set( UNITYBUILD_INCLUDES "" )
     foreach(filename ${H3DViewer_SRCS})
-      SET( UNITYBUILD_INCLUDES "${UNITYBUILD_INCLUDES}#include \"${filename}\"\n" )
+      set( UNITYBUILD_INCLUDES "${UNITYBUILD_INCLUDES}#include \"${filename}\"\n" )
     endforeach(filename)
 
     # Using a cached variable with our string in it. Because cmake doesn't support multi-line strings we have to replace the newlines with a delimiter, so we arbitrarily use +=+.
     string(REPLACE "
 " "+=+" UnitybuildIncludesConverted ${UNITYBUILD_INCLUDES}) # Convert the file we're going to write to use our delimiter instead of newlines
     if(NOT (UNITY_BUILD_CACHE_${PROJECT_NAME}) OR NOT (UnitybuildIncludesConverted STREQUAL UNITY_BUILD_CACHE_${PROJECT_NAME})) # If we don't have the cache variable or if its contents don't match our new string then we write the unmodified new UnityBuild file and store the one with the swapped out delimiters in the cache variable
-      MESSAGE(STATUS "Updating UnityBuild.cpp for " ${PROJECT_NAME})
+      message(STATUS "Updating UnityBuild.cpp for " ${PROJECT_NAME})
       string(REPLACE "
 " "+=+" unityBuildCacheNew ${UNITYBUILD_INCLUDES})
-      SET(UNITY_BUILD_CACHE_${PROJECT_NAME} ${unityBuildCacheNew} CACHE INTERNAL "Used for determining if UnityBuild.cpp should be updated or not.")
+      set(UNITY_BUILD_CACHE_${PROJECT_NAME} ${unityBuildCacheNew} CACHE INTERNAL "Used for determining if UnityBuild.cpp should be updated or not.")
       file(WRITE UnityBuild.cpp ${UNITYBUILD_INCLUDES})
     else()
-      MESSAGE(STATUS "Unitybuild.cpp for ${PROJECT_NAME} already up to date")
+      message(STATUS "Unitybuild.cpp for ${PROJECT_NAME} already up to date")
     endif()
     # overwrite the source files to only include the generated unity build file.
     set( H3DViewer_SRCS UnityBuild.cpp ) 
   endif()
 endif()
 
-SET( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should use precompiled headers. This greatly reduces build times after first build." )
+set( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should use precompiled headers. This greatly reduces build times after first build." )
 
 # set up precompiled headers  
-IF( MSVC AND PRECOMPILED_HEADERS_${PROJECT_NAME})
+if( MSVC AND PRECOMPILED_HEADERS_${PROJECT_NAME})
   list( APPEND H3DViewer_HEADERS ${H3DViewer_SOURCE_DIR}/../src/StdAfx.h )
   list( APPEND H3DViewer_SRCS ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp )
-  IF( ${MSVC_VERSION} LESS 1900)
-    SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SRCS}
+  if( ${MSVC_VERSION} LESS 1900)
+    set_source_files_properties( ${H3DViewer_SRCS}
                                  PROPERTIES COMPILE_FLAGS "/Zm900 /FIStdAfx.h /YuStdAfx.h" )
-    SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
+    set_source_files_properties( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
                                  PROPERTIES COMPILE_FLAGS "/Zm900 /YcStdAfx.h" )
-  ELSE( ${MSVC_VERSION} LESS 1900)
-    SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SRCS}
+  else( ${MSVC_VERSION} LESS 1900)
+    set_source_files_properties( ${H3DViewer_SRCS}
                                  PROPERTIES COMPILE_FLAGS "/FIStdAfx.h /YuStdAfx.h" )
-    SET_SOURCE_FILES_PROPERTIES( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
+    set_source_files_properties( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
                                  PROPERTIES COMPILE_FLAGS "/YcStdAfx.h" )
-  ENDIF( ${MSVC_VERSION} LESS 1900)
-ENDIF()
+  endif( ${MSVC_VERSION} LESS 1900)
+endif()
 
 # Add the H3DViewer.rc resource file if Visual Studio
-IF(MSVC)
-  SET( H3DViewer_SRCS ${H3DViewer_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc
+if(MSVC)
+  set( H3DViewer_SRCS ${H3DViewer_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc
                                         ${H3DViewer_SOURCE_DIR}/H3DViewer.ico )
-ENDIF(MSVC)
+endif(MSVC)
 
 # Add the directory to INCLUDE_DIRECTORIES before any other statement to make sure that this header file is found first.first.
 # This assumes that we always use "#include <path/include_header.h>" in our code even if the file is actually found in
 # the same directory as the file that contains the include statement.
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/include )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR}/include )
 
 # Add required libs to this variable.
-SET(requiredLibs)
+set(requiredLibs)
 
 # Where to find cmake modules used to find packages.
-SET(CMAKE_MODULE_PATH ${H3DViewer_SOURCE_DIR}/modules ${H3DViewer_SOURCE_DIR}/../../build/modules/sharedModules )
-IF( COMMAND cmake_policy )
-  IF( POLICY CMP0011 )
+set(CMAKE_MODULE_PATH ${H3DViewer_SOURCE_DIR}/modules ${H3DViewer_SOURCE_DIR}/../../build/modules/sharedModules )
+if( COMMAND cmake_policy )
+  if( POLICY CMP0011 )
     cmake_policy( SET CMP0011 NEW )
-  ENDIF( POLICY CMP0011 )
-ENDIF( COMMAND cmake_policy )
-INCLUDE( StripAndAddLibraryDirectories )
+  endif( POLICY CMP0011 )
+endif( COMMAND cmake_policy )
+include( StripAndAddLibraryDirectories )
 
-IF( H3D_USE_DEPENDENCIES_ONLY )
+if( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
-  INCLUDE_DIRECTORIES( ${EXTERNAL_INCLUDE_DIR} ) 
-ENDIF( H3D_USE_DEPENDENCIES_ONLY )
+  include_directories( ${EXTERNAL_INCLUDE_DIR} ) 
+endif( H3D_USE_DEPENDENCIES_ONLY )
 
-IF( TARGET H3DUtil )
-  INCLUDE_DIRECTORIES( ${H3DUTIL_INCLUDE_DIR} ) 
-  SET( requiredLibs ${requiredLibs} H3DUtil )
-ELSE( TARGET H3DUtil )
+if( TARGET H3DUtil )
+  include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
+  set( requiredLibs ${requiredLibs} H3DUtil )
+else( TARGET H3DUtil )
   #H3DUtil
-  FIND_PACKAGE(H3DUtil REQUIRED)
+  find_package(H3DUtil REQUIRED)
 
-  IF(H3DUTIL_FOUND)
-    INCLUDE_DIRECTORIES( ${H3DUTIL_INCLUDE_DIR} ) 
-    SET(requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
-  ENDIF(H3DUTIL_FOUND)
-ENDIF( TARGET H3DUtil )
+  if(H3DUTIL_FOUND)
+    include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
+    set(requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+  endif(H3DUTIL_FOUND)
+endif( TARGET H3DUtil )
 
-IF( TARGET HAPI )
-  INCLUDE_DIRECTORIES( ${HAPI_INCLUDE_DIR} ) 
-  SET( requiredLibs ${requiredLibs} HAPI )
-ELSE( TARGET HAPI )
+if( TARGET HAPI )
+  include_directories( ${HAPI_INCLUDE_DIR} ) 
+  set( requiredLibs ${requiredLibs} HAPI )
+else( TARGET HAPI )
   #HAPI
-  FIND_PACKAGE(HAPI REQUIRED)
+  find_package(HAPI REQUIRED)
 
-  IF(HAPI_FOUND)
-    INCLUDE_DIRECTORIES( ${HAPI_INCLUDE_DIR} ) 
-    SET(requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
-  ENDIF(HAPI_FOUND)
-ENDIF( TARGET HAPI )
+  if(HAPI_FOUND)
+    include_directories( ${HAPI_INCLUDE_DIR} ) 
+    set(requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+  endif(HAPI_FOUND)
+endif( TARGET HAPI )
 
-IF( TARGET H3DAPI )
-  INCLUDE_DIRECTORIES( ${H3DAPI_INCLUDE_DIR} ) 
-  SET( requiredLibs ${requiredLibs} H3DAPI )
-ELSE( TARGET H3DAPI )
+if( TARGET H3DAPI )
+  include_directories( ${H3DAPI_INCLUDE_DIR} ) 
+  set( requiredLibs ${requiredLibs} H3DAPI )
+else( TARGET H3DAPI )
   #H3DAPI
-  FIND_PACKAGE(H3DAPI REQUIRED)
+  find_package(H3DAPI REQUIRED)
 
-  IF(H3DAPI_FOUND)
-    INCLUDE_DIRECTORIES( ${H3DAPI_INCLUDE_DIR} ) 
-    SET(requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
-  ENDIF(H3DAPI_FOUND)
-ENDIF( TARGET H3DAPI )
+  if(H3DAPI_FOUND)
+    include_directories( ${H3DAPI_INCLUDE_DIR} ) 
+    set(requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+  endif(H3DAPI_FOUND)
+endif( TARGET H3DAPI )
 
 # WxWidgets.
-SET(WXWINDOWS_USE_GL 1)
+set(WXWINDOWS_USE_GL 1)
 # find wx library propgrid
 # The propgrid code does not work properly on Ubuntu 11.10 with the installed CMake and wx (2.8).
 # It returns true even though propgrid does not exist, it probably ignores USE_LIBS that does not exist.
 # Since there is no wxWidgets_VERSION variable or something like that there is code to check the end of
 # include path. I have no idea if this would work on all other UNIX systems as well. NOTE, report
 # this to CMAKE unless it is reported already.
-SET(wxWidgets_USE_LIBS propgrid)  
-SET( wxWidgets_FIND_QUIETLY 1 )
-SET(wxWidgets_FOUND 0)
-IF(WIN32)
-  FIND_PACKAGE(wxWidgetsWin)
-  IF(wxWidgets_FOUND)
-    INCLUDE_DIRECTORIES( ${wxWidgets_INCLUDE_DIR} ) 
-    SET(requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
-  ENDIF(wxWidgets_FOUND)
-ENDIF(WIN32)
+set(wxWidgets_USE_LIBS propgrid)  
+set( wxWidgets_FIND_QUIETLY 1 )
+set(wxWidgets_FOUND 0)
+if(WIN32)
+  find_package(wxWidgetsWin)
+  if(wxWidgets_FOUND)
+    include_directories( ${wxWidgets_INCLUDE_DIR} ) 
+    set(requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+  endif(wxWidgets_FOUND)
+endif(WIN32)
 
-IF(wxWidgets_FOUND)
-ELSE(wxWidgets_FOUND)
-  FIND_PACKAGE(wxWidgets)
-ENDIF(wxWidgets_FOUND)
+if(wxWidgets_FOUND)
+else(wxWidgets_FOUND)
+  find_package(wxWidgets)
+endif(wxWidgets_FOUND)
 
-IF(wxWidgets_FOUND)
+if(wxWidgets_FOUND)
 
-  IF( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
-    SET( wxWIDGETS_VERSIONABOVE_28 FALSE )
-    FOREACH( TMP_INCLUDE_DIR ${wxWidgets_INCLUDE_DIRS} )
-      STRING( REGEX MATCH "wx[-][0-9][.][0-9]+$" wx_version_match ${TMP_INCLUDE_DIR} )
-      IF( NOT ${wx_version_match} STREQUAL ""  )
-        STRING( REGEX MATCH "[0-9][.][0-9]+$" wx_version_match_version ${wx_version_match} )
-        IF( ${wx_version_match_version} VERSION_GREATER "2.8" )
-          SET( wxWIDGETS_VERSIONABOVE_28 TRUE )
-        ENDIF()
-      ENDIF()
-    ENDFOREACH( TMP_INCLUDE_DIR ${wxWidgets_INCLUDE_DIRS} )
-    IF( NOT wxWIDGETS_VERSIONABOVE_28 )
-      SET(wxWidgets_FOUND 0)
-    ENDIF( NOT wxWIDGETS_VERSIONABOVE_28 )
-  ENDIF( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
-ENDIF(wxWidgets_FOUND )
+  if( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
+    set( wxWIDGETS_VERSIONABOVE_28 FALSE )
+    foreach( TMP_INCLUDE_DIR ${wxWidgets_INCLUDE_DIRS} )
+      string( REGEX MATCH "wx[-][0-9][.][0-9]+$" wx_version_match ${TMP_INCLUDE_DIR} )
+      if( NOT ${wx_version_match} STREQUAL ""  )
+        string( REGEX MATCH "[0-9][.][0-9]+$" wx_version_match_version ${wx_version_match} )
+        if( ${wx_version_match_version} VERSION_GREATER "2.8" )
+          set( wxWIDGETS_VERSIONABOVE_28 TRUE )
+        endif()
+      endif()
+    endforeach( TMP_INCLUDE_DIR ${wxWidgets_INCLUDE_DIRS} )
+    if( NOT wxWIDGETS_VERSIONABOVE_28 )
+      set(wxWidgets_FOUND 0)
+    endif( NOT wxWIDGETS_VERSIONABOVE_28 )
+  endif( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
+endif(wxWidgets_FOUND )
 
-IF(wxWidgets_FOUND)
-  SET( HAVE_WXPROPGRID 1 )
-  SET(wxWidgets_USE_LIBS base core gl adv richtext html propgrid qa)  
-ELSE(wxWidgets_FOUND )
-  MESSAGE( STATUS "wxWidgets propgrid not found. Needed for better tree view and program setting choice in H3DViewer. Part of wxWidgets 2.9." )
-  SET(wxWidgets_USE_LIBS base core gl adv richtext html qa)
-ENDIF(wxWidgets_FOUND )
+if(wxWidgets_FOUND)
+  set( HAVE_WXPROPGRID 1 )
+  set(wxWidgets_USE_LIBS base core gl adv richtext html propgrid qa)  
+else(wxWidgets_FOUND )
+  message( STATUS "wxWidgets propgrid not found. Needed for better tree view and program setting choice in H3DViewer. Part of wxWidgets 2.9." )
+  set(wxWidgets_USE_LIBS base core gl adv richtext html qa)
+endif(wxWidgets_FOUND )
 
 # reset the wxWidgets_FOUND variable before running FIND_PACKAGE again.
-SET( wxWidgets_FOUND 0 )
+set( wxWidgets_FOUND 0 )
 
 # find wx libraries except propgrid
-IF(WIN32)
-  FIND_PACKAGE(wxWidgetsWin)
-  IF(wxWidgets_FOUND)
-    INCLUDE_DIRECTORIES( ${wxWidgets_INCLUDE_DIR} ) 
-    SET(requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
-  ENDIF(wxWidgets_FOUND)
-ENDIF(WIN32)
+if(WIN32)
+  find_package(wxWidgetsWin)
+  if(wxWidgets_FOUND)
+    include_directories( ${wxWidgets_INCLUDE_DIR} ) 
+    set(requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+  endif(wxWidgets_FOUND)
+endif(WIN32)
 
-IF(wxWidgets_FOUND)
-ELSE(wxWidgets_FOUND)
-  FIND_PACKAGE(wxWidgets REQUIRED)
-  IF(wxWidgets_FOUND)
-    INCLUDE(${wxWidgets_USE_FILE})
-    SET(requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
-  ENDIF(wxWidgets_FOUND)
-ENDIF(wxWidgets_FOUND)
+if(wxWidgets_FOUND)
+else(wxWidgets_FOUND)
+  find_package(wxWidgets REQUIRED)
+  if(wxWidgets_FOUND)
+    include(${wxWidgets_USE_FILE})
+    set(requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+  endif(wxWidgets_FOUND)
+endif(wxWidgets_FOUND)
 
-FIND_PACKAGE( DirectX )
-IF( DirectX_FOUND )
-  SET( HAVE_DX9 1 )
-  INCLUDE_DIRECTORIES( ${DirectX_INCLUDE_DIRS} )
-  SET( requiredLibs ${requiredLibs} ${DirectX_LIBRARIES} )
-ENDIF( DirectX_FOUND )
+find_package( DirectX )
+if( DirectX_FOUND )
+  set( HAVE_DX9 1 )
+  include_directories( ${DirectX_INCLUDE_DIRS} )
+  set( requiredLibs ${requiredLibs} ${DirectX_LIBRARIES} )
+endif( DirectX_FOUND )
 
 # Create build files.
-IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
+if( GENERATE_H3DVIEWER_CPACK_PROJECT )
   # if generating CPACK project using BUNDLE we should not create the bundle here instead
   # it is built with CPack 
-  ADD_EXECUTABLE(H3DViewer WIN32 ${H3DViewer_SRCS} ${H3DViewer_HEADERS})
-ELSE( GENERATE_H3DVIEWER_CPACK_PROJECT )
-  ADD_EXECUTABLE(H3DViewer WIN32 MACOSX_BUNDLE ${H3DViewer_SRCS} ${H3DViewer_HEADERS} ${H3DViewer_SOURCE_DIR}/H3DViewer.icns )
-ENDIF ( GENERATE_H3DVIEWER_CPACK_PROJECT )
+  add_executable(H3DViewer WIN32 ${H3DViewer_SRCS} ${H3DViewer_HEADERS})
+else( GENERATE_H3DVIEWER_CPACK_PROJECT )
+  add_executable(H3DViewer WIN32 MACOSX_BUNDLE ${H3DViewer_SRCS} ${H3DViewer_HEADERS} ${H3DViewer_SOURCE_DIR}/H3DViewer.icns )
+endif ( GENERATE_H3DVIEWER_CPACK_PROJECT )
 
 # make sure that the H3DViewer.rc contains the correct svn-version
-IF( MSVC )
+if( MSVC )
 
-  SET( H3DViewer_SVN_VERSION "0" )
-  IF( ENABLE_SVN_REVISION )
+  set( H3DViewer_SVN_VERSION "0" )
+  if( ENABLE_SVN_REVISION )
     # Find SubWCRev.exe
-    FIND_FILE( SubWCRev
+    find_file( SubWCRev
                NAMES "SubWCRev.exe"
                DOC   "Set to SubWCRev.exe that comes with TortoiseSVN. Used to find svn revision number." )
-    MARK_AS_ADVANCED( SubWCRev )
-  ENDIF( ENABLE_SVN_REVISION )
+    mark_as_advanced( SubWCRev )
+  endif( ENABLE_SVN_REVISION )
 
-  SET( H3DViewer_is_working_copy 10 )
-  IF( ENABLE_SVN_REVISION AND SubWCRev )
-    EXECUTE_PROCESS( COMMAND ${SubWCRev} ${H3DViewer_SOURCE_DIR}/../
+  set( H3DViewer_is_working_copy 10 )
+  if( ENABLE_SVN_REVISION AND SubWCRev )
+    execute_process( COMMAND ${SubWCRev} ${H3DViewer_SOURCE_DIR}/../
                      RESULT_VARIABLE H3DViewer_is_working_copy )
-    IF( ${H3DViewer_is_working_copy} EQUAL 0 )
-      SET( H3DViewer_SVN_VERSION "$WCREV$" )
-    ENDIF( ${H3DViewer_is_working_copy} EQUAL 0 )
-  ENDIF( ENABLE_SVN_REVISION AND SubWCRev )
+    if( ${H3DViewer_is_working_copy} EQUAL 0 )
+      set( H3DViewer_SVN_VERSION "$WCREV$" )
+    endif( ${H3DViewer_is_working_copy} EQUAL 0 )
+  endif( ENABLE_SVN_REVISION AND SubWCRev )
 
   # autogenerate H3DViewer.rc depending on the version
-  CONFIGURE_FILE( H3DViewer.rc.cmake ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
+  configure_file( H3DViewer.rc.cmake ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
 
-  IF( ENABLE_SVN_REVISION )
-    ADD_CUSTOM_COMMAND( TARGET H3DViewer
+  if( ENABLE_SVN_REVISION )
+    add_custom_command( TARGET H3DViewer
                         PRE_BUILD
                         COMMAND ${H3DViewer_SOURCE_DIR}/../../build/UpdateResourceFile 
                         ARGS H3DViewer ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${H3DViewer_SOURCE_DIR}/H3DViewer.rc.cmake
@@ -300,44 +300,44 @@ IF( MSVC )
                         ${H3DViewer_SOURCE_DIR}
                         "H3DViewer_Output_Name"
                         "$(TargetFileName)" )
-  ENDIF( ENABLE_SVN_REVISION )
+  endif( ENABLE_SVN_REVISION )
 
-  IF( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
+  if( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
     # Update SVN revision in file.
-    EXECUTE_PROCESS( COMMAND ${SubWCRev} ${H3DViewer_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
+    execute_process( COMMAND ${SubWCRev} ${H3DViewer_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
     
-    ADD_CUSTOM_COMMAND( TARGET H3DViewer 
+    add_custom_command( TARGET H3DViewer 
                         PRE_BUILD 
                         COMMAND ${SubWCRev} 
                         ARGS ${H3DViewer_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
-  ENDIF( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
-ENDIF(MSVC)
+  endif( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
+endif(MSVC)
 
 
-IF( EXISTS ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )
-  FILE( REMOVE ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )
-ENDIF( EXISTS ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )
-CONFIGURE_FILE( ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/H3DViewerConfig.h )
+if( EXISTS ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )
+  file( REMOVE ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )
+endif( EXISTS ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )
+configure_file( ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/H3DViewerConfig.h )
 
-IF( NOT ( GENERATE_CPACK_PROJECT OR GENERATE_H3DVIEWER_CPACK_PROJECT ) )
+if( NOT ( GENERATE_CPACK_PROJECT OR GENERATE_H3DVIEWER_CPACK_PROJECT ) )
   # Install header files on non-windows system (e.g. Unix).
-  INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/include/H3DViewerConfig.h
+  install( FILES ${CMAKE_CURRENT_BINARY_DIR}/include/H3DViewerConfig.h
            DESTINATION ${H3DViewer_SOURCE_DIR}/../src )
-ENDIF( NOT ( GENERATE_CPACK_PROJECT OR GENERATE_H3DVIEWER_CPACK_PROJECT ) )
+endif( NOT ( GENERATE_CPACK_PROJECT OR GENERATE_H3DVIEWER_CPACK_PROJECT ) )
 
 # Link against requiredLibs.
-TARGET_LINK_LIBRARIES( H3DViewer ${requiredLibs} )
+target_link_libraries( H3DViewer ${requiredLibs} )
 
-IF( COMMAND cmake_policy )
-  IF( POLICY CMP0054 )
+if( COMMAND cmake_policy )
+  if( POLICY CMP0054 )
     cmake_policy(SET CMP0054 OLD)
-  ENDIF( POLICY CMP0054 )
-ENDIF( COMMAND cmake_policy )
+  endif( POLICY CMP0054 )
+endif( COMMAND cmake_policy )
 foreach( H3DUTIL_INCLUDE_DIR_TMP ${H3DUTIL_INCLUDE_DIR} )
-  IF( EXISTS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h )
-    FILE( STRINGS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG"  )
-    LIST( LENGTH list_of_defines list_of_defines_length )
-    IF( list_of_defines_length )
+  if( EXISTS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h )
+    file( STRINGS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG"  )
+    list( LENGTH list_of_defines list_of_defines_length )
+    if( list_of_defines_length )
       if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         execute_process( COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
         if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
@@ -350,119 +350,119 @@ foreach( H3DUTIL_INCLUDE_DIR_TMP ${H3DUTIL_INCLUDE_DIR} )
       elseif (${MSVC_VERSION} LESS 1600 )
         message(FATAL_ERROR "Enabling ENABLE_THREAD_LOCK_DEBUG requires C++11 support. This compiler lacks such support.")
       endif ()
-    ENDIF( list_of_defines_length )
-  ENDIF( EXISTS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h )
+    endif( list_of_defines_length )
+  endif( EXISTS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h )
 endforeach( H3DUTIL_INCLUDE_DIR_TMP )
 
 
 # Set postfix for debug version of H3DViewer.
-SET_TARGET_PROPERTIES( H3DViewer PROPERTIES DEBUG_POSTFIX "_d" )
+set_target_properties( H3DViewer PROPERTIES DEBUG_POSTFIX "_d" )
 
-SET_TARGET_PROPERTIES( H3DViewer
+set_target_properties( H3DViewer
     PROPERTIES
     MACOSX_BUNDLE_BUNDLE_NAME H3DViewer
     MACOSX_BUNDLE_ICON_FILE H3DViewer.icns
 )
 
-IF(MSVC)
+if(MSVC)
 
-  SET( H3DViewer_COMPILE_FLAGS "-DWXUSINGDLL" )
-  IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
-    SET( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} -DH3DVIEWER_STANDALONE" )
-  ENDIF( GENERATE_H3DVIEWER_CPACK_PROJECT )
+  set( H3DViewer_COMPILE_FLAGS "-DWXUSINGDLL" )
+  if( GENERATE_H3DVIEWER_CPACK_PROJECT )
+    set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} -DH3DVIEWER_STANDALONE" )
+  endif( GENERATE_H3DVIEWER_CPACK_PROJECT )
 
   # Treat wchar_t as built in type for all visual studio versions.
   # This is default for every version above 7 ( so far ) but we still set it for all.
-  SET( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /Zc:wchar_t")
+  set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /Zc:wchar_t")
 
-  IF( MSVC80 )
+  if( MSVC80 )
     # This might be useful for visual studio 2005 users that often recompile the api.
-    IF( NOT DEFINED USE_VC8_MP_FLAG )
-      SET( USE_VC8_MP_FLAG "NO" CACHE BOOL "In visual studio 8 the MP flag exists but is not documented. Maybe it is unsafe to use. If you want to use it then set this flag to yes." )
-    ENDIF( NOT DEFINED USE_VC8_MP_FLAG )
+    if( NOT DEFINED USE_VC8_MP_FLAG )
+      set( USE_VC8_MP_FLAG "NO" CACHE BOOL "In visual studio 8 the MP flag exists but is not documented. Maybe it is unsafe to use. If you want to use it then set this flag to yes." )
+    endif( NOT DEFINED USE_VC8_MP_FLAG )
 
-    IF( USE_VC8_MP_FLAG )
-      SET( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /MP" )
-    ENDIF( USE_VC8_MP_FLAG )
-  ENDIF( MSVC80 )
+    if( USE_VC8_MP_FLAG )
+      set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /MP" )
+    endif( USE_VC8_MP_FLAG )
+  endif( MSVC80 )
 
-  IF( ${MSVC_VERSION} GREATER 1399 )
+  if( ${MSVC_VERSION} GREATER 1399 )
     # Remove compiler warnings about deprecation for visual studio versions 8 and above.
-    SET( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE" )
-  ENDIF( ${MSVC_VERSION} GREATER 1399 )
+    set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE" )
+  endif( ${MSVC_VERSION} GREATER 1399 )
 
-  IF( ${MSVC_VERSION} GREATER 1499 )
+  if( ${MSVC_VERSION} GREATER 1499 )
     # Build using several threads for visual studio versions 9 and above.
-    SET( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /MP" )
-  ENDIF( ${MSVC_VERSION} GREATER 1499 )
+    set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /MP" )
+  endif( ${MSVC_VERSION} GREATER 1499 )
 
-  IF( ${MSVC_VERSION} LESS 1600 )
+  if( ${MSVC_VERSION} LESS 1600 )
     # Turn off optimization for visual studio versions 8 and below.
     # Old setting which I (Markus) have no idea why it was added.
-    SET( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /Od" )
-  ENDIF( ${MSVC_VERSION} LESS 1600 )
+    set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /Od" )
+  endif( ${MSVC_VERSION} LESS 1600 )
 
   # H3D API is now to big to link incrementally with vc. And remove link warning in debug build.
-  SET_TARGET_PROPERTIES( H3DViewer PROPERTIES LINK_FLAGS_DEBUG "/INCREMENTAL:NO /NODEFAULTLIB:msvcrt" )
-  SET_TARGET_PROPERTIES( H3DViewer PROPERTIES LINK_FLAGS "/INCREMENTAL:NO" )
+  set_target_properties( H3DViewer PROPERTIES LINK_FLAGS_DEBUG "/INCREMENTAL:NO /NODEFAULTLIB:msvcrt" )
+  set_target_properties( H3DViewer PROPERTIES LINK_FLAGS "/INCREMENTAL:NO" )
 
-  SET_TARGET_PROPERTIES( H3DViewer PROPERTIES COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS}" )
-  SET_TARGET_PROPERTIES( H3DViewer PROPERTIES FOLDER "H3D" )
-ENDIF(MSVC)
+  set_target_properties( H3DViewer PROPERTIES COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS}" )
+  set_target_properties( H3DViewer PROPERTIES FOLDER "H3D" )
+endif(MSVC)
 
-SET( DEFAULT_BIN_INSTALL "bin" )
-SET( DEFAULT_LIB_INSTALL "lib" )
+set( DEFAULT_BIN_INSTALL "bin" )
+set( DEFAULT_LIB_INSTALL "lib" )
 
-IF( WIN32 )
-  SET( DEFAULT_BIN_INSTALL "bin32" )
-  SET( DEFAULT_LIB_INSTALL "lib32" )
-  IF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    SET( DEFAULT_BIN_INSTALL "bin64" )
-    SET( DEFAULT_LIB_INSTALL "lib64" )
-  ENDIF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-ENDIF( WIN32 )
+if( WIN32 )
+  set( DEFAULT_BIN_INSTALL "bin32" )
+  set( DEFAULT_LIB_INSTALL "lib32" )
+  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+    set( DEFAULT_BIN_INSTALL "bin64" )
+    set( DEFAULT_LIB_INSTALL "lib64" )
+  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+endif( WIN32 )
 
 # Install in these folders.
-IF( APPLE )
-  IF( NOT DEFINED OSX_BUNDLE_INSTALL_DESTINATION )
-    SET( OSX_BUNDLE_INSTALL_DESTINATION /Applications CACHE PATH "Directory into which to install the H3DViewer.app bundle." )
-  ENDIF( NOT DEFINED OSX_BUNDLE_INSTALL_DESTINATION )
+if( APPLE )
+  if( NOT DEFINED OSX_BUNDLE_INSTALL_DESTINATION )
+    set( OSX_BUNDLE_INSTALL_DESTINATION /Applications CACHE PATH "Directory into which to install the H3DViewer.app bundle." )
+  endif( NOT DEFINED OSX_BUNDLE_INSTALL_DESTINATION )
 
 
-  SET_SOURCE_FILES_PROPERTIES(
+  set_source_files_properties(
 	${H3DViewer_SOURCE_DIR}/H3DViewer.icns
    	PROPERTIES
 	MACOSX_PACKAGE_LOCATION Resources
    )
 
-  INSTALL( TARGETS H3DViewer
+  install( TARGETS H3DViewer
            LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
            RUNTIME DESTINATION ${DEFAULT_BIN_INSTALL}
            BUNDLE DESTINATION ${OSX_BUNDLE_INSTALL_DESTINATION}
            COMPONENT H3DAPI_cpack_runtime )
-ELSE(APPLE)
-  SET( H3DViewer_package_install_dir "" )
-  IF( WIN32 AND GENERATE_H3DVIEWER_CPACK_PROJECT )
-    SET( H3DViewer_package_install_dir "H3DViewer/" )
-  ENDIF( WIN32 AND GENERATE_H3DVIEWER_CPACK_PROJECT )
+else(APPLE)
+  set( H3DViewer_package_install_dir "" )
+  if( WIN32 AND GENERATE_H3DVIEWER_CPACK_PROJECT )
+    set( H3DViewer_package_install_dir "H3DViewer/" )
+  endif( WIN32 AND GENERATE_H3DVIEWER_CPACK_PROJECT )
 
-	SET( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DViewer_cpack_runtime" )
-	IF( GENERATE_CPACK_PROJECT )
-	  SET( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DAPI_cpack_runtime" )
-  ENDIF( GENERATE_CPACK_PROJECT )
+	set( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DViewer_cpack_runtime" )
+	if( GENERATE_CPACK_PROJECT )
+	  set( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DAPI_cpack_runtime" )
+  endif( GENERATE_CPACK_PROJECT )
 
-  INSTALL( TARGETS H3DViewer
+  install( TARGETS H3DViewer
 					 LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
 					 RUNTIME DESTINATION ${H3DViewer_package_install_dir}${DEFAULT_BIN_INSTALL} COMPONENT ${H3DVIEWER_INSTALL_COMPONENT_NAME} )
-ENDIF( APPLE )
+endif( APPLE )
 
 # Add a cache variable GENERATE_H3DVIEWER_CPACK_PROJECT to have the choice of generating a project
 # for packaging H3DViewer. Default is NO since most people will not use this.
-IF( NOT DEFINED GENERATE_H3DVIEWER_CPACK_PROJECT )
-  SET( GENERATE_H3DVIEWER_CPACK_PROJECT "NO" CACHE BOOL "Decides if a cpack project should be generated. The project in the first loaded CMakeLists will configure CPack." )
-  MARK_AS_ADVANCED(GENERATE_H3DVIEWER_CPACK_PROJECT)
-ENDIF( NOT DEFINED GENERATE_H3DVIEWER_CPACK_PROJECT )
+if( NOT DEFINED GENERATE_H3DVIEWER_CPACK_PROJECT )
+  set( GENERATE_H3DVIEWER_CPACK_PROJECT "NO" CACHE BOOL "Decides if a cpack project should be generated. The project in the first loaded CMakeLists will configure CPack." )
+  mark_as_advanced(GENERATE_H3DVIEWER_CPACK_PROJECT)
+endif( NOT DEFINED GENERATE_H3DVIEWER_CPACK_PROJECT )
 
-IF( GENERATE_H3DVIEWER_CPACK_PROJECT )
+if( GENERATE_H3DVIEWER_CPACK_PROJECT )
   include( ${H3DViewer_SOURCE_DIR}/H3DViewerCPack.cmake )
-ENDIF( GENERATE_H3DVIEWER_CPACK_PROJECT )
+endif( GENERATE_H3DVIEWER_CPACK_PROJECT )
