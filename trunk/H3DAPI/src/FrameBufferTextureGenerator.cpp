@@ -1743,6 +1743,7 @@ bool FrameBufferTextureGenerator::resizeBuffers( H3DInt32 _width, H3DInt32 _heig
       }else {
         glTexImage2D( texture_type, 0, depth_internal_format, _width, _height, 0,
           depth_format, depth_type, NULL);
+        _check_gl_error(__FILE__, __LINE__);
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
           texture_type, depth_id, 0 );
 
@@ -1810,12 +1811,14 @@ bool FrameBufferTextureGenerator::resizeBuffers( H3DInt32 _width, H3DInt32 _heig
     if( texture_type == GL_TEXTURE_2D ) {
       glTexImage2D(GL_TEXTURE_2D, 0, internal_format, _width, _height, 0,
         GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+      _check_gl_error(__FILE__, __LINE__);
 
       glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, (GLenum)( GL_COLOR_ATTACHMENT0_EXT + i ),
         GL_TEXTURE_2D, color_ids[i], 0 );        
     } else if( texture_type == GL_TEXTURE_RECTANGLE_ARB ) {
       glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, internal_format, _width, _height, 0,
         GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+      _check_gl_error(__FILE__, __LINE__);
 
       glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, (GLenum)( GL_COLOR_ATTACHMENT0_EXT + i ),
         GL_TEXTURE_RECTANGLE_ARB, color_ids[i], 0 );        
@@ -1865,7 +1868,7 @@ bool FrameBufferTextureGenerator::checkFBOCompleteness() {
   // check for errors
   GLenum fbo_err = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
   if( fbo_err != GL_FRAMEBUFFER_COMPLETE_EXT ) {
-    Console(LogLevel::Error) << "Warning: Frame Buffer Object error: ";
+    H3DConsole(LogLevel::Error) << "Warning: Frame Buffer Object error: ";
     switch(fbo_err) {
     case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT :
       Console(LogLevel::Error) << "Attachment not complete" << endl;
@@ -1901,7 +1904,6 @@ bool FrameBufferTextureGenerator::checkFBOCompleteness() {
       Console(LogLevel::Error) << "Unkown error" << endl;
       break;
     }
-    Console(LogLevel::Error) << " (in FrameBufferTextureGenerator node). " << endl;
     return false;
   }
   return true;
