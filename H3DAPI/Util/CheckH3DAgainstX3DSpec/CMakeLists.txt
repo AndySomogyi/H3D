@@ -20,7 +20,7 @@ include_directories( . )
 set(requiredLibs)
 
 # Where to find modules, used when finding packages.
-set(CMAKE_MODULE_PATH "${CheckH3DAgainstX3DSpec_SOURCE_DIR}/../../build/modules/")
+set(CMAKE_MODULE_PATH "${CheckH3DAgainstX3DSpec_SOURCE_DIR}/../../build/modules/sharedModules")
 
 if( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
@@ -80,7 +80,6 @@ if( INCLUDE_Geospatial )
   if( TARGET Geospatial )
     set( Geospatial_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/bin" )
   else( TARGET Geospatial )
-    set( CMAKE_MODULE_PATH "${CheckH3DAgainstX3DSpec_SOURCE_DIR}" )
     find_file(Geospatial_DLL "Geospatial" )
 
     if(Geospatial_DLL)
@@ -98,7 +97,6 @@ if( INCLUDE_H3DPhysics )
   if( TARGET H3DPhysics )
     set( H3DPhysics_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
   else( TARGET H3DPhysics )
-    set( CMAKE_MODULE_PATH "${CheckH3DAgainstX3DSpec_SOURCE_DIR}/../NodeRoutesToDotFile/" )
     find_package(H3DPhysics)
 
     if(H3DPhysics_FOUND)
@@ -116,7 +114,6 @@ if( INCLUDE_MedX3D )
   if( TARGET MedX3D )
     set( MedX3D_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
   else( TARGET MedX3D )
-    set( CMAKE_MODULE_PATH "${CheckH3DAgainstX3DSpec_SOURCE_DIR}/../CreateH3DNodesFieldsList/" )
     find_package(MedX3D)
 
     if(MEDX3D_FOUND)
@@ -128,9 +125,7 @@ endif( INCLUDE_MedX3D )
 
 configure_file( ${CheckH3DAgainstX3DSpec_SOURCE_DIR}/CheckH3DAgainstX3DSpec.cmake ${CheckH3DAgainstX3DSpec_SOURCE_DIR}/CheckH3DAgainstX3DSpec.cpp )
 
-set(CMAKE_MODULE_PATH "${CheckH3DAgainstX3DSpec_SOURCE_DIR}/../../build/modules/")
-
-# Create build filess.
+# Create build files.
 add_executable(CheckH3DAgainstX3DSpec  ${CheckH3DAgainstX3DSpec_SRCS})
 target_link_libraries( CheckH3DAgainstX3DSpec ${requiredLibs} ${optionalLibs} )
 
