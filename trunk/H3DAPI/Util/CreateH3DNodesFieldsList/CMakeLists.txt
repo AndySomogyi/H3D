@@ -1,6 +1,6 @@
-IF(WIN32)
+if(WIN32)
   cmake_minimum_required(VERSION 2.6.0)
-ENDIF(WIN32)
+endif(WIN32)
 
 # The name of our project is "CreateH3DNodesFieldsList".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${CreateH3DNodesFieldsList_SOURCE_DIR} and
@@ -8,233 +8,233 @@ ENDIF(WIN32)
 project(CreateH3DNodesFieldsList)
 
 # Where to find Source files.
-SET( CreateH3DNodesFieldsList_SRCS "${CreateH3DNodesFieldsList_SOURCE_DIR}/CreateH3DNodesFieldsList.cpp" )
+set( CreateH3DNodesFieldsList_SRCS "${CreateH3DNodesFieldsList_SOURCE_DIR}/CreateH3DNodesFieldsList.cpp" )
 
 # Add optional libs to this variable.
-SET(optionalLibs)
+set(optionalLibs)
 
 # Include directories.
-INCLUDE_DIRECTORIES( . )
+include_directories( . )
 
 # Add required libs to this variable.
-SET(requiredLibs)
+set(requiredLibs)
 
 # Where to find modules, used when finding packages.
-SET(CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../build/modules/sharedModules" )
+set(CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../build/modules/sharedModules" )
 
-IF( H3D_USE_DEPENDENCIES_ONLY )
+if( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
-  INCLUDE_DIRECTORIES( ${EXTERNAL_INCLUDE_DIR} ) 
-  INCLUDE_DIRECTORIES( ${H3DUTIL_INCLUDE_DIR} ) 
-  INCLUDE_DIRECTORIES( ${HAPI_INCLUDE_DIR} ) 
-  INCLUDE_DIRECTORIES( ${H3DAPI_INCLUDE_DIR} ) 
+  include_directories( ${EXTERNAL_INCLUDE_DIR} ) 
+  include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
+  include_directories( ${HAPI_INCLUDE_DIR} ) 
+  include_directories( ${H3DAPI_INCLUDE_DIR} ) 
   
-  SET( requiredLibs ${requiredLibs} H3DUtil HAPI H3DAPI )
-ELSE( H3D_USE_DEPENDENCIES_ONLY )
+  set( requiredLibs ${requiredLibs} H3DUtil HAPI H3DAPI )
+else( H3D_USE_DEPENDENCIES_ONLY )
   #H3DAPI
-  FIND_PACKAGE(H3DAPI REQUIRED)
+  find_package(H3DAPI REQUIRED)
 
-  IF(H3DAPI_FOUND)
-    INCLUDE_DIRECTORIES( ${H3DAPI_INCLUDE_DIR} ) 
-    SET(requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
-  ENDIF(H3DAPI_FOUND)
+  if(H3DAPI_FOUND)
+    include_directories( ${H3DAPI_INCLUDE_DIR} ) 
+    set(requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+  endif(H3DAPI_FOUND)
 
   #H3DUtil
-  FIND_PACKAGE(H3DUtil REQUIRED)
+  find_package(H3DUtil REQUIRED)
 
-  IF(H3DUTIL_FOUND)
-    INCLUDE_DIRECTORIES( ${H3DUTIL_INCLUDE_DIR} ) 
-    SET(requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
-  ENDIF(H3DUTIL_FOUND)
+  if(H3DUTIL_FOUND)
+    include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
+    set(requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+  endif(H3DUTIL_FOUND)
 
   #HAPI
-  FIND_PACKAGE(HAPI REQUIRED)
+  find_package(HAPI REQUIRED)
 
-  IF(HAPI_FOUND)
-    INCLUDE_DIRECTORIES( ${HAPI_INCLUDE_DIR} ) 
-    SET(requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
-  ENDIF(HAPI_FOUND)
-ENDIF( H3D_USE_DEPENDENCIES_ONLY )
+  if(HAPI_FOUND)
+    include_directories( ${HAPI_INCLUDE_DIR} ) 
+    set(requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+  endif(HAPI_FOUND)
+endif( H3D_USE_DEPENDENCIES_ONLY )
 
-SET( H3D_MSVC_VERSION 6 )
-SET( TEMP_MSVC_VERSION 1299 )
-WHILE( ${MSVC_VERSION} GREATER ${TEMP_MSVC_VERSION} )
-  MATH( EXPR H3D_MSVC_VERSION "${H3D_MSVC_VERSION} + 1" )
-  MATH( EXPR TEMP_MSVC_VERSION "${TEMP_MSVC_VERSION} + 100" )
-ENDWHILE( ${MSVC_VERSION} GREATER ${TEMP_MSVC_VERSION} )
+set( H3D_MSVC_VERSION 6 )
+set( TEMP_MSVC_VERSION 1299 )
+while( ${MSVC_VERSION} GREATER ${TEMP_MSVC_VERSION} )
+  math( EXPR H3D_MSVC_VERSION "${H3D_MSVC_VERSION} + 1" )
+  math( EXPR TEMP_MSVC_VERSION "${TEMP_MSVC_VERSION} + 100" )
+endwhile( ${MSVC_VERSION} GREATER ${TEMP_MSVC_VERSION} )
 
-SET( DEFAULT_BIN_INSTALL "bin" )
+set( DEFAULT_BIN_INSTALL "bin" )
 
-IF( WIN32 )
-  SET( DEFAULT_BIN_INSTALL "bin32" )
-  IF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    SET( DEFAULT_BIN_INSTALL "bin64" )
-  ENDIF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-ENDIF( WIN32 )
-SET( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL "${CreateH3DNodesFieldsList_SOURCE_DIR}/../nodesFieldsList" )
+if( WIN32 )
+  set( DEFAULT_BIN_INSTALL "bin32" )
+  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+    set( DEFAULT_BIN_INSTALL "bin64" )
+  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+endif( WIN32 )
+set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL "${CreateH3DNodesFieldsList_SOURCE_DIR}/../nodesFieldsList" )
 
 #UI
-OPTION( INCLUDE_UI
+option( INCLUDE_UI
         "Add UI nodes to list"
         OFF )
-IF( INCLUDE_UI )
-  IF( TARGET UI )
-    SET( UI_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
-    IF( EXISTS "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../UI/doc" )
-      SET( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
+if( INCLUDE_UI )
+  if( TARGET UI )
+    set( UI_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
+    if( EXISTS "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../UI/doc" )
+      set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../UI/doc/nodesFieldsList" )
-    ENDIF()
-  ELSE( TARGET UI )
-    FIND_PACKAGE(UI)
+    endif()
+  else( TARGET UI )
+    find_package(UI)
 
-    IF(UI_FOUND)
+    if(UI_FOUND)
       get_filename_component( UI_SEARCH_PATH ${UI_LIBRARY} PATH )
-      STRING( REGEX REPLACE "/([^/])*$" "/${DEFAULT_BIN_INSTALL}" UI_SEARCH_PATH "${UI_SEARCH_PATH}" )
-      IF( EXISTS "${UI_INCLUDE_DIR}/../../../UI/doc" )
-        SET( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
+      string( REGEX REPLACE "/([^/])*$" "/${DEFAULT_BIN_INSTALL}" UI_SEARCH_PATH "${UI_SEARCH_PATH}" )
+      if( EXISTS "${UI_INCLUDE_DIR}/../../../UI/doc" )
+        set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                   "${UI_INCLUDE_DIR}/../../../UI/doc/nodesFieldsList" )
-      ENDIF()
-    ENDIF(UI_FOUND)
-  ENDIF( TARGET UI )
-ENDIF( INCLUDE_UI )
+      endif()
+    endif(UI_FOUND)
+  endif( TARGET UI )
+endif( INCLUDE_UI )
 
 #H3DPhysics
-OPTION( INCLUDE_H3DPhysics
+option( INCLUDE_H3DPhysics
         "Add H3DPhysics nodes to list"
         OFF )
-IF( INCLUDE_H3DPhysics )
-  IF( TARGET H3DPhysics )
-    SET( H3DPhysics_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
-    IF( EXISTS "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../H3DPhysics/doc" )
-      SET( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
+if( INCLUDE_H3DPhysics )
+  if( TARGET H3DPhysics )
+    set( H3DPhysics_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
+    if( EXISTS "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../H3DPhysics/doc" )
+      set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../H3DPhysics/doc/nodesFieldsList" )
-    ENDIF()
-  ELSE( TARGET H3DPhysics )
-    FIND_PACKAGE(H3DPhysics)
+    endif()
+  else( TARGET H3DPhysics )
+    find_package(H3DPhysics)
 
-    IF(H3DPhysics_FOUND)
+    if(H3DPhysics_FOUND)
       get_filename_component( H3DPhysics_SEARCH_PATH ${H3DPhysics_LIBRARY} PATH )
-      STRING( REGEX REPLACE "/([^/])*$" "/${DEFAULT_BIN_INSTALL}" H3DPhysics_SEARCH_PATH "${H3DPhysics_SEARCH_PATH}" )
-      IF( EXISTS "${H3DPhysics_INCLUDE_DIR}/../../../H3DPhysics/doc" )
-        SET( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
+      string( REGEX REPLACE "/([^/])*$" "/${DEFAULT_BIN_INSTALL}" H3DPhysics_SEARCH_PATH "${H3DPhysics_SEARCH_PATH}" )
+      if( EXISTS "${H3DPhysics_INCLUDE_DIR}/../../../H3DPhysics/doc" )
+        set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                   "${H3DPhysics_INCLUDE_DIR}/../../../H3DPhysics/doc/nodesFieldsList" )
-      ENDIF()
-    ENDIF(H3DPhysics_FOUND)
-  ENDIF( TARGET H3DPhysics )
-ENDIF( INCLUDE_H3DPhysics )
+      endif()
+    endif(H3DPhysics_FOUND)
+  endif( TARGET H3DPhysics )
+endif( INCLUDE_H3DPhysics )
 
 #MedX3D
-OPTION( INCLUDE_MedX3D
+option( INCLUDE_MedX3D
         "Add MedX3D nodes to list"
         OFF )
-IF( INCLUDE_MedX3D )
-  IF( TARGET MedX3D )
-    SET( MedX3D_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
-    IF( EXISTS "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../MedX3D/doc" )
-      SET( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
+if( INCLUDE_MedX3D )
+  if( TARGET MedX3D )
+    set( MedX3D_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
+    if( EXISTS "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../MedX3D/doc" )
+      set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../MedX3D/doc/nodesFieldsList" )
-    ENDIF()
-  ELSE( TARGET MedX3D )
-    FIND_PACKAGE(MedX3D)
+    endif()
+  else( TARGET MedX3D )
+    find_package(MedX3D)
 
-    IF(MEDX3D_FOUND)
+    if(MEDX3D_FOUND)
       get_filename_component( MedX3D_SEARCH_PATH ${MEDX3D_LIBRARY} PATH )
-      STRING( REGEX REPLACE "/([^/])*$" "/${DEFAULT_BIN_INSTALL}" MedX3D_SEARCH_PATH "${MedX3D_SEARCH_PATH}" )
-      IF( EXISTS "${MEDX3D_INCLUDE_DIR}/../../../MedX3D/doc" )
-        SET( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
+      string( REGEX REPLACE "/([^/])*$" "/${DEFAULT_BIN_INSTALL}" MedX3D_SEARCH_PATH "${MedX3D_SEARCH_PATH}" )
+      if( EXISTS "${MEDX3D_INCLUDE_DIR}/../../../MedX3D/doc" )
+        set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                   "${MEDX3D_INCLUDE_DIR}/../../../MedX3D/doc/nodesFieldsList" )
-      ENDIF()
-    ENDIF(MEDX3D_FOUND)
-  ENDIF( TARGET MedX3D )
-ENDIF( INCLUDE_MedX3D )
+      endif()
+    endif(MEDX3D_FOUND)
+  endif( TARGET MedX3D )
+endif( INCLUDE_MedX3D )
 
 # Add a cache variable NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES used
 # to give extra release libraries which have a database which
 # dot-files should be generated for.
-IF( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES )
-  SET( CreateH3DNodesFieldsList_EXTRA_BINARIES "" CACHE STRING "Add paths to extra release binaries that contain additional H3D nodes for which to generate dot-files. Each binary path must be enclosed in \" and separated by semi colon(;)" )
-  MARK_AS_ADVANCED(CreateH3DNodesFieldsList_EXTRA_BINARIES)
-ENDIF( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES )
+if( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES )
+  set( CreateH3DNodesFieldsList_EXTRA_BINARIES "" CACHE STRING "Add paths to extra release binaries that contain additional H3D nodes for which to generate dot-files. Each binary path must be enclosed in \" and separated by semi colon(;)" )
+  mark_as_advanced(CreateH3DNodesFieldsList_EXTRA_BINARIES)
+endif( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES )
 
-SET( CreateH3DNodesFieldsList_EXTRA_BINARIES_CODE )
-FOREACH( CreateH3DNodesFieldsList_EXTRA_BINARY ${CreateH3DNodesFieldsList_EXTRA_BINARIES} )
-  FILE( TO_CMAKE_PATH ${CreateH3DNodesFieldsList_EXTRA_BINARY} CreateH3DNodesFieldsList_EXTRA_BINARY_CMAKE_PATH )
-  SET( CreateH3DNodesFieldsList_EXTRA_BINARIES_CODE "${CreateH3DNodesFieldsList_EXTRA_BINARIES_CODE}\n  extra_libraries.push_back( \"${CreateH3DNodesFieldsList_EXTRA_BINARY_CMAKE_PATH}\" );" )
-ENDFOREACH( CreateH3DNodesFieldsList_EXTRA_BINARY ${CreateH3DNodesFieldsList_EXTRA_BINARIES} )
+set( CreateH3DNodesFieldsList_EXTRA_BINARIES_CODE )
+foreach( CreateH3DNodesFieldsList_EXTRA_BINARY ${CreateH3DNodesFieldsList_EXTRA_BINARIES} )
+  file( TO_CMAKE_PATH ${CreateH3DNodesFieldsList_EXTRA_BINARY} CreateH3DNodesFieldsList_EXTRA_BINARY_CMAKE_PATH )
+  set( CreateH3DNodesFieldsList_EXTRA_BINARIES_CODE "${CreateH3DNodesFieldsList_EXTRA_BINARIES_CODE}\n  extra_libraries.push_back( \"${CreateH3DNodesFieldsList_EXTRA_BINARY_CMAKE_PATH}\" );" )
+endforeach( CreateH3DNodesFieldsList_EXTRA_BINARY ${CreateH3DNodesFieldsList_EXTRA_BINARIES} )
 
-IF( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES_nodesFieldsList_OUTPUT_DIR )
-  SET( CreateH3DNodesFieldsList_EXTRA_BINARIES_nodesFieldsList_OUTPUT_DIR "${CreateH3DNodesFieldsList_SOURCE_DIR}/../" CACHE PATH "Path to the directory in which to output list of nodes and fields for extra binaries." )
-  MARK_AS_ADVANCED(CreateH3DNodesFieldsList_EXTRA_BINARIES_nodesFieldsList_OUTPUT_DIR)
-ENDIF( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES_nodesFieldsList_OUTPUT_DIR )
+if( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES_nodesFieldsList_OUTPUT_DIR )
+  set( CreateH3DNodesFieldsList_EXTRA_BINARIES_nodesFieldsList_OUTPUT_DIR "${CreateH3DNodesFieldsList_SOURCE_DIR}/../" CACHE PATH "Path to the directory in which to output list of nodes and fields for extra binaries." )
+  mark_as_advanced(CreateH3DNodesFieldsList_EXTRA_BINARIES_nodesFieldsList_OUTPUT_DIR)
+endif( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES_nodesFieldsList_OUTPUT_DIR )
 
-SET( CreateH3DNodesFieldsList_OUTPUT_FILE_CODE )
-FOREACH( OUTPUT_FILE ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL} )
-  FILE( TO_CMAKE_PATH ${OUTPUT_FILE} OUTPUT_FILE_CMAKE_PATH )
-  SET( CreateH3DNodesFieldsList_OUTPUT_FILE_CODE "${CreateH3DNodesFieldsList_OUTPUT_FILE_CODE}\n  nodes_fields_output_file.push_back( \"${OUTPUT_FILE_CMAKE_PATH}\" );" )
-ENDFOREACH()
+set( CreateH3DNodesFieldsList_OUTPUT_FILE_CODE )
+foreach( OUTPUT_FILE ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL} )
+  file( TO_CMAKE_PATH ${OUTPUT_FILE} OUTPUT_FILE_CMAKE_PATH )
+  set( CreateH3DNodesFieldsList_OUTPUT_FILE_CODE "${CreateH3DNodesFieldsList_OUTPUT_FILE_CODE}\n  nodes_fields_output_file.push_back( \"${OUTPUT_FILE_CMAKE_PATH}\" );" )
+endforeach()
 
-IF( NOT DEFINED CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE )
-  SET( CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE "" CACHE STRING "Path to file in which to output node names and comma separated def name abreviation suggestions." )
-  MARK_AS_ADVANCED(CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE)
-ENDIF( NOT DEFINED CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE )
+if( NOT DEFINED CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE )
+  set( CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE "" CACHE STRING "Path to file in which to output node names and comma separated def name abreviation suggestions." )
+  mark_as_advanced(CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE)
+endif( NOT DEFINED CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE )
 
-IF( CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE )
-  SET( OUTPUT_ABREVIATION_OR_NAME_CLASH ON )
-ELSE()
-  SET( OUTPUT_ABREVIATION_OR_NAME_CLASH OFF )
-ENDIF()
+if( CreateH3DNodesFieldsList_OUTPUT_ABREVIATION_FILE )
+  set( OUTPUT_ABREVIATION_OR_NAME_CLASH ON )
+else()
+  set( OUTPUT_ABREVIATION_OR_NAME_CLASH OFF )
+endif()
 
-IF( NOT DEFINED CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE )
-  SET( CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE "" CACHE STRING "Path to file in which to output node names clashes between libraries." )
-  MARK_AS_ADVANCED(CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE)
-ENDIF( NOT DEFINED CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE )
+if( NOT DEFINED CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE )
+  set( CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE "" CACHE STRING "Path to file in which to output node names clashes between libraries." )
+  mark_as_advanced(CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE)
+endif( NOT DEFINED CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE )
 
-IF( NOT OUTPUT_ABREVIATION_OR_NAME_CLASH )
-  IF( CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE )
-    SET( OUTPUT_ABREVIATION_OR_NAME_CLASH ON )
-  ELSE()
-    SET( OUTPUT_ABREVIATION_OR_NAME_CLASH OFF )
-  ENDIF()
-ENDIF()
+if( NOT OUTPUT_ABREVIATION_OR_NAME_CLASH )
+  if( CreateH3DNodesFieldsList_OUTPUT_NAME_CLASH_FILE )
+    set( OUTPUT_ABREVIATION_OR_NAME_CLASH ON )
+  else()
+    set( OUTPUT_ABREVIATION_OR_NAME_CLASH OFF )
+  endif()
+endif()
 
-CONFIGURE_FILE( ${CreateH3DNodesFieldsList_SOURCE_DIR}/CreateH3DNodesFieldsList.cmake ${CreateH3DNodesFieldsList_SOURCE_DIR}/CreateH3DNodesFieldsList.cpp )
+configure_file( ${CreateH3DNodesFieldsList_SOURCE_DIR}/CreateH3DNodesFieldsList.cmake ${CreateH3DNodesFieldsList_SOURCE_DIR}/CreateH3DNodesFieldsList.cpp )
 
 # Create build filess.
-ADD_EXECUTABLE(CreateH3DNodesFieldsList  ${CreateH3DNodesFieldsList_SRCS})
-TARGET_LINK_LIBRARIES( CreateH3DNodesFieldsList ${requiredLibs} ${optionalLibs} )
+add_executable(CreateH3DNodesFieldsList  ${CreateH3DNodesFieldsList_SRCS})
+target_link_libraries( CreateH3DNodesFieldsList ${requiredLibs} ${optionalLibs} )
 
 # Debug version should have _d postfix.
-SET_TARGET_PROPERTIES( CreateH3DNodesFieldsList PROPERTIES DEBUG_POSTFIX "_d" )
+set_target_properties( CreateH3DNodesFieldsList PROPERTIES DEBUG_POSTFIX "_d" )
 
 # set the install directory to the H3D directory on Windows
-IF(WIN32) 
+if(WIN32) 
   # Variable used to set compile properties.
-  SET( CreateH3DNodesFieldsList_COMPILE_FLAGS "" )
+  set( CreateH3DNodesFieldsList_COMPILE_FLAGS "" )
 
-  IF( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
-    SET( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_UI" )
-    ADD_DEPENDENCIES( CreateH3DNodesFieldsList UI )
-  ENDIF( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+    set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_UI" )
+    add_dependencies( CreateH3DNodesFieldsList UI )
+  endif( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
 
-  IF( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
-    SET( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_H3DPhysics" )
-    ADD_DEPENDENCIES( CreateH3DNodesFieldsList H3DPhysics )
-  ENDIF( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+    set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_H3DPhysics" )
+    add_dependencies( CreateH3DNodesFieldsList H3DPhysics )
+  endif( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
 
-  IF( MEDX3D_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
-    SET( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_MedX3D" )
-    ADD_DEPENDENCIES( CreateH3DNodesFieldsList MedX3D )
-  ENDIF( MEDX3D_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( MEDX3D_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+    set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_MedX3D" )
+    add_dependencies( CreateH3DNodesFieldsList MedX3D )
+  endif( MEDX3D_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
 
   # Set compile and link properties for projects.
-  IF(MSVC80)
+  if(MSVC80)
     # Remove some warnings about deprecated functions. Do not treat wchar_t as built in type
-    SET( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t-" )
-  ELSEIF(MSVC90)
+    set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t-" )
+  elseif(MSVC90)
     # Remove some warnings about deprecated functions. Do not treat wchar_t as built in type. Compile on multiple processors/threads if possible.
-    SET( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t- /MP" )
-  ENDIF(MSVC80)
+    set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE /Zc:wchar_t- /MP" )
+  endif(MSVC80)
 
-  SET_TARGET_PROPERTIES( CreateH3DNodesFieldsList PROPERTIES COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS}" )
+  set_target_properties( CreateH3DNodesFieldsList PROPERTIES COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS}" )
 
-ENDIF(WIN32)
+endif(WIN32)
