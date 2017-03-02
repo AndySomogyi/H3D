@@ -1,6 +1,6 @@
 if( NOT TARGET H3DAPI )
   message( FATAL_ERROR "Include file H3DAPICPack.cmake require the target H3DAPI to exist. Please add H3DAPI/build/CMakeLists.txt as subdirectory first." )
-endif( NOT TARGET H3DAPI )
+endif()
 
 # Add all sources, they are added to a variable called H3DAPI_SRCS defined
 # in the included file. All header files are added to a variable called
@@ -18,42 +18,42 @@ if( GENERATE_CPACK_PROJECT )
         foreach( EXTERNAL_INCLUDE_DIR_TMP ${EXTERNAL_INCLUDE_DIR} )
           if( EXISTS ${EXTERNAL_INCLUDE_DIR_TMP}/../include/pthread )
             set( H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT "${EXTERNAL_INCLUDE_DIR_TMP}/.." )
-          endif( EXISTS ${EXTERNAL_INCLUDE_DIR_TMP}/../include/pthread )
-        endforeach( EXTERNAL_INCLUDE_DIR_TMP ${EXTERNAL_INCLUDE_DIR} )
+          endif()
+        endforeach()
       else( H3D_USE_DEPENDENCIES_ONLY )
         set( H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT "$ENV{H3D_EXTERNAL_ROOT}" )
-      endif( H3D_USE_DEPENDENCIES_ONLY )
+      endif()
       set( H3DAPI_CPACK_EXTERNAL_ROOT "${H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT}" CACHE PATH "Set to the External directory used with H3DAPI, needed to pack properly. If not set FIND_modules will be used instead." )
-      mark_as_advanced(H3DAPI_CPACK_EXTERNAL_ROOT)
-    endif( NOT DEFINED H3DAPI_CPACK_EXTERNAL_ROOT )
+      mark_as_advanced( H3DAPI_CPACK_EXTERNAL_ROOT )
+    endif()
 
     if( TARGET OpenHapticsRenderer )
       set( OPENHAPTICS_FOUND TRUE )
-    endif( TARGET OpenHapticsRenderer )
+    endif()
     if( TARGET Chai3DRenderer )
       set( CHAI3D_FOUND TRUE )
-    endif( TARGET Chai3DRenderer )
+    endif()
     include( ${H3DAPI_SOURCE_DIR}/../../HAPI/build/HAPICPack.cmake )
-  endif( WIN32 )
+  endif()
 
 
   # Set information properties about the project to install.
   set( CPACK_ALL_INSTALL_TYPES Full Developer )
-  set(CMAKE_MODULE_PATH ${H3DAPI_SOURCE_DIR}/modules ${H3DAPI_SOURCE_DIR}/modules/sharedModules )
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "H3DAPI. A cross platform, haptics device independent, X3D based API for 3D graphics and haptics.")
-  set(CPACK_PACKAGE_VENDOR "SenseGraphics AB")
-  set(CPACK_PACKAGE_CONTACT "support@sensegraphics.com" )
-  set(CPACK_PACKAGE_DESCRIPTION_FILE "${H3DAPI_SOURCE_DIR}/../ReadMe")
-  set(CPACK_RESOURCE_FILE_LICENSE "${H3DAPI_SOURCE_DIR}/../LICENSE")
+  set( CMAKE_MODULE_PATH ${H3DAPI_SOURCE_DIR}/modules ${H3DAPI_SOURCE_DIR}/modules/sharedModules )
+  set( CPACK_PACKAGE_DESCRIPTION_SUMMARY "H3DAPI. A cross platform, haptics device independent, X3D based API for 3D graphics and haptics." )
+  set( CPACK_PACKAGE_VENDOR "SenseGraphics AB" )
+  set( CPACK_PACKAGE_CONTACT "support@sensegraphics.com" )
+  set( CPACK_PACKAGE_DESCRIPTION_FILE "${H3DAPI_SOURCE_DIR}/../ReadMe" )
+  set( CPACK_RESOURCE_FILE_LICENSE "${H3DAPI_SOURCE_DIR}/../LICENSE" )
 
   # Project to install.
-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};H3DAPI;ALL;/")
+  set( CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};H3DAPI;ALL;/" )
 
   # Installation directory for package.
-  set(CPACK_PACKAGE_INSTALL_DIRECTORY "H3D" )
+  set( CPACK_PACKAGE_INSTALL_DIRECTORY "H3D" )
 
   # Our project depends on these debian packages for Linux.
-  set(DEBIAN_PACKAGE_DEPENDS "libcurl3, libfreetype6-dev, ftgl-dev, python2.4-dev, libaudiofile0, libvorbis-dev, libopenal-dev, zlib1g-dev, libxerces27-dev, libfreeimage-dev, hapi(>= 1.0.0), h3dutil(>=1.0.0)" )
+  set( DEBIAN_PACKAGE_DEPENDS "libcurl3, libfreetype6-dev, ftgl-dev, python2.4-dev, libaudiofile0, libvorbis-dev, libopenal-dev, zlib1g-dev, libxerces27-dev, libfreeimage-dev, hapi(>= 1.0.0), h3dutil(>=1.0.0)" )
   
   # File patterns to ignore, common for all operating systems.
   set( H3DAPI_CPACK_IGNORE_PATTERNS /\\\\.svn/
@@ -87,14 +87,14 @@ if( GENERATE_CPACK_PROJECT )
                   /plane/bobcat_nh\\\\.x3d$
                   /plane/bobcat_orig\\\\.x3d$ )
 
-  set(CPACK_PACKAGE_VERSION_MAJOR ${H3DAPI_MAJOR_VERSION})
-  set(CPACK_PACKAGE_VERSION_MINOR ${H3DAPI_MINOR_VERSION})
-  set(CPACK_PACKAGE_VERSION_PATCH ${H3DAPI_BUILD_VERSION})
+  set( CPACK_PACKAGE_VERSION_MAJOR ${H3DAPI_MAJOR_VERSION} )
+  set( CPACK_PACKAGE_VERSION_MINOR ${H3DAPI_MINOR_VERSION} )
+  set( CPACK_PACKAGE_VERSION_PATCH ${H3DAPI_BUILD_VERSION} )
   
   # TODO: fix different for windows and unix if needed.
-  if(WIN32 AND NOT UNIX)
-    set(CPACK_NSIS_INSTALL_ROOT "C:" )
-    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL "ON" )
+  if( WIN32 AND NOT UNIX )
+    set( CPACK_NSIS_INSTALL_ROOT "C:" )
+    set( CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL "ON" )
     set( CPACK_PACKAGE_START_MENU_NAME "H3DAPI ${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}" )
     
     # External binary directory to add to path.
@@ -107,12 +107,12 @@ if( GENERATE_CPACK_PROJECT )
       set( EXTERNAL_BIN_REPLACE_PATH "bin32" )
       set( CPACK_H3D_64_BIT "TRUE" )
       set( CPACK_NSIS_EXECUTABLES_DIRECTORY bin64 )
-    endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+    endif()
     set( EXTERNAL_BIN_PATH "${CPACK_EXTERNAL_BIN}" )
 
     # EXTERNAL_INCLUDES and EXTERNAL_INCLUDE_INSTALL_PATHS must be of equal lengths.
     # The reason for defining these variables here is in case we want to add functionality
-    # to configure installation in some other way (using FIND-modules for example).
+    # to configure installation in some other way ( using FIND-modules for example ).
     set( EXTERNAL_INCLUDES "" )
     set( EXTERNAL_INCLUDE_INSTALL_PATHS "" )
     # The EXTERNAL_INCLUDES_FILES are installed directly in External/include
@@ -192,108 +192,108 @@ if( GENERATE_CPACK_PROJECT )
 
     else( EXISTS ${H3DAPI_CPACK_EXTERNAL_ROOT} )
       message( WARNING "H3DAPI_CPACK_EXTERNAL_ROOT must be set to the External directory used by H3DAPI in order to package properly." )
-    endif( EXISTS ${H3DAPI_CPACK_EXTERNAL_ROOT} )
+    endif()
     
     if( EXTERNAL_INCLUDES )
       list( LENGTH EXTERNAL_INCLUDES EXTERNAL_INCLUDES_LENGTH )
       math( EXPR EXTERNAL_INCLUDES_LENGTH "${EXTERNAL_INCLUDES_LENGTH} - 1" )
       foreach( val RANGE ${EXTERNAL_INCLUDES_LENGTH} )
-        list(GET EXTERNAL_INCLUDES ${val} val1)
-        list(GET EXTERNAL_INCLUDE_INSTALL_PATHS ${val} val2)
+        list( GET EXTERNAL_INCLUDES ${val} val1 )
+        list( GET EXTERNAL_INCLUDE_INSTALL_PATHS ${val} val2 )
         install( DIRECTORY ${val1}
                  DESTINATION ${val2}
                  COMPONENT H3DAPI_cpack_external_source
                  REGEX "(/.svn)|(/CVS)" EXCLUDE )
-      endforeach( val )
-    endif( EXTERNAL_INCLUDES )
+      endforeach()
+    endif()
     
     foreach( include_file ${EXTERNAL_INCLUDES_FILES} )
       if( EXISTS ${include_file} )
         install( FILES ${include_file}
                  DESTINATION External/include
                  COMPONENT H3DAPI_cpack_external_source )
-      endif( EXISTS ${include_file} )
-    endforeach( include_file )
+      endif()
+    endforeach()
     
     foreach( library ${EXTERNAL_LIBRARIES} )
       if( EXISTS ${library} )
         install( FILES ${library}
                  DESTINATION External/lib32
                  COMPONENT H3DAPI_cpack_external_source )
-      endif( EXISTS ${library} )
+      endif()
       # Add the other library path as well
       string( REGEX REPLACE "(/lib32/)" "/lib64/" other_library ${library} )
       if( EXISTS ${other_library} )
         install( FILES ${other_library}
                  DESTINATION External/lib64
                  COMPONENT H3DAPI_cpack_external_source )
-      endif( EXISTS ${other_library} )
-    endforeach( library )
+      endif()
+    endforeach()
     
     foreach( library ${EXTERNAL_STATIC_LIBRARIES} )
       if( EXISTS ${library} )
         install( FILES ${library}
                  DESTINATION External/lib32/static
                  COMPONENT H3DAPI_cpack_external_source )
-      endif( EXISTS ${library} )
+      endif()
       # Add the other library path as well
       string( REGEX REPLACE "(/lib32/)" "/lib64/" other_library ${library} )
       if( EXISTS ${other_library} )
         install( FILES ${other_library}
                  DESTINATION External/lib64/static
                  COMPONENT H3DAPI_cpack_external_source )
-      endif( EXISTS ${other_library} )
-    endforeach( library )
+      endif()
+    endforeach()
     
     foreach( binary ${EXTERNAL_BINARIES} )
       if( EXISTS ${binary} )
         install( FILES ${binary}
                  DESTINATION External/${EXTERNAL_BIN_PATH}
                  COMPONENT H3DAPI_cpack_external_runtime )
-      endif( EXISTS ${binary} )
+      endif()
 
       string( REGEX REPLACE "(/${EXTERNAL_BIN_PATH}/)" "/${EXTERNAL_BIN_REPLACE_PATH}/" other_binary ${binary} )
       if( EXISTS ${other_binary} )
         install( FILES ${other_binary}
                  DESTINATION External/${EXTERNAL_BIN_REPLACE_PATH}
                  COMPONENT H3DAPI_cpack_external_runtime )
-      endif( EXISTS ${other_binary} )
-    endforeach( binary )    
+      endif()
+    endforeach()    
     
     # setting names and dependencies between components and also grouping them.
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_DISPLAY_NAME "External runtime")
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_DESCRIPTION "External runtime binaries needed by H3DAPI.")
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_DEPENDS HAPI_cpack_external_runtime )
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_GROUP "H3DAPI_cpack_group")
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_INSTALL_TYPES Developer Full)
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_DISPLAY_NAME "External runtime" )
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_DESCRIPTION "External runtime binaries needed by H3DAPI." )
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_DEPENDS HAPI_cpack_external_runtime )
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_GROUP "H3DAPI_cpack_group" )
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_RUNTIME_INSTALL_TYPES Developer Full )
     
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_DISPLAY_NAME "External header/libraries")
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_DESCRIPTION "External headers and libraries needed by H3DAPI.")
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_DEPENDS HAPI_cpack_external_source H3DAPI_cpack_external_runtime )
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_GROUP "H3DAPI_cpack_group")
-    set(CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_INSTALL_TYPES Developer Full)
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_DISPLAY_NAME "External header/libraries" )
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_DESCRIPTION "External headers and libraries needed by H3DAPI." )
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_DEPENDS HAPI_cpack_external_source H3DAPI_cpack_external_runtime )
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_GROUP "H3DAPI_cpack_group" )
+    set( CPACK_COMPONENT_H3DAPI_CPACK_EXTERNAL_SOURCE_INSTALL_TYPES Developer Full )
 
     set( H3DAPI_CPACK_INSTALLED_DIRECTORIES "" )
     
     if( H3DAPI_LOADER_PROJECTS )
       set( CPACK_ADD_H3DLOAD_DEMOS_LINKS "ON" )
-    endif( H3DAPI_LOADER_PROJECTS )
+    endif()
 
     # Create cached variable for getting the plugin folder.
     set( H3DVIEWER_PLUGIN_FOLDER "" CACHE PATH "Path to folder containing plugins for H3DViewer." )
-    mark_as_advanced(H3DVIEWER_PLUGIN_FOLDER)
+    mark_as_advanced( H3DVIEWER_PLUGIN_FOLDER )
     if( H3DVIEWER_PLUGIN_FOLDER )
       # Create cached variable for getting the VHTK examples folder.
       set( VHTK_EXAMPLES_FOLDER "" CACHE PATH "Path to folder containing VHTK examples." )
-      mark_as_advanced(VHTK_EXAMPLES_FOLDER)
+      mark_as_advanced( VHTK_EXAMPLES_FOLDER )
       if( VHTK_EXAMPLES_FOLDER )
         set( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
                                                 "${VHTK_EXAMPLES_FOLDER};H3DAPI/examples/VHTK" )
         set( CPACK_ADD_VHTK_DEMOS_LINKS "ON" )
       else( VHTK_EXAMPLES_FOLDER )
         set( CPACK_ADD_VHTK_DEMOS_LINKS "OFF" )
-      endif( VHTK_EXAMPLES_FOLDER )
-    endif( H3DVIEWER_PLUGIN_FOLDER )
+      endif()
+    endif()
 
     #Extra links to start menu if values are "ON"
     set( CPACK_ADD_H3DDOC_LINKS "ON" )
@@ -308,7 +308,7 @@ if( GENERATE_CPACK_PROJECT )
       set( redist_architectures 32 )
       if( ${redist_version} GREATER 9 )
         set( redist_architectures ${redist_architectures} 64 )
-      endif( ${redist_version} GREATER 9 )
+      endif()
       foreach( redist_architecture ${redist_architectures} )
         set( redist_version_with_arch ${redist_version}_${redist_architecture} )
         # Add cache variable vc${redist_version}_redist which should be set to the install file
@@ -316,8 +316,8 @@ if( GENERATE_CPACK_PROJECT )
         # installation folder for each visual studio installation.
         if( NOT DEFINED vc${redist_version_with_arch}_redist )
           set( vc${redist_version_with_arch}_redist CACHE FILEPATH "Set this to the exe installing microsoft visual studio redistributable for visual studio ${redist_version}" )
-          mark_as_advanced(vc${redist_version_with_arch})
-        endif( NOT DEFINED vc${redist_version_with_arch}_redist )
+          mark_as_advanced( vc${redist_version_with_arch} )
+        endif()
         if( vc${redist_version_with_arch}_redist )
           string( REPLACE "/" "\\\\" Temp_vc${redist_version_with_arch}_redist ${vc${redist_version_with_arch}_redist} )
           get_filename_component( VC${redist_version_with_arch}_FILE_NAME ${vc${redist_version_with_arch}_redist} NAME )
@@ -327,7 +327,7 @@ if( GENERATE_CPACK_PROJECT )
                                                    ${MS_REDIST_ARCH_COMMAND} )
             set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                      ${MS_REDIST_ARCH_COMMAND} )
-          endif( redist_architecture EQUAL 64 )
+          endif()
           set( MS_REDIST_INSTALL_COMMAND_1 " Set output Path\\n  SetOutPath \\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\"\\n"
                                            " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc${redist_version_with_arch}_redist}\\\"\\n" )
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
@@ -346,7 +346,7 @@ if( GENERATE_CPACK_PROJECT )
                                                    " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\\${VC${redist_version_with_arch}_FILE_NAME}\\\" /q /norestart \\\"'\\n" )
             set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                    " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\\${VC${redist_version_with_arch}_FILE_NAME}\\\" /q /uninstall \\\"'\\n" )
-          endif( ${redist_version} LESS 9 )
+          endif()
           set( MS_REDIST_INSTALL_COMMAND_2 " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
                                            " Delete file\\n  Delete \\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\\${VC${redist_version_with_arch}_FILE_NAME}\\\"\\n"
                                            " Reset output Path\\n  SetOutPath \\\"$INSTDIR\\\"\\n"
@@ -362,20 +362,20 @@ if( GENERATE_CPACK_PROJECT )
                                              "A comment\\n \\\${EndIf}\\n" )
             set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                      "A comment\\n \\\${EndIf}\\n" )
-          endif( redist_architecture EQUAL 64 )
-        endif( vc${redist_version_with_arch}_redist )
-      endforeach( redist_architecture )
-    endforeach( redist_version )
+          endif()
+        endif()
+      endforeach()
+    endforeach()
     
     # Install python if not already installed
     set( python_architectures 32 )
-    if(${MSVC_VERSION} GREATER 1599 )
+    if( ${MSVC_VERSION} GREATER 1599 )
       set( python_architectures ${python_architectures} 64 )
-    endif(${MSVC_VERSION} GREATER 1599 )
+    endif()
     foreach( python_architecture ${python_architectures} )
       set( PYTHONMSI_CACHE_NAME PythonInstallMSI_${python_architecture} )
       set( ${PYTHONMSI_CACHE_NAME} "" CACHE FILEPATH "Needs to be set to add python installation to the package." )
-      mark_as_advanced(${PYTHONMSI_CACHE_NAME})
+      mark_as_advanced( ${PYTHONMSI_CACHE_NAME} )
       if( ${PYTHONMSI_CACHE_NAME} )
         set( PYTHON_TARGET_DIR "" )
         string( REGEX MATCH 2\\.[456789] CPACK_PYTHON_VERSION ${${PYTHONMSI_CACHE_NAME}} )
@@ -394,7 +394,7 @@ if( GENERATE_CPACK_PROJECT )
         if( python_architecture EQUAL 64 )
           set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                    ${PYTHON_ARCH_COMMAND} )
-        endif( python_architecture EQUAL 64 )
+        endif()
         set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                  " Set reg view\\n  SetRegView ${python_architecture} \\n"
                                                  ${PYTHON_INSTALL_COMMAND_1}
@@ -413,7 +413,7 @@ if( GENERATE_CPACK_PROJECT )
         if( python_architecture EQUAL 64 )
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                  ${PYTHON_ARCH_COMMAND} )
-        endif( python_architecture EQUAL 64 )
+        endif()
         set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                ${PYTHON_INSTALL_COMMAND_1}
                                                " Check if python is installed\\n  StrCmp $0 \\\"\\\" 0 install_python_no${python_architecture}\\n"
@@ -429,7 +429,7 @@ if( GENERATE_CPACK_PROJECT )
                                                  "A comment\\n \\\${Else}\\n"
                                                  "Check if python install path is free \\n  GetFullPathName $0 C:\\\\Python${CPACK_PYTHON_VERSION_NO_DOT}_${python_architecture}\\n"
                                                  "A comment \\n \\\${EndIf}\\n" )
-        endif( python_architecture EQUAL 64 )
+        endif()
         set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                "If errors then path was not found, i.e. empty\\n  IfErrors 0 python_install_not_hidden${python_architecture} \\n"
                                                "A comment \\n    ClearErrors\\n" )
@@ -443,7 +443,7 @@ if( GENERATE_CPACK_PROJECT )
                                                  "A comment\\n \\\${Else}\\n"
                                                  ${PYTHON_EXECUTE}
                                                  "A comment \\n \\\${EndIf}\\n" )
-        endif( python_architecture EQUAL 64 )
+        endif()
         set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                "A comment \\n Goto python_end_install${python_architecture}\\n"
                                                "A comment \\n python_install_not_hidden${python_architecture}:\\n"
@@ -458,13 +458,13 @@ if( GENERATE_CPACK_PROJECT )
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                  "A comment\\n \\\${EndIf}\\n"
                                                  " Set reg view\\n  SetRegView 32 \\n" )
-        endif( python_architecture EQUAL 64 )
-      endif( ${PYTHONMSI_CACHE_NAME} )
-    endforeach( python_architecture )
+        endif()
+      endif()
+    endforeach()
     
     # Install OpenAL.
     set( OpenAlInstallExe "" CACHE FILEPATH "Needs to be set to add openal installation to the package." )
-    mark_as_advanced(OpenAlInstallExe)
+    mark_as_advanced( OpenAlInstallExe )
     if( OpenAlInstallExe )
       get_filename_component( OpenAL_FILE_NAME ${OpenAlInstallExe} NAME )
       string( REPLACE "/" "\\\\" TEMP_OpenAlInstallExe ${OpenAlInstallExe} )
@@ -480,7 +480,7 @@ if( GENERATE_CPACK_PROJECT )
                                                  "A comment\\n \\\${If} \\\${RunningX64}\\n"
                                                  "A comment\\n   SetRegView 32\\n"
                                                  "A comment\\n \\\${EndIf}\\n" )
-      endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+      endif()
       set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                " Get OpenAL uninstall registry string\\n  ReadRegStr $0 HKLM SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\OpenAL \\\"UninstallString\\\"\\n"
                                                " Check if OpenAL is installed\\n  StrCmp $0 \\\"\\\" uninstall_openal_no 0\\n"
@@ -495,11 +495,11 @@ if( GENERATE_CPACK_PROJECT )
                                                  "A comment\\n \\\${If} \\\${RunningX64}\\n"
                                                  "A comment\\n   SetRegView 64\\n"
                                                  "A comment\\n \\\${EndIf}\\n" )
-      endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    endif( OpenAlInstallExe )
+      endif()
+    endif()
 
   set( CMakeInstallExe "" CACHE FILEPATH "Needs to be set to add CMake installation to the package." )
-    mark_as_advanced(CMakeInstallExe)
+    mark_as_advanced( CMakeInstallExe )
     if( CMakeInstallExe )
       set( CMAKE_VERSION_TO_CHECK "" )
       string( REGEX MATCH [0123456789]+\\.[0123456789]+\\.[0123456789]+\\.[0123456789]+ CMAKE_VERSION_TO_CHECK ${CMakeInstallExe} )
@@ -542,7 +542,7 @@ if( GENERATE_CPACK_PROJECT )
                                              ${CMAKE_INSTALL_EXE_INSTALL_COMMAND_3}
                                              "A comment \\n  install_cmake_no:\\n"
                                              "A comment \\n \\\${EndIf}\\n" )
-    endif( CMakeInstallExe )
+    endif()
 
     # Modify path in the the NSIS template.
     set( CPACK_NSIS_MODIFY_PATH "ON" )
@@ -550,16 +550,16 @@ if( GENERATE_CPACK_PROJECT )
     configure_file( ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions_64.ini.cmake ${CMAKE_CURRENT_BINARY_DIR}/NSIS.InstallOptions_64.ini )
     string( REPLACE "/" "\\\\" Temp_CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
     set( CPACK_NSIS_INSTALLOPTIONS_64 "${Temp_CMAKE_CURRENT_BINARY_DIR}\\\\NSIS.InstallOptions_64.ini" )
-  else(WIN32 AND NOT UNIX)
-    set(H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/
+  else( WIN32 AND NOT UNIX )
+    set( H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/
                                                                      "~$" )
     set( H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS}
-            "/CVS/;/.svn/;/.bzr/;/.hg/;/.git.*/;.swp$;.#;/#;~$")
-    set(CPACK_SOURCE_GENERATOR TGZ ZIP ) 
-    set(CPACK_SOURCE_PACKAGE_FILE_NAME "h3dapi-${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}.${H3DAPI_BUILD_VERSION}") 
-    set(CPACK_SOURCE_IGNORE_FILES ${H3DAPI_CPACK_IGNORE_PATTERNS} )
-    set(CPACK_SOURCE_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/..;/" )
-  endif(WIN32 AND NOT UNIX)
+            "/CVS/;/.svn/;/.bzr/;/.hg/;/.git.*/;.swp$;.#;/#;~$" )
+    set( CPACK_SOURCE_GENERATOR TGZ ZIP ) 
+    set( CPACK_SOURCE_PACKAGE_FILE_NAME "h3dapi-${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}.${H3DAPI_BUILD_VERSION}" ) 
+    set( CPACK_SOURCE_IGNORE_FILES ${H3DAPI_CPACK_IGNORE_PATTERNS} )
+    set( CPACK_SOURCE_INSTALLED_DIRECTORIES "${H3DAPI_SOURCE_DIR}/..;/" )
+  endif()
   
   # Install header files
   install( FILES ${H3DAPI_HEADERS} ${H3DAPI_SOURCE_DIR}/../include/H3D/H3DApi.cmake
@@ -664,7 +664,7 @@ if( GENERATE_CPACK_PROJECT )
     install( FILES ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI/H3DViewer/include/H3DViewerConfig.h
              DESTINATION H3DAPI/H3DViewer/src
              COMPONENT H3DAPI_cpack_sources )
-  endif( TARGET H3DViewer )
+  endif()
   install( DIRECTORY ${H3DAPI_SOURCE_DIR}/../H3DViewer
            DESTINATION H3DAPI
            COMPONENT H3DAPI_cpack_sources
@@ -675,7 +675,7 @@ if( GENERATE_CPACK_PROJECT )
            DESTINATION H3DAPI/lib
            COMPONENT H3DAPI_cpack_headers
            REGEX "(/.svn)|(/CVS)" EXCLUDE )
-  endif( EXISTS ${H3DAPI_SOURCE_DIR}/../lib/doc )
+  endif()
 
   install( FILES ${H3DAPI_SOURCE_DIR}/../lib/H3DInterface.py
                  ${H3DAPI_SOURCE_DIR}/../lib/H3DUtils.py
@@ -711,24 +711,24 @@ if( GENERATE_CPACK_PROJECT )
            DESTINATION H3DAPI/settings
            COMPONENT H3DAPI_cpack_runtime
            REGEX "(/.svn)|(/CVS)" EXCLUDE )
-  endif( EXISTS ${H3DAPI_SOURCE_DIR}/../settings/dist )
+  endif()
   
   if( EXISTS ${H3DAPI_SOURCE_DIR}/../settings/icons )
     install( DIRECTORY ${H3DAPI_SOURCE_DIR}/../settings/icons
            DESTINATION H3DAPI/settings
            COMPONENT H3DAPI_cpack_runtime
            REGEX "(/.svn)|(/CVS)" EXCLUDE )
-  endif( EXISTS ${H3DAPI_SOURCE_DIR}/../settings/icons )
+  endif()
 
   # Add a cache variable H3DAPI_DOCS_DIRECTORY used to indicate where the H3DAPI docs are.
   if( NOT DEFINED H3DAPI_DOCS_DIRECTORY )
     set( H3DAPI_DOCS_DIRECTORY_DEFAULT "" )
     if( H3D_USE_DEPENDENCIES_ONLY )
       set( H3DAPI_DOCS_DIRECTORY_DEFAULT "${H3DAPI_SOURCE_DIR}/../../doc" )
-    endif( H3D_USE_DEPENDENCIES_ONLY )
+    endif()
     set( H3DAPI_DOCS_DIRECTORY "${H3DAPI_DOCS_DIRECTORY_DEFAULT}" CACHE PATH "Set this to the directory containing the documentation of H3DAPI." )
-    mark_as_advanced(H3DAPI_DOCS_DIRECTORY)
-  endif( NOT DEFINED H3DAPI_DOCS_DIRECTORY )
+    mark_as_advanced( H3DAPI_DOCS_DIRECTORY )
+  endif()
   
   if( EXISTS ${H3DAPI_DOCS_DIRECTORY} )
     install( DIRECTORY ${H3DAPI_DOCS_DIRECTORY}/H3DAPI
@@ -738,70 +738,70 @@ if( GENERATE_CPACK_PROJECT )
     install( FILES "${H3DAPI_DOCS_DIRECTORY}/H3D API Manual.pdf"
              DESTINATION doc
              COMPONENT H3DAPI_cpack_headers )
-  endif( EXISTS ${H3DAPI_DOCS_DIRECTORY} )
+  endif()
   
   # setting names and dependencies between components and also grouping them.
-  set(CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_DISPLAY_NAME "Runtime")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_DESCRIPTION "The runtime libraries (dlls) for H3DAPI.")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_DEPENDS HAPI_cpack_runtime H3DAPI_cpack_external_runtime )
-  set(CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_GROUP "H3DAPI_cpack_group")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_INSTALL_TYPES Developer Full)
+  set( CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_DISPLAY_NAME "Runtime" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_DESCRIPTION "The runtime libraries ( dlls ) for H3DAPI." )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_DEPENDS HAPI_cpack_runtime H3DAPI_cpack_external_runtime )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_GROUP "H3DAPI_cpack_group" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_RUNTIME_INSTALL_TYPES Developer Full )
     
-  set(CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_DISPLAY_NAME "Libraries")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_DESCRIPTION "H3DAPI libraries, needed for building against H3DAPI.")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_DEPENDS HAPI_cpack_libraries H3DAPI_cpack_external_source H3DAPI_cpack_headers )
-  set(CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_GROUP "H3DAPI_cpack_group")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_INSTALL_TYPES Developer Full)
+  set( CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_DISPLAY_NAME "Libraries" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_DESCRIPTION "H3DAPI libraries, needed for building against H3DAPI." )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_DEPENDS HAPI_cpack_libraries H3DAPI_cpack_external_source H3DAPI_cpack_headers )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_GROUP "H3DAPI_cpack_group" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_LIBRARIES_INSTALL_TYPES Developer Full )
     
-  set(CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_DISPLAY_NAME "C++ Headers")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_DESCRIPTION "H3DAPI C++ headers, needed for building against H3DAPI.")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_DEPENDS HAPI_cpack_headers H3DAPI_cpack_external_source H3DAPI_cpack_libraries )
-  set(CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_GROUP "H3DAPI_cpack_group")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_INSTALL_TYPES Developer Full)
+  set( CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_DISPLAY_NAME "C++ Headers" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_DESCRIPTION "H3DAPI C++ headers, needed for building against H3DAPI." )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_DEPENDS HAPI_cpack_headers H3DAPI_cpack_external_source H3DAPI_cpack_libraries )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_GROUP "H3DAPI_cpack_group" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_HEADERS_INSTALL_TYPES Developer Full )
     
-  set(CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_DISPLAY_NAME "C++ Source")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_DESCRIPTION "Everything needed to build H3DAPI.")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_DEPENDS H3DAPI_cpack_headers HAPI_cpack_sources )
-  set(CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_GROUP "H3DAPI_cpack_group")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_INSTALL_TYPES Full)
+  set( CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_DISPLAY_NAME "C++ Source" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_DESCRIPTION "Everything needed to build H3DAPI." )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_DEPENDS H3DAPI_cpack_headers HAPI_cpack_sources )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_GROUP "H3DAPI_cpack_group" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_SOURCES_INSTALL_TYPES Full )
   
-  set(CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_DISPLAY_NAME "Example applications")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_DESCRIPTION "The example applications for H3DAPI.")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_DEPENDS H3DAPI_cpack_runtime )
-  set(CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_GROUP "H3DAPI_cpack_group")
-  set(CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_INSTALL_TYPES Developer Full)
+  set( CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_DISPLAY_NAME "Example applications" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_DESCRIPTION "The example applications for H3DAPI." )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_DEPENDS H3DAPI_cpack_runtime )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_GROUP "H3DAPI_cpack_group" )
+  set( CPACK_COMPONENT_H3DAPI_CPACK_EXAMPLES_RUNTIME_INSTALL_TYPES Developer Full )
   
-  set(CPACK_COMPONENT_GROUP_H3DAPI_CPACK_GROUP_DISPLAY_NAME "H3DAPI")
-  set(CPACK_COMPONENT_GROUP_H3DAPI_CPACK_GROUP_DESCRIPTION "H3DAPI is an open source, cross platform, scene graph API. Build X3D scenes by using the nodes written in H3DAPI. Load scenes using H3DViewer or H3DLoad that comes with this package.")
-  set(CPACK_COMPONENT_GROUP_HAPI_CPACK_GROUP_PARENT_GROUP "H3DAPI_cpack_group")  
+  set( CPACK_COMPONENT_GROUP_H3DAPI_CPACK_GROUP_DISPLAY_NAME "H3DAPI" )
+  set( CPACK_COMPONENT_GROUP_H3DAPI_CPACK_GROUP_DESCRIPTION "H3DAPI is an open source, cross platform, scene graph API. Build X3D scenes by using the nodes written in H3DAPI. Load scenes using H3DViewer or H3DLoad that comes with this package." )
+  set( CPACK_COMPONENT_GROUP_HAPI_CPACK_GROUP_PARENT_GROUP "H3DAPI_cpack_group" )  
 
   # Add a cache variable H3D_cmake_runtime_path to point to cmake binary.
-  set (H3D_cmake_runtime_path_default "")
+  set( H3D_cmake_runtime_path_default "" )
   if( NOT DEFINED H3D_cmake_runtime_path )
     if( WIN32 AND NOT UNIX )
-      set (VERSION_CMAKES "4.0" "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6")
-      foreach (version_cmake ${VERSION_CMAKES} )
-        if (EXISTS "C:/Program Files/CMake ${version_cmake}/bin/cmake.exe")
+      set( VERSION_CMAKES "4.0" "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" )
+      foreach( version_cmake ${VERSION_CMAKES} )
+        if( EXISTS "C:/Program Files/CMake ${version_cmake}/bin/cmake.exe" )
           set( H3D_cmake_runtime_path_default "C:/Program Files/CMake ${version_cmake}/bin/cmake.exe" )
           break()
-        endif (EXISTS "C:/Program Files/CMake ${version_cmake}/bin/cmake.exe")
+        endif()
         
-        if (EXISTS "C:/Program Files (x86)/CMake ${version_cmake}/bin/cmake.exe")
+        if( EXISTS "C:/Program Files (x86)/CMake ${version_cmake}/bin/cmake.exe" )
           set( H3D_cmake_runtime_path_default "C:/Program Files (x86)/CMake ${version_cmake}/bin/cmake.exe" )
           break()
-        endif (EXISTS "C:/Program Files (x86)/CMake ${version_cmake}/bin/cmake.exe")
+        endif()
         
-        if ( EXISTS "C:/Program/CMake ${version_cmake}/bin/cmake.exe")
+        if( EXISTS "C:/Program/CMake ${version_cmake}/bin/cmake.exe" )
           set( H3D_cmake_runtime_path_default "C:/Program/CMake ${version_cmake}/bin/cmake.exe" )
           break()
-        endif ( EXISTS "C:/Program/CMake ${version_cmake}/bin/cmake.exe")
-      endforeach (version_cmake )
+        endif()
+      endforeach()
     else( WIN32 AND NOT UNIX )
       set( H3D_cmake_runtime_path_default "cmake" )
-    endif( WIN32 AND NOT UNIX )
+    endif()
     set( H3D_cmake_runtime_path ${H3D_cmake_runtime_path_default} CACHE FILEPATH "The path to the cmake runtime." )
-    mark_as_advanced(H3D_cmake_runtime_path)
-  endif( NOT DEFINED H3D_cmake_runtime_path )
+    mark_as_advanced( H3D_cmake_runtime_path )
+  endif()
 
   if( H3D_cmake_runtime_path )
     set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_POST_BUILD ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_POST_BUILD}
@@ -812,7 +812,7 @@ if( GENERATE_CPACK_PROJECT )
                                                        COMMAND ${H3D_cmake_runtime_path} 
                                                        ARGS -DBUILD_TYPE=$(Configuration) -DCOMPONENT=H3DAPI_cpack_examples_runtime -P cmake_install.cmake)
     
-    if (NOT H3D_USE_DEPENDENCIES_ONLY)
+    if( NOT H3D_USE_DEPENDENCIES_ONLY )
       add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/DummyFile
                           COMMAND echo )
       add_custom_target( INSTALL_RUNTIME_AND_LIBRARIES_ONLY
@@ -822,16 +822,16 @@ if( GENERATE_CPACK_PROJECT )
                           POST_BUILD
                           ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_POST_BUILD} )
       add_dependencies( INSTALL_RUNTIME_AND_LIBRARIES_ONLY H3DAPI ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
-    endif (NOT H3D_USE_DEPENDENCIES_ONLY)
+    endif()
   else( H3D_cmake_runtime_path )
-    message (STATUS "H3D_cmake_runtime_path is not set, please set it to continue")
-  endif( H3D_cmake_runtime_path )
+    message( STATUS "H3D_cmake_runtime_path is not set, please set it to continue" )
+  endif()
 
-  if( NOT H3D_USE_DEPENDENCIES_ONLY)
-  include(CPack)
-    include(UseDebian)
-    if(DEBIAN_FOUND)
-      ADD_DEBIAN_TARGETS(H3DAPI)
-    endif(DEBIAN_FOUND)
-  endif( NOT H3D_USE_DEPENDENCIES_ONLY)
-endif( GENERATE_CPACK_PROJECT )
+  if( NOT H3D_USE_DEPENDENCIES_ONLY )
+  include( CPack )
+    include( UseDebian )
+    if( DEBIAN_FOUND )
+      ADD_DEBIAN_TARGETS( H3DAPI )
+    endif()
+  endif()
+endif()

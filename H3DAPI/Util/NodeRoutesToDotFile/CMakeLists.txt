@@ -1,55 +1,55 @@
-if(WIN32)
-  cmake_minimum_required(VERSION 2.6.0)
-endif(WIN32)
+if( WIN32 )
+  cmake_minimum_required( VERSION 2.6.0 )
+endif()
 
 # The name of our project is "NodeRoutesToDotFile".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${NodeRoutesToDotFile_SOURCE_DIR} and
 # to the root binary directory of the project as ${NodeRoutesToDotFile_BINARY_DIR}.
-project (NodeRoutesToDotFile)
+project( NodeRoutesToDotFile )
 
 # Add a cache variable NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES used
 # to give extra release libraries which have a database which
 # dot-files should be generated for.
 if( NOT DEFINED NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES )
-  set( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES "" CACHE STRING "Add paths to extra release libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon(;)" )
-  mark_as_advanced(NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES)
-endif( NOT DEFINED NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES )
+  set( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES "" CACHE STRING "Add paths to extra release libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon( ; )" )
+  mark_as_advanced( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES )
+endif()
 
 # Add a cache variable NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES used
 # to give extra debug libraries which have a database which
 # dot-files should be generated for.
 if( NOT DEFINED NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES )
-  set( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES "" CACHE STRING "Add paths to extra debug libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon(;)" )
-  mark_as_advanced(NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES)
-endif( NOT DEFINED NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES )
+  set( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES "" CACHE STRING "Add paths to extra debug libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon( ; )" )
+  mark_as_advanced( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES )
+endif()
 
 set( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES_CODE )
 foreach( NodeRoutesToDotFile_EXTRA_LIBRARY ${NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES} )
   file( TO_CMAKE_PATH ${NodeRoutesToDotFile_EXTRA_LIBRARY} NodeRoutesToDotFile_EXTRA_LIBRARY_CMAKE_PATH )
   set( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES_CODE "${NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES_CODE}\n  extra_libraries.push_back( ${NodeRoutesToDotFile_EXTRA_LIBRARY_CMAKE_PATH} );" )
-endforeach( NodeRoutesToDotFile_EXTRA_LIBRARY ${NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES} )
+endforeach()
 
 set( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES_CODE )
 foreach( NodeRoutesToDotFile_EXTRA_LIBRARY ${NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES} )
   file( TO_CMAKE_PATH ${NodeRoutesToDotFile_EXTRA_LIBRARY} NodeRoutesToDotFile_EXTRA_LIBRARY_CMAKE_PATH )
   set( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES_CODE "${NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES_CODE}\n extra_libraries.push_back( ${NodeRoutesToDotFile_EXTRA_LIBRARY_CMAKE_PATH} );" )
-endforeach( NodeRoutesToDotFile_EXTRA_LIBRARY ${NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES} )
+endforeach()
 
 
 # Where to find Source files.
 set( NodeRoutesToDotFile_SRCS "${NodeRoutesToDotFile_SOURCE_DIR}/NodeRoutesToDotFile.cpp" )
 
 # Add optional libs to this variable.
-set(optionalLibs)
+set( optionalLibs )
 
 # Include directories.
 include_directories( . )
 
 # Add required libs to this variable.
-set(requiredLibs)
+set( requiredLibs )
 
 # Where to find modules, used when finding packages.
-set(CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}/../../build/modules/sharedModules")
+set( CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}/../../build/modules/sharedModules" )
 
 if( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
@@ -63,57 +63,57 @@ if( H3D_USE_DEPENDENCIES_ONLY )
   set( requiredLibs ${requiredLibs} H3DUtil HAPI H3DAPI UI H3DPhysics )
 else( H3D_USE_DEPENDENCIES_ONLY )
   #H3DAPI
-  find_package(H3DAPI REQUIRED)
+  find_package( H3DAPI REQUIRED )
 
-  if(H3DAPI_FOUND)
+  if( H3DAPI_FOUND )
     include_directories( ${H3DAPI_INCLUDE_DIR} ) 
-    set(requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
-  endif(H3DAPI_FOUND)
+    set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+  endif()
 
   #H3DUtil
-  find_package(H3DUtil REQUIRED)
+  find_package( H3DUtil REQUIRED )
 
-  if(H3DUTIL_FOUND)
+  if( H3DUTIL_FOUND )
     include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-    set(requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
-  endif(H3DUTIL_FOUND)
+    set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+  endif()
 
   #HAPI
-  find_package(HAPI REQUIRED)
+  find_package( HAPI REQUIRED )
 
-  if(HAPI_FOUND)
+  if( HAPI_FOUND )
     include_directories( ${HAPI_INCLUDE_DIR} ) 
-    set(requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
-  endif(HAPI_FOUND)
+    set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+  endif()
 
   #UI
-  find_package(UI)
+  find_package( UI )
 
-  if(UI_FOUND)
+  if( UI_FOUND )
     include_directories( ${UI_INCLUDE_DIR} ) 
-    set(optionalLibs ${optionalLibs} ${UI_LIBRARIES} )
-  endif(UI_FOUND)
+    set( optionalLibs ${optionalLibs} ${UI_LIBRARIES} )
+  endif()
 
   #H3DPhysics
-  find_package(H3DPhysics)
+  find_package( H3DPhysics )
 
-  if(H3DPhysics_FOUND)
+  if( H3DPhysics_FOUND )
     include_directories( ${H3DPhysics_INCLUDE_DIR} ) 
-    set(optionalLibs ${optionalLibs} ${H3DPhysics_LIBRARIES} )
-  endif(H3DPhysics_FOUND)
-endif( H3D_USE_DEPENDENCIES_ONLY )
+    set( optionalLibs ${optionalLibs} ${H3DPhysics_LIBRARIES} )
+  endif()
+endif()
 
 # Optional extra library. Used for sound in H3D API.
-find_package(OpenAL)
-if(OPENAL_FOUND)
+find_package( OpenAL )
+if( OPENAL_FOUND )
   include_directories( ${OPENAL_INCLUDE_DIR} )
-  set(optionalLibs ${optionalLibs} ${OPENAL_LIBRARIES} )
-endif(OPENAL_FOUND)
+  set( optionalLibs ${optionalLibs} ${OPENAL_LIBRARIES} )
+endif()
 
 configure_file( ${NodeRoutesToDotFile_SOURCE_DIR}/NodeRoutesToDotFile.cmake ${NodeRoutesToDotFile_SOURCE_DIR}/NodeRoutesToDotFile.cpp )
 
 # Create build filess.
-add_executable(NodeRoutesToDotFile  ${NodeRoutesToDotFile_SRCS})
+add_executable( NodeRoutesToDotFile  ${NodeRoutesToDotFile_SRCS} )
 target_link_libraries( NodeRoutesToDotFile ${requiredLibs} ${optionalLibs} )
 
 # Debug version should have _d postfix.
@@ -131,31 +131,31 @@ if( WIN32 )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
     set( DEFAULT_BIN_INSTALL "bin64" )
     set( DEFAULT_LIB_INSTALL "lib64" )
-  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+  endif()
   
   if( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -DHAVE_UI" )
-  endif( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  endif()
 
   if( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -DHAVE_H3DPhysics" )
-  endif( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  endif()
   
   # Treat wchar_t as built in type for all visual studio versions.
   # This is default for every version above 7 ( so far ) but we still set it for all.
-  set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} /Zc:wchar_t")
+  set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} /Zc:wchar_t" )
 
   if( ${MSVC_VERSION} GREATER 1399 )
     # Remove compiler warnings about deprecation for visual studio versions 8 and above.
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE" )
-  endif( ${MSVC_VERSION} GREATER 1399 )
+  endif()
   
   if( ${MSVC_VERSION} GREATER 1499 )
     # Build using several threads for visual studio versions 9 and above.
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} /MP" )
-  endif( ${MSVC_VERSION} GREATER 1499 )
+  endif()
 
-endif(WIN32)
+endif()
 
 set_target_properties( NodeRoutesToDotFile PROPERTIES COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS}" )
 
@@ -163,4 +163,4 @@ if( H3D_USE_DEPENDENCIES_ONLY )
   install( TARGETS NodeRoutesToDotFile
            LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
            RUNTIME DESTINATION ${DEFAULT_BIN_INSTALL} )
-endif( H3D_USE_DEPENDENCIES_ONLY )
+endif()
