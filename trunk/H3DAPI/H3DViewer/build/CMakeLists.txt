@@ -429,10 +429,9 @@ if( APPLE )
   endif()
 
 
-  set_source_files_properties(
-	${H3DViewer_SOURCE_DIR}/H3DViewer.icns
-   	PROPERTIES
-	MACOSX_PACKAGE_LOCATION Resources )
+  set_source_files_properties( ${H3DViewer_SOURCE_DIR}/H3DViewer.icns
+                               PROPERTIES
+                               MACOSX_PACKAGE_LOCATION Resources )
 
   install( TARGETS H3DViewer
            LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
@@ -445,14 +444,14 @@ else( APPLE )
     set( H3DViewer_package_install_dir "H3DViewer/" )
   endif()
 
-	set( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DViewer_cpack_runtime" )
-	if( GENERATE_CPACK_PROJECT )
-	  set( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DAPI_cpack_runtime" )
+  set( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DViewer_cpack_runtime" )
+  if( GENERATE_CPACK_PROJECT )
+    set( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DAPI_cpack_runtime" )
   endif()
 
   install( TARGETS H3DViewer
-					 LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
-					 RUNTIME DESTINATION ${H3DViewer_package_install_dir}${DEFAULT_BIN_INSTALL} COMPONENT ${H3DVIEWER_INSTALL_COMPONENT_NAME} )
+           LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
+           RUNTIME DESTINATION ${H3DViewer_package_install_dir}${DEFAULT_BIN_INSTALL} COMPONENT ${H3DVIEWER_INSTALL_COMPONENT_NAME} )
 endif()
 
 # Add a cache variable GENERATE_H3DVIEWER_CPACK_PROJECT to have the choice of generating a project

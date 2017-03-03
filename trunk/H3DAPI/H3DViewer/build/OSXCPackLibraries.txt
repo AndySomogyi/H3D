@@ -21,27 +21,25 @@ file( GLOB ODE_FILES "/opt/local/lib/libode.*.dylib" )
 file( GLOB BULLET_FILES "/opt/local/lib/libbullet*.*.dylib" "/opt/local/lib/libLinearMath.*.dylib" )
 
 set( OSX_DEPENDENT_LIBRARIES ${H3DAPI_FILES}
-     			     ${HAPI_FILES}
-			     ${H3DUTIL_FILES}
-			     ${GLEW_FILES}
-			     ${AUDIOFILE_FILES}
-			     ${BULLET_FILES}
-			     ${FONTCONFIG_FILES}
-			     ${FREEIMAGE_FILES}
-			     ${FREETYPE_FILES}
-			     ${FTGL_FILES}
-			     ${NIFALCON_FILES}
-			     ${LIBUSB_FILES}
-			     ${ODE_FILES}
-			     ${OGG_FILES}
-			     ${SPIDERMONKEY_FILES}
-			     ${TEEM_FILES}
-			     ${VORBIS_FILES}
-			     ${VORBISFILE_FILES}
-			     ${WXWIDGETS_FILES}
-			     ${XERCES_FILES}
-
-)
+                             ${HAPI_FILES}
+                             ${H3DUTIL_FILES}
+                             ${GLEW_FILES}
+                             ${AUDIOFILE_FILES}
+                             ${BULLET_FILES}
+                             ${FONTCONFIG_FILES}
+                             ${FREEIMAGE_FILES}
+                             ${FREETYPE_FILES}
+                             ${FTGL_FILES}
+                             ${NIFALCON_FILES}
+                             ${LIBUSB_FILES}
+                             ${ODE_FILES}
+                             ${OGG_FILES}
+                             ${SPIDERMONKEY_FILES}
+                             ${TEEM_FILES}
+                             ${VORBIS_FILES}
+                             ${VORBISFILE_FILES}
+                             ${WXWIDGETS_FILES}
+                             ${XERCES_FILES} )
 
 message( STATUS ${CMAKE_INSTALL_PREFIX} )
 
@@ -50,5 +48,5 @@ file( GLOB UI_FILES ${CMAKE_INSTALL_PREFIX}/lib/libh3dui.*.dylib )
 file( GLOB H3DPHYSICS_FILES "${CMAKE_INSTALL_PREFIX}/lib/libh3dphysics.*.dylib" )
 
 set( OSX_PLUGIN_LIBRARIES ${MEDX3D_FILES}
-			  ${UI_FILES}
-			  ${H3DPHYSICS_FILES} )
+                          ${UI_FILES}
+                          ${H3DPHYSICS_FILES} )

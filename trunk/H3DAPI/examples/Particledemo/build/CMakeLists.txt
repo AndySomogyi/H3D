@@ -24,7 +24,7 @@ set( CMAKE_SKIP_BUILD_RPATH FALSE )
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-set( CMAKE_BUILD_WITH_INSTALL_RPATH FALSE ) 
+set( CMAKE_BUILD_WITH_INSTALL_RPATH FALSE )
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
@@ -62,44 +62,44 @@ set( CMAKE_MODULE_PATH ${ParticleDemo_SOURCE_DIR}/../../../build/modules/sharedM
 
 if( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
-  include_directories( ${EXTERNAL_INCLUDE_DIR} ) 
+  include_directories( ${EXTERNAL_INCLUDE_DIR} )
 endif()
 
 if( TARGET H3DUtil )
-  include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
+  include_directories( ${H3DUTIL_INCLUDE_DIR} )
   set( requiredLibs ${requiredLibs} H3DUtil )
 else( TARGET H3DUtil )
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
   if( H3DUTIL_FOUND )
-    include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
+    include_directories( ${H3DUTIL_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET HAPI )
-  include_directories( ${HAPI_INCLUDE_DIR} ) 
+  include_directories( ${HAPI_INCLUDE_DIR} )
   set( requiredLibs ${requiredLibs} HAPI )
 else( TARGET HAPI )
   #HAPI
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
-    include_directories( ${HAPI_INCLUDE_DIR} ) 
+    include_directories( ${HAPI_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET H3DAPI )
-  include_directories( ${H3DAPI_INCLUDE_DIR} ) 
+  include_directories( ${H3DAPI_INCLUDE_DIR} )
   set( requiredLibs ${requiredLibs} H3DAPI )
 else( TARGET H3DAPI )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
-    include_directories( ${H3DAPI_INCLUDE_DIR} ) 
+    include_directories( ${H3DAPI_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
   endif()
 endif()
@@ -110,7 +110,7 @@ set( WXWINDOWS_USE_GL 1 )
 if( WIN32 )
   find_package( wxWidgetsWin )
   if( wxWidgets_FOUND )
-    include_directories( ${wxWidgets_INCLUDE_DIR} ) 
+    include_directories( ${wxWidgets_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
     set( TMP_wxWidgets_FOUND TRUE )
   endif()
@@ -138,21 +138,21 @@ set_target_properties( ParticleDemo PROPERTIES DEBUG_POSTFIX "_d" )
 if( MSVC )
   # Set compile and link properties for projects.
   set( ParticleDemo_COMPILE_FLAGS "-DWXUSINGDLL" )
-  
+
   # Treat wchar_t as built in type for all visual studio versions.
   # This is default for every version above 7 (so far) but we still set it for all.
   set( ParticleDemo_COMPILE_FLAGS "${ParticleDemo_COMPILE_FLAGS} /Zc:wchar_t" )
-  
+
   if( ${MSVC_VERSION} GREATER 1399 )
     # Remove compiler warnings about deprecation for visual studio versions 8 and above.
     set( ParticleDemo_COMPILE_FLAGS "${ParticleDemo_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE" )
   endif()
-  
+
   if( ${MSVC_VERSION} GREATER 1499 )
     # Build using several threads for visual studio versions 9 and above.
     set( ParticleDemo_COMPILE_FLAGS "${ParticleDemo_COMPILE_FLAGS} /MP" )
   endif()
-  
+
   if( ${MSVC_VERSION} LESS 1500 )
     # Turn off optimization for visual studio versions 8 and below.
     # Old setting which I (Markus) have no idea why it was added.

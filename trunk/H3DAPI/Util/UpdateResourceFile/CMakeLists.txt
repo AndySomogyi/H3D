@@ -37,7 +37,7 @@ target_link_libraries( UpdateResourceFile ${requiredLibs} ${optionalLibs} )
 set_target_properties( UpdateResourceFile PROPERTIES DEBUG_POSTFIX "_d" )
 
 # set the install directory to the H3D directory on Windows
-if( WIN32 ) 
+if( WIN32 )
   # Variable used to set compile properties.
   set( UPDATERESOURCEFILE_COMPILE_FLAGS "" )
   # Set compile and link properties for projects.
