@@ -504,7 +504,7 @@ endif()
 #  set( HAVE_V8 1 )
 #  include_directories( ${V8_INCLUDE_DIRS} )
 #  set( requiredLibs ${requiredLibs} ${V8_LIBRARIES} )
-#endif( V8_FOUND )
+#endif()
 
 find_package( SpiderMonkey )
 if( SpiderMonkey_FOUND )
