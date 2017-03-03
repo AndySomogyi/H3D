@@ -191,28 +191,28 @@ set( optionalLibs )
 set( requiredLibs )
 
 if( NOT DEFINED DISABLE_H3D_DISPLAYLIST )
-set( DISABLE_H3D_DISPLAYLIST "OFF" CACHE BOOL "force disable h3d displaylist" )
-mark_as_advanced( DISABLE_H3D_DISPLAYLIST )
+  set( DISABLE_H3D_DISPLAYLIST "OFF" CACHE BOOL "force disable h3d displaylist" )
+  mark_as_advanced( DISABLE_H3D_DISPLAYLIST )
 endif()
 
 if( NOT DEFINED DISABLE_FIELD_ACCESS_TYPE_CHECK )
-set( DISABLE_FIELD_ACCESS_TYPE_CHECK "OFF" CACHE BOOL "force disable field access type check" )
-mark_as_advanced( DISABLE_FIELD_ACCESS_TYPE_CHECK )
+  set( DISABLE_FIELD_ACCESS_TYPE_CHECK "OFF" CACHE BOOL "force disable field access type check" )
+  mark_as_advanced( DISABLE_FIELD_ACCESS_TYPE_CHECK )
 endif()
 
 if( NOT DEFINED DISABLE_PROTOTYPENODE )
-set( DISABLE_PROTOTYPENODE "OFF" CACHE BOOL "force disable usage of x3dprototypenode for optimization, do not turn on if you use x3dprototypenode" )
-mark_as_advanced( DISABLE_PROTOTYPENODE )
+  set( DISABLE_PROTOTYPENODE "OFF" CACHE BOOL "force disable usage of x3dprototypenode for optimization, do not turn on if you use x3dprototypenode" )
+  mark_as_advanced( DISABLE_PROTOTYPENODE )
 endif()
 
 if( NOT DEFINED DEPRECATE_DISPLAYLIST_EVENT_COLLECT )
-set( DEPRECATE_DISPLAYLIST_EVENT_COLLECT "OFF" CACHE BOOL "force disable event collection for h3ddisplaylistobject to save cpu time. Note: its hasCausedEvent will no long report correctly " )
-mark_as_advanced( DEPRECATE_DISPLAYLIST_EVENT_COLLECT )
+  set( DEPRECATE_DISPLAYLIST_EVENT_COLLECT "OFF" CACHE BOOL "force disable event collection for h3ddisplaylistobject to save cpu time. Note: its hasCausedEvent will no long report correctly " )
+  mark_as_advanced( DEPRECATE_DISPLAYLIST_EVENT_COLLECT )
 endif()
 
 if( NOT DEFINED USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT )
-set( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT "OFF" CACHE BOOL " Let H3DAPI to manage active texture value, instead of relying on opengl get function. H3DAPI rely on setTextureUnit and getTextureUnit to simply manage it " )
-mark_as_advanced( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT )
+  set( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT "OFF" CACHE BOOL " Let H3DAPI to manage active texture value, instead of relying on opengl get function. H3DAPI rely on setTextureUnit and getTextureUnit to simply manage it " )
+  mark_as_advanced( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT )
 endif()
 
 
@@ -360,12 +360,12 @@ endif()
 if( PYTHON_FOUND )
   set( HAVE_PYTHON 1 )
   include_directories( ${PYTHON_INCLUDE_PATH} ) 
-if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-  # pyconfig.h is put in different directory from Ubuntu 13.04 (raring) 
-  # and CMake FindPythonLibs module is not updated for this yet. 
-  # Adding it explicitly here in the mean time.
-  include_directories( /usr/include/${CMAKE_LIBRARY_ARCHITECTURE}/python2.7 ) 
-endif()
+  if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+    # pyconfig.h is put in different directory from Ubuntu 13.04 (raring) 
+    # and CMake FindPythonLibs module is not updated for this yet. 
+    # Adding it explicitly here in the mean time.
+    include_directories( /usr/include/${CMAKE_LIBRARY_ARCHITECTURE}/python2.7 ) 
+  endif()
   set( optionalLibs ${optionalLibs} ${PYTHON_LIBRARIES} )
 endif()
 
