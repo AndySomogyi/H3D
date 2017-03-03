@@ -112,7 +112,7 @@ if( GENERATE_CPACK_PROJECT )
 
     # EXTERNAL_INCLUDES and EXTERNAL_INCLUDE_INSTALL_PATHS must be of equal lengths.
     # The reason for defining these variables here is in case we want to add functionality
-    # to configure installation in some other way ( using FIND-modules for example ).
+    # to configure installation in some other way (using FIND-modules for example).
     set( EXTERNAL_INCLUDES "" )
     set( EXTERNAL_INCLUDE_INSTALL_PATHS "" )
     # The EXTERNAL_INCLUDES_FILES are installed directly in External/include
@@ -510,7 +510,7 @@ if( GENERATE_CPACK_PROJECT )
                                        " Delete CMake installer\\n  Delete \\\"$INSTDIR\\\\${CMAKE_INSTALL_EXE_FILE_NAME}\\\"\\n\\n" )
       
       # could not find a way to uninstall using the exe command line, no idea how to do that yet.
-      #SET( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
+      #set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
       #                                         " Code to install CMake\\n  ReadRegStr $0 HKLM \\\"SOFTWARE\\\\Kitware\\\\CMake ${CMAKE_VERSION_TO_CHECK}\\\" \\\"\\\"\\n"
       #                                         " Check if CMake is installed\\n  StrCmp $0 \\\"\\\" uninstall_cmake_no 0\\n"
       #                                         " Check if uninstall CMake \\n  MessageBox MB_YESNO \\\"Do you want to uninstall CMake? It is recommended if no other builds on your system use CMake for configuration.\\\" IDYES uninstall_cmake_yes IDNO uninstall_cmake_no\\n"

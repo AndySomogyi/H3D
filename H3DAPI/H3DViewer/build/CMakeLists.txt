@@ -32,7 +32,7 @@ endif()
 set( CMAKE_SKIP_BUILD_RPATH FALSE )
 
 # when building, don't use the install RPATH already
-# ( but later on when installing )
+# (but later on when installing)
 set( CMAKE_BUILD_WITH_INSTALL_RPATH FALSE ) 
 
 # add the automatically determined parts of the RPATH
@@ -180,7 +180,7 @@ endif()
 # WxWidgets.
 set( WXWINDOWS_USE_GL 1 )
 # find wx library propgrid
-# The propgrid code does not work properly on Ubuntu 11.10 with the installed CMake and wx ( 2.8 ).
+# The propgrid code does not work properly on Ubuntu 11.10 with the installed CMake and wx (2.8).
 # It returns true even though propgrid does not exist, it probably ignores USE_LIBS that does not exist.
 # Since there is no wxWidgets_VERSION variable or something like that there is code to check the end of
 # include path. I have no idea if this would work on all other UNIX systems as well. NOTE, report
@@ -320,7 +320,7 @@ endif()
 configure_file( ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/H3DViewerConfig.h )
 
 if( NOT ( GENERATE_CPACK_PROJECT OR GENERATE_H3DVIEWER_CPACK_PROJECT ) )
-  # Install header files on non-windows system ( e.g. Unix ).
+  # Install header files on non-windows system (e.g. Unix).
   install( FILES ${CMAKE_CURRENT_BINARY_DIR}/include/H3DViewerConfig.h
            DESTINATION ${H3DViewer_SOURCE_DIR}/../src )
 endif()
@@ -335,7 +335,7 @@ if( COMMAND cmake_policy )
 endif()
 foreach( H3DUTIL_INCLUDE_DIR_TMP ${H3DUTIL_INCLUDE_DIR} )
   if( EXISTS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h )
-    file( STRINGS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG"  )
+    file( STRINGS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG" )
     list( LENGTH list_of_defines list_of_defines_length )
     if( list_of_defines_length )
       if( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" )
@@ -372,7 +372,7 @@ if( MSVC )
   endif()
 
   # Treat wchar_t as built in type for all visual studio versions.
-  # This is default for every version above 7 ( so far ) but we still set it for all.
+  # This is default for every version above 7 (so far) but we still set it for all.
   set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /Zc:wchar_t" )
 
   if( MSVC80 )
@@ -398,7 +398,7 @@ if( MSVC )
 
   if( ${MSVC_VERSION} LESS 1600 )
     # Turn off optimization for visual studio versions 8 and below.
-    # Old setting which I ( Markus ) have no idea why it was added.
+    # Old setting which I (Markus) have no idea why it was added.
     set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} /Od" )
   endif()
 
