@@ -39,7 +39,7 @@ if( NOT WIN32 )
     add_subdirectory( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build
                       ${CMAKE_CURRENT_BINARY_DIR}/H3DUtil )
   endif()
-  
+
   if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build )
     message( STATUS "Including HAPI" )
     add_subdirectory( ${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/build
@@ -98,7 +98,7 @@ if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsL
     set( CreateH3DNodesFieldsList_PROJECT "NO" CACHE BOOL "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
   endif()
   if( CreateH3DNodesFieldsList_PROJECT )
-  
+
     # This project is added here since H3DPhysics/UI/MedX3D should be defined before this is done.
     message( STATUS "Including CreateH3DNodesFieldsList" )
     add_subdirectory( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList
@@ -131,22 +131,22 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
   set( CPACK_PACKAGE_VERSION_MAJOR ${H3DWithToolkitsWin_MAJOR_VERSION} )
   set( CPACK_PACKAGE_VERSION_MINOR ${H3DWithToolkitsWin_MINOR_VERSION} )
   set( CPACK_PACKAGE_VERSION_PATCH ${H3DWithToolkitsWin_BUILD_VERSION} )
-	set( CPACK_PACKAGE_NAME "H3DApi-Full" )
-	set( CPACK_PACKAGE_FILE_NAME "H3DApi-Full-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}" )
-	set( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}" )
-  
+  set( CPACK_PACKAGE_NAME "H3DApi-Full" )
+  set( CPACK_PACKAGE_FILE_NAME "H3DApi-Full-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}" )
+  set( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}" )
+
   # Set information properties about the project to install.
   set( CPACK_PACKAGE_DESCRIPTION_SUMMARY "H3DAPI. A cross platform, haptics device independent, X3D based API for 3D graphics and haptics." )
   set( CPACK_PACKAGE_VENDOR "SenseGraphics AB" )
   set( CPACK_PACKAGE_CONTACT "support@sensegraphics.com" )
   set( CPACK_PACKAGE_DESCRIPTION_FILE "${H3DAPI_SOURCE_DIR}/../ReadMe" )
   set( CPACK_RESOURCE_FILE_LICENSE "${H3DAPI_SOURCE_DIR}/../LICENSE" )
-  
+
   add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/DummyFile
                       COMMAND echo )
   add_custom_target( INSTALL_RUNTIME_AND_LIBRARIES_ONLY
                      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/DummyFile )
-  
+
   add_custom_command( TARGET INSTALL_RUNTIME_AND_LIBRARIES_ONLY
                       POST_BUILD
                       COMMAND ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_POST_BUILD} )
@@ -156,11 +156,11 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
   set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES H3DPhysics ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
   add_dependencies( INSTALL_RUNTIME_AND_LIBRARIES_ONLY ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
 
-	set( CPACK_NSIS_EXECUTABLES_DIRECTORY bin32 )
+  set( CPACK_NSIS_EXECUTABLES_DIRECTORY bin32 )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
     set( CPACK_NSIS_EXECUTABLES_DIRECTORY bin64 )
   endif()
-  
+
   if( MSVC )
     # Additional, temporary command, to get 64 bit library for windows.
     set( h3d_msvc_version 6 )
@@ -169,7 +169,7 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
       math( EXPR h3d_msvc_version "${h3d_msvc_version} + 1" )
       math( EXPR TEMP_MSVC_VERSION "${TEMP_MSVC_VERSION} + 100" )
     endwhile()
-    
+
     set( 32_OR_64 "64" )
     if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
       set( 32_OR_64 "32" )
@@ -186,7 +186,7 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
                  DESTINATION lib${32_OR_64}
                  COMPONENT ${COMPONENT_PREFIX}libraries )
       endif()
-      
+
       set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_OR_64}/${NAME_TO_INSTALL}_vc${h3d_msvc_version}.dll )
       if( EXISTS ${FILE_NAME_TO_INSTALL} )
         install( FILES ${FILE_NAME_TO_INSTALL}
@@ -204,14 +204,14 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
                    DESTINATION ${NAME_TO_INSTALL}/include/H3D
                    COMPONENT ${COMPONENT_PREFIX}headers )
         endif()
-        
+
         set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/include/${NAME_TO_INSTALL}/${NAME_TO_INSTALL}_${32_OR_64}.h )
         if( EXISTS ${FILE_NAME_TO_INSTALL} )
           install( FILES ${FILE_NAME_TO_INSTALL}
                    DESTINATION ${NAME_TO_INSTALL}/include/${NAME_TO_INSTALL}
                    COMPONENT ${COMPONENT_PREFIX}headers )
         endif()
-        
+
         set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/include/H3D/${NAME_TO_INSTALL}/${NAME_TO_INSTALL}_${32_OR_64}.h )
         if( EXISTS ${FILE_NAME_TO_INSTALL} )
           install( FILES ${FILE_NAME_TO_INSTALL}
@@ -220,21 +220,21 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
         endif()
       endforeach()
     endforeach()
-    
+
     set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_OR_64}/H3DLoad.exe )
     if( EXISTS ${FILE_NAME_TO_INSTALL} )
       install( FILES ${FILE_NAME_TO_INSTALL}
                DESTINATION bin${32_OR_64}
                COMPONENT H3DAPI_cpack_runtime )
     endif()
-    
+
     set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_OR_64}/H3DViewer.exe )
     if( EXISTS ${FILE_NAME_TO_INSTALL} )
       install( FILES ${FILE_NAME_TO_INSTALL}
                DESTINATION bin${32_OR_64}
                COMPONENT H3DAPI_cpack_runtime )
     endif()
-    
+
     set( FILE_NAMES_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/H3DViewerPackageExtraFiles/ACKNOWLEDGEMENTS
                               ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/H3DViewerPackageExtraFiles/NOTICE )
     foreach( NAME_TO_INSTALL ${FILE_NAMES_TO_INSTALL} )
@@ -244,8 +244,8 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
                  COMPONENT H3DUtil_cpack_runtime )
       endif()
     endforeach()
-    
-    
+
+
   endif()
-	include( CPack )
+  include( CPack )
 endif()
