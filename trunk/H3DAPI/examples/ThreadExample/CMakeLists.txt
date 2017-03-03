@@ -16,7 +16,7 @@ endif()
 set( CMAKE_SKIP_BUILD_RPATH FALSE )
 
 # when building, don't use the install RPATH already
-# ( but later on when installing )
+# (but later on when installing)
 set( CMAKE_BUILD_WITH_INSTALL_RPATH FALSE ) 
 
 # add the automatically determined parts of the RPATH
@@ -101,7 +101,7 @@ if( MSVC )
   set( ThreadExample_COMPILE_FLAGS "" )
   
   # Treat wchar_t as built in type for all visual studio versions.
-  # This is default for every version above 7 ( so far ) but we still set it for all.
+  # This is default for every version above 7 (so far) but we still set it for all.
   set( ThreadExample_COMPILE_FLAGS "${ThreadExample_COMPILE_FLAGS} /Zc:wchar_t" )
   
   if( ${MSVC_VERSION} GREATER 1399 )

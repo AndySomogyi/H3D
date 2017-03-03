@@ -142,7 +142,7 @@ if( WIN32 )
   endif()
   
   # Treat wchar_t as built in type for all visual studio versions.
-  # This is default for every version above 7 ( so far ) but we still set it for all.
+  # This is default for every version above 7 (so far) but we still set it for all.
   set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} /Zc:wchar_t" )
 
   if( ${MSVC_VERSION} GREATER 1399 )

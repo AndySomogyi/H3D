@@ -361,7 +361,7 @@ if( PYTHON_FOUND )
   set( HAVE_PYTHON 1 )
   include_directories( ${PYTHON_INCLUDE_PATH} ) 
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-  # pyconfig.h is put in different directory from Ubuntu 13.04 ( raring ) 
+  # pyconfig.h is put in different directory from Ubuntu 13.04 (raring) 
   # and CMake FindPythonLibs module is not updated for this yet. 
   # Adding it explicitly here in the mean time.
   include_directories( /usr/include/${CMAKE_LIBRARY_ARCHITECTURE}/python2.7 ) 
@@ -499,12 +499,12 @@ if( OpenEXR_FOUND )
 endif()
 
 # We do not use V8 anymore, only SpiderMonkey
-#FIND_PACKAGE( V8 )
-#IF( V8_FOUND )
-#  SET( HAVE_V8 1 )
-#  INCLUDE_DIRECTORIES( ${V8_INCLUDE_DIRS} )
-#  SET( requiredLibs ${requiredLibs} ${V8_LIBRARIES} )
-#ENDIF( V8_FOUND )
+#find_package( V8 )
+#if( V8_FOUND )
+#  set( HAVE_V8 1 )
+#  include_directories( ${V8_INCLUDE_DIRS} )
+#  set( requiredLibs ${requiredLibs} ${V8_LIBRARIES} )
+#endif( V8_FOUND )
 
 find_package( SpiderMonkey )
 if( SpiderMonkey_FOUND )
@@ -578,7 +578,7 @@ if( COMMAND cmake_policy )
 endif()
 foreach( H3DUTIL_INCLUDE_DIR_TMP ${H3DUTIL_INCLUDE_DIR} )
   if( EXISTS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h )
-    file( STRINGS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG"  )
+    file( STRINGS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG" )
     list( LENGTH list_of_defines list_of_defines_length )
     if( list_of_defines_length )
       if( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" )
@@ -699,7 +699,7 @@ endif()
 configure_file( ${H3DAPI_SOURCE_DIR}/../include/H3D/H3DApi.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/H3D/H3DApi.h )
 
 if( NOT GENERATE_CPACK_PROJECT )
-  # Install header files on non-windows system ( e.g. Unix ).
+  # Install header files on non-windows system (e.g. Unix).
   install( FILES ${CMAKE_CURRENT_BINARY_DIR}/include/H3D/H3DApi.h
            DESTINATION ${H3DAPI_SOURCE_DIR}/../include/H3D )
 endif()
