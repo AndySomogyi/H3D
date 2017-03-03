@@ -24,18 +24,18 @@ set( CMAKE_MODULE_PATH "${CheckH3DAgainstX3DSpec_SOURCE_DIR}/../../build/modules
 
 if( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
-  include_directories( ${EXTERNAL_INCLUDE_DIR} ) 
-  include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-  include_directories( ${HAPI_INCLUDE_DIR} ) 
-  include_directories( ${H3DAPI_INCLUDE_DIR} ) 
-  
+  include_directories( ${EXTERNAL_INCLUDE_DIR} )
+  include_directories( ${H3DUTIL_INCLUDE_DIR} )
+  include_directories( ${HAPI_INCLUDE_DIR} )
+  include_directories( ${H3DAPI_INCLUDE_DIR} )
+
   set( requiredLibs ${requiredLibs} H3DUtil HAPI H3DAPI )
 else( H3D_USE_DEPENDENCIES_ONLY )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
-    include_directories( ${H3DAPI_INCLUDE_DIR} ) 
+    include_directories( ${H3DAPI_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
   endif()
 
@@ -43,7 +43,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
   find_package( H3DUtil REQUIRED )
 
   if( H3DUTIL_FOUND )
-    include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
+    include_directories( ${H3DUTIL_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
   endif()
 
@@ -51,7 +51,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
-    include_directories( ${HAPI_INCLUDE_DIR} ) 
+    include_directories( ${HAPI_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
   endif()
 endif()
@@ -143,7 +143,7 @@ if( DONT_LIST_INITIALIZE_TO_INPUT_OUTPUT )
 endif()
 
 # set the install directory to the H3D directory on Windows
-if( WIN32 ) 
+if( WIN32 )
   if( Geospatial_DLL )
     set( CheckH3DAgainstX3DSpec_COMPILE_FLAGS "${CheckH3DAgainstX3DSpec_COMPILE_FLAGS} -DHAVE_Geospatial" )
     add_dependencies( CheckH3DAgainstX3DSpec Geospatial )

@@ -53,20 +53,20 @@ set( CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}/../../build/modules/sh
 
 if( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
-  include_directories( ${EXTERNAL_INCLUDE_DIR} ) 
-  include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-  include_directories( ${HAPI_INCLUDE_DIR} ) 
-  include_directories( ${H3DAPI_INCLUDE_DIR} ) 
+  include_directories( ${EXTERNAL_INCLUDE_DIR} )
+  include_directories( ${H3DUTIL_INCLUDE_DIR} )
+  include_directories( ${HAPI_INCLUDE_DIR} )
+  include_directories( ${H3DAPI_INCLUDE_DIR} )
   include_directories( ${UI_INCLUDE_DIR} )
   include_directories( ${H3DPHYSICS_INCLUDE_DIR} )
-  
+
   set( requiredLibs ${requiredLibs} H3DUtil HAPI H3DAPI UI H3DPhysics )
 else( H3D_USE_DEPENDENCIES_ONLY )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
-    include_directories( ${H3DAPI_INCLUDE_DIR} ) 
+    include_directories( ${H3DAPI_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
   endif()
 
@@ -74,7 +74,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
   find_package( H3DUtil REQUIRED )
 
   if( H3DUTIL_FOUND )
-    include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
+    include_directories( ${H3DUTIL_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
   endif()
 
@@ -82,7 +82,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
-    include_directories( ${HAPI_INCLUDE_DIR} ) 
+    include_directories( ${HAPI_INCLUDE_DIR} )
     set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
   endif()
 
@@ -90,7 +90,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
   find_package( UI )
 
   if( UI_FOUND )
-    include_directories( ${UI_INCLUDE_DIR} ) 
+    include_directories( ${UI_INCLUDE_DIR} )
     set( optionalLibs ${optionalLibs} ${UI_LIBRARIES} )
   endif()
 
@@ -98,7 +98,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
   find_package( H3DPhysics )
 
   if( H3DPhysics_FOUND )
-    include_directories( ${H3DPhysics_INCLUDE_DIR} ) 
+    include_directories( ${H3DPhysics_INCLUDE_DIR} )
     set( optionalLibs ${optionalLibs} ${H3DPhysics_LIBRARIES} )
   endif()
 endif()
@@ -132,7 +132,7 @@ if( WIN32 )
     set( DEFAULT_BIN_INSTALL "bin64" )
     set( DEFAULT_LIB_INSTALL "lib64" )
   endif()
-  
+
   if( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -DHAVE_UI" )
   endif()
@@ -140,7 +140,7 @@ if( WIN32 )
   if( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -DHAVE_H3DPhysics" )
   endif()
-  
+
   # Treat wchar_t as built in type for all visual studio versions.
   # This is default for every version above 7 (so far) but we still set it for all.
   set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} /Zc:wchar_t" )
@@ -149,7 +149,7 @@ if( WIN32 )
     # Remove compiler warnings about deprecation for visual studio versions 8 and above.
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -D_CRT_SECURE_NO_DEPRECATE" )
   endif()
-  
+
   if( ${MSVC_VERSION} GREATER 1499 )
     # Build using several threads for visual studio versions 9 and above.
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} /MP" )
