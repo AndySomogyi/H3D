@@ -55,7 +55,7 @@ set( ParticleDemo_SRCS
 include_directories( ../src )
 
 # Add required libraries to this variable.
-set( requiredLibs )
+set( required_libs )
 
 # Where to find cmake modules used to find packages.
 set( CMAKE_MODULE_PATH ${ParticleDemo_SOURCE_DIR}/../../../build/modules/sharedModules )
@@ -67,40 +67,40 @@ endif()
 
 if( TARGET H3DUtil )
   include_directories( ${H3DUTIL_INCLUDE_DIR} )
-  set( requiredLibs ${requiredLibs} H3DUtil )
+  set( required_libs ${required_libs} H3DUtil )
 else( TARGET H3DUtil )
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
   if( H3DUTIL_FOUND )
     include_directories( ${H3DUTIL_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET HAPI )
   include_directories( ${HAPI_INCLUDE_DIR} )
-  set( requiredLibs ${requiredLibs} HAPI )
+  set( required_libs ${required_libs} HAPI )
 else( TARGET HAPI )
   #HAPI
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
     include_directories( ${HAPI_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET H3DAPI )
   include_directories( ${H3DAPI_INCLUDE_DIR} )
-  set( requiredLibs ${requiredLibs} H3DAPI )
+  set( required_libs ${required_libs} H3DAPI )
 else( TARGET H3DAPI )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
     include_directories( ${H3DAPI_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
   endif()
 endif()
 
@@ -111,7 +111,7 @@ if( WIN32 )
   find_package( wxWidgetsWin )
   if( wxWidgets_FOUND )
     include_directories( ${wxWidgets_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
     set( TMP_wxWidgets_FOUND TRUE )
   endif()
 endif()
@@ -122,15 +122,15 @@ else( TMP_wxWidgets_FOUND )
   find_package( wxWidgets REQUIRED )
   if( wxWidgets_FOUND )
     include( ${wxWidgets_USE_FILE} )
-    set( requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
   endif()
 endif()
 
 # Create build files.
 add_executable( ParticleDemo WIN32 MACOSX_BUNDLE ${ParticleDemo_SRCS} )
 
-# Link against requiredLibs and optionalLibs.
-target_link_libraries( ParticleDemo ${requiredLibs} ${optionalLibs} )
+# Link against required_libs and optional_libs.
+target_link_libraries( ParticleDemo ${required_libs} ${optional_libs} )
 
 # Set postfix for debug version of H3DViewer.
 set_target_properties( ParticleDemo PROPERTIES DEBUG_POSTFIX "_d" )
@@ -164,19 +164,19 @@ if( MSVC )
   set_target_properties( ParticleDemo PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB:msvcrt" )
 endif()
 
-set( DEFAULT_BIN_INSTALL "bin" )
-set( DEFAULT_LIB_INSTALL "lib" )
+set( default_bin_install "bin" )
+set( default_lib_install "lib" )
 
 if( WIN32 )
-  set( DEFAULT_BIN_INSTALL "bin32" )
-  set( DEFAULT_LIB_INSTALL "lib32" )
+  set( default_bin_install "bin32" )
+  set( default_lib_install "lib32" )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( DEFAULT_BIN_INSTALL "bin64" )
-    set( DEFAULT_LIB_INSTALL "lib64" )
+    set( default_bin_install "bin64" )
+    set( default_lib_install "lib64" )
   endif()
 endif()
 
 install( TARGETS ParticleDemo
-         LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
-         RUNTIME DESTINATION ${DEFAULT_BIN_INSTALL}
+         LIBRARY DESTINATION ${default_lib_install}
+         RUNTIME DESTINATION ${default_bin_install}
          COMPONENT H3DAPI_cpack_examples_runtime )
