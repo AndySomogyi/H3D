@@ -681,7 +681,7 @@ const char *geometry_shader_functions_string =
 void H3D::ShadowCasterShaders::shaderInit( bool cpu_shadows, bool draw_caps, 
   bool dir_light, bool single_pass_stereo, float matrixViewShift, float matrixProjShift )
 {
-  float diff_threshold = 0.00001;
+  float diff_threshold = 0.00001f;
   if( !shader_node.get() ||
       current_cpu_shadows != cpu_shadows ||
       current_draw_caps != draw_caps ||

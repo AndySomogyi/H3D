@@ -166,7 +166,7 @@ void NoiseTexture3D::SFImage::update() {
   }
   value = new PixelImage( _width, _height, _depth, 8,
                           PixelImage::LUMINANCE,
-                          PixelImage::UNSIGNED, data, false, Vec3f(0.01, 0.01, 0.01) );
+                          PixelImage::UNSIGNED, data, false, Vec3f(0.01f, 0.01f, 0.01f) );
 }
 
 

@@ -383,7 +383,7 @@ if( check_func( value ) ) { \
                Vec4d, SFVec4d, field_ptr, v ); break; \
       } \
       case X3DTypes::SFBOOL: { \
-        macro( PyInt_Check, PyInt_AsLong, PyInt_FromLong,  \
+        macro( PyInt_Check, 0 != PyInt_AsLong, PyInt_FromLong,  \
                bool, SFBool, field_ptr, v ); break; \
       } \
       case X3DTypes::SFSTRING: { \
@@ -499,7 +499,7 @@ if( check_func( value ) ) { \
                Vec4d, MFVec4d, field_ptr, v ); break; \
       } \
       case X3DTypes::MFBOOL: { \
-        macro( PyInt_Check, PyInt_AsLong, PyInt_FromLong, bool,  \
+        macro( PyInt_Check, 0 != PyInt_AsLong, PyInt_FromLong, bool,  \
                MFBool, field_ptr, v ); break; \
       } \
       case X3DTypes::MFSTRING: { \
@@ -1176,7 +1176,7 @@ call the base class __init__ function." );
       Field *field_ptr = static_cast< Field * >
         ( PyCObject_AsVoidPtr( py_field_ptr ) );
       Py_DECREF( py_field_ptr );
-      bool access_check = PyInt_AsLong( py_access_check );
+      bool access_check = PyInt_AsLong( py_access_check ) != 0;
       
       if( field_ptr ) { 
         field_ptr->setAccessCheck( access_check );
@@ -3020,7 +3020,7 @@ call the base class __init__ function." );
       H3DHapticsDevice *hdev = NULL;
       if( di ) {
         size_t nr_devices = di->device->size();
-        if( index >=0 && index < nr_devices ) {
+        if( index >=0 && index < static_cast<long long>( nr_devices ) ) {
           hdev = di->device->getValueByIndex( index );
         }
       }

@@ -417,7 +417,7 @@ void Text::DisplayList::callList( bool build_list ) {
   if( font && !font->fontsBuilt() ) {
     try {
       font->buildFonts();
-    } catch( const Exception::H3DException &e ) {
+    } catch( const Exception::H3DException ) {
     }
   }
   X3DGeometryNode::DisplayList::callList( build_list );
@@ -443,7 +443,7 @@ void Text::SFBound::update() {
 
   try {
     font_style->buildFonts();
-  } catch( const Exception::H3DException &e ) {
+  } catch( const Exception::H3DException ) {
     // Not doing anything here.
   }
 

@@ -709,10 +709,11 @@ Scene::Scene( Inst< SFChildNode >  _sceneRoot,
 #endif
   active( true ),
   last_traverseinfo( NULL ),
-  SAI_browser( this ),
+  SAI_browser( NULL ),
   shadow_caster( new ShadowCaster ),
   last_unused_texture_check ( 0 ) {
 
+  SAI_browser = this;
 #ifdef HAVE_PROFILER
   H3DUtil::H3DTimer::setEnabled("H3D_scene",true);
   H3DUtil::H3DTimer::setInterval("H3D_scene",10);
