@@ -164,80 +164,80 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
   if( MSVC )
     # Additional, temporary command, to get 64 bit library for windows.
     set( h3d_msvc_version 6 )
-    set( TEMP_MSVC_VERSION 1299 )
-    while( ${MSVC_VERSION} GREATER ${TEMP_MSVC_VERSION} )
+    set( temp_msvc_version 1299 )
+    while( ${MSVC_VERSION} GREATER ${temp_msvc_version} )
       math( EXPR h3d_msvc_version "${h3d_msvc_version} + 1" )
-      math( EXPR TEMP_MSVC_VERSION "${TEMP_MSVC_VERSION} + 100" )
+      math( EXPR temp_msvc_version "${temp_msvc_version} + 100" )
     endwhile()
 
-    set( 32_OR_64 "64" )
+    set( 32_or_64 "64" )
     if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-      set( 32_OR_64 "32" )
+      set( 32_or_64 "32" )
     endif()
     set( NAMES_TO_INSTALL "H3DUtil" "HAPI" "H3DAPI" "H3DPhysics" "MedX3D" "UI" "OpenHapticsRenderer" "Chai3DRenderer" )
     foreach( NAME_TO_INSTALL ${NAMES_TO_INSTALL} )
-      set( COMPONENT_PREFIX "${NAME_TO_INSTALL}_cpack_" )
-      if( ${COMPONENT_PREFIX} STREQUAL "OpenHapticsRenderer_cpack_" OR ${COMPONENT_PREFIX} STREQUAL "Chai3DRenderer_cpack_" )
-        set( COMPONENT_PREFIX "HAPI_cpack_" )
+      set( component_prefix "${NAME_TO_INSTALL}_cpack_" )
+      if( ${component_prefix} STREQUAL "OpenHapticsRenderer_cpack_" OR ${component_prefix} STREQUAL "Chai3DRenderer_cpack_" )
+        set( component_prefix "HAPI_cpack_" )
       endif()
-      set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../lib${32_OR_64}/${NAME_TO_INSTALL}_vc${h3d_msvc_version}.lib )
-      if( EXISTS ${FILE_NAME_TO_INSTALL} )
-        install( FILES ${FILE_NAME_TO_INSTALL}
-                 DESTINATION lib${32_OR_64}
-                 COMPONENT ${COMPONENT_PREFIX}libraries )
+      set( file_name_to_install ${H3DWithToolkitsWin_SOURCE_DIR}/../lib${32_or_64}/${NAME_TO_INSTALL}_vc${h3d_msvc_version}.lib )
+      if( EXISTS ${file_name_to_install} )
+        install( FILES ${file_name_to_install}
+                 DESTINATION lib${32_or_64}
+                 COMPONENT ${component_prefix}libraries )
       endif()
 
-      set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_OR_64}/${NAME_TO_INSTALL}_vc${h3d_msvc_version}.dll )
-      if( EXISTS ${FILE_NAME_TO_INSTALL} )
-        install( FILES ${FILE_NAME_TO_INSTALL}
-                 DESTINATION bin${32_OR_64}
-                 COMPONENT ${COMPONENT_PREFIX}runtime )
+      set( file_name_to_install ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_or_64}/${NAME_TO_INSTALL}_vc${h3d_msvc_version}.dll )
+      if( EXISTS ${file_name_to_install} )
+        install( FILES ${file_name_to_install}
+                 DESTINATION bin${32_or_64}
+                 COMPONENT ${component_prefix}runtime )
       endif()
 
       foreach( base_dir ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/ ${CMAKE_CURRENT_BINARY_DIR}/${NAME_TO_INSTALL}/ ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI/${NAME_TO_INSTALL}/ ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI/HAPI/${NAME_TO_INSTALL}/ )
-        set( FILE_NAME_TO_INSTALL ${base_dir}include/H3D/${NAME_TO_INSTALL}_${32_OR_64}.h )
+        set( file_name_to_install ${base_dir}include/H3D/${NAME_TO_INSTALL}_${32_or_64}.h )
         if( ${NAME_TO_INSTALL} STREQUAL "H3DAPI" )
-          set( FILE_NAME_TO_INSTALL ${base_dir}include/H3D/H3DApi_${32_OR_64}.h )
+          set( file_name_to_install ${base_dir}include/H3D/H3DApi_${32_or_64}.h )
         endif()
-        if( EXISTS ${FILE_NAME_TO_INSTALL} )
-          install( FILES ${FILE_NAME_TO_INSTALL}
+        if( EXISTS ${file_name_to_install} )
+          install( FILES ${file_name_to_install}
                    DESTINATION ${NAME_TO_INSTALL}/include/H3D
-                   COMPONENT ${COMPONENT_PREFIX}headers )
+                   COMPONENT ${component_prefix}headers )
         endif()
 
-        set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/include/${NAME_TO_INSTALL}/${NAME_TO_INSTALL}_${32_OR_64}.h )
-        if( EXISTS ${FILE_NAME_TO_INSTALL} )
-          install( FILES ${FILE_NAME_TO_INSTALL}
+        set( file_name_to_install ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/include/${NAME_TO_INSTALL}/${NAME_TO_INSTALL}_${32_or_64}.h )
+        if( EXISTS ${file_name_to_install} )
+          install( FILES ${file_name_to_install}
                    DESTINATION ${NAME_TO_INSTALL}/include/${NAME_TO_INSTALL}
-                   COMPONENT ${COMPONENT_PREFIX}headers )
+                   COMPONENT ${component_prefix}headers )
         endif()
 
-        set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/include/H3D/${NAME_TO_INSTALL}/${NAME_TO_INSTALL}_${32_OR_64}.h )
-        if( EXISTS ${FILE_NAME_TO_INSTALL} )
-          install( FILES ${FILE_NAME_TO_INSTALL}
+        set( file_name_to_install ${H3DWithToolkitsWin_SOURCE_DIR}/../${NAME_TO_INSTALL}/include/H3D/${NAME_TO_INSTALL}/${NAME_TO_INSTALL}_${32_or_64}.h )
+        if( EXISTS ${file_name_to_install} )
+          install( FILES ${file_name_to_install}
                    DESTINATION ${NAME_TO_INSTALL}/include/H3D/${NAME_TO_INSTALL}
-                   COMPONENT ${COMPONENT_PREFIX}headers )
+                   COMPONENT ${component_prefix}headers )
         endif()
       endforeach()
     endforeach()
 
-    set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_OR_64}/H3DLoad.exe )
-    if( EXISTS ${FILE_NAME_TO_INSTALL} )
-      install( FILES ${FILE_NAME_TO_INSTALL}
-               DESTINATION bin${32_OR_64}
+    set( file_name_to_install ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_or_64}/H3DLoad.exe )
+    if( EXISTS ${file_name_to_install} )
+      install( FILES ${file_name_to_install}
+               DESTINATION bin${32_or_64}
                COMPONENT H3DAPI_cpack_runtime )
     endif()
 
-    set( FILE_NAME_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_OR_64}/H3DViewer.exe )
-    if( EXISTS ${FILE_NAME_TO_INSTALL} )
-      install( FILES ${FILE_NAME_TO_INSTALL}
-               DESTINATION bin${32_OR_64}
+    set( file_name_to_install ${H3DWithToolkitsWin_SOURCE_DIR}/../bin${32_or_64}/H3DViewer.exe )
+    if( EXISTS ${file_name_to_install} )
+      install( FILES ${file_name_to_install}
+               DESTINATION bin${32_or_64}
                COMPONENT H3DAPI_cpack_runtime )
     endif()
 
-    set( FILE_NAMES_TO_INSTALL ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/H3DViewerPackageExtraFiles/ACKNOWLEDGEMENTS
+    set( file_names_to_install ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/H3DViewerPackageExtraFiles/ACKNOWLEDGEMENTS
                               ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/H3DViewerPackageExtraFiles/NOTICE )
-    foreach( NAME_TO_INSTALL ${FILE_NAMES_TO_INSTALL} )
+    foreach( NAME_TO_INSTALL ${file_names_to_install} )
       if( EXISTS ${NAME_TO_INSTALL} )
         install( FILES ${NAME_TO_INSTALL}
                  DESTINATION .
