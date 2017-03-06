@@ -249,11 +249,6 @@ namespace yy {
   {
     YYUSE (yylocationp);
     YYUSE (yyvaluep);
-    switch (yytype)
-      {
-         default:
-    break;
-      }
   }
 
 
@@ -278,13 +273,6 @@ namespace yy {
     YYUSE (yyvaluep);
 
     YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
-
-    switch (yytype)
-      {
-  
-  default:
-    break;
-      }
   }
 
   void

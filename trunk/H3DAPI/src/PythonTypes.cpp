@@ -374,7 +374,7 @@ self, deepCopy )" );
                            "Failed to create return value (a list). Please report this issue." );
       return NULL;
     }
-    for( Py_ssize_t i = 0; i < result.result.size(); ++i ) {
+    for( Py_ssize_t i = 0; i < static_cast<Py_ssize_t>( result.result.size() ); ++i ) {
       PyObject *dict = PyDict_New();
       if( !dict ) {
         PyErr_SetString( PyExc_ValueError, 
@@ -467,7 +467,7 @@ self, deepCopy )" );
                            "Failed to create return value (a list). Please report this issue." );
       return NULL;
     }
-    for( Py_ssize_t i = 0; i < result.result.size(); ++i ) {
+    for( Py_ssize_t i = 0; i < static_cast<Py_ssize_t>( result.result.size() ); ++i ) {
       PyObject *dict = PyDict_New();
       if( !dict ) {
         PyErr_SetString( PyExc_ValueError, 

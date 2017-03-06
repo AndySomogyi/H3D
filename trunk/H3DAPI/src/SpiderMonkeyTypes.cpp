@@ -3579,7 +3579,11 @@ JSBool setFieldValueFromjsvalSimple( JSContext *cx, Field *field, jsval value ) 
   FieldType *f = static_cast< FieldType * >( field );
   JSType v;
   if( ConvertFunc( cx, value, &v ) ) {
+#if FieldType == SFBool
+    setValueNoAccessCheck( f, v != 0);
+#else
     setValueNoAccessCheck( f, (typename FieldType::value_type) v);
+#endif
     return JS_TRUE;
   } else {
     stringstream s;

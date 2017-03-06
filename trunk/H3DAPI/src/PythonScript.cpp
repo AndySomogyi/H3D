@@ -395,14 +395,14 @@ void PythonScript::loadScript( const string &script_filename, const string &scri
     
       // get length of file:
       is.seekg (0, ios::end);
-      length = is.tellg();
+      length = static_cast<int>(is.tellg());
       is.seekg (0, ios::beg);
     
       // allocate memory:
       buffer = new char [length + 1];
       // read data as a block:
       is.read (buffer,length);
-      length = is.gcount();
+      length = static_cast<int>(is.gcount());
       is.close();
       buffer[length ] = '\0';
     
