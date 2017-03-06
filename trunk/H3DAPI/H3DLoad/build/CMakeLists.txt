@@ -37,13 +37,13 @@ set( H3DLoad_BUILD_VERSION "1" )
 set( H3DLoad_SRCS "${H3DLoad_SOURCE_DIR}/../src/H3DLoad.cpp" )
 
 # Add optional libs to this variable.
-set( optionalLibs )
+set( optional_libs )
 
 # Include directories.
 include_directories( ../src )
 
 # Add required libs to this variable.
-set( requiredLibs )
+set( required_libs )
 
 # Where to find modules, used when finding packages.
 set( CMAKE_MODULE_PATH ${H3DLoad_SOURCE_DIR}/../../build/modules/sharedModules )
@@ -61,40 +61,40 @@ endif()
 
 if( TARGET H3DUtil )
   include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} H3DUtil )
+  set( required_libs ${required_libs} H3DUtil )
 else( TARGET H3DUtil )
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
   if( H3DUTIL_FOUND )
     include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET HAPI )
   include_directories( ${HAPI_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} HAPI )
+  set( required_libs ${required_libs} HAPI )
 else( TARGET HAPI )
   #HAPI
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
     include_directories( ${HAPI_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET H3DAPI )
   include_directories( ${H3DAPI_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} H3DAPI )
+  set( required_libs ${required_libs} H3DAPI )
 else( TARGET H3DAPI )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
     include_directories( ${H3DAPI_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
   endif()
 endif()
 
@@ -106,7 +106,7 @@ if( GLUT_FOUND )
   if( WIN32 )
     STRIP_AND_ADD_LIBRARY_DIRECTORIES( ${GLUT_LIBRARIES} )
   else( WIN32 )
-    set( requiredLibs ${requiredLibs} ${GLUT_LIBRARIES} )
+    set( required_libs ${required_libs} ${GLUT_LIBRARIES} )
   endif()
 endif()
   
@@ -115,12 +115,12 @@ find_package( OpenGL REQUIRED )
 
 if( OPENGL_FOUND )
   include_directories( ${OPENGL_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} ${OPENGL_LIBRARIES} )
+  set( required_libs ${required_libs} ${OPENGL_LIBRARIES} )
 endif()
 
 # Create build filess.
 add_executable( H3DLoad  ${H3DLoad_SRCS} )
-target_link_libraries( H3DLoad ${requiredLibs} ${optionalLibs} )
+target_link_libraries( H3DLoad ${required_libs} ${optional_libs} )
 
 # Debug version should have _d postfix.
 set_target_properties( H3DLoad PROPERTIES DEBUG_POSTFIX "_d" )
@@ -149,21 +149,21 @@ if( MSVC )
   set_target_properties( H3DLoad PROPERTIES FOLDER "H3D" )
 endif()
 
-set( DEFAULT_BIN_INSTALL "bin" )
-set( DEFAULT_LIB_INSTALL "lib" )
+set( default_bin_install "bin" )
+set( default_lib_install "lib" )
 
 if( WIN32 )
-  set( DEFAULT_BIN_INSTALL "bin32" )
-  set( DEFAULT_LIB_INSTALL "lib32" )
+  set( default_bin_install "bin32" )
+  set( default_lib_install "lib32" )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( DEFAULT_BIN_INSTALL "bin64" )
-    set( DEFAULT_LIB_INSTALL "lib64" )
+    set( default_bin_install "bin64" )
+    set( default_lib_install "lib64" )
   endif()
 endif()
 
 # Install to this destination.
 install( TARGETS H3DLoad
-         LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
-         RUNTIME DESTINATION ${DEFAULT_BIN_INSTALL}
+         LIBRARY DESTINATION ${default_lib_install}
+         RUNTIME DESTINATION ${default_bin_install}
          COMPONENT H3DAPI_cpack_runtime )
 

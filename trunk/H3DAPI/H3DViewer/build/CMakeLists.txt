@@ -122,7 +122,7 @@ endif()
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/include )
 
 # Add required libs to this variable.
-set( requiredLibs )
+set( required_libs )
 
 # Where to find cmake modules used to find packages.
 set( CMAKE_MODULE_PATH ${H3DViewer_SOURCE_DIR}/modules ${H3DViewer_SOURCE_DIR}/../../build/modules/sharedModules )
@@ -140,40 +140,40 @@ endif()
 
 if( TARGET H3DUtil )
   include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} H3DUtil )
+  set( required_libs ${required_libs} H3DUtil )
 else( TARGET H3DUtil )
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
   if( H3DUTIL_FOUND )
     include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET HAPI )
   include_directories( ${HAPI_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} HAPI )
+  set( required_libs ${required_libs} HAPI )
 else( TARGET HAPI )
   #HAPI
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
     include_directories( ${HAPI_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET H3DAPI )
   include_directories( ${H3DAPI_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} H3DAPI )
+  set( required_libs ${required_libs} H3DAPI )
 else( TARGET H3DAPI )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
     include_directories( ${H3DAPI_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
   endif()
 endif()
 
@@ -192,7 +192,7 @@ if( WIN32 )
   find_package( wxWidgetsWin )
   if( wxWidgets_FOUND )
     include_directories( ${wxWidgets_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
   endif()
 endif()
 
@@ -204,17 +204,17 @@ endif()
 if( wxWidgets_FOUND )
 
   if( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
-    set( wxWIDGETS_VERSIONABOVE_28 FALSE )
+    set( wxwidgets_version_above_28 FALSE )
     foreach( TMP_INCLUDE_DIR ${wxWidgets_INCLUDE_DIRS} )
       string( REGEX MATCH "wx[-][0-9][.][0-9]+$" wx_version_match ${TMP_INCLUDE_DIR} )
       if( NOT ${wx_version_match} STREQUAL "" )
         string( REGEX MATCH "[0-9][.][0-9]+$" wx_version_match_version ${wx_version_match} )
         if( ${wx_version_match_version} VERSION_GREATER "2.8" )
-          set( wxWIDGETS_VERSIONABOVE_28 TRUE )
+          set( wxwidgets_version_above_28 TRUE )
         endif()
       endif()
     endforeach()
-    if( NOT wxWIDGETS_VERSIONABOVE_28 )
+    if( NOT wxwidgets_version_above_28 )
       set( wxWidgets_FOUND 0 )
     endif()
   endif()
@@ -236,7 +236,7 @@ if( WIN32 )
   find_package( wxWidgetsWin )
   if( wxWidgets_FOUND )
     include_directories( ${wxWidgets_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
   endif()
 endif()
 
@@ -245,7 +245,7 @@ else( wxWidgets_FOUND )
   find_package( wxWidgets REQUIRED )
   if( wxWidgets_FOUND )
     include( ${wxWidgets_USE_FILE} )
-    set( requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
   endif()
 endif()
 
@@ -253,7 +253,7 @@ find_package( DirectX )
 if( DirectX_FOUND )
   set( HAVE_DX9 1 )
   include_directories( ${DirectX_INCLUDE_DIRS} )
-  set( requiredLibs ${requiredLibs} ${DirectX_LIBRARIES} )
+  set( required_libs ${required_libs} ${DirectX_LIBRARIES} )
 endif()
 
 # Create build files.
@@ -325,8 +325,8 @@ if( NOT ( GENERATE_CPACK_PROJECT OR GENERATE_H3DVIEWER_CPACK_PROJECT ) )
            DESTINATION ${H3DViewer_SOURCE_DIR}/../src )
 endif()
 
-# Link against requiredLibs.
-target_link_libraries( H3DViewer ${requiredLibs} )
+# Link against required_libs.
+target_link_libraries( H3DViewer ${required_libs} )
 
 if( COMMAND cmake_policy )
   if( POLICY CMP0054 )
@@ -410,15 +410,15 @@ if( MSVC )
   set_target_properties( H3DViewer PROPERTIES FOLDER "H3D" )
 endif()
 
-set( DEFAULT_BIN_INSTALL "bin" )
-set( DEFAULT_LIB_INSTALL "lib" )
+set( default_bin_install "bin" )
+set( default_lib_install "lib" )
 
 if( WIN32 )
-  set( DEFAULT_BIN_INSTALL "bin32" )
-  set( DEFAULT_LIB_INSTALL "lib32" )
+  set( default_bin_install "bin32" )
+  set( default_lib_install "lib32" )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( DEFAULT_BIN_INSTALL "bin64" )
-    set( DEFAULT_LIB_INSTALL "lib64" )
+    set( default_bin_install "bin64" )
+    set( default_lib_install "lib64" )
   endif()
 endif()
 
@@ -434,8 +434,8 @@ if( APPLE )
                                MACOSX_PACKAGE_LOCATION Resources )
 
   install( TARGETS H3DViewer
-           LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
-           RUNTIME DESTINATION ${DEFAULT_BIN_INSTALL}
+           LIBRARY DESTINATION ${default_lib_install}
+           RUNTIME DESTINATION ${default_bin_install}
            BUNDLE DESTINATION ${OSX_BUNDLE_INSTALL_DESTINATION}
            COMPONENT H3DAPI_cpack_runtime )
 else( APPLE )
@@ -450,8 +450,8 @@ else( APPLE )
   endif()
 
   install( TARGETS H3DViewer
-           LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
-           RUNTIME DESTINATION ${H3DViewer_package_install_dir}${DEFAULT_BIN_INSTALL} COMPONENT ${H3DVIEWER_INSTALL_COMPONENT_NAME} )
+           LIBRARY DESTINATION ${default_lib_install}
+           RUNTIME DESTINATION ${H3DViewer_package_install_dir}${default_bin_install} COMPONENT ${H3DVIEWER_INSTALL_COMPONENT_NAME} )
 endif()
 
 # Add a cache variable GENERATE_H3DVIEWER_CPACK_PROJECT to have the choice of generating a project

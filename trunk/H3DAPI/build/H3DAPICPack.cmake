@@ -100,29 +100,29 @@ if( GENERATE_CPACK_PROJECT )
     # External binary directory to add to path.
     set( CPACK_EXTERNAL_BIN "bin32" )
     set( CPACK_H3D_64_BIT "FALSE" )
-    set( EXTERNAL_BIN_REPLACE_PATH "bin64" )
+    set( external_bin_replace_path "bin64" )
     set( CPACK_NSIS_EXECUTABLES_DIRECTORY bin32 )
     if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
       set( CPACK_EXTERNAL_BIN "bin64" )
-      set( EXTERNAL_BIN_REPLACE_PATH "bin32" )
+      set( external_bin_replace_path "bin32" )
       set( CPACK_H3D_64_BIT "TRUE" )
       set( CPACK_NSIS_EXECUTABLES_DIRECTORY bin64 )
     endif()
-    set( EXTERNAL_BIN_PATH "${CPACK_EXTERNAL_BIN}" )
+    set( external_bin_path "${CPACK_EXTERNAL_BIN}" )
 
-    # EXTERNAL_INCLUDES and EXTERNAL_INCLUDE_INSTALL_PATHS must be of equal lengths.
+    # external_includes and external_include_install_paths must be of equal lengths.
     # The reason for defining these variables here is in case we want to add functionality
     # to configure installation in some other way (using FIND-modules for example).
-    set( EXTERNAL_INCLUDES "" )
-    set( EXTERNAL_INCLUDE_INSTALL_PATHS "" )
-    # The EXTERNAL_INCLUDES_FILES are installed directly in External/include
-    set( EXTERNAL_INCLUDES_FILES "" )
-    set( EXTERNAL_LIBRARIES "" )
-    set( EXTERNAL_STATIC_LIBRARIES "" )
-    set( EXTERNAL_BINARIES "" )
+    set( external_includes "" )
+    set( external_include_install_paths "" )
+    # The external_include_files are installed directly in External/include
+    set( external_include_files "" )
+    set( external_libraries "" )
+    set( external_static_libraries "" )
+    set( external_binaries "" )
 
     if( EXISTS ${H3DAPI_CPACK_EXTERNAL_ROOT} )
-      set( EXTERNAL_INCLUDES ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/xercesc/
+      set( external_includes ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/xercesc/
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/curl/
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/Cg/
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/AL/
@@ -134,7 +134,7 @@ if( GENERATE_CPACK_PROJECT )
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/FTGL/
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/DirectShow/
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/js/ )
-      set( EXTERNAL_INCLUDE_INSTALL_PATHS External/include/xercesc
+      set( external_include_install_paths External/include/xercesc
                                           External/include/curl
                                           External/include/Cg
                                           External/include/AL
@@ -147,9 +147,9 @@ if( GENERATE_CPACK_PROJECT )
                                           External/include/DirectShow
                                           External/include/js )
 
-      set( EXTERNAL_INCLUDES_FILES ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/.h )
+      set( external_include_files ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/.h )
 
-      set( EXTERNAL_LIBRARIES ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/glew32.lib
+      set( external_libraries ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/glew32.lib
                               ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/xerces-c_3.lib
                               ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/xerces-c_3D.lib
                               ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/libcurl.lib
@@ -165,7 +165,7 @@ if( GENERATE_CPACK_PROJECT )
                               ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/ftgl.lib
                               ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/js32.lib )
 
-      set( EXTERNAL_STATIC_LIBRARIES ${EXTERNAL_STATIC_LIBRARIES}
+      set( external_static_libraries ${external_static_libraries}
                                      #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/glew32s.lib
                                      #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/libcurl.lib
                                      #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/libvorbisfile_static.lib
@@ -176,30 +176,30 @@ if( GENERATE_CPACK_PROJECT )
                                      #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/ftgl_static.lib
                                      ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/strmbase.lib )
 
-      set( EXTERNAL_BINARIES ${EXTERNAL_BINARIES}
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/glew32.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/xerces-c_3_1.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/xerces-c_3_1D.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/libcurl.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/cg.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/cgGL.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/libvorbisfile.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/libvorbis.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/libogg.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/audiofile.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/ftgl.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${EXTERNAL_BIN_PATH}/js32.dll )
+      set( external_binaries ${external_binaries}
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/glew32.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/xerces-c_3_1.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/xerces-c_3_1D.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/libcurl.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/cg.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/cgGL.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/libvorbisfile.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/libvorbis.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/libogg.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/audiofile.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/ftgl.dll
+                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/js32.dll )
 
     else( EXISTS ${H3DAPI_CPACK_EXTERNAL_ROOT} )
       message( WARNING "H3DAPI_CPACK_EXTERNAL_ROOT must be set to the External directory used by H3DAPI in order to package properly." )
     endif()
 
-    if( EXTERNAL_INCLUDES )
-      list( LENGTH EXTERNAL_INCLUDES EXTERNAL_INCLUDES_LENGTH )
-      math( EXPR EXTERNAL_INCLUDES_LENGTH "${EXTERNAL_INCLUDES_LENGTH} - 1" )
-      foreach( val RANGE ${EXTERNAL_INCLUDES_LENGTH} )
-        list( GET EXTERNAL_INCLUDES ${val} val1 )
-        list( GET EXTERNAL_INCLUDE_INSTALL_PATHS ${val} val2 )
+    if( external_includes )
+      list( LENGTH external_includes external_includes_length )
+      math( EXPR external_includes_length "${external_includes_length} - 1" )
+      foreach( val RANGE ${external_includes_length} )
+        list( GET external_includes ${val} val1 )
+        list( GET external_include_install_paths ${val} val2 )
         install( DIRECTORY ${val1}
                  DESTINATION ${val2}
                  COMPONENT H3DAPI_cpack_external_source
@@ -207,7 +207,7 @@ if( GENERATE_CPACK_PROJECT )
       endforeach()
     endif()
 
-    foreach( include_file ${EXTERNAL_INCLUDES_FILES} )
+    foreach( include_file ${external_include_files} )
       if( EXISTS ${include_file} )
         install( FILES ${include_file}
                  DESTINATION External/include
@@ -215,7 +215,7 @@ if( GENERATE_CPACK_PROJECT )
       endif()
     endforeach()
 
-    foreach( library ${EXTERNAL_LIBRARIES} )
+    foreach( library ${external_libraries} )
       if( EXISTS ${library} )
         install( FILES ${library}
                  DESTINATION External/lib32
@@ -230,7 +230,7 @@ if( GENERATE_CPACK_PROJECT )
       endif()
     endforeach()
 
-    foreach( library ${EXTERNAL_STATIC_LIBRARIES} )
+    foreach( library ${external_static_libraries} )
       if( EXISTS ${library} )
         install( FILES ${library}
                  DESTINATION External/lib32/static
@@ -245,17 +245,17 @@ if( GENERATE_CPACK_PROJECT )
       endif()
     endforeach()
 
-    foreach( binary ${EXTERNAL_BINARIES} )
+    foreach( binary ${external_binaries} )
       if( EXISTS ${binary} )
         install( FILES ${binary}
-                 DESTINATION External/${EXTERNAL_BIN_PATH}
+                 DESTINATION External/${external_bin_path}
                  COMPONENT H3DAPI_cpack_external_runtime )
       endif()
 
-      string( REGEX REPLACE "(/${EXTERNAL_BIN_PATH}/)" "/${EXTERNAL_BIN_REPLACE_PATH}/" other_binary ${binary} )
+      string( REGEX REPLACE "(/${external_bin_path}/)" "/${external_bin_replace_path}/" other_binary ${binary} )
       if( EXISTS ${other_binary} )
         install( FILES ${other_binary}
-                 DESTINATION External/${EXTERNAL_BIN_REPLACE_PATH}
+                 DESTINATION External/${external_bin_replace_path}
                  COMPONENT H3DAPI_cpack_external_runtime )
       endif()
     endforeach()

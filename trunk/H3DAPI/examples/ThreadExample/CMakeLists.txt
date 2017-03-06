@@ -30,10 +30,10 @@ if( "${isSystemDir}" STREQUAL "-1" )
 endif()
 
 # Optional libraries to link against are added to this variable.
-set( optionalLibs )
+set( optional_libs )
 
 # Required libraries to link against are added to this variable.
-set( requiredLibs )
+set( required_libs )
 
 # Where to find modules used to find libraries.
 set( CMAKE_MODULE_PATH "${ThreadExample_SOURCE_DIR}/../../build/modules/sharedModules" )
@@ -45,40 +45,40 @@ endif()
 
 if( TARGET H3DUtil )
   include_directories( ${H3DUTIL_INCLUDE_DIR} )
-  set( requiredLibs ${requiredLibs} H3DUtil )
+  set( required_libs ${required_libs} H3DUtil )
 else( TARGET H3DUtil )
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
   if( H3DUTIL_FOUND )
     include_directories( ${H3DUTIL_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET HAPI )
   include_directories( ${HAPI_INCLUDE_DIR} )
-  set( requiredLibs ${requiredLibs} HAPI )
+  set( required_libs ${required_libs} HAPI )
 else( TARGET HAPI )
   #HAPI
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
     include_directories( ${HAPI_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET H3DAPI )
   include_directories( ${H3DAPI_INCLUDE_DIR} )
-  set( requiredLibs ${requiredLibs} H3DAPI )
+  set( required_libs ${required_libs} H3DAPI )
 else( TARGET H3DAPI )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
     include_directories( ${H3DAPI_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
   endif()
 endif()
 
@@ -87,7 +87,7 @@ add_library( ThreadExample SHARED ${ThreadExample_SOURCE_DIR}/ThreadExample.h
                                  ${ThreadExample_SOURCE_DIR}/ThreadExample.cpp )
 
 # Link against libraries.
-target_link_libraries( ThreadExample ${requiredLibs} ${optionalLibs} )
+target_link_libraries( ThreadExample ${required_libs} ${optional_libs} )
 
 # Debug versions have _d postfix.
 set_target_properties( ThreadExample PROPERTIES DEBUG_POSTFIX "_d" )
@@ -117,21 +117,21 @@ if( MSVC )
   set_target_properties( ThreadExample PROPERTIES COMPILE_FLAGS "${ThreadExample_COMPILE_FLAGS}" )
 endif()
 
-set( DEFAULT_BIN_INSTALL "bin" )
-set( DEFAULT_LIB_INSTALL "lib" )
+set( default_bin_install "bin" )
+set( default_lib_install "lib" )
 
 if( WIN32 )
-  set( DEFAULT_BIN_INSTALL "bin32" )
-  set( DEFAULT_LIB_INSTALL "lib32" )
+  set( default_bin_install "bin32" )
+  set( default_lib_install "lib32" )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( DEFAULT_BIN_INSTALL "bin64" )
-    set( DEFAULT_LIB_INSTALL "lib64" )
+    set( default_bin_install "bin64" )
+    set( default_lib_install "lib64" )
   endif()
 endif()
 
 # Install to these directories.
 install( TARGETS ThreadExample
-         LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
-         RUNTIME DESTINATION ${DEFAULT_BIN_INSTALL}
+         LIBRARY DESTINATION ${default_lib_install}
+         RUNTIME DESTINATION ${default_bin_install}
          COMPONENT H3DAPI_cpack_examples_runtime )
 

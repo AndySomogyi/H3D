@@ -11,13 +11,13 @@ project( CheckH3DAgainstX3DSpec )
 set( CheckH3DAgainstX3DSpec_SRCS "${CheckH3DAgainstX3DSpec_SOURCE_DIR}/CheckH3DAgainstX3DSpec.cpp" )
 
 # Add optional libs to this variable.
-set( optionalLibs )
+set( optional_libs )
 
 # Include directories.
 include_directories( . )
 
 # Add required libs to this variable.
-set( requiredLibs )
+set( required_libs )
 
 # Where to find modules, used when finding packages.
 set( CMAKE_MODULE_PATH "${CheckH3DAgainstX3DSpec_SOURCE_DIR}/../../build/modules/sharedModules" )
@@ -29,14 +29,14 @@ if( H3D_USE_DEPENDENCIES_ONLY )
   include_directories( ${HAPI_INCLUDE_DIR} )
   include_directories( ${H3DAPI_INCLUDE_DIR} )
 
-  set( requiredLibs ${requiredLibs} H3DUtil HAPI H3DAPI )
+  set( required_libs ${required_libs} H3DUtil HAPI H3DAPI )
 else( H3D_USE_DEPENDENCIES_ONLY )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
     include_directories( ${H3DAPI_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
   endif()
 
   #H3DUtil
@@ -44,7 +44,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
 
   if( H3DUTIL_FOUND )
     include_directories( ${H3DUTIL_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
   endif()
 
   #HAPI
@@ -52,23 +52,23 @@ else( H3D_USE_DEPENDENCIES_ONLY )
 
   if( HAPI_FOUND )
     include_directories( ${HAPI_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 endif()
 
 set( H3D_MSVC_VERSION 6 )
-set( TEMP_MSVC_VERSION 1299 )
-while( ${MSVC_VERSION} GREATER ${TEMP_MSVC_VERSION} )
+set( temp_msvc_version 1299 )
+while( ${MSVC_VERSION} GREATER ${temp_msvc_version} )
   math( EXPR H3D_MSVC_VERSION "${H3D_MSVC_VERSION} + 1" )
-  math( EXPR TEMP_MSVC_VERSION "${TEMP_MSVC_VERSION} + 100" )
+  math( EXPR temp_msvc_version "${temp_msvc_version} + 100" )
 endwhile()
 
-set( DEFAULT_BIN_INSTALL "bin" )
+set( default_bin_install "bin" )
 
 if( WIN32 )
-  set( DEFAULT_BIN_INSTALL "bin32" )
+  set( default_bin_install "bin32" )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( DEFAULT_BIN_INSTALL "bin64" )
+    set( default_bin_install "bin64" )
   endif()
 endif()
 
@@ -95,13 +95,13 @@ option( INCLUDE_H3DPhysics
         OFF )
 if( INCLUDE_H3DPhysics )
   if( TARGET H3DPhysics )
-    set( H3DPhysics_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
+    set( H3DPhysics_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${default_bin_install}" )
   else( TARGET H3DPhysics )
     find_package( H3DPhysics )
 
     if( H3DPhysics_FOUND )
       get_filename_component( H3DPhysics_SEARCH_PATH ${H3DPhysics_LIBRARY} PATH )
-      string( REGEX REPLACE "/([^/])*$" "/${DEFAULT_BIN_INSTALL}" H3DPhysics_SEARCH_PATH "${H3DPhysics_SEARCH_PATH}" )
+      string( REGEX REPLACE "/([^/])*$" "/${default_bin_install}" H3DPhysics_SEARCH_PATH "${H3DPhysics_SEARCH_PATH}" )
     endif()
   endif()
 endif()
@@ -112,13 +112,13 @@ option( INCLUDE_MedX3D
         OFF )
 if( INCLUDE_MedX3D )
   if( TARGET MedX3D )
-    set( MedX3D_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${DEFAULT_BIN_INSTALL}" )
+    set( MedX3D_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${default_bin_install}" )
   else( TARGET MedX3D )
     find_package( MedX3D )
 
     if( MEDX3D_FOUND )
       get_filename_component( MedX3D_SEARCH_PATH ${MEDX3D_LIBRARY} PATH )
-      string( REGEX REPLACE "/([^/])*$" "/${DEFAULT_BIN_INSTALL}" MedX3D_SEARCH_PATH "${MedX3D_SEARCH_PATH}" )
+      string( REGEX REPLACE "/([^/])*$" "/${default_bin_install}" MedX3D_SEARCH_PATH "${MedX3D_SEARCH_PATH}" )
     endif()
   endif()
 endif()
@@ -127,7 +127,7 @@ configure_file( ${CheckH3DAgainstX3DSpec_SOURCE_DIR}/CheckH3DAgainstX3DSpec.cmak
 
 # Create build files.
 add_executable( CheckH3DAgainstX3DSpec  ${CheckH3DAgainstX3DSpec_SRCS} )
-target_link_libraries( CheckH3DAgainstX3DSpec ${requiredLibs} ${optionalLibs} )
+target_link_libraries( CheckH3DAgainstX3DSpec ${required_libs} ${optional_libs} )
 
 # Debug version should have _d postfix.
 set_target_properties( CheckH3DAgainstX3DSpec PROPERTIES DEBUG_POSTFIX "_d" )

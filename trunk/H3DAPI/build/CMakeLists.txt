@@ -185,10 +185,10 @@ if( MSVC )
 endif()
 
 # Add all optional libraries to this variable
-set( optionalLibs )
+set( optional_libs )
 
 # Add all required libraries to this variable
-set( requiredLibs )
+set( required_libs )
 
 if( NOT DEFINED DISABLE_H3D_DISPLAYLIST )
   set( DISABLE_H3D_DISPLAYLIST "OFF" CACHE BOOL "force disable h3d displaylist" )
@@ -222,7 +222,7 @@ if( TARGET H3DUtil )
   # Target was created by ADD_SUBDIRECTORY command. There might not be anything in
   # H3DUTIL_INCLUDE_DIR but HAPI_INCLUDE_DIR covers that in this case.
   include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} H3DUtil )
+  set( required_libs ${required_libs} H3DUtil )
   set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} H3DUtil )
 else( TARGET H3DUtil )
   #H3DUtil
@@ -230,14 +230,14 @@ else( TARGET H3DUtil )
 
   if( H3DUTIL_FOUND )
     include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET HAPI )
   # Target was created by ADD_SUBDIRECTORY command.
   include_directories( ${HAPI_INCLUDE_DIR} ) 
-  set( requiredLibs ${requiredLibs} HAPI )
+  set( required_libs ${required_libs} HAPI )
   set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} HAPI )
 else( TARGET HAPI )
   #HAPI
@@ -246,27 +246,27 @@ else( TARGET HAPI )
 
   if( HAPI_FOUND )
     include_directories( ${HAPI_INCLUDE_DIR} ) 
-    set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 endif()
 
 if( TARGET Chai3DRenderer )
-  set( requiredLibs ${requiredLibs} Chai3DRenderer )
+  set( required_libs ${required_libs} Chai3DRenderer )
   if( MSVC80 )
-    set( requiredLibs ${requiredLibs} optimized atls.lib debug atlsd.lib )
+    set( required_libs ${required_libs} optimized atls.lib debug atlsd.lib )
   endif()
   set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} Chai3DRenderer )
 endif()
   
 if( TARGET OpenHapticsRenderer )
-  set( requiredLibs ${requiredLibs} OpenHapticsRenderer )
+  set( required_libs ${required_libs} OpenHapticsRenderer )
   set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} OpenHapticsRenderer )
 endif()
 
 # Extra libs to link against.
 if( WIN32 )
   # TODO: Only for MSVC?
-  set( requiredLibs ${requiredLibs} winmm.lib DelayImp.lib )
+  set( required_libs ${required_libs} winmm.lib DelayImp.lib )
 endif()
 
 # Find OpenGL library. Required to compile.
@@ -274,14 +274,14 @@ find_package( OpenGL REQUIRED )
 if( OPENGL_FOUND )
   set( HAVE_OPENGL 1 )
   include_directories( ${OPENGL_INCLUDE_DIR} )
-  set( requiredLibs ${requiredLibs} ${OPENGL_LIBRARIES} )
+  set( required_libs ${required_libs} ${OPENGL_LIBRARIES} )
 endif()
 
 # Find Glew library. Required to compile.
 find_package( GLEW REQUIRED )
 if( GLEW_FOUND )
   include_directories( ${GLEW_INCLUDE_DIRS} )
-  set( requiredLibs ${requiredLibs} ${GLEW_LIBRARIES} )
+  set( required_libs ${required_libs} ${GLEW_LIBRARIES} )
 endif()
 
 # Optional extra library. Makes is possible to use GLUT windows handling with H3D API.
@@ -292,7 +292,7 @@ if( GLUT_FOUND )
   include_directories( ${GLUT_INCLUDE_DIR} )
   if( WIN32 )
     if( MINGW )
-      set( requiredLibs ${requiredLibs} ${GLUT_LIBRARIES} )
+      set( required_libs ${required_libs} ${GLUT_LIBRARIES} )
     else( MINGW )
       # This is used in order for the compiler to find freeglut.lib.
       # If freeglut.lib is in any other place than glut32 on your system
@@ -301,7 +301,7 @@ if( GLUT_FOUND )
       STRIP_AND_ADD_LIBRARY_DIRECTORIES( ${GLUT_LIBRARIES} )
     endif()
   else( WIN32 )
-    set( requiredLibs ${requiredLibs} ${GLUT_LIBRARIES} )
+    set( required_libs ${required_libs} ${GLUT_LIBRARIES} )
   endif()
 endif()
 
@@ -310,7 +310,7 @@ find_package( Xerces )
 if( XERCES_FOUND )
   set( HAVE_XERCES 1 )
   include_directories( ${XERCES_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${XERCES_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${XERCES_LIBRARIES} )
 endif()
 
 # Optional extra library. Used in H3D API to resolved urls.
@@ -318,7 +318,7 @@ find_package( CURL )
 if( CURL_FOUND )
   set( HAVE_LIBCURL 1 )
   include_directories( ${CURL_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${CURL_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${CURL_LIBRARIES} )
 endif()
 
 # Optional extra library. Needed to support shading using the CG shader language from NVidia.
@@ -326,14 +326,14 @@ find_package( NvidiaCG )
 if( NvidiaCG_FOUND )
   set( HAVE_CG 1 )
   include_directories( ${NvidiaCG_INCLUDE_DIRS} ) 
-  set( optionalLibs ${optionalLibs} ${NvidiaCG_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${NvidiaCG_LIBRARIES} )
 endif()
 
 # Optional extra library. Used to read compressed files.
 find_package( ZLIB )
 if( ZLIB_FOUND )
   include_directories( ${ZLIB_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${ZLIB_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${ZLIB_LIBRARIES} )
 endif()
 
 # Optional extra library. Add python bindings to H3D API, allow for extended prototyping without using C++.
@@ -366,7 +366,7 @@ if( PYTHON_FOUND )
     # Adding it explicitly here in the mean time.
     include_directories( /usr/include/${CMAKE_LIBRARY_ARCHITECTURE}/python2.7 ) 
   endif()
-  set( optionalLibs ${optionalLibs} ${PYTHON_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${PYTHON_LIBRARIES} )
 endif()
 
 # Optional extra library. Used for sound in H3D API.
@@ -374,7 +374,7 @@ find_package( OpenAL )
 if( OPENAL_FOUND )
   set( HAVE_OPENAL 1 )
   include_directories( ${OPENAL_INCLUDE_DIR} )
-  set( optionalLibs ${optionalLibs} ${OPENAL_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${OPENAL_LIBRARIES} )
 endif()
 
 # Optional extra library. Used to read sound files.
@@ -382,7 +382,7 @@ find_package( Vorbis )
 if( Vorbis_FOUND )
   set( HAVE_LIBVORBIS 1 )
   include_directories( ${Vorbis_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${Vorbis_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${Vorbis_LIBRARIES} )
 endif()
 
 # Optional extra library. Used for Oculus Rift support.
@@ -390,7 +390,7 @@ find_package( LibOVR )
 if( LibOVR_FOUND )
   set( HAVE_LIBOVR 1 )
   include_directories( ${LibOVR_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${LibOVR_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${LibOVR_LIBRARIES} )
 endif()
 
 # Optional extra library. Used to read sound files.
@@ -398,7 +398,7 @@ find_package( Audiofile )
 if( Audiofile_FOUND )
   set( HAVE_LIBAUDIOFILE 1 )
   include_directories( ${Audiofile_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${Audiofile_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${Audiofile_LIBRARIES} )
 endif()
 
 # Optional extra library. Used to handle fonts in H3D API.
@@ -406,7 +406,7 @@ find_package( Freetype )
 if( FREETYPE_FOUND )
   set( HAVE_FREETYPE 1 )
   include_directories( ${FREETYPE_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${FREETYPE_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${FREETYPE_LIBRARIES} )
 endif()
 
 # Optional extra library. Adds support to use devices by 3dxware. See www.3dconnexion.com.
@@ -414,7 +414,7 @@ find_package( 3DXWARE )
 if( 3DXWARE_FOUND )
   set( HAVE_3DXWARE 1 )
   include_directories( ${3DXWARE_INCLUDE_DIRS} ) 
-  set( optionalLibs ${optionalLibs} ${3DXWARE_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${3DXWARE_LIBRARIES} )
 endif()
 
 # Optional extra library. Used for RazerHydraSensor
@@ -422,7 +422,7 @@ find_package( SixenseSDK )
 if( SixenseSDK_FOUND )
   set( HAVE_SIXENSE 1 )
   include_directories( ${SixenseSDK_INCLUDE_DIRS} )
-  set( requiredLibs ${requiredLibs} ${SixenseSDK_LIBRARIES} )
+  set( required_libs ${required_libs} ${SixenseSDK_LIBRARIES} )
 endif()
 
 # Optional extra library. Used to render fonts in OpenGL.
@@ -431,18 +431,18 @@ if( FTGL_FOUND )
   set( HAVE_FTGL 1 )
   set( FTGL_INCLUDE_IS_UPPER ${FTGL_INCLUDE_IS_UPPER} )
   include_directories( ${FTGL_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${FTGL_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${FTGL_LIBRARIES} )
 endif()
 
 # Optional extra library. Used to read images.
 find_package( FreeImage )
 if( FreeImage_FOUND )
   include_directories( ${FreeImage_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${FreeImage_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${FreeImage_LIBRARIES} )
 endif()
 
 if( Haptik_FOUND )
-  set( optionalLibs ${optionalLibs} ${Haptik_LIBRARY} )
+  set( optional_libs ${optional_libs} ${Haptik_LIBRARY} )
 endif()
 
 if( WIN32 )
@@ -453,7 +453,7 @@ if( WIN32 )
   if( DirectShow_FOUND )
     set( HAVE_DSHOW 1 )
     include_directories( ${DirectShow_INCLUDE_DIRS} )
-    set( optionalLibs ${optionalLibs} ${DirectShow_LIBRARIES} )
+    set( optional_libs ${optional_libs} ${DirectShow_LIBRARIES} )
   endif()
 endif()
 
@@ -464,7 +464,7 @@ if( NOT WIN32 )
   if( FONTCONFIG_FOUND )
     set( HAVE_FONTCONFIG 1 )
     include_directories( ${FONTCONFIG_INCLUDE_DIRS} )
-    set( optionalLibs ${optionalLibs} ${FONTCONFIG_LIBRARIES} )
+    set( optional_libs ${optional_libs} ${FONTCONFIG_LIBRARIES} )
   endif()
 
   if( NOT APPLE )
@@ -473,7 +473,7 @@ if( NOT WIN32 )
     if( FFMPEG_FOUND )
       set( HAVE_FFMPEG 1 )
       include_directories( ${FFMPEG_INCLUDE_DIRS} )
-      list( APPEND optionalLibs ${FFMPEG_LIBRARIES} )
+      list( APPEND optional_libs ${FFMPEG_LIBRARIES} )
     endif()  
   endif()
 endif()
@@ -481,13 +481,13 @@ endif()
 find_package( DCMTK )
 if( DCMTK_FOUND )
   include_directories( ${DCMTK_INCLUDE_DIRS} ) 
-  set( requiredLibs ${requiredLibs} ${DCMTK_LIBRARIES} )
+  set( required_libs ${required_libs} ${DCMTK_LIBRARIES} )
 endif()
 
 find_package( Teem )
 if( Teem_FOUND )
   include_directories( ${Teem_INCLUDE_DIRS} )
-  set( requiredLibs ${requiredLibs} ${Teem_LIBRARIES} )
+  set( required_libs ${required_libs} ${Teem_LIBRARIES} )
 endif()
 
 # Optional extra library. Used to handle OpenEXR HDR image formats.
@@ -495,7 +495,7 @@ find_package( OpenEXR )
 if( OpenEXR_FOUND )
   set( HAVE_OPENEXR 1 )
   include_directories( ${OpenEXR_INCLUDE_DIRS} )
-  set( optionalLibs ${optionalLibs} ${OpenEXR_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${OpenEXR_LIBRARIES} )
 endif()
 
 # We do not use V8 anymore, only SpiderMonkey
@@ -503,21 +503,21 @@ endif()
 #if( V8_FOUND )
 #  set( HAVE_V8 1 )
 #  include_directories( ${V8_INCLUDE_DIRS} )
-#  set( requiredLibs ${requiredLibs} ${V8_LIBRARIES} )
+#  set( required_libs ${required_libs} ${V8_LIBRARIES} )
 #endif()
 
 find_package( SpiderMonkey )
 if( SpiderMonkey_FOUND )
   set( HAVE_SPIDERMONKEY 1 )
   include_directories( ${SpiderMonkey_INCLUDE_DIRS} )
-  set( requiredLibs ${requiredLibs} ${SpiderMonkey_LIBRARIES} )
+  set( required_libs ${required_libs} ${SpiderMonkey_LIBRARIES} )
 endif()
 
 find_package( VirtualHand )
 if( VirtualHand_FOUND )
   set( HAVE_VIRTUAL_HAND_SDK 1 )
   include_directories( ${VirtualHand_INCLUDE_DIRS} )
-  set( requiredLibs ${requiredLibs} ${VirtualHand_LIBRARIES} )
+  set( required_libs ${required_libs} ${VirtualHand_LIBRARIES} )
 endif()
 
 # H3DAPI shared library definition
@@ -569,7 +569,7 @@ if( MSVC )
 endif()
 
 # add the libraries needed for linking
-target_link_libraries( H3DAPI ${requiredLibs} ${optionalLibs} )
+target_link_libraries( H3DAPI ${required_libs} ${optional_libs} )
 
 if( COMMAND cmake_policy )
   if( POLICY CMP0054 )
@@ -619,18 +619,18 @@ if( MSVC )
   set_target_properties( H3DAPI PROPERTIES FOLDER "H3D" )
 endif()
 
-set( DEFAULT_BIN_INSTALL "bin" )
-set( DEFAULT_LIB_INSTALL "lib" )
+set( default_bin_install "bin" )
+set( default_lib_install "lib" )
 
 if( WIN32 )
-  set( DEFAULT_BIN_INSTALL "bin32" )
-  set( DEFAULT_LIB_INSTALL "lib32" )
+  set( default_bin_install "bin32" )
+  set( default_lib_install "lib32" )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( DEFAULT_BIN_INSTALL "bin64" )
-    set( DEFAULT_LIB_INSTALL "lib64" )
+    set( default_bin_install "bin64" )
+    set( default_lib_install "lib64" )
   endif()
   # Temporary variables used later to set LINK_FLAGS.
-  set( TEMP_OUTPUT_POSTFIX "" )
+  set( temp_output_postfix "" )
 
   # if we are using 64 bit compiler some object files get too big so we need
   # to add the /bigobj flag
@@ -642,7 +642,7 @@ if( WIN32 )
     include( H3DCommonFunctions )
     # change the name depending on compiler to be able to tell them apart
     # since they are not compatible with each other. 
-    setH3DMSVCOutputName( H3DAPI "H3DAPI" TEMP_OUTPUT_POSTFIX )
+    setH3DMSVCOutputName( H3DAPI "H3DAPI" temp_output_postfix )
     # Add common H3D compile flags for microsoft visual studio
     addCommonH3DMSVCCompileFlags( H3DAPI_COMPILE_FLAGS )
 
@@ -665,13 +665,13 @@ if( WIN32 )
   endif()
   
   if( TARGET Chai3DRenderer AND MSVC )
-    set( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /DELAYLOAD:\"Chai3DRenderer${TEMP_OUTPUT_POSTFIX}_d.dll\"" )
-    set( H3DAPI_LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE} /DELAYLOAD:\"Chai3DRenderer${TEMP_OUTPUT_POSTFIX}.dll\"" )
+    set( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /DELAYLOAD:\"Chai3DRenderer${temp_output_postfix}_d.dll\"" )
+    set( H3DAPI_LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE} /DELAYLOAD:\"Chai3DRenderer${temp_output_postfix}.dll\"" )
   endif()
   
   if( TARGET OpenHapticsRenderer AND MSVC )
-    set( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}_d.dll\"" )
-    set( H3DAPI_LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE} /DELAYLOAD:\"OpenHapticsRenderer${TEMP_OUTPUT_POSTFIX}.dll\"" )
+    set( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /DELAYLOAD:\"OpenHapticsRenderer${temp_output_postfix}_d.dll\"" )
+    set( H3DAPI_LINK_FLAGS_RELEASE "${H3DAPI_LINK_FLAGS_RELEASE} /DELAYLOAD:\"OpenHapticsRenderer${temp_output_postfix}.dll\"" )
   endif()
 
 
@@ -706,9 +706,9 @@ endif()
 
 # Intall directories.
 install( TARGETS H3DAPI
-         LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL} COMPONENT H3DAPI_cpack_runtime
-         RUNTIME DESTINATION ${DEFAULT_BIN_INSTALL} COMPONENT H3DAPI_cpack_runtime
-         ARCHIVE DESTINATION ${DEFAULT_LIB_INSTALL} COMPONENT H3DAPI_cpack_libraries )
+         LIBRARY DESTINATION ${default_lib_install} COMPONENT H3DAPI_cpack_runtime
+         RUNTIME DESTINATION ${default_bin_install} COMPONENT H3DAPI_cpack_runtime
+         ARCHIVE DESTINATION ${default_lib_install} COMPONENT H3DAPI_cpack_libraries )
 
 if( NOT ( WIN32 OR GENERATE_CPACK_PROJECT ) )
   # Install include files.
@@ -746,7 +746,7 @@ if( H3DAPI_LOADER_PROJECTS )
       find_package( wxWidgetsWin )
       if( wxWidgets_FOUND )
         include_directories( ${wxWidgets_INCLUDE_DIR} ) 
-        set( requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+        set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
       endif()
     endif()
 
@@ -756,7 +756,7 @@ if( H3DAPI_LOADER_PROJECTS )
       find_package( wxWidgets )
       if( wxWidgets_FOUND )
         include( ${wxWidgets_USE_FILE} )
-        set( requiredLibs ${requiredLibs} ${wxWidgets_LIBRARIES} )
+        set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
       endif()
     endif()
   endif()

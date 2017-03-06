@@ -40,13 +40,13 @@ endforeach()
 set( NodeRoutesToDotFile_SRCS "${NodeRoutesToDotFile_SOURCE_DIR}/NodeRoutesToDotFile.cpp" )
 
 # Add optional libs to this variable.
-set( optionalLibs )
+set( optional_libs )
 
 # Include directories.
 include_directories( . )
 
 # Add required libs to this variable.
-set( requiredLibs )
+set( required_libs )
 
 # Where to find modules, used when finding packages.
 set( CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}/../../build/modules/sharedModules" )
@@ -60,14 +60,14 @@ if( H3D_USE_DEPENDENCIES_ONLY )
   include_directories( ${UI_INCLUDE_DIR} )
   include_directories( ${H3DPHYSICS_INCLUDE_DIR} )
 
-  set( requiredLibs ${requiredLibs} H3DUtil HAPI H3DAPI UI H3DPhysics )
+  set( required_libs ${required_libs} H3DUtil HAPI H3DAPI UI H3DPhysics )
 else( H3D_USE_DEPENDENCIES_ONLY )
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
     include_directories( ${H3DAPI_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${H3DAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
   endif()
 
   #H3DUtil
@@ -75,7 +75,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
 
   if( H3DUTIL_FOUND )
     include_directories( ${H3DUTIL_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${H3DUTIL_LIBRARIES} )
+    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
   endif()
 
   #HAPI
@@ -83,7 +83,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
 
   if( HAPI_FOUND )
     include_directories( ${HAPI_INCLUDE_DIR} )
-    set( requiredLibs ${requiredLibs} ${HAPI_LIBRARIES} )
+    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 
   #UI
@@ -91,7 +91,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
 
   if( UI_FOUND )
     include_directories( ${UI_INCLUDE_DIR} )
-    set( optionalLibs ${optionalLibs} ${UI_LIBRARIES} )
+    set( optional_libs ${optional_libs} ${UI_LIBRARIES} )
   endif()
 
   #H3DPhysics
@@ -99,7 +99,7 @@ else( H3D_USE_DEPENDENCIES_ONLY )
 
   if( H3DPhysics_FOUND )
     include_directories( ${H3DPhysics_INCLUDE_DIR} )
-    set( optionalLibs ${optionalLibs} ${H3DPhysics_LIBRARIES} )
+    set( optional_libs ${optional_libs} ${H3DPhysics_LIBRARIES} )
   endif()
 endif()
 
@@ -107,14 +107,14 @@ endif()
 find_package( OpenAL )
 if( OPENAL_FOUND )
   include_directories( ${OPENAL_INCLUDE_DIR} )
-  set( optionalLibs ${optionalLibs} ${OPENAL_LIBRARIES} )
+  set( optional_libs ${optional_libs} ${OPENAL_LIBRARIES} )
 endif()
 
 configure_file( ${NodeRoutesToDotFile_SOURCE_DIR}/NodeRoutesToDotFile.cmake ${NodeRoutesToDotFile_SOURCE_DIR}/NodeRoutesToDotFile.cpp )
 
 # Create build filess.
 add_executable( NodeRoutesToDotFile  ${NodeRoutesToDotFile_SRCS} )
-target_link_libraries( NodeRoutesToDotFile ${requiredLibs} ${optionalLibs} )
+target_link_libraries( NodeRoutesToDotFile ${required_libs} ${optional_libs} )
 
 # Debug version should have _d postfix.
 set_target_properties( NodeRoutesToDotFile PROPERTIES DEBUG_POSTFIX "_d" )
@@ -122,15 +122,15 @@ set_target_properties( NodeRoutesToDotFile PROPERTIES DEBUG_POSTFIX "_d" )
 # Variable used to set compile properties.
 set( NODEROUTESTODOTFILE_COMPILE_FLAGS "-DH3D_GENERATE_DOTROUTE_FILES" )
 
-set( DEFAULT_BIN_INSTALL "bin" )
-set( DEFAULT_LIB_INSTALL "lib" )
+set( default_bin_install "bin" )
+set( default_lib_install "lib" )
 
 if( WIN32 )
-  set( DEFAULT_BIN_INSTALL "bin32" )
-  set( DEFAULT_LIB_INSTALL "lib32" )
+  set( default_bin_install "bin32" )
+  set( default_lib_install "lib32" )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( DEFAULT_BIN_INSTALL "bin64" )
-    set( DEFAULT_LIB_INSTALL "lib64" )
+    set( default_bin_install "bin64" )
+    set( default_lib_install "lib64" )
   endif()
 
   if( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
@@ -161,6 +161,6 @@ set_target_properties( NodeRoutesToDotFile PROPERTIES COMPILE_FLAGS "${NODEROUTE
 
 if( H3D_USE_DEPENDENCIES_ONLY )
   install( TARGETS NodeRoutesToDotFile
-           LIBRARY DESTINATION ${DEFAULT_LIB_INSTALL}
-           RUNTIME DESTINATION ${DEFAULT_BIN_INSTALL} )
+           LIBRARY DESTINATION ${default_lib_install}
+           RUNTIME DESTINATION ${default_bin_install} )
 endif()
