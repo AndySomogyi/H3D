@@ -306,11 +306,11 @@ if( GLUT_FOUND )
 endif()
 
 # Optional extra library. Without this H3D API can not load scenes defined with X3D syntax.
-find_package( Xerces )
-if( XERCES_FOUND )
+find_package( XercesC )
+if( XercesC_FOUND )
   set( HAVE_XERCES 1 )
-  include_directories( ${XERCES_INCLUDE_DIRS} )
-  set( optional_libs ${optional_libs} ${XERCES_LIBRARIES} )
+  include_directories( ${XercesC_INCLUDE_DIRS} )
+  set( optional_libs ${optional_libs} ${XercesC_LIBRARIES} )
 endif()
 
 # Optional extra library. Used in H3D API to resolved urls.
