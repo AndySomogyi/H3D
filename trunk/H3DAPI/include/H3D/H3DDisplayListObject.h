@@ -185,7 +185,7 @@ namespace H3D {
             
       /// Returns the number of input fields that has generated an event
       /// to this field since the last call to the update() function.
-      inline unsigned int nrPendingEvents() {
+      inline size_t nrPendingEvents() {
         return event_fields.size();
       }
 

@@ -241,7 +241,7 @@ void GeometryGroup::IsTouched::update() {
 
 void GeometryGroup::MFVec3fPerIndex::unrouteAllFrom() {
   if( !routes_in.empty() ) {
-    int prev_routes_in_size;
+    size_t prev_routes_in_size;
     do {
       prev_routes_in_size = routes_in.size();
       routes_in.front()->unroute( this );

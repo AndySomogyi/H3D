@@ -256,7 +256,7 @@ void ShadowGeometry::renderShadowFallback( X3DGeometryNode *g,
   glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(4, GL_DOUBLE, 0,
                   &(*triangle_points.begin()) );
-  glDrawArrays( GL_TRIANGLES, 0, triangle_points.size() );
+  glDrawArrays( GL_TRIANGLES, 0, static_cast<GLsizei>(triangle_points.size()) );
   glDisableClientState(GL_VERTEX_ARRAY);
 
 }

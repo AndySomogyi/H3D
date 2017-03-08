@@ -611,7 +611,7 @@ X3DFontStyleNode::Justification FontStyle::getMinorJustification() {
     // Could not convert try to use original text string.
     font->Render( text.c_str() );
    } else {
-    font->Render( &wtext[0], ret);
+    font->Render( &wtext[0], static_cast<int>(ret));
    }
 #else
    font->Render( text.c_str() );

@@ -526,7 +526,7 @@ GLhandleARB ComposedShader::createHandle(ComposedShader* shader) {
     for ( size_t i= 0; i < shader->transformFeedbackVaryings->size(); ++i ) {
       varyings[i]= shader->transformFeedbackVaryings->getValueByIndex ( i ).c_str();
     }
-    glTransformFeedbackVaryings(program_handle, varyings.size(), &varyings[0], GL_INTERLEAVED_ATTRIBS);
+    glTransformFeedbackVaryings(program_handle, static_cast<GLsizei>(varyings.size()), &varyings[0], GL_INTERLEAVED_ATTRIBS);
   }
 
   // link shader program

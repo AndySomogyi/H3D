@@ -359,7 +359,7 @@ void Appearance::traverseSG( TraverseInfo &ti ) {
     glGetIntegerv( GL_MAX_LIGHTS, &max_lights );
   }
   NavigationInfo *ni = NavigationInfo::getActive();
-  unsigned int nr_lights = ti.getActiveLightNodes().size();
+  size_t nr_lights = ti.getActiveLightNodes().size();
   if( !ni || ni->headlight->getValue() ) {
     ++nr_lights;
   }
