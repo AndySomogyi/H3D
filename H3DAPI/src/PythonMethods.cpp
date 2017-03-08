@@ -2948,7 +2948,7 @@ call the base class __init__ function." );
       //H3D::Node *node =  H3DNodeDatabase::createNode( node_name );
       //return PyNode_FromNode( H3DNodeDatabase::createNode( node_name ) );
 
-      unsigned int nr_args = 1;     
+      Py_ssize_t nr_args = 1;     
 
       if( PyTuple_Check( args ) ) {
         nr_args =  PyTuple_Size( args );
@@ -3052,7 +3052,7 @@ call the base class __init__ function." );
 
     PyObject *pythonAddProgramSetting( PyObject *self, PyObject *args ) {
       // args are (field, setting_name = "", section_name = "" )
-      unsigned int nr_args = 1;     
+      Py_ssize_t nr_args = 1;     
       Field *field = NULL;
       PyObject *py_field = args;
 
@@ -3112,7 +3112,7 @@ call the base class __init__ function." );
     PyObject *pythonFindNodes( PyObject *self, PyObject *args ) {
       // args are ( node, type_names, node_name= "", field_names= [], exactNodeName= true, verbose= false )
       // return value is [(found_node,(parent0,parent1,...))]
-      unsigned int nr_args= 1;
+      Py_ssize_t nr_args= 1;
       Node* node= NULL;
       Scene::StringVec type_names;
       std::string node_name;
@@ -3302,7 +3302,7 @@ call the base class __init__ function." );
     PyObject* pythonAddURNResolveRule( PyObject *self, PyObject *args ) {
            // args are (field, setting_name = "", section_name = "" )
       if( PyTuple_Check( args ) ) {
-        unsigned int nr_args =  PyTuple_Size( args );
+        Py_ssize_t nr_args =  PyTuple_Size( args );
         
         if( nr_args != 3 ) {
           ostringstream err;

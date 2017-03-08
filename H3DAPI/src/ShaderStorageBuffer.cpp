@@ -39,8 +39,8 @@ H3DNodeDatabase ShaderStorageBuffer::database ( "ShaderStorageBuffer",
 
 // initialize static member
 H3DUtil::MutexLock ShaderStorageBuffer::global_block_bindings_lock;
-std::set<unsigned int> ShaderStorageBuffer::global_block_bindings;
-unsigned int ShaderStorageBuffer::max_block_bindings;
+std::set<size_t> ShaderStorageBuffer::global_block_bindings;
+size_t ShaderStorageBuffer::max_block_bindings;
 
 namespace ShaderStorageBufferInternals{
   FIELDDB_ELEMENT ( ShaderStorageBuffer, width, INPUT_OUTPUT );
@@ -175,7 +175,7 @@ ShaderStorageBuffer::~ShaderStorageBuffer ( ){
 
 int ShaderStorageBuffer::generateShaderStorageBinding ( ){
   global_block_bindings_lock.lock ( );
-  set<unsigned int>::const_iterator it_end = global_block_bindings.end ( );
+  set<size_t>::const_iterator it_end = global_block_bindings.end ( );
   if ( global_block_bindings.size()>=max_block_bindings )
   {
     global_block_bindings_lock.unlock ( );
@@ -189,7 +189,7 @@ int ShaderStorageBuffer::generateShaderStorageBinding ( ){
     {
       global_block_bindings.insert ( i );
       global_block_bindings_lock.unlock ( );
-      return i;
+      return static_cast<int>(i);
     }
   }
   global_block_bindings_lock.unlock ( );
@@ -198,10 +198,10 @@ int ShaderStorageBuffer::generateShaderStorageBinding ( ){
 
 void ShaderStorageBuffer::deleteShaderStorageBinding ( int binding ){
   global_block_bindings_lock.lock ( );
-  set<unsigned int>::const_iterator it_end = global_block_bindings.end ( );
-  if ( global_block_bindings.find( binding ) == it_end )
+  set<size_t>::const_iterator it_end = global_block_bindings.end ( );
+  if ( global_block_bindings.find( static_cast<size_t>(binding) ) == it_end )
   {
-    global_block_bindings.erase(binding);
+    global_block_bindings.erase(static_cast<size_t>(binding));
     global_block_bindings_lock.unlock ( );
   }
   global_block_bindings_lock.unlock ( );

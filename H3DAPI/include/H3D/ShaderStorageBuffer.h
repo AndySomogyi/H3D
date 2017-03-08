@@ -131,9 +131,9 @@ namespace H3D {
     
     // collection of all the current storage block binding points already used, 
     // it will be used to help generate non-identical block binding id
-    static set<unsigned int> global_block_bindings;
+    static set<size_t> global_block_bindings;
     static H3DUtil::MutexLock global_block_bindings_lock;
-    static unsigned int max_block_bindings;
+    static size_t max_block_bindings;
     static int generateShaderStorageBinding ( );
     static void deleteShaderStorageBinding ( int binding );
 

@@ -2057,10 +2057,10 @@ LRESULT H3DWindowNode::Message(HWND _hWnd,
 
           GetKeyboardState( state );
 
-          if( ToAscii( key, 0, state, code, 0 ) == 1 )
+          if( ToAscii( static_cast<UINT>(key), 0, state, code, 0 ) == 1 )
             key=code[ 0 ];
 
-          onKeyUp(key, false );
+          onKeyUp(static_cast<int>(key), false );
         }
       }
       break;
@@ -2077,11 +2077,11 @@ LRESULT H3DWindowNode::Message(HWND _hWnd,
     case WM_SYSDEADCHAR:
     case WM_DEADCHAR:
     case WM_SYSCHAR:
-    case WM_CHAR: onKeyDown( wParam, false ); break;
+    case WM_CHAR: onKeyDown( static_cast<int>(wParam), false ); break;
 
     case WM_MENUCHAR: {
       if( GetKeyState( VK_MENU ) >= 0 )
-        onKeyDown( wParam, false );
+        onKeyDown( static_cast<int>(wParam), false );
       break;
     }
 
