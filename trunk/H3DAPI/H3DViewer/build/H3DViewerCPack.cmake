@@ -91,7 +91,7 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
     endif()
     set( CPACK_NSIS_DISPLAY_NAME "H3DViewer${CPACK_NSIS_DISPLAY_NAME_POSTFIX} ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}" )
 
-    set( features_to_install "bin" "H3DViewer/${external_bin_path}" )
+    set( FEATURES_TO_INSTALL "bin" "H3DViewer/${external_bin_path}" )
     set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\\n" )
     set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "\\n" )
     set( temp_output_postfix ${CMAKE_MODULE_PATH} )
