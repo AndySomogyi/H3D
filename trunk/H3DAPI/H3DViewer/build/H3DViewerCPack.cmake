@@ -158,25 +158,25 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
       endif()
     endforeach()
     
-    set( H3D_MSVC_VERSION 6 )
+    set( h3d_msvc_version 6 )
     set( temp_msvc_version 1299 )
     while( ${MSVC_VERSION} GREATER ${temp_msvc_version} )
-      math( EXPR H3D_MSVC_VERSION "${H3D_MSVC_VERSION} + 1" )
+      math( EXPR h3d_msvc_version "${h3d_msvc_version} + 1" )
       math( EXPR temp_msvc_version "${temp_msvc_version} + 100" )
     endwhile()
 
     if( H3D_USE_DEPENDENCIES_ONLY )      
       # these part are added separately so that these plug in can be automatically added to H3DViewer
-      install( FILES ${H3DViewer_BINARY_DIR}/../../H3DPhysics/Release/H3DPhysics_vc${H3D_MSVC_VERSION}.dll
-                     ${H3DViewer_BINARY_DIR}/../../MedX3D/Release/MedX3D_vc${H3D_MSVC_VERSION}.dll
-                     ${H3DViewer_BINARY_DIR}/../../UI/Release/UI_vc${H3D_MSVC_VERSION}.dll
+      install( FILES ${H3DViewer_BINARY_DIR}/../../H3DPhysics/Release/H3DPhysics_vc${h3d_msvc_version}.dll
+                     ${H3DViewer_BINARY_DIR}/../../MedX3D/Release/MedX3D_vc${h3d_msvc_version}.dll
+                     ${H3DViewer_BINARY_DIR}/../../UI/Release/UI_vc${h3d_msvc_version}.dll
                      CONFIGURATIONS Release
                      DESTINATION H3DViewer/plugins )
     else( H3D_USE_DEPENDENCIES_ONLY )
       # these part are added separately so that these plug in can be automatically added to H3DViewer
-      install( FILES ${H3DViewer_SOURCE_DIR}/../../../${default_bin_install}/H3DPhysics_vc${H3D_MSVC_VERSION}.dll
-                     ${H3DViewer_SOURCE_DIR}/../../../${default_bin_install}/MedX3D_vc${H3D_MSVC_VERSION}.dll
-                     ${H3DViewer_SOURCE_DIR}/../../../${default_bin_install}/UI_vc${H3D_MSVC_VERSION}.dll
+      install( FILES ${H3DViewer_SOURCE_DIR}/../../../${default_bin_install}/H3DPhysics_vc${h3d_msvc_version}.dll
+                     ${H3DViewer_SOURCE_DIR}/../../../${default_bin_install}/MedX3D_vc${h3d_msvc_version}.dll
+                     ${H3DViewer_SOURCE_DIR}/../../../${default_bin_install}/UI_vc${h3d_msvc_version}.dll
                      CONFIGURATIONS Release
                      DESTINATION H3DViewer/plugins )
     endif()
