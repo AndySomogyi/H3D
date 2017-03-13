@@ -248,9 +248,3 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
   endif()
   include( CPack )
 endif()
-
-if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../SimulationBase/SimulationAPI/build )
-  message( STATUS "Including SimulationAPI" )
-  add_subdirectory( ${H3DWithToolkitsWin_SOURCE_DIR}/../SimulationBase/SimulationAPI/build
-                    ${CMAKE_CURRENT_BINARY_DIR}/SimulationBase/SimulationAPI/build )
-endif()
