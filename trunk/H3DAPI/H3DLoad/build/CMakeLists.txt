@@ -46,7 +46,7 @@ include_directories( ../src )
 set( required_libs )
 
 # Where to find modules, used when finding packages.
-set( CMAKE_MODULE_PATH ${H3DLoad_SOURCE_DIR}/../../build/modules/sharedModules )
+set( CMAKE_MODULE_PATH "${H3DLoad_SOURCE_DIR}/../../build/modules/sharedModules" )
 if( COMMAND cmake_policy )
   if( POLICY CMP0011 )
     cmake_policy( SET CMP0011 NEW )
