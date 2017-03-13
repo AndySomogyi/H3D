@@ -108,7 +108,7 @@ set( H3DAPI_BUILD_VERSION 1 )
 
 
 # Set here already in case a special NSIS template needs to be used by cpack.
-set( CMAKE_MODULE_PATH ${H3DAPI_SOURCE_DIR}/modules ${H3DAPI_SOURCE_DIR}/modules/sharedModules )
+set( CMAKE_MODULE_PATH "${H3DAPI_SOURCE_DIR}/modules" "${H3DAPI_SOURCE_DIR}/modules/sharedModules" )
 if( COMMAND cmake_policy )
   if( POLICY CMP0011 )
     cmake_policy( SET CMP0011 NEW )
@@ -777,7 +777,7 @@ endif()
 
 if( H3DAPI_EXAMPLE_PROJECTS )
   if( GLUT_FOUND )
-    message( STATUS "Including H3DAPI manual Examples" )
+    message( STATUS "Including H3DAPI manual examples" )
     add_subdirectory( ${H3DAPI_SOURCE_DIR}/../examples/manualExamples/C++
                       ${CMAKE_CURRENT_BINARY_DIR}/examples/manualExamples )
   endif()

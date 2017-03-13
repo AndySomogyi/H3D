@@ -6,6 +6,8 @@ endif()
 # in the included file. All header files are added to a variable called
 # H3DAPI_HEADERS.
 include( ${H3DAPI_SOURCE_DIR}/H3DAPISourceFiles.txt )
+list( APPEND H3DAPI_HEADERS ${H3DAPI_SOURCE_DIR}/../include/H3D/StdAfx.h )
+list( APPEND H3DAPI_SRCS ${H3DAPI_SOURCE_DIR}/../src/StdAfx.cpp )
 
 # If cpack should be configured.
 if( GENERATE_CPACK_PROJECT )
@@ -590,9 +592,17 @@ if( GENERATE_CPACK_PROJECT )
            DESTINATION H3DAPI/build
            COMPONENT H3DAPI_cpack_sources )
 
+  install( FILES ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions.ini.in
+                 ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions_64.ini.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/NSIS.template.in
+           DESTINATION H3DAPI/build/modules
+           COMPONENT H3DAPI_cpack_sources )
+  
   install( FILES ${H3DAPI_SOURCE_DIR}/modules/sharedModules/Find3DXWARE.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindAudiofile.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindBZip2.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindChai3D.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindCURL.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindDCMTK.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindDirectShow.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindDirectX.cmake
@@ -600,7 +610,9 @@ if( GENERATE_CPACK_PROJECT )
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindFontConfig.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindFreeImage.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindFTGL.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindFreetype.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindGLEW.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindGLUT.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindGLUTWin.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindH3DAPI.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindH3DBZip2.cmake
@@ -611,25 +623,30 @@ if( GENERATE_CPACK_PROJECT )
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindH3DUtil.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindH3DZLIB.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindHAPI.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindLibOVR.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindMd5sum.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindNvidiaCG.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindOpenAL.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindOpenEXR.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindOpenHaptics.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindPTHREAD.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindSixenseSDK.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindSpiderMonkey.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindTeem.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindV8.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindVirtualHand.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindVorbis.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindWxWidgetsWin.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindXerces.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindXercesC.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindZLIB.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/H3DCommonFunctions.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/H3DExternalSearchPath.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/InstallH3DAPIAndExternals.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions.ini.in
-                 ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions_64.ini.cmake
-                 ${H3DAPI_SOURCE_DIR}/modules/NSIS.template.in
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/StripAndAddLibraryDirectories.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/TestIfVCExpress.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/UseDebian.cmake
-           DESTINATION H3DAPI/build/modules
+           DESTINATION H3DAPI/build/modules/sharedModules
            COMPONENT H3DAPI_cpack_sources )
 
   install( DIRECTORY ${H3DAPI_SOURCE_DIR}/../Conformance
