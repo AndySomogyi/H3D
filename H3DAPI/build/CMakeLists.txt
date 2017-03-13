@@ -373,7 +373,7 @@ endif()
 find_package( OpenAL )
 if( OPENAL_FOUND )
   set( HAVE_OPENAL 1 )
-  include_directories( ${OPENAL_INCLUDE_DIR} )
+  include_directories( ${OPENAL_INCLUDE_DIRS} )
   set( optional_libs ${optional_libs} ${OPENAL_LIBRARIES} )
 endif()
 
@@ -461,10 +461,10 @@ if( NOT WIN32 )
   # Linux specific libraries
 
   find_package( FontConfig )
-  if( FONTCONFIG_FOUND )
+  if( FontConfig_FOUND )
     set( HAVE_FONTCONFIG 1 )
-    include_directories( ${FONTCONFIG_INCLUDE_DIRS} )
-    set( optional_libs ${optional_libs} ${FONTCONFIG_LIBRARIES} )
+    include_directories( ${FontConfig_INCLUDE_DIRS} )
+    set( optional_libs ${optional_libs} ${FontConfig_LIBRARIES} )
   endif()
 
   if( NOT APPLE )
@@ -660,7 +660,7 @@ if( WIN32 )
     set( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /DELAYLOAD:\"Haptik.Library.dll\"" )
   endif()
 
-  if( SIXENSE_FOUND AND MSVC )
+  if( SixenseSDK_FOUND AND MSVC )
     set( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /DELAYLOAD:\"sixense.dll\" /DELAYLOAD:\"sixense_utils.dll\" /DELAYLOAD:\"sixense_x64.dll\" /DELAYLOAD:\"sixense_utils_x64.dll\"" )
   endif()
   

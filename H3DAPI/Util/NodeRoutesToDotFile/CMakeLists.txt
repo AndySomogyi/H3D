@@ -106,7 +106,7 @@ endif()
 # Optional extra library. Used for sound in H3D API.
 find_package( OpenAL )
 if( OPENAL_FOUND )
-  include_directories( ${OPENAL_INCLUDE_DIR} )
+  include_directories( ${OPENAL_INCLUDE_DIRS} )
   set( optional_libs ${optional_libs} ${OPENAL_LIBRARIES} )
 endif()
 

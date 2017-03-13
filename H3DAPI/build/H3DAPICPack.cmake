@@ -30,7 +30,7 @@ if( GENERATE_CPACK_PROJECT )
     endif()
 
     if( TARGET OpenHapticsRenderer )
-      set( OPENHAPTICS_FOUND TRUE )
+      set( OpenHaptics_FOUND TRUE )
     endif()
     if( TARGET Chai3DRenderer )
       set( CHAI3D_FOUND TRUE )
