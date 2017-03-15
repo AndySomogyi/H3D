@@ -73,6 +73,7 @@ parser.add_argument('--testdefs', dest='testdefs', help='The name of one or more
 parser.add_argument('--resolution', dest='resolution', help='The resolution h3dload should be run at (only used for h3dload), in the format widthxheight, for example 800x600', default='640x480')
 parser.add_argument('--inject_at_end_of_scene', dest='inject_at_end_of_scene', help='Specifies if the testing boilerplate nodes should be injected before </Scene> instead of the standard behaviour of injecting after <Scene>. For compatibility with projects that do search-and-replace inside the x3d file and might match information in one of the unittesting nodes if they come before nodes that are expected to be in Scene.', default=False)
 parser.add_argument('--simulationbasedir', dest='simulationbasedir', help='Path to the directory where the project that is being tested has its SimulationBase  python directory, this is required for using the settings testdef property.', default=None)
+parser.add_argument('--skipResultUpload', dest='skipResultUpload', action='store_true',help='Specifies if skip the uploading of result, this can be handy while doing simple test', default=False)
 args = parser.parse_known_args()[0]
 
 
@@ -557,16 +558,17 @@ class TestCaseRunner ( object ):
      
     results = []
     
-    self.server_name = args.servername;
-    self.ConnectDB()
-    
-    curs = self.db.cursor()
-    curs.execute("SELECT id FROM servers WHERE server_name='%s'" % self.server_name)
-    res = curs.fetchone()
-    if res == None:
-      print("Failed to obtain server id from db")
-      return
-    self.server_id = res[0]
+    if not args.skipResultUpload:
+      self.server_name = args.servername;
+      self.ConnectDB()
+      
+      curs = self.db.cursor()
+      curs.execute("SELECT id FROM servers WHERE server_name='%s'" % self.server_name)
+      res = curs.fetchone()
+      if res == None:
+        print("Failed to obtain server id from db")
+        return
+      self.server_id = res[0]
 
     all_tests_successful = True
     all_tests_run = True
@@ -588,7 +590,7 @@ class TestCaseRunner ( object ):
                 all_tests_successful = case_results.success and all_tests_successful
                 all_tests_run = case_results.terminates_ok and all_tests_run
                 testCase.filename = (os.path.relpath(file_path, directory)).replace('\'', '/') # This is used to set up the tree structure for the results page. It will store this parameter in the database as a unique identifier of this specific file of tests.
-                if case_results != None:  
+                if not args.skipResultUpload and case_results != None:  
                   self.UploadResultsToSQL(testCase, case_results, root, filedescription)            
     if not found_tests:
       print "No valid tests found in: " + os.path.abspath(directory)
