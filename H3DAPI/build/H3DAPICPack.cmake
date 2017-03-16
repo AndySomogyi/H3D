@@ -33,7 +33,7 @@ if( GENERATE_CPACK_PROJECT )
       set( OpenHaptics_FOUND TRUE )
     endif()
     if( TARGET Chai3DRenderer )
-      set( CHAI3D_FOUND TRUE )
+      set( Chai3D_FOUND TRUE )
     endif()
     include( ${H3DAPI_SOURCE_DIR}/../../HAPI/build/HAPICPack.cmake )
   endif()
@@ -597,7 +597,7 @@ if( GENERATE_CPACK_PROJECT )
                  ${H3DAPI_SOURCE_DIR}/modules/NSIS.template.in
            DESTINATION H3DAPI/build/modules
            COMPONENT H3DAPI_cpack_sources )
-  
+
   install( FILES ${H3DAPI_SOURCE_DIR}/modules/sharedModules/Find3DXWARE.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindAudiofile.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindBZip2.cmake
