@@ -40,7 +40,7 @@ X3DFontStyleNode::X3DFontStyleNode(
   type_name = "X3DFontStyleNode";
 }
 
-Vec3f X3DFontStyleNode::stringDimensions( const string &text,
+Vec3f X3DFontStyleNode::stringDimensions( const std::string& text,
                                           Alignment alignment ) {
   Vec3f dimensions = Vec3f( 0, 0, 0 ); 
   
@@ -66,16 +66,16 @@ Vec3f X3DFontStyleNode::stringDimensions( const string &text,
   return dimensions;
 }
 
-Vec3f X3DFontStyleNode::stringDimensions( const vector< string > &text,
+Vec3f X3DFontStyleNode::stringDimensions( const std::vector< std::string >& text,
                                           Alignment alignment,
-                                          const vector< H3DFloat > &length ) {
+                                          const std::vector< H3DFloat >& length ) {
   Vec3f dims( 0, 0, 0 );
   
   H3DFloat spacing = getSpacing();
 
-  vector< H3DFloat >::const_iterator l = length.begin();
+  std::vector< H3DFloat >::const_iterator l = length.begin();
 
-  for( vector< string >::const_iterator i = text.begin();
+  for( std::vector< std::string >::const_iterator i = text.begin();
        i != text.end();
        ++i ) {
     Vec3f line_dims = stringDimensions( *i, alignment );
@@ -102,6 +102,7 @@ Vec3f X3DFontStyleNode::stringDimensions( const vector< string > &text,
         dims = line_dims;
       }
     }
-  } 
+  }
+
   return dims;
 }

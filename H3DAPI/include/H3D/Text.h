@@ -157,7 +157,7 @@ namespace H3D {
 
     // Traverse the scenegraph. See X3DGeometryNode::traverseSG
     // for more info.
-    virtual void traverseSG( TraverseInfo &ti ); 
+    virtual void traverseSG( TraverseInfo& ti ); 
 
     /// The number of triangles renderered in this geometry, we don't know
     /// so return -1
@@ -172,16 +172,16 @@ namespace H3D {
     /// object that intersects the line.
     /// \returns true if intersected, false otherwise.
     virtual bool lineIntersect( 
-      const Vec3f &from,
-      const Vec3f &to,    
-      LineIntersectResult &result );
+      const Vec3f& from,
+      const Vec3f& to,    
+      LineIntersectResult& result );
 
     /// The style the text should be rendered with. See X3DFontStyleNode.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// 
     /// \dotfile Text_fontStyle.dot
-    auto_ptr< SFFontStyleNode   >  fontStyle;
+    auto_ptr< SFFontStyleNode >  fontStyle;
     
     /// The length field contains an MFFloat value that specifies the length
     /// of each text string in the local coordinate system. If the string is
@@ -198,7 +198,7 @@ namespace H3D {
     /// <b>Valid range:</b> >=0
     /// 
     /// \dotfile Text_length.dot
-    auto_ptr< MFFloat  >  length;
+    auto_ptr< MFFloat >  length;
 
     /// The maxExtent field limits and compresses all of the text strings if
     /// the length of the maximum string is longer than the maximum extent, as
@@ -214,7 +214,7 @@ namespace H3D {
     /// <b>Valid range:</b> >=0
     /// 
     /// \dotfile Text_maxExtent.dot
-    auto_ptr< SFFloat  >  maxExtent;
+    auto_ptr< SFFloat >  maxExtent;
 
     /// The strings to render. Each string will be on its own line.
     /// 
@@ -258,7 +258,7 @@ namespace H3D {
     /// <b>Default value:</b> FALSE \n
     /// 
     /// \dotfile Text_solid.dot
-    auto_ptr< SFBool   >  solid;
+    auto_ptr< SFBool >  solid;
 
     /// The H3DNodeDatabase for this node.
     static H3DNodeDatabase database;
@@ -277,29 +277,29 @@ namespace H3D {
     /// the value of the maxExtent field. The length field is inspected as
     /// well as the dimensions of the text to determine what the scale should
     /// be.
-    virtual void scaleToMaxExtent( const vector< string >&text, 
-                                   X3DFontStyleNode *font );
+    virtual void scaleToMaxExtent( const std::vector< std::string >& text, 
+                                   X3DFontStyleNode* font );
     
     /// Justify the text in the minor alignment by translating it in the 
     /// way described in the FontStyle node.
-    virtual void justifyMinor( const vector< string > &text,
-                               X3DFontStyleNode *font );
+    virtual void justifyMinor( const std::vector< std::string >& text,
+                               X3DFontStyleNode* font );
 
     /// Move to the position of the next line. What the next line is
     /// depends on the values in the FontStyle node, i.e. if the text
     /// is horizontal, if it is top to bottom or the other way around, 
     /// spacing etc.
-    virtual void moveToNewLine( const string &text, X3DFontStyleNode *font );
+    virtual void moveToNewLine( const std::string& text, X3DFontStyleNode* font );
 
     /// Render a line of text in the style of the X3DFontStyleNode given.
     /// The OpenGL transform matrices will not be changed by the call.
-    virtual void renderTextLine( const string& text,
-                                 X3DFontStyleNode *font );
+    virtual void renderTextLine( const std::string& text,
+                                 X3DFontStyleNode* font );
     
     /// Justify the line of text in the major alignment by translating
     /// it in the way described in the FontStyle node.
-    virtual void justifyLine( const string& text,
-                              X3DFontStyleNode *font );
+    virtual void justifyLine( const std::string& text,
+                              X3DFontStyleNode* font );
   };
 }
 
