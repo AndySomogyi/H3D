@@ -157,11 +157,11 @@ namespace H3D {
   class H3DAPI_API FontStyle : public X3DFontStyleNode {
   public:
     /// Thrown when the string in the style field is an invalid value.
-    H3D_VALUE_EXCEPTION( string, InvalidFontStyleStyle );
+    H3D_VALUE_EXCEPTION( std::string, InvalidFontStyleStyle );
     /// Thrown when the strings in the justify field are invalid values.
-    H3D_VALUE_EXCEPTION( string, InvalidFontStyleJustify );
+    H3D_VALUE_EXCEPTION( std::string, InvalidFontStyleJustify );
     /// Thrown when the strings in the renderType field are invalid values.
-    H3D_VALUE_EXCEPTION( string, InvalidFontStyleRenderType );
+    H3D_VALUE_EXCEPTION( std::string, InvalidFontStyleRenderType );
 
     /// Constructor.
     FontStyle( Inst< SFNode   > _metadata    = 0,
@@ -212,7 +212,7 @@ namespace H3D {
     virtual void renderChar( unsigned char c );
 
     /// Render the given string with this font from left to right horizontally.
-    virtual void renderHorizontalLine( const string &c );
+    virtual void renderHorizontalLine( const std::string& c );
 
     /// Returns how many metres in the the positive y-direction from the
     /// origin the characters of this font use. 
@@ -344,7 +344,7 @@ namespace H3D {
 #if defined( HAVE_FREETYPE ) && defined( HAVE_FTGL )
     /// FTGL container class for all glyphs in the current font, used to
     /// measure bounding  boxes, render, advance, etc.
-    FTFont *font;
+    FTFont* font;
 #endif
   };
 }

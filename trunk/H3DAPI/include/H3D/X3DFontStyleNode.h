@@ -56,7 +56,7 @@ namespace H3D {
     } Justification;
     
     /// Constructor.
-    X3DFontStyleNode( Inst< SFNode>  _metadata = 0 );
+    X3DFontStyleNode( Inst< SFNode> _metadata = 0 );
 
     /// Build Character instances for all characters that will be allowed
     /// for use by this font node. Characters are to be put into the 
@@ -106,7 +106,7 @@ namespace H3D {
     virtual void renderChar( unsigned char c ) {}
 
     /// Render the given string with this font from left to right horizontally.
-    virtual void renderHorizontalLine( const string &s ) {}
+    virtual void renderHorizontalLine( const std::string& s ) {}
 
     /// Get the dimensions in metres of the character given when 
     /// rendered with this font.
@@ -123,7 +123,7 @@ namespace H3D {
     /// Given a text string and an alignment of the text the function
     /// returns the dimensions of the bounding box of the 3d representation
     /// of the text using this font.
-    Vec3f stringDimensions( const string &text,
+    Vec3f stringDimensions( const std::string& text,
                             Alignment alignment );
 
     /// Given a vector of text string and an alignment of the text the 
@@ -132,15 +132,15 @@ namespace H3D {
     /// the length of the text fields as in the Text node. If this is 
     /// specified this length will be used as length for as many strings
     /// in text as there are values in length.
-    Vec3f stringDimensions( const vector< string > &text,
+    Vec3f stringDimensions( const std::vector< std::string >& text,
                             Alignment alignment,
-                            const vector< H3DFloat > &length = 
-                            vector< H3DFloat >() );
+                            const std::vector< H3DFloat >& length = 
+                            std::vector< H3DFloat >() );
 
     /// Returns the default xml containerField attribute value.
     /// For this node it is "fontStyle".
     ///
-    virtual string defaultXMLContainerField() {
+    virtual std::string defaultXMLContainerField() {
       return "fontStyle";
     }
 

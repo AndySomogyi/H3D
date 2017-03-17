@@ -90,7 +90,7 @@ namespace H3D {
     virtual void setTextureUnit( GLint unit ) {texture_unit=unit;}
 
     /// Set the OpenGL texture target that is used for this texture.
-    virtual void setTextureTarget( GLenum target ) {texture_target = target;}
+    virtual void setTextureTarget( GLenum target ) { texture_target = target; }
 
     ///{
     /// Bindless texturing functions
