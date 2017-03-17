@@ -61,7 +61,7 @@ if( H3D_USE_DEPENDENCIES_ONLY )
   include_directories( ${H3DPHYSICS_INCLUDE_DIR} )
 
   set( required_libs ${required_libs} H3DUtil HAPI H3DAPI UI H3DPhysics )
-else( H3D_USE_DEPENDENCIES_ONLY )
+else()
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 

@@ -30,7 +30,7 @@ if( H3D_USE_DEPENDENCIES_ONLY )
   include_directories( ${H3DAPI_INCLUDE_DIR} )
 
   set( required_libs ${required_libs} H3DUtil HAPI H3DAPI )
-else( H3D_USE_DEPENDENCIES_ONLY )
+else()
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
@@ -79,7 +79,7 @@ option( INCLUDE_Geospatial
 if( INCLUDE_Geospatial )
   if( TARGET Geospatial )
     set( Geospatial_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/bin" )
-  else( TARGET Geospatial )
+  else()
     find_file( Geospatial_DLL "Geospatial" )
 
     if( Geospatial_DLL )
@@ -96,7 +96,7 @@ option( INCLUDE_H3DPhysics
 if( INCLUDE_H3DPhysics )
   if( TARGET H3DPhysics )
     set( H3DPhysics_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${default_bin_install}" )
-  else( TARGET H3DPhysics )
+  else()
     find_package( H3DPhysics )
 
     if( H3DPhysics_FOUND )
@@ -113,7 +113,7 @@ option( INCLUDE_MedX3D
 if( INCLUDE_MedX3D )
   if( TARGET MedX3D )
     set( MedX3D_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/${default_bin_install}" )
-  else( TARGET MedX3D )
+  else()
     find_package( MedX3D )
 
     if( MEDX3D_FOUND )

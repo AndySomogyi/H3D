@@ -68,7 +68,7 @@ endif()
 if( TARGET H3DUtil )
   include_directories( ${H3DUTIL_INCLUDE_DIR} )
   set( required_libs ${required_libs} H3DUtil )
-else( TARGET H3DUtil )
+else()
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
@@ -81,7 +81,7 @@ endif()
 if( TARGET HAPI )
   include_directories( ${HAPI_INCLUDE_DIR} )
   set( required_libs ${required_libs} HAPI )
-else( TARGET HAPI )
+else()
   #HAPI
   find_package( HAPI REQUIRED )
 
@@ -94,7 +94,7 @@ endif()
 if( TARGET H3DAPI )
   include_directories( ${H3DAPI_INCLUDE_DIR} )
   set( required_libs ${required_libs} H3DAPI )
-else( TARGET H3DAPI )
+else()
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
@@ -105,25 +105,15 @@ else( TARGET H3DAPI )
 endif()
 
 # WxWidgets.
-set( TMP_wxWidgets_FOUND FALSE )
 set( WXWINDOWS_USE_GL 1 )
-if( WIN32 )
-  find_package( wxWidgetsWin )
-  if( wxWidgets_FOUND )
+find_package( wxWidgets COMPONENTS base core gl adv )
+if( wxWidgets_FOUND )
+  if( WIN32 )
     include_directories( ${wxWidgets_INCLUDE_DIR} )
-    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
-    set( TMP_wxWidgets_FOUND TRUE )
-  endif()
-endif()
-
-if( TMP_wxWidgets_FOUND )
-else( TMP_wxWidgets_FOUND )
-  set( wxWidgets_USE_LIBS base core gl adv )
-  find_package( wxWidgets REQUIRED )
-  if( wxWidgets_FOUND )
+  else()
     include( ${wxWidgets_USE_FILE} )
-    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
   endif()
+  set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
 endif()
 
 # Create build files.

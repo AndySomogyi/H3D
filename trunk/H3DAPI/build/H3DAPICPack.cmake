@@ -22,7 +22,7 @@ if( GENERATE_CPACK_PROJECT )
             set( H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT "${EXTERNAL_INCLUDE_DIR_TMP}/.." )
           endif()
         endforeach()
-      else( H3D_USE_DEPENDENCIES_ONLY )
+      else()
         set( H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT "$ENV{H3D_EXTERNAL_ROOT}" )
       endif()
       set( H3DAPI_CPACK_EXTERNAL_ROOT "${H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT}" CACHE PATH "Set to the External directory used with H3DAPI, needed to pack properly. If not set FIND_modules will be used instead." )
@@ -192,7 +192,7 @@ if( GENERATE_CPACK_PROJECT )
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/ftgl.dll
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/js32.dll )
 
-    else( EXISTS ${H3DAPI_CPACK_EXTERNAL_ROOT} )
+    else()
       message( WARNING "H3DAPI_CPACK_EXTERNAL_ROOT must be set to the External directory used by H3DAPI in order to package properly." )
     endif()
 
@@ -292,7 +292,7 @@ if( GENERATE_CPACK_PROJECT )
         set( H3DAPI_CPACK_INSTALLED_DIRECTORIES ${H3DAPI_CPACK_INSTALLED_DIRECTORIES}
                                                 "${VHTK_EXAMPLES_FOLDER};H3DAPI/examples/VHTK" )
         set( CPACK_ADD_VHTK_DEMOS_LINKS "ON" )
-      else( VHTK_EXAMPLES_FOLDER )
+      else()
         set( CPACK_ADD_VHTK_DEMOS_LINKS "OFF" )
       endif()
     endif()
@@ -330,34 +330,34 @@ if( GENERATE_CPACK_PROJECT )
             set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                      ${MS_REDIST_ARCH_COMMAND} )
           endif()
-          set( MS_REDIST_INSTALL_COMMAND_1 " Set output Path\\n  SetOutPath \\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\"\\n"
+          set( ms_redist_install_command_1 " Set output Path\\n  SetOutPath \\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\"\\n"
                                            " Code to install Visual studio redistributable\\n  File \\\"${Temp_vc${redist_version_with_arch}_redist}\\\"\\n" )
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                                 ${MS_REDIST_INSTALL_COMMAND_1} )
+                                                 ${ms_redist_install_command_1} )
           set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                    " Check if uninstall vc redist \\n  MessageBox MB_YESNO \\\"Do you want to uninstall Visual studio ${redist_version} ${redist_architecture} bit redistributable? It is recommended if no other applications use it.\\\" IDYES uninstall_vcredist_yes${redist_architecture} IDNO uninstall_vcredist_no${redist_architecture}\\n"
                                                    " A comment \\n  uninstall_vcredist_yes${redist_architecture}:\\n"
-                                                   ${MS_REDIST_INSTALL_COMMAND_1} )
+                                                   ${ms_redist_install_command_1} )
           if( ${redist_version} LESS 9 )
             set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                    " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\\${VC${redist_version_with_arch}_FILE_NAME}\\\" /q:a /norestart /c:\\\"msiexec /i vcredist.msi /qn\\\"'\\n" )
             set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                    " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\\${VC${redist_version_with_arch}_FILE_NAME}\\\" /q:a /norestart /c:\\\"msiexec /x vcredist.msi /qn\\\"'\\n" )
-          else( )
+          else()
             set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                    " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\\${VC${redist_version_with_arch}_FILE_NAME}\\\" /q /norestart \\\"'\\n" )
             set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                    " Execute silent and wait\\n  ExecWait '\\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\\${VC${redist_version_with_arch}_FILE_NAME}\\\" /q /uninstall \\\"'\\n" )
           endif()
-          set( MS_REDIST_INSTALL_COMMAND_2 " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+          set( ms_redist_install_command_2 " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
                                            " Delete file\\n  Delete \\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\\${VC${redist_version_with_arch}_FILE_NAME}\\\"\\n"
                                            " Reset output Path\\n  SetOutPath \\\"$INSTDIR\\\"\\n"
                                            " Wait a bit for system to unlock directory.\\n  Sleep 1000\\n"
                                            " Remove folder\\n  RMDir /r \\\"$INSTDIR\\\\vc${redist_version_with_arch}\\\"\\n\\n" )
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                                 ${MS_REDIST_INSTALL_COMMAND_2} )
+                                                 ${ms_redist_install_command_2} )
           set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
-                                                   ${MS_REDIST_INSTALL_COMMAND_2}
+                                                   ${ms_redist_install_command_2}
                                                    " A comment \\n  uninstall_vcredist_no${redist_architecture}:\\n\\n" )
           if( redist_architecture EQUAL 64 )
             set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
@@ -382,16 +382,16 @@ if( GENERATE_CPACK_PROJECT )
         set( PYTHON_TARGET_DIR "" )
         string( REGEX MATCH 2\\.[456789] CPACK_PYTHON_VERSION ${${PYTHONMSI_CACHE_NAME}} )
         string( REGEX REPLACE \\. "" CPACK_PYTHON_VERSION_NO_DOT ${CPACK_PYTHON_VERSION} )
-        get_filename_component( PYTHON_FILE_NAME ${${PYTHONMSI_CACHE_NAME}} NAME )
-        string( REPLACE "/" "\\\\" TEMP_PythonInstallMSI ${${PYTHONMSI_CACHE_NAME}} )
+        get_filename_component( python_file_name ${${PYTHONMSI_CACHE_NAME}} NAME )
+        string( REPLACE "/" "\\\\" python_install_msi_tmp ${${PYTHONMSI_CACHE_NAME}} )
         set( PYTHON_ARCH_COMMAND "A comment\\n \\\${If} \\\${RunningX64}\\n" )
-        set( PYTHON_EXECUTE " Execute python installer silent, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\" /qn ALLUSERS=1'\\n" )
+        set( PYTHON_EXECUTE " Execute python installer silent, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${python_file_name}\\\" /qn ALLUSERS=1'\\n" )
         set( PYTHON_EXECUTE_TARGET_DIR " Get system dir \\n  StrCpy $1 $WINDIR 3 0\\n"
-                                       " Execute python installer silent, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\" /qn ALLUSERS=1 TARGETDIR=$1Python${CPACK_PYTHON_VERSION_NO_DOT}_${python_architecture}'\\n" )
-        set( PYTHON_INSTALL_COMMAND_1 " Code to install Python\\n  ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n" )
-        set( PYTHON_INSTALL_COMMAND_2 " Extract python installer\\n  File \\\"${TEMP_PythonInstallMSI}\\\"\\n" )
-        set( PYTHON_INSTALL_COMMAND_3 " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-                                      " Delete python installer\\n  Delete \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"\\n\\n" )
+                                       " Execute python installer silent, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${python_file_name}\\\" /qn ALLUSERS=1 TARGETDIR=$1Python${CPACK_PYTHON_VERSION_NO_DOT}_${python_architecture}'\\n" )
+        set( python_install_command_1 " Code to install Python\\n  ReadRegStr $0 HKLM SOFTWARE\\\\Python\\\\PythonCore\\\\${CPACK_PYTHON_VERSION}\\\\InstallPath \\\"\\\"\\n" )
+        set( python_install_command_2 " Extract python installer\\n  File \\\"${python_install_msi_tmp}\\\"\\n" )
+        set( python_install_command_3 " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+                                      " Delete python installer\\n  Delete \\\"$INSTDIR\\\\${python_file_name}\\\"\\n\\n" )
 
         if( python_architecture EQUAL 64 )
           set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
@@ -399,13 +399,13 @@ if( GENERATE_CPACK_PROJECT )
         endif()
         set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                  " Set reg view\\n  SetRegView ${python_architecture} \\n"
-                                                 ${PYTHON_INSTALL_COMMAND_1}
+                                                 ${python_install_command_1}
                                                  " Check if python is installed\\n  StrCmp $0 \\\"\\\" uninstall_python_no${python_architecture} 0\\n"
                                                  " Check if uninstall python \\n  MessageBox MB_YESNO \\\"Do you want to uninstall python ${python_architecture} bit? It is recommended if no other applications use python ${CPACK_PYTHON_VERSION}.\\\" IDYES uninstall_python_yes${python_architecture} IDNO uninstall_python_no${python_architecture}\\n"
                                                  " A comment \\n  uninstall_python_yes${python_architecture}:\\n"
-                                                 ${PYTHON_INSTALL_COMMAND_2}
-                                                 " Execute python installer, wait for completion\\n  ExecWait '\\\"msiexec\\\" /x \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\" /qn'\\n"
-                                                 ${PYTHON_INSTALL_COMMAND_3}
+                                                 ${python_install_command_2}
+                                                 " Execute python installer, wait for completion\\n  ExecWait '\\\"msiexec\\\" /x \\\"$INSTDIR\\\\${python_file_name}\\\" /qn'\\n"
+                                                 ${python_install_command_3}
                                                  " A comment \\n  uninstall_python_no${python_architecture}:\\n"
                                                  " Set reg view\\n  SetRegView 32 \\n" )
         set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
@@ -417,14 +417,14 @@ if( GENERATE_CPACK_PROJECT )
                                                  ${PYTHON_ARCH_COMMAND} )
         endif()
         set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                               ${PYTHON_INSTALL_COMMAND_1}
+                                               ${python_install_command_1}
                                                " Check if python is installed\\n  StrCmp $0 \\\"\\\" 0 install_python_no${python_architecture}\\n"
-                                               ${PYTHON_INSTALL_COMMAND_2}
+                                               ${python_install_command_2}
                                                "A comment \\n  ClearErrors\\n" )
         if( python_architecture EQUAL 64 )
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                "Check if python install path is free \\n  GetFullPathName $0 C:\\\\Python${CPACK_PYTHON_VERSION_NO_DOT}\\n" )
-        else( python_architecture EQUAL 64 )
+        else()
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                  "A comment\\n \\\${If} \\\${RunningX64}\\n"
                                                  "Check if python install path is free \\n  GetFullPathName $0 C:\\\\Python${CPACK_PYTHON_VERSION_NO_DOT}\\n"
@@ -438,7 +438,7 @@ if( GENERATE_CPACK_PROJECT )
         if( python_architecture EQUAL 64 )
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                  ${PYTHON_EXECUTE} )
-        else( python_architecture EQUAL 64 )
+        else()
           set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                  "A comment\\n \\\${If} \\\${RunningX64}\\n"
                                                  ${PYTHON_EXECUTE_TARGET_DIR}
@@ -449,9 +449,9 @@ if( GENERATE_CPACK_PROJECT )
         set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
                                                "A comment \\n Goto python_end_install${python_architecture}\\n"
                                                "A comment \\n python_install_not_hidden${python_architecture}:\\n"
-                                               " Execute python installer, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${PYTHON_FILE_NAME}\\\"'\\n"
+                                               " Execute python installer, wait for completion\\n  ExecWait '\\\"msiexec\\\" /i \\\"$INSTDIR\\\\${python_file_name}\\\"'\\n"
                                                " A comment \\n  python_end_install${python_architecture}:\\n"
-                                               ${PYTHON_INSTALL_COMMAND_3}
+                                               ${python_install_command_3}
                                                "A comment \\n  install_python_no${python_architecture}:\\n"
                                                "A comment \\n \\\${EndIf}\\n" )
         if( python_architecture EQUAL 64 )
@@ -468,15 +468,15 @@ if( GENERATE_CPACK_PROJECT )
     set( OpenAlInstallExe "" CACHE FILEPATH "Needs to be set to add openal installation to the package." )
     mark_as_advanced( OpenAlInstallExe )
     if( OpenAlInstallExe )
-      get_filename_component( OpenAL_FILE_NAME ${OpenAlInstallExe} NAME )
-      string( REPLACE "/" "\\\\" TEMP_OpenAlInstallExe ${OpenAlInstallExe} )
-      set( OPENAL_INSTALL_COMMAND_1 " Code to install OPENAL\\n  File \\\"${TEMP_OpenAlInstallExe}\\\"\\n" )
-      set( OPENAL_INSTALL_COMMAND_2 " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
-                                    " Delete install file\\n  Delete \\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\"\\n" )
+      get_filename_component( openal_file_name ${OpenAlInstallExe} NAME )
+      string( REPLACE "/" "\\\\" openal_install_exe_tmp ${OpenAlInstallExe} )
+      set( openal_install_command_1 " Code to install OPENAL\\n  File \\\"${openal_install_exe_tmp}\\\"\\n" )
+      set( openal_install_command_2 " Wait a bit for system to unlock file.\\n  Sleep 1000\\n"
+                                    " Delete install file\\n  Delete \\\"$INSTDIR\\\\${openal_file_name}\\\"\\n" )
       set( CPACK_NSIS_EXTRA_INSTALL_COMMANDS ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-                                             ${OPENAL_INSTALL_COMMAND_1}
-                                             " Execute install file\\n  ExecWait '\\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\" /s'\\n"
-                                             ${OPENAL_INSTALL_COMMAND_2} )
+                                             ${openal_install_command_1}
+                                             " Execute install file\\n  ExecWait '\\\"$INSTDIR\\\\${openal_file_name}\\\" /s'\\n"
+                                             ${openal_install_command_2} )
       if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # check if the system is 64 bit
         set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
                                                  "A comment\\n \\\${If} \\\${RunningX64}\\n"
@@ -488,9 +488,9 @@ if( GENERATE_CPACK_PROJECT )
                                                " Check if OpenAL is installed\\n  StrCmp $0 \\\"\\\" uninstall_openal_no 0\\n"
                                                " Check if uninstall OpenAL \\n  MessageBox MB_YESNO \\\"Do you want to uninstall OpenAL? It is recommended if no other applications use it.\\\" IDYES uninstall_openal_yes IDNO uninstall_openal_no\\n"
                                                " A comment \\n  uninstall_openal_yes:\\n"
-                                               ${OPENAL_INSTALL_COMMAND_1}
-                                               " Execute install file\\n  ExecWait '\\\"$INSTDIR\\\\${OpenAL_FILE_NAME}\\\" /u /s'\\n"
-                                               ${OPENAL_INSTALL_COMMAND_2}
+                                               ${openal_install_command_1}
+                                               " Execute install file\\n  ExecWait '\\\"$INSTDIR\\\\${openal_file_name}\\\" /u /s'\\n"
+                                               ${openal_install_command_2}
                                                " A comment \\n  uninstall_openal_no:\\n\\n" )
       if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # check if the system is 64 bit
         set( CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS ${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
@@ -552,7 +552,7 @@ if( GENERATE_CPACK_PROJECT )
     configure_file( ${H3DAPI_SOURCE_DIR}/modules/NSIS.InstallOptions_64.ini.cmake ${CMAKE_CURRENT_BINARY_DIR}/NSIS.InstallOptions_64.ini )
     string( REPLACE "/" "\\\\" Temp_CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
     set( CPACK_NSIS_INSTALLOPTIONS_64 "${Temp_CMAKE_CURRENT_BINARY_DIR}\\\\NSIS.InstallOptions_64.ini" )
-  else( WIN32 AND NOT UNIX )
+  else()
     set( H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS} /examples/Particledemo/
                                                                      "~$" )
     set( H3DAPI_CPACK_IGNORE_PATTERNS ${H3DAPI_CPACK_IGNORE_PATTERNS}
@@ -636,6 +636,7 @@ if( GENERATE_CPACK_PROJECT )
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindV8.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindVirtualHand.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindVorbis.cmake
+                 ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindwxWidgets.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindWxWidgetsWin.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindXerces.cmake
                  ${H3DAPI_SOURCE_DIR}/modules/sharedModules/FindXercesC.cmake
@@ -813,7 +814,7 @@ if( GENERATE_CPACK_PROJECT )
           break()
         endif()
       endforeach()
-    else( WIN32 AND NOT UNIX )
+    else()
       set( H3D_cmake_runtime_path_default "cmake" )
     endif()
     set( H3D_cmake_runtime_path ${H3D_cmake_runtime_path_default} CACHE FILEPATH "The path to the cmake runtime." )
@@ -840,7 +841,7 @@ if( GENERATE_CPACK_PROJECT )
                           ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_POST_BUILD} )
       add_dependencies( INSTALL_RUNTIME_AND_LIBRARIES_ONLY H3DAPI ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
     endif()
-  else( H3D_cmake_runtime_path )
+  else()
     message( STATUS "H3D_cmake_runtime_path is not set, please set it to continue" )
   endif()
 
