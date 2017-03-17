@@ -30,7 +30,7 @@ if( H3D_USE_DEPENDENCIES_ONLY )
   include_directories( ${H3DAPI_INCLUDE_DIR} )
 
   set( required_libs ${required_libs} H3DUtil HAPI H3DAPI )
-else( H3D_USE_DEPENDENCIES_ONLY )
+else()
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
@@ -84,7 +84,7 @@ if( INCLUDE_UI )
       set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../UI/doc/nodesFieldsList" )
     endif()
-  else( TARGET UI )
+  else()
     find_package( UI )
 
     if( UI_FOUND )
@@ -109,7 +109,7 @@ if( INCLUDE_H3DPhysics )
       set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../H3DPhysics/doc/nodesFieldsList" )
     endif()
-  else( TARGET H3DPhysics )
+  else()
     find_package( H3DPhysics )
 
     if( H3DPhysics_FOUND )
@@ -134,7 +134,7 @@ if( INCLUDE_MedX3D )
       set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
                                                                  "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../../MedX3D/doc/nodesFieldsList" )
     endif()
-  else( TARGET MedX3D )
+  else()
     find_package( MedX3D )
 
     if( MEDX3D_FOUND )

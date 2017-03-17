@@ -51,7 +51,7 @@ endif()
 if( TARGET H3DUtil )
   include_directories( ${H3DUTIL_INCLUDE_DIR} )
   set( required_libs ${required_libs} H3DUtil )
-else( TARGET H3DUtil )
+else()
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
@@ -64,7 +64,7 @@ endif()
 if( TARGET HAPI )
   include_directories( ${HAPI_INCLUDE_DIR} )
   set( required_libs ${required_libs} HAPI )
-else( TARGET HAPI )
+else()
   #HAPI
   find_package( HAPI REQUIRED )
 
@@ -77,7 +77,7 @@ endif()
 if( TARGET H3DAPI )
   include_directories( ${H3DAPI_INCLUDE_DIR} )
   set( required_libs ${required_libs} H3DAPI )
-else( TARGET H3DAPI )
+else()
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
@@ -97,8 +97,8 @@ if( GLUT_FOUND )
     # If freeglut.lib is in any other place than glut32 on your system
     # either this CMakeLists.txt or FindGLUTWin needs to be changed
     # to allow for choice of extra library directory.
-    STRIP_AND_ADD_LIBRARY_DIRECTORIES( ${GLUT_LIBRARIES} )
-  else( WIN32 )
+    stripAndAddLibraryDirectories( ${GLUT_LIBRARIES} )
+  else()
     set( required_libs ${required_libs} ${GLUT_LIBRARIES} )
   endif()
 endif()

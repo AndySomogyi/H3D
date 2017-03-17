@@ -19,7 +19,7 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
             set( H3DViewer_CPACK_EXTERNAL_ROOT_DEFAULT "${EXTERNAL_INCLUDE_DIR_TMP}/.." )
           endif()
         endforeach()
-      else( H3D_USE_DEPENDENCIES_ONLY )
+      else()
         set( H3DViewer_CPACK_EXTERNAL_ROOT_DEFAULT "$ENV{H3D_EXTERNAL_ROOT}" )
       endif()
       set( H3DViewer_CPACK_EXTERNAL_ROOT "${H3DViewer_CPACK_EXTERNAL_ROOT_DEFAULT}" CACHE PATH "Set to the External directory used with H3DViewer, needed to pack properly. If not set FIND_modules will be used instead." )
@@ -172,7 +172,7 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
                      ${H3DViewer_BINARY_DIR}/../../UI/Release/UI_vc${h3d_msvc_version}.dll
                      CONFIGURATIONS Release
                      DESTINATION H3DViewer/plugins )
-    else( H3D_USE_DEPENDENCIES_ONLY )
+    else()
       # these part are added separately so that these plug in can be automatically added to H3DViewer
       install( FILES ${H3DViewer_SOURCE_DIR}/../../../${default_bin_install}/H3DPhysics_vc${h3d_msvc_version}.dll
                      ${H3DViewer_SOURCE_DIR}/../../../${default_bin_install}/MedX3D_vc${h3d_msvc_version}.dll

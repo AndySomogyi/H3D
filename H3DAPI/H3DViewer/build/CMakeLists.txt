@@ -102,7 +102,7 @@ if( MSVC AND PRECOMPILED_HEADERS_${PROJECT_NAME} )
                                  PROPERTIES COMPILE_FLAGS "/Zm900 /FIStdAfx.h /YuStdAfx.h" )
     set_source_files_properties( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
                                  PROPERTIES COMPILE_FLAGS "/Zm900 /YcStdAfx.h" )
-  else( ${MSVC_VERSION} LESS 1900 )
+  else()
     set_source_files_properties( ${H3DViewer_SRCS}
                                  PROPERTIES COMPILE_FLAGS "/FIStdAfx.h /YuStdAfx.h" )
     set_source_files_properties( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
@@ -141,7 +141,7 @@ endif()
 if( TARGET H3DUtil )
   include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
   set( required_libs ${required_libs} H3DUtil )
-else( TARGET H3DUtil )
+else()
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
@@ -154,7 +154,7 @@ endif()
 if( TARGET HAPI )
   include_directories( ${HAPI_INCLUDE_DIR} ) 
   set( required_libs ${required_libs} HAPI )
-else( TARGET HAPI )
+else()
   #HAPI
   find_package( HAPI REQUIRED )
 
@@ -167,7 +167,7 @@ endif()
 if( TARGET H3DAPI )
   include_directories( ${H3DAPI_INCLUDE_DIR} ) 
   set( required_libs ${required_libs} H3DAPI )
-else( TARGET H3DAPI )
+else()
   #H3DAPI
   find_package( H3DAPI REQUIRED )
 
@@ -185,24 +185,8 @@ set( WXWINDOWS_USE_GL 1 )
 # Since there is no wxWidgets_VERSION variable or something like that there is code to check the end of
 # include path. I have no idea if this would work on all other UNIX systems as well. NOTE, report
 # this to CMAKE unless it is reported already.
-set( wxWidgets_USE_LIBS propgrid )  
-set( wxWidgets_FIND_QUIETLY 1 )
-set( wxWidgets_FOUND 0 )
-if( WIN32 )
-  find_package( wxWidgetsWin )
-  if( wxWidgets_FOUND )
-    include_directories( ${wxWidgets_INCLUDE_DIR} ) 
-    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
-  endif()
-endif()
-
+find_package( wxWidgets QUIET COMPONENTS propgrid )
 if( wxWidgets_FOUND )
-else( wxWidgets_FOUND )
-  find_package( wxWidgets )
-endif()
-
-if( wxWidgets_FOUND )
-
   if( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
     set( wxwidgets_version_above_28 FALSE )
     foreach( TMP_INCLUDE_DIR ${wxWidgets_INCLUDE_DIRS} )
@@ -220,33 +204,26 @@ if( wxWidgets_FOUND )
   endif()
 endif()
 
+set( wx_components )
 if( wxWidgets_FOUND )
   set( HAVE_WXPROPGRID 1 )
-  set( wxWidgets_USE_LIBS base core gl adv richtext html propgrid qa )  
-else( wxWidgets_FOUND )
+  set( wx_components base core gl adv richtext html propgrid qa )  
+else()
   message( STATUS "wxWidgets propgrid not found. Needed for better tree view and program setting choice in H3DViewer. Part of wxWidgets 2.9." )
-  set( wxWidgets_USE_LIBS base core gl adv richtext html qa )
+  set( wx_components base core gl adv richtext html qa )
 endif()
 
 # reset the wxWidgets_FOUND variable before running FIND_PACKAGE again.
 set( wxWidgets_FOUND 0 )
 
-# find wx libraries except propgrid
-if( WIN32 )
-  find_package( wxWidgetsWin )
-  if( wxWidgets_FOUND )
-    include_directories( ${wxWidgets_INCLUDE_DIR} ) 
-    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
-  endif()
-endif()
-
+find_package( wxWidgets REQUIRED COMPONENTS ${wx_components} )
 if( wxWidgets_FOUND )
-else( wxWidgets_FOUND )
-  find_package( wxWidgets REQUIRED )
-  if( wxWidgets_FOUND )
+  if( WIN32 )
+    include_directories( ${wxWidgets_INCLUDE_DIR} ) 
+  else()
     include( ${wxWidgets_USE_FILE} )
-    set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
   endif()
+  set( required_libs ${required_libs} ${wxWidgets_LIBRARIES} )
 endif()
 
 find_package( DirectX )
@@ -261,7 +238,7 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
   # if generating CPACK project using BUNDLE we should not create the bundle here instead
   # it is built with CPack 
   add_executable( H3DViewer WIN32 ${H3DViewer_SRCS} ${H3DViewer_HEADERS} )
-else( GENERATE_H3DVIEWER_CPACK_PROJECT )
+else()
   add_executable( H3DViewer WIN32 MACOSX_BUNDLE ${H3DViewer_SRCS} ${H3DViewer_HEADERS} ${H3DViewer_SOURCE_DIR}/H3DViewer.icns )
 endif()
 
@@ -333,9 +310,9 @@ if( COMMAND cmake_policy )
     cmake_policy( SET CMP0054 OLD )
   endif()
 endif()
-foreach( H3DUTIL_INCLUDE_DIR_TMP ${H3DUTIL_INCLUDE_DIR} )
-  if( EXISTS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h )
-    file( STRINGS ${H3DUTIL_INCLUDE_DIR_TMP}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG" )
+foreach( h3dutil_include_dir_tmp ${H3DUTIL_INCLUDE_DIR} )
+  if( EXISTS ${h3dutil_include_dir_tmp}/H3DUtil/H3DUtil.h )
+    file( STRINGS ${h3dutil_include_dir_tmp}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG" )
     list( LENGTH list_of_defines list_of_defines_length )
     if( list_of_defines_length )
       if( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" )
@@ -438,7 +415,7 @@ if( APPLE )
            RUNTIME DESTINATION ${default_bin_install}
            BUNDLE DESTINATION ${OSX_BUNDLE_INSTALL_DESTINATION}
            COMPONENT H3DAPI_cpack_runtime )
-else( APPLE )
+else()
   set( H3DViewer_package_install_dir "" )
   if( WIN32 AND GENERATE_H3DVIEWER_CPACK_PROJECT )
     set( H3DViewer_package_install_dir "H3DViewer/" )
