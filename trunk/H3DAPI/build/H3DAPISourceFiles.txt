@@ -5,9 +5,9 @@
 # unity build.
 
 
-# These are the files that should be part of both unity build and 
+# These are the files that should be part of both unity build and
 # normal build projects.
-SET( ALL_BUILD_FILES "GLUTWindow.cpp"
+set( ALL_BUILD_FILES "GLUTWindow.cpp"
                      "H3DWindowNode.cpp"
                      "ProfileSAX2Handlers.cpp"
                      "PythonMethods.cpp"
@@ -18,7 +18,7 @@ SET( ALL_BUILD_FILES "GLUTWindow.cpp"
 
 # These are the files that are not part of a unity build solution. They
 # will all be included in the UnityBuild.cpp file instead.
-SET( NON_UNITYBUILD_FILES 
+set( NON_UNITYBUILD_FILES
                  "Anchor.cpp"
                  "AnyDevice.cpp"
                  "Appearance.cpp"
@@ -82,7 +82,7 @@ SET( NON_UNITYBUILD_FILES
                  "FakeHapticsDevice.cpp"
                  "FalconDevice.cpp"
                  "FBODebugger.cpp"
-                 "FFmpegDecoder.cpp"	
+                 "FFmpegDecoder.cpp"
                  "Field.cpp"
                  "FillProperties.cpp"
                  "FitToBoxTransform.cpp"
@@ -213,7 +213,7 @@ SET( NON_UNITYBUILD_FILES
                  "NurbsTextureCoordinate.cpp"
                  "NurbsTrimmedSurface.cpp"
                  "OculusRiftHandler.cpp"
-				 "OculusRiftSensor.cpp"
+                 "OculusRiftSensor.cpp"
                  "OggFileReader.cpp"
                  "OpenEXRImageLoader.cpp"
                  "OpenHapticsOptions.cpp"
@@ -396,7 +396,7 @@ SET( NON_UNITYBUILD_FILES
 
 
 
-SET( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
+set( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/AnyDevice.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Appearance.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Arc2D.h"
@@ -415,7 +415,7 @@ SET( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Capsule.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Circle2D.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/ClipPlane.h"
-                    "${H3DAPI_SOURCE_DIR}/../include/H3D/ClutchedDevice.h"                    
+                    "${H3DAPI_SOURCE_DIR}/../include/H3D/ClutchedDevice.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Collision.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/CollisionOptions.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Color.h"
@@ -614,7 +614,7 @@ SET( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/NavigationInfo.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Node.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/NoiseTexture.h"
-                    "${H3DAPI_SOURCE_DIR}/../include/H3D/NoiseTexture3D.h"                    
+                    "${H3DAPI_SOURCE_DIR}/../include/H3D/NoiseTexture3D.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/Normal.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/NormalInterpolator.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/NormalShader.h"
@@ -843,27 +843,27 @@ SET( H3DAPI_HEADERS "${H3DAPI_SOURCE_DIR}/../include/H3D/Anchor.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/X3DViewpointNode.h"
                     "${H3DAPI_SOURCE_DIR}/../include/H3D/DDSImageLoader.h" )
 
-IF( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
-  SET( H3DAPI_HEADERS ${H3DAPI_HEADERS} "${CMAKE_CURRENT_BINARY_DIR}/H3DAPI/include/H3D/H3DApi.h" )
-ELSE( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
-  SET( H3DAPI_HEADERS ${H3DAPI_HEADERS} "${CMAKE_CURRENT_BINARY_DIR}/include/H3D/H3DApi.h" )
-ENDIF( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
+if( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI )
+  set( H3DAPI_HEADERS ${H3DAPI_HEADERS} "${CMAKE_CURRENT_BINARY_DIR}/H3DAPI/include/H3D/H3DApi.h" )
+else()
+  set( H3DAPI_HEADERS ${H3DAPI_HEADERS} "${CMAKE_CURRENT_BINARY_DIR}/include/H3D/H3DApi.h" )
+endif()
 
 # The sources for a normal build is all files used for unity build and
 # the rest of the files.
-SET( H3DAPI_SRCS "" )
-foreach(filename ${ALL_BUILD_FILES})
-  SET( H3DAPI_SRCS ${H3DAPI_SRCS} "${H3DAPI_SOURCE_DIR}/../src/${filename}" )
-endforeach(filename)
+set( H3DAPI_SRCS "" )
+foreach( filename ${ALL_BUILD_FILES} )
+  set( H3DAPI_SRCS ${H3DAPI_SRCS} "${H3DAPI_SOURCE_DIR}/../src/${filename}" )
+endforeach()
 
-foreach(filename ${NON_UNITYBUILD_FILES})
-  SET( H3DAPI_SRCS ${H3DAPI_SRCS} "${H3DAPI_SOURCE_DIR}/../src/${filename}" )
-endforeach(filename)
+foreach( filename ${NON_UNITYBUILD_FILES} )
+  set( H3DAPI_SRCS ${H3DAPI_SRCS} "${H3DAPI_SOURCE_DIR}/../src/${filename}" )
+endforeach()
 
 # The sources for unity build is the UnityBuild.cpp file and all
 # unity build files.
-SET( H3DAPI_SRCS_UNITYBUILD "UnityBuild.cpp")
-foreach(filename ${ALL_BUILD_FILES})
-  SET( H3DAPI_SRCS_UNITYBUILD ${H3DAPI_SRCS_UNITYBUILD} "${H3DAPI_SOURCE_DIR}/../src/${filename}" )
-endforeach(filename)
+set( H3DAPI_SRCS_UNITYBUILD "UnityBuild.cpp" )
+foreach( filename ${ALL_BUILD_FILES} )
+  set( H3DAPI_SRCS_UNITYBUILD ${H3DAPI_SRCS_UNITYBUILD} "${H3DAPI_SOURCE_DIR}/../src/${filename}" )
+endforeach()
 
