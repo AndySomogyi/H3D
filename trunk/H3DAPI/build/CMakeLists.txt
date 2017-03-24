@@ -16,12 +16,6 @@ if( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INST
   set( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
 endif()
 
-# Add the directory to INCLUDE_DIRECTORIES before any other statement to make sure that this header file is found first.
-# This assumes that we always use "#include <path/include_header.h>" in our code even if the file is actually found in
-# the same directory as the file that contains the include statement.
-include_directories( ${CMAKE_CURRENT_BINARY_DIR}/include )
-set( H3DAPI_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include ${H3DAPI_SOURCE_DIR}/../include CACHE INTERNAL "Set to internal to propagate change" )
-
 # Make include files in paths like /usr/local/include have preference before
 # files in OSX frameworks. 
 set( CMAKE_FIND_FRAMEWORK "LAST" )
@@ -98,8 +92,13 @@ if( WIN32 AND EXISTS ${H3DAPI_SOURCE_DIR}/../../HAPI/build )
   endif()
 endif()
 
+# Add the directory to INCLUDE_DIRECTORIES before any other statement to make sure that this header file is found first.
+# This assumes that we always use "#include <path/include_header.h>" in our code even if the file is actually found in
+# the same directory as the file that contains the include statement.
+set( H3DAPI_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include ${H3DAPI_SOURCE_DIR}/../include CACHE INTERNAL "Set to internal to propagate change" )
+
 # Include H3D header dir.
-include_directories( ../include )
+include_directories( ${H3DAPI_INCLUDE_DIR} )
 
 # Version of H3D API.
 set( H3DAPI_MAJOR_VERSION 2 )
