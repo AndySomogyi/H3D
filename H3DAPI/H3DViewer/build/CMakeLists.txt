@@ -125,7 +125,7 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR}/include )
 set( required_libs )
 
 # Where to find cmake modules used to find packages.
-set( CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules/sharedModules" )
+set( CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules" )
 if( COMMAND cmake_policy )
   if( POLICY CMP0011 )
     cmake_policy( SET CMP0011 NEW )

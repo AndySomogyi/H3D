@@ -107,7 +107,7 @@ set( H3DAPI_BUILD_VERSION 1 )
 
 
 # Set here already in case a special NSIS template needs to be used by cpack.
-set( CMAKE_MODULE_PATH "${H3DAPI_SOURCE_DIR}/modules" "${H3DAPI_SOURCE_DIR}/modules/sharedModules" )
+set( CMAKE_MODULE_PATH "${H3DAPI_SOURCE_DIR}/localModules" "${H3DAPI_SOURCE_DIR}/modules" )
 if( COMMAND cmake_policy )
   if( POLICY CMP0011 )
     cmake_policy( SET CMP0011 NEW )
