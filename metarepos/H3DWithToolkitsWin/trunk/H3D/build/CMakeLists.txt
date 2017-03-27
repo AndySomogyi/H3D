@@ -29,9 +29,9 @@ set( H3DPHYSICS_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/incl
 set( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIRS}" "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
 
 # Version of H3DWithToolkitsWin
-set( H3DWithToolkitsWin_MAJOR_VERSION 3 )
-set( H3DWithToolkitsWin_MINOR_VERSION 0 )
-set( H3DWithToolkitsWin_BUILD_VERSION 0 )
+set( H3DWithToolkitsWin_MAJOR_VERSION 2 )
+set( H3DWithToolkitsWin_MINOR_VERSION 3 )
+set( H3DWithToolkitsWin_BUILD_VERSION 1 )
 if( NOT WIN32 )
   if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build )
     message( STATUS "Including H3DUtil" )
