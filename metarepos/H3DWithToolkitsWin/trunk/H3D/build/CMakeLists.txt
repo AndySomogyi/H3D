@@ -126,7 +126,7 @@ if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
            DESTINATION build
            COMPONENT H3DUtil_cpack_sources )
   # Make sure that the nsis template for H3DAPI is used for packaging.
-  set( CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build/modules" )
+  set( CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/build/localModules" )
   set( CPACK_PACKAGE_VERSION_MAJOR ${H3DWithToolkitsWin_MAJOR_VERSION} )
   set( CPACK_PACKAGE_VERSION_MINOR ${H3DWithToolkitsWin_MINOR_VERSION} )
   set( CPACK_PACKAGE_VERSION_PATCH ${H3DWithToolkitsWin_BUILD_VERSION} )
