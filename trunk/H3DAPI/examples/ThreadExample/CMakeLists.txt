@@ -36,7 +36,7 @@ set( optional_libs )
 set( required_libs )
 
 # Where to find modules used to find libraries.
-set( CMAKE_MODULE_PATH "${ThreadExample_SOURCE_DIR}/../../build/modules/sharedModules" )
+set( CMAKE_MODULE_PATH "${ThreadExample_SOURCE_DIR}/../../build/modules" )
 
 if( H3D_USE_DEPENDENCIES_ONLY )
   # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
