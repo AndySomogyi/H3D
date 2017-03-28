@@ -66,23 +66,23 @@ else()
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
-    include_directories( ${H3DAPI_INCLUDE_DIR} )
+    include_directories( ${H3DAPI_INCLUDE_DIRS} )
     set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
   endif()
 
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
-  if( H3DUTIL_FOUND )
-    include_directories( ${H3DUTIL_INCLUDE_DIR} )
-    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
+  if( H3DUtil_FOUND )
+    include_directories( ${H3DUtil_INCLUDE_DIRS} )
+    set( required_libs ${required_libs} ${H3DUtil_LIBRARIES} )
   endif()
 
   #HAPI
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
-    include_directories( ${HAPI_INCLUDE_DIR} )
+    include_directories( ${HAPI_INCLUDE_DIRS} )
     set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 
@@ -90,7 +90,7 @@ else()
   find_package( UI )
 
   if( UI_FOUND )
-    include_directories( ${UI_INCLUDE_DIR} )
+    include_directories( ${UI_INCLUDE_DIRS} )
     set( optional_libs ${optional_libs} ${UI_LIBRARIES} )
   endif()
 
@@ -98,7 +98,7 @@ else()
   find_package( H3DPhysics )
 
   if( H3DPhysics_FOUND )
-    include_directories( ${H3DPhysics_INCLUDE_DIR} )
+    include_directories( ${H3DPhysics_INCLUDE_DIRS} )
     set( optional_libs ${optional_libs} ${H3DPhysics_LIBRARIES} )
   endif()
 endif()

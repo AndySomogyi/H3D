@@ -35,23 +35,23 @@ else()
   find_package( H3DAPI REQUIRED )
 
   if( H3DAPI_FOUND )
-    include_directories( ${H3DAPI_INCLUDE_DIR} )
+    include_directories( ${H3DAPI_INCLUDE_DIRS} )
     set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
   endif()
 
   #H3DUtil
   find_package( H3DUtil REQUIRED )
 
-  if( H3DUTIL_FOUND )
-    include_directories( ${H3DUTIL_INCLUDE_DIR} )
-    set( required_libs ${required_libs} ${H3DUTIL_LIBRARIES} )
+  if( H3DUtil_FOUND )
+    include_directories( ${H3DUtil_INCLUDE_DIRS} )
+    set( required_libs ${required_libs} ${H3DUtil_LIBRARIES} )
   endif()
 
   #HAPI
   find_package( HAPI REQUIRED )
 
   if( HAPI_FOUND )
-    include_directories( ${HAPI_INCLUDE_DIR} )
+    include_directories( ${HAPI_INCLUDE_DIRS} )
     set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
   endif()
 endif()
@@ -137,12 +137,12 @@ if( INCLUDE_MedX3D )
   else()
     find_package( MedX3D )
 
-    if( MEDX3D_FOUND )
+    if( MedX3D_FOUND )
       get_filename_component( MedX3D_SEARCH_PATH ${MEDX3D_LIBRARY} PATH )
       string( REGEX REPLACE "/([^/])*$" "/${default_bin_install}" MedX3D_SEARCH_PATH "${MedX3D_SEARCH_PATH}" )
-      if( EXISTS "${MEDX3D_INCLUDE_DIR}/../../../MedX3D/doc" )
+      if( EXISTS "${MedX3D_INCLUDE_DIR}/../../../MedX3D/doc" )
         set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL ${CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL}
-                                                                  "${MEDX3D_INCLUDE_DIR}/../../../MedX3D/doc/nodesFieldsList" )
+                                                                  "${MedX3D_INCLUDE_DIR}/../../../MedX3D/doc/nodesFieldsList" )
       endif()
     endif()
   endif()
@@ -221,7 +221,7 @@ if( WIN32 )
     add_dependencies( CreateH3DNodesFieldsList H3DPhysics )
   endif()
 
-  if( MEDX3D_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( MedX3D_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
     set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_MedX3D" )
     add_dependencies( CreateH3DNodesFieldsList MedX3D )
   endif()
