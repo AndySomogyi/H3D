@@ -37,7 +37,9 @@
 #ifdef HAVE_TEEM
 #include <H3DUtil/PixelImage.h>
 
+#ifndef TEEM_STATIC
 #define TEEM_STATIC
+#endif
 #include <teem/nrrd.h>
 #include <teem/air.h>
 using namespace H3D;
