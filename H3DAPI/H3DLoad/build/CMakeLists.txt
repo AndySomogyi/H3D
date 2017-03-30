@@ -1,6 +1,5 @@
-if( WIN32 )
-  cmake_minimum_required( VERSION 2.6.0 )
-endif()
+cmake_minimum_required( VERSION 2.8.7 )
+cmake_policy( VERSION 2.8.7 )
 
 # The name of our project is "H3DLoad".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${H3DLoad_SOURCE_DIR} and
@@ -47,11 +46,6 @@ set( required_libs )
 
 # Where to find modules, used when finding packages.
 set( CMAKE_MODULE_PATH "${H3DLoad_SOURCE_DIR}/../../build/modules" )
-if( COMMAND cmake_policy )
-  if( POLICY CMP0011 )
-    cmake_policy( SET CMP0011 NEW )
-  endif()
-endif()
 include( StripAndAddLibraryDirectories )
 
 if( H3D_USE_DEPENDENCIES_ONLY )

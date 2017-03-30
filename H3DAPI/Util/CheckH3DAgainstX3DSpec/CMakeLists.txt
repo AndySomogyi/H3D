@@ -1,6 +1,5 @@
-if( WIN32 )
-  cmake_minimum_required( VERSION 2.6.0 )
-endif()
+cmake_minimum_required( VERSION 2.8.7 )
+cmake_policy( VERSION 2.8.7 )
 
 # The name of our project is "CheckH3DAgainstX3DSpec".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${CheckH3DAgainstX3DSpec_SOURCE_DIR} and

@@ -1,11 +1,6 @@
-if( COMMAND cmake_policy )
-  if( POLICY CMP0003 )
-    cmake_policy( SET CMP0003 OLD )
-  endif()
-endif()
-if( WIN32 )
-  cmake_minimum_required( VERSION 2.6.0 )
-endif()
+cmake_minimum_required( VERSION 2.8.7 )
+cmake_policy( VERSION 2.8.7 )
+
 # The name of our project is "H3DViewer".  CMakeLists files in this project can
 # refer to the root source directory of the project as ${H3DViewer_SOURCE_DIR} and
 # to the root binary directory of the project as ${H3DViewer_BINARY_DIR}.
@@ -126,11 +121,6 @@ set( required_libs )
 
 # Where to find cmake modules used to find packages.
 set( CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules" )
-if( COMMAND cmake_policy )
-  if( POLICY CMP0011 )
-    cmake_policy( SET CMP0011 NEW )
-  endif()
-endif()
 include( StripAndAddLibraryDirectories )
 
 if( H3D_USE_DEPENDENCIES_ONLY )
@@ -305,11 +295,6 @@ endif()
 # Link against required_libs.
 target_link_libraries( H3DViewer ${required_libs} )
 
-if( COMMAND cmake_policy )
-  if( POLICY CMP0054 )
-    cmake_policy( SET CMP0054 OLD )
-  endif()
-endif()
 foreach( h3dutil_include_dir_tmp ${H3DUTIL_INCLUDE_DIR} )
   if( EXISTS ${h3dutil_include_dir_tmp}/H3DUtil/H3DUtil.h )
     file( STRINGS ${h3dutil_include_dir_tmp}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG" )
