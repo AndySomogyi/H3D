@@ -1,12 +1,5 @@
-if( COMMAND cmake_policy )
-  if( POLICY CMP0003 )
-    cmake_policy( SET CMP0003 OLD )
-  endif()
-endif()
-
-if( WIN32 )
-  cmake_minimum_required( VERSION 2.6.0 )
-endif()
+cmake_minimum_required( VERSION 2.8.7 )
+cmake_policy( VERSION 2.8.7 )
 
 project( H3DAPI )
 
@@ -108,11 +101,6 @@ set( H3DAPI_BUILD_VERSION 1 )
 
 # Set here already in case a special NSIS template needs to be used by cpack.
 set( CMAKE_MODULE_PATH "${H3DAPI_SOURCE_DIR}/localModules" "${H3DAPI_SOURCE_DIR}/modules" )
-if( COMMAND cmake_policy )
-  if( POLICY CMP0011 )
-    cmake_policy( SET CMP0011 NEW )
-  endif()
-endif()
 include( StripAndAddLibraryDirectories )
 
 # Version of project.
@@ -570,11 +558,6 @@ endif()
 # add the libraries needed for linking
 target_link_libraries( H3DAPI ${required_libs} ${optional_libs} )
 
-if( COMMAND cmake_policy )
-  if( POLICY CMP0054 )
-    cmake_policy( SET CMP0054 OLD )
-  endif()
-endif()
 foreach( h3dutil_include_dir_tmp ${H3DUTIL_INCLUDE_DIR} )
   if( EXISTS ${h3dutil_include_dir_tmp}/H3DUtil/H3DUtil.h )
     file( STRINGS ${h3dutil_include_dir_tmp}/H3DUtil/H3DUtil.h list_of_defines REGEX "#define THREAD_LOCK_DEBUG" )
