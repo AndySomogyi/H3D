@@ -1,4 +1,6 @@
-cmake_minimum_required( VERSION 2.6.0 )
+cmake_minimum_required( VERSION 2.8.7 )
+cmake_policy( VERSION 2.8.7 )
+
 project( H3DWithToolkitsWin )
 
 # set the install directory to the H3DWithToolkitsWin directory on Windows
