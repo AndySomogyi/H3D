@@ -489,7 +489,7 @@ setupResourceFile( H3DAPI
                    RESOURCE_FILE_CMAKE_TEMPLATE ${H3DAPI_SOURCE_DIR}/H3DAPI.rc.cmake
                    RESOURCE_FILE_OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc
                    UPDATERESOURCEFILE_EXE ${H3DAPI_SOURCE_DIR}/UpdateResourceFile
-                   UPDATERESOURCEFILE_EXE_EXTRA_ARGS "H3DAPI_Output_Name" "\$\(TargetFileName\)" )
+                   UPDATERESOURCEFILE_EXE_EXTRA_ARGS "H3DAPI_Output_Name" "$(TargetFileName)" )
 
 # add the libraries needed for linking
 target_link_libraries( H3DAPI ${required_libs} ${optional_libs} )
@@ -557,7 +557,6 @@ if( WIN32 )
   endif()
   
   if( MSVC )
-    include( H3DCommonFunctions )
     # change the name depending on compiler to be able to tell them apart
     # since they are not compatible with each other. 
     setH3DMSVCOutputName( H3DAPI "H3DAPI" temp_output_postfix )
