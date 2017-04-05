@@ -6,39 +6,13 @@ cmake_policy( VERSION 2.8.7 )
 # to the root binary directory of the project as ${H3DViewer_BINARY_DIR}.
 project( H3DViewer )
 
-# set the install directory to the H3D directory on Windows
-if( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
-  set( CMAKE_INSTALL_PREFIX ${H3DViewer_SOURCE_DIR}/../../.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
-  set( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
-endif()
+# Where to find cmake modules used to find packages.
+set( CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules" )
 
-# Add a cache variable ENABLE_SVN_REVISION to have the choice of using
-# SubWCRev.exe to embed svn revision number in generated DLLs.
-# Default is YES for Visual Studio and NMake generators, NO otherwise.
-if( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
-  set( ENABLE_SVN_REVISION_DEFAULT "NO" )
-  if( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
-    set( ENABLE_SVN_REVISION_DEFAULT "YES" )
-  endif()
-  set( ENABLE_SVN_REVISION ${ENABLE_SVN_REVISION_DEFAULT} CACHE BOOL "Use SubWCRev.exe to embed svn revision number in generated DLLs." )
-endif()
+include( H3DCommonFunctions )
+handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DViewer_SOURCE_DIR}/../../.. GENERATE_CPACK_PROJECT )
 
-# use, i.e. don't skip the full RPATH for the build tree
-set( CMAKE_SKIP_BUILD_RPATH FALSE )
-
-# when building, don't use the install RPATH already
-# (but later on when installing)
-set( CMAKE_BUILD_WITH_INSTALL_RPATH FALSE ) 
-
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-set( CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE )
-
-# the RPATH to be used when installing, but only if it's not a system directory
-list( FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir )
-if( "${isSystemDir}" STREQUAL "-1" )
-   set( CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
-endif()
+setupRPathForLib()
 
 set( H3DViewer_MAJOR_VERSION "2" )
 set( H3DViewer_MINOR_VERSION "3" )
@@ -119,8 +93,6 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR}/include )
 # Add required libs to this variable.
 set( required_libs )
 
-# Where to find cmake modules used to find packages.
-set( CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules" )
 include( StripAndAddLibraryDirectories )
 
 if( H3D_USE_DEPENDENCIES_ONLY )
@@ -233,52 +205,13 @@ else()
 endif()
 
 # make sure that the H3DViewer.rc contains the correct svn-version
-if( MSVC )
-
-  set( H3DViewer_SVN_VERSION "0" )
-  if( ENABLE_SVN_REVISION )
-    # Find SubWCRev.exe
-    find_file( SubWCRev
-               NAMES "SubWCRev.exe"
-               DOC   "Set to SubWCRev.exe that comes with TortoiseSVN. Used to find svn revision number." )
-    mark_as_advanced( SubWCRev )
-  endif()
-
-  set( H3DViewer_is_working_copy 10 )
-  if( ENABLE_SVN_REVISION AND SubWCRev )
-    execute_process( COMMAND ${SubWCRev} ${H3DViewer_SOURCE_DIR}/../
-                     RESULT_VARIABLE H3DViewer_is_working_copy )
-    if( ${H3DViewer_is_working_copy} EQUAL 0 )
-      set( H3DViewer_SVN_VERSION "$WCREV$" )
-    endif()
-  endif()
-
-  # autogenerate H3DViewer.rc depending on the version
-  configure_file( H3DViewer.rc.cmake ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
-
-  if( ENABLE_SVN_REVISION )
-    add_custom_command( TARGET H3DViewer
-                        PRE_BUILD
-                        COMMAND ${H3DViewer_SOURCE_DIR}/../../build/UpdateResourceFile 
-                        ARGS H3DViewer ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${H3DViewer_SOURCE_DIR}/H3DViewer.rc.cmake
-                        ${H3DViewer_MAJOR_VERSION} ${H3DViewer_MINOR_VERSION}
-                        ${H3DViewer_BUILD_VERSION} "${H3DViewer_SVN_VERSION}"
-                        "H3DViewer_SOURCE_DIR"
-                        ${H3DViewer_SOURCE_DIR}
-                        "H3DViewer_Output_Name"
-                        "$(TargetFileName)" )
-  endif()
-
-  if( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DViewer_is_working_copy} EQUAL 0 )
-    # Update SVN revision in file.
-    execute_process( COMMAND ${SubWCRev} ${H3DViewer_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
-    
-    add_custom_command( TARGET H3DViewer 
-                        PRE_BUILD 
-                        COMMAND ${SubWCRev} 
-                        ARGS ${H3DViewer_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc )
-  endif()
-endif()
+setupResourceFile( H3DViewer
+                   VERSION_PREFIX H3DViewer
+                   SVN_DIR_CANDIDATE ${H3DViewer_SOURCE_DIR}/../
+                   RESOURCE_FILE_CMAKE_TEMPLATE ${H3DViewer_SOURCE_DIR}/H3DViewer.rc.cmake
+                   RESOURCE_FILE_OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer.rc
+                   UPDATERESOURCEFILE_EXE ${H3DViewer_SOURCE_DIR}/../../build/UpdateResourceFile
+                   UPDATERESOURCEFILE_EXE_EXTRA_ARGS "H3DViewer_SOURCE_DIR" ${H3DViewer_SOURCE_DIR} "H3DViewer_Output_Name" "$(TargetFileName)" )
 
 
 if( EXISTS ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )

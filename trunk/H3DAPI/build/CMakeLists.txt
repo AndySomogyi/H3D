@@ -3,11 +3,11 @@ cmake_policy( VERSION 2.8.7 )
 
 project( H3DAPI )
 
-# set the install directory to the H3D directory on Windows
-if( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
-  set( CMAKE_INSTALL_PREFIX ${H3DAPI_SOURCE_DIR}/../.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
-  set( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
-endif()
+# Set here already in case a special NSIS template needs to be used by cpack.
+set( CMAKE_MODULE_PATH "${H3DAPI_SOURCE_DIR}/localModules" "${H3DAPI_SOURCE_DIR}/modules" )
+
+include( H3DCommonFunctions )
+handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DAPI_SOURCE_DIR}/../.. GENERATE_CPACK_PROJECT PREFER_STATIC_LIBRARIES )
 
 # Make include files in paths like /usr/local/include have preference before
 # files in OSX frameworks. 
@@ -19,36 +19,12 @@ set( H3DAPI_LINK_FLAGS "" )
 set( H3DAPI_LINK_FLAGS_RELEASE "" )
 set( H3DAPI_LINK_FLAGS_DEBUG "" )
 
-# Add a cache variable GENERATE_CPACK_PROJECT to have the choice of generating a project
-# for packaging H3DAPI. Default is NO since most people will not use this.
-if( NOT DEFINED GENERATE_CPACK_PROJECT )
-  set( GENERATE_CPACK_PROJECT "NO" CACHE BOOL "Decides if a cpack project should be generated. The project in the first loaded CMakeLists will configure CPack." )
-  mark_as_advanced( GENERATE_CPACK_PROJECT )
-endif()
-
 # Add a cache variable GENERATE_UNITY_BUILD to have the choice of selecting
 # a unity build project. Default is NO.
 if( NOT DEFINED GENERATE_UNITY_BUILD )
   set( GENERATE_UNITY_BUILD "NO" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
 endif()
 
-# Add a cache variable ENABLE_SVN_REVISION to have the choice of using
-# SubWCRev.exe to embed svn revision number in generated DLLs.
-# Default is YES for Visual Studio and NMake generators, NO otherwise.
-if( MSVC AND NOT DEFINED ENABLE_SVN_REVISION )
-  set( ENABLE_SVN_REVISION_DEFAULT "NO" )
-  if( CMAKE_GENERATOR MATCHES "Visual Studio|NMake" )
-    set( ENABLE_SVN_REVISION_DEFAULT "YES" )
-  endif()
-  set( ENABLE_SVN_REVISION ${ENABLE_SVN_REVISION_DEFAULT} CACHE BOOL "Use SubWCRev.exe to embed svn revision number in generated DLLs." )
-endif()
-
-# Add a cache variable PREFER_STATIC_LIBRARIES to have the choice of generating a project
-# linking against static libraries if they exist. Default is NO since most people will not use this.
-if( NOT DEFINED PREFER_STATIC_LIBRARIES )
-  set( PREFER_STATIC_LIBRARIES "NO" CACHE BOOL "Decides if CMake should prefer static libraries to dynamic libraries when both exist. To link FreeGLUT static see the PREFER_FREEGLUT_STATIC_LIBRARIES option." )
-  mark_as_advanced( PREFER_STATIC_LIBRARIES )
-endif()
 
 if( WIN32 AND NOT DEFINED PREFER_FREEGLUT_STATIC_LIBRARIES )
   # Add a cache variable PREFER_FREEGLUT_STATIC_LIBRARIES to have the choice of generating a project
@@ -57,10 +33,6 @@ if( WIN32 AND NOT DEFINED PREFER_FREEGLUT_STATIC_LIBRARIES )
   mark_as_advanced( PREFER_FREEGLUT_STATIC_LIBRARIES )
 endif()
 
-
-if( PREFER_STATIC_LIBRARIES )
-  set( CMAKE_FIND_LIBRARY_SUFFIXES .a;${CMAKE_FIND_LIBRARY_SUFFIXES} )
-endif()
 
 # Add a cache variable GENERATE_NODEROUTESTODOTFILE_BUILD that should be
 # set to yes if NodeRoutesToDotFile project should be run against this
@@ -511,49 +483,13 @@ endif()
 add_library( H3DAPI SHARED ${H3DAPI_SRCS} ${H3DAPI_HEADERS} )
 
 # make sure that the H3DAPI.rc contains the correct svn-version
-if( MSVC )
-  set( H3DAPI_SVN_VERSION "0" )
-  if( ENABLE_SVN_REVISION )
-    # Find SubWCRev.exe
-    find_file( SubWCRev
-               NAMES "SubWCRev.exe"
-               DOC   "Set to SubWCRev.exe that comes with TortoiseSVN. Used to find svn revision number." )
-    mark_as_advanced( SubWCRev )
-  endif()
-
-  set( H3DAPI_is_working_copy 10 )
-  if( ENABLE_SVN_REVISION AND SubWCRev )
-    execute_process( COMMAND ${SubWCRev} ${H3DAPI_SOURCE_DIR}/../
-                     RESULT_VARIABLE H3DAPI_is_working_copy )
-    if( ${H3DAPI_is_working_copy} EQUAL 0 )
-      set( H3DAPI_SVN_VERSION "$WCREV$" )
-    endif()
-  endif()
-
-  # autogenerate H3DAPI.rc depending on the version
-  configure_file( H3DAPI.rc.cmake ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc )
-
-  if( ENABLE_SVN_REVISION )
-    add_custom_command( TARGET H3DAPI
-                        PRE_BUILD
-                        COMMAND ${H3DAPI_SOURCE_DIR}/UpdateResourceFile 
-                        ARGS H3DAPI ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc ${H3DAPI_SOURCE_DIR}/H3DAPI.rc.cmake
-                        ${H3DAPI_MAJOR_VERSION} ${H3DAPI_MINOR_VERSION}
-                        ${H3DAPI_BUILD_VERSION} "${H3DAPI_SVN_VERSION}"
-                        "H3DAPI_Output_Name"
-                        "$(TargetFileName)" )
-  endif()
-
-  if( ENABLE_SVN_REVISION AND SubWCRev AND ${H3DAPI_is_working_copy} EQUAL 0 )
-    # Update SVN revision in file.
-    execute_process( COMMAND ${SubWCRev} ${H3DAPI_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc )
-
-    add_custom_command( TARGET H3DAPI 
-                        PRE_BUILD 
-                        COMMAND ${SubWCRev} 
-                        ARGS ${H3DAPI_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc )
-  endif()
-endif()
+setupResourceFile( H3DAPI
+                   VERSION_PREFIX H3DAPI
+                   SVN_DIR_CANDIDATE ${H3DAPI_SOURCE_DIR}/../
+                   RESOURCE_FILE_CMAKE_TEMPLATE ${H3DAPI_SOURCE_DIR}/H3DAPI.rc.cmake
+                   RESOURCE_FILE_OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/H3DAPI.rc
+                   UPDATERESOURCEFILE_EXE ${H3DAPI_SOURCE_DIR}/UpdateResourceFile
+                   UPDATERESOURCEFILE_EXE_EXTRA_ARGS "H3DAPI_Output_Name" "\$\(TargetFileName\)" )
 
 # add the libraries needed for linking
 target_link_libraries( H3DAPI ${required_libs} ${optional_libs} )
