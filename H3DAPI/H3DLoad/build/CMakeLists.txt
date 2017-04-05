@@ -6,27 +6,13 @@ cmake_policy( VERSION 2.8.7 )
 # to the root binary directory of the project as ${H3DLoad_BINARY_DIR}.
 project( H3DLoad )
 
-if( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
-  set( CMAKE_INSTALL_PREFIX ${H3DLoad_SOURCE_DIR}/../../.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
-  set( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
-endif()
+# Where to find modules, used when finding packages.
+set( CMAKE_MODULE_PATH "${H3DLoad_SOURCE_DIR}/../../build/modules" )
 
-# use, i.e. don't skip the full RPATH for the build tree
-set( CMAKE_SKIP_BUILD_RPATH FALSE )
+include( H3DCommonFunctions )
+handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DLoad_SOURCE_DIR}/../../.. )
 
-# when building, don't use the install RPATH already
-# (but later on when installing)
-set( CMAKE_BUILD_WITH_INSTALL_RPATH FALSE ) 
-
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-set( CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE )
-
-# the RPATH to be used when installing, but only if it's not a system directory
-list( FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir )
-if( "${isSystemDir}" STREQUAL "-1" )
-   set( CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
-endif()
+setupRPathForLib()
 
 set( H3DLoad_MAJOR_VERSION "2" )
 set( H3DLoad_MINOR_VERSION "3" )
@@ -44,8 +30,6 @@ include_directories( ../src )
 # Add required libs to this variable.
 set( required_libs )
 
-# Where to find modules, used when finding packages.
-set( CMAKE_MODULE_PATH "${H3DLoad_SOURCE_DIR}/../../build/modules" )
 include( StripAndAddLibraryDirectories )
 
 if( H3D_USE_DEPENDENCIES_ONLY )
