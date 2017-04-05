@@ -3,15 +3,11 @@ cmake_policy( VERSION 2.8.7 )
 
 project( H3DWithToolkitsWin )
 
-# set the install directory to the H3DWithToolkitsWin directory on Windows
-if( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET )
-  set( CMAKE_INSTALL_PREFIX ${H3DWithToolkitsWin_SOURCE_DIR}/.. CACHE PATH "Install path prefix, prepended onto install directories." FORCE )
-  set( H3D_CMAKE_INSTALL_PREFIX_ALREADY_SET TRUE )
-endif()
+set( CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build/modules" )
+include( H3DCommonFunctions )
+handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DWithToolkitsWin_SOURCE_DIR}/.. GENERATE_CPACK_PROJECT )
 
 set( H3D_USE_DEPENDENCIES_ONLY TRUE )
-
-set( CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build/modules" )
 
 set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
 
