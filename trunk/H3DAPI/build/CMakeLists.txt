@@ -18,14 +18,6 @@ set( H3DAPI_COMPILE_FLAGS "-DH3DAPI_EXPORTS" )
 set( H3DAPI_LINK_FLAGS "" )
 set( H3DAPI_LINK_FLAGS_RELEASE "" )
 set( H3DAPI_LINK_FLAGS_DEBUG "" )
-
-# Add a cache variable GENERATE_UNITY_BUILD to have the choice of selecting
-# a unity build project. Default is NO.
-if( NOT DEFINED GENERATE_UNITY_BUILD )
-  set( GENERATE_UNITY_BUILD "NO" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
-endif()
-
-
 if( WIN32 AND NOT DEFINED PREFER_FREEGLUT_STATIC_LIBRARIES )
   # Add a cache variable PREFER_FREEGLUT_STATIC_LIBRARIES to have the choice of generating a project
   # linking statically against glut. Default is NO since most people will not use this.
@@ -74,6 +66,7 @@ set( H3DAPI_BUILD_VERSION 1 )
 # Set here already in case a special NSIS template needs to be used by cpack.
 set( CMAKE_MODULE_PATH "${H3DAPI_SOURCE_DIR}/localModules" "${H3DAPI_SOURCE_DIR}/modules" )
 include( StripAndAddLibraryDirectories )
+include( H3DCommonFunctions ) # Include again to get the correct version of the included file.
 
 # Version of project.
 set( H3DAPI_FULL_VERSION
@@ -83,40 +76,12 @@ ${H3DAPI_MAJOR_VERSION}.${H3DAPI_MINOR_VERSION}.${H3DAPI_BUILD_VERSION} )
 # defined in the included file. All header files are added to a variable called
 # H3DAPI_HEADERS.
 include( ${H3DAPI_SOURCE_DIR}/H3DAPISourceFiles.txt )
-
-if( GENERATE_UNITY_BUILD )
-  if( NOT DEFINED UNITY_BUILD_${PROJECT_NAME} )
-    set(  UNITY_BUILD_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
-  endif()
-
-  if( UNITY_BUILD_${PROJECT_NAME} )  
-    # Generate a unity build, by creating the UnityBuild.cpp and only including the required 
-    # source files.
-    set( UNITYBUILD_INCLUDES "" )
-
-    foreach( filename ${NON_UNITYBUILD_FILES} )
-      set( UNITYBUILD_INCLUDES "${UNITYBUILD_INCLUDES}\n #include \"${H3DAPI_SOURCE_DIR}/../src/${filename}\"" )
-    endforeach()
-
-    # Using a cached variable with our string in it. Because cmake doesn't support multi-line strings we have to replace the newlines with a delimiter, so we arbitrarily use +=+.
-    string( REPLACE "
-" "+=+" UnitybuildIncludesConverted ${UNITYBUILD_INCLUDES} ) # Convert the file we're going to write to use our delimiter instead of newlines
-    if( NOT ( UNITY_BUILD_CACHE_${PROJECT_NAME} ) OR NOT ( UnitybuildIncludesConverted STREQUAL UNITY_BUILD_CACHE_${PROJECT_NAME} )) # If we don't have the cache variable or if its contents don't match our new string then we write the unmodified new UnityBuild file and store the one with the swapped out delimiters in the cache variable
-      message( STATUS "Updating UnityBuild.cpp for " ${PROJECT_NAME} )
-      string( REPLACE "
-" "+=+" unityBuildCacheNew ${UNITYBUILD_INCLUDES} )
-      set( UNITY_BUILD_CACHE_${PROJECT_NAME} ${unityBuildCacheNew} CACHE INTERNAL "Used for determining if UnityBuild.cpp should be updated or not." )
-      file( WRITE UnityBuild.cpp ${UNITYBUILD_INCLUDES} )
-    else()
-      message( STATUS "Unitybuild.cpp for ${PROJECT_NAME} already up to date" )
-    endif()
-    if( MSVC )
-      set( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} /bigobj" )
-    endif()
-
-    set( H3DAPI_SRCS ${H3DAPI_SRCS_UNITYBUILD} )
-  endif()
-endif()
+handleUnityBuild( PROJECT_NAME ${PROJECT_NAME}
+                  SOURCE_FILES ${NON_UNITYBUILD_FILES}
+                  OUTPUT_VARIABLE H3DAPI_SRCS
+                  SOURCE_PREFIX_PATH ${H3DAPI_SOURCE_DIR}/../src/
+                  COMPILE_FLAGS_VARIABLE H3DAPI_COMPILE_FLAGS
+                  UNITY_BUILD_SOURCES ${H3DAPI_SRCS_UNITYBUILD} )
 
 set( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should use precompiled headers. This greatly reduces build times after first build." )
 

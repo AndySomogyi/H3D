@@ -29,36 +29,9 @@ endif()
 include_directories( ../src )
 
 include( "${H3DViewer_SOURCE_DIR}/H3DViewerSourceFiles.txt" )
-
-if( GENERATE_UNITY_BUILD )
-  if( NOT DEFINED UNITY_BUILD_${PROJECT_NAME} )
-    set(  UNITY_BUILD_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should build through a unity build instead of a normal build. A unity builds packs all .cpp files into a UnityBuild.cpp file and then only include this in the project. This greatly reduces build times." )
-  endif()
-
-  if( UNITY_BUILD_${PROJECT_NAME} )
-    # Generate a unity build, by creating the UnityBuild.cpp and only including the required 
-    # source files.
-    set( UNITYBUILD_INCLUDES "" )
-    foreach( filename ${H3DViewer_SRCS} )
-      set( UNITYBUILD_INCLUDES "${UNITYBUILD_INCLUDES}#include \"${filename}\"\n" )
-    endforeach()
-
-    # Using a cached variable with our string in it. Because cmake doesn't support multi-line strings we have to replace the newlines with a delimiter, so we arbitrarily use +=+.
-    string( REPLACE "
-" "+=+" UnitybuildIncludesConverted ${UNITYBUILD_INCLUDES} ) # Convert the file we're going to write to use our delimiter instead of newlines
-    if( NOT ( UNITY_BUILD_CACHE_${PROJECT_NAME} ) OR NOT ( UnitybuildIncludesConverted STREQUAL UNITY_BUILD_CACHE_${PROJECT_NAME} )) # If we don't have the cache variable or if its contents don't match our new string then we write the unmodified new UnityBuild file and store the one with the swapped out delimiters in the cache variable
-      message( STATUS "Updating UnityBuild.cpp for " ${PROJECT_NAME} )
-      string( REPLACE "
-" "+=+" unityBuildCacheNew ${UNITYBUILD_INCLUDES} )
-      set( UNITY_BUILD_CACHE_${PROJECT_NAME} ${unityBuildCacheNew} CACHE INTERNAL "Used for determining if UnityBuild.cpp should be updated or not." )
-      file( WRITE UnityBuild.cpp ${UNITYBUILD_INCLUDES} )
-    else()
-      message( STATUS "Unitybuild.cpp for ${PROJECT_NAME} already up to date" )
-    endif()
-    # overwrite the source files to only include the generated unity build file.
-    set( H3DViewer_SRCS UnityBuild.cpp ) 
-  endif()
-endif()
+handleUnityBuild( PROJECT_NAME ${PROJECT_NAME}
+                  SOURCE_FILES ${H3DViewer_SRCS}
+                  OUTPUT_VARIABLE H3DViewer_SRCS )
 
 set( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should use precompiled headers. This greatly reduces build times after first build." )
 
