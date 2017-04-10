@@ -21,6 +21,8 @@ if platform.system() == 'Windows':
   import win32con
   import win32process
   import psutil
+  import wmi
+
 
 
 class Process(object):
@@ -131,8 +133,27 @@ class ProcessWin32(Process):
       time.sleep(0.1)
       shell.SendKeys(key)
 
+  
+  def killProcessThroughWMI(self, process):
+    # function to kill process through python wmi package
+    # the input process can be either process name or process id
 
-    
+    processByName = not isinstance( process, (int, long) )
+    c = wmi.WMI()
+    processes = []
+    if processByName:
+      processes = c.Win32_Process (name=str(process))
+    else:
+      processes = c.Win32_Process (ProcessId=int(process))
+    for p in processes:
+      print ("killing "+str(p.ProcessId)+" "+str(p.Name))
+      result = p.Terminate()[0]
+      if result==0:
+        print ("killing "+str(p.ProcessId)+" "+str(p.Name)+" succeed!")
+      else:
+        print ("killing "+str(p.ProcessId)+" "+str(p.Name)+" failed!")
+
+
   def kill(self):
 
     # If the process crashed then windows might have started WerFault.exe that
@@ -145,6 +166,7 @@ class ProcessWin32(Process):
     for proc in psutil.process_iter():
       if "WerFault.exe".lower() in proc.name().lower():
         # NOTE: Blanket kill all WerFault instances!
+        print "killing werfault.exe"
         proc.kill()
         
         # # Check if WerFault is for our process
@@ -157,9 +179,24 @@ class ProcessWin32(Process):
     try:
       psutil_proc = psutil.Process(self.process.pid)
       for proc_child in psutil_proc.children(recursive=True):
+        print "killing children process, ", proc_child.name(), " with pid ", proc_child.pid
         proc_child.kill()
+        #self.killProcessThroughWMI(proc_child.pid)
+      gone, still_alive = psutil.wait_procs(proc_child, timeout=3)
+      for p in still_alive:
+        print "killing children process through wmi"
+        self.killProcessThroughWMI(p.pid)
       if self.isRunning():
+        print "killing main process:"
         psutil_proc.kill()
+        try:
+          psutil_proc.wait(timeout=3)
+        except:
+          pass
+        if self.isRunning():
+          print "killing main process through wmi"
+          killProcessThroughWMI(self.process.pid)
+
     except:
       pass
 

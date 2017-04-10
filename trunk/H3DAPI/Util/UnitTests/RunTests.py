@@ -249,26 +249,8 @@ class TestCaseRunner ( object ):
       return test_results
     else:
       print "Shutdown timeout hit, test looks like it crashed or froze."
-      # To ensure the launched process is killed, use pskill and 
-      # id information stored in childProcessedIDList.txt to force kill those ids. 
-      # try to locate childProcessIdList.txt file which is supposed to be generated
-      # by test case to indicate the the id of the process
-      pskill_path = self.getExePath("pskill.exe")
-      if pskill_path is not None:
-        if os.path.isfile("childProcessIdList.txt"):
-          f = open("childProcessIdList.txt",'r')
-          process_ids = f.read().split()
-          f.close()
-          for process_id in process_ids:
-            print "force kiling id", process_id
-            kill_process = str(pskill_path)+" /accepteula -t -nobanner "+str(process_id)
-            p = subprocess.Popen( kill_process, shell=False )
-        else:
-          print "pskill located, but cannot locate the id for the process that started for current test case"
-      else: 
-        print "pskill does not exist, use internal process kill to try to locate and kill all related processes"
-
       try:
+        print "killing processes:"
         process.kill ()
         time_slept = 0
         self.shutdown_timeout = 60
