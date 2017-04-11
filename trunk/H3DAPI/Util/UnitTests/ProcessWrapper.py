@@ -146,12 +146,16 @@ class ProcessWin32(Process):
     else:
       processes = c.Win32_Process (ProcessId=int(process))
     for p in processes:
-      print ("killing "+str(p.ProcessId)+" "+str(p.Name))
-      result = p.Terminate()[0]
-      if result==0:
-        print ("killing "+str(p.ProcessId)+" "+str(p.Name)+" succeed!")
-      else:
-        print ("killing "+str(p.ProcessId)+" "+str(p.Name)+" failed!")
+      
+      try:
+        print ("killing "+str(p.ProcessId)+" "+str(p.Name))
+        result = p.Terminate()[0]
+        if result==0:
+          print ("killing "+str(p.ProcessId)+" "+str(p.Name)+" succeed!")
+        else:
+          print ("killing "+str(p.ProcessId)+" "+str(p.Name)+" failed!")
+      except:
+        pass
 
 
   def kill(self):
@@ -180,22 +184,11 @@ class ProcessWin32(Process):
       psutil_proc = psutil.Process(self.process.pid)
       for proc_child in psutil_proc.children(recursive=True):
         print "killing children process, ", proc_child.name(), " with pid ", proc_child.pid
-        proc_child.kill()
-        #self.killProcessThroughWMI(proc_child.pid)
-      gone, still_alive = psutil.wait_procs(proc_child, timeout=3)
-      for p in still_alive:
-        print "killing children process through wmi"
-        self.killProcessThroughWMI(p.pid)
+        self.killProcessThroughWMI(proc_child.pid)
+      
       if self.isRunning():
         print "killing main process:"
-        psutil_proc.kill()
-        try:
-          psutil_proc.wait(timeout=3)
-        except:
-          pass
-        if self.isRunning():
-          print "killing main process through wmi"
-          killProcessThroughWMI(self.process.pid)
+        self.killProcessThroughWMI(psutil_proc.pid)
 
     except:
       pass
