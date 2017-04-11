@@ -259,6 +259,18 @@ class TestCaseRunner ( object ):
           time_slept += 0.5
       except:
         pass
+      # after process kill, additionally check if other processes started are killed
+      # It seems sometime, process.kill() can not locate all child processes. 
+      # Note: The solution only works on windows, and require additional work to store
+      # process ids started in the case execution
+      if platform.system() == 'Windows':
+        if os.path.isfile("childProcessIdList.txt"):
+          f = open("childProcessIdList.txt",'r')
+          process_ids = f.read().split()
+          f.close()
+          for process_id in process_ids:
+            process.killProcessThroughWMI(int(process_id))
+
       test_results.std_out= process.getStdOut()
       test_results.std_err= process.getStdErr()
       if test_case.ignore_warnings:
