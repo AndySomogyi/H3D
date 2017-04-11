@@ -74,6 +74,7 @@ parser.add_argument('--resolution', dest='resolution', help='The resolution h3dl
 parser.add_argument('--inject_at_end_of_scene', dest='inject_at_end_of_scene', help='Specifies if the testing boilerplate nodes should be injected before </Scene> instead of the standard behaviour of injecting after <Scene>. For compatibility with projects that do search-and-replace inside the x3d file and might match information in one of the unittesting nodes if they come before nodes that are expected to be in Scene.', default=False)
 parser.add_argument('--simulationbasedir', dest='simulationbasedir', help='Path to the directory where the project that is being tested has its SimulationBase  python directory, this is required for using the settings testdef property.', default=None)
 parser.add_argument('--skipResultUpload', dest='skipResultUpload', action='store_true',help='Specifies if skip the uploading of result, this can be handy while doing simple test', default=False)
+parser.add_argument('--skipSvnInfoOutput', dest='skipSvnInfoOutput', action='store_true',help='Specifies if skip extracting svn info of x3d and script file used in for the test', default=False)
 args = parser.parse_known_args()[0]
 
 
@@ -441,28 +442,33 @@ class TestCaseRunner ( object ):
         
         
     # use svn info to attempt to find the repo url of this test and its test script
-    p = subprocess.Popen( 'svn info "' + os.path.join(directory, testCase.x3d) + '"', stdout=subprocess.PIPE, shell=False )
-    svn_info_out, _ = p.communicate()
-    svn_url_x3d = ""
-    svn_url_script = ""
-    if p.returncode != 0:
-      print("Unable to obtain svn info for test x3d file, won't include it in results")
+    if args.skipSvnInfoOutput:
+      svn_info_out = ""
+      svn_url_x3d = ""
+      svn_url_script = ""
     else:
-      #include it here
-      for line in svn_info_out.split('\r\n'):
-        if line.startswith("URL: "):
-          svn_url_x3d = line[5:]
-          break
-    p = subprocess.Popen('svn info "' + os.path.join(directory, testCase.script) + '"', stdout=subprocess.PIPE, shell=False )
-    svn_info_out, _ = p.communicate()
-    if p.returncode != 0:
-      print("Unable to obtain svn info for test x3d file, won't include it in results")
-    else:
-      #include it here
-      for line in svn_info_out.split('\r\n'):
-        if line.startswith("URL: "):
-          svn_url_script = line[5:]
-          break
+      p = subprocess.Popen( 'svn info "' + os.path.join(directory, testCase.x3d) + '"', stdout=subprocess.PIPE, shell=False )
+      svn_info_out, _ = p.communicate()
+      svn_url_x3d = ""
+      svn_url_script = ""
+      if p.returncode != 0:
+        print("Unable to obtain svn info for test x3d file, won't include it in results")
+      else:
+        #include it here
+        for line in svn_info_out.split('\r\n'):
+          if line.startswith("URL: "):
+            svn_url_x3d = line[5:]
+            break
+      p = subprocess.Popen('svn info "' + os.path.join(directory, testCase.script) + '"', stdout=subprocess.PIPE, shell=False )
+      svn_info_out, _ = p.communicate()
+      if p.returncode != 0:
+        print("Unable to obtain svn info for test x3d file, won't include it in results")
+      else:
+        #include it here
+        for line in svn_info_out.split('\r\n'):
+          if line.startswith("URL: "):
+            svn_url_script = line[5:]
+            break
 
     # Check if we should change the physics engine being used for this test and if so then use Variation's Option feature to ensure the test is run with that engine
     if not testCase.physics_engine is None:
