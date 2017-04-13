@@ -406,36 +406,44 @@ class TestCaseRunner ( object ):
       else:
         try:
           print("Doing settings injection!")
-          settings_new, settings_old = shlex.split(testCase.settings)
-          if settings_new is None or settings_old is None:
-            print("Error! Settings property needs two values, the settings file to use and the settings file that needs to be modified!")
+          settings_new, settings_dir = shlex.split(testCase.settings)
+          if settings_new is None or settings_dir is None:
+            print("Error! Settings property needs two values, the settings file to use and the module's settings directory!")
             all_tests_successful = False
             exitcode = 1
             return None
-          settings_new = directory + "\\" + settings_new
-          settings_old = directory + "\\" + settings_old
+          settings_new = os.path.join(directory, settings_new)
+          settings_local = os.path.join(directory, settings_dir, "local", testCase.name, "settings", testCase.name + ".ini")
+          settings_default = os.path.join(directory, settings_dir, "Default" + testCase.name + ".ini")
+            
           sys.path.append(args.simulationbasedir)
           import SimulationBase.Settings
           settings_file = SimulationBase.Settings.ConfigINI()
-          if os.path.exists(settings_old + ".original.ini"):
+          if os.path.exists(settings_local + ".original.ini"):
             try:
-              print settings_old+'_original.ini already exists! This probably means that RunTests was interrupted during a previous execution.'
-              print "Restoring " + settings_old + " before continuing..."
-              os.remove(settings_old)
-              os.rename(settings_old + ".original.ini", settings_old)  
+              print settings_local+'_original.ini already exists! This probably means that RunTests was interrupted during a previous execution.'
+              print "Restoring " + settings_local + " before continuing..."
+              os.remove(settings_local)
+              os.rename(settings_local + ".original.ini", settings_local)  
             except:
               print "Failed to restore! Please check the files manually."
               return
             
-          settings_file.load(settings_old)
-          if not settings_file.save(settings_old + ".original.ini"):
-            print("Failed to backup original file.")
+          if(os.path.exists(settings_local)):
+            settings_file.load(settings_local)
+            if not settings_file.save(settings_local + ".original.ini"):
+              print("Failed to backup original file.")            
+          else:
+            print("No local settings file found, you should make sure you run this module outside of the tests at least once before running more tests with it.")
+            all_tests_successful = False
+            return None              
+
           settings_file_new = SimulationBase.Settings.ConfigINI()
           settings_file_new.load(settings_new)
           for section in settings_file_new.getSections():
             for option in settings_file_new.getOptions(section):
               settings_file.set(section, option, settings_file_new.get(section, option))
-          if not settings_file.save(settings_old):
+          if not settings_file.save(settings_local):
             print("Failed to save new file")
         except Exception as e:
           print(str(e))
@@ -535,9 +543,11 @@ class TestCaseRunner ( object ):
       
     try:
       if testCase.settings != None:
-        settings_new, settings_old = shlex.split(testCase.settings)
-        os.remove(directory + "\\" + settings_old)
-        os.rename(directory + "\\" + settings_old+".original.ini", directory + "\\" + settings_old)
+        settings_new, settings_dir = shlex.split(testCase.settings)
+        settings_new = os.path.join(directory, settings_new)
+        settings_local = os.path.join(directory, settings_dir, "local", testCase.name, "settings", testCase.name + ".ini")     
+        os.remove(settings_local)
+        os.rename(settings_local+".original.ini", settings_local)
     except:
       pass
 
@@ -587,8 +597,12 @@ class TestCaseRunner ( object ):
                 print "Testing: " + testCase.name
                 case_results = self.processTestDef(file, testCase, results, root)
                 results.append(case_results)
-                all_tests_successful = case_results.success and all_tests_successful
-                all_tests_run = case_results.terminates_ok and all_tests_run
+                if case_results != None:
+                  all_tests_successful = all_tests_successful and case_results.success
+                  all_tests_run = all_tests_run and case_results.terminates_ok
+                else:
+                  all_tests_succesful = False
+                  all_tests_run = False
                 testCase.filename = (os.path.relpath(file_path, directory)).replace('\'', '/') # This is used to set up the tree structure for the results page. It will store this parameter in the database as a unique identifier of this specific file of tests.
                 if not args.skipResultUpload and case_results != None:  
                   self.UploadResultsToSQL(testCase, case_results, root, filedescription)            
