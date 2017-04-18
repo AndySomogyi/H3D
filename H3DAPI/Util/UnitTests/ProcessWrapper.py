@@ -155,6 +155,7 @@ class ProcessWin32(Process):
         else:
           print ("killing "+str(p.ProcessId)+" "+str(p.Name)+" failed!")
       except:
+        print ("Something went wrong while trying to kill"+str(p.ProcessId)+" "+str(p.Name))
         pass
 
 
