@@ -82,26 +82,11 @@ handleUnityBuild( PROJECT_NAME ${PROJECT_NAME}
                   SOURCE_PREFIX_PATH ${H3DAPI_SOURCE_DIR}/../src/
                   COMPILE_FLAGS_VARIABLE H3DAPI_COMPILE_FLAGS
                   UNITY_BUILD_SOURCES ${H3DAPI_SRCS_UNITYBUILD} )
-
-set( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should use precompiled headers. This greatly reduces build times after first build." )
-
-# set up precompiled headers  
-if( MSVC AND PRECOMPILED_HEADERS_${PROJECT_NAME} )
-  list( APPEND H3DAPI_HEADERS ${H3DAPI_SOURCE_DIR}/../include/H3D/StdAfx.h )
-  list( APPEND H3DAPI_SRCS ${H3DAPI_SOURCE_DIR}/../src/StdAfx.cpp )
-  if( ${MSVC_VERSION} LESS 1900 )
-    set_source_files_properties( ${H3DAPI_SRCS}
-                                 PROPERTIES COMPILE_FLAGS "/Zm900 /FIH3D/StdAfx.h /YuH3D/StdAfx.h" )
-    set_source_files_properties( ${H3DAPI_SOURCE_DIR}/../src/StdAfx.cpp 
-                                 PROPERTIES COMPILE_FLAGS "/Zm900 /YcH3D/StdAfx.h" )
-  else()
-    set_source_files_properties( ${H3DAPI_SRCS}
-                                 PROPERTIES COMPILE_FLAGS "/FIH3D/StdAfx.h /YuH3D/StdAfx.h" )
-    set_source_files_properties( ${H3DAPI_SOURCE_DIR}/../src/StdAfx.cpp 
-                                 PROPERTIES COMPILE_FLAGS "/YcH3D/StdAfx.h" )
-  endif()
-endif()
-
+handlePrecompiledHeaders( PROJECT_NAME ${PROJECT_NAME}
+                          HEADERS_VARIABLE H3DAPI_HEADERS
+                          SRCS_VARIABLE H3DAPI_SRCS_SRCS
+                          STDAFX_HEADER_LOCATION ${H3DAPI_SOURCE_DIR}/../include/H3D/
+                          STDAFX_SOURCE_LOCATION ${H3DAPI_SOURCE_DIR}/../src/ )
 
 # Add the H3DAPI.rc resource file if Visual Studio
 if( MSVC )
