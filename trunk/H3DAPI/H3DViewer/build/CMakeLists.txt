@@ -32,25 +32,11 @@ include( "${H3DViewer_SOURCE_DIR}/H3DViewerSourceFiles.txt" )
 handleUnityBuild( PROJECT_NAME ${PROJECT_NAME}
                   SOURCE_FILES ${H3DViewer_SRCS}
                   OUTPUT_VARIABLE H3DViewer_SRCS )
-
-set( PRECOMPILED_HEADERS_${PROJECT_NAME} "YES" CACHE BOOL "Decides if a the generated project files should use precompiled headers. This greatly reduces build times after first build." )
-
-# set up precompiled headers  
-if( MSVC AND PRECOMPILED_HEADERS_${PROJECT_NAME} )
-  list( APPEND H3DViewer_HEADERS ${H3DViewer_SOURCE_DIR}/../src/StdAfx.h )
-  list( APPEND H3DViewer_SRCS ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp )
-  if( ${MSVC_VERSION} LESS 1900 )
-    set_source_files_properties( ${H3DViewer_SRCS}
-                                 PROPERTIES COMPILE_FLAGS "/Zm900 /FIStdAfx.h /YuStdAfx.h" )
-    set_source_files_properties( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
-                                 PROPERTIES COMPILE_FLAGS "/Zm900 /YcStdAfx.h" )
-  else()
-    set_source_files_properties( ${H3DViewer_SRCS}
-                                 PROPERTIES COMPILE_FLAGS "/FIStdAfx.h /YuStdAfx.h" )
-    set_source_files_properties( ${H3DViewer_SOURCE_DIR}/../src/StdAfx.cpp 
-                                 PROPERTIES COMPILE_FLAGS "/YcStdAfx.h" )
-  endif()
-endif()
+handlePrecompiledHeaders( PROJECT_NAME ${PROJECT_NAME}
+                          HEADERS_VARIABLE H3DViewer_HEADERS
+                          SRCS_VARIABLE H3DViewer_SRCS
+                          STDAFX_HEADER_LOCATION ${H3DViewer_SOURCE_DIR}/../src/
+                          STDAFX_SOURCE_LOCATION ${H3DViewer_SOURCE_DIR}/../src/ )
 
 # Add the H3DViewer.rc resource file if Visual Studio
 if( MSVC )
