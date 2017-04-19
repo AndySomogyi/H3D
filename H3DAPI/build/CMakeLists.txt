@@ -467,16 +467,9 @@ if( MSVC )
   set_target_properties( H3DAPI PROPERTIES FOLDER "H3D" )
 endif()
 
-set( default_bin_install "bin" )
-set( default_lib_install "lib" )
+getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
 if( WIN32 )
-  set( default_bin_install "bin32" )
-  set( default_lib_install "lib32" )
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( default_bin_install "bin64" )
-    set( default_lib_install "lib64" )
-  endif()
   # Temporary variables used later to set LINK_FLAGS.
   set( temp_output_postfix "" )
 

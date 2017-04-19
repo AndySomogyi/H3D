@@ -128,18 +128,7 @@ if( MSVC )
   # Remove link warning in debug build.
   set_target_properties( ParticleDemo PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB:msvcrt" )
 endif()
-
-set( default_bin_install "bin" )
-set( default_lib_install "lib" )
-
-if( WIN32 )
-  set( default_bin_install "bin32" )
-  set( default_lib_install "lib32" )
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( default_bin_install "bin64" )
-    set( default_lib_install "lib64" )
-  endif()
-endif()
+getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
 install( TARGETS ParticleDemo
          LIBRARY DESTINATION ${default_lib_install}
