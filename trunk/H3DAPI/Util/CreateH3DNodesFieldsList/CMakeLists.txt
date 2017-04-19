@@ -55,21 +55,8 @@ else()
   endif()
 endif()
 
-set( h3d_msvc_version 6 )
-set( temp_msvc_version 1299 )
-while( ${MSVC_VERSION} GREATER ${temp_msvc_version} )
-  math( EXPR h3d_msvc_version "${h3d_msvc_version} + 1" )
-  math( EXPR temp_msvc_version "${temp_msvc_version} + 100" )
-endwhile()
+getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
-set( default_bin_install "bin" )
-
-if( WIN32 )
-  set( default_bin_install "bin32" )
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( default_bin_install "bin64" )
-  endif()
-endif()
 set( CreateH3DNodesFieldsList_OUTPUT_FILE_DEFAULT_INTERNAL "${CreateH3DNodesFieldsList_SOURCE_DIR}/../nodesFieldsList" )
 
 #UI

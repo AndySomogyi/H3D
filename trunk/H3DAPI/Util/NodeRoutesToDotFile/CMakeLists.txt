@@ -121,16 +121,9 @@ set_target_properties( NodeRoutesToDotFile PROPERTIES DEBUG_POSTFIX "_d" )
 # Variable used to set compile properties.
 set( NODEROUTESTODOTFILE_COMPILE_FLAGS "-DH3D_GENERATE_DOTROUTE_FILES" )
 
-set( default_bin_install "bin" )
-set( default_lib_install "lib" )
+getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
 if( WIN32 )
-  set( default_bin_install "bin32" )
-  set( default_lib_install "lib32" )
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( default_bin_install "bin64" )
-    set( default_lib_install "lib64" )
-  endif()
 
   if( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -DHAVE_UI" )

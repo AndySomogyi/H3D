@@ -98,18 +98,7 @@ if( MSVC )
 
   set_target_properties( ThreadExample PROPERTIES COMPILE_FLAGS "${ThreadExample_COMPILE_FLAGS}" )
 endif()
-
-set( default_bin_install "bin" )
-set( default_lib_install "lib" )
-
-if( WIN32 )
-  set( default_bin_install "bin32" )
-  set( default_lib_install "lib32" )
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( default_bin_install "bin64" )
-    set( default_lib_install "lib64" )
-  endif()
-endif()
+getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
 # Install to these directories.
 install( TARGETS ThreadExample

@@ -94,18 +94,9 @@ target_link_libraries( Spheres_X3D ${required_libs} ${optional_libs} )
 set_target_properties( Sphere_X3D PROPERTIES DEBUG_POSTFIX "_d" )
 set_target_properties( Spheres_X3D PROPERTIES DEBUG_POSTFIX "_d" )
 
-# set the install directory to the H3D directory on Windows
-set( default_bin_install "bin" )
-set( default_lib_install "lib" )
+getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
 if( WIN32 )
-  set( default_bin_install "bin32" )
-  set( default_lib_install "lib32" )
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( default_bin_install "bin64" )
-    set( default_lib_install "lib64" )
-  endif()
-
   # Set compile and link properties for projects.
   set( ManualExamples_COMPILE_FLAGS "" )
 
