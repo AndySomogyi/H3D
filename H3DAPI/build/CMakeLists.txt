@@ -15,9 +15,9 @@ set( CMAKE_FIND_FRAMEWORK "LAST" )
 
 # make sure symbols are exported.
 set( H3DAPI_COMPILE_FLAGS "-DH3DAPI_EXPORTS" )
-set( H3DAPI_LINK_FLAGS "" )
-set( H3DAPI_LINK_FLAGS_RELEASE "" )
-set( H3DAPI_LINK_FLAGS_DEBUG "" )
+set( H3DAPI_LINK_FLAGS )
+set( H3DAPI_LINK_FLAGS_RELEASE )
+set( H3DAPI_LINK_FLAGS_DEBUG )
 if( WIN32 AND NOT DEFINED PREFER_FREEGLUT_STATIC_LIBRARIES )
   # Add a cache variable PREFER_FREEGLUT_STATIC_LIBRARIES to have the choice of generating a project
   # linking statically against glut. Default is NO since most people will not use this.
@@ -236,6 +236,7 @@ if( NvidiaCG_FOUND )
   set( HAVE_CG 1 )
   include_directories( ${NvidiaCG_INCLUDE_DIRS} ) 
   set( optional_libs ${optional_libs} ${NvidiaCG_LIBRARIES} )
+  addDelayLoadFlags( NvidiaCG_LIBRARIES H3DAPI_LINK_FLAGS )
 endif()
 
 # Optional extra library. Used to read compressed files.
@@ -292,6 +293,7 @@ if( Vorbis_FOUND )
   set( HAVE_LIBVORBIS 1 )
   include_directories( ${Vorbis_INCLUDE_DIRS} )
   set( optional_libs ${optional_libs} ${Vorbis_LIBRARIES} )
+  addDelayLoadFlags( Vorbis_vorbisfile_LIBRARY H3DAPI_LINK_FLAGS )
 endif()
 
 # Optional extra library. Used for Oculus Rift support.
@@ -332,6 +334,7 @@ if( SixenseSDK_FOUND )
   set( HAVE_SIXENSE 1 )
   include_directories( ${SixenseSDK_INCLUDE_DIRS} )
   set( required_libs ${required_libs} ${SixenseSDK_LIBRARIES} )
+  addDelayLoadFlags( SixenseSDK_LIBRARIES H3DAPI_LINK_FLAGS )
 endif()
 
 # Optional extra library. Used to render fonts in OpenGL.
@@ -352,6 +355,7 @@ endif()
 
 if( Haptik_FOUND )
   set( optional_libs ${optional_libs} ${Haptik_LIBRARY} )
+  addDelayLoadFlags( Haptik_LIBRARY H3DAPI_LINK_FLAGS )
 endif()
 
 if( WIN32 )
@@ -427,6 +431,7 @@ if( VirtualHand_FOUND )
   set( HAVE_VIRTUAL_HAND_SDK 1 )
   include_directories( ${VirtualHand_INCLUDE_DIRS} )
   set( required_libs ${required_libs} ${VirtualHand_LIBRARIES} )
+  addDelayLoadFlags( VirtualHand_LIBRARIES H3DAPI_LINK_FLAGS )
 endif()
 
 # H3DAPI shared library definition
@@ -489,19 +494,6 @@ if( WIN32 )
     # H3D API is now to big to link incrementally with vc8.
     set( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /INCREMENTAL:NO" )
     set( H3DAPI_LINK_FLAGS_DEBUG "${H3DAPI_LINK_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt" )
-  endif()
-
-  # Set delayload properties of H3D API.
-  if( MSVC )
-    set( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /DELAYLOAD:\"cg.dll\" /DELAYLOAD:\"cgGL.dll\" /DELAYLOAD:\"vorbisfile.dll\" /DELAYLOAD:\"VirtualHandDevice.dll\" /DELAYLOAD:\"VirtualHandCore.dll\"" )
-  endif()
-
-  if( Haptik_FOUND AND MSVC )
-    set( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /DELAYLOAD:\"Haptik.Library.dll\"" )
-  endif()
-
-  if( SixenseSDK_FOUND AND MSVC )
-    set( H3DAPI_LINK_FLAGS "${H3DAPI_LINK_FLAGS} /DELAYLOAD:\"sixense.dll\" /DELAYLOAD:\"sixense_utils.dll\" /DELAYLOAD:\"sixense_x64.dll\" /DELAYLOAD:\"sixense_utils_x64.dll\"" )
   endif()
   
   if( TARGET Chai3DRenderer AND MSVC )
