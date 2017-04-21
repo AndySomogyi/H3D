@@ -632,15 +632,20 @@ void Scene::idle() {
   H3DUtil::H3DTimer::stepBegin("Scene_callbacks");
 #endif
   callback_lock.lock();
-  // execute callbacks
-  for( CallbackList::iterator i = callbacks.begin();
-       i != callbacks.end(); ) {
-    CallbackCode c = (*i).first( (*i).second );
-    if( c == CALLBACK_DONE ) {
-      i = callbacks.erase( i );
-    } else {
-      ++i;
+  try {
+    // execute callbacks
+    for( CallbackList::iterator i = callbacks.begin();
+         i != callbacks.end(); ) {
+      CallbackCode c = (*i).first( (*i).second );
+      if( c == CALLBACK_DONE ) {
+        i = callbacks.erase( i );
+      } else {
+        ++i;
+      }
     }
+  } catch (const Exception::QuitAPI &) {
+    callback_lock.unlock();
+    throw Exception::QuitAPI();
   }
   callback_lock.unlock();
 #ifdef HAVE_PROFILER
