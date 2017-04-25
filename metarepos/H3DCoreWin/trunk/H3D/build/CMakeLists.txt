@@ -17,10 +17,13 @@ set( H3DUTIL_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../H3DUtil/include" CACHE INT
 set( HAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../HAPI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
 set( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../H3DAPI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
 set( H3DAPI_INCLUDE_DIR "${H3DCoreWin_SOURCE_DIR}/../External/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-# PTHREAD_INCLUDE_DIR is added here since it is normally found by FindH3DUtil.
-# for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
-# is done then any of the included CMakeLists.txt is doing something wrong.
-set( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIR}" "${H3DCoreWin_SOURCE_DIR}/../External/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+
+if ( WIN32 )
+  # PTHREAD_INCLUDE_DIR is added here since it is normally found by FindH3DUtil.
+  # for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
+  # is done then any of the included CMakeLists.txt is doing something wrong.
+  set( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIR}" "${H3DCoreWin_SOURCE_DIR}/../External/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+endif()
 
 if( NOT WIN32 )
   if( EXISTS ${H3DCoreWin_SOURCE_DIR}/../H3DUtil/build )
