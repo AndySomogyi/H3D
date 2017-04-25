@@ -21,11 +21,14 @@ set( H3DAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/include" CAC
 set( UI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../UI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
 set( MEDX3D_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
 set( H3DPHYSICS_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-# PTHREAD_INCLUDE_DIRS is added here since it is normally found by FindH3DUtil.
-# for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
-# is done then any of the included CMakeLists.txt is doing something wrong.
-set( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIRS}" "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
 
+if( WIN32 )
+  # PTHREAD_INCLUDE_DIRS is added here since it is normally found by FindH3DUtil.
+  # for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
+  # is done then any of the included CMakeLists.txt is doing something wrong.
+  set( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIRS}" "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+endif()
+  
 # Version of H3DWithToolkitsWin
 set( H3DWithToolkitsWin_MAJOR_VERSION 2 )
 set( H3DWithToolkitsWin_MINOR_VERSION 3 )
