@@ -242,7 +242,7 @@ namespace H3D {
     /// \dotfile Text_origin.dot
     auto_ptr< SFVec3f > origin;
 
-    /// The dimensions of Text node’s 2D bounding box.
+    /// The dimensions of Text node's 2D bounding box.
     ///
     /// <b>Access type:</b> outputOnly \n
     /// 
