@@ -47,7 +47,7 @@ namespace H3D {
   /// drawn with a constant colour of color. Objects very close to the viewer
   /// are blended very little with the fog color. A visibilityRange of 0.0 
   /// disables the LocalFog node. The visibilityRange is affected by the
-  /// scaling transformations of the LocalFog node’s parents; translations
+  /// scaling transformations of the LocalFog node's parents; translations
   /// and rotations have no affect on visibilityRange.
   ///
   /// The fogType field controls how much of the fog colour is blended with
