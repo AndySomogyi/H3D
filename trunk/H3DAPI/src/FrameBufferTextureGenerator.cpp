@@ -265,12 +265,14 @@ X3DGroupingNode( _addChildren, _removeChildren, _children, _metadata, _bound,
     depthBufferStorage->route( depthWarningPrinted );
     depthWarningPrinted->setValue(false);
 
+    colorMismatchWarningPrinted->setValue( false );
+
     colorMismatchWarningPrinted->setName( "colorMismatchWarningPrinted" );
     colorMismatchWarningPrinted->setOwner(this);
     colorBufferStorages->route( colorMismatchWarningPrinted );
-    colorMismatchWarningPrinted->setValue(false);
+    
 
-    colorInitWarningPrinted->setName("colorWarningStroageInitPrinte");
+    colorInitWarningPrinted->setName("colorInitWarningPrinted");
     colorInitWarningPrinted->setOwner(this);
     colorBufferStorages->route( colorInitWarningPrinted );
 
