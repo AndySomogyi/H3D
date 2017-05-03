@@ -55,7 +55,7 @@ namespace H3D {
   ///
   /// The spacing field determines the line spacing between adjacent lines
   /// of text. The distance between the baseline of each line of text is
-  /// (spacing × size) in the appropriate direction (depending on other
+  /// (spacing Ã— size) in the appropriate direction (depending on other
   /// fields described below). 
   ///
   /// \anchor FontStyle_family
@@ -108,7 +108,7 @@ namespace H3D {
   /// according to their natural advance width. Each line of characters is 
   /// advanced in the negative Y direction if topToBottom is TRUE or in the
   /// positive Y direction if topToBottom is FALSE. Lines are advanced by the
-  /// amount of size × spacing.
+  /// amount of size Ã— spacing.
   ///
   /// For vertical text (horizontal = FALSE), characters on each line of text
   /// advance in the negative Y direction if topToBottom is TRUE or in the 
@@ -116,7 +116,7 @@ namespace H3D {
   /// according to their natural advance height. Each line of characters is 
   /// advanced in the positive X direction if leftToRight is TRUE or in the
   /// negative X direction if leftToRight is FALSE. Lines are advanced by 
-  /// the amount of size × spacing.
+  /// the amount of size Ã— spacing.
   /// 
   /// \anchor FontStyle_justify
   /// The justify field determines alignment of the above text layout 
@@ -291,7 +291,7 @@ namespace H3D {
 
     /// The spacing field determines the line spacing between adjacent lines
     /// of text. The distance between the baseline of each line of text is
-    /// (spacing × size) in the appropriate direction.
+    /// (spacing Ã— size) in the appropriate direction.
     /// 
     /// <b>Access type:</b> initializeOnly \n
     /// <b>Default value:</b> 1 \n

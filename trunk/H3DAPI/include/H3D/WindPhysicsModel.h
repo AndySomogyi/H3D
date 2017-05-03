@@ -47,7 +47,7 @@ namespace H3D {
   /// From the wind speed, the force applied per unit-area on the particle
   /// is calculated using the following formula:
   ///
-  /// pressure = 10(2 × log(speed)) × 0.64615
+  /// pressure = 10(2 Ã— log(speed)) Ã— 0.64615
   /// 
   /// The gustiness specifies how much the wind speed varies from the average
   /// value defined by the speed field. The wind speed variation is calculated

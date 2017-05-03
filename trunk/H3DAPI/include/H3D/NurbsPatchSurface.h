@@ -50,7 +50,7 @@ namespace H3D {
   /// is to be evaluated as a closed surface or not in the u and v dimensions.
   ///
   /// controlPoint defines a set of control points of dimension 
-  /// uDimension × vDimension. This set of points defines a mesh where the
+  /// uDimension Ã— vDimension. This set of points defines a mesh where the
   /// points do not have a uniform spacing. uDimension points define a 
   /// polyline in u-direction followed by further u-polylines with the 
   /// v-parameter in ascending order. The number of control points shall be
@@ -64,10 +64,10 @@ namespace H3D {
   /// The control vertex corresponding to the control point P[i,j] on the 
   /// control grid is: 
   ///
-  /// P[i,j].x = controlPoints[i + ( j × uDimension)].x
-  /// P[i,j].y = controlPoints[i + ( j × uDimension)].y
-  /// P[i,j].z = controlPoints[i + ( j × uDimension)].z
-  /// P[i,j].w = weight[ i + (j × uDimension)]
+  /// P[i,j].x = controlPoints[i + ( j Ã— uDimension)].x
+  /// P[i,j].y = controlPoints[i + ( j Ã— uDimension)].y
+  /// P[i,j].z = controlPoints[i + ( j Ã— uDimension)].z
+  /// P[i,j].w = weight[ i + (j Ã— uDimension)]
   ///
   /// where 0 = i < uDimension and 
   ///       0 = j < vDimension.
@@ -84,11 +84,11 @@ namespace H3D {
   /// if a tessellation value is smaller than 0, the number of tessellation
   /// points is:
   ///
-  ///   -tessellation × (u/v)dimension)+1;
+  ///   -tessellation Ã— (u/v)dimension)+1;
   ///
   /// if a tessellation value is 0, the number of tessellation points is:
   ///
-  ///    (2 × (u/v)dimension)+1. 
+  ///    (2 Ã— (u/v)dimension)+1. 
   ///
   /// For implementations doing tessellations based on chord length, 
   /// tessellation values less than zero are interpreted as the maximum chord

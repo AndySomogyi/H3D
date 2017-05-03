@@ -88,7 +88,7 @@ namespace H3D {
   /// fraction_changed events output a floating point value in the closed 
   /// interval [0, 1]. At startTime the value of fraction_changed is 0. After
   /// startTime, the value of fraction_changed in any cycle will progress
-  /// through the range (0.0, 1.0]. At startTime + N × cycleInterval, for 
+  /// through the range (0.0, 1.0]. At startTime + N x cycleInterval, for 
   /// N = 1, 2, ..., (i.e., at the end of every cycle), the value of 
   /// fraction_changed is 1.
   ///
@@ -97,7 +97,7 @@ namespace H3D {
   /// (satisfied by the default values). The time events output absolute
   /// times for each tick of the TimeSensor node simulation. The time events 
   /// shall start at the first simulation tick greater than or equal to 
-  /// startTime. time events end at stopTime, or at startTime + N × 
+  /// startTime. time events end at stopTime, or at startTime + N x 
   /// cycleInterval for some positive integer value of N, or loop forever
   /// depending on the values of the other fields. An active TimeSensor node 
   /// shall stop at the first simulation tick when now = stopTime > startTime.
@@ -108,7 +108,7 @@ namespace H3D {
   /// generate final time and fraction_changed events. If loop is FALSE at the
   /// end of the Nth cycleInterval and was TRUE at startTime + M cycleInterval
   /// for all 0 < M < N, the final time event will be generated with a value
-  /// of (startTime + N × cycleInterval) or stopTime (if stopTime > startTime),
+  /// of (startTime + N x cycleInterval) or stopTime (if stopTime > startTime),
   /// whichever value is less. If loop is TRUE at the completion of every 
   /// cycle, the final event is generated as evaluated at stopTime (if
   /// stopTime > startTime) or never.

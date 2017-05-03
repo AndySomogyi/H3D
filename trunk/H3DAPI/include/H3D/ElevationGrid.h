@@ -71,11 +71,11 @@ namespace H3D {
   /// color field are applied to each vertex or each quadrilateral of the
   /// ElevationGrid node. If colorPerVertex is FALSE and the color field is
   /// not NULL, the color field shall specify a Color node containing at least
-  /// (xDimension-1)×(zDimension-1) colours; one for each quadrilateral.
+  /// (xDimension-1)Ã—(zDimension-1) colours; one for each quadrilateral.
   ///
   /// If colorPerVertex is TRUE and the color field is not NULL, the color 
   /// field shall specify a Color node containing at least 
-  /// xDimension × zDimension colours, one for each vertex.
+  /// xDimension Ã— zDimension colours, one for each vertex.
   ///
   /// The normal field specifies per-vertex or per-quadrilateral normals for
   /// the ElevationGrid node. If the normal field is NULL, normals are 
@@ -87,12 +87,12 @@ namespace H3D {
   /// each vertex or each quadrilateral of the ElevationGrid node depending
   /// on the value of normalPerVertex. If normalPerVertex is FALSE and the
   /// normal node is not NULL, the normal field shall specify a Normal node
-  /// containing at least (xDimension-1)×(zDimension-1) normals; one for each
+  /// containing at least (xDimension-1)Ã—(zDimension-1) normals; one for each
   /// quadrilateral
   ///
   /// If normalPerVertex is TRUE and the normal field is not NULL, the normal
   /// field shall specify a Normal node containing at least 
-  /// xDimension × zDimension normals; one for each vertex.
+  /// xDimension Ã— zDimension normals; one for each vertex.
   ///
   /// The texCoord field specifies per-vertex texture coordinates for the 
   /// ElevationGrid node. If texCoord is NULL, default texture coordinates
@@ -101,7 +101,7 @@ namespace H3D {
   /// texture coordinate is aligned with the positive X-axis, and the T
   /// texture coordinate with positive Z-axis. If texCoord is not NULL,
   /// it shall specify a TextureCoordinate node containing at least 
-  /// (xDimension)×(zDimension) texture coordinates; one for each vertex.
+  /// (xDimension)Ã—(zDimension) texture coordinates; one for each vertex.
   ///
   /// By default, the quadrilaterals are defined with a counterclockwise 
   /// ordering. Hence, the Y-component of the normal is positive. Setting

@@ -35,7 +35,7 @@
 namespace H3D {
   /// \ingroup X3DNodes 
   /// \class TextureMatrixTransform
-  /// \brief The matrix field specifies a generalized, unfiltered 4×4 
+  /// \brief The matrix field specifies a generalized, unfiltered 4Ã—4 
   /// transformation matrix that can be used to modify the texture. 
   /// Any set of values is permitted.
   /// 
@@ -56,7 +56,7 @@ namespace H3D {
     /// transform for the currently active texture unit.
     virtual void render();
 
-    /// The matrix field specifies a generalized, unfiltered 4×4 
+    /// The matrix field specifies a generalized, unfiltered 4Ã—4 
     /// transformation matrix that can be used to modify the texture. 
     /// Any set of values is permitted.Specifies a translation of the texture coordinates.
     /// 

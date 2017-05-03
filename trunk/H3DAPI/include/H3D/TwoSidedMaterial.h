@@ -101,7 +101,7 @@ namespace H3D {
     /// sources this surface shall reflect. Ambient light is omnidirectional
     /// and depends only on the number of light sources, not their positions
     /// with respect to the surface. Ambient colour is calculated as 
-    /// ambientIntensity × diffuseColor.
+    /// ambientIntensity x diffuseColor.
     ///
     /// <b>Access type:</b> inputOutput \n
     /// <b>Default value:</b> 0.2 \n
