@@ -43,7 +43,7 @@ namespace H3D {
   /// and shall be a value between 0 and 4. The following three numbers are
   /// the size of the texture: width, height and depth, respectively. The 
   /// remaining values of the array are treated as the pixels for the image.
-  /// There shall be at least width × height × depth number of pixel values
+  /// There shall be at least width Ã— height Ã— depth number of pixel values
   /// provided. Each of the width, height and depth are required to be a
   /// power of 2 unless scaleToPowerOfTwo is TRUE.
   ///

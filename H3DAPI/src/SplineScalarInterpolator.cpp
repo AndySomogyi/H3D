@@ -93,7 +93,7 @@ void SplineScalarInterpolator::SFValue::update() {
     static_cast<MFFloat*>(routes_in[3])->getValue();
   H3DFloat weight;
 
-  //Retunerar det lägsta indexet[i] =key-index, + weight(s) 
+  //Retunerar det lÃ¤gsta indexet[i] =key-index, + weight(s) 
   int key_index = interpolator->lookupKey( fraction, 
     weight );
 
@@ -187,13 +187,13 @@ void SplineScalarInterpolator::SFValue::update() {
 
     //Calculate F1, F2, T0, T1
     if (!_closed || specified || ignoreClosed){
-      // Denna loop fungerar för notSpec.
+      // Denna loop fungerar fÃ¶r notSpec.
       for(int i=1; i<key_size-1; ++i){
         F1.push_back(2*((_key[i] - _key[i-1])/(_key[i+1] - _key[i-1])));
         F2.push_back(2*((_key[i+1] - _key[i])/(_key[i+1] - _key[i-1])));
       }
       if((key_index>0) && (key_index <key_size-2)){
-        T0 = (F1[key_index-1]*T[key_index]); //eftersom i borjar på 1 ska jag ha F1-1
+        T0 = (F1[key_index-1]*T[key_index]); //eftersom i borjar pÃ¥ 1 ska jag ha F1-1
         T1 = (F2[key_index]*T[key_index+1]);
       }
       else if(specified && (key_index ==0)){

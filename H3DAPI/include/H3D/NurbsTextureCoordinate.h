@@ -102,7 +102,7 @@ namespace H3D {
     }
 
     /// controlPoint defines a set of control points of dimension 
-    /// uDimension × vDimension. This set of points defines a mesh where the
+    /// uDimension x vDimension. This set of points defines a mesh where the
     /// points do not have a uniform spacing. uDimension points define a 
     /// polyline in u-direction followed by further u-polylines with the 
     /// v-parameter in ascending order. The number of control points shall be

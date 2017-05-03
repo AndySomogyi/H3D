@@ -70,7 +70,7 @@ namespace H3D {
   ///   "BLENDTEXTUREALPHA" Linearly blend this texture stage, using the alpha
   ///   from this stage's texture. Arg1 * (Alpha) + Arg2 * (1 - Alpha).
   ///   "BLENDFACTORALPHA" Linearly blend this texture stage, using the alpha
-  ///   factor from the MultiTexture node. Arg1 × (Alpha) + Arg2 × (1 = Alpha).
+  ///   factor from the MultiTexture node. Arg1 Ã— (Alpha) + Arg2 Ã— (1 = Alpha).
   ///   "BLENDCURRENTALPHA" Linearly blend this texture stage, using the alpha
   ///   taken from the previous texture stage. 
   ///   Arg1 * (Alpha)+Arg2*(1 - Alpha)
@@ -82,7 +82,7 @@ namespace H3D {
   ///   color channels, including alpha.
   ///   This can do either diffuse or specular bump mapping with correct
   ///   input. Performs the function 
-  ///   (Arg1.R × Arg2.R + Arg1.G × Arg2.G + Arg1.B × Arg2.B) where each
+  ///   (Arg1.R Ã— Arg2.R + Arg1.G Ã— Arg2.G + Arg1.B Ã— Arg2.B) where each
   ///   component has been scaled and offset to make it signed. The result 
   ///   is replicated into all four (including alpha) channels.
   /// - The function field defines an optional function to be applied to
