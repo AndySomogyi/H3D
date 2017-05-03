@@ -7,28 +7,8 @@ set( CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build/module
 include( H3DCommonFunctions )
 handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DWithToolkitsWin_SOURCE_DIR}/.. GENERATE_CPACK_PROJECT )
 
-set( H3D_USE_DEPENDENCIES_ONLY TRUE )
-
 set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
 
-#pthread is required for using the H3DUtil library
-find_package( PTHREAD REQUIRED )
-
-#set include directories
-set( H3DUTIL_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-set( HAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-set( H3DAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-set( UI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../UI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-set( MEDX3D_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-set( H3DPHYSICS_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-
-if( WIN32 )
-  # PTHREAD_INCLUDE_DIRS is added here since it is normally found by FindH3DUtil.
-  # for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
-  # is done then any of the included CMakeLists.txt is doing something wrong.
-  set( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIRS}" "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
-endif()
-  
 # Version of H3DWithToolkitsWin
 set( H3DWithToolkitsWin_MAJOR_VERSION 2 )
 set( H3DWithToolkitsWin_MINOR_VERSION 3 )
@@ -106,6 +86,26 @@ if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsL
   endif()
 endif()
 
+set( H3D_USE_DEPENDENCIES_ONLY TRUE )
+
+#pthread is required for using the H3DUtil library
+find_package( PTHREAD REQUIRED )
+
+#set include directories
+set( H3DUTIL_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+set( HAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../HAPI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+set( H3DAPI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+set( UI_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../UI/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+set( MEDX3D_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../MedX3D/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+set( H3DPHYSICS_INCLUDE_DIR "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+
+if( WIN32 )
+  # PTHREAD_INCLUDE_DIRS is added here since it is normally found by FindH3DUtil.
+  # for this type of top cmakelists build we do not want to use FindH3DUtil, ever. If that
+  # is done then any of the included CMakeLists.txt is doing something wrong.
+  set( EXTERNAL_INCLUDE_DIR "${PTHREAD_INCLUDE_DIRS}" "${H3DWithToolkitsWin_SOURCE_DIR}/../External/include" CACHE INTERNAL "Set to internal so it can be changed by sub directories." )
+endif()
+  
 if( NOT DEFINED H3D_EXTRA_TOOLKITS )
   set( H3D_EXTRA_TOOLKITS "" CACHE STRING "Add names of directories of extra toolkits that you want to include. Separate each name by ;. The extra toolkit CMakeLists.txt must be located in ${H3DWithToolkitsWin_SOURCE_DIR}/../<name of toolkit>/build" FORCE )
 endif()
