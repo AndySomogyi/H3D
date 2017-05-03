@@ -21,39 +21,13 @@ set( required_libs )
 # Where to find modules, used when finding packages.
 set( CMAKE_MODULE_PATH "${CreateH3DNodesFieldsList_SOURCE_DIR}/../../build/modules" )
 
-if( H3D_USE_DEPENDENCIES_ONLY )
-  # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
-  include_directories( ${EXTERNAL_INCLUDE_DIR} )
-  include_directories( ${H3DUTIL_INCLUDE_DIR} )
-  include_directories( ${HAPI_INCLUDE_DIR} )
-  include_directories( ${H3DAPI_INCLUDE_DIR} )
-
-  set( required_libs ${required_libs} H3DUtil HAPI H3DAPI )
-else()
-  #H3DAPI
-  find_package( H3DAPI REQUIRED )
-
-  if( H3DAPI_FOUND )
-    include_directories( ${H3DAPI_INCLUDE_DIRS} )
-    set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
-  endif()
-
-  #H3DUtil
-  find_package( H3DUtil REQUIRED )
-
-  if( H3DUtil_FOUND )
-    include_directories( ${H3DUtil_INCLUDE_DIRS} )
-    set( required_libs ${required_libs} ${H3DUtil_LIBRARIES} )
-  endif()
-
-  #HAPI
-  find_package( HAPI REQUIRED )
-
-  if( HAPI_FOUND )
-    include_directories( ${HAPI_INCLUDE_DIRS} )
-    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
-  endif()
-endif()
+include( H3DCommonFunctions )
+set( tmp_h3d_include_dirs )
+findIncludeDirsAndLibrariesForH3DProjects ( PROJECT_NAMES H3DUtil HAPI H3DAPI
+                                            INCLUDE_DIRS_OUTPUT_VAR tmp_h3d_include_dirs
+                                            LIBRARIES_OUTPUT_VAR required_libs
+                                            REQUIRED_PROJECTS H3DUtil HAPI H3DAPI )
+include_directories( ${tmp_h3d_include_dirs} ) 
 
 getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
@@ -197,17 +171,17 @@ if( WIN32 )
   # Variable used to set compile properties.
   set( CreateH3DNodesFieldsList_COMPILE_FLAGS "" )
 
-  if( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( UI_FOUND OR TARGET UI )
     set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_UI" )
     add_dependencies( CreateH3DNodesFieldsList UI )
   endif()
 
-  if( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( H3DPhysics_FOUND OR TARGET H3DPhysics )
     set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_H3DPhysics" )
     add_dependencies( CreateH3DNodesFieldsList H3DPhysics )
   endif()
 
-  if( MedX3D_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( MedX3D_FOUND OR TARGET MedX3D )
     set( CreateH3DNodesFieldsList_COMPILE_FLAGS "${CreateH3DNodesFieldsList_COMPILE_FLAGS} -DHAVE_MedX3D" )
     add_dependencies( CreateH3DNodesFieldsList MedX3D )
   endif()
