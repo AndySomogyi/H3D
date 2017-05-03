@@ -40,22 +40,16 @@ if( WIN32 AND EXISTS ${H3DAPI_SOURCE_DIR}/../../HAPI/build )
   add_subdirectory( ${H3DAPI_SOURCE_DIR}/../../HAPI/build
                     ${CMAKE_CURRENT_BINARY_DIR}/HAPI )
 
-  get_directory_property( hapi_include_dir_tmp DIRECTORY ${H3DAPI_SOURCE_DIR}/../../HAPI/build INCLUDE_DIRECTORIES )
-  set( HAPI_INCLUDE_DIR ${hapi_include_dir_tmp} CACHE INTERNAL "Set to internal so others can change it." )
-
   # Check if Haptik was found.
   if( Haptik_INCLUDE_DIR AND Haptik_LIBRARY )
     set( Haptik_FOUND 1 )
   endif()
 endif()
 
-# Add the directory to INCLUDE_DIRECTORIES before any other statement to make sure that this header file is found first.
+# Add the directory to include_directories before any other statement to make sure that this header file is found first.
 # This assumes that we always use "#include <path/include_header.h>" in our code even if the file is actually found in
 # the same directory as the file that contains the include statement.
-set( H3DAPI_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include ${H3DAPI_SOURCE_DIR}/../include CACHE INTERNAL "Set to internal to propagate change" )
-
-# Include H3D header dir.
-include_directories( ${H3DAPI_INCLUDE_DIR} )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR}/include ${H3DAPI_SOURCE_DIR}/../include )
 
 # Version of H3D API.
 set( H3DAPI_MAJOR_VERSION 2 )
@@ -125,39 +119,12 @@ if( NOT DEFINED USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT )
 endif()
 
 
-
-
-if( TARGET H3DUtil )
-  # Target was created by ADD_SUBDIRECTORY command. There might not be anything in
-  # H3DUTIL_INCLUDE_DIR but HAPI_INCLUDE_DIR covers that in this case.
-  include_directories( ${H3DUTIL_INCLUDE_DIR} ) 
-  set( required_libs ${required_libs} H3DUtil )
-  set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} H3DUtil )
-else()
-  #H3DUtil
-  find_package( H3DUtil REQUIRED )
-
-  if( H3DUtil_FOUND )
-    include_directories( ${H3DUtil_INCLUDE_DIRS} ) 
-    set( required_libs ${required_libs} ${H3DUtil_LIBRARIES} )
-  endif()
-endif()
-
-if( TARGET HAPI )
-  # Target was created by ADD_SUBDIRECTORY command.
-  include_directories( ${HAPI_INCLUDE_DIR} ) 
-  set( required_libs ${required_libs} HAPI )
-  set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} HAPI )
-else()
-  #HAPI
-  set( HAPI_DECIDES_RENDERER_SUPPORT 1 )
-  find_package( HAPI REQUIRED )
-
-  if( HAPI_FOUND )
-    include_directories( ${HAPI_INCLUDE_DIRS} ) 
-    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
-  endif()
-endif()
+set( tmp_h3d_include_dirs )
+findIncludeDirsAndLibrariesForH3DProjects ( PROJECT_NAMES H3DUtil HAPI
+                                            INCLUDE_DIRS_OUTPUT_VAR tmp_h3d_include_dirs
+                                            LIBRARIES_OUTPUT_VAR required_libs
+                                            REQUIRED_PROJECTS H3DUtil HAPI )
+include_directories( ${tmp_h3d_include_dirs} ) 
 
 if( TARGET Chai3DRenderer )
   set( required_libs ${required_libs} Chai3DRenderer )
@@ -434,6 +401,9 @@ if( VirtualHand_FOUND )
   addDelayLoadFlags( VirtualHand_LIBRARIES H3DAPI_LINK_FLAGS )
 endif()
 
+populateProjectIncludeDirectoriesCacheVar( VARIABLE_NAME H3DAPI_INCLUDE_DIRS
+                                           DEPRECATED_VARIABLE_NAMES H3DAPI_INCLUDE_DIR )
+
 # H3DAPI shared library definition
 add_library( H3DAPI SHARED ${H3DAPI_SRCS} ${H3DAPI_HEADERS} )
 
@@ -550,7 +520,7 @@ endif()
 
 if( NOT DEFINED H3DAPI_LOADER_PROJECTS )
   set( H3DAPI_LOADER_PROJECTS_DEFAULT "NO" )
-  if( H3D_USE_DEPENDENCIES_ONLY )
+  if( CMAKE_PARENT_LIST_FILE )
     set( H3DAPI_LOADER_PROJECTS_DEFAULT "YES" )
   endif()
   set( H3DAPI_LOADER_PROJECTS "${H3DAPI_LOADER_PROJECTS_DEFAULT}" CACHE BOOL "If set to YES H3DLoad and H3DViewer will be included in the build." )
@@ -573,12 +543,12 @@ if( H3DAPI_LOADER_PROJECTS )
     endif()
   endif()
 
-  if( H3D_USE_DEPENDENCIES_ONLY )
+  if( CMAKE_PARENT_LIST_FILE )
     set( WXWINDOWS_USE_GL 1 )
     find_package( wxWidgets COMPONENTS base core )
   endif()
 
-  if( ( NOT H3D_USE_DEPENDENCIES_ONLY ) OR wxWidgets_FOUND )
+  if( ( NOT CMAKE_PARENT_LIST_FILE ) OR wxWidgets_FOUND )
     message( STATUS "Including H3DViewer" )
     add_subdirectory( ${H3DAPI_SOURCE_DIR}/../H3DViewer/build
                       ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer )
@@ -600,7 +570,7 @@ if( H3DAPI_EXAMPLE_PROJECTS )
   endif()
   
   if( EXISTS ${H3DAPI_SOURCE_DIR}/../examples/Particledemo )
-    if( ( NOT H3D_USE_DEPENDENCIES_ONLY ) OR wxWidgets_FOUND )
+    if( ( NOT CMAKE_PARENT_LIST_FILE ) OR wxWidgets_FOUND )
       message( STATUS "Including ParticleDemo" )
       add_subdirectory( ${H3DAPI_SOURCE_DIR}/../examples/Particledemo/build
                         ${CMAKE_CURRENT_BINARY_DIR}/examples/Particledemo )
@@ -616,7 +586,7 @@ if( H3DAPI_EXAMPLE_PROJECTS )
   set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} ThreadExample Sphere_X3D Spheres_X3D )
 endif()
 
-if( H3D_USE_DEPENDENCIES_ONLY )
+if( CMAKE_PARENT_LIST_FILE )
   set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} PARENT_SCOPE )
 else()
   include( ${H3DAPI_SOURCE_DIR}/H3DAPICPack.cmake )

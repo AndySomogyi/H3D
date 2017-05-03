@@ -50,57 +50,12 @@ set( required_libs )
 # Where to find modules, used when finding packages.
 set( CMAKE_MODULE_PATH "${NodeRoutesToDotFile_SOURCE_DIR}/../../build/modules" )
 
-if( H3D_USE_DEPENDENCIES_ONLY )
-  # The variables set here must be set by the CMakeLists.txt that sets H3D_USE_DEPENDENCIES_ONLY to true.
-  include_directories( ${EXTERNAL_INCLUDE_DIR} )
-  include_directories( ${H3DUTIL_INCLUDE_DIR} )
-  include_directories( ${HAPI_INCLUDE_DIR} )
-  include_directories( ${H3DAPI_INCLUDE_DIR} )
-  include_directories( ${UI_INCLUDE_DIR} )
-  include_directories( ${H3DPHYSICS_INCLUDE_DIR} )
-
-  set( required_libs ${required_libs} H3DUtil HAPI H3DAPI UI H3DPhysics )
-else()
-  #H3DAPI
-  find_package( H3DAPI REQUIRED )
-
-  if( H3DAPI_FOUND )
-    include_directories( ${H3DAPI_INCLUDE_DIRS} )
-    set( required_libs ${required_libs} ${H3DAPI_LIBRARIES} )
-  endif()
-
-  #H3DUtil
-  find_package( H3DUtil REQUIRED )
-
-  if( H3DUtil_FOUND )
-    include_directories( ${H3DUtil_INCLUDE_DIRS} )
-    set( required_libs ${required_libs} ${H3DUtil_LIBRARIES} )
-  endif()
-
-  #HAPI
-  find_package( HAPI REQUIRED )
-
-  if( HAPI_FOUND )
-    include_directories( ${HAPI_INCLUDE_DIRS} )
-    set( required_libs ${required_libs} ${HAPI_LIBRARIES} )
-  endif()
-
-  #UI
-  find_package( UI )
-
-  if( UI_FOUND )
-    include_directories( ${UI_INCLUDE_DIRS} )
-    set( optional_libs ${optional_libs} ${UI_LIBRARIES} )
-  endif()
-
-  #H3DPhysics
-  find_package( H3DPhysics )
-
-  if( H3DPhysics_FOUND )
-    include_directories( ${H3DPhysics_INCLUDE_DIRS} )
-    set( optional_libs ${optional_libs} ${H3DPhysics_LIBRARIES} )
-  endif()
-endif()
+set( tmp_h3d_include_dirs )
+findIncludeDirsAndLibrariesForH3DProjects ( PROJECT_NAMES H3DUtil HAPI H3DAPI UI H3DPhysics
+                                            INCLUDE_DIRS_OUTPUT_VAR tmp_h3d_include_dirs
+                                            LIBRARIES_OUTPUT_VAR required_libs
+                                            REQUIRED_PROJECTS H3DUtil HAPI H3DAPI )
+include_directories( ${tmp_h3d_include_dirs} ) 
 
 # Optional extra library. Used for sound in H3D API.
 find_package( OpenAL )
@@ -125,11 +80,11 @@ getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
 if( WIN32 )
 
-  if( UI_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( UI_FOUND )
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -DHAVE_UI" )
   endif()
 
-  if( H3DPhysics_FOUND OR H3D_USE_DEPENDENCIES_ONLY )
+  if( H3DPhysics_FOUND )
     set( NODEROUTESTODOTFILE_COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS} -DHAVE_H3DPhysics" )
   endif()
 
@@ -151,8 +106,6 @@ endif()
 
 set_target_properties( NodeRoutesToDotFile PROPERTIES COMPILE_FLAGS "${NODEROUTESTODOTFILE_COMPILE_FLAGS}" )
 
-if( H3D_USE_DEPENDENCIES_ONLY )
-  install( TARGETS NodeRoutesToDotFile
-           LIBRARY DESTINATION ${default_lib_install}
-           RUNTIME DESTINATION ${default_bin_install} )
-endif()
+install( TARGETS NodeRoutesToDotFile
+         LIBRARY DESTINATION ${default_lib_install}
+         RUNTIME DESTINATION ${default_bin_install} )
