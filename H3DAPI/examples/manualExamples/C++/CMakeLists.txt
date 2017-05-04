@@ -27,7 +27,7 @@ findIncludeDirsAndLibrariesForH3DProjects ( PROJECT_NAMES H3DUtil HAPI H3DAPI
                                             INCLUDE_DIRS_OUTPUT_VAR tmp_h3d_include_dirs
                                             LIBRARIES_OUTPUT_VAR required_libs
                                             REQUIRED_PROJECTS H3DUtil HAPI H3DAPI )
-include_directories( ${tmp_h3d_include_dirs} ) 
+include_directories( ${tmp_h3d_include_dirs} )
 
 # Optional extra library. Makes is possible to used GLUT windows handling with H3D API.
 find_package( GLUT REQUIRED )

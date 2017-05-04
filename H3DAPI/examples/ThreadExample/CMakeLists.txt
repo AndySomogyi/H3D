@@ -25,7 +25,7 @@ findIncludeDirsAndLibrariesForH3DProjects ( PROJECT_NAMES H3DUtil HAPI H3DAPI
                                             INCLUDE_DIRS_OUTPUT_VAR tmp_h3d_include_dirs
                                             LIBRARIES_OUTPUT_VAR required_libs
                                             REQUIRED_PROJECTS H3DUtil HAPI H3DAPI )
-include_directories( ${tmp_h3d_include_dirs} ) 
+include_directories( ${tmp_h3d_include_dirs} )
 
 # Build files created.
 add_library( ThreadExample SHARED ${ThreadExample_SOURCE_DIR}/ThreadExample.h
