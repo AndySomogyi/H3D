@@ -162,7 +162,7 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
       math( EXPR temp_msvc_version "${temp_msvc_version} + 100" )
     endwhile()
 
-    if( H3D_USE_DEPENDENCIES_ONLY )      
+    if( NOT ${CMAKE_PROJECT_NAME} STREQUAL "H3DViewer" )
       # these part are added separately so that these plug in can be automatically added to H3DViewer
       install( FILES ${H3DViewer_BINARY_DIR}/../../H3DPhysics/Release/H3DPhysics_vc${h3d_msvc_version}.dll
                      ${H3DViewer_BINARY_DIR}/../../MedX3D/Release/MedX3D_vc${h3d_msvc_version}.dll
