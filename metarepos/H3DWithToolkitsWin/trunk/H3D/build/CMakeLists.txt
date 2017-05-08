@@ -3,6 +3,14 @@ cmake_policy( VERSION 2.8.7 )
 
 project( H3DWithToolkitsWin )
 
+if( "$ENV{H3D_ROOT}" STREQUAL "" )
+  set( ENV{H3D_ROOT} ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI )
+endif()
+
+if( WIN32 AND( "$ENV{H3D_EXTERNAL_ROOT}" STREQUAL "" ) )
+  set( ENV{H3D_EXTERNAL_ROOT} ${H3DWithToolkitsWin_SOURCE_DIR}/../External )
+endif()
+
 set( CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build/modules" )
 include( H3DCommonFunctions )
 handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DWithToolkitsWin_SOURCE_DIR}/.. GENERATE_CPACK_PROJECT )
@@ -102,13 +110,13 @@ if( NOT DEFINED H3D_EXTRA_TOOLKITS )
   set( H3D_EXTRA_TOOLKITS "" CACHE STRING "Add names of directories of extra toolkits that you want to include. Separate each name by ;. The extra toolkit CMakeLists.txt must be located in ${H3DWithToolkitsWin_SOURCE_DIR}/../<name of toolkit>/build" FORCE )
 endif()
 
-foreach( EXTRA_TOOLKIT ${H3D_EXTRA_TOOLKITS} )
-  if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build )
-    message( STATUS "Including ${EXTRA_TOOLKIT}" )
-    add_subdirectory( ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build
-                       ${CMAKE_CURRENT_BINARY_DIR}/${EXTRA_TOOLKIT} )
-    if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build/${EXTRA_TOOLKIT}CPack.cmake )
-      include( ${H3DWithToolkitsWin_SOURCE_DIR}/../${EXTRA_TOOLKIT}/build/${EXTRA_TOOLKIT}CPack.cmake )
+foreach( extra_toolkit ${H3D_EXTRA_TOOLKITS} )
+  if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../${extra_toolkit}/build )
+    message( STATUS "Including ${extra_toolkit}" )
+    add_subdirectory( ${H3DWithToolkitsWin_SOURCE_DIR}/../${extra_toolkit}/build
+                       ${CMAKE_CURRENT_BINARY_DIR}/${extra_toolkit} )
+    if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../${extra_toolkit}/build/${extra_toolkit}CPack.cmake )
+      include( ${H3DWithToolkitsWin_SOURCE_DIR}/../${extra_toolkit}/build/${extra_toolkit}CPack.cmake )
     endif()
   endif()
 endforeach()
