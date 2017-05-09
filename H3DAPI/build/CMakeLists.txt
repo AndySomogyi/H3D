@@ -120,10 +120,11 @@ endif()
 
 
 set( tmp_h3d_include_dirs )
-findIncludeDirsAndLibrariesForH3DProjects ( PROJECT_NAMES H3DUtil HAPI
-                                            INCLUDE_DIRS_OUTPUT_VAR tmp_h3d_include_dirs
-                                            LIBRARIES_OUTPUT_VAR required_libs
-                                            REQUIRED_PROJECTS H3DUtil HAPI )
+findIncludeDirsAndLibrariesForH3DProjects( PROJECT_NAMES HAPI
+                                           INCLUDE_DIRS_OUTPUT_VAR tmp_h3d_include_dirs
+                                           LIBRARIES_OUTPUT_VAR required_libs
+                                           REQUIRED_PROJECTS HAPI
+                                           REQUIRED_PROJECTS_COMPONENTS HAPI_SameComponentsAsInstalledLibrary )
 include_directories( ${tmp_h3d_include_dirs} ) 
 
 if( TARGET Chai3DRenderer )
