@@ -30,7 +30,7 @@ def scheduleCallback ( timeSource, time, func, data ):
   # Add out callback
   timer.addCallback ( time, func, data )
 
-class UnitTestHelper :
+class TestHelper :
   def __init__( self, early_shutdown_file, output_file_prefix, output_filename_prefix):
     self.test_funcs = Queue()
     self.screenshot_queue = Queue()
@@ -87,7 +87,7 @@ class UnitTestHelper :
           absolute_time = validation['absolute_time']
 
       if not(start_time is None):
-        scheduleCallback ( time_source, (0 if absolute_time else time_source.getValue())+start_time, UnitTestHelper.startFuncDelayed, (self,func, run_time, time_source) )
+        scheduleCallback ( time_source, (0 if absolute_time else time_source.getValue())+start_time, TestHelper.startFuncDelayed, (self,func, run_time, time_source) )
       else:
         try:
           for validation in func.validation:
@@ -100,9 +100,9 @@ class UnitTestHelper :
           print "Exception in step " + func.__name__ + ": " + str(e)
           traceback.print_exc(3)
         if(not (run_time is None)):
-          scheduleCallback ( time_source, time_source.getValue()+run_time, UnitTestHelper.doTesting, (self,))
+          scheduleCallback ( time_source, time_source.getValue()+run_time, TestHelper.doTesting, (self,))
         else:
-          scheduleCallback ( time_source, time_source.getValue()+1, UnitTestHelper.doTesting, (self,))          
+          scheduleCallback ( time_source, time_source.getValue()+1, TestHelper.doTesting, (self,))          
       return
     except Exception as e:
       shutdown_file = open( self.early_shutdown_file, 'w' )
@@ -124,9 +124,9 @@ class UnitTestHelper :
           traceback.print_exc(3)
 
       if(not (run_time is None)):
-        scheduleCallback ( time_source, time_source.getValue()+run_time, UnitTestHelper.doTesting, (self,))
+        scheduleCallback ( time_source, time_source.getValue()+run_time, TestHelper.doTesting, (self,))
       else:
-        scheduleCallback ( time_source, time_source.getValue()+0.5, UnitTestHelper.doTesting, (self,))
+        scheduleCallback ( time_source, time_source.getValue()+0.5, TestHelper.doTesting, (self,))
 
   def printCustom(self, value):
     if self.customPrintHelper is None:
@@ -157,9 +157,9 @@ def linenumber_of_member(m):
 testfunctions_list = [o for o in getmembers(res) if isfunction(o[1]) and hasattr(o[1], "validation")]
 testfunctions_list.sort(key=linenumber_of_member)
 
-testHelper = UnitTestHelper(TestBaseFolder+"/test_complete", os.path.abspath(os.path.join(TestCaseDefFolder, "output").replace("\\", '/')), TestCaseName + '_')
+testHelper = TestHelper(TestBaseFolder+"/test_complete", os.path.abspath(os.path.join(TestCaseDefFolder, "output").replace("\\", '/')), TestCaseName + '_')
 testHelper.addTests(testfunctions_list)
 res.printCustom = testHelper.printCustom
 res.TestCaseDefFolder = TestCaseDefFolder
 
-scheduleCallback ( time, time.getValue()+StartTime, UnitTestHelper.doTesting, (testHelper,))
+scheduleCallback ( time, time.getValue()+StartTime, TestHelper.doTesting, (testHelper,))
