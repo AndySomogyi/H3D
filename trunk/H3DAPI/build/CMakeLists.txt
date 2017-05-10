@@ -78,7 +78,7 @@ handleUnityBuild( PROJECT_NAME ${PROJECT_NAME}
                   UNITY_BUILD_SOURCES ${H3DAPI_SRCS_UNITYBUILD} )
 handlePrecompiledHeaders( PROJECT_NAME ${PROJECT_NAME}
                           HEADERS_VARIABLE H3DAPI_HEADERS
-                          SRCS_VARIABLE H3DAPI_SRCS_SRCS
+                          SRCS_VARIABLE H3DAPI_SRCS
                           STDAFX_HEADER_LOCATION ${H3DAPI_SOURCE_DIR}/../include/H3D/
                           STDAFX_SOURCE_LOCATION ${H3DAPI_SOURCE_DIR}/../src/ )
 
