@@ -1,5 +1,5 @@
 ﻿"""
-This script is supposed to run unit tests on every H3DAPI node. 
+This script is used to run tests on H3D scenes
 
 Requirements:
   You must install Imagemagick (and add to PATH) in order for image comparison to function, otherwise rendering tests will always fail.
@@ -36,7 +36,7 @@ parser = argparse.ArgumentParser(
   description='Runs python tests')
 parser.add_argument('--workingdir', dest='workingdir', 
                     default=os.getcwd().replace('', ''),
-                    help='The directory containing the unit tests.')
+                    help='The directory containing the test definitions.')
 parser.add_argument('--processworkingdir', dest='processworkingdir', 
                     default=None,
                     help='The working directory for the test process. If omitted, will be set to base of X3D file to test')
@@ -66,12 +66,12 @@ parser.add_argument('--dbuser', dest='dbuser', help='Database user. Needs write-
 parser.add_argument('--dbpass', dest='dbpass', help='Database password.')
 parser.add_argument('--servername', dest='servername', help='The name of this server. All results from tests run by this script will be associated with this name.',
                     default='Unknown')
-parser.add_argument('--RunTestsDir', dest='RunTestsDir', help='The location of UnitTestsUtil.py and UnitTestsBoilerplate.py. This is for the cases where RunTests.py is being run from a different directory, for example for targeting a specific build of H3D.',
+parser.add_argument('--RunTestsDir', dest='RunTestsDir', help='The location of UnitTestsUtil.py and TestBoilerplate.py. This is for the cases where RunTests.py is being run from a different directory, for example for targeting a specific build of H3D.',
                     default=os.path.dirname(os.path.realpath(__file__)).replace('\\', '/'))
 parser.add_argument('--case', dest='case', help='The name of a specific case located somewhere in or below the workingdir. If this is specified then only this Case, out of all the cases in all the TestDefs, will be run', default='')
 parser.add_argument('--testdefs', dest='testdefs', help='The name of one or more testdefs located somewhere in or below the workingdir. If this is specified then only cases in these TestDefs will be run. This can be combined with --case if you have multiple testdefs containing cases with the same name and only want to run one of them.', default='')
 parser.add_argument('--resolution', dest='resolution', help='The resolution h3dload should be run at (only used for h3dload), in the format widthxheight, for example 800x600', default='640x480')
-parser.add_argument('--inject_at_end_of_scene', dest='inject_at_end_of_scene', help='Specifies if the testing boilerplate nodes should be injected before </Scene> instead of the standard behaviour of injecting after <Scene>. For compatibility with projects that do search-and-replace inside the x3d file and might match information in one of the unittesting nodes if they come before nodes that are expected to be in Scene.', default=False)
+parser.add_argument('--inject_at_end_of_scene', dest='inject_at_end_of_scene', help='Specifies if the testing boilerplate nodes should be injected before </Scene> instead of the standard behaviour of injecting after <Scene>. For compatibility with projects that do search-and-replace inside the x3d file and might match information in one of the testing nodes if they come before nodes that are expected to be in Scene.', default=False)
 parser.add_argument('--simulationbasedir', dest='simulationbasedir', help='Path to the directory where the project that is being tested has its SimulationBase  python directory, this is required for using the settings testdef property.', default=None)
 parser.add_argument('--skipResultUpload', dest='skipResultUpload', action='store_true',help='Specifies if skip the uploading of result, this can be handy while doing simple test', default=False)
 parser.add_argument('--skipSvnInfoOutput', dest='skipSvnInfoOutput', action='store_true',help='Specifies if skip extracting svn info of x3d and script file used in for the test', default=False)
@@ -394,7 +394,7 @@ class TestCaseRunner ( object ):
                                                                   os.path.abspath(directory).replace('\\', '/'),
                                                                   args.RunTestsDir,
                                                                   testCase.starttime,
-                                                                  os.path.join(args.RunTestsDir, 'UnitTestBoilerplate.py'))
+                                                                  os.path.join(args.RunTestsDir, 'TestBoilerplate.py'))
     v = Variation (testCase.name, script)
     # Check if we should change settings
     if not testCase.settings is None:
