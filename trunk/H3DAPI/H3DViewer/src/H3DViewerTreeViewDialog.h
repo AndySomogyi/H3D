@@ -77,6 +77,7 @@ protected:
 class H3DViewImage : public ViewImage {
 public:
   H3DViewImage ( wxWindow* parent, X3DTextureNode& _texture );
+  ~H3DViewImage();
 
 protected:
   virtual void OnSave( wxCommandEvent& event );

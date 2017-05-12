@@ -745,6 +745,13 @@ H3DViewImage::H3DViewImage(wxWindow* parent, X3DTextureNode& _texture)
   SetTitle(wxString(s.str().c_str(), wxConvUTF8));
 }
 
+H3DViewImage::~H3DViewImage() {
+  if(image_data) {
+    delete[] image_data;
+    image_data = 0;
+  }
+}
+
 void H3DViewImage::OnSave(wxCommandEvent& event) {
   #ifdef HAVE_FREEIMAGE
   auto_ptr< wxFileDialog > file_dialog(new wxFileDialog(this,
