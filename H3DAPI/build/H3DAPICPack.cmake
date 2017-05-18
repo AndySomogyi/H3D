@@ -744,7 +744,7 @@ if( GENERATE_CPACK_PROJECT )
     if( NOT ${CMAKE_PROJECT_NAME} STREQUAL "H3DAPI" )
       set( H3DAPI_DOCS_DIRECTORY_DEFAULT "${H3DAPI_SOURCE_DIR}/../../doc" )
     endif()
-    set( H3DAPI_DOCS_DIRECTORY "${H3DAPI_DOCS_DIRECTORY_DEFAULT}" CACHE PATH "Set this to the directory containing the documentation of H3DAPI." )
+    set( H3DAPI_DOCS_DIRECTORY "${H3DAPI_DOCS_DIRECTORY_DEFAULT}" CACHE PATH "Set this to the directory containing the manual and generated doxygen documentation of H3DAPI." )
     mark_as_advanced( H3DAPI_DOCS_DIRECTORY )
   endif()
 
