@@ -108,7 +108,7 @@ if( INCLUDE_MedX3D )
   endif()
 endif()
 
-# Add a cache variable NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES used
+# Add a cache variable CreateH3DNodesFieldsList_EXTRA_BINARIES used
 # to give extra release libraries which have a database which
 # dot-files should be generated for.
 if( NOT DEFINED CreateH3DNodesFieldsList_EXTRA_BINARIES )

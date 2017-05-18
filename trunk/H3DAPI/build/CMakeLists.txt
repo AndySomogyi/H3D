@@ -114,7 +114,7 @@ if( NOT DEFINED DEPRECATE_DISPLAYLIST_EVENT_COLLECT )
 endif()
 
 if( NOT DEFINED USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT )
-  set( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT "OFF" CACHE BOOL " Let H3DAPI to manage active texture value, instead of relying on opengl get function. H3DAPI rely on setTextureUnit and getTextureUnit to simply manage it " )
+  set( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT "OFF" CACHE BOOL "Let H3DAPI manage active texture value, instead of relying on opengl get function. H3DAPI rely on setTextureUnit and getTextureUnit to simply manage it " )
   mark_as_advanced( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT )
 endif()
 
