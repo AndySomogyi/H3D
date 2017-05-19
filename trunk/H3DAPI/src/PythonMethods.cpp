@@ -3110,7 +3110,7 @@ call the base class __init__ function." );
     }
 
     PyObject *pythonFindNodes( PyObject *self, PyObject *args ) {
-      // args are ( node, type_names, node_name= "", field_names= [], exactNodeName= true, verbose= false )
+      // args are ( node, type_names, node_name= "", field_names= [], exactNodeName= true, verbose= false, node_type_names_to_ignore=[] )
       // return value is [(found_node,(parent0,parent1,...))]
       Py_ssize_t nr_args= 1;
       Node* node= NULL;
@@ -3119,7 +3119,8 @@ call the base class __init__ function." );
       Scene::SearchFieldNameMap search_field_names;
       bool verbose= false;
       bool exact_node_name= true;
-
+      Scene::StringVec node_type_names_to_ignore;
+      
       if( PyTuple_Check ( args ) ) {
         nr_args =  PyTuple_Size( args );
 
@@ -3128,7 +3129,7 @@ call the base class __init__ function." );
           node= PyNode_AsNode ( PyTuple_GetItem( args, 0 ) );
           if ( !node ) {
             PyErr_SetString( PyExc_ValueError, 
-              "Invalid argument(s) to function findNodes( node, type_names, node_name= "", field_names= [], exactNodeName= true, verbose= false ): Invalid node argument (1)." );
+              "Invalid argument(s) to function findNodes( node, type_names, node_name= "", field_names= [], exactNodeName= true, verbose= false, node_type_names_to_ignore=[] ): Invalid node argument (1)." );
             return NULL;
           }
         }
@@ -3213,9 +3214,9 @@ call the base class __init__ function." );
           }
         }
 
-        // verbose (arg 4)
+        // exact_node_name (arg 4)
         if ( nr_args > 4 ) {
-          // Verbose
+          // exact_node_name
           PyObject* py_exact_node_name= PyTuple_GetItem( args, 4 );
           if ( PyBool_Check( py_exact_node_name ) || PyInt_Check( py_exact_node_name ) ) {
             exact_node_name= PyObject_IsTrue ( py_exact_node_name ) == 1;
@@ -3239,6 +3240,33 @@ call the base class __init__ function." );
           }
         }
 
+        // node names (arg 6)
+        if ( nr_args > 6 ) {
+          // Ignore Node type names
+          PyObject* py_ignore_node_names= PyTuple_GetItem( args, 6 );
+          if ( PyString_Check ( py_ignore_node_names ) ) {
+            // Single type name
+            node_type_names_to_ignore.push_back ( PyString_AsString ( py_ignore_node_names ) );
+          } else if ( PyList_Check ( py_ignore_node_names ) ) {
+            // List of type names
+            Py_ssize_t size= PyList_Size ( py_ignore_node_names );
+            for ( Py_ssize_t i= 0; i < size; ++i ) {
+              PyObject* py_node_name= PyList_GetItem ( py_ignore_node_names, i );
+              if ( PyString_Check ( py_node_name ) ) {
+                node_type_names_to_ignore.push_back ( PyString_AsString ( py_node_name ) );
+              } else {
+                PyErr_SetString( PyExc_ValueError, 
+                  "Invalid argument(s) to function findNodes(): Invalid node_type_names_to_ignore argument (7)." );
+                return NULL;
+              }
+            }
+          } else {
+            PyErr_SetString( PyExc_ValueError, 
+              "Invalid argument(s) to function findNodes(): Invalid node_type_names_to_ignore argument (7)." );
+            return NULL;
+          }
+        }
+
        } else {
          PyErr_SetString( PyExc_ValueError, 
            "Invalid argument(s) to function findNodes ()" );
@@ -3253,7 +3281,8 @@ call the base class __init__ function." );
          search_field_names.empty() ? NULL : &search_field_names,
          type_names.empty() ? NULL : &type_names,
          exact_node_name,
-         verbose );
+         verbose, 
+         node_type_names_to_ignore.empty() ? NULL : &node_type_names_to_ignore);
 
        // return value is [(found_node,(parent0,parent1,...))]
        PyObject* py_result= PyList_New(result.size()); // New ref that is returned (no need to decr)
