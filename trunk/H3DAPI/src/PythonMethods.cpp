@@ -3281,7 +3281,8 @@ call the base class __init__ function." );
          search_field_names.empty() ? NULL : &search_field_names,
          type_names.empty() ? NULL : &type_names,
          exact_node_name,
-         verbose, 
+         verbose,
+         NULL,
          node_type_names_to_ignore.empty() ? NULL : &node_type_names_to_ignore);
 
        // return value is [(found_node,(parent0,parent1,...))]
