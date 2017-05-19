@@ -435,8 +435,8 @@ namespace H3D {
       StringVec* _typeNames= NULL,
       bool _exactNodeName= true,
       bool _verbose= false,
-      StringVec* _ignoreTraverseNodeTypeNames= NULL,
-      Node* _parent= NULL ) {
+      Node* _parent= NULL,
+      StringVec* _ignoreTraverseNodeTypeNames= NULL ) {
 
       // if the node type name is in the ignore list we have nothing to do with this node
       if ( _ignoreTraverseNodeTypeNames &&
@@ -494,7 +494,7 @@ namespace H3D {
                 if ( _verbose ) {
                   Console(LogLevel::Error) << "Node::findNodes(): " << _node.getName() << " -> " << f->getName() << endl;
                 }
-                findNodes ( *c, _result, _nodeName, _parentMap, _searchFieldNames, _typeNames, _exactNodeName, _verbose, _ignoreTraverseNodeTypeNames, &_node );
+                findNodes ( *c, _result, _nodeName, _parentMap, _searchFieldNames, _typeNames, _exactNodeName, _verbose, &_node, _ignoreTraverseNodeTypeNames );
               }
             } else if ( MFNode* mf_node= dynamic_cast< MFNode * >( f ) ) {
               const NodeVector& children= mf_node->getValue();
@@ -504,7 +504,7 @@ namespace H3D {
                   if ( _verbose ) {
                     Console(LogLevel::Error) << "Node::findNodes(): " << _node.getName() << " -> " << f->getName() << endl;
                   }
-                  findNodes ( *c, _result, _nodeName, _parentMap, _searchFieldNames, _typeNames, _exactNodeName, _verbose, _ignoreTraverseNodeTypeNames, &_node );
+                  findNodes ( *c, _result, _nodeName, _parentMap, _searchFieldNames, _typeNames, _exactNodeName, _verbose, &_node, _ignoreTraverseNodeTypeNames );
                 }
               }
             }
