@@ -387,6 +387,8 @@ namespace H3D {
     /// \param[in]  _verbose   If true, then output will be written to the Console to show the search path.
     /// \param[in]  _parent    The parent of this node. Used during recursion, should usually be left as NULL when
     ///                        called from user code.
+    /// \param[in]  _ignoreTraverseNodeTypeNames  The nodes with type name in the _ignoreTraverseNodeTypeNames will neither be traversed nor
+    ///                        added to the result.
     ///
     /// Examples:
     /// \code
@@ -433,7 +435,15 @@ namespace H3D {
       StringVec* _typeNames= NULL,
       bool _exactNodeName= true,
       bool _verbose= false,
+      StringVec* _ignoreTraverseNodeTypeNames= NULL,
       Node* _parent= NULL ) {
+
+      // if the node type name is in the ignore list we have nothing to do with this node
+      if ( _ignoreTraverseNodeTypeNames &&
+           find ( _ignoreTraverseNodeTypeNames->begin(), _ignoreTraverseNodeTypeNames->end(), _node.getTypeName() ) != _ignoreTraverseNodeTypeNames->end() ) {
+          // We should not search this node type at all
+          return;
+      }
 
       if ( _typeNames == NULL || 
             find ( _typeNames->begin(), _typeNames->end(), _node.getTypeName() ) != _typeNames->end() ) {
@@ -484,7 +494,7 @@ namespace H3D {
                 if ( _verbose ) {
                   Console(LogLevel::Error) << "Node::findNodes(): " << _node.getName() << " -> " << f->getName() << endl;
                 }
-                findNodes ( *c, _result, _nodeName, _parentMap, _searchFieldNames, _typeNames, _exactNodeName, _verbose, &_node );
+                findNodes ( *c, _result, _nodeName, _parentMap, _searchFieldNames, _typeNames, _exactNodeName, _verbose, _ignoreTraverseNodeTypeNames, &_node );
               }
             } else if ( MFNode* mf_node= dynamic_cast< MFNode * >( f ) ) {
               const NodeVector& children= mf_node->getValue();
@@ -494,7 +504,7 @@ namespace H3D {
                   if ( _verbose ) {
                     Console(LogLevel::Error) << "Node::findNodes(): " << _node.getName() << " -> " << f->getName() << endl;
                   }
-                  findNodes ( *c, _result, _nodeName, _parentMap, _searchFieldNames, _typeNames, _exactNodeName, _verbose, &_node );
+                  findNodes ( *c, _result, _nodeName, _parentMap, _searchFieldNames, _typeNames, _exactNodeName, _verbose, _ignoreTraverseNodeTypeNames, &_node );
                 }
               }
             }
