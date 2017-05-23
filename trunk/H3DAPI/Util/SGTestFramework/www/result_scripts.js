@@ -816,6 +816,7 @@ function SetServer(server_id, server_name) {
   $(".Selected_TestRun").removeClass('Selected_TestRun');
   $(this).addClass('Selected_Server');
   $('#Categories_List').empty();
+  $('tr', $('#Summary_Table')).not('#Summary_Table_Header').remove();  
   $('#TestRuns_List').empty();
   display_options.servers.available = [server_name];
   display_options.servers.selected = [server_name];
@@ -876,9 +877,52 @@ function GetTestRunList(server_id) {
 function SetTestRun(test_run_id) {
   $('#Categories_List').empty();
   $('#loading_spinner_container').show();
-
+  $('tr', $('#Summary_Table')).not('#Summary_Table_Header').remove();
+  
+  $.ajax({
+    type: 'GET',
+    url: 'get_summary.php?test_run_id=' + test_run_id,
+    dataType: 'json',
+    success: function(data) {
+        $('tr', $('#Summary_Table')).not('#Summary_Table_Header').remove();
+        for(var i = 0; i < Object.keys(data).length; ++i) {
+          var key = Object.keys(data)[i];
+          var row = $('<tr>');
+          
+          var cell = $('<td>');
+          cell.html(key);
+          row.append(cell);
+          
+          var cell = $('<td>');
+          cell.html(data[key].successful.toString());
+          row.append(cell);
+          
+          var cell = $('<td>');
+          cell.html(data[key].success_count);
+          row.append(cell);
+          
+          var cell = $('<td>');
+          cell.html(data[key].fail_count);
+          row.append(cell);
+          
+          var cell = $('<td>');
+          cell.html(data[key].error_count);
+          row.append(cell);
+          
+          var cell = $('<td>');
+          cell.html(data[key].success_count + data[key].error_count);
+          row.append(cell);
+          
+          if($('#Summary_Table > tbody'))
+            $('#Summary_Table > tbody').append(row);
+          else
+            $('#Summary_Table').append(row);
+        }     
+      }
+    });
+  
   LoadSQLModel(test_run_id, function(data) {
-    $('#Categories_List').empty();
+    $('#Categories_List').empty();    
     $('#loading_spinner_container').hide();
     model = data;
     refreshDisplayOptions(model);
