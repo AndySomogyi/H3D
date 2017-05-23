@@ -120,7 +120,8 @@ namespace H3D {
         geometry( NULL ),
         distance_from_viewer( 0 ),
         user_data ( NULL ),
-        new_particle ( true ) {}
+        new_particle ( true ),
+        type( LINE ){}
       
       inline void updateParticle( const Matrix4f &_global_to_local,
                                   Vec3f vp_pos_local,

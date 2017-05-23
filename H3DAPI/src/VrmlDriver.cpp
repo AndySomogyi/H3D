@@ -34,8 +34,17 @@
 
 PrototypeVector *VrmlDriver::global_proto_vector=NULL;
 
-VrmlDriver::VrmlDriver ()
-  : trace_scanning (false), trace_parsing (false) {
+VrmlDriver::VrmlDriver () : 
+  trace_scanning ( false ), 
+  trace_parsing ( false ), 
+  DEF_export( NULL ), 
+  DEF_map( NULL ),
+  file_name( "" ),
+  old_char_no( 0 ),
+  old_line_no( 0 ),
+  proto_vector( NULL ),
+  result( 0 ),
+  vrml_line_no( 0 ) {
 
   proto_instance = 0;
 }

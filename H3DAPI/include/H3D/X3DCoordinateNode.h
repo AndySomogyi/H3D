@@ -94,7 +94,7 @@ namespace H3D {
         index = 0;
       }
 
-      Iterator() {
+      Iterator() : coord( NULL ) {
         index = -1;
       }
       

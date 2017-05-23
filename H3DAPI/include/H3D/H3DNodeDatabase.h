@@ -270,7 +270,9 @@ namespace H3D {
       
     protected:
       FieldDBConstIterator():
-        inherited_iterator( NULL ) {}
+        inherited_iterator( NULL ),
+        ndb( NULL ),
+        status( END ) {}
 
       /// Defines the status of the iterator.
       typedef enum {
