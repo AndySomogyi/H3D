@@ -945,6 +945,22 @@ function SetTestRun(test_run_id) {
     });  
 
     // Set up the toggle buttons.
+    $('#Options_Toggle_Only_Show_Failed').data('only_showing_failed', false);
+    $('#Options_Toggle_Only_Show_Failed').prop('value', 'Only Show Failed Cases');
+    $('#Options_Toggle_Only_Show_Failed').unbind().click(function(){
+      if($(this).data('only_showing_failed')) {
+        $(".TestCase:not(:has(.test_failed))").show(); // Showing the test cases
+        $("ul:has(label:has(.test_successful))").show() // Showing the test categories
+        $(this).data('only_showing_failed', false);
+        $('#Options_Toggle_Only_Show_Failed').prop('value', 'Show All Cases');
+      } else {
+        $(".TestCase:not(:has(.test_failed))").hide(); // Hiding the test cases
+        $("ul:has(label:has(.test_successful))").hide() // Hiding the test categories
+        $(this).data('only_showing_failed', true);
+        $('#Options_Toggle_Only_Show_Failed').prop('value', 'Only Show Failed Cases');
+      }
+    });
+    
     $('#Options_Toggle_Categories').data('collapsed', true);
     $('#Options_Toggle_Categories').prop('value', 'Expand All Categories');
     $('#Options_Toggle_Categories').unbind().click(function(){
