@@ -54,11 +54,12 @@ namespace H3D {
 #endif
 
       /// Creates an empty vector.
-      inline MFNodeAutoRefVector() {}
+      inline MFNodeAutoRefVector() : owner( NULL ) {}
       
       /// Creates a vector with n elements.
-      inline MFNodeAutoRefVector( typename AutoRefVector< RefClass >::size_type n ):
-        AutoRefVector< RefClass >( n ) {}
+      inline MFNodeAutoRefVector( typename AutoRefVector< RefClass >::size_type n ) :
+        AutoRefVector< RefClass >( n ),
+        owner( NULL ) {}
       
       /// Destructor.
       inline virtual ~MFNodeAutoRefVector() {

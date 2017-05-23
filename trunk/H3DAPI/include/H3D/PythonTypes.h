@@ -95,7 +95,7 @@ namespace H3D {
 
   class PyNodePtr {
   public:
-    PyNodePtr() : refCountNode ( true ) {}
+    PyNodePtr() : refCountNode ( true ), ptr( NULL ) {}
 
     /// If true, then the PyNode should keep a reference count
     /// for the Node ptr. Usually this is the desired behaviour, except

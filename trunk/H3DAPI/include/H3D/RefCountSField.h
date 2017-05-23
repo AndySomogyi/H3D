@@ -95,7 +95,8 @@ namespace H3D {
 
       /// Constructor.   
       explicit RefCountSFieldAutoRef( RefClass* n = 0) throw() :
-        AutoRef< RefClass >( n ) {
+        AutoRef< RefClass >( n ),
+        rc_field( NULL ) {
     
       }
 

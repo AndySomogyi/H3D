@@ -219,7 +219,7 @@ namespace H3D {
       public TypedField< SFBool, Types< SFBool, SFVec3f > > {
 
     public:
-      CalculateHapticDeviceMoveInfo() {
+      CalculateHapticDeviceMoveInfo() : the_owner( NULL ) {
         button_pressed = false;
       }
 
@@ -260,7 +260,7 @@ namespace H3D {
       public AutoUpdate< TypedField< SFBool, Types< SFVec3f, SFRotation, SFRotation > > > {
 
     public:
-      CalculateSWSMoveInfo() {
+      CalculateSWSMoveInfo() : the_owner( NULL ) {
       }
 
       virtual void update();

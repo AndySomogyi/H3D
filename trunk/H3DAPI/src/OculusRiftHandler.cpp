@@ -198,7 +198,17 @@ OculusRiftHandler::OculusRiftHandler() :
   m_msaaEnabled(false),
   m_frameIndex(0),
   m_sensorSampleTime(0),
-  m_isInitialized(false) {
+  m_isInitialized(false),
+  m_eyeBuffers(),
+  m_eyeRenderDesc(),
+  m_eyeRenderPose(),
+  m_hmdDesc(),
+  m_frameTiming( 0.0 ),
+  m_hmdToEyeOffset(),
+  m_mirrorDesc(),
+  m_mirrorFBO( 0 ),
+  m_mirrorTexture( nullptr ),
+  m_trackingState() {
   H3D::OculusRiftSensor::oculus = this;
 }
 
