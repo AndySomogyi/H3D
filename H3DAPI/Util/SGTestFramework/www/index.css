@@ -299,3 +299,11 @@ input:checked + label > .glyph {
   height: 200px;
   left: -100px;
 }
+
+table{
+border:1px solid black;
+}
+
+table th{
+border:1px solid black;
+}
