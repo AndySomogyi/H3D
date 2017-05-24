@@ -46,7 +46,7 @@ namespace H3D {
   public:
 
     /// Constructor.
-    OggFileReader() : comment( NULL ), info( NULL ) {
+    OggFileReader() : comment( NULL ), info( NULL ), ogg_file() {
       should_clear = false;
       type_name = "OggFileReader";
     }
