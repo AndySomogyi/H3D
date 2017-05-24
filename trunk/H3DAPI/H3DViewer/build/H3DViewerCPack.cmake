@@ -4,23 +4,26 @@ endif()
 
 # To allow other projects that use H3DVIEWER as a subproject to add extra include directories
 # when packaging.
-if( GENERATE_H3DVIEWER_CPACK_PROJECT )
+if( GENERATE_H3DViewer_PACKAGE_PROJECT )
   if( WIN32 )
+    handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES H3D_EXTERNAL_ROOT
+                                                  OLD_VARIABLE_NAMES H3DViewer_CPACK_EXTERNAL_ROOT
+                                                  DOC_STRINGS "Set to the External directory used with H3DViewer, needed to pack properly. If not set FIND_modules will be used instead." )
     # Add a cache variable which indicates where the Externals directory used for packaging
     # H3DViewer is located. If not set then FIND modules will be used instead.
-    if( NOT DEFINED H3DViewer_CPACK_EXTERNAL_ROOT )
-      set( H3DViewer_CPACK_EXTERNAL_ROOT_DEFAULT "" )
+    if( NOT DEFINED H3D_EXTERNAL_ROOT )
+      set( h3d_external_root_default "" )
       if( H3D_USE_DEPENDENCIES_ONLY )
         foreach( EXTERNAL_INCLUDE_DIR_TMP ${EXTERNAL_INCLUDE_DIR} )
           if( EXISTS ${EXTERNAL_INCLUDE_DIR_TMP}/../include/pthread )
-            set( H3DViewer_CPACK_EXTERNAL_ROOT_DEFAULT "${EXTERNAL_INCLUDE_DIR_TMP}/.." )
+            set( h3d_external_root_default "${EXTERNAL_INCLUDE_DIR_TMP}/.." )
           endif()
         endforeach()
       else()
-        set( H3DViewer_CPACK_EXTERNAL_ROOT_DEFAULT "$ENV{H3D_EXTERNAL_ROOT}" )
+        set( h3d_external_root_default "$ENV{H3D_EXTERNAL_ROOT}" )
       endif()
-      set( H3DViewer_CPACK_EXTERNAL_ROOT "${H3DViewer_CPACK_EXTERNAL_ROOT_DEFAULT}" CACHE PATH "Set to the External directory used with H3DViewer, needed to pack properly. If not set FIND_modules will be used instead." )
-      mark_as_advanced( H3DViewer_CPACK_EXTERNAL_ROOT )
+      set( H3D_EXTERNAL_ROOT "${h3d_external_root_default}" CACHE PATH "Set to the External directory used with H3DViewer, needed to pack properly. If not set FIND_modules will be used instead." )
+      mark_as_advanced( H3D_EXTERNAL_ROOT )
     endif()
   endif()
   
@@ -42,9 +45,12 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
   set( CPACK_NSIS_UNINSTALL_NAME "H3DViewer-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}" )
   
   if( APPLE )
-    if( NOT DEFINED H3DVIEWER_CPACK_INCLUDE_LIBRARIES )
-      set( H3DVIEWER_CPACK_INCLUDE_LIBRARIES "NO" CACHE BOOL "Decides if all dependent shared libraries should be included in the bundle or not." )
-      mark_as_advanced( H3DVIEWER_CPACK_INCLUDE_LIBRARIES )
+    handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES H3DViewer_PACKAGE_include_libraries
+                                                  OLD_VARIABLE_NAMES H3DVIEWER_CPACK_INCLUDE_LIBRARIES
+                                                  DOC_STRINGS "Decides if all dependent shared libraries should be included in the bundle or not." )
+    if( NOT DEFINED H3DViewer_PACKAGE_include_libraries )
+      set( H3DViewer_PACKAGE_include_libraries "NO" CACHE BOOL "Decides if all dependent shared libraries should be included in the bundle or not." )
+      mark_as_advanced( H3DViewer_PACKAGE_include_libraries )
     endif()
 
     set( CPACK_BUNDLE_NAME "H3DViewer" ) #- provides the bundle name (displayed in the finder underneath the bundle icon). 
@@ -52,7 +58,7 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
     set( CPACK_BUNDLE_PLIST "${H3DViewer_SOURCE_DIR}/info.plist" ) # - path to a file that will become the bundle plist. 
     set( CPACK_BUNDLE_STARTUP_COMMAND "${H3DViewer_SOURCE_DIR}/start.sh" ) #- path to a file that will be executed when the user opens the bundle. Could be a shell-script or a binary.
 
-    if( H3DVIEWER_CPACK_INCLUDE_LIBRARIES )
+    if( H3DViewer_PACKAGE_include_libraries )
       #Include all shared libraries in bundle
       include( "${H3DViewer_SOURCE_DIR}/OSXCPackLibraries.txt" )
 
@@ -97,7 +103,7 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
     # Modify path since in the NSIS template.
     set( CPACK_NSIS_MODIFY_PATH "ON" )
   
-    if( EXISTS ${H3DViewer_CPACK_EXTERNAL_ROOT} )
+    if( EXISTS ${H3D_EXTERNAL_ROOT} )
       set( external_binaries ${external_binaries}
                              ${H3DViewer_CPACK_EXTERNAL_ROOT}/${external_bin_path}/wxbase30u_vc_custom.dll
                              ${H3DViewer_CPACK_EXTERNAL_ROOT}/${external_bin_path}/wxbase30u_xml_vc_custom.dll
@@ -118,9 +124,9 @@ if( GENERATE_H3DVIEWER_CPACK_PROJECT )
                              ${H3DViewer_CPACK_EXTERNAL_ROOT}/${external_bin_path}/wxmsw30u_propgrid_vc_x64_custom.dll
                              ${H3DViewer_CPACK_EXTERNAL_ROOT}/${external_bin_path}/wxmsw30u_richtext_vc_x64_custom.dll
                              ${H3DViewer_CPACK_EXTERNAL_ROOT}/${external_bin_path}/ode_double.dll )
-      install( FILES "${H3DViewer_CPACK_EXTERNAL_ROOT}/include/ACKNOWLEDGEMENTS"
+      install( FILES "${H3D_EXTERNAL_ROOT}/include/ACKNOWLEDGEMENTS"
                DESTINATION H3DViewer )
-      install( DIRECTORY ${H3DViewer_CPACK_EXTERNAL_ROOT}/include/ExternalLicenses/
+      install( DIRECTORY ${H3D_EXTERNAL_ROOT}/include/ExternalLicenses/
                DESTINATION H3DViewer/ExternalLicenses )
     endif()
 

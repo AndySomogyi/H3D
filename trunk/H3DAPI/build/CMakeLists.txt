@@ -7,7 +7,7 @@ project( H3DAPI )
 set( CMAKE_MODULE_PATH "${H3DAPI_SOURCE_DIR}/localModules" "${H3DAPI_SOURCE_DIR}/modules" )
 
 include( H3DCommonFunctions )
-handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DAPI_SOURCE_DIR}/../.. GENERATE_CPACK_PROJECT PREFER_STATIC_LIBRARIES )
+handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DAPI_SOURCE_DIR}/../.. GENERATE_H3D_PACKAGE_PROJECT H3D_PREFER_STATIC_LIBRARIES GENERATE_NodeRoutesToDotFile_BUILD )
 
 # Make include files in paths like /usr/local/include have preference before
 # files in OSX frameworks. 
@@ -23,15 +23,6 @@ if( WIN32 AND NOT DEFINED PREFER_FREEGLUT_STATIC_LIBRARIES )
   # linking statically against glut. Default is NO since most people will not use this.
   set( PREFER_FREEGLUT_STATIC_LIBRARIES "NO" CACHE BOOL "Decides if CMake should prefer static libraries to dynamic libraries for FreeGLUT when both exist." )
   mark_as_advanced( PREFER_FREEGLUT_STATIC_LIBRARIES )
-endif()
-
-
-# Add a cache variable GENERATE_NODEROUTESTODOTFILE_BUILD that should be
-# set to yes if NodeRoutesToDotFile project should be run against this
-# build of H3DAPI.
-if( NOT DEFINED GENERATE_NODEROUTESTODOTFILE_BUILD )
-  set( GENERATE_NODEROUTESTODOTFILE_BUILD "NO" CACHE BOOL "Breaks H3DAPI for normal use but this flag must be set to yes when using the NodeRoutesToDotFile project, located in ${H3DAPI_SOURCE_DIR}/../Util/NodeRoutesToDotFile." )
-  mark_as_advanced( GENERATE_NODEROUTESTODOTFILE_BUILD )
 endif()
 
 # Include HAPI in the build.
@@ -93,31 +84,74 @@ set( optional_libs )
 # Add all required libraries to this variable
 set( required_libs )
 
-if( NOT DEFINED DISABLE_H3D_DISPLAYLIST )
-  set( DISABLE_H3D_DISPLAYLIST "OFF" CACHE BOOL "force disable h3d displaylist" )
-  mark_as_advanced( DISABLE_H3D_DISPLAYLIST )
+set( vars_to_negate_after_creation )
+foreach( tmp_var USE_DisplayList USE_field_access_type_check USE_Prototype_node USE_DisplayList_event_collect )
+  if( NOT DEFINED ${tmp_var} )
+    list( APPEND vars_to_negate_after_creation ${tmp_var} )
+  endif()
+endforeach()
+handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES USE_DisplayList         USE_field_access_type_check     USE_Prototype_node    USE_DisplayList_event_collect       USE_H3D_application_manage_active_texture_unit
+                                              OLD_VARIABLE_NAMES DISABLE_H3D_DISPLAYLIST DISABLE_FIELD_ACCESS_TYPE_CHECK DISABLE_PROTOTYPENODE DEPRECATE_DISPLAYLIST_EVENT_COLLECT USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT
+                                              DOC_STRINGS "Build with DisplayLists feature in H3D."
+                                                          "Check field access types. Can be disabled in production releases to get better performance."
+                                                          "Build with X3D proto node features. Disable for optimization if an application does not use this feature."
+                                                          "Use event collection for H3DDisplayListObjects. Disable to save CPU time. Note: displayList fields hasCausedEvent will no longer report correctly if disabled."
+                                                          "Let H3DAPI manage active texture value, instead of relying on opengl get function. H3DAPI rely on setTextureUnit and getTextureUnit to simply manage it." )
+if( vars_to_negate_after_creation )
+  foreach( var_to_negate ${vars_to_negate_after_creation} )
+    if( DEFINED ${var_to_negate} ) # The function handleRenamingVariablesBackwardCompatibility initialized it based on the old variable name, that one should be negated.
+      get_property( var_type CACHE ${var_to_negate} PROPERTY TYPE )
+      get_property( var_doc CACHE ${var_to_negate} PROPERTY HELPSTRING )
+      if( ${var_to_negate} )
+        set( ${var_to_negate} OFF CACHE ${var_type} ${var_doc} FORCE )
+      else()
+        set( ${var_to_negate} ON CACHE ${var_type} ${var_doc} FORCE )
+      endif()
+    endif()
+  endforeach()
 endif()
 
-if( NOT DEFINED DISABLE_FIELD_ACCESS_TYPE_CHECK )
-  set( DISABLE_FIELD_ACCESS_TYPE_CHECK "OFF" CACHE BOOL "force disable field access type check" )
-  mark_as_advanced( DISABLE_FIELD_ACCESS_TYPE_CHECK )
+if( NOT DEFINED USE_DisplayList )
+  set( USE_DisplayList ON CACHE BOOL "Build with DisplayLists feature in H3D." )
+  mark_as_advanced( USE_DisplayList )
+endif()
+set( DISABLE_H3D_DISPLAYLIST ON )  # Have to set this for H3DApi.h to be generated properly
+if( USE_DisplayList )
+  set( DISABLE_H3D_DISPLAYLIST OFF )
 endif()
 
-if( NOT DEFINED DISABLE_PROTOTYPENODE )
-  set( DISABLE_PROTOTYPENODE "OFF" CACHE BOOL "force disable usage of x3dprototypenode for optimization, do not turn on if you use x3dprototypenode" )
-  mark_as_advanced( DISABLE_PROTOTYPENODE )
+if( NOT DEFINED USE_field_access_type_check )
+  set( USE_field_access_type_check ON CACHE BOOL "Check field access types. Can be disabled in production releases to get better performance." )
+  mark_as_advanced( USE_field_access_type_check )
+endif()
+set( DISABLE_FIELD_ACCESS_TYPE_CHECK ON )  # Have to set this for H3DApi.h to be generated properly
+if( USE_field_access_type_check )
+  set( DISABLE_FIELD_ACCESS_TYPE_CHECK OFF )
 endif()
 
-if( NOT DEFINED DEPRECATE_DISPLAYLIST_EVENT_COLLECT )
-  set( DEPRECATE_DISPLAYLIST_EVENT_COLLECT "OFF" CACHE BOOL "force disable event collection for h3ddisplaylistobject to save cpu time. Note: its hasCausedEvent will no long report correctly " )
-  mark_as_advanced( DEPRECATE_DISPLAYLIST_EVENT_COLLECT )
+if( NOT DEFINED USE_Prototype_node )
+  set( USE_Prototype_node ON CACHE BOOL "Build with X3D proto node features. Disable for optimization if an application does not use this feature." )
+  mark_as_advanced( USE_Prototype_node )
+endif()
+set( DISABLE_PROTOTYPENODE ON )  # Have to set this for H3DApi.h to be generated properly
+if( USE_Prototype_node )
+  set( DISABLE_PROTOTYPENODE OFF )
 endif()
 
-if( NOT DEFINED USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT )
-  set( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT "OFF" CACHE BOOL "Let H3DAPI manage active texture value, instead of relying on opengl get function. H3DAPI rely on setTextureUnit and getTextureUnit to simply manage it " )
-  mark_as_advanced( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT )
+if( NOT DEFINED USE_DisplayList_event_collect )
+  set( USE_DisplayList_event_collect ON CACHE BOOL "Use event collection for H3DDisplayListObjects. Disable to save CPU time. Note: displayList fields hasCausedEvent will no longer report correctly if disabled." )
+  mark_as_advanced( USE_DisplayList_event_collect )
+endif()
+set( DEPRECATE_DISPLAYLIST_EVENT_COLLECT ON ) # Have to set this for H3DApi.h to be generated properly
+if( USE_DisplayList_event_collect )
+  set( DEPRECATE_DISPLAYLIST_EVENT_COLLECT OFF )
 endif()
 
+if( NOT DEFINED USE_H3D_application_manage_active_texture_unit )
+  set( USE_H3D_application_manage_active_texture_unit "OFF" CACHE BOOL "Let H3DAPI manage active texture value, instead of relying on opengl get function. H3DAPI rely on setTextureUnit and getTextureUnit to simply manage it." )
+  mark_as_advanced( USE_H3D_application_manage_active_texture_unit )
+endif()
+set( USE_APPLICATION_MANAGED_ACTIVE_TEXTURE_UNIT ${USE_H3D_application_manage_active_texture_unit} )
 
 set( tmp_h3d_include_dirs )
 findIncludeDirsAndLibrariesForH3DProjects( PROJECT_NAMES HAPI
@@ -420,7 +454,7 @@ setupResourceFile( H3DAPI
 # add the libraries needed for linking
 target_link_libraries( H3DAPI ${required_libs} ${optional_libs} )
 
-handleCommonCacheVar( ENABLE_THREAD_LOCK_DEBUG FALSE )
+handleCommonCacheVar( USE_thread_lock_debug FALSE )
 
 # make the name of debug libraries end in _d.
 set_target_properties( H3DAPI PROPERTIES DEBUG_POSTFIX "_d" )
@@ -480,7 +514,7 @@ if( WIN32 )
 
 endif()
 
-if( GENERATE_NODEROUTESTODOTFILE_BUILD )
+if( GENERATE_NodeRoutesToDotFile_BUILD )
   set( H3DAPI_COMPILE_FLAGS "${H3DAPI_COMPILE_FLAGS} -DH3D_GENERATE_DOTROUTE_FILES" )
 endif()
 
@@ -501,7 +535,7 @@ if( EXISTS ${H3DAPI_SOURCE_DIR}/../include/H3D/H3DApi.h )
 endif()
 configure_file( ${H3DAPI_SOURCE_DIR}/../include/H3D/H3DApi.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/H3D/H3DApi.h )
 
-if( NOT GENERATE_CPACK_PROJECT )
+if( NOT GENERATE_H3D_PACKAGE_PROJECT )
   # Install header files on non-windows system (e.g. Unix).
   install( FILES ${CMAKE_CURRENT_BINARY_DIR}/include/H3D/H3DApi.h
            DESTINATION ${H3DAPI_SOURCE_DIR}/../include/H3D )
@@ -513,22 +547,32 @@ install( TARGETS H3DAPI
          RUNTIME DESTINATION ${default_bin_install} COMPONENT H3DAPI_cpack_runtime
          ARCHIVE DESTINATION ${default_lib_install} COMPONENT H3DAPI_cpack_libraries )
 
-if( NOT ( WIN32 OR GENERATE_CPACK_PROJECT ) )
+if( NOT ( WIN32 OR GENERATE_H3D_PACKAGE_PROJECT ) )
   # Install include files.
   install( FILES ${H3DAPI_HEADERS}
            DESTINATION include/H3D )
 endif()
 
-if( NOT DEFINED H3DAPI_LOADER_PROJECTS )
-  set( H3DAPI_LOADER_PROJECTS YES CACHE BOOL "If set to YES H3DLoad and H3DViewer will be included in the build." )
+handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES GENERATE_H3DAPI_loader_PROJECTS GENERATE_H3DLoad_PROJECT GENERATE_H3DAPI_example_PROJECTS
+                                              OLD_VARIABLE_NAMES H3DAPI_LOADER_PROJECTS H3DAPI_H3DLOAD_PROJECTS H3DAPI_EXAMPLE_PROJECTS
+                                              DOC_STRINGS "If set to YES H3DLoad and H3DViewer might be included in the build."
+                                                          "If set to YES H3DLoad will be included in the build."
+                                                          "If set to YES various example projects build on H3DAPI will be included in the build." )
+
+if( NOT DEFINED GENERATE_H3DAPI_loader_PROJECTS )
+  set( GENERATE_H3DAPI_loader_PROJECTS YES CACHE BOOL "If set to YES H3DLoad and H3DViewer might be included in the build." )
 endif()
 
-if( NOT DEFINED H3DAPI_H3DLOAD_PROJECTS )
-  set( H3DAPI_H3DLOAD_PROJECTS YES CACHE BOOL "If set to YES H3DLoad will be included in the build." )
+if( NOT DEFINED GENERATE_H3DLoad_PROJECT )
+  set( GENERATE_H3DLoad_PROJECT YES CACHE BOOL "If set to YES H3DLoad will be included in the build." )
 endif()
 
-if( H3DAPI_LOADER_PROJECTS )
-  if( H3DAPI_H3DLOAD_PROJECTS )
+if( NOT DEFINED GENERATE_H3DViewer_PROJECT )
+  set( GENERATE_H3DViewer_PROJECT YES CACHE BOOL "If set to YES H3DViewer will be included in the build." )
+endif()
+
+if( GENERATE_H3DAPI_loader_PROJECTS )
+  if( GENERATE_H3DLoad_PROJECT )
     if( GLUT_FOUND )
       message( STATUS "Including H3DLoad" )
       add_subdirectory( ${H3DAPI_SOURCE_DIR}/../H3DLoad/build
@@ -539,24 +583,26 @@ if( H3DAPI_LOADER_PROJECTS )
     endif()
   endif()
 
-  set( WXWINDOWS_USE_GL 1 )
-  find_package( wxWidgets COMPONENTS base core )
+  if( GENERATE_H3DViewer_PROJECT )
+    set( WXWINDOWS_USE_GL 1 )
+    find_package( wxWidgets COMPONENTS base core )
 
-  if( wxWidgets_FOUND )
-    message( STATUS "Including H3DViewer" )
-    add_subdirectory( ${H3DAPI_SOURCE_DIR}/../H3DViewer/build
-                      ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer )
-    set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} H3DViewer )
-  else()
-    message( WARNING "wxWidgets was not found. H3DViewer will not be generated." )
+    if( wxWidgets_FOUND )
+      message( STATUS "Including H3DViewer" )
+      add_subdirectory( ${H3DAPI_SOURCE_DIR}/../H3DViewer/build
+                        ${CMAKE_CURRENT_BINARY_DIR}/H3DViewer )
+      set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} H3DViewer )
+    else()
+      message( WARNING "wxWidgets was not found. H3DViewer will not be generated." )
+    endif()
   endif()
 endif()
 
-if( NOT DEFINED H3DAPI_EXAMPLE_PROJECTS )
-  set( H3DAPI_EXAMPLE_PROJECTS "NO" CACHE BOOL "If set to YES various example projects build on H3DAPI will be included in the build." )
+if( NOT DEFINED GENERATE_H3DAPI_example_PROJECTS )
+  set( GENERATE_H3DAPI_example_PROJECTS "NO" CACHE BOOL "If set to YES various example projects build on H3DAPI will be included in the build." )
 endif()
 
-if( H3DAPI_EXAMPLE_PROJECTS )
+if( GENERATE_H3DAPI_example_PROJECTS )
   if( GLUT_FOUND )
     message( STATUS "Including H3DAPI manual examples" )
     add_subdirectory( ${H3DAPI_SOURCE_DIR}/../examples/manualExamples/C++
