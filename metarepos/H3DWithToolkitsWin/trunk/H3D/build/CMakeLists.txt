@@ -13,7 +13,7 @@ endif()
 
 set( CMAKE_MODULE_PATH "${H3DWithToolkitsWin_SOURCE_DIR}/../H3DUtil/build/modules" )
 include( H3DCommonFunctions )
-handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DWithToolkitsWin_SOURCE_DIR}/.. GENERATE_CPACK_PROJECT )
+handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DWithToolkitsWin_SOURCE_DIR}/.. GENERATE_H3D_PACKAGE_PROJECT )
 
 set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
 
@@ -72,7 +72,7 @@ if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build )
   include( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build/H3DPhysicsCPack.cmake )
 endif()
 
-if( GENERATE_NODEROUTESTODOTFILE_BUILD )
+if( GENERATE_NodeRoutesToDotFiles_BUILD )
   if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/NodeRoutesToDotFile )
     # This project is added here since H3DPhysics/UI should be defined before this is done.
     message( STATUS "Including NodeRoutesToDotFile" )
@@ -82,10 +82,10 @@ if( GENERATE_NODEROUTESTODOTFILE_BUILD )
 endif()
 
 if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
-  if( NOT DEFINED CreateH3DNodesFieldsList_PROJECT )
-    set( CreateH3DNodesFieldsList_PROJECT "NO" CACHE BOOL "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
+  if( NOT DEFINED GENERATE_CreateH3DNodesFieldsList_PROJECT )
+    set( GENERATE_CreateH3DNodesFieldsList_PROJECT "NO" CACHE BOOL "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
   endif()
-  if( CreateH3DNodesFieldsList_PROJECT )
+  if( GENERATE_CreateH3DNodesFieldsList_PROJECT )
 
     # This project is added here since H3DPhysics/UI/MedX3D should be defined before this is done.
     message( STATUS "Including CreateH3DNodesFieldsList" )
@@ -122,7 +122,7 @@ foreach( extra_toolkit ${H3D_EXTRA_TOOLKITS} )
 endforeach()
 
 # If cpack should be configured.
-if( GENERATE_CPACK_PROJECT AND TARGET H3DAPI )
+if( GENERATE_H3D_PACKAGE_PROJECT AND TARGET H3DAPI )
   install( FILES ${H3DWithToolkitsWin_SOURCE_DIR}/CMakeLists.txt
            DESTINATION build
            COMPONENT H3DUtil_cpack_sources )
