@@ -10,7 +10,7 @@ project( H3DViewer )
 set( CMAKE_MODULE_PATH "${H3DViewer_SOURCE_DIR}/modules" "${H3DViewer_SOURCE_DIR}/../../build/modules" )
 
 include( H3DCommonFunctions )
-handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DViewer_SOURCE_DIR}/../../.. GENERATE_CPACK_PROJECT )
+handleCommonCacheVar( CMAKE_INSTALL_PREFIX ${H3DViewer_SOURCE_DIR}/../../.. GENERATE_H3D_PACKAGE_PROJECT )
 
 setupRPathForLib()
 
@@ -21,8 +21,20 @@ set( H3DVIEWER_APP_NAME "H3DViewer ${H3DViewer_MAJOR_VERSION}.${H3DViewer_MINOR_
 
 # Add a cache variable USE_PYTHON_CONSOLE to have the choice of enabling the
 # interactive Python console in H3DViewer. Default is NO.
-if( NOT DEFINED USE_PYTHON_CONSOLE )
-  set( USE_PYTHON_CONSOLE "NO" CACHE BOOL "Decides if the interactive Python console is enabled in H3DViewer." )
+handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES USE_python_console GENERATE_H3DViewer_PACKAGE_PROJECT
+                                              OLD_VARIABLE_NAMES USE_PYTHON_CONSOLE GENERATE_H3DVIEWER_CPACK_PROJECT
+                                              DOC_STRINGS "Decides if the interactive Python console is enabled in H3DViewer."
+                                                          "Decides if a cpack project for H3DViewer should be generated." )
+if( NOT DEFINED USE_python_console )
+  set( USE_python_console "NO" CACHE BOOL "Decides if the interactive Python console is enabled in H3DViewer." )
+endif()
+set( USE_PYTHON_CONSOLE ${USE_python_console} ) # For H3DViewerConfig.h to be generated properly
+
+# Add a cache variable GENERATE_H3DVIEWER_CPACK_PROJECT to have the choice of generating a project
+# for packaging H3DViewer. Default is NO since most people will not use this.
+if( NOT DEFINED GENERATE_H3DViewer_PACKAGE_PROJECT )
+  set( GENERATE_H3DViewer_PACKAGE_PROJECT "NO" CACHE BOOL "Decides if a cpack project for H3DViewer should be generated." )
+  mark_as_advanced( GENERATE_H3DViewer_PACKAGE_PROJECT )
 endif()
 
 # Include directories.
@@ -119,7 +131,7 @@ if( DirectX_FOUND )
 endif()
 
 # Create build files.
-if( GENERATE_H3DVIEWER_CPACK_PROJECT )
+if( GENERATE_H3DViewer_PACKAGE_PROJECT )
   # if generating CPACK project using BUNDLE we should not create the bundle here instead
   # it is built with CPack 
   add_executable( H3DViewer WIN32 ${H3DViewer_SRCS} ${H3DViewer_HEADERS} )
@@ -142,7 +154,7 @@ if( EXISTS ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.h )
 endif()
 configure_file( ${H3DViewer_SOURCE_DIR}/../src/H3DViewerConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/H3DViewerConfig.h )
 
-if( NOT ( GENERATE_CPACK_PROJECT OR GENERATE_H3DVIEWER_CPACK_PROJECT ) )
+if( NOT ( GENERATE_H3D_PACKAGE_PROJECT OR GENERATE_H3DViewer_PACKAGE_PROJECT ) )
   # Install header files on non-windows system (e.g. Unix).
   install( FILES ${CMAKE_CURRENT_BINARY_DIR}/include/H3DViewerConfig.h
            DESTINATION ${H3DViewer_SOURCE_DIR}/../src )
@@ -151,7 +163,7 @@ endif()
 # Link against required_libs.
 target_link_libraries( H3DViewer ${required_libs} )
 
-handleCommonCacheVar( ENABLE_THREAD_LOCK_DEBUG FALSE )
+handleCommonCacheVar( USE_thread_lock_debug FALSE )
 
 # Set postfix for debug version of H3DViewer.
 set_target_properties( H3DViewer PROPERTIES DEBUG_POSTFIX "_d" )
@@ -165,7 +177,7 @@ set_target_properties( H3DViewer
 if( MSVC )
 
   set( H3DViewer_COMPILE_FLAGS "-DWXUSINGDLL" )
-  if( GENERATE_H3DVIEWER_CPACK_PROJECT )
+  if( GENERATE_H3DViewer_PACKAGE_PROJECT )
     set( H3DViewer_COMPILE_FLAGS "${H3DViewer_COMPILE_FLAGS} -DH3DVIEWER_STANDALONE" )
   endif()
 
@@ -212,8 +224,11 @@ getDefaultH3DOutputDirectoryName( default_bin_install default_lib_install )
 
 # Install in these folders.
 if( APPLE )
-  if( NOT DEFINED OSX_BUNDLE_INSTALL_DESTINATION )
-    set( OSX_BUNDLE_INSTALL_DESTINATION /Applications CACHE PATH "Directory into which to install the H3DViewer.app bundle." )
+  handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES H3DViewer_OSX_BUNDLE_INSTALL_DESTINATION GENERATE_H3DViewer_PACKAGE_PROJECT
+                                                OLD_VARIABLE_NAMES OSX_BUNDLE_INSTALL_DESTINATION
+                                                DOC_STRINGS "Directory into which to install the H3DViewer.app bundle." )
+  if( NOT DEFINED H3DViewer_OSX_BUNDLE_INSTALL_DESTINATION )
+    set( H3DViewer_OSX_BUNDLE_INSTALL_DESTINATION /Applications CACHE PATH "Directory into which to install the H3DViewer.app bundle." )
   endif()
 
 
@@ -224,16 +239,16 @@ if( APPLE )
   install( TARGETS H3DViewer
            LIBRARY DESTINATION ${default_lib_install}
            RUNTIME DESTINATION ${default_bin_install}
-           BUNDLE DESTINATION ${OSX_BUNDLE_INSTALL_DESTINATION}
+           BUNDLE DESTINATION ${H3DViewer_OSX_BUNDLE_INSTALL_DESTINATION}
            COMPONENT H3DAPI_cpack_runtime )
 else()
   set( H3DViewer_package_install_dir "" )
-  if( WIN32 AND GENERATE_H3DVIEWER_CPACK_PROJECT )
+  if( WIN32 AND GENERATE_H3DViewer_PACKAGE_PROJECT )
     set( H3DViewer_package_install_dir "H3DViewer/" )
   endif()
 
   set( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DViewer_cpack_runtime" )
-  if( GENERATE_CPACK_PROJECT )
+  if( GENERATE_H3D_PACKAGE_PROJECT )
     set( H3DVIEWER_INSTALL_COMPONENT_NAME "H3DAPI_cpack_runtime" )
   endif()
 
@@ -242,13 +257,6 @@ else()
            RUNTIME DESTINATION ${H3DViewer_package_install_dir}${default_bin_install} COMPONENT ${H3DVIEWER_INSTALL_COMPONENT_NAME} )
 endif()
 
-# Add a cache variable GENERATE_H3DVIEWER_CPACK_PROJECT to have the choice of generating a project
-# for packaging H3DViewer. Default is NO since most people will not use this.
-if( NOT DEFINED GENERATE_H3DVIEWER_CPACK_PROJECT )
-  set( GENERATE_H3DVIEWER_CPACK_PROJECT "NO" CACHE BOOL "Decides if a cpack project should be generated. The project in the first loaded CMakeLists will configure CPack." )
-  mark_as_advanced( GENERATE_H3DVIEWER_CPACK_PROJECT )
-endif()
-
-if( GENERATE_H3DVIEWER_CPACK_PROJECT )
+if( GENERATE_H3DViewer_PACKAGE_PROJECT )
   include( ${H3DViewer_SOURCE_DIR}/H3DViewerCPack.cmake )
 endif()

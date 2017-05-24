@@ -10,23 +10,27 @@ list( APPEND H3DAPI_HEADERS ${H3DAPI_SOURCE_DIR}/../include/H3D/StdAfx.h )
 list( APPEND H3DAPI_SRCS ${H3DAPI_SOURCE_DIR}/../src/StdAfx.cpp )
 
 # If cpack should be configured.
-if( GENERATE_CPACK_PROJECT )
+if( GENERATE_H3D_PACKAGE_PROJECT )
   if( WIN32 )
+    handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES H3D_EXTERNAL_ROOT
+                                                  OLD_VARIABLE_NAMES H3DAPI_CPACK_EXTERNAL_ROOT
+                                                  DOC_STRINGS "Set to the External directory used with H3DAPI, needed to pack properly. If not set FIND_modules will be used instead." )
+
     # Add a cache variable which indicates where the Externals directory used for packaging
     # HAPI is located. If not set then FIND modules will be used instead.
-    if( NOT DEFINED H3DAPI_CPACK_EXTERNAL_ROOT )
-      set( H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT "" )
+    if( NOT DEFINED H3D_EXTERNAL_ROOT )
+      set( h3d_external_root_default "" )
       if( NOT ${CMAKE_PROJECT_NAME} STREQUAL "H3DAPI" )
         foreach( external_include_dir_tmp ${H3DAPI_INCLUDE_DIRS} )
           if( EXISTS ${external_include_dir_tmp}/../include/pthread )
-            set( H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT "${external_include_dir_tmp}/.." )
+            set( h3d_external_root_default "${external_include_dir_tmp}/.." )
           endif()
         endforeach()
       else()
-        set( H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT "$ENV{H3D_EXTERNAL_ROOT}" )
+        set( h3d_external_root_default "$ENV{H3D_EXTERNAL_ROOT}" )
       endif()
-      set( H3DAPI_CPACK_EXTERNAL_ROOT "${H3DAPI_CPACK_EXTERNAL_ROOT_DEFAULT}" CACHE PATH "Set to the External directory used with H3DAPI, needed to pack properly. If not set FIND_modules will be used instead." )
-      mark_as_advanced( H3DAPI_CPACK_EXTERNAL_ROOT )
+      set( H3D_EXTERNAL_ROOT "${h3d_external_root_default}" CACHE PATH "Set to the External directory used with H3DAPI, needed to pack properly. If not set FIND_modules will be used instead." )
+      mark_as_advanced( H3D_EXTERNAL_ROOT )
     endif()
 
     if( TARGET OpenHapticsRenderer )
@@ -123,8 +127,8 @@ if( GENERATE_CPACK_PROJECT )
     set( external_static_libraries "" )
     set( external_binaries "" )
 
-    if( EXISTS ${H3DAPI_CPACK_EXTERNAL_ROOT} )
-      set( external_includes ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/xercesc/
+    if( EXISTS ${H3D_EXTERNAL_ROOT} )
+      set( external_includes ${H3D_EXTERNAL_ROOT}/include/xercesc/
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/curl/
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/Cg/
                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/AL/
@@ -149,9 +153,9 @@ if( GENERATE_CPACK_PROJECT )
                                           External/include/DirectShow
                                           External/include/js )
 
-      set( external_include_files ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/.h )
+      set( external_include_files ${H3D_EXTERNAL_ROOT}/include/.h )
 
-      set( external_libraries ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/glew32.lib
+      set( external_libraries ${H3D_EXTERNAL_ROOT}/lib32/glew32.lib
                               ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/xerces-c_3.lib
                               ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/xerces-c_3D.lib
                               ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/libcurl.lib
@@ -277,14 +281,14 @@ if( GENERATE_CPACK_PROJECT )
 
     set( H3DAPI_CPACK_INSTALLED_DIRECTORIES "" )
 
-    if( H3DAPI_LOADER_PROJECTS )
+    if( GENERATE_H3DAPI_loader_PROJECTS )
       set( CPACK_ADD_H3DLOAD_DEMOS_LINKS "ON" )
     endif()
 
     # Create cached variable for getting the plugin folder.
-    set( H3DVIEWER_PLUGIN_FOLDER "" CACHE PATH "Path to folder containing plugins for H3DViewer." )
-    mark_as_advanced( H3DVIEWER_PLUGIN_FOLDER )
-    if( H3DVIEWER_PLUGIN_FOLDER )
+    set( H3DViewer_PLUGIN_FOLDER "" CACHE PATH "Path to folder containing plugins for H3DViewer." )
+    mark_as_advanced( H3DViewer_PLUGIN_FOLDER )
+    if( H3DViewer_PLUGIN_FOLDER )
       # Create cached variable for getting the VHTK examples folder.
       set( VHTK_EXAMPLES_FOLDER "" CACHE PATH "Path to folder containing VHTK examples." )
       mark_as_advanced( VHTK_EXAMPLES_FOLDER )
@@ -737,23 +741,28 @@ if( GENERATE_CPACK_PROJECT )
            COMPONENT H3DAPI_cpack_runtime
            REGEX "(/.svn)|(/CVS)" EXCLUDE )
   endif()
+  
+  handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES H3DAPI_documentation_directory H3D_CMake_runtime_path
+                                                OLD_VARIABLE_NAMES H3DAPI_DOCS_DIRECTORY H3D_cmake_runtime_path
+                                                DOC_STRINGS "Set this to the directory containing the manual and generated doxygen documentation of H3DAPI."
+                                                            "The path to the cmake runtime." )
 
   # Add a cache variable H3DAPI_DOCS_DIRECTORY used to indicate where the H3DAPI docs are.
-  if( NOT DEFINED H3DAPI_DOCS_DIRECTORY )
-    set( H3DAPI_DOCS_DIRECTORY_DEFAULT "" )
+  if( NOT DEFINED H3DAPI_documentation_directory )
+    set( h3dapi_documentation_directory_default "" )
     if( NOT ${CMAKE_PROJECT_NAME} STREQUAL "H3DAPI" )
-      set( H3DAPI_DOCS_DIRECTORY_DEFAULT "${H3DAPI_SOURCE_DIR}/../../doc" )
+      set( h3dapi_documentation_directory_default "${H3DAPI_SOURCE_DIR}/../../doc" )
     endif()
-    set( H3DAPI_DOCS_DIRECTORY "${H3DAPI_DOCS_DIRECTORY_DEFAULT}" CACHE PATH "Set this to the directory containing the manual and generated doxygen documentation of H3DAPI." )
-    mark_as_advanced( H3DAPI_DOCS_DIRECTORY )
+    set( H3DAPI_documentation_directory "${h3dapi_documentation_directory_default}" CACHE PATH "Set this to the directory containing the manual and generated doxygen documentation of H3DAPI." )
+    mark_as_advanced( H3DAPI_documentation_directory )
   endif()
 
-  if( EXISTS ${H3DAPI_DOCS_DIRECTORY} )
-    install( DIRECTORY ${H3DAPI_DOCS_DIRECTORY}/H3DAPI
+  if( EXISTS ${H3DAPI_documentation_directory} )
+    install( DIRECTORY ${H3DAPI_documentation_directory}/H3DAPI
              DESTINATION doc
              COMPONENT H3DAPI_cpack_headers
              REGEX "(/.svn)|(/CVS)" EXCLUDE )
-    install( FILES "${H3DAPI_DOCS_DIRECTORY}/H3D API Manual.pdf"
+    install( FILES "${H3DAPI_documentation_directory}/H3D API Manual.pdf"
              DESTINATION doc
              COMPONENT H3DAPI_cpack_headers )
   endif()
@@ -793,41 +802,41 @@ if( GENERATE_CPACK_PROJECT )
   set( CPACK_COMPONENT_GROUP_H3DAPI_CPACK_GROUP_DESCRIPTION "H3DAPI is an open source, cross platform, scene graph API. Build X3D scenes by using the nodes written in H3DAPI. Load scenes using H3DViewer or H3DLoad that comes with this package." )
   set( CPACK_COMPONENT_GROUP_HAPI_CPACK_GROUP_PARENT_GROUP "H3DAPI_cpack_group" )
 
-  # Add a cache variable H3D_cmake_runtime_path to point to cmake binary.
-  set( H3D_cmake_runtime_path_default "" )
-  if( NOT DEFINED H3D_cmake_runtime_path )
+  # Add a cache variable H3D_CMake_runtime_path to point to cmake binary.
+  set( h3d_cmake_runtime_path_default "" )
+  if( NOT DEFINED H3D_CMake_runtime_path )
     if( WIN32 AND NOT UNIX )
       set( VERSION_CMAKES "4.0" "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" )
       foreach( version_cmake ${VERSION_CMAKES} )
         if( EXISTS "C:/Program Files/CMake ${version_cmake}/bin/cmake.exe" )
-          set( H3D_cmake_runtime_path_default "C:/Program Files/CMake ${version_cmake}/bin/cmake.exe" )
+          set( h3d_cmake_runtime_path_default "C:/Program Files/CMake ${version_cmake}/bin/cmake.exe" )
           break()
         endif()
 
         if( EXISTS "C:/Program Files (x86)/CMake ${version_cmake}/bin/cmake.exe" )
-          set( H3D_cmake_runtime_path_default "C:/Program Files (x86)/CMake ${version_cmake}/bin/cmake.exe" )
+          set( h3d_cmake_runtime_path_default "C:/Program Files (x86)/CMake ${version_cmake}/bin/cmake.exe" )
           break()
         endif()
 
         if( EXISTS "C:/Program/CMake ${version_cmake}/bin/cmake.exe" )
-          set( H3D_cmake_runtime_path_default "C:/Program/CMake ${version_cmake}/bin/cmake.exe" )
+          set( h3d_cmake_runtime_path_default "C:/Program/CMake ${version_cmake}/bin/cmake.exe" )
           break()
         endif()
       endforeach()
     else()
-      set( H3D_cmake_runtime_path_default "cmake" )
+      set( h3d_cmake_runtime_path_default "cmake" )
     endif()
-    set( H3D_cmake_runtime_path ${H3D_cmake_runtime_path_default} CACHE FILEPATH "The path to the cmake runtime." )
-    mark_as_advanced( H3D_cmake_runtime_path )
+    set( H3D_CMake_runtime_path ${h3d_cmake_runtime_path_default} CACHE FILEPATH "The path to the cmake runtime." )
+    mark_as_advanced( H3D_CMake_runtime_path )
   endif()
 
-  if( H3D_cmake_runtime_path )
+  if( H3D_CMake_runtime_path )
     set( INSTALL_RUNTIME_AND_LIBRARIES_ONLY_POST_BUILD ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_POST_BUILD}
-                                                       COMMAND ${H3D_cmake_runtime_path}
+                                                       COMMAND ${H3D_CMake_runtime_path}
                                                        ARGS -DBUILD_TYPE=$(Configuration) -DCOMPONENT=H3DAPI_cpack_runtime -P cmake_install.cmake
-                                                       COMMAND ${H3D_cmake_runtime_path}
+                                                       COMMAND ${H3D_CMake_runtime_path}
                                                        ARGS -DBUILD_TYPE=$(Configuration) -DCOMPONENT=H3DAPI_cpack_libraries -P cmake_install.cmake
-                                                       COMMAND ${H3D_cmake_runtime_path}
+                                                       COMMAND ${H3D_CMake_runtime_path}
                                                        ARGS -DBUILD_TYPE=$(Configuration) -DCOMPONENT=H3DAPI_cpack_examples_runtime -P cmake_install.cmake)
 
     if( ${CMAKE_PROJECT_NAME} STREQUAL "H3DAPI" )
@@ -842,7 +851,7 @@ if( GENERATE_CPACK_PROJECT )
       add_dependencies( INSTALL_RUNTIME_AND_LIBRARIES_ONLY H3DAPI ${INSTALL_RUNTIME_AND_LIBRARIES_ONLY_DEPENDENCIES} )
     endif()
   else()
-    message( STATUS "H3D_cmake_runtime_path is not set, please set it to continue" )
+    message( STATUS "H3D_CMake_runtime_path is not set, please set it to continue" )
   endif()
 
   if( ${CMAKE_PROJECT_NAME} STREQUAL "H3DAPI" )

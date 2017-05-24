@@ -6,30 +6,35 @@ cmake_policy( VERSION 2.8.7 )
 # to the root binary directory of the project as ${NodeRoutesToDotFile_BINARY_DIR}.
 project( NodeRoutesToDotFile )
 
+handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES NodeRoutesToDotFile_extra_release_libraries NodeRoutesToDotFile_extra_debug_libraries
+                                              OLD_VARIABLE_NAMES NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES
+                                              DOC_STRINGS "Add paths to extra release libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon( ; )"
+                                                          "Add paths to extra debug libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon( ; )" )
+
 # Add a cache variable NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES used
 # to give extra release libraries which have a database which
 # dot-files should be generated for.
-if( NOT DEFINED NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES )
-  set( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES "" CACHE STRING "Add paths to extra release libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon( ; )" )
-  mark_as_advanced( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES )
+if( NOT DEFINED NodeRoutesToDotFile_extra_release_libraries )
+  set( NodeRoutesToDotFile_extra_release_libraries "" CACHE STRING "Add paths to extra release libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon( ; )" )
+  mark_as_advanced( NodeRoutesToDotFile_extra_release_libraries )
 endif()
 
 # Add a cache variable NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES used
 # to give extra debug libraries which have a database which
 # dot-files should be generated for.
-if( NOT DEFINED NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES )
-  set( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES "" CACHE STRING "Add paths to extra debug libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon( ; )" )
-  mark_as_advanced( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES )
+if( NOT DEFINED NodeRoutesToDotFile_extra_debug_libraries )
+  set( NodeRoutesToDotFile_extra_debug_libraries "" CACHE STRING "Add paths to extra debug libraries that contain additional H3D nodes for which to generate dot-files. Each library path must be enclosed in \" and separated by semi colon( ; )" )
+  mark_as_advanced( NodeRoutesToDotFile_extra_debug_libraries )
 endif()
 
 set( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES_CODE )
-foreach( NodeRoutesToDotFile_EXTRA_LIBRARY ${NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES} )
+foreach( NodeRoutesToDotFile_EXTRA_LIBRARY ${NodeRoutesToDotFile_extra_release_libraries} )
   file( TO_CMAKE_PATH ${NodeRoutesToDotFile_EXTRA_LIBRARY} NodeRoutesToDotFile_EXTRA_LIBRARY_CMAKE_PATH )
   set( NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES_CODE "${NodeRoutesToDotFile_EXTRA_RELEASE_LIBRARIES_CODE}\n  extra_libraries.push_back( ${NodeRoutesToDotFile_EXTRA_LIBRARY_CMAKE_PATH} );" )
 endforeach()
 
 set( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES_CODE )
-foreach( NodeRoutesToDotFile_EXTRA_LIBRARY ${NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES} )
+foreach( NodeRoutesToDotFile_EXTRA_LIBRARY ${NodeRoutesToDotFile_extra_debug_libraries} )
   file( TO_CMAKE_PATH ${NodeRoutesToDotFile_EXTRA_LIBRARY} NodeRoutesToDotFile_EXTRA_LIBRARY_CMAKE_PATH )
   set( NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES_CODE "${NodeRoutesToDotFile_EXTRA_DEBUG_LIBRARIES_CODE}\n extra_libraries.push_back( ${NodeRoutesToDotFile_EXTRA_LIBRARY_CMAKE_PATH} );" )
 endforeach()
