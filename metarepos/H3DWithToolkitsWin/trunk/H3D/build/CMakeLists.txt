@@ -72,7 +72,7 @@ if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build )
   include( ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DPhysics/build/H3DPhysicsCPack.cmake )
 endif()
 
-if( GENERATE_NodeRoutesToDotFiles_BUILD )
+if( GENERATE_NodeRoutesToDotFile_BUILD )
   if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/NodeRoutesToDotFile )
     # This project is added here since H3DPhysics/UI should be defined before this is done.
     message( STATUS "Including NodeRoutesToDotFile" )
@@ -81,9 +81,13 @@ if( GENERATE_NodeRoutesToDotFiles_BUILD )
   endif()
 endif()
 
+
 if( EXISTS ${H3DWithToolkitsWin_SOURCE_DIR}/../H3DAPI/Util/CreateH3DNodesFieldsList )
+  handleRenamingVariablesBackwardCompatibility( NEW_VARIABLE_NAMES GENERATE_CreateH3DNodesFieldsList_PROJECT
+                                                OLD_VARIABLE_NAMES CreateH3DNodesFieldsList_PROJECT
+                                                DOC_STRINGS "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
   if( NOT DEFINED GENERATE_CreateH3DNodesFieldsList_PROJECT )
-    set( GENERATE_CreateH3DNodesFieldsList_PROJECT "NO" CACHE BOOL "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
+    set( GENERATE_CreateH3DNodesFieldsList_PROJECT NO CACHE BOOL "If set to YES the CreateH3DNodesFieldsList project will be included in this build." )
   endif()
   if( GENERATE_CreateH3DNodesFieldsList_PROJECT )
 
