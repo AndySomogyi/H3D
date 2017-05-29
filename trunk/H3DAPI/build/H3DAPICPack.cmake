@@ -129,17 +129,17 @@ if( GENERATE_H3D_PACKAGE_PROJECT )
 
     if( EXISTS ${H3D_EXTERNAL_ROOT} )
       set( external_includes ${H3D_EXTERNAL_ROOT}/include/xercesc/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/curl/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/Cg/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/AL/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/vorbis/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/ogg/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/libaudiofile/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/freetype/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/3dconnexion/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/FTGL/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/DirectShow/
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/include/js/ )
+                             ${H3D_EXTERNAL_ROOT}/include/curl/
+                             ${H3D_EXTERNAL_ROOT}/include/Cg/
+                             ${H3D_EXTERNAL_ROOT}/include/AL/
+                             ${H3D_EXTERNAL_ROOT}/include/vorbis/
+                             ${H3D_EXTERNAL_ROOT}/include/ogg/
+                             ${H3D_EXTERNAL_ROOT}/include/libaudiofile/
+                             ${H3D_EXTERNAL_ROOT}/include/freetype/
+                             ${H3D_EXTERNAL_ROOT}/include/3dconnexion/
+                             ${H3D_EXTERNAL_ROOT}/include/FTGL/
+                             ${H3D_EXTERNAL_ROOT}/include/DirectShow/
+                             ${H3D_EXTERNAL_ROOT}/include/js/ )
       set( external_include_install_paths External/include/xercesc
                                           External/include/curl
                                           External/include/Cg
@@ -156,48 +156,48 @@ if( GENERATE_H3D_PACKAGE_PROJECT )
       set( external_include_files ${H3D_EXTERNAL_ROOT}/include/.h )
 
       set( external_libraries ${H3D_EXTERNAL_ROOT}/lib32/glew32.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/xerces-c_3.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/xerces-c_3D.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/libcurl.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/cg.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/cgGL.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/OpenAL32.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/libvorbisfile.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/libvorbis.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/libogg.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/audiofile.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/siapp.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/spwmath.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/ftgl.lib
-                              ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/js32.lib )
+                              ${H3D_EXTERNAL_ROOT}/lib32/xerces-c_3.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/xerces-c_3D.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/libcurl.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/cg.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/cgGL.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/OpenAL32.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/libvorbisfile.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/libvorbis.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/libogg.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/audiofile.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/siapp.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/spwmath.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/ftgl.lib
+                              ${H3D_EXTERNAL_ROOT}/lib32/js32.lib )
 
       set( external_static_libraries ${external_static_libraries}
-                                     #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/glew32s.lib
-                                     #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/libcurl.lib
-                                     #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/libvorbisfile_static.lib
-                                     #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/libvorbis_static.lib
-                                     #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/libogg_static.lib
-                                     ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/freetype2312.lib
-                                     ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/freetype2312MT.lib
-                                     #${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/ftgl_static.lib
-                                     ${H3DAPI_CPACK_EXTERNAL_ROOT}/lib32/static/strmbase.lib )
+                                     #${H3D_EXTERNAL_ROOT}/lib32/static/glew32s.lib
+                                     #${H3D_EXTERNAL_ROOT}/lib32/static/libcurl.lib
+                                     #${H3D_EXTERNAL_ROOT}/lib32/static/libvorbisfile_static.lib
+                                     #${H3D_EXTERNAL_ROOT}/lib32/static/libvorbis_static.lib
+                                     #${H3D_EXTERNAL_ROOT}/lib32/static/libogg_static.lib
+                                     ${H3D_EXTERNAL_ROOT}/lib32/static/freetype2312.lib
+                                     ${H3D_EXTERNAL_ROOT}/lib32/static/freetype2312MT.lib
+                                     #${H3D_EXTERNAL_ROOT}/lib32/static/ftgl_static.lib
+                                     ${H3D_EXTERNAL_ROOT}/lib32/static/strmbase.lib )
 
       set( external_binaries ${external_binaries}
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/glew32.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/xerces-c_3_1.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/xerces-c_3_1D.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/libcurl.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/cg.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/cgGL.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/libvorbisfile.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/libvorbis.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/libogg.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/audiofile.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/ftgl.dll
-                             ${H3DAPI_CPACK_EXTERNAL_ROOT}/${external_bin_path}/js32.dll )
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/glew32.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/xerces-c_3_1.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/xerces-c_3_1D.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/libcurl.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/cg.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/cgGL.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/libvorbisfile.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/libvorbis.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/libogg.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/audiofile.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/ftgl.dll
+                             ${H3D_EXTERNAL_ROOT}/${external_bin_path}/js32.dll )
 
     else()
-      message( WARNING "H3DAPI_CPACK_EXTERNAL_ROOT must be set to the External directory used by H3DAPI in order to package properly." )
+      message( WARNING "H3D_EXTERNAL_ROOT must be set to the External directory used by H3DAPI in order to package properly." )
     endif()
 
     if( external_includes )
