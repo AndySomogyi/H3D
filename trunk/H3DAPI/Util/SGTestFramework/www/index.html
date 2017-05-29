@@ -55,6 +55,29 @@
         <input id='Options_Collapse_Steps' type='button' value='Collapse visible Steps'/>
         <input id='Options_Expand_Steps' type='button' value='Expand Visible Steps'/>
       </div>
+      <div id='Operations'>
+        <h3 class='Operations_Header'>Operations</h3>
+        <input id='Operations_Update_Baselines' type='button' value='Update all selected baselines'/>
+        <div id='baseline_result_div'>
+          <span id='baseline_result_span'>Result of baseline submission goes here</span>
+          <div id='baseline_loading_spinner_container'>
+            <div id='baseline_loading_spinner' class="ispinner black animating">
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+              <div class="ispinner-blade"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
       <div id='Summary'><h2>Summary</h2><button onclick="toggle_visibility('Summary_Table')">Toggle Summary Table</Button><br /><br />
         <table id='Summary_Table'>
@@ -68,8 +91,8 @@
           </tr>
         </table>
       </div>
-      <div id='Categories'><h2>Categories</h2>      
-        <div id='loading_spinner_container'> 
+      <div id='Categories'><h2>Categories</h2>
+        <div id='loading_spinner_container'>
           <div id='loading_spinner' class="ispinner black animating">
             <div class="ispinner-blade"></div>
             <div class="ispinner-blade"></div>
@@ -83,8 +106,8 @@
             <div class="ispinner-blade"></div>
             <div class="ispinner-blade"></div>
             <div class="ispinner-blade"></div>
-          </div>      
-        </div>      
+          </div>
+        </div>
         <div id='Categories_List'></div>
       </div>
     </div>

@@ -159,6 +159,10 @@ function refreshDisplayOptions(model) {
       
     rb.data('propName', display_options.properties.available[i]);
     
+    
+    $('#baseline_result_span').html('');
+    $('#baseline_loading_spinner_container').hide();
+    
     $('#Option_Properties').append(rb);
     $('#Option_Properties').append(display_options.properties.available[i] + "<br/>")
     
@@ -504,6 +508,14 @@ function generateImages(div) {
       image_container.append("Diff:</br>");
       image_container.append(getImageBlobURL(testcase.id, "diff", diff_download_name));
       container.append(image_container);
+
+      // Add baseline update checkbox here
+      var cb = $('<input>Include in baseline update</input>');
+      cb.attr('type', 'checkbox');
+      cb.addClass('baselineUpdateCheckbox');
+      cb.data('model', testcase);
+      container.append("<br />");
+      container.append(cb);
     } 
   }
   div.append(container);
@@ -521,8 +533,16 @@ function generateConsole(div) {
       succeeded.append("Step failed - No baseline!");
     else if(!testcase.hasOwnProperty("text_output"))
       succeeded.append("Step failed - No output!");
-    else
+    else {
       succeeded.append("Step failed - Invalid output!");
+      // Add baseline update checkbox here
+      var cb = $('<input>Include in baseline update</input>');
+      cb.attr('type', 'checkbox');
+      cb.addClass('baselineUpdateCheckbox');
+      cb.data('model', testcase);
+      container.append("<br />");
+      container.append(cb);
+    }
   } else {
     succeeded.addClass('test_successful');
     succeeded.append("Step successful!");
@@ -541,6 +561,13 @@ function generateConsole(div) {
       baseline.append("<b>Baseline:</b></br></br>");
       baseline.append(testcase.text_baseline.split('\n').join('</br>'));
       container.append(baseline);
+      // Add baseline update checkbox here
+      var cb = $('<input>Include in baseline update</input>');
+      cb.attr('type', 'checkbox');
+      cb.addClass('baselineUpdateCheckbox');
+      cb.data('model', testcase);
+      container.append("<br />");
+      container.append(cb);
     }
     if(testcase.hasOwnProperty("text_diff")) {
     var diff = $('<div>');
@@ -552,6 +579,7 @@ function generateConsole(div) {
   } else {
     $('.TestStep_name', div).addClass('minimized');
   }
+  
   div.append(container);
 }
 
@@ -773,6 +801,9 @@ function GetServerList() {
   display_options.servers.available = [];
   display_options.servers.selected = [];
   $('#Options_Toggle').hide();
+  $('#Operations').hide();
+  $('#baseline_result_span').html('');
+  $('#baseline_loading_spinner_container').hide();
   
   // Connect database
   $.ajax({
@@ -878,6 +909,7 @@ function GetTestRunList(server_id) {
 function SetTestRun(test_run_id) {
   $('#Categories_List').empty();
   $('#loading_spinner_container').show();
+  $('#Operations').show();
   $('tr', $('#Summary_Table')).not('#Summary_Table_Header').remove();
   
   $.ajax({
@@ -943,8 +975,42 @@ function SetTestRun(test_run_id) {
       } else if (testResult.result_type=='error') {
         generateError($(this));
       }
-    });  
-
+    });
+    
+    $('.baselineUpdateCheckbox').prop('checked', false);
+    
+    $('#baseline_result_span').html('');
+    $('#baseline_loading_spinner_container').hide();
+          
+    $('#Operations_Update_Baselines').unbind().click(function() {
+      var cases = [];
+      $('#baseline_result_span').html('Updating, please wait...');
+      $('#baseline_loading_spinner_container').show();
+      var checkboxes = $('.baselineUpdateCheckbox:checked');
+      for(var i = 0; i < checkboxes.length; ++i) {
+        var data = $(checkboxes[i]).data('model');
+        cases.push({'file_id': data.file_id,
+                   'case_id': data.case_id,
+                   'step_id': data.step_id,
+                   'validation_type' : data.result_type});
+      }
+      $.ajax({
+          type: 'POST',
+          url: 'update_baselines.php?test_run_id=' + test_run_id,
+          data: {'data' : JSON.stringify({cases}) },
+          success: function(data) {            
+            $('#baseline_loading_spinner_container').hide();
+            $('#baseline_result_span').html(data);
+          },
+          error: function(data) {
+            $('#baseline_loading_spinner_container').hide();
+            $('#baseline_result_span').html('Error when submitting command: ' + data.responseText);
+          },
+          async: true
+      });      
+      
+    });
+    
     // Set up the toggle buttons.
     $('#Options_Toggle_Only_Show_Failed').data('only_showing_failed', false);
     $('#Options_Toggle_Only_Show_Failed').prop('value', 'Only Show Failed Cases');
