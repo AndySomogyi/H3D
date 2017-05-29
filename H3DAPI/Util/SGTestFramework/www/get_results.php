@@ -47,7 +47,7 @@ $render_query = sprintf("
         join servers
           ON test_runs.server_id = servers.id
  WHERE  test_runs.id = %d
- GROUP  BY case_id,file_id,step_name
+ GROUP  BY case_id,file_id,step_id
 )", $test_run_id);
 
 $console_query = sprintf("
@@ -67,7 +67,7 @@ $console_query = sprintf("
         join servers
           ON test_runs.server_id = servers.id
  WHERE  test_runs.id = %d
- GROUP  BY case_id,file_id,step_name
+ GROUP  BY case_id,file_id,step_id
  )", $test_run_id);
  
 $custom_query = sprintf("
@@ -87,7 +87,7 @@ $custom_query = sprintf("
         join servers
           ON test_runs.server_id = servers.id
  WHERE  test_runs.id = %d
- GROUP  BY case_id,file_id,step_name
+ GROUP  BY case_id,file_id,step_id
  )", $test_run_id);
  
  
@@ -107,7 +107,7 @@ $error_query = sprintf("
         join servers
           ON test_runs.server_id = servers.id
  WHERE test_runs.id = %d
- GROUP BY case_id,file_id,step_name)", $test_run_id);
+ GROUP BY case_id,file_id,step_id)", $test_run_id);
 
 
 function getCategoryDescription($db, $path) {
@@ -289,6 +289,9 @@ function generate_results($db, $data, $fetched_data) {
       "filename"   => $row['filename'],
       "result_type"   => $row['result_type'],
       "test_run_id" => $row['test_run_id'],
+      "file_id" => $row['file_id'],
+      "case_id" => $row['case_id'],
+      "step_id" => $row['step_id'],
       "server_id"=> $row['server_id'],
       "server_name"=> $row['server_name'],
       "time"   => $row['timestamp'],

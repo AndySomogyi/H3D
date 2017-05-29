@@ -772,13 +772,15 @@ class TestCaseRunner ( object ):
               baseline_file = open(result.baseline_path, 'rb')
               baseline_image = baseline_file.read()
               baseline_file.close()
-              curs.execute("SELECT id, image FROM rendering_baselines WHERE file_id=%s AND case_id=%s AND step_id='%s' ORDER BY timestamp DESC LIMIT 1" % (testfile_id, testcase_id, teststep_id))
+              curs.execute("SELECT id, image FROM rendering_baselines WHERE file_id=%s AND case_id=%s AND step_id=%s ORDER BY timestamp DESC LIMIT 1" % (testfile_id, testcase_id, teststep_id))
               res = curs.fetchone()
               if res == None or res[1] != baseline_image:
                 curs.execute(("INSERT INTO rendering_baselines (file_id, case_id, step_id, timestamp, image) VALUES (%d, %d, %d, '%s'" % (testfile_id, testcase_id, teststep_id, args.timestamp)) + ", %s)", [baseline_image,])
 #              elif res[1] != baseline_image:
 #                curs.execute("INSERT into rendering_baselines  image=%s WHERE id=%s", [baseline_image, res[0]])
-            
+            else:
+              print("Unable to find baseline at " + result.baseline_path + ", can't upload.")
+              
             if not result.success: #validation failed, if possible we should upload both the rendering and the diff
               if result.diff_path != '':
                 diff_file = open(result.diff_path, 'rb')
