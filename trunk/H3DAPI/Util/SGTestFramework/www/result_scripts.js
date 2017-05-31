@@ -915,6 +915,12 @@ function SetTestRun(test_run_id) {
     dataType: 'json',
     success: function(data) {
         $('tr', $('#Summary_Table')).not('#Summary_Table_Header').remove();
+        var all_succeeded = true;
+        var total_success = 0;
+        var total_fail = 0;
+        var total_step_fail = 0;
+        var total_error = 0;
+        var total_cases = 0;
         for(var i = 0; i < Object.keys(data).length; ++i) {
           var key = Object.keys(data)[i];
           var row = $('<tr>');
@@ -926,28 +932,83 @@ function SetTestRun(test_run_id) {
           var cell = $('<td>');
           cell.html(data[key].successful.toString());
           row.append(cell);
+          all_succeeded = all_succeeded && data[key].successful;
           
           var cell = $('<td>');
           cell.html(data[key].success_count);
           row.append(cell);
+          total_success += data[key].success_count;
           
           var cell = $('<td>');
           cell.html(data[key].fail_count);
           row.append(cell);
+          total_fail += data[key].fail_count;
+          
+          var cell = $('<td>');
+          cell.html(data[key].step_fail_count);
+          row.append(cell);
+          total_step_fail += data[key].step_fail_count;
           
           var cell = $('<td>');
           cell.html(data[key].error_count);
           row.append(cell);
+          total_error += data[key].error_count;
           
           var cell = $('<td>');
-          cell.html(data[key].success_count + data[key].error_count);
+          cell.html(data[key].success_count + data[key].fail_count);
+          row.append(cell);
+          total_cases += data[key].success_count + data[key].fail_count;
+          
+          var cell = $('<td>');
+          cell.html(((data[key].success_count/(data[key].success_count + data[key].fail_count))*100).toFixed(2) + "%");
           row.append(cell);
           
           if($('#Summary_Table > tbody'))
             $('#Summary_Table > tbody').append(row);
           else
             $('#Summary_Table').append(row);
-        }     
+        }
+      if(Object.keys(data).length > 0) {
+        var row = $('<tr>');
+        
+        var cell = $('<td>');
+        cell.html("Total");
+        row.append(cell);
+        
+        var cell = $('<td>');
+        cell.html(all_succeeded.toString());
+        row.append(cell);
+        
+        var cell = $('<td>');
+        cell.html(total_success);
+        row.append(cell);
+        
+        var cell = $('<td>');
+        cell.html(total_fail);
+        row.append(cell);
+        
+        var cell = $('<td>');
+        cell.html(total_step_fail);
+        row.append(cell);
+        
+        var cell = $('<td>');
+        cell.html(total_error);
+        row.append(cell);
+        
+        var cell = $('<td>');
+        cell.html(total_cases);
+        row.append(cell);
+        
+        var cell = $('<td>');
+        cell.html(((total_success/total_cases)*100).toFixed(2) + "%");
+        
+        row.append(cell);
+        
+        if($('#Summary_Table > tbody'))
+          $('#Summary_Table > tbody').append(row);
+        else
+          $('#Summary_Table').append(row);      
+      }
       }
     });
   
