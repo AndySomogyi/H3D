@@ -35,30 +35,38 @@ function do_svn_command($command) {
   return $svn_output;
 }
 
-if(strpos(do_svn_command("info " . $svnpath), '(Not a valid URL)') !== false) {
-  echo "Invalid test_svn_path variable set, check server configuration";
-  exit;
+$has_valid_svn_path = false;
+
+for($i = 0; $i < count($svnpaths); ++$i) {
+  if(is_bool(strpos(do_svn_command("info " . $svnpaths[$i]), '(Not a valid URL)'))) {
+    $has_valid_svn_path = true;
+  }
+}
+if(!$has_valid_svn_path) {
+    echo "No valid svn paths in \$svn_paths, check server configuration";
+    exit;
 }
 
 // since svn commands are case-sensitive, we have a function that tests the four most likely capitalizations of .TestDef, just to be extra sure we won't get problems with it later.
-function get_testdef_path($testdef_filename) {
-  global $svnpath;
+// returns an empty string if no matching case was found, which also could mean that the provided svnpath is invalid.
+function get_testdef_path($svnpath, $testdef_filename) {
   $testdef_path = $testdef_filename . ".TestDef";
-  if(strpos(do_svn_command("info " . $svnpath . $testdef_path), '(Not a valid URL)') === false) {
+  if(is_bool(strpos(do_svn_command("info " . $svnpath . $testdef_path), '(Not a valid URL)'))) {
     return $testdef_path;
   }
   $testdef_path = $testdef_filename . ".testdef";
-  if(strpos(do_svn_command("info " . $svnpath . $testdef_path), '(Not a valid URL)') === false) {
+  if(is_bool(strpos(do_svn_command("info " . $svnpath . $testdef_path), '(Not a valid URL)'))) {
     return $testdef_path;
   }  
   $testdef_path = $testdef_filename . ".Testdef";
-  if(strpos(do_svn_command("info " . $svnpath . $testdef_path), '(Not a valid URL)') === false) {
+  if(is_bool(strpos(do_svn_command("info " . $svnpath . $testdef_path), '(Not a valid URL)'))) {
     return $testdef_path;
   }
   $testdef_path = $testdef_filename . ".testDef";
-  if(strpos(do_svn_command("info " . $svnpath . $testdef_path), '(Not a valid URL)') === false) {
+  if(is_bool(strpos(do_svn_command("info " . $svnpath . $testdef_path), '(Not a valid URL)'))) {
     return $testdef_path;
   }
+  return "";
 }
 
 
@@ -75,12 +83,12 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
   // Replace its contents with the output of the test, as identified by its validation type and its case and step IDs.
   // Store the path to the file's directory in a global array so we can batch our commits.
 
-  global $db, $svnpath, $folders_to_commit;
+  global $db, $svnpaths, $folders_to_commit;
   // Get the TestDef filename
   $testdef_filename = fetch_result($db, "SELECT filename FROM test_files WHERE id = " . mysqli_real_escape_string($db, $test_file_id) . ";", true);
   if($testdef_filename == null) {
     echo "Invalid testfile id.";
-    exit;
+    return;
   } else {
    $testdef_filename = $testdef_filename['filename'];
   }
@@ -89,7 +97,7 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
   $test_case_name = fetch_result($db, "SELECT case_name FROM test_cases WHERE id = " .  mysqli_real_escape_string($db, $test_case_id) . ";", true);
   if($test_case_name == null) {
     echo "Invalid testcase id.";
-    exit;
+    return;
   } else {
     $test_case_name = $test_case_name['case_name'];
   }
@@ -98,14 +106,29 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
   $test_step_name = fetch_result($db, "SELECT step_name FROM test_steps WHERE id = " .  mysqli_real_escape_string($db, $test_step_id) . ";", true);
   if($test_step_name == null) {
     echo "Invalid teststep id.";
-    exit;
+    return;
   } else {
   $test_step_name = $test_step_name['step_name'];
   }
 
-
-  $testdef_filename = get_testdef_path($testdef_filename);
-  $testdef_path = $svnpath . $testdef_filename;
+  
+  $active_svn_path = "";
+  for($i = 0; $i < count($svnpaths); ++$i) {
+    $testdef_filename_temp = get_testdef_path($svnpaths[$i], $testdef_filename);
+    if($testdef_filename_temp != "") {
+      $testdef_filename = $testdef_filename_temp;
+      $testdef_path = $svnpaths[$i] . $testdef_filename;
+      $active_svn_path = $svnpaths[$i];
+      break;
+    }
+  }
+  if($active_svn_path == "") {
+    echo "Unable to find matching testdef in any of the paths in \$svn_paths!";
+    return;
+  } else {
+    echo "active svn path is " . $active_svn_path;
+  }
+  
 
   // Make sure we have a checkout of the testdef directory
   do_svn_command("checkout " . dirname($testdef_path) . " temp/" . dirname($testdef_filename));
@@ -127,7 +150,7 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
   }
 
   // Do an svn_checkout of the baseline folder, just in case it was not included in the checkout of the testdef folder
-  //do_svn_command("checkout " . $svnpath . $baseline_path . " temp/" . $baseline_path);
+  //do_svn_command("checkout " . $active_svn_path . $baseline_path . " temp/" . $baseline_path);
 
 
   // Replace its contents with the output of the test, as identified by its validation type and its case and step IDs.
@@ -137,7 +160,7 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
     $output_image = fetch_result($db, "SELECT output_image FROM rendering_results WHERE test_run_id = " . mysqli_real_escape_string($db, $test_run_id) . " AND case_id = " . mysqli_real_escape_string($db, $test_case_id) . " AND step_id = " . mysqli_real_escape_string($db, $test_step_id) . ";", true);
     if($output_image == null) {
       echo "Unable to find output image for the specified test run/case/step.";
-      exit;
+      return;
     } else {
       $output_image = $output_image['output_image'];
     }
@@ -154,7 +177,7 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
     $output_console = fetch_result($db, "SELECT output FROM console_results WHERE test_run_id = " . mysqli_real_escape_string($db, $test_run_id) . " AND case_id = " . mysqli_real_escape_string($db, $test_case_id) . " AND step_id = " . mysqli_real_escape_string($db, $test_step_id) . ";", true);
     if($output_console == null) {
       echo "Unable to find console output for the specified test run/case/step.";
-      exit;
+      return;
     } else {
       $output_console = $output_console['output'];
     }
@@ -171,7 +194,7 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
     $output_custom = fetch_result($db, "SELECT output FROM custom_results WHERE test_run_id = " . mysqli_real_escape_string($db, $test_run_id) . " AND case_id = " . mysqli_real_escape_string($db, $test_case_id) . " AND step_id = " . mysqli_real_escape_string($db, $test_step_id) . ";", true);
     if($output_custom == null) {
       echo "Unable to find custom output for the specified test run/case/step.";
-      exit;
+      return;
     } else {
       $output_custom = $output_custom['output'];
     }
