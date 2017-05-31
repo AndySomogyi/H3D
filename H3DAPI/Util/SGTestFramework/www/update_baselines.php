@@ -113,12 +113,14 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
 
   
   $active_svn_path = "";
+  $active_svn_top_folder_name = "";
   for($i = 0; $i < count($svnpaths); ++$i) {
     $testdef_filename_temp = get_testdef_path($svnpaths[$i], $testdef_filename);
     if($testdef_filename_temp != "") {
       $testdef_filename = $testdef_filename_temp;
       $testdef_path = $svnpaths[$i] . $testdef_filename;
       $active_svn_path = $svnpaths[$i];
+      $active_svn_top_folder_name = substr($active_svn_path, strrpos($active_svn_path, "/", (strrpos($active_svn_path, "/")) - strlen($active_svn_path) - 1)+1);
       break;
     }
   }
@@ -129,12 +131,12 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
   
 
   // Make sure we have a checkout of the testdef directory
-  do_svn_command("checkout " . dirname($testdef_path) . " temp/" . dirname($testdef_filename));
+  do_svn_command("checkout " . dirname($testdef_path) . " temp/" . $active_svn_top_folder_name . dirname($testdef_filename));
 
   // Open the testdef file (which is a form of ini file)
   $previous_error_flags = error_reporting();
   error_reporting($previous_error_flags & ~E_DEPRECATED);
-  $testdef = parse_ini_file("temp/" . $testdef_filename, true);
+  $testdef = parse_ini_file("temp/" . $active_svn_top_folder_name . $testdef_filename, true);
   error_reporting($previous_error_flags);
   $baseline_folder = str_replace("\\", "/", $testdef[$test_case_name]['baseline folder']);
   $baseline_path = dirname($testdef_filename) . "/" . $baseline_folder . "/";
@@ -148,7 +150,7 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
   }
 
   // Do an svn_checkout of the baseline folder, just in case it was not included in the checkout of the testdef folder
-  //do_svn_command("checkout " . $active_svn_path . $baseline_path . " temp/" . $baseline_path);
+  //do_svn_command("checkout " . $active_svn_path . $baseline_path . " temp/" . $active_svn_top_folder_name . $baseline_path);
 
 
   // Replace its contents with the output of the test, as identified by its validation type and its case and step IDs.
@@ -162,12 +164,12 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
     } else {
       $output_image = $output_image['output_image'];
     }
-    file_put_contents("temp/" . $baseline_file, $output_image);
+    file_put_contents("temp/" . $active_svn_top_folder_name . $baseline_file, $output_image);
     // Now queue up the commit
-    if(!array_key_exists($baseline_path, $folders_to_commit)) {
-      $folders_to_commit[$baseline_path] = 1;
+    if(!array_key_exists($active_svn_top_folder_name . $baseline_path, $folders_to_commit)) {
+      $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = 1;
     } else {
-      $folders_to_commit[$baseline_path] = $folders_to_commit[$baseline_path] + 1;
+      $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = $folders_to_commit[$baseline_path] + 1;
     }
     
   } else if($test_validation_type == "console") {
@@ -179,12 +181,12 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
     } else {
       $output_console = $output_console['output'];
     }
-    file_put_contents("temp/" . $baseline_file, $output_console);
+    file_put_contents("temp/" . $active_svn_top_folder_name . $baseline_file, $output_console);
     // Now queue up the commit
-    if(!array_key_exists($baseline_path, $folders_to_commit)) {
-      $folders_to_commit[$baseline_path] = 1;
+    if(!array_key_exists($active_svn_top_folder_name . $baseline_path, $folders_to_commit)) {
+      $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = 1;
     } else {
-      $folders_to_commit[$baseline_path] = $folders_to_commit[$baseline_path] + 1;
+      $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = $folders_to_commit[$baseline_path] + 1;
     }
     
   } else if($test_validation_type == "custom") {
@@ -196,12 +198,12 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
     } else {
       $output_custom = $output_custom['output'];
     }
-    file_put_contents("temp/" . $baseline_file, $output_custom);
+    file_put_contents("temp/" . $active_svn_top_folder_name . $baseline_file, $output_custom);
     // Now queue up the commit
-    if(!array_key_exists($baseline_path, $folders_to_commit)) {
-      $folders_to_commit[$baseline_path] = 1;
+    if(!array_key_exists($active_svn_top_folder_name . $baseline_path, $folders_to_commit)) {
+      $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = 1;
     } else {
-      $folders_to_commit[$baseline_path] = $folders_to_commit[$baseline_path] + 1;
+      $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = $folders_to_commit[$baseline_path] + 1;
     }
   }
 
@@ -212,7 +214,7 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
 // Now to actually do everything!
 
 // Doing an svn revert jut to be extra sure that our working copy is clean
-echo do_svn_command('revert -R temp/*');
+do_svn_command('revert -R temp/');
 
 // Read the submitted cases.
 $cases_to_update = json_decode($_POST['data'], true)['cases'];
