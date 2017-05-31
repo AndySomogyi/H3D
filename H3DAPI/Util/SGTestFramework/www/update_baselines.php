@@ -125,8 +125,6 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
   if($active_svn_path == "") {
     echo "Unable to find matching testdef in any of the paths in \$svn_paths!";
     return;
-  } else {
-    echo "active svn path is " . $active_svn_path;
   }
   
 
