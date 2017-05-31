@@ -535,13 +535,6 @@ function generateConsole(div) {
       succeeded.append("Step failed - No output!");
     else {
       succeeded.append("Step failed - Invalid output!");
-      // Add baseline update checkbox here
-      var cb = $('<input>Include in baseline update</input>');
-      cb.attr('type', 'checkbox');
-      cb.addClass('baselineUpdateCheckbox');
-      cb.data('model', testcase);
-      container.append("<br />");
-      container.append(cb);
     }
   } else {
     succeeded.addClass('test_successful');
@@ -561,13 +554,6 @@ function generateConsole(div) {
       baseline.append("<b>Baseline:</b></br></br>");
       baseline.append(testcase.text_baseline.split('\n').join('</br>'));
       container.append(baseline);
-      // Add baseline update checkbox here
-      var cb = $('<input>Include in baseline update</input>');
-      cb.attr('type', 'checkbox');
-      cb.addClass('baselineUpdateCheckbox');
-      cb.data('model', testcase);
-      container.append("<br />");
-      container.append(cb);
     }
     if(testcase.hasOwnProperty("text_diff")) {
     var diff = $('<div>');
@@ -576,6 +562,17 @@ function generateConsole(div) {
       diff.append(testcase.text_diff.split('\n').join('</br>'));
       container.append(diff);
     }
+    
+    if(testcase.hasOwnProperty("text_baseline") && testcase.hasOwnProperty("text_diff")) {
+      // Add baseline update checkbox here
+      var cb = $('<input>Include in baseline update</input>');
+      cb.attr('type', 'checkbox');
+      cb.addClass('baselineUpdateCheckbox');
+      cb.data('model', testcase);
+      container.append("<br />");
+      container.append(cb);    
+    }
+    
   } else {
     $('.TestStep_name', div).addClass('minimized');
   }
