@@ -164,7 +164,7 @@ void HaptikDevice::SelectDevice::update() {
   // find out which index the selected device has.
   if( hd->hapi_device.get() ) {
     value = static_cast< HAPI::HaptikHapticsDevice * >( hd->hapi_device.get() )
-      ->getHaptikIndex();;
+      ->getHaptikIndex();
   } else {
     value = -1;
   }
