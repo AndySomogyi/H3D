@@ -64,7 +64,7 @@ namespace H3D {
         rt_value_changed = true;
       } else {
         assert( H3DUtil::ThreadBase::inMainThread() );
-        PeriodicUpdate< BaseField >::setValue( v, id );;
+        PeriodicUpdate< BaseField >::setValue( v, id );
         void * param[] = { &this->value, &rt_value };
         H3DUtil::HapticThread::synchronousHapticCB( transferValue, param );
       }
@@ -112,7 +112,7 @@ namespace H3D {
     /// rt_value member in a thread safe way.
     inline virtual void update() {
       assert( H3DUtil::ThreadBase::inMainThread() );
-      PeriodicUpdate< BaseField >::update();;
+      PeriodicUpdate< BaseField >::update();
       void * param[] = { &this->value, &rt_value };
       H3DUtil::HapticThread::synchronousHapticCB( transferValue, param );
     }
@@ -483,7 +483,7 @@ namespace H3D {
     /// rt_value member in a thread safe way.
     inline virtual void update() {
       assert(  H3DUtil::ThreadBase::inMainThread() );
-      PeriodicUpdate< BaseField >::update();;
+      PeriodicUpdate< BaseField >::update();
       void * param[] = { &this->value, &rt_value };
        H3DUtil::HapticThread::synchronousHapticCB( transferValue, param );
     }

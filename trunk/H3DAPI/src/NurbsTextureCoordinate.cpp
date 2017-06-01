@@ -39,7 +39,7 @@ H3DNodeDatabase NurbsTextureCoordinate::database(
                                    &X3DGeometricPropertyNode::database );
 
 namespace NurbsTextureCoordinateInternals {
-  FIELDDB_ELEMENT( NurbsTextureCoordinate, controlPoint, INPUT_OUTPUT );;
+  FIELDDB_ELEMENT( NurbsTextureCoordinate, controlPoint, INPUT_OUTPUT );
   FIELDDB_ELEMENT( NurbsTextureCoordinate, weight, INPUT_OUTPUT );
   FIELDDB_ELEMENT( NurbsTextureCoordinate, uDimension, INPUT_OUTPUT );
   FIELDDB_ELEMENT( NurbsTextureCoordinate, vDimension, INPUT_OUTPUT );

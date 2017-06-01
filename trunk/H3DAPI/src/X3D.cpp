@@ -499,7 +499,7 @@ void X3D::writeNodeAsX3DHelp( ostream& os,
     }
   } else if( output_type == VRML_OUTPUT ) {
     if( !use_node ) {
-      os << prefix << "DEF " << name << " " << node_name << " {" << endl;;
+      os << prefix << "DEF " << name << " " << node_name << " {" << endl;
       visited_nodes.insert( node );
     } else {
       os << prefix << "USE " << name << endl;
