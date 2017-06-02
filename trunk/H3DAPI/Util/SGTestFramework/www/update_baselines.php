@@ -229,7 +229,7 @@ for($i = 0; $i < count($cases_to_update); ++$i) {
 
 $folder_keys = array_keys($folders_to_commit);
 foreach($folder_keys as $folder) {
-  do_svn_command("commit temp/" . $folder . ' -m "Updating ' . $folders_to_commit[$folder] . ' baseline(s) from web UI"');
+  do_svn_command("commit temp/" . $folder . ' -m "User ' . $_SERVER['PHP_AUTH_USER'] . ' updating ' . $folders_to_commit[$folder] . ' baseline(s) from web UI"');
   echo "Committed " . $folders_to_commit[$folder] . " file(s) to " . $folder . "</br>";
 }
 ?>
