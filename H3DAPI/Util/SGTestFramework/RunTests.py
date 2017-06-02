@@ -731,11 +731,9 @@ class TestCaseRunner ( object ):
             curs.execute("SELECT new_failure FROM error_results WHERE test_run_id=%d and file_id=%d and case_id=%d and step_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (prev_testrun, testfile_id, testcase_id, teststep_id))
             res = curs.fetchone()
             if res == None:
-              print("setting newfailure to N")
               new_failure = 'N'
             else:
               new_failure = 'Y'
-              print("setting newfailure to Y")
           # If no previous run for this server then set new_failure to Y
           else:
             new_failure = 'Y'
