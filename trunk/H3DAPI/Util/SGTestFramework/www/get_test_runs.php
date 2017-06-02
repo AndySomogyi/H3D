@@ -27,13 +27,26 @@ function generate_results($db, $query){
   while($row = mysqli_fetch_assoc($fetch_result)) {
     $success = false;  
     if($test_run_result = mysqli_query($db, sprintf("
-      SELECT (SELECT success FROM rendering_results WHERE rendering_results.test_run_id=%d AND success='N'  LIMIT 1) IS NULL AS rendering_success,
-      (SELECT success FROM custom_results WHERE custom_results.test_run_id=%d AND success='N' LIMIT 1) IS NULL AS  custom_success,
-      (SELECT success FROM console_results WHERE console_results.test_run_id=%d AND success='N' LIMIT 1) IS NULL AS console_success,
-      (SELECT COUNT(error_results.id) FROM error_results WHERE error_results.test_run_id=%d LIMIT 1)=0 AS exec_success"
+      SELECT (SELECT success FROM rendering_results WHERE rendering_results.test_run_id=%d AND success='N' LIMIT 1) IS NULL AS rendering_success,
+             (SELECT success FROM custom_results WHERE custom_results.test_run_id=%d AND success='N' LIMIT 1) IS NULL AS  custom_success,
+             (SELECT success FROM console_results WHERE console_results.test_run_id=%d AND success='N' LIMIT 1) IS NULL AS console_success,
+             (SELECT COUNT(error_results.id) FROM error_results WHERE error_results.test_run_id=%d LIMIT 1)=0 AS exec_success"
       , $row['id'], $row['id'], $row['id'], $row['id']))) {
       if($test_run_row = mysqli_fetch_assoc($test_run_result)) {
         $success = $test_run_row['rendering_success'] && $test_run_row['custom_success'] && $test_run_row['console_success'] && $test_run_row['exec_success'];
+        
+        $new_failure = true;
+        if(!$success) {
+          $new_failure_result = mysqli_query($db, sprintf("
+          SELECT (SELECT new_failure FROM rendering_results WHERE rendering_results.test_run_id=%d AND success='N' AND new_failure='Y' LIMIT 1) IS NOT NULL AS rendering_fail_new,
+                 (SELECT new_failure FROM custom_results WHERE custom_results.test_run_id=%d AND success='N' AND new_failure='Y' LIMIT 1) IS NOT NULL AS  custom_fail_new,
+                 (SELECT new_failure FROM console_results WHERE console_results.test_run_id=%d AND success='N' AND new_failure='Y' LIMIT 1) IS NOT NULL AS console_fail_new,
+                   (SELECT COUNT(error_results.id) FROM error_results WHERE error_results.test_run_id=%d AND new_failure='Y')>0 AS exec_fail_new
+            ", $row['id'], $row['id'],$row['id'], $row['id']));
+            if($new_fail_row = mysqli_fetch_assoc($new_failure_result)) {
+              $new_failure = $new_fail_row['rendering_fail_new'] || $new_fail_row['custom_fail_new'] || $new_fail_row['console_fail_new'] || $new_fail_row['exec_fail_new'];
+          }
+        }
       }
     }
   
@@ -41,7 +54,8 @@ function generate_results($db, $query){
       "id" => $row['id'],
       "timestamp" => $row['timestamp'],
       "has_results" => $row['result_count'] > 0,
-      "success" => $success
+      "success" => $success,
+      "new_failure" => $new_failure
     );
     array_push($data, $server);
   }

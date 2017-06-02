@@ -722,31 +722,67 @@ class TestCaseRunner ( object ):
 
       for result in step.results:
         if type(result).__name__ == 'ErrorResult':
-          curs.execute("INSERT INTO error_results (test_run_id, file_id, case_id, step_id, stdout, stderr) VALUES (%d, %d, %d, %d, '%s', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(result.stdout), self.db.escape_string(result.stderr)))
-
+          new_failure = 'Y'
+          # Get the latest test run for this server to see if that error was gotten then. By not checking for the latest test run that contained the current test case we get a sort of quirk where if a test case previously had errors and then didn't get run and then gets run again it will display the error as new.
+          curs.execute("SELECT test_run_id FROM test_runs WHERE test_run_id<%d and server_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (self.test_run_id, self.server_id))
+          res = curs.fetchone()
+          if res != None:
+            prev_testrun = res[0]
+            curs.execute("SELECT new_failure FROM error_results WHERE test_run_id=%d and file_id=%d and case_id=%d and step_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (prev_testrun, testfile_id, testcase_id, teststep_id))
+            res = curs.fetchone()
+            if res == None:
+              print("setting newfailure to N")
+              new_failure = 'N'
+            else:
+              new_failure = 'Y'
+              print("setting newfailure to Y")
+          # If no previous run for this server then set new_failure to Y
+          else:
+            new_failure = 'Y'
+          curs.execute("INSERT INTO error_results (test_run_id, file_id, case_id, step_id, stdout, stderr, new_failure) VALUES (%d, %d, %d, %d, '%s', '%s', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(result.stdout), self.db.escape_string(result.stderr), new_failure))
         elif type(result).__name__ == 'ConsoleResult':
           output_string = ''
           for line in result.output:
             output_string += line
           if result.success:
-            curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output) VALUES (%d, %d, %d, %d, 'Y', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string)))
+            curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, new_failure) VALUES (%d, %d, %d, %d, 'Y', '%s'm 'N')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string)))
           else:
+            # Try to fetch the previous test run to see if the failure is new
+            curs.execute("SELECT success FROM console_results WHERE test_run_id<%d and file_id=%d and case_id=%d and step_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (self.test_run_id, testfile_id, testcase_id, teststep_id))
+            res = curs.fetchone()
+            if res == None:
+              new_failure = 'Y'
+            else:
+              if res[0] == 'Y' : # If the success value is true then the previous run succeeded so this failure is new
+                new_failure = 'Y'
+              else:
+                new_failure = 'N'
             # Go read the baseline file so we can add that to the output
             if os.path.exists(result.baseline_path):
               f = open(result.baseline_path)
               baseline_string = f.read()
               f.close()
-              curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff) VALUES (%d, %d, %d, %d, 'N', '%s', '%s', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string), self.db.escape_string(baseline_string), self.db.escape_string(result.diff)))
+              curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff, new_failure) VALUES (%d, %d, %d, %d, 'N', '%s', '%s', '%s', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string), self.db.escape_string(baseline_string), self.db.escape_string(result.diff)), new_failure)
             else:
-              curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff) VALUES (%d, %d, %d, %d, 'N', '%s', NULL, NULL)" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string)))
+              curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff, new_failure) VALUES (%d, %d, %d, %d, 'N', '%s', NULL, NULL, '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string), new_failure))
             
         elif type(result).__name__ == 'CustomResult':
           output_string = ''
           for line in result.output:
             output_string += line
           if result.success:
-            curs.execute("INSERT INTO custom_results (test_run_id, file_id, case_id, step_id, success, output) VALUES (%d, %d, %d, %d, 'Y', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string)))
+            curs.execute("INSERT INTO custom_results (test_run_id, file_id, case_id, step_id, success, output, new_failure) VALUES (%d, %d, %d, %d, 'Y', '%s', 'N')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string)))
           else:
+            # Try to fetch the previous test run to see if the failure is new
+            curs.execute("SELECT success FROM custom_results WHERE test_run_id<%d and file_id=%d and case_id=%d and step_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (self.test_run_id, testfile_id, testcase_id, teststep_id))
+            res = curs.fetchone()
+            if res == None:
+              new_failure = 'Y'
+            else:
+              if res[0] == 'Y' : # If the success value  is true then the previous run succeeded so this failure is new
+                new_failure = 'Y'
+              else:
+                new_failure = 'N'          
             # Go read the baseline file so we can add that to the output
             if os.path.exists(result.baseline_path):
               f = open(result.baseline_path)
@@ -754,7 +790,7 @@ class TestCaseRunner ( object ):
               f.close()
             else:
               baseline_string = 'Baseline not found'
-            curs.execute("INSERT INTO custom_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff) VALUES (%d, %d, %d, %d, 'N', '%s', '%s', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string), self.db.escape_string(baseline_string), self.db.escape_string(result.diff)))
+            curs.execute("INSERT INTO custom_results (test_run_id, file_id, case_id, step_id, success, output, baseline, diff, new_failure) VALUES (%d, %d, %d, %d, 'N', '%s', '%s', '%s', '%s')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string), self.db.escape_string(baseline_string), self.db.escape_string(result.diff), new_failure))
 
         elif type(result).__name__ == 'PerformanceResult':
           # Insert the performance results, but only if all the tests in this step succeeded!
@@ -767,6 +803,7 @@ class TestCaseRunner ( object ):
 
         elif type(result).__name__ == 'RenderingResult':
             step_name = step.step_name
+            
             # Fetch the current baseline so we can compare it to the one in the database
             if os.path.exists(result.baseline_path):
               baseline_file = open(result.baseline_path, 'rb')
@@ -782,6 +819,17 @@ class TestCaseRunner ( object ):
               print("Unable to find baseline at " + result.baseline_path + ", can't upload.")
               
             if not result.success: #validation failed, if possible we should upload both the rendering and the diff
+              # Try to fetch the previous test run to see if the failure is new
+              curs.execute("SELECT success FROM rendering_results WHERE test_run_id<%d and file_id=%d and case_id=%d and step_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (self.test_run_id, testfile_id, testcase_id, teststep_id))
+              res = curs.fetchone()
+              if res == None:
+                new_failure = 'Y'
+              else:
+                if res[0] == 'Y' : # If the success value  is true then the previous run succeeded so this failure is new
+                  new_failure = 'Y'
+                else:
+                  new_failure = 'N'  
+                            
               if result.diff_path != '':
                 diff_file = open(result.diff_path, 'rb')
                 diff_image = diff_file.read()
@@ -794,9 +842,9 @@ class TestCaseRunner ( object ):
                 output_file.close()
               else:
                 output_image = 'NULL'
-              curs.execute("INSERT INTO rendering_results (test_run_id, file_id, case_id, step_id, success, output_image, diff_image) VALUES (%d, %d, %d, %d" % (self.test_run_id, testfile_id, testcase_id, teststep_id) + ", 'N', %s, %s)", [output_image, diff_image]);
+              curs.execute("INSERT INTO rendering_results (test_run_id, file_id, case_id, step_id, new_failure, success, output_image, diff_image) VALUES (%d, %d, %d, %d, '%s'" % (self.test_run_id, testfile_id, testcase_id, teststep_id, new_failure) + ", 'N', %s, %s)", [output_image, diff_image]);
             else:
-              curs.execute("INSERT INTO rendering_results (test_run_id, file_id, case_id, step_id, success) VALUES (%d, %d, %d, %d, 'Y')" % (self.test_run_id, testfile_id, testcase_id, teststep_id));
+              curs.execute("INSERT INTO rendering_results (test_run_id, file_id, case_id, step_id, success, new_failure) VALUES (%d, %d, %d, %d, 'Y', 'N')" % (self.test_run_id, testfile_id, testcase_id, teststep_id));
 
     curs.close()
     self.db.commit()

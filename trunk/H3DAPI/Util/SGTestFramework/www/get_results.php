@@ -28,7 +28,7 @@ $perf_query = sprintf("
 $render_query = sprintf("
 (SELECT rendering_results.id AS id,test_runs.timestamp,server_id,server_name,rendering_results.test_run_id,
         rendering_results.file_id,filename,rendering_results.case_id,'rendering' AS result_type,case_name,
-        rendering_results.step_id,step_name,success,test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description,
+        rendering_results.step_id,step_name,success,new_failure,test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description,
         (SELECT id FROM rendering_baselines
           WHERE rendering_results.file_id = rendering_baselines.file_id
             AND rendering_results.case_id = rendering_baselines.case_id
@@ -53,7 +53,7 @@ $render_query = sprintf("
 $console_query = sprintf("
 (SELECT console_results.id AS id,test_runs.timestamp,server_id,server_name,console_results.test_run_id,
         console_results.file_id,
-        filename,console_results.case_id,'console' AS result_type,case_name,console_results.step_id,step_name,success,
+        filename,console_results.case_id,'console' AS result_type,case_name,console_results.step_id,step_name,success,new_failure,
         output AS text_output,baseline AS text_baseline, diff AS text_diff, test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description
  FROM   test_runs
         left join console_results
@@ -73,7 +73,7 @@ $console_query = sprintf("
 $custom_query = sprintf("
 (SELECT custom_results.id AS id,test_runs.timestamp,server_id,server_name,custom_results.test_run_id,
         custom_results.file_id,
-        filename,custom_results.case_id,'custom' AS result_type,case_name,custom_results.step_id,step_name,success,
+        filename,custom_results.case_id,'custom' AS result_type,case_name,custom_results.step_id,step_name,success,new_failure,
         output AS text_output,baseline AS text_baseline, diff AS text_diff, test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description
  FROM   test_runs
         left join custom_results
@@ -93,7 +93,7 @@ $custom_query = sprintf("
  
 $error_query = sprintf("
 (SELECT error_results.id AS id,test_runs.timestamp,server_id,server_name,error_results.test_run_id,
-        error_results.file_id,
+        error_results.file_id,new_failure,
         filename,error_results.case_id,'error' AS result_type,case_name,error_results.step_id,step_name, stdout, stderr, test_cases.svn_url_x3d, test_cases.svn_url_script, test_files.description
  FROM   test_runs
         left join error_results
@@ -298,6 +298,7 @@ function generate_results($db, $data, $fetched_data) {
       "svn_url_x3d" => $row['svn_url_x3d'],
       "svn_url_script" => $row['svn_url_script'],
       "success" => 'Y',
+      "new_failure" => 'N'
       );
     $testcase["step_name"] = $row['step_name'];
     
@@ -306,6 +307,7 @@ function generate_results($db, $data, $fetched_data) {
         $node['success'] = false;
       }
       $testcase["success"] = $row['success'];
+      $testcase["new_failure"] = $row['new_failure'];
       $testcase["baseline_id"] = $row['baseline_id'];
     }
     else if($row['result_type'] == "performance") {
@@ -426,6 +428,7 @@ function generate_results($db, $data, $fetched_data) {
         $node['success'] = false;
       }
       $testcase["success"] = $row['success'];
+      $testcase["new_failure"] = $row['new_failure'];
       $testcase["text_output"] = $row["text_output"];
       $testcase["text_baseline"] = $row["text_baseline"];
       $testcase["text_diff"] = $row["text_diff"];
@@ -434,6 +437,7 @@ function generate_results($db, $data, $fetched_data) {
         $node['success'] = false;
       }
       $testcase["success"] = $row['success'];
+      $testcase["new_failure"] = $row['new_failure'];
       $testcase["text_output"] = $row["text_output"];
       $testcase["text_baseline"] = $row["text_baseline"];
       $testcase["text_diff"] = $row["text_diff"];
@@ -442,6 +446,7 @@ function generate_results($db, $data, $fetched_data) {
       $testcase["success"] = 'N';
       $testcase["stdout"] = $row['stdout'];
       $testcase["stderr"] = $row['stderr'];
+      $testcase["new_failure"] = $row['new_failure'];
     } 
 //     All that remains now is to push the testcase to the node's testcases array
     $target = 0;

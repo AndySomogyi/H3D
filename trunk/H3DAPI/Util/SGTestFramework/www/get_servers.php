@@ -31,13 +31,26 @@ function generate_results($db, $query){
           if($test_run_row = mysqli_fetch_assoc($test_run_result)) {
             $success = $test_run_row['rendering_success'] && $test_run_row['custom_success'] && $test_run_row['console_success'] && $test_run_row['exec_success'];
           }
+          $new_failure = true;
+          if(!$success) {
+            $new_failure_result = mysqli_query($db, sprintf("
+            SELECT (SELECT new_failure FROM rendering_results WHERE rendering_results.test_run_id=%d AND success='N' AND new_failure='Y' LIMIT 1) IS NOT NULL AS rendering_fail_new,
+                   (SELECT new_failure FROM custom_results WHERE custom_results.test_run_id=%d AND success='N' AND new_failure='Y' LIMIT 1) IS NOT NULL AS  custom_fail_new,
+                   (SELECT new_failure FROM console_results WHERE console_results.test_run_id=%d AND success='N' AND new_failure='Y' LIMIT 1) IS NOT NULL AS console_fail_new,
+                   (SELECT COUNT(error_results.id) FROM error_results WHERE error_results.test_run_id=%d AND new_failure='Y' LIMIT 1)>0 AS exec_fail_new
+            ", $latest_test_run, $latest_test_run, $latest_test_run, $latest_test_run));
+            if($new_fail_row = mysqli_fetch_assoc($new_failure_result)) {
+              $new_failure = $new_fail_row['rendering_fail_new'] || $new_fail_row['custom_fail_new'] || $new_fail_row['console_fail_new'] || $new_fail_row['exec_fail_new'];
+            }
+          }          
         }
       }	      
     }
     $server = array(
       "id" => $row['id'],
       "name" => $row['server_name'],
-      "success" => $success
+      "success" => $success,
+      "new_failure" => $new_failure
     );
 
     

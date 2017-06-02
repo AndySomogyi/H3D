@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `console_results` (
   `output` text NOT NULL,
   `baseline` text,
   `diff` text,
+  `new_failure` enum('Y','N'),
   PRIMARY KEY (`id`),
   KEY `test_run_id_success` (`test_run_id`,`success`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `custom_results` (
   `output` mediumtext,
   `baseline` text,
   `diff` text,
+  `new_failure` enum('Y','N'),
   PRIMARY KEY (`id`),
   KEY `test_run_id_success` (`test_run_id`,`success`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
@@ -51,6 +53,7 @@ CREATE TABLE IF NOT EXISTS `error_results` (
   `step_id` int(10) unsigned NOT NULL,
   `stdout` text,
   `stderr` text,
+  `new_failure` enum('Y','N'),
   PRIMARY KEY (`id`),
   KEY `test_run_id` (`test_run_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -104,6 +107,7 @@ CREATE TABLE IF NOT EXISTS `rendering_results` (
   `success` enum('Y','N') NOT NULL,
   `output_image` mediumblob,
   `diff_image` mediumblob,
+  `new_failure` enum('Y','N'),
   PRIMARY KEY (`id`),
   KEY `test_run_id_success` (`test_run_id`,`success`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;

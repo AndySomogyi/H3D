@@ -475,6 +475,9 @@ function generateImages(div) {
   } else { // Didn't succeed
     var succeeded = $("<span>");
     succeeded.addClass('test_failed');
+    if(testcase.new_failure == 'Y') {
+      succeeded.addClass('test_failed_new');
+    }
     div.append(succeeded);
     
 /*    if (testcase.diff_image == "") {
@@ -529,6 +532,9 @@ function generateConsole(div) {
   
   if(testcase.success == "N"){
     succeeded.addClass('test_failed');
+    if(testcase.new_failure == 'Y') {
+      succeeded.addClass('test_failed_new');
+    }
     if(!testcase.hasOwnProperty("text_baseline"))
       succeeded.append("Step failed - No baseline!");
     else if(!testcase.hasOwnProperty("text_output"))
@@ -547,7 +553,10 @@ function generateConsole(div) {
   output.append("<b style='text-transform:capitalize;'>" + testcase.result_type + ":</b></br></br>");
   output.append(testcase.text_output.split('\n').join('</br>'));
   container.append(output);
-  if(testcase.success == "N") {  
+  if(testcase.success == "N") { 
+    if(testcase.new_failure == 'Y') {
+      succeeded.addClass('test_failed_new');
+    } 
     if(testcase.hasOwnProperty("text_baseline")) {
       var baseline = $('<div>');
       baseline.addClass('stdout_div');
@@ -591,6 +600,10 @@ function generateError(div) {
   std.append("</br></br><b>stderr:</b></br></br>");
   std.append(testcase.stderr.split('\n').join('</br>'));
   container.append(std);
+  
+  if(testcase.new_failure == 'Y') {
+    container.addClass('test_failed_new');
+  } 
   
   div.append(container);
 }
@@ -650,6 +663,9 @@ function ConstructTestCases(model, target, path) {
           case_name.addClass("test_successful");
         } else {
           case_name.addClass("test_failed");
+          if(model.testcases[i].new_failure == 'Y') {
+            case_name.addClass('test_failed_new');
+          }
         }
         
         case_div.append(case_name);
@@ -675,6 +691,9 @@ function ConstructTestCases(model, target, path) {
       if(model.testcases[i].success != 'Y') {
         case_name.removeClass("test_successful");
         case_name.addClass("test_failed");
+        if(model.testcases[i].new_failure == 'Y') {
+          case_name.addClass('test_failed_new');
+        }
       }
       
       // This is specifically for suppressing the green label
@@ -698,6 +717,9 @@ function ConstructTestCases(model, target, path) {
       if(model.testcases[i].result_type == 'error') {
         name_div.append("Testcase failed");
         name_div.addClass("test_failed");
+        if(model.testcases[i].new_failure == 'Y') {
+          name_div.addClass('test_failed_new');
+        }
       } else {
         name_div.append("Step: " + model.testcases[i].step_name);
       }
@@ -770,8 +792,12 @@ function ConstructList(model, target, path) {
 		    ul.append(description_container);
         }
         ConstructList(model[i].children, ul, path + model[i].name + "/");
-        if($('.test_failed', ul).length > 0)
-          name.addClass('test_failed');                
+        if($('.test_failed', ul).length > 0) {
+          name.addClass('test_failed');
+          if($('.test_failed_new', ul).length > 0) {
+            name.addClass("test_failed_new");
+          }
+        }         
         else
           name.addClass('test_successful');
       }
@@ -781,8 +807,12 @@ function ConstructList(model, target, path) {
         else
           name.addClass('test_failed');
         ConstructTestCases(model[i], ul, path + model[i].name + "/");
-        if($('.test_failed', ul).length > 0)
-          name.addClass('test_failed');                
+        if($('.test_failed', ul).length > 0) {
+          name.addClass('test_failed');
+          if($('.test_failed_new', ul).length > 0) {
+            name.addClass("test_failed_new");
+          }
+        }            
         else
           name.addClass('test_successful');        
         
@@ -817,6 +847,9 @@ function GetServerList() {
           div.addClass("noselect");
           if(!res[i].success) {
             div.addClass('test_failed');
+            if(res[i].new_failure) {
+              div.addClass('test_failed_new');
+            }
           }
           div.append(res[i].name);
           div.data("server_id", res[i].id);
@@ -882,6 +915,9 @@ function GetTestRunList(server_id) {
           div.addClass("noselect");
           if(!res[i].success) {
             div.addClass('test_failed');
+            if(res[i].new_failure) {
+              div.addClass('test_failed_new');
+            }
           }
           div.append(res[i].timestamp);
           div.data("test_run_id", res[i].id);

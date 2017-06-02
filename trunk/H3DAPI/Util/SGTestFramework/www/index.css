@@ -151,14 +151,26 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
 
 
 .test_successful {
-  background-color: hsla(143, 100%, 68%, 1);
+  background-color: hsla(143, 100%, 48%, 1);
   margin-left: 10px;
 }
 
 .test_failed {
-  background-color: hsla(353, 100%, 68%, 1);
+  background-color: hsla(29, 100%, 80%, 1);
   margin-left: 10px;
 }
+
+
+.test_failed .test_failed_new {
+  background-color: hsla(353, 100%, 60%, 1);
+  margin-left: 10px;
+}
+
+.test_failed.test_failed_new:not(.Selected_TestRun):not(.Selected_Server) {
+  background-color: hsla(353, 100%, 60%, 1);
+  margin-left: 10px;
+}
+
 
 
 div#Servers_List {
@@ -306,4 +318,29 @@ border:1px solid black;
 
 table th{
 border:1px solid black;
+}
+
+#Options_Legend {
+  margin-left: 10px;
+}
+
+.legend_allsuccess {
+
+}
+
+.legend_selected {
+  background-color: lightblue;
+}
+
+.legend_successful_case {
+  background-color: hsla(143, 100%, 48%, 1);
+}
+
+.legend_failed_case {
+  background-color: hsla(29, 100%, 80%, 1);
+}
+
+
+.legend_failed_new{
+  background-color: hsla(353, 100%, 60%, 1);
 }
