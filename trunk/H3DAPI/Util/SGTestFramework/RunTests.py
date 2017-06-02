@@ -743,7 +743,7 @@ class TestCaseRunner ( object ):
           for line in result.output:
             output_string += line
           if result.success:
-            curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, new_failure) VALUES (%d, %d, %d, %d, 'Y', '%s'm 'N')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string)))
+            curs.execute("INSERT INTO console_results (test_run_id, file_id, case_id, step_id, success, output, new_failure) VALUES (%d, %d, %d, %d, 'Y', '%s', 'N')" % (self.test_run_id, testfile_id, testcase_id, teststep_id, self.db.escape_string(output_string)))
           else:
             # Try to fetch the previous test run to see if the failure is new
             curs.execute("SELECT success FROM console_results WHERE test_run_id<%d and file_id=%d and case_id=%d and step_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (self.test_run_id, testfile_id, testcase_id, teststep_id))
