@@ -724,7 +724,7 @@ class TestCaseRunner ( object ):
         if type(result).__name__ == 'ErrorResult':
           new_failure = 'Y'
           # Get the latest test run for this server to see if that error was gotten then. By not checking for the latest test run that contained the current test case we get a sort of quirk where if a test case previously had errors and then didn't get run and then gets run again it will display the error as new.
-          curs.execute("SELECT test_run_id FROM test_runs WHERE test_run_id<%d and server_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (self.test_run_id, self.server_id))
+          curs.execute("SELECT id FROM test_runs WHERE id<%d and server_id=%d ORDER BY id DESC LIMIT 1;" % (self.test_run_id, self.server_id))
           res = curs.fetchone()
           if res != None:
             prev_testrun = res[0]
