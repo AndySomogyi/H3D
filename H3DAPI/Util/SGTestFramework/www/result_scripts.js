@@ -715,7 +715,11 @@ function ConstructTestCases(model, target, path) {
       });
         
       if(model.testcases[i].result_type == 'error') {
-        name_div.append("Testcase failed");
+        if(model.testcases[i].step_name == '') {
+          name_div.append("Testcase failed");
+        } else {
+          name_div.append(model.testcases[i].step_name);
+        }
         name_div.addClass("test_failed");
         if(model.testcases[i].new_failure == 'Y') {
           name_div.addClass('test_failed_new');
