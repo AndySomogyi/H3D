@@ -22,6 +22,10 @@ import json
 import datetime
 from collections import namedtuple
 import shlex
+from inspect import getmembers, isfunction
+import operator
+from importlib import import_module
+import ast
 
 import MySQLdb
 
@@ -306,11 +310,28 @@ class TestCaseRunner ( object ):
         except:
           description = ''
       else:
-        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials', 'physics_engine','settings', 'ignore_warnings'])
+        test_case = namedtuple('TestDefinition', ['name', 'filename', 'x3d', 'baseline', 'script', 'runtime', 'starttime', 'resolution', 'processargs', 'maxtrials', 'physics_engine','settings', 'ignore_warnings', 'expected_steps'])
         test_case.name = sect
         test_case.x3d = confParser.get(sect, 'x3d')
         test_case.baseline = confParser.get(sect, 'baseline folder')
         test_case.script = confParser.get(sect, 'script')
+        
+        if test_case.script != "":
+          test_case.expected_steps = []
+          try:
+            # Load the test script
+            testdef_dir = os.path.dirname(file_path)
+            script_path = os.path.join(testdef_dir,  test_case.script)
+            if os.path.exists(script_path):
+              script_file = open(script_path, "rb")
+              tree = ast.parse(script_file.read())
+              script_file.close()
+              for item in tree.body:
+                if isinstance(item, ast.FunctionDef) and 'decorator_list' in item._fields:
+                  test_case.expected_steps.append(item.name)
+          except Exception as e:
+            pass
+        
         try: 
           test_case.runtime = confParser.getfloat(sect, 'timeout')
         except:
@@ -359,7 +380,7 @@ class TestCaseRunner ( object ):
 
         if args.case == "" or args.case == test_case.name:
           result.append(test_case)
-
+    
     return result, description
 
   def processTestDef(self, file, testCase, results, directory):
@@ -520,6 +541,7 @@ class TestCaseRunner ( object ):
         
   #    print os.path.abspath(output_dir + '\\validation.txt')
       result.parseValidationFile(testCase, os.path.abspath(output_dir + '\\validation.txt'), os.path.abspath(os.path.join(directory, testCase.baseline)), os.path.abspath(output_dir + '\\text\\'), testCase.fuzz, testCase.threshold)
+        
       if result.success and all_tests_successful:
         exitcode = 0
       else:
@@ -728,7 +750,7 @@ class TestCaseRunner ( object ):
           res = curs.fetchone()
           if res != None:
             prev_testrun = res[0]
-            curs.execute("SELECT new_failure FROM error_results WHERE test_run_id=%d and file_id=%d and case_id=%d and step_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (prev_testrun, testfile_id, testcase_id, teststep_id))
+            curs.execute("SELECT id FROM error_results WHERE test_run_id=%d and file_id=%d and case_id=%d and step_id=%d ORDER BY test_run_id DESC LIMIT 1;" % (prev_testrun, testfile_id, testcase_id, teststep_id))
             res = curs.fetchone()
             if res == None:
               new_failure = 'Y'

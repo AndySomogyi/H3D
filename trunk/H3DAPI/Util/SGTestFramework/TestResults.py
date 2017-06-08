@@ -201,12 +201,6 @@ class TestResults ( object ):
 
   def parseValidationFile(self, testcase, file_path='validation.txt', baseline_folder='', text_output_folder='', fuzz=0, threshold=0):
     self.step_list = []
-    if (self.errors > 0):
-      self.step_list.append(self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest returned errors", self.std_err)]))
-      self.success = False
-    elif not self.terminates_ok:
-      self.step_list.append(self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest didn't finish successfully (crashed, froze, or was otherwise interrupted.)", self.std_err)]))
-      self.success = False
     if not os.path.exists(file_path):
       self.step_list.append(self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest didn't output validation data, it probably crashed.", self.std_err)]))
       self.success = False
@@ -220,7 +214,7 @@ class TestResults ( object ):
       line = self.getNextLine(f)
       if line == '':
         if step_name != '':
-          self.step_list.append(self.StepResultTuple(step_name, False, [self.ErrorResultTuple("Test never finished executing the step " + step_name, self.std_err)]))
+          self.step_list.append(self.StepResultTuple(step_name, False, [self.ErrorResultTuple("Test never finished executing this step", self.std_err)]))
           self.success = False
         break;
       results = []
@@ -282,3 +276,21 @@ class TestResults ( object ):
       step_name = line
     
     f.close()
+    
+    # Now check which steps, if any, were not run
+    for step in testcase.expected_steps:
+      step_was_run = False
+      for result_tuple in self.step_list:
+        if result_tuple[0] == step:
+          step_was_run = True
+          break
+      if not step_was_run:
+        self.step_list.append(self.StepResultTuple(step, False, [self.ErrorResultTuple(self.std_out + "\nThe step was not run.", "")]))
+    # And finally save potential error step tuples, we put them at the start of the list.
+    if (self.errors > 0):
+      self.step_list.insert(0, self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest returned errors", self.std_err)]))
+      self.success = False
+    elif not self.terminates_ok:
+      self.step_list.insert(0, self.StepResultTuple("", False, [self.ErrorResultTuple(self.std_out + "\nTest didn't finish successfully (crashed, froze, or was otherwise interrupted.)", self.std_err)]))
+      self.success = False
+    
