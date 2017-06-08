@@ -40,10 +40,18 @@ ul > .Category_Item { position:relative; margin-left: 20px;}
   padding: 5px;
   margin: 5px;
 }
+
+.TestCase {
+  clear:both;
+}
+
 .TestCase:hover{
   background-color: hsla(195,53%,79%, 0.45);  
 }
 
+a {
+  color: hsl(269, 52%, 13%);
+}
 .stdout_div {
   position:relative; margin-left: 20px;
   width: 400px;

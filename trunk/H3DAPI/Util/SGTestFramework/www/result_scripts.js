@@ -72,7 +72,10 @@ var hash_server = decodeURI(location.hash.substr(location.hash.indexOf('server='
 var hash_run = location.hash.substr(location.hash.indexOf('testrun=')).split('&')[0].split('=')[1];
 var hash_category = decodeURI(location.hash.substr(location.hash.indexOf('category=')).split('&')[0].split('=')[1]).replace(/--/g, ' ');
 var hash_case = decodeURI(location.hash.substr(location.hash.indexOf('case=')).split('&')[0].split('=')[1]);
-
+var open_cases = decodeURI(location.hash.substr(location.hash.indexOf('opencases=')).split('&')[0].split('=')[1]).split(',');
+if(open_cases[0] == "undefined") {
+  open_cases = [];
+}
 
 function getSelectedUnit() {
   if(display_options.properties.selected == "mean") {
@@ -646,18 +649,36 @@ function ConstructTestCases(model, target, path) {
         case_name.addClass("TestResult_name");
         
         if(hash_server == display_options.servers.current && hash_category.startsWith(path) && hash_case == model.testcases[i].name) {
-          $("input", $(target).parent()).prop("checked", true)
+          $("input", $(target).parent()).prop("checked", true);
+          if(open_cases.indexOf(model.testcases[i].id) < 0) {
+            open_cases.push(model.testcases[i].id);
+          }
         } else {
-          case_name.addClass("minimized");
+          if(open_cases.indexOf(model.testcases[i].id) > -1) {
+            $("input", $(target).parent()).prop("checked", true);
+          } else {
+            case_name.addClass("minimized");
+          }
         }
           
+        $(case_name).data("testcase", model.testcases[i]);
         case_name.click(function(){ // onclick function for toggling the presence of a minimized-class
           $(this).toggleClass("minimized");
+          var testcase = $(this).data("testcase");
+          if($(this).hasClass("minimized")) {
+            if(open_cases.indexOf(testcase.id) > -1) {
+              open_cases.splice(open_cases.indexOf(testcase.id), 1);
+            }
+          } else if(open_cases.indexOf(testcase.id) < 0){
+            open_cases.push(testcase.id);
+          }
+          window.location.hash = window.location.hash.split('#')[0] + encodeURI("#server=" + display_options.servers.current.replace(/ /g, '--') + "&testrun=" + display_options.testruns.selected + "&category=" + path.replace(/ /g, '--') + "&case=" + testcase.name)          
+          URLUpdateOpenCases();
         });
         
         var case_name_link = $("<a>");
         case_name_link.append("Case: " + model.testcases[i].name);
-        case_name_link.attr('href', encodeURI("#server=" + display_options.servers.current.replace(/ /g, '--') + "&testrun=" + display_options.testruns.selected + "&category=" + path.replace(/ /g, '--') + "&case=" + model.testcases[i].name));
+        //case_name_link.attr('href', );
         case_name.append(case_name_link);
         if(model.testcases[i].success == 'Y') {
           case_name.addClass("test_successful");
@@ -864,6 +885,7 @@ function GetServerList() {
                 $(".Selected_Server").removeClass('Selected_Server');
                 $(this).addClass('Selected_Server');
               window.location.hash = encodeURI("#server=" + display_options.servers.current.replace(/ /g, '--'));
+              open_cases = [];
           });
           if(hash_server == res[i].name) {
             SetServer($(div).data("server_id"), $(div).data("server_name"));
@@ -896,6 +918,7 @@ function OnTestRunClick(){
     window.location.hash = encodeURI("#server=" + display_options.servers.current.replace(/ /g, '--') + "&testrun=" + $(this).data("test_run_id"));
     hash_run = $(this).data("test_run_id");
   }
+  open_cases = [];
   SetTestRun($(this).data("test_run_id"));
   $(".Selected_TestRun").removeClass('Selected_TestRun');
   $(this).addClass('Selected_TestRun');
@@ -1179,3 +1202,10 @@ $(document).ready(function(){
 });
 
 
+
+function URLUpdateOpenCases() {
+  window.location.hash = window.location.hash.replace(/[&]opencases[=][0-9,]+/g, "");
+  if(open_cases.length > 0) {
+    window.location.hash = window.location.hash + "&opencases=" + open_cases.join();
+  }
+}
