@@ -79,6 +79,7 @@ parser.add_argument('--inject_at_end_of_scene', dest='inject_at_end_of_scene', h
 parser.add_argument('--simulationbasedir', dest='simulationbasedir', help='Path to the directory where the project that is being tested has its SimulationBase  python directory, this is required for using the settings testdef property.', default=None)
 parser.add_argument('--skipResultUpload', dest='skipResultUpload', action='store_true',help='Specifies if skip the uploading of result, this can be handy while doing simple test', default=False)
 parser.add_argument('--skipSvnInfoOutput', dest='skipSvnInfoOutput', action='store_true',help='Specifies if skip extracting svn info of x3d and script file used in for the test', default=False)
+parser.add_argument('--retentionTime', dest='retentionTime', help="How old test results are allowed to be (counted in days) before they are deleted automatically. If unspecified then no deletions will be made. If specified, will delete all test results and test runs that are older than [retentionTime] days before running all the tests. If it is not greater than 1 then no deletion will be done.", default=-1)
 args = parser.parse_known_args()[0]
 
 
@@ -601,7 +602,10 @@ class TestCaseRunner ( object ):
         print("Failed to obtain server id from db")
         return
       self.server_id = res[0]
-
+    
+    if args.retentionTime > 1:
+      self.DeleteOldResults(args.retentionTime)
+    
     all_tests_successful = True
     all_tests_run = True
     
@@ -672,9 +676,30 @@ class TestCaseRunner ( object ):
         print(str(e))        
         
         
-  def UploadResultsToSQL(self, testCase, case_results, output_dir, testfile_description):
+  def DeleteOldResults(self, retentionTime):
+    if retentionTime <= 1:
+      print "Retention Time too low, needs to be greater than 1."
+      return
+      
     self.ConnectDB()
-    print "Uploading results."
+    curs = self.db.cursor()
+    
+    curs.execute("SELECT id FROM test_runs WHERE timestamp < (CURRENT_DATE - interval " + str(retentionTime) + " day)")
+    res = curs.fetchall()
+    if len(res) > 0:
+      print("found " + str(len(res)) + " test runs that were older than " + str(retentionTime) + " days, deleting them now...")
+      for row in res:
+        curs.execute("DELETE FROM error_results WHERE test_run_id = %d;" % row[0])
+        curs.execute("DELETE FROM custom_results WHERE test_run_id = %d;" % row[0])
+        curs.execute("DELETE FROM rendering_results WHERE test_run_id = %d;" % row[0])
+        curs.execute("DELETE FROM performance_result_data WHERE performance_result_id in (SELECT id FROM performance_results WHERE test_run_id = %d);" % row[0])
+        curs.execute("DELETE FROM performance_results WHERE test_run_id = %d;" % row[0])
+        curs.execute("DELETE FROM test_runs WHERE id = %d" % row[0])
+    
+    
+  def UploadResultsToSQL(self, testCase, case_results, output_dir, testfile_description):
+    print "Uploading results for " + testCase.filename
+    self.ConnectDB()
     curs = self.db.cursor()
     
     # fetch the optional test_description.txt file from the directory
