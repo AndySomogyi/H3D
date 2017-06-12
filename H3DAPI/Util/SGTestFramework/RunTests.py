@@ -79,7 +79,7 @@ parser.add_argument('--inject_at_end_of_scene', dest='inject_at_end_of_scene', h
 parser.add_argument('--simulationbasedir', dest='simulationbasedir', help='Path to the directory where the project that is being tested has its SimulationBase  python directory, this is required for using the settings testdef property.', default=None)
 parser.add_argument('--skipResultUpload', dest='skipResultUpload', action='store_true',help='Specifies if skip the uploading of result, this can be handy while doing simple test', default=False)
 parser.add_argument('--skipSvnInfoOutput', dest='skipSvnInfoOutput', action='store_true',help='Specifies if skip extracting svn info of x3d and script file used in for the test', default=False)
-parser.add_argument('--retentionTime', dest='retentionTime', help="How old test results are allowed to be (counted in days) before they are deleted automatically. If unspecified then no deletions will be made. If specified, will delete all test results and test runs that are older than [retentionTime] days before running all the tests. If it is not greater than 1 then no deletion will be done.", default=-1)
+parser.add_argument('--retentionTime', type=int, dest='retentionTime', help="How old test results are allowed to be (counted in days) before they are deleted automatically. If unspecified then no deletions will be made. If specified, will delete all test results and test runs that are older than [retentionTime] days before running all the tests. If it is not greater than 1 then no deletion will be done.", default=-1)
 args = parser.parse_known_args()[0]
 
 
