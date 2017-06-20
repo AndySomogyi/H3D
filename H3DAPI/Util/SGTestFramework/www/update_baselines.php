@@ -35,17 +35,6 @@ function do_svn_command($command) {
   return $svn_output;
 }
 
-$has_valid_svn_path = false;
-
-for($i = 0; $i < count($svnpaths); ++$i) {
-  if(is_bool(strpos(do_svn_command("info " . $svnpaths[$i]), '(Not a valid URL)'))) {
-    $has_valid_svn_path = true;
-  }
-}
-if(!$has_valid_svn_path) {
-    echo "No valid svn paths in \$svn_paths, check server configuration";
-    exit;
-}
 
 // since svn commands are case-sensitive, we have a function that tests the four most likely capitalizations of .TestDef, just to be extra sure we won't get problems with it later.
 // returns an empty string if no matching case was found, which also could mean that the provided svnpath is invalid.
@@ -213,6 +202,24 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
 
 // Now to actually do everything!
 
+// Get the commit message
+$commit_message = $_POST['commit_message'];
+
+// Check that we have a valid svn path configured
+$has_valid_svn_path = false;
+
+for($i = 0; $i < count($svnpaths); ++$i) {
+  if(is_bool(strpos(do_svn_command("info " . $svnpaths[$i]), '(Not a valid URL)'))) {
+    $has_valid_svn_path = true;
+  }
+}
+if(!$has_valid_svn_path) {
+    echo "No valid svn paths in \$svn_paths, check server configuration";
+    exit;
+}
+
+
+
 // Doing an svn revert jut to be extra sure that our working copy is clean
 do_svn_command('revert -R temp/');
 
@@ -228,8 +235,17 @@ for($i = 0; $i < count($cases_to_update); ++$i) {
 }
 
 $folder_keys = array_keys($folders_to_commit);
+$user = "<LDAP auth not enabled for this result page>";
+if(array_key_exists('PHP_AUTH_USER', $_SERVER)) {
+  $user = $_SERVER['PHP_AUTH_USER'];
+}
 foreach($folder_keys as $folder) {
-  do_svn_command("commit temp/" . $folder . ' -m "User ' . $_SERVER['PHP_AUTH_USER'] . ' updating ' . $folders_to_commit[$folder] . ' baseline(s) from web UI"');
+  if(file_exists("commit_message.txt")) {
+    unlink("commit_message.txt");
+  }
+  $commit_message_file = fopen("commit_message.txt", "w");
+  fwrite($commit_message_file, "Commit from " . $user . ":" . PHP_EOL . $commit_message . PHP_EOL . "Updated " . $folders_to_commit[$folder] . " baseline(s) from web UI");
+  do_svn_command("commit temp/" . $folder . " -F commit_message.txt");
   echo "Committed " . $folders_to_commit[$folder] . " file(s) to " . $folder . "</br>";
 }
 ?>
