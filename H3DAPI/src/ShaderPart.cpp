@@ -278,18 +278,6 @@ bool ShaderPart::SFShaderString::doFullRebuild() {
   return hasCausedEvent(shader_part->url) || hasCausedEvent(shader_part->forceReload);
 }
 
-void ShaderPart::SFShaderString::upToDate() {
-  bool have_event = (event.ptr != NULL);
-  TypedField< EventCollectingField< SFString >,
-    Types<MFString, SFBool>, AnyNumber< Field > >::upToDate();
-  if(have_event) {
-    ShaderPart *shader_part = static_cast<ShaderPart *>(getOwner());
-    if(value != "") {
-      value = shader_part->preProcess(value, shader_part->getURLUsed());
-    }
-  }
-}
-
 void ShaderPart::SFShaderString::update() {
   //PROFILE_START("shaderpart: update");
 
@@ -331,6 +319,10 @@ void ShaderPart::SFShaderString::update() {
 
   if(shader_part->type->getValue() == "GEOMETRY"||shader_part->type->getValue() == "FRAGMENT") {
     shader_part->updateSinglePassStereoValues(value);
+  }
+
+  if(value != "") {
+    value = shader_part->preProcess(value, shader_part->getURLUsed());
   }
 
   //PROFILE_END();
