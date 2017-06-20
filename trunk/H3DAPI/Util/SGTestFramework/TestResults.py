@@ -132,7 +132,8 @@ class TestResults ( object ):
         error.append("WARNING: Image comparison not available! Probably Imagemagick is not installed, or not in the path, or one of the following files do not exist:\n" +
                      "baseline: %s\noutput:%s\n" % (baseline_path,rendering_path) +
                      "Or the following file could not be created:\n" +
-                     "diff: %s" % (os.path.split(rendering_path)[0] + '/diff_' + os.path.split(rendering_path)[1]))
+                     "diff: %s" % (os.path.split(rendering_path)[0] + '/diff_' + os.path.split(rendering_path)[1]) + "\n" +
+                     "Error was: " + str(E))
         process= None
 
       if process:
@@ -227,7 +228,15 @@ class TestResults ( object ):
           results.append(res)
           if len(render_error) > 0:
             results.append(self.ErrorResultTuple('Error when rendering validation for ' + screenshot_path + ':' + "\n".join(render_error), ''))
-          
+        elif line == 'image':
+          # Image format: One line that says image, one line with output image path, one line with fuzz and threshold, separated by a comma
+          image_path = self.getNextLine(f)
+          fuzz, threshold = self.getNextLine(f).split(',')
+          res, render_error = self.getRenderingResult(baseline_folder + '\\' + os.path.split(image_path)[1], image_path, int(fuzz), int(threshold))
+          success = success and res.success
+          results.append(res)
+          if len(render_error) > 0:
+            results.append(self.ErrorResultTuple('Error when validating image for ' + image_path + ':' + "\n".join(render_error), ''))
         elif line == 'performance_start':
           # Performance format: One line that says performance, one line with all framerate samples, separated by space
           line = self.getNextLine(f)
