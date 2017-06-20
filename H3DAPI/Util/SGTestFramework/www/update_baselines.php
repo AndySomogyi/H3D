@@ -192,7 +192,7 @@ function UpdateBaseline($test_run_id, $test_case_id, $test_step_id, $test_file_i
     if(!array_key_exists($active_svn_top_folder_name . $baseline_path, $folders_to_commit)) {
       $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = 1;
     } else {
-      $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = $folders_to_commit[$baseline_path] + 1;
+      $folders_to_commit[$active_svn_top_folder_name . $baseline_path] = $folders_to_commit[$active_svn_top_folder_name . $baseline_path] + 1;
     }
   }
 
