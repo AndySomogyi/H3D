@@ -329,7 +329,12 @@ class TestCaseRunner ( object ):
               script_file.close()
               for item in tree.body:
                 if isinstance(item, ast.FunctionDef) and 'decorator_list' in item._fields:
-                  test_case.expected_steps.append(item.name)
+                  for decorator in item.decorator_list:
+                    try:
+                      if decorator.func.id in ['custom', 'console', 'screenshot', 'image', 'performance']:
+                        test_case.expected_steps.append(item.name)
+                    except:
+                      pass
           except Exception as e:
             pass
         
