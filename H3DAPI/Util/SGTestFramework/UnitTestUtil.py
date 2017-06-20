@@ -36,6 +36,34 @@ def screenshot(start_time = None, run_time = None, time_source = None, absolute_
     return func
   return _screenshot
 
+def image(start_time = None, run_time = None, time_source = None, absolute_time = None, image_name = None, fuzz=5, threshold=20):
+  def _image(func):
+    def init(testHelper, validator, validation_output_file):
+      pass
+
+    def post(testHelper, validator, validation_output_file):
+      try:
+        image_name = validator['image_name']
+        filename = os.path.abspath(os.path.join(testHelper.output_file_prefix, image_name).replace('\\', '/'))
+    #    pp.pprint("saving to " + self.validation_file)
+        f = open(validation_output_file, 'a')
+        f.write('image\n')
+        f.write(filename + '\n')
+        f.write(str(fuzz) + ',' + str(threshold))
+        f.flush()
+        f.close()
+      except Exception as e:
+        if str(e) != '':
+          print(str(e))   
+    
+    if not hasattr(func, 'validation'):
+      func.validation = []
+
+    func.validation.append({'type': 'image', 'step_name' : func.__name__, 'init' :  init, 'post' : post, 'start_time' : start_time, "run_time" : run_time, "time_source" : time_source, "absolute_time" : absolute_time, 'image_name' : image_name, 'fuzz' : fuzz, 'threshold' : threshold})
+    return func
+  return _image
+
+
 
 def performance(start_time = None, run_time = None, time_source = None, absolute_time = None):
   class FramerateCounter( AutoUpdate( SFFloat ) ):
