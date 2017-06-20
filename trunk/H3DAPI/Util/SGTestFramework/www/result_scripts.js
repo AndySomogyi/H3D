@@ -1105,31 +1105,44 @@ function SetTestRun(test_run_id) {
           
     $('#Operations_Update_Baselines').unbind().click(function() {
       var cases = [];
-      $('#baseline_result_span').html('Updating, please wait...');
-      $('#baseline_loading_spinner_container').show();
-      var checkboxes = $('.baselineUpdateCheckbox:checked');
-      for(var i = 0; i < checkboxes.length; ++i) {
-        var data = $(checkboxes[i]).data('model');
-        cases.push({'file_id': data.file_id,
-                   'case_id': data.case_id,
-                   'step_id': data.step_id,
-                   'validation_type' : data.result_type});
+      var commit_message = "";
+      while (commit_message == "") {
+        commit_message = prompt("Please enter a commit message describing the update.");
+        if(commit_message == "") {
+          alert("Please do not enter an empty commit message!");
+        }
       }
-      $.ajax({
-          type: 'POST',
-          url: 'update_baselines.php?test_run_id=' + test_run_id,
-          data: {'data' : JSON.stringify({cases}) },
-          success: function(data) {            
-            $('#baseline_loading_spinner_container').hide();
-            $('#baseline_result_span').html(data);
-          },
-          error: function(data) {
-            $('#baseline_loading_spinner_container').hide();
-            $('#baseline_result_span').html('Error when submitting command: ' + data.responseText);
-          },
-          async: true
-      });      
-      
+      if(commit_message == null) {
+        alert("No baseline update was done.");
+      } else {
+        $('#baseline_result_span').html('Updating, please wait...');
+        $('#baseline_loading_spinner_container').show();
+        var checkboxes = $('.baselineUpdateCheckbox:checked');
+        for(var i = 0; i < checkboxes.length; ++i) {
+          var data = $(checkboxes[i]).data('model');
+          cases.push({'file_id': data.file_id,
+                     'case_id': data.case_id,
+                     'step_id': data.step_id,
+                     'validation_type' : data.result_type});
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'update_baselines.php?test_run_id=' + test_run_id,
+            data: {
+              'data' : JSON.stringify({cases}),
+              'commit_message' : commit_message  
+            },
+            success: function(data) {            
+              $('#baseline_loading_spinner_container').hide();
+              $('#baseline_result_span').html(data);
+            },
+            error: function(data) {
+              $('#baseline_loading_spinner_container').hide();
+              $('#baseline_result_span').html('Error when submitting command: ' + data.responseText);
+            },
+            async: true
+        });      
+      }
     });
     
     // Set up the toggle buttons.
