@@ -236,7 +236,7 @@ for($i = 0; $i < count($cases_to_update); ++$i) {
 
 $folder_keys = array_keys($folders_to_commit);
 $user = "<LDAP auth not enabled for this result page>";
-if(array_key_exists('PHP_AUTH_USER', $_SERVER)) {
+if(isset($_SERVER['PHP_AUTH_USER'])) {
   $user = $_SERVER['PHP_AUTH_USER'];
 }
 foreach($folder_keys as $folder) {
