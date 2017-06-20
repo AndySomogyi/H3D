@@ -81,11 +81,6 @@ namespace H3D {
     /// Update the string to use as shader depending from the urls given.
     class H3DAPI_API SFShaderString : public TypedField< EventCollectingField< SFString >, 
       Types<MFString,SFBool>, AnyNumber< Field > > {
-    public:
-      /// Check that the field is up-to-date, if not update() is called 
-      /// to make it up-to-date. Specialized here to apply the preProcess function
-      /// on the resulting shader string.
-      virtual void upToDate();
     protected:
       virtual void update();
 
